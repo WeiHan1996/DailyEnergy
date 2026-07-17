@@ -44,6 +44,14 @@
 
 只有用户或明确授权的项目决策者可以把 Draft 或 Proposed 变为 Accepted。
 
+### 项目控制文档
+
+- **Draft**：新建或重大改版，等待审核；
+- **Active**：当前生效并持续维护；
+- **Archived**：不再用于当前工作，仅保留历史。
+
+ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks 属于持续变化的控制文件，审核后使用 Active。
+
 ## 3. 冲突优先级
 
 发生冲突时按以下顺序处理：
