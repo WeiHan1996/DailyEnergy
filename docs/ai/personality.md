@@ -1,8 +1,8 @@
 # DailyEnergy 数字朋友人格手册
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
 - **所属阶段**：Phase 0 — Blueprint
-- **最后更新**：2026-07-15
+- **最后更新**：2026-07-17
 - **适用范围**：产品文案、AI Prompt、内容模板、设计、运营、审核与测试
 - **上游文档**：[产品愿景](../product/vision.md)、[首批用户画像](../product/persona.md)、[MVP 用户旅程](../product/journey.md)、[第一阶段 MVP](../product/mvp.md)
 
