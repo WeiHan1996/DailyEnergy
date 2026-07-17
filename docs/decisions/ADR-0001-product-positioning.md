@@ -1,7 +1,8 @@
 # ADR-0001：DailyEnergy 定位为日常陪伴产品，而非算命工具
 
-- **状态**：Proposed
+- **状态**：Accepted
 - **日期**：2026-07-15
+- **接受日期**：2026-07-17
 - **决策范围**：产品定位、品牌、功能、AI、数据、增长与商业化
 - **决策所有者**：DailyEnergy 项目
 - **相关文档**：[产品愿景](../product/vision.md)、[首批用户画像](../product/persona.md)、[MVP 用户旅程](../product/journey.md)、[第一阶段 MVP](../product/mvp.md)、[数字朋友人格手册](../ai/personality.md)
