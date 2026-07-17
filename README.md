@@ -211,6 +211,8 @@ AI 模型不会从小程序端直接调用。所有供应商接入统一经过 A
 ```text
 daily-energy/
 ├── README.md
+├── AGENTS.md               # AI 与开发协作规则
+├── ROADMAP.md              # 长期路线图与阶段门槛
 ├── apps/
 │   ├── miniapp/              # 微信原生小程序
 │   ├── api/                  # NestJS 业务后端
@@ -224,6 +226,7 @@ daily-energy/
 │   ├── schema.prisma
 │   └── migrations/
 ├── docs/
+│   ├── INDEX.md             # 文档索引与状态
 │   ├── product/              # 愿景、原则、用户、旅程、MVP
 │   ├── ai/                   # 人设、记忆、Prompt、安全
 │   ├── technical/            # 架构、数据库、API、部署
@@ -342,19 +345,26 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 ## 当前状态
 
 ```text
-阶段：Blueprint Design
-状态：产品与技术方向已形成初步共识，尚未开始编码
-当前目标：完成项目文档体系，建立可供 AI 持续开发的唯一真相来源
+阶段：Phase 0B — 开发前详细规格
+状态：Phase 0A 产品基线已完成，尚未开始业务编码
+当前目标：完成页面、状态、Schema、AI、数据、API、指标和工程规范
+当前任务：S-02 信息架构与页面地图
 ```
 
-建议接下来依次完成：
+长期工作入口：
 
-1. `docs/product/vision.md`：产品愿景与边界；
-2. `docs/product/persona.md`：首批目标用户画像；
-3. `docs/product/journey.md`：首次使用与连续 7 天旅程；
-4. `docs/product/mvp.md`：MVP 功能与验收标准；
-5. `docs/ai/personality.md`：数字朋友的人格手册；
-6. `docs/decisions/ADR-0001-product-positioning.md`：为什么是陪伴产品，而不是算命工具。
+1. [ROADMAP.md](./ROADMAP.md)：长期阶段、交付物和退出门槛；
+2. [docs/INDEX.md](./docs/INDEX.md)：文档依赖、状态和读取顺序；
+3. [tasks/current.md](./tasks/current.md)：唯一正在执行的任务；
+4. [tasks/backlog.md](./tasks/backlog.md)：有序候选任务；
+5. [AGENTS.md](./AGENTS.md)：AI 与开发协作规则。
+
+当前任务只完成：
+
+- `docs/design/information-architecture.md`；
+- `docs/design/screen-inventory.md`。
+
+完成并接受 S-02 后，才进入 S-03 交互状态与页面规格。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 
