@@ -1,5 +1,9 @@
 # DailyEnergy Agent Instructions
 
+- **Status**: Draft
+- **Last updated**: 2026-07-17
+- **Scope**: Entire repository
+
 These instructions apply to the entire repository.
 
 ## 1. Start every task by restoring context
