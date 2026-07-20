@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
-- **文档状态**：Draft
-- **最后更新**：2026-07-17
+- **文档状态**：Active
+- **最后更新**：2026-07-20
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -72,11 +72,11 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | 文件 | 状态 | 作用 | 更新时机 |
 |---|---|---|---|
 | [README.md](../README.md) | Active | 项目入口、定位和当前状态 | 阶段或入口变化 |
-| [ROADMAP.md](../ROADMAP.md) | Draft | 长期阶段、交付物和退出门槛 | 里程碑或重大计划变化 |
-| [AGENTS.md](../AGENTS.md) | Draft | AI 与开发协作规则 | 工作方式变化 |
-| [docs/INDEX.md](./INDEX.md) | Draft | 文档状态和依赖索引 | 文档新增、接受或取代 |
-| [tasks/current.md](../tasks/current.md) | Draft | 唯一当前任务和交接状态 | 每个任务开始、进展和完成 |
-| [tasks/backlog.md](../tasks/backlog.md) | Draft | 有序候选任务 | 计划、优先级和依赖变化 |
+| [ROADMAP.md](../ROADMAP.md) | Accepted | 长期阶段、交付物和退出门槛 | 里程碑或重大计划变化 |
+| [AGENTS.md](../AGENTS.md) | Active | AI 与开发协作规则 | 工作方式变化 |
+| [docs/INDEX.md](./INDEX.md) | Active | 文档状态和依赖索引 | 文档新增、接受或取代 |
+| [tasks/current.md](../tasks/current.md) | Active | 唯一当前任务和交接状态 | 每个任务开始、进展和完成 |
+| [tasks/backlog.md](../tasks/backlog.md) | Active | 有序候选任务 | 计划、优先级和依赖变化 |
 
 这些文件负责控制项目，不取代产品和技术规范。
 
