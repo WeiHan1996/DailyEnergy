@@ -1,7 +1,7 @@
 # DailyEnergy Agent Instructions
 
-- **Status**: Draft
-- **Last updated**: 2026-07-17
+- **Status**: Active
+- **Last updated**: 2026-07-20
 - **Scope**: Entire repository
 
 These instructions apply to the entire repository.
