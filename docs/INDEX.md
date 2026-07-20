@@ -115,7 +115,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
 | [docs/product/state-machine.md](./product/state-machine.md) | Accepted | 用户、关系和每日体验状态 | journey、mvp |
-| docs/product/business-rules.md | Planned | 点亮、中断、跨日、提醒和删除规则 | state-machine |
+| [docs/product/business-rules.md](./product/business-rules.md) | Accepted | 点亮、中断、跨日、提醒和删除规则 | state-machine |
 | docs/ai/daily-content-schema.md | Planned | 今日结构化结果和 AI 输出契约 | mvp、personality |
 | docs/ai/evening-feedback-schema.md | Planned | 晚间反馈输入和输出 | journey、mvp |
 | docs/ai/weekly-summary-schema.md | Planned | 七天趋势和总结契约 | daily-content、feedback |
@@ -224,7 +224,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一执行任务是 S-06 点亮、跨日、中断与通知业务规则。开始该任务时读取：
+当前唯一执行任务是 S-07 今日内容 Schema。开始该任务时读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -244,6 +244,7 @@ Phase 1 开始后逐步增加：
 16. docs/design/content-layout.md；
 17. docs/design/prototype-validation.md；
 18. prototype/s04/README.md；
-19. docs/product/state-machine.md。
+19. docs/product/state-machine.md；
+20. docs/product/business-rules.md。
 
-完成后更新本文，将 business-rules 从 Draft 调整为 Accepted，并把唯一当前任务切换到 S-07。
+完成后更新本文，将 daily-content-schema 从 Draft 调整为 Accepted，并把唯一当前任务切换到 S-08。
