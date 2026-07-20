@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-06
 - **当前任务名称**：点亮、跨日、中断与通知业务规则
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **优先级**：最高
 - **代码工作**：禁止，当前只做产品业务规则规范
-- **当前分支**：未创建
-- **关联 PR**：无
+- **当前分支**：`agent/pointlight-crossday-notification-rules`
+- **关联 PR**：待创建
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -208,7 +208,7 @@ S-06 被接受后，下一任务为：
 - PR #8 等待接受收尾与合并；
 - 当前没有业务代码；
 - 当前没有阻塞项；
-- 下一操作：合并 PR #8 后创建 S-06 分支并开始 docs/product/business-rules.md；
+- 下一操作：编写并验证 docs/product/business-rules.md，完成后创建 Draft PR；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
 ## 12. 状态更新规则
