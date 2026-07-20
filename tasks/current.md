@@ -5,10 +5,10 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-08
 - **当前任务名称**：晚间反馈与七天总结 Schema
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **优先级**：最高
 - **代码工作**：禁止，当前只做文档级真实记录与总结契约
-- **当前分支**：待创建
+- **当前分支**：`agent/evening-weekly-schema`
 - **关联 PR**：待创建
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
@@ -232,12 +232,12 @@ S-08 被接受后，下一任务为：
 ## 11. 最近一次交接
 
 - 日期：2026-07-20；
-- S-07 已经用户确认，今日内容 Schema 已更新为 Accepted；
-- PR #10 等待 ready、squash 合并和 main 验证；
-- S-08 已设为唯一 Ready 任务；
+- PR #10 已 squash 合并到 main（`a520f96`）；
+- S-07 今日内容 Schema 已验证为 Accepted；
+- S-08 已在分支 `agent/evening-weekly-schema` 开始，状态为 In Progress；
 - 当前没有业务代码；
 - 当前没有阻塞项；
-- 下一操作：合并 PR #10 后创建 S-08 分支并将任务改为 In Progress；
+- 下一操作：读取已接受上游，编写并验证晚间反馈与七天总结两份 Schema；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
 ## 12. 状态更新规则
