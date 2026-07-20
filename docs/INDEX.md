@@ -116,7 +116,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 |---|---|---|---|
 | [docs/product/state-machine.md](./product/state-machine.md) | Accepted | 用户、关系和每日体验状态 | journey、mvp |
 | [docs/product/business-rules.md](./product/business-rules.md) | Accepted | 点亮、中断、跨日、提醒和删除规则 | state-machine |
-| docs/ai/daily-content-schema.md | Planned | 今日结构化结果和 AI 输出契约 | mvp、personality |
+| [docs/ai/daily-content-schema.md](./ai/daily-content-schema.md) | Draft | 今日结构化结果和 AI 输出契约 | mvp、personality |
 | docs/ai/evening-feedback-schema.md | Planned | 晚间反馈输入和输出 | journey、mvp |
 | docs/ai/weekly-summary-schema.md | Planned | 七天趋势和总结契约 | daily-content、feedback |
 | packages/shared-schemas | Planned | 可执行 Zod Schema | 已接受 Schema 文档 |
