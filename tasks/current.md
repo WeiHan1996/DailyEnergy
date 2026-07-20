@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-04
 - **当前任务名称**：可点击原型与首次可用性测试
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：仅允许静态交互原型；禁止业务代码
 - **当前分支**：`agent/clickable-prototype-validation`
-- **关联 PR**：待创建
+- **关联 PR**：[#7](https://github.com/WeiHan1996/DailyEnergy/pull/7)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -191,9 +191,16 @@ S-04 被接受后，下一任务为：
 - 日期：2026-07-20；
 - S-03 已确认并接受；
 - 已接受页面规格、交互状态、内容布局和 15 个关键决策；
+- 已完成无需构建的 S-04 静态可点击原型；
+- 已完成 docs/design/prototype-validation.md、5～8 人测试计划和结果模板；
+- 已覆盖首次、回访、晚间、2/5/7 天、离线、降级、错误、删除与 Safety；
+- 已通过语法、HTML、CSS、DOM 路径、远端一致性与无外部写入检查；
 - 当前没有业务代码；
+- 尚未招募、联系或执行外部用户测试；
 - 当前没有阻塞项；
-- 下一操作：创建 S-04 原型分支并开始静态可点击原型；
+- 当前分支：agent/clickable-prototype-validation；
+- 当前 PR：[#7](https://github.com/WeiHan1996/DailyEnergy/pull/7)（Draft）；
+- 下一操作：审核并确认 PR #7；确认前不启动 S-05；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
 ## 11. 状态更新规则
