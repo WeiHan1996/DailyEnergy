@@ -102,8 +102,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
-| docs/design/information-architecture.md | Planned | 页面层级、入口和导航 | journey、mvp |
-| docs/design/screen-inventory.md | Planned | 页面、弹层、系统状态清单 | information-architecture |
+| docs/design/information-architecture.md | Accepted | 页面层级、入口和导航 | journey、mvp |
+| docs/design/screen-inventory.md | Accepted | 页面、弹层、系统状态清单 | information-architecture |
 | docs/design/screen-specs.md | Planned | 每页字段、操作和验收 | screen-inventory |
 | docs/design/interaction-states.md | Planned | 加载、失败、降级、权限和恢复 | screen-specs |
 | docs/design/content-layout.md | Planned | 今日内容、趋势和分享的信息层级 | personality、daily-content-schema |
@@ -224,7 +224,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一执行任务是信息架构与页面地图。开始该任务时读取：
+当前唯一执行任务是 S-03 交互状态与页面规格。开始该任务时读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -236,6 +236,8 @@ Phase 1 开始后逐步增加：
 8. docs/product/journey.md；
 9. docs/product/mvp.md；
 10. docs/ai/personality.md；
-11. docs/decisions/ADR-0001-product-positioning.md。
+11. docs/decisions/ADR-0001-product-positioning.md；
+12. docs/design/information-architecture.md；
+13. docs/design/screen-inventory.md。
 
-完成后更新本文，将相应文件从 Planned 调整为 Draft 或 Accepted。
+完成后更新本文，将 screen-specs、interaction-states 和 content-layout 从 Planned 调整为 Draft 或 Accepted。

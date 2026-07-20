@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-20
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-02 信息架构与页面地图](./current.md)
+- **当前任务**：[S-03 交互状态与页面规格](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -47,8 +47,8 @@
 | ID | 任务 | 状态 | 主要交付 | 依赖 |
 |---|---|---|---|---|
 | S-01 | 长期路线图和项目控制系统 | Done | ROADMAP、INDEX、AGENTS、tasks、README | Phase 0A |
-| S-02 | 信息架构与页面地图 | Ready | information-architecture、screen-inventory | S-01 |
-| S-03 | 交互状态与页面规格 | Planned | screen-specs、interaction-states、content-layout | S-02 |
+| S-02 | 信息架构与页面地图 | Done | information-architecture、screen-inventory | S-01 |
+| S-03 | 交互状态与页面规格 | Ready | screen-specs、interaction-states、content-layout | S-02 |
 | S-04 | 可点击原型与首次可用性测试 | Planned | prototype、5～8 人测试报告 | S-03 |
 
 ### 业务状态与内容契约
