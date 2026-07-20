@@ -1,0 +1,38 @@
+{
+  "name": "@daily-energy/shared-schemas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Executable DailyEnergy runtime contracts and inferred TypeScript types.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./json-schema": {
+      "types": "./dist/json-schema.d.ts",
+      "import": "./dist/json-schema.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.check.json",
+    "test": "vitest run",
+    "format:check": "prettier --check .",
+    "validate": "npm run format:check && npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.5",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}

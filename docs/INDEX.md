@@ -119,7 +119,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/ai/daily-content-schema.md](./ai/daily-content-schema.md) | Accepted | 今日结构化结果和 AI 输出契约 | mvp、personality |
 | [docs/ai/evening-feedback-schema.md](./ai/evening-feedback-schema.md) | Accepted | 晚间反馈输入和输出 | journey、mvp |
 | [docs/ai/weekly-summary-schema.md](./ai/weekly-summary-schema.md) | Accepted | 七天趋势和总结契约 | daily-content、feedback |
-| packages/shared-schemas | Planned | 可执行 Zod Schema | 已接受 Schema 文档 |
+| [packages/shared-schemas](../packages/shared-schemas/README.md) | Accepted | 可执行 Zod Schema | 已接受 Schema 文档 |
 
 ### 7.3 稳定生成与 AI
 
@@ -224,7 +224,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一执行任务是 S-09 共享 Schema 草案。开始该任务时读取：
+当前唯一执行任务是 S-10 稳定种子与产品日期决策。开始该任务时读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -236,13 +236,12 @@ Phase 1 开始后逐步增加：
 8. docs/product/journey.md；
 9. docs/product/mvp.md；
 10. docs/ai/personality.md；
-11. docs/product/state-machine.md；
-12. docs/product/business-rules.md；
-13. docs/design/screen-specs.md；
-14. docs/design/interaction-states.md；
-15. docs/design/content-layout.md；
-16. docs/ai/daily-content-schema.md；
-17. docs/ai/evening-feedback-schema.md；
-18. docs/ai/weekly-summary-schema.md。
+11. docs/decisions/ADR-0001-product-positioning.md；
+12. docs/product/state-machine.md；
+13. docs/product/business-rules.md；
+14. docs/ai/daily-content-schema.md；
+15. docs/ai/evening-feedback-schema.md；
+16. docs/ai/weekly-summary-schema.md；
+17. packages/shared-schemas/README.md。
 
-完成后更新本文，将 packages/shared-schemas 从 Draft 调整为 Accepted，并把唯一当前任务切换到 S-10。
+完成后更新本文，将 ADR-0002 从 Draft 调整为 Accepted，并把唯一当前任务切换到 S-11。
