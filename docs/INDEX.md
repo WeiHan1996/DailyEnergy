@@ -117,8 +117,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/product/state-machine.md](./product/state-machine.md) | Accepted | 用户、关系和每日体验状态 | journey、mvp |
 | [docs/product/business-rules.md](./product/business-rules.md) | Accepted | 点亮、中断、跨日、提醒和删除规则 | state-machine |
 | [docs/ai/daily-content-schema.md](./ai/daily-content-schema.md) | Accepted | 今日结构化结果和 AI 输出契约 | mvp、personality |
-| docs/ai/evening-feedback-schema.md | Planned | 晚间反馈输入和输出 | journey、mvp |
-| docs/ai/weekly-summary-schema.md | Planned | 七天趋势和总结契约 | daily-content、feedback |
+| [docs/ai/evening-feedback-schema.md](./ai/evening-feedback-schema.md) | Accepted | 晚间反馈输入和输出 | journey、mvp |
+| [docs/ai/weekly-summary-schema.md](./ai/weekly-summary-schema.md) | Accepted | 七天趋势和总结契约 | daily-content、feedback |
 | packages/shared-schemas | Planned | 可执行 Zod Schema | 已接受 Schema 文档 |
 
 ### 7.3 稳定生成与 AI
@@ -224,7 +224,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一执行任务是 S-08 晚间反馈与七天总结 Schema。开始该任务时读取：
+当前唯一执行任务是 S-09 共享 Schema 草案。开始该任务时读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -236,16 +236,13 @@ Phase 1 开始后逐步增加：
 8. docs/product/journey.md；
 9. docs/product/mvp.md；
 10. docs/ai/personality.md；
-11. docs/decisions/ADR-0001-product-positioning.md；
-12. docs/design/information-architecture.md；
-13. docs/design/screen-inventory.md；
-14. docs/design/screen-specs.md；
-15. docs/design/interaction-states.md；
-16. docs/design/content-layout.md；
-17. docs/design/prototype-validation.md；
-18. prototype/s04/README.md；
-19. docs/product/state-machine.md；
-20. docs/product/business-rules.md；
-21. docs/ai/daily-content-schema.md。
+11. docs/product/state-machine.md；
+12. docs/product/business-rules.md；
+13. docs/design/screen-specs.md；
+14. docs/design/interaction-states.md；
+15. docs/design/content-layout.md；
+16. docs/ai/daily-content-schema.md；
+17. docs/ai/evening-feedback-schema.md；
+18. docs/ai/weekly-summary-schema.md。
 
-完成后更新本文，将 evening-feedback-schema 与 weekly-summary-schema 从 Draft 调整为 Accepted，并把唯一当前任务切换到 S-09。
+完成后更新本文，将 packages/shared-schemas 从 Draft 调整为 Accepted，并把唯一当前任务切换到 S-10。

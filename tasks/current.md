@@ -3,11 +3,11 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-20
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务 ID**：S-08
-- **当前任务名称**：晚间反馈与七天总结 Schema
+- **当前任务 ID**：S-09
+- **当前任务名称**：共享 Schema 草案
 - **任务状态**：Ready
 - **优先级**：最高
-- **代码工作**：禁止，当前只做文档级真实记录与总结契约
+- **代码工作**：允许，但只限可执行共享 Schema、类型、示例与契约测试
 - **当前分支**：待创建
 - **关联 PR**：待创建
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
@@ -16,64 +16,35 @@
 
 ## 1. 当前目标
 
-把已接受的产品状态机、业务规则、用户旅程、内容布局和今日内容 Schema 转换为两份唯一、可版本化、可校验的文档级契约：
+把三份已接受的文档级契约转换为一个自包含、可运行、可测试的 TypeScript + Zod 共享包：
 
-1. 晚间反馈：用户对当天真实状态和实际体验的结构化记录；
-2. 七天总结：只依据真实记录及明确缺失生成的趋势事实、总结表达和客户端安全视图。
+- [今日内容 Schema](../docs/ai/daily-content-schema.md)；
+- [晚间反馈 Schema](../docs/ai/evening-feedback-schema.md)；
+- [七天趋势与总结 Schema](../docs/ai/weekly-summary-schema.md)。
 
-本任务必须持续区分：
+本任务建立运行时校验、推断类型、JSON Schema 导出和契约测试，使后续规则引擎、AI Gateway、数据库、API、微信小程序与管理后台不能各自发明字段。
 
-- 用户真实反馈与娱乐性今日能量；
-- 用户提交事实、服务端派生事实与 AI 表达；
-- 本地草稿、已提交记录、修订历史与客户端视图；
-- 七天聚合事实、总结表达、内部发布对象与客户端视图；
-- 内容帮助度、任务状态、晚间反馈和关系节点；
-- 数据不足、真实缺失、服务降级与硬失败。
-
-本文不创建 Zod、TypeScript、JSON Schema、数据库、API、Prompt 或业务代码。
+本任务不是正式产品业务实现。不得创建页面、API 服务、数据库、规则算法、Prompt 或 AI 调用。
 
 ## 2. 必须交付
 
-### docs/ai/evening-feedback-schema.md
+### packages/shared-schemas
 
 至少包含：
 
-- 目的、适用范围、规范用语和术语；
-- 晚间入口资格、写入窗口与历史只读边界；
-- 本地草稿、提交命令、服务端记录、修订历史和客户端视图分层；
-- 记录身份、产品日期、Schema 版本、修订号和时间字段；
-- 用户真实状态字段、允许枚举、“说不准”、缺失和省略规则；
-- 是否记录主要行动/可选任务的实际体验，以及与既有行为状态的边界；
-- 内容帮助度与晚间反馈是否复用或引用，禁止重复事实；
-- 可选自由文本的长度、纯文本、最小化、隐私与 Safety 约束；
-- 首次提交、更正、并发冲突、重复提交、删除和历史读取；
-- Offline、本地草稿、跨日续写窗口和请求结果未知；
-- 客户端可见字段与内部审计字段；
-- null、空字符串、未知字段和版本兼容；
-- 正常、缺失、修订、删除、Safety 和错误示例；
-- 下游 Schema、数据库、API、前端、测试和埋点约束。
+- 独立 package.json；
+- TypeScript 配置；
+- src/common.ts：ID、日期、时间、版本、字符和纯文本约束；
+- src/daily-content.ts：今日输入、规则事实、表达、发布结果和客户端视图；
+- src/evening-feedback.ts：提交、patch、反馈记录和客户端视图；
+- src/weekly-summary.ts：源快照、聚合事实、表达、发布结果和客户端视图；
+- src/index.ts：稳定公共导出；
+- JSON Schema 导出入口或注册表；
+- 契约示例/fixtures；
+- 正向与负向测试；
+- README：边界、使用方式、版本和下游约束。
 
-### docs/ai/weekly-summary-schema.md
-
-至少包含：
-
-- 目的、适用范围、规范用语和术语；
-- 七天窗口的产品日期集合、时区依赖和总结身份；
-- 资格、最小数据量、数据不足和不可用状态；
-- 允许的源记录、禁止的娱乐分数及源依赖；
-- 缺失日、说不准、已删除日和部分字段缺失的聚合语义；
-- 聚合事实、趋势事实、AI/模板表达、内部发布结果和客户端视图分层；
-- 情绪、精力、睡眠、反馈、点亮或行动事实的安全聚合边界；
-- 样本量、分母、计数、分布和趋势标签；
-- 禁止因果推断、诊断、人格判断、绩效评价和确定性预测；
-- 总结文本字段、字符上限、纯文本和人格约束；
-- 高亮、温和观察、下一周轻行动与数据说明；
-- 主模型、备用模型、受控模板和数据不足模板的同构输出；
-- 记录更正/删除后的失效、重算、版本和历史策略；
-- 客户端安全视图、内部 provenance、源引用和隐私回退；
-- null、空数组、未知字段和版本兼容；
-- 完整、部分数据、无数据、删除和降级示例；
-- 下游 Schema、数据库、API、前端、测试和埋点约束。
+如果为了可维护性需要拆分更多文件，可以在 packages/shared-schemas 内进行，但不能建立未经决策的整个 Monorepo 骨架。
 
 ## 3. 上游必读文档
 
@@ -83,164 +54,200 @@
 2. [README.md](../README.md)；
 3. [ROADMAP.md](../ROADMAP.md)；
 4. [docs/INDEX.md](../docs/INDEX.md)；
-5. [产品愿景](../docs/product/vision.md)；
-6. [用户画像](../docs/product/persona.md)；
-7. [用户旅程](../docs/product/journey.md)；
-8. [第一阶段 MVP](../docs/product/mvp.md)；
-9. [人格手册](../docs/ai/personality.md)；
-10. [ADR-0001](../docs/decisions/ADR-0001-product-positioning.md)；
-11. [信息架构](../docs/design/information-architecture.md)；
-12. [页面清单](../docs/design/screen-inventory.md)；
-13. [页面规格](../docs/design/screen-specs.md)；
-14. [交互状态](../docs/design/interaction-states.md)；
-15. [内容布局](../docs/design/content-layout.md)；
-16. [原型验证方案](../docs/design/prototype-validation.md)；
-17. [原型说明](../prototype/s04/README.md)；
-18. [产品状态机](../docs/product/state-machine.md)；
-19. [业务规则](../docs/product/business-rules.md)；
-20. [今日内容 Schema](../docs/ai/daily-content-schema.md)。
+5. [产品状态机](../docs/product/state-machine.md)；
+6. [业务规则](../docs/product/business-rules.md)；
+7. [页面规格](../docs/design/screen-specs.md)；
+8. [交互状态](../docs/design/interaction-states.md)；
+9. [内容布局](../docs/design/content-layout.md)；
+10. [人格手册](../docs/ai/personality.md)；
+11. [今日内容 Schema](../docs/ai/daily-content-schema.md)；
+12. [晚间反馈 Schema](../docs/ai/evening-feedback-schema.md)；
+13. [七天趋势与总结 Schema](../docs/ai/weekly-summary-schema.md)。
 
 ## 4. 已接受且不得重开的决策
 
-- 真实签到、娱乐性今日能量、晚间反馈和用户行为是不同事实；
-- 晚间反馈只写入目标产品日期，不跨日误写到当前日期；
-- 历史写入窗口关闭后只读，不补填、不追责；
-- 边界前合法打开的 EVE-001 可以在有限续写窗口提交；
-- Offline 不自动排队提交，恢复后先读取权威状态；
-- 提交和更正使用修订语义，未知结果先查询；
-- DAY 删除使当日反馈、总结源引用和派生结果失效；
-- 七天趋势必须显示真实缺失，不用预测或娱乐分数填补；
-- 今日内容的五维 `pace / action / connection / resources / recovery` 是娱乐与行动参考，不能复用为用户真实状态；
-- AI 只能表达已经计算的聚合事实，不能创造用户状态、趋势、原因或记忆；
-- 已发布对象不使用 null 或空字符串，可选字段无值时省略；
-- AI/模板输出严格白名单，任一结构或 Safety 失败不能局部发布；
-- 客户端只接收显式安全视图，内部对象不得直接裁剪下发；
-- 重要源引用必须可追溯、可删除且不会留下幽灵引用；
-- 产品不提供医疗、投资、法律结论，也不做人格和工作能力评价；
-- 中断、缺失和低状态不降低关系，不制造羞耻或连续压力。
+- TypeScript 与 Zod 是共享运行时契约的默认技术；
+- 文档级契约仍是产品语义来源，可执行 Schema 不得缩小安全和隐私边界；
+- 所有外部输入使用严格对象，未知字段默认拒绝；
+- 已发布对象不接受 null、空字符串或占位值；
+- 日期归属使用 product_date，时间戳不能替代；
+- Unicode 展示字符按用户感知字符计数；
+- 生成文本是单行简体中文纯文本，不执行 Markdown、HTML、URL 或代码；
+- 规则事实、AI 表达、内部发布对象、客户端视图和行为状态是不同类型；
+- AI 不能修改稳定 ID、分数、档位、排序、行动或聚合事实；
+- 客户端内部对象必须显式白名单投影，不能通过黑名单裁剪；
+- 晚间反馈、帮助度和任务是独立权威事实；
+- 晚间 note 默认不进入 AI、周总结、日志和分析；
+- 七天窗口恰好七个连续产品日期，缺失日期不压缩、不补齐；
+- 每个状态指标 observed + unsure + missing 必须等于 7；
+- 1～2 个观察不能产生方向，UNSURE 不进入有序计算；
+- 更正或删除会失效依赖的周总结；
+- 主模型、备用模型和模板必须通过同一表达 Schema；
+- Safety/Schema 失败不能局部拼出普通内容。
 
-## 5. 必须固化的不变量
+## 5. 必须固化的可执行约束
 
-- 晚间记录只描述用户主动提交的真实事实；
-- “说不准”是有效值，不等于缺失、null 或系统失败；
-- 未提交、本地草稿、已提交、更正中和已删除不能混为一个状态；
-- 重复提交不能产生多份同日权威反馈；
-- 更正保留修订与审计边界，客户端只显示当前允许版本；
-- 自由文本不能成为结构化状态的隐藏替代品；
-- 七天窗口中的每个分母、样本量和缺失数可以解释；
-- 已删除或无授权数据不能继续影响任何总结文本；
-- AI 不计算计数、分布、趋势或下一步选择；
-- 数据不足必须直接承认，不用模板假装发现趋势；
-- 总结文本不能把相关性写成原因；
-- 模板与 AI 必须通过相同结构、长度和 Safety 校验；
-- 历史结果和重算策略必须显式，不静默改写用户曾看到的内容；
-- 行为状态变化不能反向改写当日晚间反馈；
-- S-08 的两份 Schema 可以无歧义转换为 S-09 可执行类型。
+### 通用
 
-## 6. 当前任务需推荐的决策
+- 对象默认 strict；
+- 枚举使用稳定 token，不接受显示文案；
+- opaque ID 非空、有明确上限且不包含空白控制字符；
+- product_date 必须是实际存在的 YYYY-MM-DD 日期；
+- RFC 3339 时间可解析且必须带时区；
+- semver 和版本 token 有边界；
+- 展示字符使用 Intl.Segmenter 或语义等价实现；
+- 禁止 null、空白字符串、换行、URL、HTML、Markdown 和文本 emoji 的字段明确实现；
+- 错误路径足够精确，可以定位到数组项或字段。
 
-S-08 需要在 PR 中显著列出推荐并说明权衡：
+### 今日内容
 
-1. 晚间反馈最终记录哪些真实字段及枚举；
-2. “说不准”、未回答、跳过和删除的不同语义；
-3. 晚间反馈是否包含自由文本，若包含则长度与用途；
-4. 内容帮助度是否只引用既有行为事实，还是在晚间记录中单独询问；
-5. 主要行动和可选任务的实际结果是否进入反馈记录；
-6. 首次提交、更正、冲突和重复提交的修订模型；
-7. 本地草稿是否持久化以及何时必须丢弃；
-8. 跨日续写窗口关闭后的提交与历史读取行为；
-9. 七天窗口是固定关系节点窗口、滚动七个产品日期还是版本化周期；
-10. 生成七天总结所需的最低有效日期数；
-11. 缺失日期、字段缺失和“说不准”如何进入分母；
-12. 哪些真实字段允许做分布或方向性趋势；
-13. 点亮、任务和帮助度是否作为行为事实进入总结；
-14. 娱乐性今日能量和五维为何必须排除；
-15. 聚合事实、AI 表达、内部发布对象与客户端安全视图如何分层；
-16. 更正或删除源记录后，未读和已读总结如何失效或重算；
-17. 数据不足、模型失败和 Safety 失败的模板及客户端状态；
-18. 内部 provenance、源依赖和修订信息哪些可以下发；
-19. 文本字段、字符预算、纯文本和禁止措辞；
-20. 两份 Schema 的版本兼容、未知字段和 S-09 映射方式。
+- 五维 ID 固定且恰好五项；
+- canonical order、display order、focus 和唯一性校验；
+- 内部分数为 0～100 整数，客户端视图不含 score；
+- selected_action_id 必须引用候选；
+- action/task/ritual ID 在 facts、expression 和 client view 中一致；
+- 每个字段和核心/全文字符预算同时校验；
+- PublishedDailyResult 与 ClientDailyContentView 使用不同 Schema；
+- provenance、source dependencies 和 privacy fallbacks 不进入客户端。
 
-用户确认前，这些新结论保持 Draft。
+### 晚间反馈
 
-## 7. 建议对象边界
+- SET/CLEAR note patch 使用判别联合；
+- CLEAR 不允许 value，SET 必须 1～80 字；
+- expected revisions 为非负整数；
+- task patch 可选且引用既有任务；
+- overall feeling 与 helpfulness 必需；
+- record、revision 和 client view 分开；
+- availability、write window 和主操作组合合法；
+- 未知字段、null 和部分更新语义有负向测试。
 
-晚间反馈至少区分：
+### 七天趋势与总结
 
-1. **EveningFeedbackDraft**：设备本地、未提交且非权威的最小草稿；
-2. **EveningFeedbackSubmission**：带目标日期、预期修订和幂等意图的提交命令；
-3. **EveningFeedbackRecord**：服务端当前权威真实记录；
-4. **EveningFeedbackRevision**：受限审计修订，不直接下发；
-5. **ClientEveningFeedbackView**：客户端可读写资格和当前安全值。
+- source/client day slots 恰好七项、日期唯一、升序且连续；
+- window_start/end 与首尾槽位一致；
+- coverage、missing_dates 和真实记录天数互相一致；
+- observed + unsure + missing = 7；
+- direction 样本门槛和 mode/top kind 最小样本约束；
+- 帮助度与任务计数等式；
+- expression 每段 fact_refs 数量和正文 120～260 字；
+- PublishedWeeklySummary 与客户端视图分开；
+- daily score、娱乐五维和 raw notes 不属于周契约；
+- source fingerprint、失效和修订字段类型清楚。
 
-七天总结至少区分：
+## 6. 包边界
 
-1. **WeeklySourceSnapshot**：七个产品日期及允许源记录的受限快照；
-2. **WeeklyAggregateFacts**：确定性计数、分布、缺失和趋势事实；
-3. **WeeklyExpressionPayload**：AI 或模板对固定事实的受约束表达；
-4. **PublishedWeeklySummary**：原子发布、版本化且可追踪的内部结果；
-5. **ClientWeeklySummaryView**：显式白名单客户端视图；
-6. **WeeklySummaryAvailability**：资格、数据不足、生成中、可用、失效和错误状态。
+本包可以：
 
-最终命名可以调整，但不能把真实输入、聚合计算、AI 表达和客户端对象压成一个可由模型任意生成的对象。
+- 依赖 Zod；
+- 提供 TypeScript 推断类型；
+- 导出运行时 parse/safeParse Schema；
+- 导出 JSON Schema，供文档、API 或跨语言工具使用；
+- 提供纯校验 helper 和测试 fixtures。
 
-## 8. 不在当前任务范围
+本包不得：
 
-- 可执行 Zod、TypeScript 或 JSON Schema；
-- 产品时区、续写窗口精确时长和稳定周期算法；
-- 数据库表、索引、迁移和事务；
-- API 路径、HTTP 状态、错误码和幂等键格式；
-- Prompt 全文、模型供应商、重试和成本参数；
-- Safety 分类与高风险固定响应全文；
-- 结构化记忆模型和长期月度趋势；
-- 前端组件、图表视觉、后端服务和测试代码；
-- D1/D3/D7 指标最终计算口径；
-- 生产数据、真实用户文本和运营后台；
-- 医疗、心理诊断、绩效或人格评估；
-- 自动聊天、社区、会员或商业化能力。
+- 连接数据库、Redis、队列、网络、文件系统或模型；
+- 计算每日分数、七天 direction 或内容选择；
+- 生成 AI 文本；
+- 包含用户真实数据或生产样本；
+- 创建 NestJS DTO、Prisma 模型、微信页面或 Next.js 组件；
+- 决定根 workspace、包管理器、CI、统一 ESLint 或 Monorepo 结构；
+- 暴露服务端 secret、Prompt、内部规则实现或敏感日志。
 
-## 9. 验收标准
+根 package.json、pnpm workspace、统一构建与发布由 S-28 / Phase 1 工程任务决定。S-09 的包必须可以在自身目录独立安装与验证。
 
-- 两份概念 Schema 可以无歧义转换为 S-09 可执行类型；
-- 晚间真实字段、草稿、提交、修订、删除和客户端视图职责清楚；
-- 七天源快照、聚合事实、表达、内部结果和客户端视图职责清楚；
-- 每个字段的必填/可选、枚举、长度、数组、null 和未知字段语义完整；
-- “说不准”、缺失、删除和数据不足不会混用；
-- 七天每项结论都有真实来源、样本量和缺失说明；
-- 娱乐五维和运势分数不会进入真实趋势；
-- AI 不能计算趋势、创造事实或修改聚合结果；
-- 主模型、备用模型和模板产生同构完整表达；
-- 自由文本、总结文本和源引用满足隐私与 Safety；
-- 更正、删除、跨日、Offline、未知结果和历史读取完整；
-- 完整、部分数据、无数据、降级和客户端安全视图示例齐全；
-- 下游 Schema、数据库、API、前端、测试和埋点约束明确；
-- 文档索引和任务状态同步；
+## 7. 公共 API 原则
+
+- 公共 Schema 使用稳定、可搜索的 PascalCase 名称并以 Schema 结尾；
+- 推断类型使用同名去掉 Schema；
+- 只从 src/index.ts 暴露下游承诺 API；
+- 内部 helper 不因测试方便全部导出；
+- 枚举 Schema 和值数组可以共享，但显示中文不进入核心 token；
+- 默认导出禁止，避免重命名不一致；
+- JSON Schema 导出使用稳定 $id；
+- package 版本从 0.x 开始，表示 Phase 0B 草案；
+- 破坏性变化必须同步文档、fixtures 和 major/minor 策略。
+
+## 8. JSON Schema 边界
+
+Zod 运行时 Schema 是本任务的校验权威。JSON Schema 用于：
+
+- API/文档工具读取字段；
+- 跨语言生成或预校验；
+- 固定 $id 和契约版本；
+- 发现意外字段与基础格式问题。
+
+跨字段 refinement、Unicode 字符、日期连续、fact_refs 和计数等式如果无法完整表达为 JSON Schema，必须：
+
+1. 仍在 Zod 运行时强制；
+2. 在 README 中列出；
+3. 通过负向测试证明；
+4. 不声称 JSON Schema 单独等价于完整业务校验。
+
+## 9. 测试要求
+
+至少包含：
+
+- 三份 Accepted 文档中的完整正向 JSON 示例；
+- 受控模板和个性化减少正向示例；
+- 每个根 Schema 的最小合法样例；
+- 未知字段、null、空字符串和非法枚举；
+- 无效产品日期与无时区时间；
+- 五维缺失、重复、错序和 focus 不一致；
+- action/task/ritual 引用不一致；
+- 单字段与总字符超限；
+- note patch 互斥、revision 和原子提交输入；
+- 七日数量、日期连续、coverage、missing_dates 和计数等式；
+- direction 样本不足；
+- mode/top helpful kind 门槛；
+- AI 未批准 fact_refs；
+- 客户端出现内部 score、provenance、source ID 或 raw notes；
+- JSON Schema 导出结构与稳定 $id。
+
+测试必须可以通过一个包内命令运行，并明确报告失败文件和字段路径。
+
+## 10. 验收标准
+
+- packages/shared-schemas 可以独立安装；
+- TypeScript 严格编译通过；
+- 包构建成功且无隐式 any；
+- 所有运行时 Schema 可从公共入口导入；
+- TypeScript 类型由 Schema 推断，不维护第二份手写接口；
+- 三类契约的正向 fixtures 全部通过；
+- 关键负向 fixtures 全部失败且错误路径合理；
+- JSON Schema 可以生成且 $id 稳定；
+- 包不依赖业务服务、数据库、网络或前端框架；
+- 没有 secret、真实用户数据、模型输出或敏感日志；
+- 文档映射、已知 JSON Schema 限制和使用示例清楚；
+- npm audit 不存在 production high/critical；
+- 格式、类型、测试和构建全部通过；
+- docs/INDEX.md、tasks/current.md 和 backlog 同步；
 - 通过独立 Draft PR 提交；
-- 用户确认前不进入 S-09。
+- 用户确认前不进入 S-10。
 
-## 10. 完成后的下一任务
+## 11. 完成后的下一任务
 
-S-08 被接受后，下一任务为：
+S-09 被接受后，下一任务为：
 
-- 当前任务 ID：S-09；
-- 当前任务名称：共享 Schema 草案；
-- 主要交付：packages/shared-schemas；
-- 依据：已接受的今日内容、晚间反馈和七天总结 Schema；
-- 这是首次可执行 Schema 工作，但仍不开始正式产品前后端页面实现。
+- 当前任务 ID：S-10；
+- 当前任务名称：稳定种子与产品日期决策；
+- 主要交付：ADR-0002；
+- 依据：已接受状态机、业务规则与可执行共享 Schema；
+- 不开始正式业务页面或服务实现。
 
-## 11. 最近一次交接
+## 12. 最近一次交接
 
 - 日期：2026-07-20；
-- S-07 已经用户确认，今日内容 Schema 已更新为 Accepted；
-- PR #10 等待 ready、squash 合并和 main 验证；
-- S-08 已设为唯一 Ready 任务；
+- S-08 已经用户确认，两份 Schema 文档已更新为 Accepted；
+- PR #11 等待 ready、squash 合并和 main 验证；
+- S-09 已设为唯一 Ready 任务；
+- 仓库当前没有根 package.json 或 workspace 文件；
 - 当前没有业务代码；
 - 当前没有阻塞项；
-- 下一操作：合并 PR #10 后创建 S-08 分支并将任务改为 In Progress；
+- 下一操作：合并 PR #11 后创建 S-09 分支，在 packages/shared-schemas 内建立自包含包；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
-## 12. 状态更新规则
+## 13. 状态更新规则
 
 任务开始时：
 
@@ -263,7 +270,7 @@ S-08 被接受后，下一任务为：
 用户确认并合并后：
 
 - 状态改为 Done；
-- 两份文档变为 Accepted；
+- packages/shared-schemas 在索引中变为 Accepted；
 - 更新 docs/INDEX.md；
 - 从 Backlog 选择唯一下一任务；
 - 将下一任务设为 Ready。
