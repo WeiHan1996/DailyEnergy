@@ -1,0 +1,280 @@
+{
+  "fixture_version": "adr-0002-v1",
+  "description": "Normative deterministic vectors for ADR-0002. Decimal values that can exceed IEEE-754 safe integer range are encoded as strings.",
+  "product_date_policy": {
+    "policy_version": "product-date-v1",
+    "timezone_id": "Asia/Shanghai",
+    "boundary_local_time": "04:00:00",
+    "calendar": "ISO-8601-Gregorian",
+    "view_continuation_minutes": 30,
+    "generation_completion_minutes": 15,
+    "weekly_window_days": 7
+  },
+  "date_resolution": [
+    {
+      "id": "second_before_boundary",
+      "now_utc": "2026-07-19T19:59:59Z",
+      "expected_local_time": "2026-07-20T03:59:59+08:00",
+      "expected_product_date": "2026-07-19"
+    },
+    {
+      "id": "exact_boundary",
+      "now_utc": "2026-07-19T20:00:00Z",
+      "expected_local_time": "2026-07-20T04:00:00+08:00",
+      "expected_product_date": "2026-07-20"
+    },
+    {
+      "id": "second_after_boundary",
+      "now_utc": "2026-07-19T20:00:01Z",
+      "expected_local_time": "2026-07-20T04:00:01+08:00",
+      "expected_product_date": "2026-07-20"
+    },
+    {
+      "id": "year_end_before_boundary",
+      "now_utc": "2026-12-31T19:59:59Z",
+      "expected_local_time": "2027-01-01T03:59:59+08:00",
+      "expected_product_date": "2026-12-31"
+    },
+    {
+      "id": "year_end_exact_boundary",
+      "now_utc": "2026-12-31T20:00:00Z",
+      "expected_local_time": "2027-01-01T04:00:00+08:00",
+      "expected_product_date": "2027-01-01"
+    },
+    {
+      "id": "leap_day_before_boundary",
+      "now_utc": "2028-02-29T19:59:59Z",
+      "expected_local_time": "2028-03-01T03:59:59+08:00",
+      "expected_product_date": "2028-02-29"
+    },
+    {
+      "id": "leap_day_exact_boundary",
+      "now_utc": "2028-02-29T20:00:00Z",
+      "expected_local_time": "2028-03-01T04:00:00+08:00",
+      "expected_product_date": "2028-03-01"
+    }
+  ],
+  "weekly_windows": [
+    {
+      "window_end_date": "2026-07-20",
+      "expected_window_start_date": "2026-07-14",
+      "expected_dates": [
+        "2026-07-14",
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-18",
+        "2026-07-19",
+        "2026-07-20"
+      ]
+    },
+    {
+      "window_end_date": "2028-03-01",
+      "expected_window_start_date": "2028-02-24",
+      "expected_dates": [
+        "2028-02-24",
+        "2028-02-25",
+        "2028-02-26",
+        "2028-02-27",
+        "2028-02-28",
+        "2028-02-29",
+        "2028-03-01"
+      ]
+    }
+  ],
+  "continuation_cases": [
+    {
+      "id": "view_last_eligible_second",
+      "kind": "VIEW_CONTINUATION",
+      "target_product_date": "2026-07-20",
+      "boundary_at": "2026-07-20T20:00:00Z",
+      "now_utc": "2026-07-20T20:29:59Z",
+      "grant_valid": true,
+      "page": "DLY-003",
+      "operation": "ILLUMINATE",
+      "expected_window": "CONTINUATION_ONLY"
+    },
+    {
+      "id": "view_exact_expiry",
+      "kind": "VIEW_CONTINUATION",
+      "target_product_date": "2026-07-20",
+      "boundary_at": "2026-07-20T20:00:00Z",
+      "now_utc": "2026-07-20T20:30:00Z",
+      "grant_valid": true,
+      "page": "DLY-003",
+      "operation": "ILLUMINATE",
+      "expected_window": "CLOSED"
+    },
+    {
+      "id": "view_forbidden_checkin",
+      "kind": "VIEW_CONTINUATION",
+      "target_product_date": "2026-07-20",
+      "boundary_at": "2026-07-20T20:00:00Z",
+      "now_utc": "2026-07-20T20:10:00Z",
+      "grant_valid": true,
+      "page": "DLY-003",
+      "operation": "UPSERT_CHECKIN",
+      "expected_window": "CLOSED"
+    },
+    {
+      "id": "generation_last_eligible_second",
+      "kind": "GENERATION_COMPLETION",
+      "target_product_date": "2026-07-20",
+      "boundary_at": "2026-07-20T20:00:00Z",
+      "intent_created_before_boundary": true,
+      "now_utc": "2026-07-20T20:14:59Z",
+      "expected_eligible": true
+    },
+    {
+      "id": "generation_exact_expiry",
+      "kind": "GENERATION_COMPLETION",
+      "target_product_date": "2026-07-20",
+      "boundary_at": "2026-07-20T20:00:00Z",
+      "intent_created_before_boundary": true,
+      "now_utc": "2026-07-20T20:15:00Z",
+      "expected_eligible": false
+    },
+    {
+      "id": "command_accepted_before_boundary",
+      "kind": "COMMAND_COMMIT",
+      "accepted_at": "2026-07-20T19:59:59Z",
+      "response_at": "2026-07-20T20:00:10Z",
+      "frozen_target_product_date": "2026-07-20",
+      "expected_target_product_date": "2026-07-20"
+    },
+    {
+      "id": "click_without_acceptance_after_boundary",
+      "kind": "COMMAND_COMMIT",
+      "clicked_at": "2026-07-20T19:59:59Z",
+      "accepted_at": "2026-07-20T20:00:00Z",
+      "requested_target_product_date": "2026-07-20",
+      "expected_old_date_commit": false
+    }
+  ],
+  "seed_policy": {
+    "policy_version": "seed-v1",
+    "encoding": "LP32(U32_BE byte length) over RFC 3629 UTF-8 without BOM",
+    "hash": "SHA-256",
+    "root_field_order": [
+      "dailyenergy",
+      "daily-result",
+      "seed-v1",
+      "stable_subject_id",
+      "product_date",
+      "result_version"
+    ],
+    "root_vectors": [
+      {
+        "stable_subject_id": "user_example",
+        "product_date": "2026-07-20",
+        "result_version": "daily-v1",
+        "material_hex": "0000000b6461696c79656e657267790000000c6461696c792d726573756c7400000007736565642d76310000000c757365725f6578616d706c650000000a323032362d30372d3230000000086461696c792d7631",
+        "expected_sha256_hex": "a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f782"
+      },
+      {
+        "stable_subject_id": "user_example",
+        "product_date": "2026-07-21",
+        "result_version": "daily-v1",
+        "expected_sha256_hex": "2ad68bdbee828883dcf43aa1b7ed38d1aacf959a98c7627a3365bfd5399355ed"
+      },
+      {
+        "stable_subject_id": "user_example",
+        "product_date": "2026-07-20",
+        "result_version": "daily-v2",
+        "expected_sha256_hex": "b836858920f8ba6678304d7518d12bced7f5d1abfec77f15adfdaae33457d713"
+      },
+      {
+        "stable_subject_id": "user_other",
+        "product_date": "2026-07-20",
+        "result_version": "daily-v1",
+        "expected_sha256_hex": "7b2f5b9521aaaaabdcf0fd3ebc4d898bfc0ad20967d8ec2ca368016f69e902fa"
+      }
+    ],
+    "choice_policy": {
+      "policy_version": "choice-v1",
+      "choice_field_order": [
+        "dailyenergy-choice",
+        "choice-v1",
+        "root_seed_raw_bytes",
+        "namespace",
+        "counter_u32_be"
+      ],
+      "root_seed_hex": "a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f782",
+      "vectors": [
+        {
+          "namespace": "binary.example.v1",
+          "candidate_count": 2,
+          "counter": 0,
+          "material_hex": "000000126461696c79656e657267792d63686f6963650000000963686f6963652d763100000020a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f7820000001162696e6172792e6578616d706c652e763100000000",
+          "expected_sha256_hex": "3e51f5e24fcca29d1289f8378ab4bacf26598d3ee468d78d51a99a586d28d9f9",
+          "expected_u64_be": "4490640655815320221",
+          "limit": "18446744073709551616",
+          "expected_index": 1
+        },
+        {
+          "namespace": "action.tie.v1",
+          "candidate_count": 3,
+          "counter": 0,
+          "material_hex": "000000126461696c79656e657267792d63686f6963650000000963686f6963652d763100000020a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f7820000000d616374696f6e2e7469652e763100000000",
+          "expected_sha256_hex": "f4329b41da93a979909c83dd4ed065eadfe714549f0de1c8f3d30d7107924fae",
+          "expected_u64_be": "17596297401232238969",
+          "limit": "18446744073709551615",
+          "expected_index": 2
+        },
+        {
+          "namespace": "ritual.color.v1",
+          "candidate_count": 5,
+          "counter": 0,
+          "material_hex": "000000126461696c79656e657267792d63686f6963650000000963686f6963652d763100000020a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f7820000000f72697475616c2e636f6c6f722e763100000000",
+          "expected_sha256_hex": "2a42b76e92436a0c9e4e853e9abb1a759d13b7de2ceef9f7f4e7bd854f02445a",
+          "expected_u64_be": "3045197983584053772",
+          "limit": "18446744073709551615",
+          "expected_index": 2
+        },
+        {
+          "namespace": "ritual.number.v1",
+          "candidate_count": 9,
+          "counter": 0,
+          "material_hex": "000000126461696c79656e657267792d63686f6963650000000963686f6963652d763100000020a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f7820000001072697475616c2e6e756d6265722e763100000000",
+          "expected_sha256_hex": "22c3d5c9d8d4e3152e01cea5d848082153110033d4f9995e2cae2d5bcde736c0",
+          "expected_u64_be": "2505080880651100949",
+          "limit": "18446744073709551609",
+          "expected_index": 8
+        }
+      ],
+      "rejection_boundaries": [
+        {
+          "candidate_count": 2,
+          "limit": "18446744073709551616",
+          "last_accepted": "18446744073709551615",
+          "last_accepted_index": 1,
+          "rejection_possible": false
+        },
+        {
+          "candidate_count": 3,
+          "limit": "18446744073709551615",
+          "last_accepted": "18446744073709551614",
+          "last_accepted_index": 2,
+          "first_rejected": "18446744073709551615",
+          "rejection_possible": true
+        },
+        {
+          "candidate_count": 5,
+          "limit": "18446744073709551615",
+          "last_accepted": "18446744073709551614",
+          "last_accepted_index": 4,
+          "first_rejected": "18446744073709551615",
+          "rejection_possible": true
+        },
+        {
+          "candidate_count": 9,
+          "limit": "18446744073709551609",
+          "last_accepted": "18446744073709551608",
+          "last_accepted_index": 8,
+          "first_rejected": "18446744073709551609",
+          "rejection_possible": true
+        }
+      ]
+    }
+  }
+}
