@@ -119,7 +119,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/ai/daily-content-schema.md](./ai/daily-content-schema.md) | Accepted | 今日结构化结果和 AI 输出契约 | mvp、personality |
 | [docs/ai/evening-feedback-schema.md](./ai/evening-feedback-schema.md) | Accepted | 晚间反馈输入和输出 | journey、mvp |
 | [docs/ai/weekly-summary-schema.md](./ai/weekly-summary-schema.md) | Accepted | 七天趋势和总结契约 | daily-content、feedback |
-| packages/shared-schemas | Planned | 可执行 Zod Schema | 已接受 Schema 文档 |
+| packages/shared-schemas | Draft | 可执行 Zod Schema | 已接受 Schema 文档 |
 
 ### 7.3 稳定生成与 AI
 
