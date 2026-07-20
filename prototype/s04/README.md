@@ -1,6 +1,7 @@
 # DailyEnergy S-04 可点击原型
 
-- **原型状态**：Draft
+- **原型状态**：Accepted
+- **接受日期**：2026-07-20
 - **所属任务**：S-04 — 可点击原型与首次可用性测试
 - **最后更新**：2026-07-20
 - **上游规格**：[页面规格](../../docs/design/screen-specs.md)、[交互状态](../../docs/design/interaction-states.md)、[内容布局](../../docs/design/content-layout.md)
