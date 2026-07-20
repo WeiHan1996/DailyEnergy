@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-04
 - **当前任务名称**：可点击原型与首次可用性测试
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **优先级**：最高
 - **代码工作**：仅允许静态交互原型；禁止业务代码
-- **当前分支**：未创建
-- **关联 PR**：无
+- **当前分支**：`agent/clickable-prototype-validation`
+- **关联 PR**：待创建
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
