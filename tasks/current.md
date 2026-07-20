@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-06
 - **当前任务名称**：点亮、跨日、中断与通知业务规则
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：禁止，当前只做产品业务规则规范
 - **当前分支**：`agent/pointlight-crossday-notification-rules`
-- **关联 PR**：待创建
+- **关联 PR**：[PR #9](https://github.com/WeiHan1996/DailyEnergy/pull/9)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
