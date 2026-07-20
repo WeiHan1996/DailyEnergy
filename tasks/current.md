@@ -5,10 +5,10 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-10
 - **当前任务名称**：稳定种子与产品日期决策
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **优先级**：最高
 - **代码工作**：不开始正式业务代码；允许 ADR、算法伪代码和确定性测试向量
-- **当前分支**：待创建
+- **当前分支**：`agent/stable-seed-product-date`
 - **关联 PR**：待创建
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
@@ -135,11 +135,12 @@ S-10 被接受后，下一任务为：
 ## 10. 最近一次交接
 
 - 日期：2026-07-20；
-- PR #12 已由用户确认，等待更新 Accepted 状态、squash 合并和 main 验证；
-- S-09 共享 Schema 已完成：34 个测试、构建与 production audit 通过；
-- S-10 已设为唯一 Ready 任务；
+- PR #12 已 squash 合并到 main（`f4e36f3`）；
+- S-09 共享 Schema 已验证为 Accepted；
+- S-10 已在分支 `agent/stable-seed-product-date` 开始，状态为 In Progress；
+- 当前没有正式产品业务代码；
 - 当前没有阻塞项；
-- 下一操作：合并 PR #12 后创建 S-10 分支并起草 ADR-0002；
+- 下一操作：起草 ADR-0002，加入可复算日期、种子和选择测试向量；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
 ## 11. 状态更新规则

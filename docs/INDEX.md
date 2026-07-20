@@ -171,7 +171,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 | 文件 | 状态 | 决策主题 | 最晚完成点 |
 |---|---|---|---|
-| ADR-0002-deterministic-daily-result.md | Planned | 稳定种子、历史不变与重生成 | 规则引擎开发前 |
+| [ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md) | Draft | 稳定种子、产品日期、历史不变与重生成 | 规则引擎开发前 |
 | ADR-0003-ai-provider-abstraction.md | Planned | AI Gateway 与供应商隔离 | AI Gateway 开发前 |
 | ADR-0004-structured-memory.md | Planned | 结构化记忆与不用向量库 | 记忆开发前 |
 | ADR-0005-data-retention-and-deletion.md | Planned | 保存期限、删除和审计 | 数据库开发前 |
