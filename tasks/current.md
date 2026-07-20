@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-03
 - **当前任务名称**：交互状态与页面规格
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：禁止，当前只做规格
 - **当前分支**：`agent/interaction-screen-specs`
-- **关联 PR**：待创建
+- **关联 PR**：[#6](https://github.com/WeiHan1996/DailyEnergy/pull/6)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -239,9 +239,13 @@ S-04 不开始业务代码。
 - 已完成：S-01 长期路线图和项目控制系统；
 - 已完成：S-02 信息架构与页面清单；
 - 已接受：动态今天页、无 TabBar、两步首次流程、七天记录结构；
+- 已完成 S-03 Draft：screen-specs、interaction-states、content-layout；
+- 已覆盖：20 个 P0、2 个 P1、10 个组件、8 个管理后台页面与 15 个待审核决策；
 - 当前没有业务代码；
 - 当前没有阻塞项；
-- 下一操作：启动 S-03 交互状态与页面规格；
+- 当前分支：agent/interaction-screen-specs；
+- 当前 PR：[#6](https://github.com/WeiHan1996/DailyEnergy/pull/6)（Draft）；
+- 下一操作：审核并确认 PR #6；确认前不启动 S-04；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
 ## 12. 状态更新规则
