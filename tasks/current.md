@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-07
 - **当前任务名称**：今日内容 Schema
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **优先级**：最高
 - **代码工作**：禁止，当前只做文档级内容契约
-- **当前分支**：未创建
-- **关联 PR**：无
+- **当前分支**：`agent/daily-content-schema`
+- **关联 PR**：待创建
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -218,7 +218,7 @@ S-07 被接受后，下一任务为：
 - PR #9 等待接受收尾与合并；
 - 当前没有业务代码；
 - 当前没有阻塞项；
-- 下一操作：合并 PR #9 后创建 S-07 分支并开始 docs/ai/daily-content-schema.md；
+- 下一操作：编写并验证 docs/ai/daily-content-schema.md，完成后创建 Draft PR；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
 ## 12. 状态更新规则
