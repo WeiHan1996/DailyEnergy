@@ -55,7 +55,7 @@
 
 | ID | 任务 | 状态 | 主要交付 | 依赖 |
 |---|---|---|---|---|
-| S-05 | 产品状态机 | In Progress | docs/product/state-machine.md | S-03、S-04 |
+| S-05 | 产品状态机 | In Review | docs/product/state-machine.md | S-03、S-04 |
 | S-06 | 点亮、跨日、中断与通知业务规则 | Planned | docs/product/business-rules.md | S-05 |
 | S-07 | 今日内容 Schema | Planned | docs/ai/daily-content-schema.md | S-05 |
 | S-08 | 晚间反馈与七天总结 Schema | Planned | feedback、weekly-summary Schema | S-07 |
