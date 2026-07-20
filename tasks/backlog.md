@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-20
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-09 共享 Schema 草案](./current.md)
+- **当前任务**：[S-10 稳定种子与产品日期决策](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -59,13 +59,13 @@
 | S-06 | 点亮、跨日、中断与通知业务规则 | Done | docs/product/business-rules.md | S-05 |
 | S-07 | 今日内容 Schema | Done | docs/ai/daily-content-schema.md | S-05 |
 | S-08 | 晚间反馈与七天总结 Schema | Done | feedback、weekly-summary Schema | S-07 |
-| S-09 | 共享 Schema 草案 | In Review | packages/shared-schemas | S-07、S-08 |
+| S-09 | 共享 Schema 草案 | Done | packages/shared-schemas | S-07、S-08 |
 
 ### 稳定生成与 AI
 
 | ID | 任务 | 状态 | 主要交付 | 依赖 |
 |---|---|---|---|---|
-| S-10 | 稳定种子与产品日期决策 | Planned | ADR-0002 | S-05 |
+| S-10 | 稳定种子与产品日期决策 | Ready | ADR-0002 | S-05 |
 | S-11 | 规则引擎规范 | Planned | generation-engine、scoring-rules | S-07、S-10 |
 | S-12 | AI Gateway 决策与规范 | Planned | ADR-0003、gateway.md | S-07、S-11 |
 | S-13 | Prompt 规范 | Planned | prompt-spec.md | S-12、personality |
