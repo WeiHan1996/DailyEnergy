@@ -1,0 +1,241 @@
+# DailyEnergy 文档索引
+
+- **文档状态**：Active
+- **最后更新**：2026-07-20
+- **当前阶段**：Phase 0B — 开发前详细规格
+- **路线图**：[ROADMAP.md](../ROADMAP.md)
+- **当前任务**：[tasks/current.md](../tasks/current.md)
+
+## 1. 使用方式
+
+本文件是 DailyEnergy 的规范目录。
+
+任何 AI Agent 或开发人员开始任务前，按以下顺序读取：
+
+1. [AGENTS.md](../AGENTS.md)；
+2. [README.md](../README.md)；
+3. [ROADMAP.md](../ROADMAP.md)；
+4. 本文；
+5. [tasks/current.md](../tasks/current.md)；
+6. 当前任务列出的上游规范；
+7. 所有相关 Accepted ADR；
+8. 对应 Schema、接口和测试。
+
+不要从聊天记录猜测正式结论。如果聊天内容与仓库冲突，以仓库中的 Accepted 文档为准。
+
+## 2. 状态定义
+
+### 产品、AI、设计与技术文档
+
+- **Planned**：已进入路线图，但尚未创建；
+- **Draft**：正在编写或等待审核；
+- **Accepted**：已经确认，是当前有效规范；
+- **Implemented**：规范已经完成对应实现和验证；
+- **Superseded**：被新文档或版本取代；
+- **Deprecated**：仍保留历史，但不应继续使用。
+
+### ADR
+
+- **Proposed**：等待决策；
+- **Accepted**：正式生效；
+- **Rejected**：已评审但不采用；
+- **Superseded**：被后续 ADR 取代；
+- **Deprecated**：决策不再适用。
+
+只有用户或明确授权的项目决策者可以把 Draft 或 Proposed 变为 Accepted。
+
+### 项目控制文档
+
+- **Draft**：新建或重大改版，等待审核；
+- **Active**：当前生效并持续维护；
+- **Archived**：不再用于当前工作，仅保留历史。
+
+ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks 属于持续变化的控制文件，审核后使用 Active。
+
+## 3. 冲突优先级
+
+发生冲突时按以下顺序处理：
+
+1. Accepted ADR；
+2. 当前版本的 Accepted 产品、AI、设计、技术、安全和隐私规范；
+3. API、数据与输出 Schema；
+4. 自动化测试与验收样例；
+5. tasks/current.md 中的当前任务范围；
+6. tasks/backlog.md；
+7. README 和 ROADMAP；
+8. 聊天记录、临时草稿和未合并分支。
+
+高优先级内容不一定更新得最晚。不能只按文件日期判断真相。
+
+## 4. 项目控制文档
+
+| 文件 | 状态 | 作用 | 更新时机 |
+|---|---|---|---|
+| [README.md](../README.md) | Active | 项目入口、定位和当前状态 | 阶段或入口变化 |
+| [ROADMAP.md](../ROADMAP.md) | Accepted | 长期阶段、交付物和退出门槛 | 里程碑或重大计划变化 |
+| [AGENTS.md](../AGENTS.md) | Active | AI 与开发协作规则 | 工作方式变化 |
+| [docs/INDEX.md](./INDEX.md) | Active | 文档状态和依赖索引 | 文档新增、接受或取代 |
+| [tasks/current.md](../tasks/current.md) | Active | 唯一当前任务和交接状态 | 每个任务开始、进展和完成 |
+| [tasks/backlog.md](../tasks/backlog.md) | Active | 有序候选任务 | 计划、优先级和依赖变化 |
+
+这些文件负责控制项目，不取代产品和技术规范。
+
+## 5. 已接受产品基线
+
+| 文件 | 状态 | 主要内容 | 上游 |
+|---|---|---|---|
+| [docs/product/vision.md](./product/vision.md) | Accepted | 产品愿景、使命、价值、边界和成功表现 | 无 |
+| [docs/product/persona.md](./product/persona.md) | Accepted | 22～35 岁职场女性、小红书/抖音渠道、场景和招募标准 | vision |
+| [docs/product/journey.md](./product/journey.md) | Accepted | 渠道触达到连续 7 天的完整旅程 | vision、persona |
+| [docs/product/mvp.md](./product/mvp.md) | Accepted | P0/P1 范围、验收标准、指标、Gate 和完成定义 | vision、persona、journey |
+
+## 6. 已接受 AI 与决策基线
+
+| 文件 | 状态 | 主要内容 | 上游 |
+|---|---|---|---|
+| [docs/ai/personality.md](./ai/personality.md) | Accepted | 数字朋友人格、表达风格、记忆语言和安全边界 | 产品基线 |
+| [docs/decisions/ADR-0001-product-positioning.md](./decisions/ADR-0001-product-positioning.md) | Accepted | 定位为日常陪伴，而非算命工具 | 产品与人格基线 |
+
+## 7. Phase 0B 计划文档
+
+### 7.1 设计与交互
+
+| 文件 | 状态 | 目的 | 主要依赖 |
+|---|---|---|---|
+| docs/design/information-architecture.md | Planned | 页面层级、入口和导航 | journey、mvp |
+| docs/design/screen-inventory.md | Planned | 页面、弹层、系统状态清单 | information-architecture |
+| docs/design/screen-specs.md | Planned | 每页字段、操作和验收 | screen-inventory |
+| docs/design/interaction-states.md | Planned | 加载、失败、降级、权限和恢复 | screen-specs |
+| docs/design/content-layout.md | Planned | 今日内容、趋势和分享的信息层级 | personality、daily-content-schema |
+| docs/design/design-system.md | Planned | 颜色、排版、组件、动效和无障碍 | 页面规格 |
+| docs/design/prototype-validation.md | Planned | 原型测试方法和结论 | 可点击原型 |
+
+### 7.2 产品状态与 Schema
+
+| 文件 | 状态 | 目的 | 主要依赖 |
+|---|---|---|---|
+| docs/product/state-machine.md | Planned | 用户、关系和每日体验状态 | journey、mvp |
+| docs/product/business-rules.md | Planned | 点亮、中断、跨日、提醒和删除规则 | state-machine |
+| docs/ai/daily-content-schema.md | Planned | 今日结构化结果和 AI 输出契约 | mvp、personality |
+| docs/ai/evening-feedback-schema.md | Planned | 晚间反馈输入和输出 | journey、mvp |
+| docs/ai/weekly-summary-schema.md | Planned | 七天趋势和总结契约 | daily-content、feedback |
+| packages/shared-schemas | Planned | 可执行 Zod Schema | 已接受 Schema 文档 |
+
+### 7.3 稳定生成与 AI
+
+| 文件 | 状态 | 目的 | 主要依赖 |
+|---|---|---|---|
+| docs/ai/generation-engine.md | Planned | 稳定种子、版本、缓存和幂等 | state-machine、daily-content-schema |
+| docs/ai/scoring-rules.md | Planned | 五维分数和行动候选规则 | generation-engine |
+| docs/ai/gateway.md | Planned | 供应商、超时、重试、降级和成本 | generation-engine |
+| docs/ai/prompt-spec.md | Planned | Prompt 输入、输出、版本和人格 | personality、schemas、gateway |
+| docs/ai/memory.md | Planned | 结构化记忆、用途、有效期和删除 | persona、journey、personality |
+| docs/ai/safety.md | Planned | 风险分类、固定响应和审核 | vision、personality |
+| docs/ai/evaluation.md | Planned | 自动评价、人工抽检和回归测试 | personality、prompt、safety |
+
+### 7.4 数据与接口
+
+| 文件 | 状态 | 目的 | 主要依赖 |
+|---|---|---|---|
+| docs/technical/domain-model.md | Planned | 业务实体和关系 | state-machine、schemas |
+| docs/technical/database.md | Planned | 表、索引、约束、迁移和删除 | domain-model |
+| prisma/schema.prisma | Planned | 可执行数据库 Schema | Accepted database spec |
+| docs/technical/api.md | Planned | 小程序、后端和后台接口契约 | domain、schemas |
+| docs/technical/error-codes.md | Planned | 错误、恢复和降级语义 | API、interaction-states |
+| OpenAPI 契约 | Planned | 可执行接口契约 | Accepted API spec |
+
+### 7.5 数据分析、隐私与运营
+
+| 文件 | 状态 | 目的 | 主要依赖 |
+|---|---|---|---|
+| docs/analytics/event-tracking.md | Planned | 事件、属性和归因 | journey、mvp |
+| docs/analytics/metrics.md | Planned | D1/D3/D7 等唯一口径 | event-tracking |
+| docs/analytics/experiments.md | Planned | 实验、样本和停止规则 | metrics |
+| docs/operations/privacy-data-map.md | Planned | 数据、用途、位置和保存期 | domain、database、analytics |
+| docs/operations/content-moderation.md | Planned | 审核、抽检和申诉 | safety、evaluation |
+| docs/operations/user-support.md | Planned | 内测反馈和用户请求 | journey、privacy |
+| docs/operations/incident-response.md | Planned | 故障和安全事件流程 | architecture、safety |
+
+### 7.6 工程架构与交付
+
+| 文件 | 状态 | 目的 | 主要依赖 |
+|---|---|---|---|
+| docs/technical/architecture.md | Planned | 系统边界和模块依赖 | 所有核心规格 |
+| docs/technical/repository-structure.md | Planned | Monorepo 目录与包职责 | architecture |
+| docs/technical/testing.md | Planned | 单元、集成、契约、端到端和 AI 测试 | schemas、API、safety |
+| docs/technical/deployment.md | Planned | 环境、发布、迁移和回滚 | architecture |
+| docs/technical/observability.md | Planned | 日志、指标、告警和成本 | architecture、analytics |
+| GitHub Milestones 与 Issues | Planned | Phase 1～3 工程执行 | Accepted Phase 0B specs |
+
+## 8. 计划 ADR
+
+| 文件 | 状态 | 决策主题 | 最晚完成点 |
+|---|---|---|---|
+| ADR-0002-deterministic-daily-result.md | Planned | 稳定种子、历史不变与重生成 | 规则引擎开发前 |
+| ADR-0003-ai-provider-abstraction.md | Planned | AI Gateway 与供应商隔离 | AI Gateway 开发前 |
+| ADR-0004-structured-memory.md | Planned | 结构化记忆与不用向量库 | 记忆开发前 |
+| ADR-0005-data-retention-and-deletion.md | Planned | 保存期限、删除和审计 | 数据库开发前 |
+| ADR-0006-monorepo-and-stack.md | Planned | TypeScript Monorepo 与既定技术栈 | 工程初始化前 |
+
+如果实际决策发生变化，应调整 ADR 名称和顺序，不为填满编号而创建无价值文档。
+
+## 9. 实施阶段文档
+
+Phase 1 开始后逐步增加：
+
+- 变更日志；
+- 环境与启动说明；
+- 迁移记录；
+- API 生成文档；
+- 测试报告；
+- 发布清单；
+- Alpha 和 Beta 报告；
+- 实验报告；
+- 安全复盘；
+- 性能和成本报告。
+
+这些运行文档不能修改 Accepted 产品定位，只能记录实现和验证。
+
+## 10. 文档依赖规则
+
+- 下游文档不能隐式改变上游 Accepted 规范；
+- 如果下游发现上游不可实现，先提出变更和影响；
+- Schema 必须与产品词汇一致；
+- 数据库和 API 不得创造产品未定义的状态；
+- Prompt 不得突破人格和安全规范；
+- 埋点不得采集隐私数据清单之外的信息；
+- 代码和测试完成后同步更新对应文档状态；
+- 被取代文档保留历史并指向新版本。
+
+## 11. 文档完成定义
+
+一份规范只有满足以下条件才能进入 Accepted：
+
+- 目的和适用范围明确；
+- 上游依赖已接受；
+- 术语与现有文档一致；
+- 正常、异常和边界行为完整；
+- 有明确验收或决策标准；
+- 与安全、隐私和 ADR 不冲突；
+- 未决问题不会阻塞当前阶段；
+- 已通过 PR 审核；
+- 文档索引和当前任务已同步；
+- 接受日期和状态已记录。
+
+## 12. 当前读取顺序
+
+当前唯一执行任务是信息架构与页面地图。开始该任务时读取：
+
+1. AGENTS.md；
+2. README.md；
+3. ROADMAP.md；
+4. docs/INDEX.md；
+5. tasks/current.md；
+6. docs/product/vision.md；
+7. docs/product/persona.md；
+8. docs/product/journey.md；
+9. docs/product/mvp.md；
+10. docs/ai/personality.md；
+11. docs/decisions/ADR-0001-product-positioning.md。
+
+完成后更新本文，将相应文件从 Planned 调整为 Draft 或 Accepted。
