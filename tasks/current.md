@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-05
 - **当前任务名称**：产品状态机
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **优先级**：最高
 - **代码工作**：禁止，当前只做产品状态规范
-- **当前分支**：未创建
-- **关联 PR**：无
+- **当前分支**：`agent/product-state-machine`
+- **关联 PR**：待创建
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -205,7 +205,7 @@ S-05 被接受后，下一任务为：
 - 尚未招募或执行外部用户测试；
 - 当前没有业务代码；
 - 当前没有阻塞项；
-- 下一操作：创建 S-05 状态机分支并开始 docs/product/state-machine.md；
+- 下一操作：编写并验证 docs/product/state-machine.md，完成后创建 Draft PR；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
 ## 12. 状态更新规则
