@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-03
 - **当前任务名称**：交互状态与页面规格
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **优先级**：最高
 - **代码工作**：禁止，当前只做规格
-- **当前分支**：未创建
-- **关联 PR**：无
+- **当前分支**：`agent/interaction-screen-specs`
+- **关联 PR**：待创建
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
