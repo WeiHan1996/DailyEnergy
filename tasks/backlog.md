@@ -48,7 +48,7 @@
 |---|---|---|---|---|
 | S-01 | 长期路线图和项目控制系统 | Done | ROADMAP、INDEX、AGENTS、tasks、README | Phase 0A |
 | S-02 | 信息架构与页面地图 | Done | information-architecture、screen-inventory | S-01 |
-| S-03 | 交互状态与页面规格 | Ready | screen-specs、interaction-states、content-layout | S-02 |
+| S-03 | 交互状态与页面规格 | In Progress | screen-specs、interaction-states、content-layout | S-02 |
 | S-04 | 可点击原型与首次可用性测试 | Planned | prototype、5～8 人测试报告 | S-03 |
 
 ### 业务状态与内容契约
