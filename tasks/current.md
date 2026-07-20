@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-05
 - **当前任务名称**：产品状态机
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：禁止，当前只做产品状态规范
 - **当前分支**：`agent/product-state-machine`
-- **关联 PR**：待创建
+- **关联 PR**：[PR #8](https://github.com/WeiHan1996/DailyEnergy/pull/8)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -200,12 +200,16 @@ S-05 被接受后，下一任务为：
 ## 11. 最近一次交接
 
 - 日期：2026-07-20；
-- S-04 已确认并接受；
-- 静态原型和测试计划已进入 Accepted；
+- S-04 已确认、接受并通过 PR #7 合并；
+- S-05 产品状态机已完成 Draft，交付 docs/product/state-machine.md；
+- Draft PR：[PR #8](https://github.com/WeiHan1996/DailyEnergy/pull/8)；
+- 文档覆盖 12 项推荐决策、状态域、固定启动路由、事件与守卫、幂等恢复、删除级联、全部 P0 页面映射和 9 组序列；
+- Prettier、markdownlint、结构与必需覆盖检查通过；
+- 远端状态机文档与本地验证版本逐字一致；
 - 尚未招募或执行外部用户测试；
 - 当前没有业务代码；
 - 当前没有阻塞项；
-- 下一操作：编写并验证 docs/product/state-machine.md，完成后创建 Draft PR；
+- 下一操作：等待用户审核 PR #8；确认前不标记 Accepted、不合并、不开始 S-06；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
 ## 12. 状态更新规则
