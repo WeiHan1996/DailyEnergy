@@ -108,7 +108,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/design/interaction-states.md](./design/interaction-states.md) | Accepted | 加载、失败、降级、权限和恢复 | screen-specs |
 | [docs/design/content-layout.md](./design/content-layout.md) | Accepted | 今日内容、趋势和分享的信息层级 | personality、daily-content-schema |
 | docs/design/design-system.md | Planned | 颜色、排版、组件、动效和无障碍 | 页面规格 |
-| docs/design/prototype-validation.md | Planned | 原型测试方法和结论 | 可点击原型 |
+| [docs/design/prototype-validation.md](./design/prototype-validation.md) | Accepted | [S-04 静态原型](../prototype/s04/README.md)、5～8 人测试计划和结果模板 | Accepted S-03 设计规格 |
 
 ### 7.2 产品状态与 Schema
 

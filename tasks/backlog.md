@@ -49,13 +49,13 @@
 | S-01 | 长期路线图和项目控制系统 | Done | ROADMAP、INDEX、AGENTS、tasks、README | Phase 0A |
 | S-02 | 信息架构与页面地图 | Done | information-architecture、screen-inventory | S-01 |
 | S-03 | 交互状态与页面规格 | Done | screen-specs、interaction-states、content-layout | S-02 |
-| S-04 | 可点击原型与首次可用性测试 | Ready | prototype、5～8 人测试计划与结果模板 | S-03 |
+| S-04 | 可点击原型与首次可用性测试 | Done | prototype、5～8 人测试计划与结果模板 | S-03 |
 
 ### 业务状态与内容契约
 
 | ID | 任务 | 状态 | 主要交付 | 依赖 |
 |---|---|---|---|---|
-| S-05 | 产品状态机 | Planned | docs/product/state-machine.md | S-03 |
+| S-05 | 产品状态机 | Ready | docs/product/state-machine.md | S-03、S-04 |
 | S-06 | 点亮、跨日、中断与通知业务规则 | Planned | docs/product/business-rules.md | S-05 |
 | S-07 | 今日内容 Schema | Planned | docs/ai/daily-content-schema.md | S-05 |
 | S-08 | 晚间反馈与七天总结 Schema | Planned | feedback、weekly-summary Schema | S-07 |
