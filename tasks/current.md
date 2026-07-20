@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-02
 - **当前任务名称**：信息架构与页面地图
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：禁止，当前只做规格
 - **当前分支**：agent/information-architecture
-- **关联 PR**：待创建
+- **关联 PR**：[PR #5](https://github.com/WeiHan1996/DailyEnergy/pull/5)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -206,7 +206,9 @@
 - 已完成：长期路线图和项目控制系统；
 - 当前没有业务代码；
 - 当前没有阻塞项；
-- 当前操作：执行 S-02 信息架构与页面地图；
+- 已完成：S-02 信息架构与页面清单 Draft；
+- 验证：40 个唯一页面/组件 ID，15 项 MVP 能力完成映射，分支未落后 main；
+- 下一操作：用户审核 PR #5，当前不得启动 S-03；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
 ## 11. 状态更新规则
