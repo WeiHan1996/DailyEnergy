@@ -59,7 +59,7 @@
 | S-06 | 点亮、跨日、中断与通知业务规则 | Done | docs/product/business-rules.md | S-05 |
 | S-07 | 今日内容 Schema | Done | docs/ai/daily-content-schema.md | S-05 |
 | S-08 | 晚间反馈与七天总结 Schema | Done | feedback、weekly-summary Schema | S-07 |
-| S-09 | 共享 Schema 草案 | Ready | packages/shared-schemas | S-07、S-08 |
+| S-09 | 共享 Schema 草案 | In Progress | packages/shared-schemas | S-07、S-08 |
 
 ### 稳定生成与 AI
 
