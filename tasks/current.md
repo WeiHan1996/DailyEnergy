@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-08
 - **当前任务名称**：晚间反馈与七天总结 Schema
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：禁止，当前只做文档级真实记录与总结契约
 - **当前分支**：`agent/evening-weekly-schema`
-- **关联 PR**：待创建
+- **关联 PR**：[#11](https://github.com/WeiHan1996/DailyEnergy/pull/11)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -232,12 +232,13 @@ S-08 被接受后，下一任务为：
 ## 11. 最近一次交接
 
 - 日期：2026-07-20；
-- PR #10 已 squash 合并到 main（`a520f96`）；
-- S-07 今日内容 Schema 已验证为 Accepted；
-- S-08 已在分支 `agent/evening-weekly-schema` 开始，状态为 In Progress；
-- 当前没有业务代码；
+- PR #10 已 squash 合并到 main（`a520f96`），S-07 已 Accepted；
+- S-08 两份文档级 Schema 已完成，当前状态为 Draft / In Review；
+- Draft PR：[#11](https://github.com/WeiHan1996/DailyEnergy/pull/11)；
+- 已验证 Prettier、markdownlint、9 个 JSON 示例、33 项决策、26 个验收场景、七日连续性、计数等式和文本预算；
+- 当前没有业务代码，也未开始 S-09；
 - 当前没有阻塞项；
-- 下一操作：读取已接受上游，编写并验证晚间反馈与七天总结两份 Schema；
+- 下一操作：用户审核 PR #11；确认后将两份文档改为 Accepted、合并，并准备 S-09；
 - 新会话恢复口令：**继续 DailyEnergy 当前任务**。
 
 ## 12. 状态更新规则
