@@ -102,8 +102,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
-| docs/design/information-architecture.md | Planned | 页面层级、入口和导航 | journey、mvp |
-| docs/design/screen-inventory.md | Planned | 页面、弹层、系统状态清单 | information-architecture |
+| docs/design/information-architecture.md | Draft | 页面层级、入口和导航 | journey、mvp |
+| docs/design/screen-inventory.md | Draft | 页面、弹层、系统状态清单 | information-architecture |
 | docs/design/screen-specs.md | Planned | 每页字段、操作和验收 | screen-inventory |
 | docs/design/interaction-states.md | Planned | 加载、失败、降级、权限和恢复 | screen-specs |
 | docs/design/content-layout.md | Planned | 今日内容、趋势和分享的信息层级 | personality、daily-content-schema |
