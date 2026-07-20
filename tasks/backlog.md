@@ -65,7 +65,7 @@
 
 | ID | 任务 | 状态 | 主要交付 | 依赖 |
 |---|---|---|---|---|
-| S-10 | 稳定种子与产品日期决策 | In Progress | ADR-0002 | S-05 |
+| S-10 | 稳定种子与产品日期决策 | In Review | ADR-0002 | S-05 |
 | S-11 | 规则引擎规范 | Planned | generation-engine、scoring-rules | S-07、S-10 |
 | S-12 | AI Gateway 决策与规范 | Planned | ADR-0003、gateway.md | S-07、S-11 |
 | S-13 | Prompt 规范 | Planned | prompt-spec.md | S-12、personality |

@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-10
 - **当前任务名称**：稳定种子与产品日期决策
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：不开始正式业务代码；允许 ADR、算法伪代码和确定性测试向量
 - **当前分支**：`agent/stable-seed-product-date`
-- **关联 PR**：待创建
+- **关联 PR**：[#13](https://github.com/WeiHan1996/DailyEnergy/pull/13)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
