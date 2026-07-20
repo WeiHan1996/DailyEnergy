@@ -246,7 +246,7 @@
       .map(([id, tone]) => {
         const selected = state.tone === id;
         return `
-          <button class="tone-card" type="button" data-action="select-tone" data-value="${id}" aria-pressed="${selected}">
+          <button class="tone-card" type="button" data-action="select-tone" data-value="${id}" aria-pressed="${selected}" ${state.offline ? "disabled" : ""}>
             <span class="tone-card__head">
               <span>${tone.name}</span>
               <span class="tone-card__check" aria-hidden="true">${selected ? "✓" : ""}</span>
@@ -538,7 +538,7 @@
         ${eveningGroup("task", "小任务结果", ["已完成", "想试试", "今天没做"])}
         <div class="field">
           <label for="evening-note">最想留下一句话 <span class="field-hint">（可不填）</span></label>
-          <textarea id="evening-note" class="text-area" maxlength="80" placeholder="今天有什么想留住的片段？">${escapeHtml(state.feedback.note)}</textarea>
+          <textarea id="evening-note" class="text-area" maxlength="80" placeholder="今天有什么想留住的片段？" ${state.offline ? "disabled" : ""}>${escapeHtml(state.feedback.note)}</textarea>
           <span class="field-hint">最多 80 字；本原型不会保存或上传。</span>
         </div>
         ${state.feedback.completed ? `<div class="completion-note">✓ 已保存演示记录，可在今天结束前修改</div>` : ""}
@@ -559,7 +559,7 @@
           ${options
             .map(
               (option) => `
-                <button class="choice" type="button" data-action="select-evening" data-group="${group}" data-value="${option}" aria-pressed="${state.feedback[group] === option}">${option}</button>`
+                <button class="choice" type="button" data-action="select-evening" data-group="${group}" data-value="${option}" aria-pressed="${state.feedback[group] === option}" ${state.offline ? "disabled" : ""}>${option}</button>`
             )
             .join("")}
         </div>
@@ -688,7 +688,7 @@
         <h2 id="preferences-title" class="screen-title">让表达更贴近你。</h2>
         <div class="field">
           <label for="nickname">称呼</label>
-          <input id="nickname" class="text-input" maxlength="20" value="${escapeHtml(state.nickname)}" placeholder="可不填" />
+          <input id="nickname" class="text-input" maxlength="20" value="${escapeHtml(state.nickname)}" placeholder="可不填" ${state.offline ? "disabled" : ""} />
           <span class="field-hint">留空时自然使用“你”或省略称呼。</span>
         </div>
         <div class="field"><span class="group-label">表达方式</span><span class="field-hint">只影响之后的表达，不改变今天的核心结果。</span></div>
@@ -721,8 +721,8 @@
         ${topbar(state.memory.active ? "编辑重要事项" : "新增重要事项")}
         <h2 id="memory-edit-title" class="screen-title">记录一件近期在意的事。</h2>
         <p class="screen-copy">只在你允许的方式和合适的时间使用，不预测结果。</p>
-        <div class="field"><label for="memory-title">事项</label><input id="memory-title" class="text-input" maxlength="40" value="${escapeHtml(state.memory.title)}" placeholder="例如：周五的项目汇报" /></div>
-        <div class="field"><label for="memory-date">日期（可选）</label><input id="memory-date" class="text-input" value="${escapeHtml(state.memory.date)}" placeholder="例如：7 月 24 日" /></div>
+        <div class="field"><label for="memory-title">事项</label><input id="memory-title" class="text-input" maxlength="40" value="${escapeHtml(state.memory.title)}" placeholder="例如：周五的项目汇报" ${state.offline ? "disabled" : ""} /></div>
+        <div class="field"><label for="memory-date">日期（可选）</label><input id="memory-date" class="text-input" value="${escapeHtml(state.memory.date)}" placeholder="例如：7 月 24 日" ${state.offline ? "disabled" : ""} /></div>
         ${switchRow("mention", "允许在每日内容中提及", "只在合适时自然引用，不承诺结果", state.memory.mention)}
         ${switchRow("reminder", "提醒我", "需要单独申请微信提醒权限", state.memory.reminder)}
         <div class="sticky-action"><button class="button button--block" type="button" data-action="save-memory" ${state.offline ? "disabled" : ""}>保存</button></div>
@@ -735,7 +735,7 @@
     return `
       <div class="switch-row">
         <span><strong>${label}</strong><small>${detail}</small></span>
-        <button class="switch" type="button" role="switch" aria-label="${label}" aria-checked="${checked}" data-action="toggle-memory" data-key="${id}"></button>
+        <button class="switch" type="button" role="switch" aria-label="${label}" aria-checked="${checked}" data-action="toggle-memory" data-key="${id}" ${state.offline ? "disabled" : ""}></button>
       </div>
     `;
   }
