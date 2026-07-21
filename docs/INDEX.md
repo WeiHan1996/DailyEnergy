@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-07-20
+- **最后更新**：2026-07-21
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -95,6 +95,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 |---|---|---|---|
 | [docs/ai/personality.md](./ai/personality.md) | Accepted | 数字朋友人格、表达风格、记忆语言和安全边界 | 产品基线 |
 | [docs/decisions/ADR-0001-product-positioning.md](./decisions/ADR-0001-product-positioning.md) | Accepted | 定位为日常陪伴，而非算命工具 | 产品与人格基线 |
+| [docs/decisions/ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md) | Accepted | 产品日期、稳定种子、结果身份、历史冻结与删除边界 | state-machine、business-rules、schemas |
 
 ## 7. Phase 0B 计划文档
 
@@ -171,7 +172,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 | 文件 | 状态 | 决策主题 | 最晚完成点 |
 |---|---|---|---|
-| [ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md) | Draft | 稳定种子、产品日期、历史不变与重生成 | 规则引擎开发前 |
+| [ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md) | Accepted | 稳定种子、产品日期、历史不变与重生成 | 规则引擎开发前 |
 | ADR-0003-ai-provider-abstraction.md | Planned | AI Gateway 与供应商隔离 | AI Gateway 开发前 |
 | ADR-0004-structured-memory.md | Planned | 结构化记忆与不用向量库 | 记忆开发前 |
 | ADR-0005-data-retention-and-deletion.md | Planned | 保存期限、删除和审计 | 数据库开发前 |
@@ -224,7 +225,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一执行任务是 S-10 稳定种子与产品日期决策。开始该任务时读取：
+当前唯一 Ready 任务是 S-11 规则引擎规范。开始该任务前读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -242,6 +243,8 @@ Phase 1 开始后逐步增加：
 14. docs/ai/daily-content-schema.md；
 15. docs/ai/evening-feedback-schema.md；
 16. docs/ai/weekly-summary-schema.md；
-17. packages/shared-schemas/README.md。
+17. packages/shared-schemas/README.md；
+18. docs/decisions/ADR-0002-deterministic-daily-result.md；
+19. docs/decisions/adr-0002-test-vectors.json。
 
-完成后更新本文，将 ADR-0002 从 Draft 调整为 Accepted，并把唯一当前任务切换到 S-11。
+S-11 只产出规则引擎与评分规则 Draft 规范、伪代码和确定性用例；在单独 PR 通过审核前，不开始 S-12 或生产服务实现。
