@@ -1,0 +1,2488 @@
+{
+  "fixture_version": "s11-test-vectors-v1",
+  "document_status": "Draft",
+  "manifest": {
+    "manifest_schema_version": "generation-manifest-v1",
+    "result_version": "daily-v1",
+    "product_date_policy_version": "product-date-v1",
+    "seed_policy_version": "seed-v1",
+    "choice_policy_version": "choice-v1",
+    "shared_schema_major": 0,
+    "shared_schema_contract_version": "0.1.0",
+    "daily_content_schema_version": "1.0.0",
+    "input_snapshot_version": "input-v1",
+    "rule_version": "daily-rules-v1",
+    "algorithm_version": "daily-score-v1",
+    "action_catalog_version": "action-catalog-v1",
+    "task_catalog_version": "task-catalog-v1",
+    "ritual_catalog_version": "ritual-catalog-v1",
+    "content_catalog_version": "content-catalog-v1",
+    "namespace_registry_version": "namespace-registry-v1",
+    "expression_contract_version": "daily-expression-v1",
+    "template_compatibility_version": "daily-template-v1",
+    "safety_contract_floor": "safety-baseline-v1",
+    "experiment_variant_version": "none-v1"
+  },
+  "canonical_dimension_order": [
+    "pace",
+    "action",
+    "connection",
+    "resources",
+    "recovery"
+  ],
+  "expression_style_catalog": [
+    {
+      "token": "BALANCED",
+      "semantic_directive": "PERSONALITY_BASELINE",
+      "product_source": "SYSTEM_DEFAULT_WHEN_SKIPPED",
+      "user_selectable": false
+    },
+    {
+      "token": "GENTLE",
+      "semantic_directive": "WARMER_LESS_HUMOR_STILL_CLEAR",
+      "product_source": "GENTLE",
+      "user_selectable": true
+    },
+    {
+      "token": "LIGHT_HUMOR",
+      "semantic_directive": "LIGHT_LIFE_HUMOR_WITHIN_SAFETY_CEILING",
+      "product_source": "LIGHT_HUMOR",
+      "user_selectable": true
+    },
+    {
+      "token": "CLEAR_DIRECT",
+      "semantic_directive": "SHORTER_DIRECT_NOT_COMMANDING",
+      "product_source": "CLEAR_DIRECT",
+      "user_selectable": true
+    }
+  ],
+  "expression_plan_constants": {
+    "expression_contract_version": "daily-expression-v1",
+    "output_schema_version": "1.0.0",
+    "template_compatibility_version": "daily-template-v1",
+    "required_sections": [
+      "greeting",
+      "state_response",
+      "overall_summary",
+      "core_tip",
+      "explanation_paragraphs",
+      "dimension_explanations",
+      "primary_action",
+      "optional_task",
+      "ritual_notes",
+      "closing"
+    ],
+    "relationship_mode": "GENERIC",
+    "resolved_context_slots": [],
+    "source_dependency_requirements": [],
+    "prohibited_claim_classes": [
+      "FUTURE_PREDICTION",
+      "DIAGNOSIS_OR_TREATMENT",
+      "FINANCIAL_OR_LEGAL_ADVICE",
+      "OTHER_PERSON_MIND_OR_RELATIONSHIP_OUTCOME",
+      "RESULT_GUARANTEE",
+      "RITUAL_CAUSALITY_OR_GAMBLING",
+      "TASK_PUNISHMENT_OR_SHAME",
+      "EXCLUSIVE_DEPENDENCY_OR_FABRICATED_INTIMACY",
+      "FABRICATED_MEMORY_OR_REAL_WORLD_EXPERIENCE"
+    ]
+  },
+  "expression_derivation_trace_note": "expected_expression_derivation is test-only choice/projection trace, not the closed ControlledExpressionPlanV1 object; expected_full_controlled_expression_plan is the exact contract golden.",
+  "daily_cases": [
+    {
+      "id": "all-unsure-low-assertion",
+      "stable_subject_id": "user_example",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "input_snapshot": {
+        "snapshot_version": "input-v1",
+        "product_date": "2026-07-20",
+        "result_version": "daily-v1",
+        "checkin": {
+          "revision": 1,
+          "mood": "UNSURE",
+          "energy": "UNSURE",
+          "sleep": "UNSURE"
+        },
+        "profile": {
+          "revision": 2,
+          "expression_style": "BALANCED"
+        },
+        "relationship": {
+          "stage": "NEWLY_MET",
+          "encounter_day_count": 2
+        },
+        "permitted_context": []
+      },
+      "expected_root_seed_hex": "a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f782",
+      "expected_rule_facts": {
+        "overall": {
+          "score": 50,
+          "band": "STEADY",
+          "label_token": "KEEP_IT_STEADY"
+        },
+        "dimensions": [
+          {
+            "id": "pace",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          },
+          {
+            "id": "action",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          },
+          {
+            "id": "connection",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          },
+          {
+            "id": "resources",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          },
+          {
+            "id": "recovery",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          }
+        ],
+        "focus_dimension_id": "pace",
+        "display_order": [
+          "pace",
+          "recovery",
+          "connection",
+          "action",
+          "resources"
+        ],
+        "explanation_basis": [
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.mood.unsure.v1"
+          },
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.energy.unsure.v1"
+          },
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.sleep.unsure.v1"
+          }
+        ],
+        "action_candidates": [
+          {
+            "action_id": "action.prioritize-one.v1",
+            "kind": "PRIORITIZE_ONE",
+            "target_scope": "ONE_PRIORITY",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 10,
+            "constraint_token": "ONE_PRIORITY",
+            "basis_refs": [
+              "checkin.mood.unsure.v1",
+              "checkin.energy.unsure.v1",
+              "checkin.sleep.unsure.v1"
+            ]
+          },
+          {
+            "action_id": "action.pause-and-recover.v1",
+            "kind": "PAUSE_AND_RECOVER",
+            "target_scope": "ONE_SHORT_PAUSE",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 10,
+            "constraint_token": "NO_PERFORMANCE_GOAL",
+            "basis_refs": [
+              "checkin.mood.unsure.v1",
+              "checkin.energy.unsure.v1",
+              "checkin.sleep.unsure.v1"
+            ]
+          },
+          {
+            "action_id": "action.reflect-briefly.v1",
+            "kind": "REFLECT_BRIEFLY",
+            "target_scope": "ONE_SENTENCE",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 5,
+            "constraint_token": "ONE_SENTENCE_ONLY",
+            "basis_refs": [
+              "checkin.mood.unsure.v1",
+              "checkin.energy.unsure.v1",
+              "checkin.sleep.unsure.v1"
+            ]
+          }
+        ],
+        "selected_action_id": "action.reflect-briefly.v1",
+        "optional_task_plan": {
+          "task_id": "task.note-one-word.v1",
+          "kind": "REFLECT_BRIEFLY",
+          "effort": "VERY_LIGHT",
+          "timebox_minutes": 5
+        },
+        "ritual_facts": [
+          {
+            "ritual_id": "ritual.number.9.v1",
+            "kind": "NUMBER",
+            "value": 9
+          }
+        ]
+      },
+      "expected_expression_derivation": {
+        "template_candidates": ["template.focus-first.v1"],
+        "selected_template_variant": "template.focus-first.v1",
+        "assertion_mode": "LOW_ASSERTION",
+        "requested_expression_style": "BALANCED",
+        "known_checkin_fields": [],
+        "uncertain_checkin_fields": ["mood", "energy", "sleep"],
+        "allowed_state_assertion_basis_codes": [],
+        "effective_expression_constraints": {
+          "humor_ceiling": "NONE",
+          "pressure_ceiling": "VERY_LOW",
+          "opening_requirement": "UNCERTAINTY_FIRST",
+          "dimension_explanation_mode": "NON_ASSERTIVE"
+        },
+        "greeting_context": {
+          "relationship_mode": "GENERIC"
+        }
+      },
+      "expected_choices": [
+        {
+          "namespace": "focus.tie.v1",
+          "candidate_count": 1,
+          "index": 0,
+          "hashed": false
+        },
+        {
+          "namespace": "action.tie.v1",
+          "candidate_count": 3,
+          "counter": 0,
+          "digest_hex": "f4329b41da93a979909c83dd4ed065eadfe714549f0de1c8f3d30d7107924fae",
+          "x_u64": "17596297401232238969",
+          "limit_u64": "18446744073709551615",
+          "index": 2
+        },
+        {
+          "namespace": "ritual.set.v1",
+          "candidate_count": 4,
+          "counter": 0,
+          "digest_hex": "ce7553ad7c13cf6a6ce28c52287e30b3c9e5d235ca3bb468e910e560b82c0a8c",
+          "x_u64": "14876888948664422250",
+          "limit_u64": "18446744073709551616",
+          "index": 2
+        },
+        {
+          "namespace": "ritual.number.v1",
+          "candidate_count": 9,
+          "counter": 0,
+          "digest_hex": "22c3d5c9d8d4e3152e01cea5d848082153110033d4f9995e2cae2d5bcde736c0",
+          "x_u64": "2505080880651100949",
+          "limit_u64": "18446744073709551609",
+          "index": 8
+        },
+        {
+          "namespace": "template.variant.v1",
+          "candidate_count": 1,
+          "index": 0,
+          "hashed": false
+        }
+      ]
+    },
+    {
+      "id": "extreme-low-clamp-and-single-action",
+      "stable_subject_id": "user_example",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "input_snapshot": {
+        "snapshot_version": "input-v1",
+        "product_date": "2026-07-20",
+        "result_version": "daily-v1",
+        "checkin": {
+          "revision": 1,
+          "mood": "VERY_LOW",
+          "energy": "EMPTY",
+          "sleep": "POOR"
+        },
+        "profile": {
+          "revision": 2,
+          "expression_style": "LIGHT_HUMOR"
+        },
+        "relationship": {
+          "stage": "NEWLY_MET",
+          "encounter_day_count": 2
+        },
+        "permitted_context": []
+      },
+      "expected_root_seed_hex": "a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f782",
+      "expected_rule_facts": {
+        "overall": {
+          "score": 11,
+          "band": "LOW",
+          "label_token": "TAKE_IT_GENTLY"
+        },
+        "dimensions": [
+          {
+            "id": "pace",
+            "score": 4,
+            "band": "LOW",
+            "label_token": "TAKE_IT_GENTLY"
+          },
+          {
+            "id": "action",
+            "score": 0,
+            "band": "LOW",
+            "label_token": "TAKE_IT_GENTLY"
+          },
+          {
+            "id": "connection",
+            "score": 18,
+            "band": "LOW",
+            "label_token": "TAKE_IT_GENTLY"
+          },
+          {
+            "id": "resources",
+            "score": 16,
+            "band": "LOW",
+            "label_token": "TAKE_IT_GENTLY"
+          },
+          {
+            "id": "recovery",
+            "score": 18,
+            "band": "LOW",
+            "label_token": "TAKE_IT_GENTLY"
+          }
+        ],
+        "focus_dimension_id": "recovery",
+        "care_dimension_id": "recovery",
+        "display_order": [
+          "recovery",
+          "pace",
+          "action",
+          "resources",
+          "connection"
+        ],
+        "explanation_basis": [
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.mood.very-low.v1"
+          },
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.energy.empty.v1"
+          },
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.sleep.poor.v1"
+          },
+          {
+            "type": "DIMENSION_SIGNAL",
+            "code": "dimension.recovery.low.v1"
+          }
+        ],
+        "action_candidates": [
+          {
+            "action_id": "action.pause-and-recover.v1",
+            "kind": "PAUSE_AND_RECOVER",
+            "target_scope": "ONE_SHORT_PAUSE",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 10,
+            "constraint_token": "NO_PERFORMANCE_GOAL",
+            "basis_refs": [
+              "checkin.mood.very-low.v1",
+              "checkin.energy.empty.v1",
+              "checkin.sleep.poor.v1",
+              "dimension.recovery.low.v1"
+            ]
+          }
+        ],
+        "selected_action_id": "action.pause-and-recover.v1",
+        "optional_task_plan": {
+          "task_id": "task.take-one-short-pause.v1",
+          "kind": "PAUSE_AND_RECOVER",
+          "effort": "VERY_LIGHT",
+          "timebox_minutes": 5
+        },
+        "ritual_facts": [
+          {
+            "ritual_id": "ritual.number.9.v1",
+            "kind": "NUMBER",
+            "value": 9
+          }
+        ]
+      },
+      "expected_expression_derivation": {
+        "template_candidates": [
+          "template.focus-first.v1",
+          "template.care-then-step.v1"
+        ],
+        "selected_template_variant": "template.focus-first.v1",
+        "assertion_mode": "STANDARD",
+        "requested_expression_style": "LIGHT_HUMOR",
+        "known_checkin_fields": ["mood", "energy", "sleep"],
+        "uncertain_checkin_fields": [],
+        "allowed_state_assertion_basis_codes": [
+          "checkin.mood.very-low.v1",
+          "checkin.energy.empty.v1",
+          "checkin.sleep.poor.v1",
+          "dimension.recovery.low.v1"
+        ],
+        "effective_expression_constraints": {
+          "humor_ceiling": "NONE",
+          "pressure_ceiling": "VERY_LOW",
+          "opening_requirement": "CARE_FIRST",
+          "dimension_explanation_mode": "BAND_GUIDANCE"
+        },
+        "greeting_context": {
+          "relationship_mode": "GENERIC"
+        }
+      },
+      "expected_choices": [
+        {
+          "namespace": "focus.tie.v1",
+          "candidate_count": 1,
+          "index": 0,
+          "hashed": false
+        },
+        {
+          "namespace": "action.tie.v1",
+          "candidate_count": 1,
+          "index": 0,
+          "hashed": false
+        },
+        {
+          "namespace": "ritual.set.v1",
+          "candidate_count": 4,
+          "counter": 0,
+          "digest_hex": "ce7553ad7c13cf6a6ce28c52287e30b3c9e5d235ca3bb468e910e560b82c0a8c",
+          "x_u64": "14876888948664422250",
+          "limit_u64": "18446744073709551616",
+          "index": 2
+        },
+        {
+          "namespace": "ritual.number.v1",
+          "candidate_count": 9,
+          "counter": 0,
+          "digest_hex": "22c3d5c9d8d4e3152e01cea5d848082153110033d4f9995e2cae2d5bcde736c0",
+          "x_u64": "2505080880651100949",
+          "limit_u64": "18446744073709551609",
+          "index": 8
+        },
+        {
+          "namespace": "template.variant.v1",
+          "candidate_count": 2,
+          "counter": 0,
+          "digest_hex": "edc8533374848ad20d57b03199aef4e970c61d6add7ff05f1dc9b9c126eac6ea",
+          "x_u64": "17134036262794332882",
+          "limit_u64": "18446744073709551616",
+          "index": 0
+        }
+      ]
+    },
+    {
+      "id": "extreme-high-with-support",
+      "stable_subject_id": "user_example",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "input_snapshot": {
+        "snapshot_version": "input-v1",
+        "product_date": "2026-07-20",
+        "result_version": "daily-v1",
+        "checkin": {
+          "revision": 1,
+          "mood": "LIGHT",
+          "energy": "FULL",
+          "sleep": "GOOD"
+        },
+        "profile": {
+          "revision": 2,
+          "expression_style": "BALANCED"
+        },
+        "relationship": {
+          "stage": "NEWLY_MET",
+          "encounter_day_count": 2
+        },
+        "permitted_context": []
+      },
+      "expected_root_seed_hex": "a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f782",
+      "expected_rule_facts": {
+        "overall": {
+          "score": 83,
+          "band": "HIGH",
+          "label_token": "ROOM_TO_MOVE"
+        },
+        "dimensions": [
+          {
+            "id": "pace",
+            "score": 90,
+            "band": "HIGH",
+            "label_token": "ROOM_TO_MOVE"
+          },
+          {
+            "id": "action",
+            "score": 95,
+            "band": "HIGH",
+            "label_token": "ROOM_TO_MOVE"
+          },
+          {
+            "id": "connection",
+            "score": 79,
+            "band": "HIGH",
+            "label_token": "ROOM_TO_MOVE"
+          },
+          {
+            "id": "resources",
+            "score": 79,
+            "band": "HIGH",
+            "label_token": "ROOM_TO_MOVE"
+          },
+          {
+            "id": "recovery",
+            "score": 74,
+            "band": "HIGH",
+            "label_token": "ROOM_TO_MOVE"
+          }
+        ],
+        "focus_dimension_id": "action",
+        "supporting_dimension_id": "pace",
+        "display_order": [
+          "action",
+          "resources",
+          "pace",
+          "recovery",
+          "connection"
+        ],
+        "explanation_basis": [
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.mood.light.v1"
+          },
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.energy.full.v1"
+          },
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.sleep.good.v1"
+          },
+          {
+            "type": "DIMENSION_SIGNAL",
+            "code": "dimension.action.high.v1"
+          },
+          {
+            "type": "DIMENSION_SIGNAL",
+            "code": "dimension.pace.high.v1"
+          }
+        ],
+        "action_candidates": [
+          {
+            "action_id": "action.prioritize-one.v1",
+            "kind": "PRIORITIZE_ONE",
+            "target_scope": "ONE_PRIORITY",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 10,
+            "constraint_token": "ONE_PRIORITY",
+            "basis_refs": [
+              "checkin.mood.light.v1",
+              "checkin.energy.full.v1",
+              "checkin.sleep.good.v1",
+              "dimension.action.high.v1",
+              "dimension.pace.high.v1"
+            ]
+          },
+          {
+            "action_id": "action.prepare-one-step.v1",
+            "kind": "PREPARE_ONE_STEP",
+            "target_scope": "ONE_NEXT_STEP",
+            "effort": "LIGHT",
+            "timebox_minutes": 15,
+            "constraint_token": "STOP_AFTER_FIRST_STEP",
+            "basis_refs": [
+              "checkin.mood.light.v1",
+              "checkin.energy.full.v1",
+              "checkin.sleep.good.v1",
+              "dimension.action.high.v1",
+              "dimension.pace.high.v1"
+            ]
+          },
+          {
+            "action_id": "action.organize-small-scope.v1",
+            "kind": "ORGANIZE_SMALL_SCOPE",
+            "target_scope": "ONE_SMALL_SCOPE",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 10,
+            "constraint_token": "STOP_AT_TIMEBOX",
+            "basis_refs": [
+              "checkin.mood.light.v1",
+              "checkin.energy.full.v1",
+              "checkin.sleep.good.v1",
+              "dimension.action.high.v1",
+              "dimension.pace.high.v1"
+            ]
+          }
+        ],
+        "selected_action_id": "action.organize-small-scope.v1",
+        "optional_task_plan": {
+          "task_id": "task.put-away-one-item.v1",
+          "kind": "ORGANIZE_SMALL_SCOPE",
+          "effort": "VERY_LIGHT",
+          "timebox_minutes": 5
+        },
+        "ritual_facts": [
+          {
+            "ritual_id": "ritual.number.9.v1",
+            "kind": "NUMBER",
+            "value": 9
+          }
+        ]
+      },
+      "expected_expression_derivation": {
+        "template_candidates": [
+          "template.focus-first.v1",
+          "template.support-then-focus.v1"
+        ],
+        "selected_template_variant": "template.focus-first.v1",
+        "assertion_mode": "STANDARD",
+        "requested_expression_style": "BALANCED",
+        "known_checkin_fields": ["mood", "energy", "sleep"],
+        "uncertain_checkin_fields": [],
+        "allowed_state_assertion_basis_codes": [
+          "checkin.mood.light.v1",
+          "checkin.energy.full.v1",
+          "checkin.sleep.good.v1",
+          "dimension.action.high.v1",
+          "dimension.pace.high.v1"
+        ],
+        "effective_expression_constraints": {
+          "humor_ceiling": "LIGHT",
+          "pressure_ceiling": "LIGHT",
+          "opening_requirement": "FACT_FIRST",
+          "dimension_explanation_mode": "BAND_GUIDANCE"
+        },
+        "greeting_context": {
+          "relationship_mode": "GENERIC"
+        }
+      },
+      "expected_choices": [
+        {
+          "namespace": "focus.tie.v1",
+          "candidate_count": 1,
+          "index": 0,
+          "hashed": false
+        },
+        {
+          "namespace": "support.tie.v1",
+          "candidate_count": 1,
+          "index": 0,
+          "hashed": false
+        },
+        {
+          "namespace": "action.tie.v1",
+          "candidate_count": 3,
+          "counter": 0,
+          "digest_hex": "f4329b41da93a979909c83dd4ed065eadfe714549f0de1c8f3d30d7107924fae",
+          "x_u64": "17596297401232238969",
+          "limit_u64": "18446744073709551615",
+          "index": 2
+        },
+        {
+          "namespace": "ritual.set.v1",
+          "candidate_count": 4,
+          "counter": 0,
+          "digest_hex": "ce7553ad7c13cf6a6ce28c52287e30b3c9e5d235ca3bb468e910e560b82c0a8c",
+          "x_u64": "14876888948664422250",
+          "limit_u64": "18446744073709551616",
+          "index": 2
+        },
+        {
+          "namespace": "ritual.number.v1",
+          "candidate_count": 9,
+          "counter": 0,
+          "digest_hex": "22c3d5c9d8d4e3152e01cea5d848082153110033d4f9995e2cae2d5bcde736c0",
+          "x_u64": "2505080880651100949",
+          "limit_u64": "18446744073709551609",
+          "index": 8
+        },
+        {
+          "namespace": "template.variant.v1",
+          "candidate_count": 2,
+          "counter": 0,
+          "digest_hex": "edc8533374848ad20d57b03199aef4e970c61d6add7ff05f1dc9b9c126eac6ea",
+          "x_u64": "17134036262794332882",
+          "limit_u64": "18446744073709551616",
+          "index": 0
+        }
+      ]
+    },
+    {
+      "id": "care-and-support-care-first",
+      "stable_subject_id": "user_example",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "input_snapshot": {
+        "snapshot_version": "input-v1",
+        "product_date": "2026-07-20",
+        "result_version": "daily-v1",
+        "checkin": {
+          "revision": 1,
+          "mood": "LIGHT",
+          "energy": "FULL",
+          "sleep": "POOR"
+        },
+        "profile": {
+          "revision": 2,
+          "expression_style": "LIGHT_HUMOR"
+        },
+        "relationship": {
+          "stage": "NEWLY_MET",
+          "encounter_day_count": 2
+        },
+        "permitted_context": []
+      },
+      "expected_root_seed_hex": "a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f782",
+      "expected_rule_facts": {
+        "overall": {
+          "score": 66,
+          "band": "STEADY",
+          "label_token": "KEEP_IT_STEADY"
+        },
+        "dimensions": [
+          {
+            "id": "pace",
+            "score": 72,
+            "band": "HIGH",
+            "label_token": "ROOM_TO_MOVE"
+          },
+          {
+            "id": "action",
+            "score": 74,
+            "band": "HIGH",
+            "label_token": "ROOM_TO_MOVE"
+          },
+          {
+            "id": "connection",
+            "score": 70,
+            "band": "HIGH",
+            "label_token": "ROOM_TO_MOVE"
+          },
+          {
+            "id": "resources",
+            "score": 64,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          },
+          {
+            "id": "recovery",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          }
+        ],
+        "focus_dimension_id": "recovery",
+        "supporting_dimension_id": "action",
+        "care_dimension_id": "recovery",
+        "display_order": [
+          "recovery",
+          "connection",
+          "pace",
+          "action",
+          "resources"
+        ],
+        "explanation_basis": [
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.mood.light.v1"
+          },
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.energy.full.v1"
+          },
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.sleep.poor.v1"
+          },
+          {
+            "type": "DIMENSION_SIGNAL",
+            "code": "dimension.recovery.steady.v1"
+          },
+          {
+            "type": "DIMENSION_SIGNAL",
+            "code": "dimension.action.high.v1"
+          }
+        ],
+        "action_candidates": [
+          {
+            "action_id": "action.reduce-switching.v1",
+            "kind": "REDUCE_SWITCHING",
+            "target_scope": "ONE_FOCUS_BLOCK",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 10,
+            "constraint_token": "NO_MULTITASKING",
+            "basis_refs": [
+              "checkin.mood.light.v1",
+              "checkin.energy.full.v1",
+              "checkin.sleep.poor.v1",
+              "dimension.recovery.steady.v1",
+              "dimension.action.high.v1"
+            ]
+          },
+          {
+            "action_id": "action.pause-and-recover.v1",
+            "kind": "PAUSE_AND_RECOVER",
+            "target_scope": "ONE_SHORT_PAUSE",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 10,
+            "constraint_token": "NO_PERFORMANCE_GOAL",
+            "basis_refs": [
+              "checkin.mood.light.v1",
+              "checkin.energy.full.v1",
+              "checkin.sleep.poor.v1",
+              "dimension.recovery.steady.v1",
+              "dimension.action.high.v1"
+            ]
+          },
+          {
+            "action_id": "action.reflect-briefly.v1",
+            "kind": "REFLECT_BRIEFLY",
+            "target_scope": "ONE_SENTENCE",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 5,
+            "constraint_token": "ONE_SENTENCE_ONLY",
+            "basis_refs": [
+              "checkin.mood.light.v1",
+              "checkin.energy.full.v1",
+              "checkin.sleep.poor.v1",
+              "dimension.recovery.steady.v1",
+              "dimension.action.high.v1"
+            ]
+          }
+        ],
+        "selected_action_id": "action.reflect-briefly.v1",
+        "optional_task_plan": {
+          "task_id": "task.note-one-word.v1",
+          "kind": "REFLECT_BRIEFLY",
+          "effort": "VERY_LIGHT",
+          "timebox_minutes": 5
+        },
+        "ritual_facts": [
+          {
+            "ritual_id": "ritual.number.9.v1",
+            "kind": "NUMBER",
+            "value": 9
+          }
+        ]
+      },
+      "expected_expression_derivation": {
+        "template_candidates": [
+          "template.focus-first.v1",
+          "template.care-then-step.v1"
+        ],
+        "selected_template_variant": "template.focus-first.v1",
+        "assertion_mode": "STANDARD",
+        "requested_expression_style": "LIGHT_HUMOR",
+        "known_checkin_fields": ["mood", "energy", "sleep"],
+        "uncertain_checkin_fields": [],
+        "allowed_state_assertion_basis_codes": [
+          "checkin.mood.light.v1",
+          "checkin.energy.full.v1",
+          "checkin.sleep.poor.v1",
+          "dimension.recovery.steady.v1",
+          "dimension.action.high.v1"
+        ],
+        "effective_expression_constraints": {
+          "humor_ceiling": "NONE",
+          "pressure_ceiling": "VERY_LOW",
+          "opening_requirement": "CARE_FIRST",
+          "dimension_explanation_mode": "BAND_GUIDANCE"
+        },
+        "greeting_context": {
+          "relationship_mode": "GENERIC"
+        }
+      },
+      "expected_choices": [
+        {
+          "namespace": "focus.tie.v1",
+          "candidate_count": 1,
+          "index": 0,
+          "hashed": false
+        },
+        {
+          "namespace": "support.tie.v1",
+          "candidate_count": 1,
+          "index": 0,
+          "hashed": false
+        },
+        {
+          "namespace": "action.tie.v1",
+          "candidate_count": 3,
+          "counter": 0,
+          "digest_hex": "f4329b41da93a979909c83dd4ed065eadfe714549f0de1c8f3d30d7107924fae",
+          "x_u64": "17596297401232238969",
+          "limit_u64": "18446744073709551615",
+          "index": 2
+        },
+        {
+          "namespace": "ritual.set.v1",
+          "candidate_count": 4,
+          "counter": 0,
+          "digest_hex": "ce7553ad7c13cf6a6ce28c52287e30b3c9e5d235ca3bb468e910e560b82c0a8c",
+          "x_u64": "14876888948664422250",
+          "limit_u64": "18446744073709551616",
+          "index": 2
+        },
+        {
+          "namespace": "ritual.number.v1",
+          "candidate_count": 9,
+          "counter": 0,
+          "digest_hex": "22c3d5c9d8d4e3152e01cea5d848082153110033d4f9995e2cae2d5bcde736c0",
+          "x_u64": "2505080880651100949",
+          "limit_u64": "18446744073709551609",
+          "index": 8
+        },
+        {
+          "namespace": "template.variant.v1",
+          "candidate_count": 2,
+          "counter": 0,
+          "digest_hex": "edc8533374848ad20d57b03199aef4e970c61d6add7ff05f1dc9b9c126eac6ea",
+          "x_u64": "17134036262794332882",
+          "limit_u64": "18446744073709551616",
+          "index": 0
+        }
+      ]
+    },
+    {
+      "id": "neutral-five-way-focus-tie",
+      "stable_subject_id": "user_example",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "input_snapshot": {
+        "snapshot_version": "input-v1",
+        "product_date": "2026-07-20",
+        "result_version": "daily-v1",
+        "checkin": {
+          "revision": 1,
+          "mood": "STEADY",
+          "energy": "STEADY",
+          "sleep": "OKAY"
+        },
+        "profile": {
+          "revision": 2,
+          "expression_style": "BALANCED"
+        },
+        "relationship": {
+          "stage": "NEWLY_MET",
+          "encounter_day_count": 2
+        },
+        "permitted_context": []
+      },
+      "expected_root_seed_hex": "a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f782",
+      "expected_rule_facts": {
+        "overall": {
+          "score": 50,
+          "band": "STEADY",
+          "label_token": "KEEP_IT_STEADY"
+        },
+        "dimensions": [
+          {
+            "id": "pace",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          },
+          {
+            "id": "action",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          },
+          {
+            "id": "connection",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          },
+          {
+            "id": "resources",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          },
+          {
+            "id": "recovery",
+            "score": 50,
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          }
+        ],
+        "focus_dimension_id": "pace",
+        "display_order": [
+          "pace",
+          "resources",
+          "action",
+          "recovery",
+          "connection"
+        ],
+        "explanation_basis": [
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.mood.steady.v1"
+          },
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.energy.steady.v1"
+          },
+          {
+            "type": "CHECKIN_SIGNAL",
+            "code": "checkin.sleep.okay.v1"
+          },
+          {
+            "type": "DIMENSION_SIGNAL",
+            "code": "dimension.pace.steady.v1"
+          }
+        ],
+        "action_candidates": [
+          {
+            "action_id": "action.prioritize-one.v1",
+            "kind": "PRIORITIZE_ONE",
+            "target_scope": "ONE_PRIORITY",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 10,
+            "constraint_token": "ONE_PRIORITY",
+            "basis_refs": [
+              "checkin.mood.steady.v1",
+              "checkin.energy.steady.v1",
+              "checkin.sleep.okay.v1",
+              "dimension.pace.steady.v1"
+            ]
+          },
+          {
+            "action_id": "action.prepare-one-step.v1",
+            "kind": "PREPARE_ONE_STEP",
+            "target_scope": "ONE_NEXT_STEP",
+            "effort": "LIGHT",
+            "timebox_minutes": 15,
+            "constraint_token": "STOP_AFTER_FIRST_STEP",
+            "basis_refs": [
+              "checkin.mood.steady.v1",
+              "checkin.energy.steady.v1",
+              "checkin.sleep.okay.v1",
+              "dimension.pace.steady.v1"
+            ]
+          },
+          {
+            "action_id": "action.reduce-switching.v1",
+            "kind": "REDUCE_SWITCHING",
+            "target_scope": "ONE_FOCUS_BLOCK",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 10,
+            "constraint_token": "NO_MULTITASKING",
+            "basis_refs": [
+              "checkin.mood.steady.v1",
+              "checkin.energy.steady.v1",
+              "checkin.sleep.okay.v1",
+              "dimension.pace.steady.v1"
+            ]
+          }
+        ],
+        "selected_action_id": "action.reduce-switching.v1",
+        "optional_task_plan": {
+          "task_id": "task.close-one-distraction.v1",
+          "kind": "REDUCE_SWITCHING",
+          "effort": "VERY_LIGHT",
+          "timebox_minutes": 5
+        },
+        "ritual_facts": [
+          {
+            "ritual_id": "ritual.number.9.v1",
+            "kind": "NUMBER",
+            "value": 9
+          }
+        ]
+      },
+      "expected_expression_derivation": {
+        "template_candidates": ["template.focus-first.v1"],
+        "selected_template_variant": "template.focus-first.v1",
+        "assertion_mode": "STANDARD",
+        "requested_expression_style": "BALANCED",
+        "known_checkin_fields": ["mood", "energy", "sleep"],
+        "uncertain_checkin_fields": [],
+        "allowed_state_assertion_basis_codes": [
+          "checkin.mood.steady.v1",
+          "checkin.energy.steady.v1",
+          "checkin.sleep.okay.v1",
+          "dimension.pace.steady.v1"
+        ],
+        "effective_expression_constraints": {
+          "humor_ceiling": "LIGHT",
+          "pressure_ceiling": "LIGHT",
+          "opening_requirement": "FACT_FIRST",
+          "dimension_explanation_mode": "BAND_GUIDANCE"
+        },
+        "greeting_context": {
+          "relationship_mode": "GENERIC"
+        }
+      },
+      "expected_choices": [
+        {
+          "namespace": "focus.tie.v1",
+          "candidate_count": 5,
+          "counter": 0,
+          "digest_hex": "3bbee2854a07751d2174ed7860320a81bc31236e67ac8bd78b958c0808784f82",
+          "x_u64": "4305127355913303325",
+          "limit_u64": "18446744073709551615",
+          "index": 0
+        },
+        {
+          "namespace": "action.tie.v1",
+          "candidate_count": 3,
+          "counter": 0,
+          "digest_hex": "f4329b41da93a979909c83dd4ed065eadfe714549f0de1c8f3d30d7107924fae",
+          "x_u64": "17596297401232238969",
+          "limit_u64": "18446744073709551615",
+          "index": 2
+        },
+        {
+          "namespace": "ritual.set.v1",
+          "candidate_count": 4,
+          "counter": 0,
+          "digest_hex": "ce7553ad7c13cf6a6ce28c52287e30b3c9e5d235ca3bb468e910e560b82c0a8c",
+          "x_u64": "14876888948664422250",
+          "limit_u64": "18446744073709551616",
+          "index": 2
+        },
+        {
+          "namespace": "ritual.number.v1",
+          "candidate_count": 9,
+          "counter": 0,
+          "digest_hex": "22c3d5c9d8d4e3152e01cea5d848082153110033d4f9995e2cae2d5bcde736c0",
+          "x_u64": "2505080880651100949",
+          "limit_u64": "18446744073709551609",
+          "index": 8
+        },
+        {
+          "namespace": "template.variant.v1",
+          "candidate_count": 1,
+          "index": 0,
+          "hashed": false
+        }
+      ]
+    }
+  ],
+  "daily_rule_unit_cases": [
+    {
+      "id": "partial-unsure-known-signals-only",
+      "stable_subject_id": "user_example",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "input_snapshot": {
+        "snapshot_version": "input-v1",
+        "product_date": "2026-07-20",
+        "result_version": "daily-v1",
+        "checkin": {
+          "revision": 1,
+          "mood": "GOOD",
+          "energy": "UNSURE",
+          "sleep": "LOW"
+        },
+        "profile": {
+          "revision": 2,
+          "expression_style": "BALANCED"
+        },
+        "relationship": {
+          "stage": "NEWLY_MET",
+          "encounter_day_count": 2
+        },
+        "permitted_context": []
+      },
+      "expected": {
+        "root_seed_hex": "a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f782",
+        "dimension_scores": [51, 49, 56, 49, 45],
+        "overall_score": 50,
+        "overall_band": "STEADY",
+        "focus_candidate_ids": ["connection"],
+        "focus_dimension_id": "connection",
+        "care_dimension_id_omitted": true,
+        "supporting_dimension_id_omitted": true,
+        "action_candidate_ids": [
+          "action.prepare-one-step.v1",
+          "action.communicate-clearly.v1",
+          "action.reflect-briefly.v1"
+        ],
+        "selected_action_id": "action.reflect-briefly.v1",
+        "optional_task_plan": {
+          "task_id": "task.note-one-word.v1",
+          "kind": "REFLECT_BRIEFLY",
+          "effort": "VERY_LIGHT",
+          "timebox_minutes": 5
+        },
+        "display_order": [
+          "connection",
+          "recovery",
+          "pace",
+          "action",
+          "resources"
+        ],
+        "explanation_basis_codes": [
+          "checkin.mood.good.v1",
+          "checkin.energy.unsure.v1",
+          "checkin.sleep.low.v1",
+          "dimension.connection.steady.v1"
+        ],
+        "ritual_facts": [
+          {
+            "ritual_id": "ritual.number.9.v1",
+            "kind": "NUMBER",
+            "value": 9
+          }
+        ],
+        "expression_derivation": {
+          "template_candidates": ["template.focus-first.v1"],
+          "selected_template_variant": "template.focus-first.v1",
+          "assertion_mode": "PARTIAL_ASSERTION",
+          "known_checkin_fields": ["mood", "sleep"],
+          "uncertain_checkin_fields": ["energy"],
+          "allowed_state_assertion_basis_codes": [
+            "checkin.mood.good.v1",
+            "checkin.sleep.low.v1"
+          ],
+          "effective_expression_constraints": {
+            "humor_ceiling": "LIGHT",
+            "pressure_ceiling": "LIGHT",
+            "opening_requirement": "UNCERTAINTY_FIRST",
+            "dimension_explanation_mode": "KNOWN_SIGNALS_ONLY"
+          }
+        },
+        "choice_traces": [
+          {
+            "namespace": "focus.tie.v1",
+            "candidate_count": 1,
+            "index": 0,
+            "hashed": false
+          },
+          {
+            "namespace": "action.tie.v1",
+            "candidate_count": 3,
+            "counter": 0,
+            "digest_hex": "f4329b41da93a979909c83dd4ed065eadfe714549f0de1c8f3d30d7107924fae",
+            "x_u64": "17596297401232238969",
+            "limit_u64": "18446744073709551615",
+            "index": 2
+          },
+          {
+            "namespace": "template.variant.v1",
+            "candidate_count": 1,
+            "index": 0,
+            "hashed": false
+          }
+        ]
+      },
+      "expected_full_controlled_expression_plan": {
+        "expression_contract_version": "daily-expression-v1",
+        "output_schema_version": "1.0.0",
+        "template_compatibility_version": "daily-template-v1",
+        "result_version": "daily-v1",
+        "template_variant_id": "template.focus-first.v1",
+        "assertion_mode": "PARTIAL_ASSERTION",
+        "required_sections": [
+          "greeting",
+          "state_response",
+          "overall_summary",
+          "core_tip",
+          "explanation_paragraphs",
+          "dimension_explanations",
+          "primary_action",
+          "optional_task",
+          "ritual_notes",
+          "closing"
+        ],
+        "semantic_slots": {
+          "overall": {
+            "band": "STEADY",
+            "label_token": "KEEP_IT_STEADY"
+          },
+          "dimensions": [
+            { "id": "pace", "band": "STEADY" },
+            { "id": "action", "band": "STEADY" },
+            { "id": "connection", "band": "STEADY" },
+            { "id": "resources", "band": "STEADY" },
+            { "id": "recovery", "band": "STEADY" }
+          ],
+          "focus_dimension_id": "connection",
+          "selected_action": {
+            "action_id": "action.reflect-briefly.v1",
+            "kind": "REFLECT_BRIEFLY",
+            "target_scope": "ONE_SENTENCE",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 5,
+            "constraint_token": "ONE_SENTENCE_ONLY",
+            "basis_refs": [
+              "checkin.mood.good.v1",
+              "checkin.energy.unsure.v1",
+              "checkin.sleep.low.v1",
+              "dimension.connection.steady.v1"
+            ]
+          },
+          "optional_task": {
+            "task_id": "task.note-one-word.v1",
+            "kind": "REFLECT_BRIEFLY",
+            "effort": "VERY_LIGHT",
+            "timebox_minutes": 5
+          },
+          "rituals": [
+            {
+              "ritual_id": "ritual.number.9.v1",
+              "kind": "NUMBER",
+              "value": 9
+            }
+          ],
+          "explanation_basis_codes": [
+            "checkin.mood.good.v1",
+            "checkin.energy.unsure.v1",
+            "checkin.sleep.low.v1",
+            "dimension.connection.steady.v1"
+          ]
+        },
+        "known_checkin_fields": ["mood", "sleep"],
+        "uncertain_checkin_fields": ["energy"],
+        "allowed_state_assertion_basis_codes": [
+          "checkin.mood.good.v1",
+          "checkin.sleep.low.v1"
+        ],
+        "requested_expression_style": "BALANCED",
+        "effective_expression_constraints": {
+          "humor_ceiling": "LIGHT",
+          "pressure_ceiling": "LIGHT",
+          "opening_requirement": "UNCERTAINTY_FIRST",
+          "dimension_explanation_mode": "KNOWN_SIGNALS_ONLY"
+        },
+        "greeting_context": {
+          "relationship_mode": "GENERIC"
+        },
+        "resolved_context_slots": [],
+        "source_dependency_requirements": [],
+        "prohibited_claim_classes": [
+          "FUTURE_PREDICTION",
+          "DIAGNOSIS_OR_TREATMENT",
+          "FINANCIAL_OR_LEGAL_ADVICE",
+          "OTHER_PERSON_MIND_OR_RELATIONSHIP_OUTCOME",
+          "RESULT_GUARANTEE",
+          "RITUAL_CAUSALITY_OR_GAMBLING",
+          "TASK_PUNISHMENT_OR_SHAME",
+          "EXCLUSIVE_DEPENDENCY_OR_FABRICATED_INTIMACY",
+          "FABRICATED_MEMORY_OR_REAL_WORLD_EXPERIENCE"
+        ]
+      }
+    },
+    {
+      "id": "partial-focus-tie-selects-second",
+      "stable_subject_id": "user_example",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "input_snapshot": {
+        "snapshot_version": "input-v1",
+        "product_date": "2026-07-20",
+        "result_version": "daily-v1",
+        "checkin": {
+          "revision": 1,
+          "mood": "LOW",
+          "energy": "STEADY",
+          "sleep": "LOW"
+        },
+        "profile": {
+          "revision": 2,
+          "expression_style": "BALANCED"
+        },
+        "relationship": {
+          "stage": "NEWLY_MET",
+          "encounter_day_count": 2
+        },
+        "permitted_context": []
+      },
+      "expected": {
+        "root_seed_hex": "a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f782",
+        "dimension_scores": [37, 37, 38, 41, 39],
+        "overall_score": 38,
+        "overall_band": "LOW",
+        "focus_candidate_ids": ["pace", "action"],
+        "focus_dimension_id": "action",
+        "care_dimension_id": "action",
+        "supporting_dimension_id_omitted": true,
+        "action_candidate_ids": [
+          "action.prioritize-one.v1",
+          "action.reduce-switching.v1",
+          "action.pause-and-recover.v1"
+        ],
+        "selected_action_id": "action.pause-and-recover.v1",
+        "optional_task_plan": {
+          "task_id": "task.take-one-short-pause.v1",
+          "kind": "PAUSE_AND_RECOVER",
+          "effort": "VERY_LIGHT",
+          "timebox_minutes": 5
+        },
+        "display_order": [
+          "action",
+          "recovery",
+          "pace",
+          "resources",
+          "connection"
+        ],
+        "explanation_basis_codes": [
+          "checkin.mood.low.v1",
+          "checkin.energy.steady.v1",
+          "checkin.sleep.low.v1",
+          "dimension.action.low.v1"
+        ],
+        "ritual_facts": [
+          {
+            "ritual_id": "ritual.number.9.v1",
+            "kind": "NUMBER",
+            "value": 9
+          }
+        ],
+        "expression_derivation": {
+          "template_candidates": [
+            "template.focus-first.v1",
+            "template.care-then-step.v1"
+          ],
+          "selected_template_variant": "template.focus-first.v1",
+          "assertion_mode": "STANDARD",
+          "known_checkin_fields": ["mood", "energy", "sleep"],
+          "uncertain_checkin_fields": [],
+          "allowed_state_assertion_basis_codes": [
+            "checkin.mood.low.v1",
+            "checkin.energy.steady.v1",
+            "checkin.sleep.low.v1",
+            "dimension.action.low.v1"
+          ],
+          "effective_expression_constraints": {
+            "humor_ceiling": "NONE",
+            "pressure_ceiling": "VERY_LOW",
+            "opening_requirement": "CARE_FIRST",
+            "dimension_explanation_mode": "BAND_GUIDANCE"
+          }
+        },
+        "choice_traces": [
+          {
+            "namespace": "focus.tie.v1",
+            "candidate_count": 2,
+            "counter": 0,
+            "digest_hex": "3bbee2854a07751d2174ed7860320a81bc31236e67ac8bd78b958c0808784f82",
+            "x_u64": "4305127355913303325",
+            "limit_u64": "18446744073709551616",
+            "index": 1
+          },
+          {
+            "namespace": "action.tie.v1",
+            "candidate_count": 3,
+            "counter": 0,
+            "digest_hex": "f4329b41da93a979909c83dd4ed065eadfe714549f0de1c8f3d30d7107924fae",
+            "x_u64": "17596297401232238969",
+            "limit_u64": "18446744073709551615",
+            "index": 2
+          },
+          {
+            "namespace": "template.variant.v1",
+            "candidate_count": 2,
+            "counter": 0,
+            "digest_hex": "edc8533374848ad20d57b03199aef4e970c61d6add7ff05f1dc9b9c126eac6ea",
+            "x_u64": "17134036262794332882",
+            "limit_u64": "18446744073709551616",
+            "index": 0
+          }
+        ]
+      }
+    }
+  ],
+  "band_unit_cases": [
+    {
+      "score": 0,
+      "band": "LOW",
+      "label_token": "TAKE_IT_GENTLY"
+    },
+    {
+      "score": 39,
+      "band": "LOW",
+      "label_token": "TAKE_IT_GENTLY"
+    },
+    {
+      "score": 40,
+      "band": "STEADY",
+      "label_token": "KEEP_IT_STEADY"
+    },
+    {
+      "score": 69,
+      "band": "STEADY",
+      "label_token": "KEEP_IT_STEADY"
+    },
+    {
+      "score": 70,
+      "band": "HIGH",
+      "label_token": "ROOM_TO_MOVE"
+    },
+    {
+      "score": 100,
+      "band": "HIGH",
+      "label_token": "ROOM_TO_MOVE"
+    }
+  ],
+  "score_clamp_unit_cases": [
+    {
+      "id": "lower-clamp-reachable-in-daily-v1",
+      "raw_score": -2,
+      "expected_score": 0,
+      "reachable_from_legal_daily_v1_checkin": true
+    },
+    {
+      "id": "upper-clamp-contract-boundary",
+      "raw_score": 101,
+      "expected_score": 100,
+      "reachable_from_legal_daily_v1_checkin": false
+    }
+  ],
+  "overall_rounding_cases": [
+    {
+      "dimension_scores": [0, 0, 0, 0, 2],
+      "expected_overall": 0
+    },
+    {
+      "dimension_scores": [0, 0, 0, 0, 3],
+      "expected_overall": 1
+    },
+    {
+      "dimension_scores": [39, 40, 69, 70, 100],
+      "expected_overall": 64
+    }
+  ],
+  "ritual_set_cases": [
+    {
+      "stable_subject_id": "fixture_3",
+      "root_seed_hex": "b4da0c29fec03c6d58033dd01131211df25ca667f65e5dfa26305b67e70d275d",
+      "ritual_set_index": 0,
+      "expected_rituals": [],
+      "set_digest_hex": "f7caaf404e727e781668541ffdbf06816aaaff1e75f709b75fd40e71de32921b"
+    },
+    {
+      "stable_subject_id": "fixture_0",
+      "root_seed_hex": "66db979b4bb2c1e50a9f8ba250c89b6cc268eaae3bf9da2b14ee350b0c3ac8f5",
+      "ritual_set_index": 1,
+      "expected_rituals": [
+        {
+          "ritual_id": "ritual.color.soft-lilac.v1",
+          "kind": "COLOR",
+          "value": "SOFT_LILAC"
+        }
+      ],
+      "set_digest_hex": "c4a0d38dc9246b81f5554a94da3837ac19e7678e22e3f76a6335db578e70dd06",
+      "color_digest_hex": "e14b8a01161eb2ef383d5a7b3585d4d22ebc4e987435763c9ce1cf1caaaac4c8"
+    },
+    {
+      "stable_subject_id": "user_example",
+      "root_seed_hex": "a7ae24e6611d1081a173f6aa75b81aaa26554555b64049c5751fc3996fc5f782",
+      "ritual_set_index": 2,
+      "expected_rituals": [
+        {
+          "ritual_id": "ritual.number.9.v1",
+          "kind": "NUMBER",
+          "value": 9
+        }
+      ],
+      "set_digest_hex": "ce7553ad7c13cf6a6ce28c52287e30b3c9e5d235ca3bb468e910e560b82c0a8c",
+      "number_digest_hex": "22c3d5c9d8d4e3152e01cea5d848082153110033d4f9995e2cae2d5bcde736c0"
+    },
+    {
+      "stable_subject_id": "fixture_1",
+      "root_seed_hex": "9ac00b764350c9ac9df9a59fef68db342205e0664ac0f74f0be81cebe56ff93e",
+      "ritual_set_index": 3,
+      "expected_rituals": [
+        {
+          "ritual_id": "ritual.color.cloud-gray.v1",
+          "kind": "COLOR",
+          "value": "CLOUD_GRAY"
+        },
+        {
+          "ritual_id": "ritual.number.8.v1",
+          "kind": "NUMBER",
+          "value": 8
+        }
+      ],
+      "set_digest_hex": "9e3097b23954eb8b575997105e91ed3d2075eb622e837bd893da5dd59e489d12",
+      "color_digest_hex": "39ffa1070cc23b3bdde45f1a5b38fdb16151cc60e1af0e38440cea75723d1bd8",
+      "number_digest_hex": "0d401b6bbe641633b1eeabe91e453201b01a78d4680b73df4aef742d59bf06fb"
+    }
+  ],
+  "template_choice_cases": [
+    {
+      "id": "two-candidates-selects-second",
+      "stable_subject_id": "fixture_1",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "namespace": "template.variant.v1",
+      "candidate_ids": [
+        "template.focus-first.v1",
+        "template.care-then-step.v1"
+      ],
+      "counter": 0,
+      "digest_hex": "0903b242a1739d0f2626fa6ef4c7b5628484831ead887d55491cd99c01bc942a",
+      "x_u64": "649558770517777679",
+      "limit_u64": "18446744073709551616",
+      "expected_index": 1,
+      "expected_template_variant": "template.care-then-step.v1"
+    }
+  ],
+  "supporting_tie_unit_cases": [
+    {
+      "id": "synthetic-two-way-supporting-tie",
+      "stable_subject_id": "user_example",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "synthetic_dimension_scores": {
+        "pace": 90,
+        "action": 80,
+        "connection": 80,
+        "resources": 50,
+        "recovery": 50
+      },
+      "focus_dimension_id": "pace",
+      "supporting_candidate_ids": ["action", "connection"],
+      "namespace": "support.tie.v1",
+      "counter": 0,
+      "digest_hex": "550380a1f7816d5c106d88ef74e1bbbe0011de8f22e954f54d3060c52de3e851",
+      "x_u64": "6125881351284551004",
+      "limit_u64": "18446744073709551616",
+      "expected_index": 0,
+      "expected_supporting_dimension_id": "action",
+      "reachable_from_legal_daily_v1_checkin": false
+    }
+  ],
+  "daily_properties": {
+    "legal_input_combination_count": 180,
+    "expected_terminal_success_count": 180,
+    "expected_empty_action_candidate_count": 0,
+    "minimum_action_candidate_count": 1,
+    "maximum_action_candidate_count": 3,
+    "score_monotonic_for_each_known_adjacent_input": true,
+    "score_independent_of_root_seed": true,
+    "score_and_candidate_independent_of_non_checkin_snapshot_fields": true,
+    "ritual_result_independent_of_checkin_for_same_seed": true,
+    "client_projection_contains_raw_score": false
+  },
+  "non_checkin_invariance_case": {
+    "id": "profile-relationship-and-context-do-not-change-rule-facts",
+    "stable_subject_id": "user_example",
+    "baseline_snapshot": {
+      "snapshot_version": "input-v1",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "checkin": {
+        "revision": 1,
+        "mood": "STEADY",
+        "energy": "STEADY",
+        "sleep": "OKAY"
+      },
+      "profile": {
+        "revision": 1,
+        "expression_style": "BALANCED"
+      },
+      "relationship": {
+        "stage": "NEWLY_MET",
+        "encounter_day_count": 2
+      },
+      "permitted_context": []
+    },
+    "variant_snapshot": {
+      "snapshot_version": "input-v1",
+      "product_date": "2026-07-20",
+      "result_version": "daily-v1",
+      "user_ref": "user-ref-variant",
+      "checkin": {
+        "revision": 9,
+        "mood": "STEADY",
+        "energy": "STEADY",
+        "sleep": "OKAY"
+      },
+      "profile": {
+        "revision": 8,
+        "preferred_name": "小陈",
+        "expression_style": "LIGHT_HUMOR"
+      },
+      "relationship": {
+        "stage": "FIRST_WEEK_RECORDED",
+        "encounter_day_count": 99
+      },
+      "permitted_context": [
+        {
+          "source_ref": "context-ref-variant",
+          "source_type": "RECENT_RECORD",
+          "source_revision": 7,
+          "purpose": "daily-context-v1",
+          "valid_for_product_date": "2026-07-20"
+        }
+      ]
+    },
+    "expected_rule_facts_equal": true,
+    "expected_expression_style_may_differ": true,
+    "expected_context_slots_remain_empty_in_daily_v1": true
+  },
+  "expression_style_cases": [
+    {
+      "token": "BALANCED",
+      "expected_semantic_directive": "PERSONALITY_BASELINE",
+      "expected_requested_expression_style": "BALANCED",
+      "expected_rule_facts_unchanged": true
+    },
+    {
+      "token": "GENTLE",
+      "expected_semantic_directive": "WARMER_LESS_HUMOR_STILL_CLEAR",
+      "expected_requested_expression_style": "GENTLE",
+      "expected_rule_facts_unchanged": true
+    },
+    {
+      "token": "LIGHT_HUMOR",
+      "expected_semantic_directive": "LIGHT_LIFE_HUMOR_WITHIN_SAFETY_CEILING",
+      "expected_requested_expression_style": "LIGHT_HUMOR",
+      "expected_rule_facts_unchanged": true
+    },
+    {
+      "token": "CLEAR_DIRECT",
+      "expected_semantic_directive": "SHORTER_DIRECT_NOT_COMMANDING",
+      "expected_requested_expression_style": "CLEAR_DIRECT",
+      "expected_rule_facts_unchanged": true
+    },
+    {
+      "token": "CUSTOM_COACH",
+      "expected": "SNAPSHOT_FIELD_INVALID",
+      "expected_shared_schema_shape_parse": true,
+      "expected_semantic_allowlist_parse": false
+    }
+  ],
+  "invalid_cases": [
+    {
+      "id": "unknown-is-not-unsure",
+      "mutation": "checkin.mood=UNKNOWN",
+      "expected": "SNAPSHOT_FIELD_INVALID"
+    },
+    {
+      "id": "missing-checkin",
+      "mutation": "omit checkin",
+      "expected": "SNAPSHOT_FIELD_INVALID"
+    },
+    {
+      "id": "context-date-mismatch",
+      "mutation": "permitted_context.valid_for_product_date differs from snapshot product_date",
+      "expected": "SNAPSHOT_FIELD_INVALID"
+    },
+    {
+      "id": "unknown-snapshot-field",
+      "mutation": "add undeclared snapshot field",
+      "expected": "SNAPSHOT_FIELD_INVALID"
+    },
+    {
+      "id": "unknown-expression-style",
+      "mutation": "profile.expression_style=CUSTOM_COACH",
+      "expected": "SNAPSHOT_FIELD_INVALID"
+    },
+    {
+      "id": "result-version-binding-mismatch",
+      "mutation": "snapshot result_version differs from envelope manifest",
+      "expected": "SNAPSHOT_BINDING_MISMATCH"
+    },
+    {
+      "id": "unknown-manifest",
+      "mutation": "result_version has no exact immutable manifest",
+      "expected": "MANIFEST_NOT_FOUND"
+    },
+    {
+      "id": "duplicate-action-id",
+      "mutation": "eligible catalog contains a repeated stable ID",
+      "expected": "CATALOG_DUPLICATE_ID"
+    },
+    {
+      "id": "empty-mandatory-candidates",
+      "mutation": "all main actions are filtered",
+      "expected": "MANDATORY_CANDIDATE_EMPTY"
+    },
+    {
+      "id": "choice-count-zero",
+      "mutation": "choice-v1 n=0",
+      "expected": "CHOICE_COUNT_OUT_OF_RANGE"
+    },
+    {
+      "id": "choice-count-too-large",
+      "mutation": "choice-v1 n=4294967297",
+      "expected": "CHOICE_COUNT_OUT_OF_RANGE"
+    },
+    {
+      "id": "score-band-mismatch",
+      "mutation": "score=39 with band=STEADY",
+      "expected": "RULE_FACTS_INVARIANT_FAILED"
+    }
+  ],
+  "choice_isolation_cases": [
+    {
+      "id": "registered-unconsumed-namespace",
+      "precondition": "ritual set is NUMBER_ONLY",
+      "mutation": "also evaluate registered ritual.color.v1 without consuming its output",
+      "expected_existing_choice_fields_unchanged": true
+    },
+    {
+      "id": "catalog-storage-order",
+      "mutation": "shuffle stored action rows before canonical rank sort",
+      "expected_existing_choice_fields_unchanged": true
+    },
+    {
+      "id": "rejection-counter",
+      "source_fixture": "../decisions/adr-0002-test-vectors.json",
+      "expected_counter_increments_only_after_x_gte_limit": true
+    }
+  ],
+  "weekly_coverage_cases": [
+    { "real_state_day_count": 0, "expected": "EMPTY" },
+    { "real_state_day_count": 1, "expected": "POINTS_ONLY" },
+    { "real_state_day_count": 2, "expected": "POINTS_ONLY" },
+    { "real_state_day_count": 3, "expected": "PARTIAL" },
+    { "real_state_day_count": 4, "expected": "PARTIAL" },
+    { "real_state_day_count": 5, "expected": "PARTIAL" },
+    { "real_state_day_count": 6, "expected": "PARTIAL" },
+    { "real_state_day_count": 7, "expected": "COMPLETE" }
+  ],
+  "weekly_direction_cases": [
+    {
+      "id": "fewer-than-three",
+      "ordinals": [1, 2],
+      "expected": "INSUFFICIENT_DATA"
+    },
+    {
+      "id": "higher-boundary",
+      "ordinals": [1, 1, 2],
+      "expected": "HIGHER_LATE"
+    },
+    {
+      "id": "lower-boundary",
+      "ordinals": [3, 2, 2],
+      "expected": "LOWER_LATE"
+    },
+    {
+      "id": "small-dip-return",
+      "ordinals": [2, 1, 2],
+      "expected": "SIMILAR"
+    },
+    {
+      "id": "large-dip-return",
+      "ordinals": [1, 3, 1],
+      "expected": "VARIABLE"
+    },
+    {
+      "id": "one-level-oscillation",
+      "ordinals": [1, 2, 1, 2],
+      "expected": "VARIABLE"
+    },
+    {
+      "id": "stable-seven",
+      "ordinals": [2, 2, 2, 2, 2, 2, 2],
+      "expected": "SIMILAR"
+    },
+    {
+      "id": "wide-seven-oscillation",
+      "ordinals": [0, 2, 0, 2, 0, 2, 0],
+      "expected": "VARIABLE"
+    },
+    {
+      "id": "accepted-example-mood",
+      "ordinals": [2, 3, 2, 1],
+      "expected": "LOWER_LATE"
+    },
+    {
+      "id": "accepted-example-energy",
+      "ordinals": [1, 2, 1, 0, 1],
+      "expected": "LOWER_LATE"
+    },
+    {
+      "id": "accepted-example-sleep",
+      "ordinals": [2, 3, 1, 1, 2],
+      "expected": "VARIABLE"
+    },
+    {
+      "id": "accepted-example-evening",
+      "ordinals": [2, 1, 2],
+      "expected": "SIMILAR"
+    }
+  ],
+  "weekly_missing_unsure_case": {
+    "seven_slots": [
+      "GOOD",
+      "UNSURE",
+      "MISSING",
+      "STEADY",
+      "MISSING",
+      "LOW",
+      "MISSING"
+    ],
+    "expected_observed_count": 3,
+    "expected_unsure_count": 1,
+    "expected_missing_count": 3,
+    "expected_ordinals": [3, 2, 1],
+    "expected_direction": "LOWER_LATE"
+  },
+  "weekly_mode_case_note": "Unspecified distribution keys in these compact unit inputs are zero; emitted StateMetricFacts distributions remain dense.",
+  "weekly_mode_cases": [
+    {
+      "distribution": {
+        "LOW": 2
+      },
+      "expected_mode": "LOW",
+      "expected_mode_count": 2
+    },
+    {
+      "distribution": {
+        "LOW": 2,
+        "STEADY": 1
+      },
+      "expected_mode": "LOW",
+      "expected_mode_count": 2
+    },
+    {
+      "distribution": {
+        "LOW": 2,
+        "STEADY": 2
+      },
+      "expected_mode_omitted": true
+    },
+    {
+      "distribution": {
+        "LOW": 1,
+        "STEADY": 1,
+        "HIGH": 1
+      },
+      "expected_mode_omitted": true
+    }
+  ],
+  "weekly_helpfulness_top_kind_cases": [
+    {
+      "id": "unique-top-with-two-samples",
+      "helpful_action_kind_counts": {
+        "REDUCE_SWITCHING": 2,
+        "PAUSE_AND_RECOVER": 1
+      },
+      "expected_top_helpful_action_kind": "REDUCE_SWITCHING"
+    },
+    {
+      "id": "tie-omits-top-kind",
+      "helpful_action_kind_counts": {
+        "REDUCE_SWITCHING": 2,
+        "PAUSE_AND_RECOVER": 2
+      },
+      "expected_top_helpful_action_kind_omitted": true
+    },
+    {
+      "id": "single-sample-omits-top-kind",
+      "helpful_action_kind_counts": {
+        "REDUCE_SWITCHING": 1
+      },
+      "expected_top_helpful_action_kind_omitted": true
+    }
+  ],
+  "weekly_end_to_end_cases": [
+    {
+      "id": "partial-five-complete-chain",
+      "weekly_source_snapshot": {
+        "contract": "weekly-source-snapshot",
+        "schema_version": "1.0.0",
+        "window_id": "ww_example_20260720",
+        "window_start_date": "2026-07-14",
+        "window_end_date": "2026-07-20",
+        "window_rule_version": "window-v1",
+        "days": [
+          {
+            "product_date": "2026-07-14",
+            "source_state": "RECORDED",
+            "checkin": {
+              "source_ref": "checkin_example_20260714",
+              "revision": 1,
+              "mood": "STEADY",
+              "energy": "LOW",
+              "sleep": "OKAY"
+            },
+            "evening": {
+              "source_ref": "evening_example_20260714",
+              "revision": 1,
+              "overall_feeling": "STEADY"
+            },
+            "light": {
+              "source_ref": "light_example_20260714",
+              "is_lit": true
+            },
+            "helpfulness": {
+              "source_ref": "help_example_20260714",
+              "revision": 1,
+              "rating": "HELPFUL",
+              "action_kind": "REDUCE_SWITCHING"
+            },
+            "task": {
+              "source_ref": "task_example_20260714",
+              "revision": 1,
+              "status": "COMPLETED"
+            }
+          },
+          {
+            "product_date": "2026-07-15",
+            "source_state": "MISSING"
+          },
+          {
+            "product_date": "2026-07-16",
+            "source_state": "PARTIAL",
+            "checkin": {
+              "source_ref": "checkin_example_20260716",
+              "revision": 1,
+              "mood": "GOOD",
+              "energy": "STEADY",
+              "sleep": "GOOD"
+            },
+            "light": {
+              "source_ref": "light_example_20260716",
+              "is_lit": true
+            },
+            "task": {
+              "source_ref": "task_example_20260716",
+              "revision": 1,
+              "status": "UNMARKED"
+            }
+          },
+          {
+            "product_date": "2026-07-17",
+            "source_state": "RECORDED",
+            "checkin": {
+              "source_ref": "checkin_example_20260717",
+              "revision": 1,
+              "mood": "STEADY",
+              "energy": "LOW",
+              "sleep": "LOW"
+            },
+            "evening": {
+              "source_ref": "evening_example_20260717",
+              "revision": 1,
+              "overall_feeling": "SOMEWHAT_HEAVY"
+            },
+            "light": {
+              "source_ref": "light_example_20260717",
+              "is_lit": true
+            },
+            "helpfulness": {
+              "source_ref": "help_example_20260717",
+              "revision": 1,
+              "rating": "HELPFUL",
+              "action_kind": "REDUCE_SWITCHING"
+            },
+            "task": {
+              "source_ref": "task_example_20260717",
+              "revision": 1,
+              "status": "SKIPPED"
+            }
+          },
+          {
+            "product_date": "2026-07-18",
+            "source_state": "MISSING"
+          },
+          {
+            "product_date": "2026-07-19",
+            "source_state": "PARTIAL",
+            "checkin": {
+              "source_ref": "checkin_example_20260719",
+              "revision": 1,
+              "mood": "LOW",
+              "energy": "EMPTY",
+              "sleep": "LOW"
+            },
+            "light": {
+              "source_ref": "light_example_20260719",
+              "is_lit": true
+            },
+            "helpfulness": {
+              "source_ref": "help_example_20260719",
+              "revision": 1,
+              "rating": "NOT_USED"
+            },
+            "task": {
+              "source_ref": "task_example_20260719",
+              "revision": 1,
+              "status": "INTERESTED"
+            }
+          },
+          {
+            "product_date": "2026-07-20",
+            "source_state": "RECORDED",
+            "checkin": {
+              "source_ref": "checkin_example_20260720",
+              "revision": 1,
+              "mood": "UNSURE",
+              "energy": "LOW",
+              "sleep": "OKAY"
+            },
+            "evening": {
+              "source_ref": "evening_example_20260720",
+              "revision": 1,
+              "overall_feeling": "STEADY"
+            },
+            "light": {
+              "source_ref": "light_example_20260720",
+              "is_lit": false
+            },
+            "helpfulness": {
+              "source_ref": "help_example_20260720",
+              "revision": 1,
+              "rating": "NEUTRAL"
+            },
+            "task": {
+              "source_ref": "task_example_20260720",
+              "revision": 1,
+              "status": "UNMARKED"
+            }
+          }
+        ],
+        "source_fingerprint": "weekly-source-fingerprint-20260714-20260720-v1"
+      },
+      "expected_weekly_aggregate_facts": {
+        "contract": "weekly-aggregate-facts",
+        "schema_version": "1.0.0",
+        "window_id": "ww_example_20260720",
+        "window_start_date": "2026-07-14",
+        "window_end_date": "2026-07-20",
+        "coverage": {
+          "window_day_count": 7,
+          "real_state_day_count": 5,
+          "checkin_day_count": 5,
+          "evening_feedback_day_count": 3,
+          "lit_day_count": 4,
+          "missing_dates": ["2026-07-15", "2026-07-18"],
+          "coverage_level": "PARTIAL"
+        },
+        "day_slots": [
+          {
+            "product_date": "2026-07-14",
+            "state": "RECORDED",
+            "morning": {
+              "mood": "STEADY",
+              "energy": "LOW",
+              "sleep": "OKAY"
+            },
+            "evening": {
+              "overall_feeling": "STEADY"
+            },
+            "is_lit": true,
+            "helpfulness": "HELPFUL",
+            "helpful_action_kind": "REDUCE_SWITCHING",
+            "task_status": "COMPLETED"
+          },
+          {
+            "product_date": "2026-07-15",
+            "state": "MISSING",
+            "is_lit": false,
+            "helpfulness": "UNRATED"
+          },
+          {
+            "product_date": "2026-07-16",
+            "state": "RECORDED",
+            "morning": {
+              "mood": "GOOD",
+              "energy": "STEADY",
+              "sleep": "GOOD"
+            },
+            "is_lit": true,
+            "helpfulness": "UNRATED",
+            "task_status": "UNMARKED"
+          },
+          {
+            "product_date": "2026-07-17",
+            "state": "RECORDED",
+            "morning": {
+              "mood": "STEADY",
+              "energy": "LOW",
+              "sleep": "LOW"
+            },
+            "evening": {
+              "overall_feeling": "SOMEWHAT_HEAVY"
+            },
+            "is_lit": true,
+            "helpfulness": "HELPFUL",
+            "helpful_action_kind": "REDUCE_SWITCHING",
+            "task_status": "SKIPPED"
+          },
+          {
+            "product_date": "2026-07-18",
+            "state": "MISSING",
+            "is_lit": false,
+            "helpfulness": "UNRATED"
+          },
+          {
+            "product_date": "2026-07-19",
+            "state": "RECORDED",
+            "morning": {
+              "mood": "LOW",
+              "energy": "EMPTY",
+              "sleep": "LOW"
+            },
+            "is_lit": true,
+            "helpfulness": "NOT_USED",
+            "task_status": "INTERESTED"
+          },
+          {
+            "product_date": "2026-07-20",
+            "state": "RECORDED",
+            "morning": {
+              "mood": "UNSURE",
+              "energy": "LOW",
+              "sleep": "OKAY"
+            },
+            "evening": {
+              "overall_feeling": "STEADY"
+            },
+            "is_lit": false,
+            "helpfulness": "NEUTRAL",
+            "task_status": "UNMARKED"
+          }
+        ],
+        "state_metrics": [
+          {
+            "metric_id": "MORNING_MOOD",
+            "observed_count": 4,
+            "unsure_count": 1,
+            "missing_count": 2,
+            "direction": "LOWER_LATE",
+            "direction_basis_count": 4,
+            "distribution": {
+              "VERY_LOW": 0,
+              "LOW": 1,
+              "STEADY": 2,
+              "GOOD": 1,
+              "LIGHT": 0
+            },
+            "mode_value": "STEADY",
+            "mode_count": 2
+          },
+          {
+            "metric_id": "MORNING_ENERGY",
+            "observed_count": 5,
+            "unsure_count": 0,
+            "missing_count": 2,
+            "direction": "LOWER_LATE",
+            "direction_basis_count": 5,
+            "distribution": {
+              "EMPTY": 1,
+              "LOW": 3,
+              "STEADY": 1,
+              "HIGH": 0,
+              "FULL": 0
+            },
+            "mode_value": "LOW",
+            "mode_count": 3
+          },
+          {
+            "metric_id": "MORNING_SLEEP",
+            "observed_count": 5,
+            "unsure_count": 0,
+            "missing_count": 2,
+            "direction": "VARIABLE",
+            "direction_basis_count": 5,
+            "distribution": {
+              "POOR": 0,
+              "LOW": 2,
+              "OKAY": 2,
+              "GOOD": 1
+            }
+          },
+          {
+            "metric_id": "EVENING_OVERALL",
+            "observed_count": 3,
+            "unsure_count": 0,
+            "missing_count": 4,
+            "direction": "SIMILAR",
+            "direction_basis_count": 3,
+            "distribution": {
+              "VERY_HEAVY": 0,
+              "SOMEWHAT_HEAVY": 1,
+              "STEADY": 2,
+              "PRETTY_GOOD": 0,
+              "LIGHT": 0
+            },
+            "mode_value": "STEADY",
+            "mode_count": 2
+          }
+        ],
+        "light_facts": {
+          "lit_day_count": 4
+        },
+        "feedback_facts": {
+          "evening_feedback_day_count": 3
+        },
+        "helpfulness_facts": {
+          "rated_day_count": 4,
+          "helpful_count": 2,
+          "neutral_count": 1,
+          "not_helpful_count": 0,
+          "not_used_count": 1,
+          "unrated_day_count": 3,
+          "helpful_action_kind_counts": {
+            "REDUCE_SWITCHING": 2
+          },
+          "top_helpful_action_kind": "REDUCE_SWITCHING"
+        },
+        "task_facts": {
+          "task_offered_day_count": 5,
+          "completed_count": 1,
+          "skipped_count": 1,
+          "interested_count": 1,
+          "unmarked_count": 2
+        },
+        "approved_fact_catalog": [
+          "fact.coverage.level",
+          "fact.coverage.real_days",
+          "fact.coverage.missing_days",
+          "fact.coverage.checkin_days",
+          "fact.coverage.disclosure",
+          "fact.light.count",
+          "fact.feedback.count",
+          "fact.mood.direction",
+          "fact.mood.observed_count",
+          "fact.mood.mode",
+          "fact.energy.direction",
+          "fact.energy.observed_count",
+          "fact.energy.mode",
+          "fact.sleep.direction",
+          "fact.sleep.observed_count",
+          "fact.evening.direction",
+          "fact.evening.observed_count",
+          "fact.evening.mode",
+          "fact.helpfulness.rated_count",
+          "fact.helpfulness.helpful_count",
+          "fact.helpfulness.top_action_kind",
+          "fact.task.offered_count",
+          "fact.task.completed_count",
+          "plan.notice_energy_timing",
+          "plan.continue_without_pressure"
+        ],
+        "source_fingerprint": "weekly-source-fingerprint-20260714-20260720-v1",
+        "aggregate_version": "weekly-aggregate-v1"
+      },
+      "expected_weekly_expression_plan": {
+        "coverage_level": "PARTIAL",
+        "approved_fact_ids": [
+          "fact.coverage.level",
+          "fact.coverage.real_days",
+          "fact.coverage.missing_days",
+          "fact.coverage.disclosure",
+          "fact.light.count",
+          "fact.feedback.count",
+          "fact.energy.direction",
+          "fact.energy.observed_count",
+          "fact.evening.direction",
+          "fact.evening.observed_count",
+          "fact.helpfulness.top_action_kind",
+          "plan.notice_energy_timing"
+        ],
+        "headline_fact_id": "fact.coverage.real_days",
+        "observation_fact_ids": [
+          "fact.energy.direction",
+          "fact.evening.direction"
+        ],
+        "helpful_pattern_fact_id": "fact.helpfulness.top_action_kind",
+        "next_observation_plan": "NOTICE_ENERGY_TIMING",
+        "next_observation_fact_id": "plan.notice_energy_timing",
+        "coverage_fact_id": "fact.coverage.level",
+        "source_disclosure_fact_id": "fact.coverage.disclosure"
+      }
+    }
+  ],
+  "weekly_plan_cases": [
+    {
+      "id": "partial-five-current",
+      "coverage": "PARTIAL",
+      "directions": {
+        "mood": "LOWER_LATE",
+        "energy": "LOWER_LATE",
+        "sleep": "VARIABLE",
+        "evening": "SIMILAR"
+      },
+      "top_helpful_action_kind": "REDUCE_SWITCHING",
+      "expected_headline_fact_id": "fact.coverage.real_days",
+      "expected_observation_fact_ids": [
+        "fact.energy.direction",
+        "fact.evening.direction"
+      ],
+      "expected_helpful_pattern_fact_id": "fact.helpfulness.top_action_kind",
+      "expected_next_observation_plan": "NOTICE_ENERGY_TIMING",
+      "expected_next_observation_fact_id": "plan.notice_energy_timing",
+      "expected_approved_fact_ids": [
+        "fact.coverage.level",
+        "fact.coverage.real_days",
+        "fact.coverage.missing_days",
+        "fact.coverage.disclosure",
+        "fact.light.count",
+        "fact.feedback.count",
+        "fact.energy.direction",
+        "fact.energy.observed_count",
+        "fact.evening.direction",
+        "fact.evening.observed_count",
+        "fact.helpfulness.top_action_kind",
+        "plan.notice_energy_timing"
+      ]
+    },
+    {
+      "id": "complete-stable",
+      "coverage": "COMPLETE",
+      "directions": {
+        "mood": "SIMILAR",
+        "energy": "SIMILAR",
+        "sleep": "SIMILAR",
+        "evening": "SIMILAR"
+      },
+      "top_helpful_action_kind_omitted": true,
+      "evening_feedback_equals_real_state_days": true,
+      "expected_observation_fact_ids": [
+        "fact.energy.direction",
+        "fact.evening.direction"
+      ],
+      "expected_next_observation_plan": "CONTINUE_WITHOUT_PRESSURE"
+    },
+    {
+      "id": "sleep-variable-energy-stable",
+      "coverage": "PARTIAL",
+      "energy_observed_count": 3,
+      "directions": {
+        "mood": "SIMILAR",
+        "energy": "SIMILAR",
+        "sleep": "VARIABLE",
+        "evening": "SIMILAR"
+      },
+      "expected_next_observation_plan": "NOTICE_SLEEP_AND_ENERGY"
+    },
+    {
+      "id": "helpful-only-pattern",
+      "coverage": "PARTIAL",
+      "directions": {
+        "mood": "SIMILAR",
+        "energy": "SIMILAR",
+        "sleep": "SIMILAR",
+        "evening": "SIMILAR"
+      },
+      "top_helpful_action_kind": "PAUSE_AND_RECOVER",
+      "expected_helpful_pattern_fact_id": "fact.helpfulness.top_action_kind",
+      "expected_next_observation_plan": "NOTICE_HELPFUL_ACTIONS"
+    },
+    {
+      "id": "sparse-partial-no-metric-claim",
+      "coverage": "PARTIAL",
+      "all_metric_observed_counts_below_three": true,
+      "eligible_modes": false,
+      "evening_feedback_below_real_state_days": true,
+      "expected_observation_fact_ids": ["fact.light.count"],
+      "expected_next_observation_plan": "KEEP_ONE_SMALL_NOTE"
+    },
+    {
+      "id": "points-only",
+      "coverage": "POINTS_ONLY",
+      "real_state_day_count": 2,
+      "expected_weekly_expression_plan": "OMITTED"
+    }
+  ]
+}
