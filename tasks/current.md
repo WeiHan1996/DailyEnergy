@@ -1,39 +1,40 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-07-20
+- **最后更新**：2026-07-21
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务 ID**：S-10
-- **当前任务名称**：稳定种子与产品日期决策
-- **任务状态**：In Review
+- **当前任务 ID**：S-11
+- **当前任务名称**：规则引擎规范
+- **任务状态**：Ready
 - **优先级**：最高
-- **代码工作**：不开始正式业务代码；允许 ADR、算法伪代码和确定性测试向量
-- **当前分支**：`agent/stable-seed-product-date`
-- **关联 PR**：[#13](https://github.com/WeiHan1996/DailyEnergy/pull/13)
+- **代码工作**：不开始正式业务代码；允许规范、规则表、伪代码和确定性测试用例
+- **当前分支**：待创建
+- **关联 PR**：待创建
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
 
 ## 1. 当前目标
 
-创建 `docs/decisions/ADR-0002-deterministic-daily-result.md`，一次性确定 DailyEnergy 的权威产品日期策略、跨日有限续写、稳定种子、结果版本和幂等身份，使每日事实不会因设备时间、重试、并发、部署或模型变化而迁移、重抽或静默改写。
+创建 `docs/ai/generation-engine.md` 与 `docs/ai/scoring-rules.md`，把冻结的 GenerationInputSnapshot、已接受的 result manifest 和 ADR-0002 确定性协议转换为唯一 RuleFacts、候选集合与受控模板选择，使不同实现对相同输入和版本得到相同规则事实。
 
-本任务只做决策与可复算测试向量，不实现日期服务、规则引擎、API、数据库、队列、缓存、前端或 AI 调用。
+本任务只定义可实现、可复算的规则契约，不实现日期服务、TypeScript 规则包、API、数据库、缓存、队列、前端、AI Gateway 或 Prompt。
 
 ## 2. 必须交付
 
-- 一份 Draft ADR-0002；
-- 产品日期策略版本、IANA 时区和日边界；
-- 服务端权威时钟、命令接受时刻与目标日期冻结规则；
-- OPEN / CONTINUATION_ONLY / CLOSED 的确定性判定；
-- COMMAND_COMMIT、VIEW_CONTINUATION、GENERATION_COMPLETION 的精确期限和允许操作；
-- 七天窗口按产品日历日期计算的规则；
-- 稳定用户主体、seed preimage、规范化字节编码和摘要算法；
-- 具名随机命名空间和无偏选择规则，避免共享 PRNG 顺序漂移；
-- result_version 清单、生成意图唯一性、并发与重试语义；
-- 版本升级、历史冻结、删除后重建和策略失败边界；
-- 日期边界、种子摘要、选择索引、并发和版本切换测试向量；
-- 对 S-11、S-12、S-17～S-20、S-24、S-32 的下游约束。
+- 一份 Draft `generation-engine.md`，定义输入、处理阶段、输出、版本、失败与降级边界；
+- 一份 Draft `scoring-rules.md`，定义五维、整体档位、重点排序、行动、任务与仪式规则；
+- GenerationInputSnapshot 的允许字段、规范化、缺失值和不可变语义；
+- `pace`、`action`、`connection`、`resources`、`recovery` 五维的 0～100 整数算法；
+- LOW / STEADY / HIGH 的版本化阈值、整体分数与中性标签 token；
+- `focus_dimension_id`、supporting、care 与完整 `display_order` 的确定性规则；
+- 主要行动候选、可选任务、仪式元素和模板 variant 的资格与 canonical order；
+- 所有具名 choice namespace、tie-break、rejection sampling 与候选为空时的处理；
+- rule、algorithm、catalog、template 与 result manifest 的版本和 provenance 关系；
+- RuleFacts 与 ExpressionPayload、客户端视图、关系状态和任务状态的边界；
+- 模板降级需要的受控语义槽位，但不编写 Prompt 或开放式 AI 文案；
+- 正常、缺失、边界、并列、版本变化、非法输入和降级的确定性验收用例；
+- 对 S-12 AI Gateway、S-13 Prompt、S-16 评价、S-17～S-20 数据与接口以及 Phase 2 C-006/C-007 的约束。
 
 ## 3. 上游必读
 
@@ -41,114 +42,123 @@
 2. [README.md](../README.md)；
 3. [ROADMAP.md](../ROADMAP.md)；
 4. [docs/INDEX.md](../docs/INDEX.md)；
-5. [ADR-0001 产品定位](../docs/decisions/ADR-0001-product-positioning.md)；
-6. [产品状态机](../docs/product/state-machine.md)；
-7. [业务规则](../docs/product/business-rules.md)；
-8. [今日内容 Schema](../docs/ai/daily-content-schema.md)；
-9. [晚间反馈 Schema](../docs/ai/evening-feedback-schema.md)；
-10. [七天总结 Schema](../docs/ai/weekly-summary-schema.md)；
-11. [共享 Schema 包](../packages/shared-schemas/README.md)。
+5. [产品愿景](../docs/product/vision.md)；
+6. [首批用户画像](../docs/product/persona.md)；
+7. [MVP 用户旅程](../docs/product/journey.md)；
+8. [第一阶段 MVP](../docs/product/mvp.md)；
+9. [数字朋友人格](../docs/ai/personality.md)；
+10. [ADR-0001 产品定位](../docs/decisions/ADR-0001-product-positioning.md)；
+11. [产品状态机](../docs/product/state-machine.md)；
+12. [业务规则](../docs/product/business-rules.md)；
+13. [今日内容 Schema](../docs/ai/daily-content-schema.md)；
+14. [晚间反馈 Schema](../docs/ai/evening-feedback-schema.md)；
+15. [七天总结 Schema](../docs/ai/weekly-summary-schema.md)；
+16. [共享 Schema 包](../packages/shared-schemas/README.md)；
+17. [ADR-0002 稳定每日结果](../docs/decisions/ADR-0002-deterministic-daily-result.md)；
+18. [ADR-0002 测试向量](../docs/decisions/adr-0002-test-vectors.json)。
 
 ## 4. 已接受且不得重开的边界
 
-- 产品日期由服务端权威策略解析，设备日期和客户端倒计时不能决定写入；
-- 每个正式写事件必须携带目标 product_date 和日期策略版本；
-- 服务端在边界前接受的命令继续归原日期，响应晚到不改变归属；
-- 未被服务端接受的点击、草稿或离线请求不能跨日补交；
-- 旧日事实禁止改写到新产品日期；
-- 页面续写只授予边界前已合法打开的 DLY-003 / EVE-001；
-- 签到新增和更正不属于续写操作；
-- 同一用户和产品日期最多一份 AVAILABLE 每日结果；
-- 已发布结果不可变，算法升级不重写历史；
-- 七天窗口是包含锚点的七个连续产品日期，不是七个相遇日；
-- DAY 删除后不得自动重建；无法同时满足删除与稳定身份时保持禁用；
-- Safety、Deleting 和账户阻断优先于任何日期或续写资格。
+- 产品定位是日常陪伴与娱乐参考，不是算命、诊断、投资或法律判断；
+- 产品日期固定由 `Asia/Shanghai` 04:00 和服务端 `product-date-v1` 决定；
+- 根种子只由六个 LP32 字段组成，业务输入不得偷偷加入 seed；
+- 使用 SHA-256 `seed-v1`、具名 `choice-v1` 和无偏 rejection sampling；
+- 已保留 `focus.tie.v1`、`action.tie.v1`、`ritual.color.v1`、`ritual.number.v1`、`template.variant.v1`；
+- 每个新 namespace 必须版本化登记，候选 canonical order 不得依赖数据库或对象偶然顺序；
+- 五维稳定 ID、canonical order 和安全语义已经接受；
+- 内部可以保存 0～100 整数，客户端不得接收原始分数或伪精确预测；
+- 规则引擎独占 RuleFacts 写入权，AI 只能表达，不能改分数、排序、行动或仪式事实；
+- 每个已发布结果只有一个主要行动和一个不可变可选任务定义；
+- 关系节点、用户任务状态和晚间反馈属于外部组合状态，不写入不可变 RuleFacts；
+- 同一用户同一产品日只发布一个结果，版本升级不重写历史，DAY 删除不自动复活；
+- Safety、Deleting 和账户阻断优先，日期、种子或降级不得绕过；
+- 已发布对象必须完整通过 Schema 与安全校验，不允许局部拼接或 AI 补事实。
 
 ## 5. 本任务必须推荐并决定
 
-1. 首批中国大陆种子用户使用哪个 IANA 时区；
-2. 产品日边界是自然零点、固定偏移还是带宽限的双日期规则；
-3. VIEW_CONTINUATION 与 GENERATION_COMPLETION 各持续多久；
-4. 续写资格如何绑定用户、会话、页面、原日期和策略版本；
-5. 日期解析失败、时钟异常和 tzdata 变化时如何 fail closed；
-6. 稳定 seed 是否包含用户、日期、结果版本、输入快照或实验；
-7. 如何进行跨语言规范化编码、SHA 摘要和具名派生；
-8. 如何从摘要做无偏有限集合选择；
-9. result_version 与 seed / rule / algorithm / catalog / schema 版本如何关联；
-10. 同日部署、并发、重试、签到更正和生成失败如何保持唯一；
-11. 删除后显式重新开始是否允许，以及由哪个后续 ADR 解锁；
-12. 哪些字段可进入日志、埋点和错误上下文。
+1. 签到 mood、energy、sleep 及有效上下文怎样映射为五维整数信号；
+2. 所有权重、基准值、调整上限、clamp 和舍入采用什么整数规则；
+3. 整体分数与 LOW / STEADY / HIGH 阈值如何计算并版本化；
+4. 同分时怎样选择 focus、supporting、care 和展示顺序；
+5. 行动候选怎样筛选、去重、排序并用具名 choice 选出唯一行动；
+6. 可选任务怎样保持更低或相同负担，并避免与主要行动重复；
+7. COLOR / NUMBER 仪式元素何时为空、何时出现以及候选目录顺序；
+8. 模板 variant 和受控语义槽位怎样由相同 RuleFacts 确定；
+9. 输入缺失、`UNKNOWN`、非法枚举、候选为空和版本不匹配时如何 fail closed；
+10. 规则、算法、目录、模板与 result_version manifest 怎样原子冻结；
+11. 哪些 provenance、解释依据和调试信息只保留服务端；
+12. 哪些 golden cases 足以让 TypeScript 和其他语言独立复算。
 
-## 6. 必须覆盖的测试向量
+## 6. 必须覆盖的验收场景
 
-- 日边界前一秒、边界时刻和后一秒；
-- UTC 与产品时区跨自然日、跨年和闰日；
-- 设备时间错误、请求延迟和响应跨界；
-- OPEN、合法续写、续写过期和历史页；
-- 七日窗口首尾与连续日期；
-- 同一 seed 输入多次得到相同摘要；
-- 任一 seed 字段变化得到不同摘要；
-- 相同命名空间稳定，不同命名空间隔离；
-- 2、3、5、9 等集合大小的无偏索引边界；
-- 同日并发生成只保留一个意图和一个 AVAILABLE 结果；
-- 发布新 result_version 不改写既有当日和历史结果；
-- DAY 删除不触发隐式生成。
+- 每一种合法签到枚举和“说不准”输入；
+- 低精力、睡眠一般、稳定状态及信号相互冲突；
+- 分数 0、100 和每个档位阈值的前后边界；
+- 五维全并列、部分并列和唯一最高/最低；
+- 相同输入、seed 和 manifest 重复执行得到逐字段相同 RuleFacts；
+- 新增无关 namespace 不改变既有具名选择；
+- 候选顺序、目录版本或算法语义改变时必须升级对应版本；
+- 一个候选、多个候选、候选过滤后为空和 rejection counter 递增；
+- 主要行动、可选任务和仪式引用都指向合法稳定 ID；
+- RuleFacts 不包含关系卡、任务完成态、晚间反馈或 AI 文风字段；
+- 原始分数和内部解释依据不会进入 ClientDailyContentView；
+- 非法输入、未知版本和不完整 manifest 不调用 AI 猜测，按规范失败或安全默认；
+- 模板降级与 AI 表达使用同一 RuleFacts，不改变核心行动；
+- 历史 result_version 使用原 manifest，不因当前目录升级重算。
 
 ## 7. 明确不做
 
-- 五维分数、档位阈值和行动选择业务规则；
-- PRNG 或哈希的生产代码；
-- 数据库表、唯一索引、事务和迁移；
-- API 路径、错误码、令牌格式和签名密钥；
-- AI Gateway、Prompt、模型重试和缓存；
-- 前端倒计时、跨日弹窗和页面组件；
-- 通知调度实现与平台模板；
-- 多国家、多时区账户切换；
-- 依赖客户端时钟的任何写入授权。
+- 修改 ADR-0002 的日期、seed、choice、唯一性、历史或删除决策；
+- 编写生产规则引擎、日期服务、共享运行时包或数据库迁移；
+- 设计 API 路径、错误码、表结构、缓存键、队列和事务；
+- 选择 AI 供应商、模型、超时、重试、熔断或成本策略；
+- 编写 Prompt、人格文案、完整模板文案或前端展示文案；
+- 完成 S-15 内容安全分类、S-14 结构化记忆或 S-16 质量评价；
+- 实现微信小程序、管理后台、通知、埋点或页面组件；
+- 用星座、八字、塔罗、日期吉凶或未经授权的个人数据参与评分；
+- 依据尚未发生的用户实验偷偷调权重或创建隐藏版本。
 
 ## 8. 验收标准
 
-- ADR 状态为 Draft，用户确认前不标记 Accepted；
-- 每个时间点只解析出一个产品日期；
-- OPEN / CONTINUATION_ONLY / CLOSED 对同一输入唯一；
-- 命令接受与页面续写的边界不混用；
-- 稳定 seed 字节级可复算且跨语言无歧义；
-- 新增命名随机选择不会改变既有选择；
-- result_version 和生成意图唯一性足以解释并发、重试和部署；
-- 历史不改写、删除不复活、Safety 不被日期解除；
-- 测试向量含确定输入与期望输出；
-- 下游任务不需要重新猜测日期、种子或版本语义；
-- docs/INDEX.md、tasks/current.md 和 backlog 同步；
+- 两份规范状态为 Draft，用户确认前不得标记 Accepted；
+- 任一合法输入与 manifest 都能按有限步骤得到唯一 RuleFacts；
+- 所有分数、阈值、排序和选择均使用明确整数或字节级规则；
+- 五维、行动、任务、仪式与模板候选都有稳定 ID 和 canonical order；
+- namespace、规则、算法、目录和 result_version 之间无隐含版本；
+- 正常、边界、并列、非法输入与降级都有确定期望；
+- 输出满足已接受 Schema，AI 和客户端不能覆盖内部事实；
+- 不重新决定日期、种子、唯一性、历史冻结或删除；
+- 文档索引、tasks/current.md 和 backlog 同步；
 - 通过独立 Draft PR 提交；
-- 用户确认前不进入 S-11。
+- 用户确认前不进入 S-12，也不开始生产实现。
 
 ## 9. 完成后的下一任务
 
-S-10 被接受后，下一任务为：
+S-11 被接受后，下一任务为：
 
-- 当前任务 ID：S-11；
-- 当前任务名称：规则引擎规范；
-- 主要交付：docs/ai/generation-engine.md、docs/ai/scoring-rules.md；
-- 依据：已接受的可执行 Schema、ADR-0002 日期/种子/版本决策；
-- 不开始生产服务实现。
+- 当前任务 ID：S-12；
+- 当前任务名称：AI Gateway 决策与规范；
+- 主要交付：ADR-0003、docs/ai/gateway.md；
+- 依据：Accepted RuleFacts、result manifest、Schema 与稳定生成规则；
+- 不开始生产 AI Gateway 实现。
 
 ## 10. 最近一次交接
 
-- 日期：2026-07-20；
-- PR #12 已 squash 合并到 main（`f4e36f3`）；
-- S-09 共享 Schema 已验证为 Accepted；
-- S-10 已在分支 `agent/stable-seed-product-date` 开始，状态为 In Progress；
-- 当前没有正式产品业务代码；
+- 日期：2026-07-21；
+- PR #13 已由用户确认，本提交完成 S-10 接受收尾；
+- ADR-0002 已标记为 Accepted，73 个确定性断言保持通过；
+- S-10 已标记为 Done，S-11 已设为唯一 Ready 任务；
+- S-11 分支和 PR 尚未创建，任务尚未启动；
+- 当前没有正式前端、后端、数据库或 AI 业务实现；
 - 当前没有阻塞项；
-- 下一操作：起草 ADR-0002，加入可复算日期、种子和选择测试向量；
-- 新会话恢复口令：**继续 DailyEnergy 当前任务**。
+- 下一操作：PR #13 squash 合并并验证 main；之后等待“继续 DailyEnergy 当前任务”再启动 S-11。
 
 ## 11. 状态更新规则
 
 任务开始时：
 
 - Ready → In Progress；
-- 记录分支和 PR；
+- 创建独立分支并记录 PR；
 - 不改变任务范围。
 
 任务受阻时：
@@ -166,7 +176,7 @@ S-10 被接受后，下一任务为：
 用户确认并合并后：
 
 - 状态改为 Done；
-- ADR-0002 变为 Accepted；
+- generation-engine.md 与 scoring-rules.md 变为 Accepted；
 - 更新 docs/INDEX.md；
 - 从 Backlog 选择唯一下一任务；
 - 将下一任务设为 Ready。
