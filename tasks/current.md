@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-11
 - **当前任务名称**：规则引擎规范
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：不开始正式业务代码；允许规范、规则表、伪代码和确定性测试用例
 - **当前分支**：`agent/rule-engine-spec`
-- **关联 PR**：待创建
+- **关联 PR**：[#14](https://github.com/WeiHan1996/DailyEnergy/pull/14)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -145,13 +145,15 @@ S-11 被接受后，下一任务为：
 ## 10. 最近一次交接
 
 - 日期：2026-07-21；
-- PR #13 已由用户确认，本提交完成 S-10 接受收尾；
-- ADR-0002 已标记为 Accepted，73 个确定性断言保持通过；
-- S-10 已标记为 Done，S-11 已设为唯一 Ready 任务；
-- S-11 已在 `agent/rule-engine-spec` 分支启动，PR 待创建；
+- S-11 Draft PR [#14](https://github.com/WeiHan1996/DailyEnergy/pull/14) 已创建，等待用户审核；
+- 新增 Draft `generation-engine.md`、`scoring-rules.md` 与 `s11-test-vectors.json`，未修改生产业务代码；
+- 已冻结整数权重/阈值、focus/care/supporting、行动与任务目录、独立仪式、模板资格、四种表达 token、manifest 闭包和七天事实优先级；
+- 共享 Schema 包验证通过：4 个测试文件、34 个测试，以及格式、类型检查和构建；
+- 独立规则复算通过：5 个完整 RuleFacts、2 个定向日用例、180 种合法签到、12 个周 direction、8 个 coverage 边界和 1 条完整七日 source→aggregate→plan 链路；
+- 最终独立契约审计与 `git diff --check` 通过；
 - 当前没有正式前端、后端、数据库或 AI 业务实现；
 - 当前没有阻塞项；
-- 下一操作：完成两份 Draft 规范、确定性测试向量和控制文件同步，验证后创建独立 Draft PR。
+- 下一操作：用户审核 PR #14 并决定是否接受 S-11；确认前不标记 Accepted、不合并、不开始 S-12。
 
 ## 11. 状态更新规则
 
