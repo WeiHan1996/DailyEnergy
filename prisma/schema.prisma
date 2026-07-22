@@ -1,0 +1,1918 @@
+// DailyEnergy S-19 Prisma draft.
+//
+// Target syntax: Prisma ORM 7 with PostgreSQL. Connection configuration belongs
+// in prisma.config.ts and is intentionally not created in this specification PR.
+//
+// This file is not a migration. PostgreSQL-only invariants that Prisma Schema
+// cannot express safely are listed in docs/technical/database.md and MUST be
+// added by reviewed SQL migrations before E-006 is considered complete.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider     = "postgresql"
+  relationMode = "foreignKeys"
+}
+
+enum AccountState {
+  ACTIVE
+  RESTRICTED
+  DELETING
+  DELETED
+}
+
+enum ConsentStatus {
+  ACCEPTED
+  WITHDRAWN
+}
+
+enum ExpressionStyle {
+  BALANCED
+  GENTLE
+  LIGHT_HUMOR
+  CLEAR_DIRECT
+}
+
+enum CheckinMood {
+  VERY_LOW
+  LOW
+  STEADY
+  GOOD
+  LIGHT
+  UNSURE
+}
+
+enum CheckinEnergy {
+  EMPTY
+  LOW
+  STEADY
+  HIGH
+  FULL
+  UNSURE
+}
+
+enum CheckinSleep {
+  POOR
+  LOW
+  OKAY
+  GOOD
+  UNSURE
+}
+
+enum GenerationState {
+  QUEUED
+  RUNNING
+  FALLBACK_RUNNING
+  RETRYABLE_FAILED
+  SUCCEEDED
+  TERMINAL_FAILED
+  CANCELLED
+}
+
+enum InvocationWorkload {
+  DAILY
+  WEEKLY
+}
+
+enum GatewayRouteRole {
+  PRIMARY
+  BACKUP
+  CONTROLLED_TEMPLATE
+}
+
+enum GatewayAttemptOutcome {
+  SUCCEEDED
+  TIMEOUT
+  PROVIDER_ERROR
+  INVALID_SCHEMA
+  UNSAFE
+  BUDGET_EXHAUSTED
+  CIRCUIT_OPEN
+  CANCELLED
+  BLOCKED
+}
+
+enum ContentDisplayState {
+  AVAILABLE
+  FALLBACK_ONLY
+  BLOCKED
+}
+
+enum DailyTaskStatus {
+  UNMARKED
+  INTERESTED
+  COMPLETED
+  SKIPPED
+}
+
+enum HelpfulnessRating {
+  HELPFUL
+  NEUTRAL
+  NOT_HELPFUL
+  NOT_USED
+}
+
+enum OverallFeeling {
+  VERY_HEAVY
+  SOMEWHAT_HEAVY
+  STEADY
+  PRETTY_GOOD
+  LIGHT
+  UNSURE
+}
+
+enum RelationshipCycleState {
+  ACTIVE
+  CLOSED_BY_DELETION
+}
+
+enum MatterState {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  EXPIRED
+  DELETED
+}
+
+enum MemoryGrantState {
+  ACTIVE
+  REVOKED
+}
+
+enum MemoryPurpose {
+  DAILY_EXPRESSION
+  WEEKLY_SUMMARY
+  REMINDER
+  RELATIONSHIP_EXPRESSION
+}
+
+enum SafetyStatus {
+  CLEAR
+  ACTIVE
+  RECOVERY_PENDING
+}
+
+enum SafetyDecisionLevel {
+  CLEAR
+  PROFESSIONAL_BOUNDARY
+  HIGH_RISK
+}
+
+enum NotificationIntentState {
+  SCHEDULED
+  CANCELLED
+  SUPPRESSED
+  SENT
+  OPENED
+  EXPIRED
+}
+
+enum DataTaskKind {
+  DELETE
+  EXPORT
+}
+
+enum DataTaskScope {
+  DAY
+  MATTER
+  RELATIONSHIP_DATA
+  ACCOUNT
+  EXPORT_ACCOUNT
+  EXPORT_DATE_RANGE
+}
+
+enum DataTaskState {
+  QUEUED
+  RUNNING
+  FAILED
+  SUCCEEDED
+}
+
+enum DeletionStepState {
+  PENDING
+  RUNNING
+  FAILED
+  SUCCEEDED
+}
+
+enum DeletionOutcome {
+  SUCCEEDED
+  FAILED
+  RESTRICTED_EXCEPTION
+}
+
+enum RetentionDataClass {
+  T0_TRANSIENT
+  T1_ACTIVE_PRODUCT
+  T2_RESTRICTED_EVIDENCE
+  T3_ISOLATED_BACKUP
+  T4_ANONYMOUS_SYSTEM
+}
+
+enum RetentionScope {
+  ACCOUNT
+  DAY
+  MATTER
+  RELATIONSHIP_DATA
+  SAFETY
+  NOTIFICATION
+  EXPORT
+  RUNTIME
+  EVALUATION
+  LEGAL_EVIDENCE
+  SYSTEM
+}
+
+enum RetentionTerminalAction {
+  DELETE
+  ANONYMIZE
+  RESTRICTED_FREEZE
+}
+
+enum CatalogStatus {
+  STAGED
+  ACTIVE
+  DISABLED
+  RETIRED
+}
+
+enum ProviderDeletionState {
+  QUEUED
+  SENT
+  ACKNOWLEDGED
+  TTL_ONLY
+  FAILED
+  EXPIRED
+}
+
+enum BackupState {
+  AVAILABLE
+  RESTORING_ISOLATED
+  EXPIRED
+  PURGED
+}
+
+enum LegalHoldState {
+  ACTIVE
+  RELEASED
+  EXPIRED
+}
+
+enum OutboxState {
+  PENDING
+  PUBLISHED
+  FAILED
+}
+
+enum EvaluationRunState {
+  PLANNED
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model UserAccount {
+  id                      String         @id @default(uuid()) @db.Uuid
+  ownerScopeToken         Bytes          @unique
+  stableSubjectCiphertext Bytes
+  stableSubjectKeyVersion String         @db.VarChar(64)
+  state                   AccountState   @default(ACTIVE)
+  revision                Int            @default(1)
+  restrictionCode         String?        @db.VarChar(64)
+  lastActiveUseAt         DateTime       @db.Timestamptz(3)
+  inactivityDeletionDueAt DateTime       @db.Timestamptz(3)
+  activeDeletionTaskRef   String?        @db.Uuid
+  createdAt               DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime       @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion  String         @db.VarChar(64)
+  retentionScope          RetentionScope @default(ACCOUNT)
+  retentionAnchorAt       DateTime       @db.Timestamptz(3)
+  expiresAt               DateTime?      @db.Timestamptz(3)
+
+  externalIdentities      ExternalIdentity[]
+  sessions                SessionCredential[]
+  consents                NecessaryConsentRecord[]
+  profile                 UserProfile?
+  onboarding              OnboardingCompletion?
+  continuationGrants      ViewContinuationGrant[]
+  commandReceipts         CommandReceipt[]
+  checkins                MorningCheckin[]
+  generationIntents       GenerationIntent[]
+  dailyResults            PublishedDailyResult[]
+  dailyInteractions       DailyInteraction[]
+  relationshipCycles      RelationshipCycle[]
+  matters                 ImportantMatter[]
+  memoryPurposeGrants     MemoryPurposeGrant[]
+  memoryMasterPreference  MemoryMasterPreference?
+  memoryMentionReceipts   MemoryMentionReceipt[]
+  memorySnapshots         MemoryContextSnapshot[]
+  weeklyWindows           WeeklyWindow[]
+  safetyState             SafetyState?
+  safetyDecisions         SafetyDecision[]
+  safetyEvents            SafetyEvent[]
+  safetyResponsePlans     SafetyResponsePlan[]
+  recoveryReceipts        RecoveryCommandReceipt[]
+  notificationPreferences NotificationPreference[]
+  platformPermissions     PlatformPermissionSnapshot[]
+  notificationIntents     NotificationIntent[]
+  dataTasks               DataTask[]
+  deletionGuards          DeletionGuard[]
+
+  @@index([state, inactivityDeletionDueAt])
+  @@index([expiresAt])
+  @@map("app_user_account")
+}
+
+model ExternalIdentity {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  providerCode           String         @db.VarChar(32)
+  subjectLookupToken     Bytes
+  subjectCiphertext      Bytes
+  keyVersion             String         @db.VarChar(64)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  lastSeenAt             DateTime       @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(ACCOUNT)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@unique([providerCode, subjectLookupToken])
+  @@index([accountId])
+  @@index([expiresAt])
+  @@map("app_external_identity")
+}
+
+model SessionCredential {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  tokenHash              Bytes          @unique
+  deviceRef              String?        @db.VarChar(128)
+  issuedAt               DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+  revokedAt              DateTime?      @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(ACCOUNT)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+
+  account            UserAccount             @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  continuationGrants ViewContinuationGrant[]
+
+  @@index([accountId, expiresAt])
+  @@map("app_session_credential")
+}
+
+model NecessaryConsentRecord {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  noticeVersion          String         @db.VarChar(64)
+  logicalIntent          String         @db.VarChar(64)
+  status                 ConsentStatus
+  commandRef             String         @db.Uuid
+  acceptedAt             DateTime?      @db.Timestamptz(3)
+  withdrawnAt            DateTime?      @db.Timestamptz(3)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(ACCOUNT)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account               UserAccount            @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  onboardingCompletions OnboardingCompletion[]
+
+  @@unique([accountId, commandRef])
+  @@index([accountId, logicalIntent, createdAt(sort: Desc)])
+  @@index([expiresAt])
+  @@map("app_necessary_consent_record")
+}
+
+model UserProfile {
+  id                      String          @id @default(uuid()) @db.Uuid
+  accountId               String          @unique @db.Uuid
+  revision                Int             @default(1)
+  preferredNameCiphertext Bytes?
+  preferredNameKeyVersion String?         @db.VarChar(64)
+  expressionStyle         ExpressionStyle @default(BALANCED)
+  profileSchemaVersion    String          @db.VarChar(64)
+  createdAt               DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime        @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion  String          @db.VarChar(64)
+  retentionScope          RetentionScope  @default(ACCOUNT)
+  retentionAnchorAt       DateTime        @db.Timestamptz(3)
+  expiresAt               DateTime?       @db.Timestamptz(3)
+
+  account   UserAccount           @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  revisions UserProfileRevision[]
+
+  @@index([expiresAt])
+  @@map("app_user_profile")
+}
+
+model UserProfileRevision {
+  id                      String          @id @default(uuid()) @db.Uuid
+  profileId               String          @db.Uuid
+  revision                Int
+  preferredNameCiphertext Bytes?
+  preferredNameKeyVersion String?         @db.VarChar(64)
+  expressionStyle         ExpressionStyle
+  changedFieldNames       String[]
+  commandRef              String          @db.Uuid
+  createdAt               DateTime        @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion  String          @db.VarChar(64)
+  retentionScope          RetentionScope  @default(ACCOUNT)
+  retentionAnchorAt       DateTime        @db.Timestamptz(3)
+  expiresAt               DateTime        @db.Timestamptz(3)
+
+  profile UserProfile @relation(fields: [profileId], references: [id], onDelete: Restrict)
+
+  @@unique([profileId, revision])
+  @@index([expiresAt])
+  @@map("app_user_profile_revision")
+}
+
+model OnboardingCompletion {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @unique @db.Uuid
+  profileRevision        Int
+  consentRecordId        String         @db.Uuid
+  completionCommandRef   String         @db.Uuid
+  completedAt            DateTime       @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(ACCOUNT)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account       UserAccount            @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  consentRecord NecessaryConsentRecord @relation(fields: [consentRecordId], references: [id], onDelete: Restrict)
+
+  @@unique([accountId, completionCommandRef])
+  @@index([expiresAt])
+  @@map("app_onboarding_completion")
+}
+
+model ViewContinuationGrant {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  sessionId              String         @db.Uuid
+  surfaceCode            String         @db.VarChar(32)
+  productDate            DateTime       @db.Date
+  resultRef              String?        @db.Uuid
+  feedbackRevision       Int?
+  boundaryAt             DateTime       @db.Timestamptz(3)
+  allowedOperations      String[]
+  revision               Int            @default(1)
+  expiresAt              DateTime       @db.Timestamptz(3)
+  invalidatedAt          DateTime?      @db.Timestamptz(3)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+
+  account UserAccount       @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  session SessionCredential @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+
+  @@index([accountId, productDate, expiresAt])
+  @@index([sessionId, expiresAt])
+  @@map("app_view_continuation_grant")
+}
+
+model CommandReceipt {
+  id                           String         @id @default(uuid()) @db.Uuid
+  accountId                    String         @db.Uuid
+  commandRef                   String         @db.Uuid
+  operationCode                String         @db.VarChar(64)
+  targetScope                  String         @db.VarChar(32)
+  targetKey                    String         @db.VarChar(160)
+  productDatePolicyVersion     String?        @db.VarChar(64)
+  normalizedPayloadFingerprint Bytes
+  acceptedAt                   DateTime       @db.Timestamptz(3)
+  terminalAt                   DateTime?      @db.Timestamptz(3)
+  responseRef                  String?        @db.Uuid
+  retentionPolicyVersion       String         @db.VarChar(64)
+  retentionScope               RetentionScope @default(RUNTIME)
+  retentionAnchorAt            DateTime       @db.Timestamptz(3)
+  expiresAt                    DateTime       @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@unique([accountId, commandRef])
+  @@index([accountId, operationCode, targetKey])
+  @@index([expiresAt])
+  @@map("runtime_command_receipt")
+}
+
+model MorningCheckin {
+  id                       String         @id @default(uuid()) @db.Uuid
+  accountId                String         @db.Uuid
+  productDate              DateTime       @db.Date
+  productDatePolicyVersion String         @db.VarChar(64)
+  revision                 Int            @default(1)
+  mood                     CheckinMood
+  energy                   CheckinEnergy
+  sleep                    CheckinSleep
+  firstSubmittedAt         DateTime       @db.Timestamptz(3)
+  updatedAt                DateTime       @updatedAt @db.Timestamptz(3)
+  sourceCommandRef         String         @db.Uuid
+  retentionPolicyVersion   String         @db.VarChar(64)
+  retentionScope           RetentionScope @default(DAY)
+  retentionAnchorAt        DateTime       @db.Timestamptz(3)
+  expiresAt                DateTime?      @db.Timestamptz(3)
+
+  account   UserAccount               @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  revisions MorningCheckinRevision[]
+  snapshots GenerationInputSnapshot[]
+
+  @@unique([accountId, productDate])
+  @@index([accountId, productDate(sort: Desc)])
+  @@index([expiresAt])
+  @@map("app_morning_checkin")
+}
+
+model MorningCheckinRevision {
+  id                     String         @id @default(uuid()) @db.Uuid
+  checkinId              String         @db.Uuid
+  revision               Int
+  mood                   CheckinMood
+  energy                 CheckinEnergy
+  sleep                  CheckinSleep
+  commandRef             String         @db.Uuid
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  checkin MorningCheckin @relation(fields: [checkinId], references: [id], onDelete: Restrict)
+
+  @@unique([checkinId, revision])
+  @@index([expiresAt])
+  @@map("app_morning_checkin_revision")
+}
+
+model GenerationIntent {
+  id                       String          @id @default(uuid()) @db.Uuid
+  accountId                String          @db.Uuid
+  targetProductDate        DateTime        @db.Date
+  productDatePolicyVersion String          @db.VarChar(64)
+  acceptedAt               DateTime        @db.Timestamptz(3)
+  revision                 Int             @default(1)
+  state                    GenerationState
+  resultVersion            String          @db.VarChar(64)
+  manifestRef              String          @db.VarChar(128)
+  manifestFingerprint      Bytes
+  inputSnapshotFingerprint Bytes
+  rootSeedMaterialRef      String          @db.VarChar(128)
+  completionGrantVersion   String          @db.VarChar(64)
+  publishedResultRef       String?         @db.Uuid
+  terminalReasonCode       String?         @db.VarChar(64)
+  createdAt                DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt                DateTime        @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion   String          @db.VarChar(64)
+  retentionScope           RetentionScope  @default(DAY)
+  retentionAnchorAt        DateTime        @db.Timestamptz(3)
+  expiresAt                DateTime?       @db.Timestamptz(3)
+
+  account         UserAccount              @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  inputSnapshot   GenerationInputSnapshot?
+  invocations     GatewayInvocation[]
+  publishedResult PublishedDailyResult?
+
+  @@unique([accountId, targetProductDate])
+  @@index([state, updatedAt])
+  @@index([expiresAt])
+  @@map("app_generation_intent")
+}
+
+model GenerationInputSnapshot {
+  id                     String         @id @default(uuid()) @db.Uuid
+  generationIntentId     String         @unique @db.Uuid
+  checkinId              String         @db.Uuid
+  checkinRevision        Int
+  schemaVersion          String         @db.VarChar(64)
+  snapshotPayload        Json           @db.JsonB
+  snapshotFingerprint    Bytes
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  generationIntent GenerationIntent      @relation(fields: [generationIntentId], references: [id], onDelete: Restrict)
+  checkin          MorningCheckin        @relation(fields: [checkinId], references: [id], onDelete: Restrict)
+  publishedResult  PublishedDailyResult?
+
+  @@index([checkinId, checkinRevision])
+  @@index([expiresAt])
+  @@map("app_generation_input_snapshot")
+}
+
+model GatewayInvocation {
+  id                     String             @id @default(uuid()) @db.Uuid
+  workload               InvocationWorkload
+  generationIntentId     String?            @db.Uuid
+  weeklySummaryIntentId  String?            @db.Uuid
+  planFingerprint        Bytes
+  promptPackageVersion   String             @db.VarChar(64)
+  schemaVersion          String             @db.VarChar(64)
+  templateVersion        String             @db.VarChar(64)
+  safetyBundleVersion    String             @db.VarChar(64)
+  routeManifestVersion   String             @db.VarChar(64)
+  routeFingerprint       Bytes
+  publishGuardSnapshot   Json               @db.JsonB
+  deadlineAt             DateTime           @db.Timestamptz(3)
+  createdAt              DateTime           @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String             @db.VarChar(64)
+  retentionScope         RetentionScope     @default(RUNTIME)
+  retentionAnchorAt      DateTime           @db.Timestamptz(3)
+  expiresAt              DateTime?          @db.Timestamptz(3)
+
+  generationIntent    GenerationIntent?      @relation(fields: [generationIntentId], references: [id], onDelete: Restrict)
+  weeklySummaryIntent WeeklySummaryIntent?   @relation(fields: [weeklySummaryIntentId], references: [id], onDelete: Restrict)
+  attempts            GatewayAttempt[]
+  memorySnapshot      MemoryContextSnapshot?
+
+  @@index([generationIntentId])
+  @@index([weeklySummaryIntentId])
+  @@index([expiresAt])
+  @@map("runtime_gateway_invocation")
+}
+
+model GatewayAttempt {
+  id                     String                 @id @default(uuid()) @db.Uuid
+  invocationId           String                 @db.Uuid
+  routeRole              GatewayRouteRole
+  ordinal                Int
+  requestFingerprint     Bytes
+  adapterVersion         String                 @db.VarChar(64)
+  providerProfileVersion String                 @db.VarChar(64)
+  endpointCode           String                 @db.VarChar(64)
+  modelVersion           String                 @db.VarChar(128)
+  startedAt              DateTime               @db.Timestamptz(3)
+  finishedAt             DateTime?              @db.Timestamptz(3)
+  outcome                GatewayAttemptOutcome?
+  inputTokens            Int?
+  outputTokens           Int?
+  costMicros             BigInt?
+  providerRequestRef     String?                @db.VarChar(160)
+  candidateFingerprint   Bytes?
+  failureCode            String?                @db.VarChar(64)
+  retentionPolicyVersion String                 @db.VarChar(64)
+  retentionScope         RetentionScope         @default(RUNTIME)
+  retentionAnchorAt      DateTime               @db.Timestamptz(3)
+  expiresAt              DateTime               @db.Timestamptz(3)
+
+  invocation GatewayInvocation @relation(fields: [invocationId], references: [id], onDelete: Restrict)
+  candidate  GatewayCandidate?
+
+  @@unique([invocationId, routeRole, ordinal])
+  @@index([providerProfileVersion, startedAt])
+  @@index([expiresAt])
+  @@map("runtime_gateway_attempt")
+}
+
+model GatewayCandidate {
+  id                        String         @id @default(uuid()) @db.Uuid
+  attemptId                 String         @unique @db.Uuid
+  schemaVersion             String         @db.VarChar(64)
+  completePayloadCiphertext Bytes
+  payloadKeyVersion         String         @db.VarChar(64)
+  candidateFingerprint      Bytes
+  validationReceipt         Json           @db.JsonB
+  validatedAt               DateTime       @db.Timestamptz(3)
+  expiresAt                 DateTime       @db.Timestamptz(3)
+  retentionPolicyVersion    String         @db.VarChar(64)
+  retentionScope            RetentionScope @default(RUNTIME)
+  retentionAnchorAt         DateTime       @db.Timestamptz(3)
+
+  attempt GatewayAttempt @relation(fields: [attemptId], references: [id], onDelete: Restrict)
+
+  @@index([expiresAt])
+  @@map("runtime_gateway_candidate")
+}
+
+model PublishedDailyResult {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  generationIntentId     String         @unique @db.Uuid
+  inputSnapshotId        String         @unique @db.Uuid
+  productDate            DateTime       @db.Date
+  resultVersion          String         @db.VarChar(64)
+  schemaVersion          String         @db.VarChar(64)
+  generatedAt            DateTime       @db.Timestamptz(3)
+  ruleFactsPayload       Json           @db.JsonB
+  expressionCorePayload  Json           @db.JsonB
+  provenancePayload      Json           @db.JsonB
+  validationReceipt      Json           @db.JsonB
+  resultFingerprint      Bytes
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account          UserAccount                @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  generationIntent GenerationIntent           @relation(fields: [generationIntentId], references: [id], onDelete: Restrict)
+  inputSnapshot    GenerationInputSnapshot    @relation(fields: [inputSnapshotId], references: [id], onDelete: Restrict)
+  visibility       PublishedResultVisibility?
+  contentSlots     ResultContentSlot[]
+  dailyInteraction DailyInteraction?
+  mentionReceipts  MemoryMentionReceipt[]
+
+  @@unique([accountId, productDate])
+  @@index([accountId, productDate(sort: Desc)])
+  @@index([expiresAt])
+  @@map("app_published_daily_result")
+}
+
+model PublishedResultVisibility {
+  id                     String              @id @default(uuid()) @db.Uuid
+  resultId               String              @unique @db.Uuid
+  state                  ContentDisplayState @default(AVAILABLE)
+  revision               Int                 @default(1)
+  sourceFingerprint      Bytes
+  blockedReasonCode      String?             @db.VarChar(64)
+  updatedAt              DateTime            @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String              @db.VarChar(64)
+  retentionScope         RetentionScope      @default(DAY)
+  retentionAnchorAt      DateTime            @db.Timestamptz(3)
+  expiresAt              DateTime?           @db.Timestamptz(3)
+
+  result PublishedDailyResult @relation(fields: [resultId], references: [id], onDelete: Restrict)
+
+  @@index([expiresAt])
+  @@map("app_published_result_visibility")
+}
+
+model ResultContentSlot {
+  id                     String         @id @default(uuid()) @db.Uuid
+  resultId               String         @db.Uuid
+  segmentPath            String         @db.VarChar(160)
+  fallbackPayload        Json?          @db.JsonB
+  fallbackFingerprint    Bytes?
+  fallbackSchemaVersion  String?        @db.VarChar(64)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  result               PublishedDailyResult         @relation(fields: [resultId], references: [id], onDelete: Restrict)
+  personalizedFragment PersonalizedContentFragment?
+
+  @@unique([resultId, segmentPath])
+  @@index([expiresAt])
+  @@map("app_result_content_slot")
+}
+
+model PersonalizedContentFragment {
+  id                     String         @id @default(uuid()) @db.Uuid
+  slotId                 String         @unique @db.Uuid
+  payloadCiphertext      Bytes
+  payloadKeyVersion      String         @db.VarChar(64)
+  payloadFingerprint     Bytes
+  schemaVersion          String         @db.VarChar(64)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  slot         ResultContentSlot  @relation(fields: [slotId], references: [id], onDelete: Restrict)
+  dependencies SourceDependency[]
+
+  @@index([expiresAt])
+  @@map("app_personalized_content_fragment")
+}
+
+model SourceDependency {
+  id                     String         @id @default(uuid()) @db.Uuid
+  fragmentId             String         @db.Uuid
+  sourceType             String         @db.VarChar(64)
+  sourceRef              String         @db.Uuid
+  sourceRevision         Int
+  purpose                MemoryPurpose
+  grantRef               String?        @db.Uuid
+  grantRevision          Int?
+  policyVersion          String         @db.VarChar(64)
+  segmentPaths           String[]
+  fallbackPaths          String[]
+  validAtPublish         Boolean
+  invalidatedAt          DateTime?      @db.Timestamptz(3)
+  invalidationReasonCode String?        @db.VarChar(64)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  fragment PersonalizedContentFragment @relation(fields: [fragmentId], references: [id], onDelete: Restrict)
+
+  @@index([sourceType, sourceRef])
+  @@index([grantRef])
+  @@index([expiresAt])
+  @@map("app_source_dependency")
+}
+
+model DailyInteraction {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  productDate            DateTime       @db.Date
+  resultId               String         @unique @db.Uuid
+  aggregateRevision      Int            @default(1)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime       @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account     UserAccount             @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  result      PublishedDailyResult    @relation(fields: [resultId], references: [id], onDelete: Restrict)
+  light       DailyLightFact?
+  task        DailyTaskState?
+  helpfulness DailyHelpfulnessRecord?
+  feedback    EveningFeedbackRecord?
+
+  @@unique([accountId, productDate])
+  @@index([accountId, productDate(sort: Desc)])
+  @@index([expiresAt])
+  @@map("app_daily_interaction")
+}
+
+model DailyLightFact {
+  id                     String         @id @default(uuid()) @db.Uuid
+  interactionId          String         @unique @db.Uuid
+  sourceCommandRef       String         @db.Uuid
+  litAt                  DateTime       @db.Timestamptz(3)
+  sourceValidityRevision Int            @default(1)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  interaction    DailyInteraction            @relation(fields: [interactionId], references: [id], onDelete: Restrict)
+  encounterLinks RelationshipEncounterLink[]
+
+  @@index([expiresAt])
+  @@map("app_daily_light_fact")
+}
+
+model DailyTaskState {
+  id                     String          @id @default(uuid()) @db.Uuid
+  interactionId          String          @unique @db.Uuid
+  taskDefinitionId       String          @db.VarChar(128)
+  taskKind               String          @db.VarChar(64)
+  status                 DailyTaskStatus @default(UNMARKED)
+  revision               Int             @default(1)
+  updatedAt              DateTime        @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String          @db.VarChar(64)
+  retentionScope         RetentionScope  @default(DAY)
+  retentionAnchorAt      DateTime        @db.Timestamptz(3)
+  expiresAt              DateTime?       @db.Timestamptz(3)
+
+  interaction DailyInteraction @relation(fields: [interactionId], references: [id], onDelete: Restrict)
+
+  @@index([expiresAt])
+  @@map("app_daily_task_state")
+}
+
+model DailyHelpfulnessRecord {
+  id                     String            @id @default(uuid()) @db.Uuid
+  interactionId          String            @unique @db.Uuid
+  rating                 HelpfulnessRating
+  revision               Int               @default(1)
+  updatedAt              DateTime          @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String            @db.VarChar(64)
+  retentionScope         RetentionScope    @default(DAY)
+  retentionAnchorAt      DateTime          @db.Timestamptz(3)
+  expiresAt              DateTime?         @db.Timestamptz(3)
+
+  interaction DailyInteraction @relation(fields: [interactionId], references: [id], onDelete: Restrict)
+
+  @@index([expiresAt])
+  @@map("app_daily_helpfulness_record")
+}
+
+model EveningFeedbackRecord {
+  id                     String         @id @default(uuid()) @db.Uuid
+  interactionId          String         @unique @db.Uuid
+  overallFeeling         OverallFeeling
+  noteCiphertext         Bytes?
+  noteKeyVersion         String?        @db.VarChar(64)
+  firstSubmittedAt       DateTime       @db.Timestamptz(3)
+  updatedAt              DateTime       @updatedAt @db.Timestamptz(3)
+  revision               Int            @default(1)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  interaction DailyInteraction          @relation(fields: [interactionId], references: [id], onDelete: Restrict)
+  revisions   EveningFeedbackRevision[]
+
+  @@index([expiresAt])
+  @@map("app_evening_feedback_record")
+}
+
+model EveningFeedbackRevision {
+  id                     String         @id @default(uuid()) @db.Uuid
+  feedbackId             String         @db.Uuid
+  revision               Int
+  changedFieldNames      String[]
+  noteChanged            Boolean
+  commandRef             String         @db.Uuid
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+
+  feedback EveningFeedbackRecord @relation(fields: [feedbackId], references: [id], onDelete: Restrict)
+
+  @@unique([feedbackId, revision])
+  @@index([expiresAt])
+  @@map("app_evening_feedback_revision")
+}
+
+model RelationshipCycle {
+  id                     String                 @id @default(uuid()) @db.Uuid
+  accountId              String                 @db.Uuid
+  revision               Int                    @default(1)
+  startedAt              DateTime               @db.Timestamptz(3)
+  sourceCutoffEpoch      BigInt                 @default(0)
+  state                  RelationshipCycleState @default(ACTIVE)
+  activeSlot             Boolean?               @default(true)
+  projectionFingerprint  Bytes
+  closedAt               DateTime?              @db.Timestamptz(3)
+  retentionPolicyVersion String                 @db.VarChar(64)
+  retentionScope         RetentionScope         @default(RELATIONSHIP_DATA)
+  retentionAnchorAt      DateTime               @db.Timestamptz(3)
+  expiresAt              DateTime?              @db.Timestamptz(3)
+
+  account        UserAccount                 @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  encounterLinks RelationshipEncounterLink[]
+  nodeReceipts   RelationshipNodeReceipt[]
+
+  @@unique([accountId, activeSlot])
+  @@index([accountId, state])
+  @@index([expiresAt])
+  @@map("app_relationship_cycle")
+}
+
+model RelationshipEncounterLink {
+  id                     String         @id @default(uuid()) @db.Uuid
+  cycleId                String         @db.Uuid
+  sourceLightId          String         @db.Uuid
+  productDate            DateTime       @db.Date
+  sourceValidityRevision Int
+  sourceEventId          String         @db.Uuid
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(RELATIONSHIP_DATA)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  cycle       RelationshipCycle @relation(fields: [cycleId], references: [id], onDelete: Restrict)
+  sourceLight DailyLightFact    @relation(fields: [sourceLightId], references: [id], onDelete: Restrict)
+
+  @@unique([cycleId, sourceLightId])
+  @@unique([cycleId, productDate])
+  @@index([sourceLightId])
+  @@index([expiresAt])
+  @@map("app_relationship_encounter_link")
+}
+
+model RelationshipNodeReceipt {
+  id                     String         @id @default(uuid()) @db.Uuid
+  cycleId                String         @db.Uuid
+  nodeCode               String         @db.VarChar(64)
+  sourceFingerprint      Bytes
+  outcomeCode            String         @db.VarChar(32)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(RELATIONSHIP_DATA)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  cycle RelationshipCycle @relation(fields: [cycleId], references: [id], onDelete: Restrict)
+
+  @@unique([cycleId, nodeCode, sourceFingerprint])
+  @@index([expiresAt])
+  @@map("app_relationship_node_receipt")
+}
+
+model ImportantMatter {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  revision               Int            @default(1)
+  titleCiphertext        Bytes
+  titleKeyVersion        String         @db.VarChar(64)
+  targetProductDate      DateTime?      @db.Date
+  state                  MatterState    @default(ACTIVE)
+  createdProductDate     DateTime       @db.Date
+  terminalAt             DateTime?      @db.Timestamptz(3)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime       @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(MATTER)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account   UserAccount               @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  revisions ImportantMatterRevision[]
+
+  @@index([accountId, state, targetProductDate])
+  @@index([expiresAt])
+  @@map("app_important_matter")
+}
+
+model ImportantMatterRevision {
+  id                     String         @id @default(uuid()) @db.Uuid
+  matterId               String         @db.Uuid
+  revision               Int
+  titleCiphertext        Bytes
+  titleKeyVersion        String         @db.VarChar(64)
+  targetProductDate      DateTime?      @db.Date
+  state                  MatterState
+  commandRef             String         @db.Uuid
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(MATTER)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  matter ImportantMatter @relation(fields: [matterId], references: [id], onDelete: Restrict)
+
+  @@unique([matterId, revision])
+  @@index([expiresAt])
+  @@map("app_important_matter_revision")
+}
+
+model MemoryPurposeGrant {
+  id                     String           @id @default(uuid()) @db.Uuid
+  accountId              String           @db.Uuid
+  sourceType             String           @db.VarChar(64)
+  sourceRef              String           @db.Uuid
+  purpose                MemoryPurpose
+  state                  MemoryGrantState @default(ACTIVE)
+  revision               Int              @default(1)
+  policyVersion          String           @db.VarChar(64)
+  consentSurfaceVersion  String           @db.VarChar(64)
+  createdAt              DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime         @updatedAt @db.Timestamptz(3)
+  revokedAt              DateTime?        @db.Timestamptz(3)
+  retentionPolicyVersion String           @db.VarChar(64)
+  retentionScope         RetentionScope   @default(MATTER)
+  retentionAnchorAt      DateTime         @db.Timestamptz(3)
+  expiresAt              DateTime?        @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@unique([accountId, sourceType, sourceRef, purpose])
+  @@index([accountId, purpose, state])
+  @@index([expiresAt])
+  @@map("app_memory_purpose_grant")
+}
+
+model MemoryMasterPreference {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @unique @db.Uuid
+  dailyExpressionEnabled Boolean        @default(false)
+  weeklySummaryEnabled   Boolean        @default(false)
+  continuityEnabled      Boolean        @default(false)
+  revision               Int            @default(1)
+  updatedAt              DateTime       @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(ACCOUNT)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([expiresAt])
+  @@map("app_memory_master_preference")
+}
+
+model MemoryMentionReceipt {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  sourceType             String         @db.VarChar(64)
+  sourceRef              String         @db.Uuid
+  productDate            DateTime       @db.Date
+  purpose                MemoryPurpose
+  resultId               String         @db.Uuid
+  policyVersion          String         @db.VarChar(64)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account UserAccount          @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  result  PublishedDailyResult @relation(fields: [resultId], references: [id], onDelete: Restrict)
+
+  @@unique([sourceRef, productDate, purpose, resultId])
+  @@index([accountId, productDate])
+  @@index([expiresAt])
+  @@map("app_memory_mention_receipt")
+}
+
+model MemoryContextSnapshot {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  invocationId           String         @unique @db.Uuid
+  factsPayload           Json           @db.JsonB
+  segmentContracts       Json           @db.JsonB
+  policyVersion          String         @db.VarChar(64)
+  resolverVersion        String         @db.VarChar(64)
+  registryVersion        String         @db.VarChar(64)
+  grantRevisionVector    Json           @db.JsonB
+  snapshotFingerprint    Bytes
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(RUNTIME)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account    UserAccount       @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  invocation GatewayInvocation @relation(fields: [invocationId], references: [id], onDelete: Restrict)
+
+  @@index([expiresAt])
+  @@map("app_memory_context_snapshot")
+}
+
+model WeeklyWindow {
+  id                       String         @id @default(uuid()) @db.Uuid
+  accountId                String         @db.Uuid
+  endProductDate           DateTime       @db.Date
+  windowRuleVersion        String         @db.VarChar(64)
+  currentSourceFingerprint Bytes?
+  currentSummaryRef        String?        @db.Uuid
+  revision                 Int            @default(1)
+  createdAt                DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt                DateTime       @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion   String         @db.VarChar(64)
+  retentionScope           RetentionScope @default(DAY)
+  retentionAnchorAt        DateTime       @db.Timestamptz(3)
+  expiresAt                DateTime?      @db.Timestamptz(3)
+
+  account         UserAccount                      @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  sourceSnapshots WeeklySourceSnapshot[]
+  summaryIntents  WeeklySummaryIntent[]
+  summaries       PublishedWeeklySummaryRevision[]
+
+  @@unique([accountId, endProductDate, windowRuleVersion])
+  @@index([accountId, endProductDate(sort: Desc)])
+  @@index([expiresAt])
+  @@map("app_weekly_window")
+}
+
+model WeeklySourceSnapshot {
+  id                     String         @id @default(uuid()) @db.Uuid
+  windowId               String         @db.Uuid
+  sourceFingerprint      Bytes
+  sourceSlotsPayload     Json           @db.JsonB
+  aggregateFactsPayload  Json           @db.JsonB
+  expressionPlanPayload  Json           @db.JsonB
+  aggregateVersion       String         @db.VarChar(64)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  invalidatedAt          DateTime?      @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  window WeeklyWindow @relation(fields: [windowId], references: [id], onDelete: Restrict)
+
+  @@unique([windowId, sourceFingerprint])
+  @@index([expiresAt])
+  @@map("app_weekly_source_snapshot")
+}
+
+model WeeklySummaryIntent {
+  id                     String          @id @default(uuid()) @db.Uuid
+  windowId               String          @db.Uuid
+  sourceFingerprint      Bytes
+  revision               Int             @default(1)
+  state                  GenerationState
+  summaryVersion         String          @db.VarChar(64)
+  terminalReasonCode     String?         @db.VarChar(64)
+  createdAt              DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime        @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String          @db.VarChar(64)
+  retentionScope         RetentionScope  @default(DAY)
+  retentionAnchorAt      DateTime        @db.Timestamptz(3)
+  expiresAt              DateTime?       @db.Timestamptz(3)
+
+  window      WeeklyWindow                    @relation(fields: [windowId], references: [id], onDelete: Restrict)
+  invocations GatewayInvocation[]
+  summary     PublishedWeeklySummaryRevision?
+
+  @@unique([windowId, sourceFingerprint])
+  @@index([state, updatedAt])
+  @@index([expiresAt])
+  @@map("app_weekly_summary_intent")
+}
+
+model PublishedWeeklySummaryRevision {
+  id                     String         @id @default(uuid()) @db.Uuid
+  windowId               String         @db.Uuid
+  summaryIntentId        String         @unique @db.Uuid
+  revision               Int
+  sourceFingerprint      Bytes
+  schemaVersion          String         @db.VarChar(64)
+  summaryVersion         String         @db.VarChar(64)
+  expressionCorePayload  Json           @db.JsonB
+  provenancePayload      Json           @db.JsonB
+  validationReceipt      Json           @db.JsonB
+  supersedesRef          String?        @db.Uuid
+  publishedAt            DateTime       @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  window        WeeklyWindow        @relation(fields: [windowId], references: [id], onDelete: Restrict)
+  summaryIntent WeeklySummaryIntent @relation(fields: [summaryIntentId], references: [id], onDelete: Restrict)
+  contentSlots  WeeklyContentSlot[]
+
+  @@unique([windowId, revision])
+  @@index([windowId, sourceFingerprint])
+  @@index([expiresAt])
+  @@map("app_published_weekly_summary_revision")
+}
+
+model WeeklyContentSlot {
+  id                     String         @id @default(uuid()) @db.Uuid
+  summaryId              String         @db.Uuid
+  segmentPath            String         @db.VarChar(160)
+  fallbackPayload        Json?          @db.JsonB
+  fallbackFingerprint    Bytes?
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  summary              PublishedWeeklySummaryRevision     @relation(fields: [summaryId], references: [id], onDelete: Restrict)
+  personalizedFragment WeeklyPersonalizedContentFragment?
+
+  @@unique([summaryId, segmentPath])
+  @@index([expiresAt])
+  @@map("app_weekly_content_slot")
+}
+
+model WeeklyPersonalizedContentFragment {
+  id                     String         @id @default(uuid()) @db.Uuid
+  slotId                 String         @unique @db.Uuid
+  payloadCiphertext      Bytes
+  payloadKeyVersion      String         @db.VarChar(64)
+  payloadFingerprint     Bytes
+  schemaVersion          String         @db.VarChar(64)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  slot         WeeklyContentSlot        @relation(fields: [slotId], references: [id], onDelete: Restrict)
+  dependencies WeeklySourceDependency[]
+
+  @@index([expiresAt])
+  @@map("app_weekly_personalized_content_fragment")
+}
+
+model WeeklySourceDependency {
+  id                     String         @id @default(uuid()) @db.Uuid
+  fragmentId             String         @db.Uuid
+  sourceType             String         @db.VarChar(64)
+  sourceRef              String         @db.Uuid
+  sourceRevision         Int
+  purpose                MemoryPurpose
+  grantRef               String?        @db.Uuid
+  grantRevision          Int?
+  policyVersion          String         @db.VarChar(64)
+  segmentPaths           String[]
+  fallbackPaths          String[]
+  validAtPublish         Boolean
+  invalidatedAt          DateTime?      @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(DAY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  fragment WeeklyPersonalizedContentFragment @relation(fields: [fragmentId], references: [id], onDelete: Restrict)
+
+  @@index([sourceType, sourceRef])
+  @@index([grantRef])
+  @@index([expiresAt])
+  @@map("app_weekly_source_dependency")
+}
+
+model SafetyState {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @unique @db.Uuid
+  state                  SafetyStatus   @default(CLEAR)
+  revision               Int            @default(1)
+  guardEpoch             BigInt         @default(0)
+  latestEventRef         String?        @db.Uuid
+  responsePlanRef        String?        @db.Uuid
+  updatedAt              DateTime       @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(SAFETY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([state, updatedAt])
+  @@index([expiresAt])
+  @@map("restricted_safety_state")
+}
+
+model SafetyDecision {
+  id                      String              @id @default(uuid()) @db.Uuid
+  accountId               String              @db.Uuid
+  surfaceCode             String              @db.VarChar(32)
+  commandRef              String              @db.Uuid
+  level                   SafetyDecisionLevel
+  categoryCodes           String[]
+  policyVersion           String              @db.VarChar(64)
+  ruleVersion             String              @db.VarChar(64)
+  classifierVersion       String?             @db.VarChar(64)
+  irreversibleFingerprint Bytes
+  createdAt               DateTime            @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion  String              @db.VarChar(64)
+  retentionScope          RetentionScope      @default(SAFETY)
+  retentionAnchorAt       DateTime            @db.Timestamptz(3)
+  expiresAt               DateTime?           @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@unique([accountId, surfaceCode, commandRef])
+  @@index([expiresAt])
+  @@map("restricted_safety_decision")
+}
+
+model SafetyEvent {
+  id                      String              @id @default(uuid()) @db.Uuid
+  accountId               String              @db.Uuid
+  stateRevision           Int
+  guardEpoch              BigInt
+  surfaceCode             String              @db.VarChar(32)
+  decisionLevel           SafetyDecisionLevel
+  categoryCodes           String[]
+  policyVersion           String              @db.VarChar(64)
+  ruleVersion             String              @db.VarChar(64)
+  classifierVersion       String?             @db.VarChar(64)
+  responseVersion         String              @db.VarChar(64)
+  resourceRegistryVersion String              @db.VarChar(64)
+  createdAt               DateTime            @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion  String              @db.VarChar(64)
+  retentionScope          RetentionScope      @default(SAFETY)
+  retentionAnchorAt       DateTime            @db.Timestamptz(3)
+  expiresAt               DateTime?           @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@unique([accountId, stateRevision])
+  @@index([expiresAt])
+  @@map("restricted_safety_event")
+}
+
+model SafetyResponsePlan {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  stateRevision          Int
+  blockIds               String[]
+  resourceEntryRefs      Json           @db.JsonB
+  localeCode             String         @db.VarChar(16)
+  regionCode             String         @db.VarChar(16)
+  fallbackCode           String         @db.VarChar(32)
+  viewVersion            String         @db.VarChar(64)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(SAFETY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@unique([accountId, stateRevision])
+  @@index([expiresAt])
+  @@map("restricted_safety_response_plan")
+}
+
+model SafetyResourceEntry {
+  id                 String        @id @default(uuid()) @db.Uuid
+  registryVersion    String        @db.VarChar(64)
+  entryCode          String        @db.VarChar(64)
+  regionCode         String        @db.VarChar(16)
+  localeCode         String        @db.VarChar(16)
+  contentPayload     Json          @db.JsonB
+  contentFingerprint Bytes
+  state              CatalogStatus
+  createdAt          DateTime      @default(now()) @db.Timestamptz(3)
+
+  @@unique([registryVersion, entryCode, regionCode, localeCode])
+  @@index([state, regionCode, localeCode])
+  @@map("system_safety_resource_entry")
+}
+
+model RecoveryCommandReceipt {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  expectedStateRevision  Int
+  commandRef             String         @db.Uuid
+  intentCode             String         @db.VarChar(32)
+  outcomeCode            String         @db.VarChar(32)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(SAFETY)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@unique([accountId, commandRef])
+  @@index([expiresAt])
+  @@map("restricted_recovery_command_receipt")
+}
+
+model NotificationPreference {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  notificationType       String         @db.VarChar(64)
+  enabled                Boolean        @default(false)
+  preferredWindow        String?        @db.VarChar(32)
+  autoPauseCode          String?        @db.VarChar(64)
+  ruleVersion            String         @db.VarChar(64)
+  revision               Int            @default(1)
+  updatedAt              DateTime       @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(NOTIFICATION)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@unique([accountId, notificationType])
+  @@index([expiresAt])
+  @@map("app_notification_preference")
+}
+
+model PlatformPermissionSnapshot {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  platformCode           String         @db.VarChar(32)
+  deviceRef              String         @db.VarChar(128)
+  permissionType         String         @db.VarChar(64)
+  observedStatus         String         @db.VarChar(32)
+  observedAt             DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(NOTIFICATION)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([accountId, deviceRef, permissionType, observedAt(sort: Desc)])
+  @@index([expiresAt])
+  @@map("app_platform_permission_snapshot")
+}
+
+model NotificationIntent {
+  id                     String                  @id @default(uuid()) @db.Uuid
+  accountId              String                  @db.Uuid
+  notificationType       String                  @db.VarChar(64)
+  semanticKey            Bytes
+  targetProductDate      DateTime?               @db.Date
+  matterRef              String?                 @db.Uuid
+  plannedWindow          String                  @db.VarChar(64)
+  ruleVersion            String                  @db.VarChar(64)
+  state                  NotificationIntentState @default(SCHEDULED)
+  dispatchClaimToken     String?                 @db.Uuid
+  scheduledAt            DateTime                @db.Timestamptz(3)
+  terminalAt             DateTime?               @db.Timestamptz(3)
+  createdAt              DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime                @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String                  @db.VarChar(64)
+  retentionScope         RetentionScope          @default(NOTIFICATION)
+  retentionAnchorAt      DateTime                @db.Timestamptz(3)
+  expiresAt              DateTime?               @db.Timestamptz(3)
+
+  account          UserAccount                   @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  deliveryAttempts NotificationDeliveryAttempt[]
+
+  @@unique([accountId, semanticKey])
+  @@index([state, scheduledAt])
+  @@index([accountId, notificationType, targetProductDate])
+  @@index([expiresAt])
+  @@map("app_notification_intent")
+}
+
+model NotificationDeliveryAttempt {
+  id                     String         @id @default(uuid()) @db.Uuid
+  intentId               String         @db.Uuid
+  ordinal                Int
+  channelCredentialRef   String         @db.VarChar(128)
+  requestFingerprint     Bytes
+  platformOpaqueRef      String?        @db.VarChar(160)
+  startedAt              DateTime       @db.Timestamptz(3)
+  finishedAt             DateTime?      @db.Timestamptz(3)
+  outcomeCode            String?        @db.VarChar(64)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(NOTIFICATION)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  intent NotificationIntent @relation(fields: [intentId], references: [id], onDelete: Restrict)
+
+  @@unique([intentId, ordinal])
+  @@index([expiresAt])
+  @@map("runtime_notification_delivery_attempt")
+}
+
+model DataTask {
+  id                      String         @id @default(uuid()) @db.Uuid
+  accountId               String         @db.Uuid
+  kind                    DataTaskKind
+  scope                   DataTaskScope
+  targetType              String         @db.VarChar(64)
+  targetKey               String         @db.VarChar(160)
+  activeSlot              Boolean?       @default(true)
+  state                   DataTaskState  @default(QUEUED)
+  revision                Int            @default(1)
+  confirmationVersion     String         @db.VarChar(64)
+  requestedAt             DateTime       @db.Timestamptz(3)
+  guardedAt               DateTime?      @db.Timestamptz(3)
+  startedAt               DateTime?      @db.Timestamptz(3)
+  onlineErasedAt          DateTime?      @db.Timestamptz(3)
+  finishedAt              DateTime?      @db.Timestamptz(3)
+  failureScopeCodes       String[]
+  backupPurgeDeadline     DateTime?      @db.Timestamptz(3)
+  providerExpiryDeadlines Json?          @db.JsonB
+  retentionPolicyVersion  String         @db.VarChar(64)
+  retentionScope          RetentionScope @default(RUNTIME)
+  retentionAnchorAt       DateTime       @db.Timestamptz(3)
+  expiresAt               DateTime?      @db.Timestamptz(3)
+
+  account     UserAccount              @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  checkpoints DeletionStepCheckpoint[]
+
+  @@unique([accountId, kind, scope, targetKey, activeSlot])
+  @@index([state, requestedAt])
+  @@index([accountId, kind, requestedAt(sort: Desc)])
+  @@index([expiresAt])
+  @@map("restricted_data_task")
+}
+
+model DeletionGuard {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  scope                  DataTaskScope
+  targetKey              String         @db.VarChar(160)
+  revision               Int            @default(1)
+  deletionEpoch          BigInt         @default(1)
+  taskRef                String         @db.Uuid
+  semanticBlockedAt      DateTime       @db.Timestamptz(3)
+  releasedAt             DateTime?      @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(RUNTIME)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime?      @db.Timestamptz(3)
+
+  account UserAccount @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@unique([accountId, scope, targetKey])
+  @@index([taskRef])
+  @@index([expiresAt])
+  @@map("restricted_deletion_guard")
+}
+
+model DeletionStepCheckpoint {
+  id                     String            @id @default(uuid()) @db.Uuid
+  taskId                 String            @db.Uuid
+  subsystemCode          String            @db.VarChar(64)
+  state                  DeletionStepState @default(PENDING)
+  attemptCount           Int               @default(0)
+  lastStableFailureCode  String?           @db.VarChar(64)
+  startedAt              DateTime?         @db.Timestamptz(3)
+  finishedAt             DateTime?         @db.Timestamptz(3)
+  updatedAt              DateTime          @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String            @db.VarChar(64)
+  retentionScope         RetentionScope    @default(RUNTIME)
+  retentionAnchorAt      DateTime          @db.Timestamptz(3)
+  expiresAt              DateTime?         @db.Timestamptz(3)
+
+  task DataTask @relation(fields: [taskId], references: [id], onDelete: Restrict)
+
+  @@unique([taskId, subsystemCode])
+  @@index([state, updatedAt])
+  @@index([expiresAt])
+  @@map("restricted_deletion_step_checkpoint")
+}
+
+model DayErasureGuard {
+  id                    String   @id @default(uuid()) @db.Uuid
+  ownerScopeToken       Bytes
+  productDate           DateTime @db.Date
+  deletionEpoch         BigInt
+  originalResultVersion String?  @db.VarChar(64)
+  deletionTaskRef       String   @db.Uuid
+  createdAt             DateTime @default(now()) @db.Timestamptz(3)
+  expiresAt             DateTime @db.Timestamptz(3)
+
+  @@unique([ownerScopeToken, productDate])
+  @@index([deletionTaskRef])
+  @@index([expiresAt])
+  @@map("restricted_day_erasure_guard")
+}
+
+model DeletionReceipt {
+  id                      String          @id @default(uuid()) @db.Uuid
+  caseRef                 String          @unique @db.Uuid
+  blindedSubjectToken     Bytes?
+  taskRef                 String          @db.Uuid
+  kind                    DataTaskKind
+  scope                   DataTaskScope
+  targetType              String          @db.VarChar(64)
+  confirmationVersion     String          @db.VarChar(64)
+  policyVersion           String          @db.VarChar(64)
+  requestedAt             DateTime        @db.Timestamptz(3)
+  guardedAt               DateTime        @db.Timestamptz(3)
+  onlineErasedAt          DateTime?       @db.Timestamptz(3)
+  finishedAt              DateTime        @db.Timestamptz(3)
+  backupPurgeDeadline     DateTime        @db.Timestamptz(3)
+  providerExpiryDeadlines Json            @db.JsonB
+  outcome                 DeletionOutcome
+  failureScopeCodes       String[]
+  expiresAt               DateTime        @db.Timestamptz(3)
+
+  @@index([taskRef])
+  @@index([blindedSubjectToken])
+  @@index([expiresAt])
+  @@map("restricted_deletion_receipt")
+}
+
+model ProviderDeletionRequest {
+  id                     String                @id @default(uuid()) @db.Uuid
+  taskRef                String                @db.Uuid
+  providerProfileVersion String                @db.VarChar(64)
+  opaqueProviderRef      String?               @db.VarChar(160)
+  state                  ProviderDeletionState @default(QUEUED)
+  requestedAt            DateTime              @db.Timestamptz(3)
+  sentAt                 DateTime?             @db.Timestamptz(3)
+  providerExpiryAt       DateTime              @db.Timestamptz(3)
+  evidenceRef            String?               @db.VarChar(160)
+  stableFailureCode      String?               @db.VarChar(64)
+  retentionPolicyVersion String                @db.VarChar(64)
+  retentionScope         RetentionScope        @default(LEGAL_EVIDENCE)
+  retentionAnchorAt      DateTime              @db.Timestamptz(3)
+  expiresAt              DateTime              @db.Timestamptz(3)
+
+  @@unique([taskRef, providerProfileVersion])
+  @@index([state, providerExpiryAt])
+  @@index([expiresAt])
+  @@map("restricted_provider_deletion_request")
+}
+
+model BackupCatalogEntry {
+  id                   String      @id @default(uuid()) @db.Uuid
+  generationCode       String      @unique @db.VarChar(96)
+  createdAt            DateTime    @db.Timestamptz(3)
+  expiresAt            DateTime    @db.Timestamptz(3)
+  encryptionKeyVersion String      @db.VarChar(64)
+  coveredDataDomains   String[]
+  state                BackupState @default(AVAILABLE)
+  purgedAt             DateTime?   @db.Timestamptz(3)
+
+  @@index([state, expiresAt])
+  @@map("system_backup_catalog_entry")
+}
+
+model RestoreDenyRecord {
+  id                     String         @id @default(uuid()) @db.Uuid
+  caseRef                String         @db.Uuid
+  blindedSubjectToken    Bytes
+  scope                  DataTaskScope
+  targetToken            Bytes?
+  deletionEpoch          BigInt
+  effectiveAt            DateTime       @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(LEGAL_EVIDENCE)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+
+  @@unique([caseRef, scope, deletionEpoch])
+  @@index([blindedSubjectToken, scope])
+  @@index([expiresAt])
+  @@map("restricted_restore_deny_record")
+}
+
+model RetentionPolicyEntry {
+  id                    String                  @id @default(uuid()) @db.Uuid
+  policyVersion         String                  @db.VarChar(64)
+  dataTypeCode          String                  @db.VarChar(96)
+  dataClass             RetentionDataClass
+  purposeCode           String                  @db.VarChar(96)
+  anchorCode            String                  @db.VarChar(64)
+  maxDurationIso8601    String                  @db.VarChar(32)
+  terminalAction        RetentionTerminalAction
+  scopeBehavior         Json                    @db.JsonB
+  backupDurationIso8601 String                  @db.VarChar(32)
+  legalBasisRef         String?                 @db.VarChar(160)
+  fingerprint           Bytes
+  state                 CatalogStatus
+  createdAt             DateTime                @default(now()) @db.Timestamptz(3)
+
+  @@unique([policyVersion, dataTypeCode])
+  @@index([state, dataTypeCode])
+  @@map("system_retention_policy_entry")
+}
+
+model ProviderDataHandlingProfile {
+  id                   String        @id @default(uuid()) @db.Uuid
+  profileVersion       String        @unique @db.VarChar(64)
+  providerCode         String        @db.VarChar(64)
+  purposeCodes         String[]
+  dataTypeCodes        String[]
+  regionCode           String        @db.VarChar(32)
+  subprocessors        Json          @db.JsonB
+  trainingEnabled      Boolean
+  onlineRetentionDays  Int
+  backupRetentionDays  Int
+  deletionCapabilities String[]
+  contractEvidenceRef  String        @db.VarChar(160)
+  disclosureVersion    String        @db.VarChar(64)
+  fingerprint          Bytes
+  state                CatalogStatus
+  createdAt            DateTime      @default(now()) @db.Timestamptz(3)
+
+  @@index([providerCode, state])
+  @@map("system_provider_data_handling_profile")
+}
+
+model LegalHold {
+  id                     String         @id @default(uuid()) @db.Uuid
+  holdRef                String         @unique @db.Uuid
+  blindedSubjectToken    Bytes?
+  scopeCode              String         @db.VarChar(64)
+  dataCategoryCodes      String[]
+  legalBasisRef          String         @db.VarChar(160)
+  approvalRef            String         @db.VarChar(160)
+  startedAt              DateTime       @db.Timestamptz(3)
+  reviewDueAt            DateTime       @db.Timestamptz(3)
+  endsAt                 DateTime       @db.Timestamptz(3)
+  releasedAt             DateTime?      @db.Timestamptz(3)
+  state                  LegalHoldState @default(ACTIVE)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(LEGAL_EVIDENCE)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+
+  @@index([state, reviewDueAt])
+  @@index([blindedSubjectToken])
+  @@index([expiresAt])
+  @@map("restricted_legal_hold")
+}
+
+model RestrictedAuditEvent {
+  id                     String         @id @default(uuid()) @db.Uuid
+  actorType              String         @db.VarChar(32)
+  serviceCode            String         @db.VarChar(64)
+  privilegedRoleCode     String?        @db.VarChar(64)
+  actionCode             String         @db.VarChar(64)
+  scopeCode              String         @db.VarChar(64)
+  purposeCode            String         @db.VarChar(64)
+  policyVersion          String         @db.VarChar(64)
+  opaqueObjectToken      Bytes?
+  ticketRef              String?        @db.VarChar(160)
+  holdRef                String?        @db.Uuid
+  outcomeCode            String         @db.VarChar(64)
+  stableReasonCode       String?        @db.VarChar(64)
+  requestedAt            DateTime       @db.Timestamptz(3)
+  finishedAt             DateTime?      @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(LEGAL_EVIDENCE)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+
+  @@index([actionCode, requestedAt])
+  @@index([opaqueObjectToken])
+  @@index([expiresAt])
+  @@map("restricted_audit_event")
+}
+
+model OutboxEvent {
+  id                     String         @id @default(uuid()) @db.Uuid
+  aggregateType          String         @db.VarChar(64)
+  aggregateRef           String         @db.Uuid
+  aggregateRevision      Int
+  eventType              String         @db.VarChar(96)
+  eventVersion           String         @db.VarChar(32)
+  idempotencyKey         Bytes          @unique
+  allowlistedPayload     Json           @db.JsonB
+  guardEpochs            Json           @db.JsonB
+  state                  OutboxState    @default(PENDING)
+  availableAt            DateTime       @db.Timestamptz(3)
+  publishedAt            DateTime?      @db.Timestamptz(3)
+  attemptCount           Int            @default(0)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(RUNTIME)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+
+  @@index([state, availableAt])
+  @@index([aggregateType, aggregateRef, aggregateRevision])
+  @@index([expiresAt])
+  @@map("runtime_outbox_event")
+}
+
+model InboxReceipt {
+  id                     String         @id @default(uuid()) @db.Uuid
+  consumerCode           String         @db.VarChar(64)
+  eventId                String         @db.Uuid
+  eventFingerprint       Bytes
+  processedAt            DateTime       @db.Timestamptz(3)
+  outcomeCode            String         @db.VarChar(32)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(RUNTIME)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+
+  @@unique([consumerCode, eventId])
+  @@index([expiresAt])
+  @@map("runtime_inbox_receipt")
+}
+
+model VersionCatalogEntry {
+  id                   String        @id @default(uuid()) @db.Uuid
+  catalogType          String        @db.VarChar(64)
+  version              String        @db.VarChar(64)
+  compatibilityPayload Json          @db.JsonB
+  fingerprint          Bytes
+  state                CatalogStatus
+  activatedAt          DateTime?     @db.Timestamptz(3)
+  retiredAt            DateTime?     @db.Timestamptz(3)
+  createdAt            DateTime      @default(now()) @db.Timestamptz(3)
+
+  @@unique([catalogType, version])
+  @@index([catalogType, state])
+  @@map("system_version_catalog_entry")
+}
+
+model EvaluationRun {
+  id                     String             @id @default(uuid()) @db.Uuid
+  syntheticSubjectRef    String             @db.VarChar(128)
+  corpusFingerprint      Bytes
+  codeCommit             String             @db.VarChar(64)
+  schemaVersions         Json               @db.JsonB
+  promptVersion          String             @db.VarChar(64)
+  safetyVersion          String             @db.VarChar(64)
+  routeVersion           String             @db.VarChar(64)
+  candidateParameters    Json               @db.JsonB
+  state                  EvaluationRunState @default(PLANNED)
+  aggregateScores        Json?              @db.JsonB
+  startedAt              DateTime?          @db.Timestamptz(3)
+  finishedAt             DateTime?          @db.Timestamptz(3)
+  retentionPolicyVersion String             @db.VarChar(64)
+  retentionScope         RetentionScope     @default(EVALUATION)
+  retentionAnchorAt      DateTime           @db.Timestamptz(3)
+  expiresAt              DateTime           @db.Timestamptz(3)
+
+  samples EvaluationSample[]
+
+  @@index([corpusFingerprint, codeCommit])
+  @@index([expiresAt])
+  @@map("evaluation_run")
+}
+
+model EvaluationSample {
+  id                     String         @id @default(uuid()) @db.Uuid
+  runId                  String         @db.Uuid
+  caseId                 String         @db.VarChar(96)
+  sampleOrdinal          Int
+  syntheticInputPayload  Json           @db.JsonB
+  responseCiphertext     Bytes?
+  responseKeyVersion     String?        @db.VarChar(64)
+  normalizedEvidence     Json           @db.JsonB
+  hardGateResults        Json           @db.JsonB
+  humanScores            Json?          @db.JsonB
+  providerRequestRef     String?        @db.VarChar(160)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(EVALUATION)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+
+  run EvaluationRun @relation(fields: [runId], references: [id], onDelete: Restrict)
+
+  @@unique([runId, caseId, sampleOrdinal])
+  @@index([expiresAt])
+  @@map("evaluation_sample")
+}
