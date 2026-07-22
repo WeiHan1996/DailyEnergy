@@ -132,8 +132,9 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/ai/gateway.md](./ai/gateway.md) | Accepted | 供应商隔离、路由、超时、降级、熔断、成本与隐私 | generation-engine、schemas、ADR-0003 |
 | [docs/ai/prompt-spec.md](./ai/prompt-spec.md) | Accepted | Prompt package、封闭输入、规范指令、事实绑定、版本与回归 | personality、schemas、gateway |
 | [docs/ai/memory.md](./ai/memory.md) | Accepted | 领域源、用途授权、确定性投影、有效期、无源回退与删除 | persona、journey、personality、prompt |
-| [docs/ai/safety.md](./ai/safety.md) | Draft | 输入分类、专业边界、固定响应、地区资源、恢复与全候选审核 | vision、personality、schemas、gateway、prompt、memory |
-| docs/ai/evaluation.md | Planned | 自动评价、人工抽检和回归测试 | personality、prompt、safety |
+| [docs/ai/safety.md](./ai/safety.md) | Accepted | 输入分类、专业边界、固定响应、地区资源、恢复与全候选审核 | vision、personality、schemas、gateway、prompt、memory |
+| [docs/ai/evaluation.md](./ai/evaluation.md) | Draft | 不可补偿 Gate、自动/人工评价、provider bake-off、延迟成本与变更回归 | personality、schemas、gateway、prompt、memory、safety |
+| [docs/ai/evaluation-corpus.json](./ai/evaluation-corpus.json) | Draft | 37+52+48+60+72 共 269 项版本化机器可读测试清单 | gateway、prompt、memory、safety、evaluation |
 
 ### 7.4 数据与接口
 
@@ -226,7 +227,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一 In Review 任务是 S-15 内容安全规范。执行与审核该任务时依次读取：
+当前唯一 In Review 任务是 S-16 AI 质量评价与回归测试。执行与审核该任务时依次读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -256,6 +257,7 @@ Phase 1 开始后逐步增加：
 26. docs/ai/gateway.md；
 27. docs/ai/prompt-spec.md；
 28. docs/decisions/ADR-0004-structured-memory.md；
-29. docs/ai/memory.md。
+29. docs/ai/memory.md；
+30. docs/ai/safety.md。
 
-S-15 只产出 Draft `safety.md`，并完成 S-14 的 Accepted 状态收尾与任务控制更新；在单独 PR 通过审核前，不开始 S-16、生产分类器、Safety service、数据库/API、地区资源上线、人工危机值班或普通模型接入。
+S-16 只产出 Draft `evaluation.md`、Draft `evaluation-corpus.json`，并完成 S-15 的 Accepted 状态收尾与任务控制更新；在单独 PR 通过审核前，不开始 S-17、生产 evaluator/classifier、真实 provider bake-off、模型配置、数据库/API、专业 Safety 签字或人工抽检系统实现。

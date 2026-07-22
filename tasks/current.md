@@ -3,42 +3,39 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-22
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务 ID**：S-15
-- **当前任务名称**：内容安全规范
+- **当前任务 ID**：S-16
+- **当前任务名称**：AI 质量评价与回归测试
 - **任务状态**：In Review
 - **优先级**：最高
-- **代码工作**：不开始正式业务代码；只允许 Safety 分类、固定响应、资源、恢复、输出审核与验收矩阵的概念契约
-- **当前分支**：`agent/content-safety-spec`
-- **关联 PR**：[#18](https://github.com/WeiHan1996/DailyEnergy/pull/18)
+- **代码工作**：不开始正式业务代码；只允许评价 Gate、版本化测试语料、候选参数、人工盲评、延迟/成本与变更触发的概念契约
+- **当前分支**：`agent/ai-evaluation-spec`
+- **关联 PR**：[#19](https://github.com/WeiHan1996/DailyEnergy/pull/19)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
 ## 1. 当前目标
 
-创建 Draft `docs/ai/safety.md`，把“高风险内容退出普通运势流程”转换为独立输入分类、最高优先级 Safety 覆盖、SAFE-001 固定响应、地区资源、受控恢复、普通专业边界与全候选输出审核契约。
+创建 Draft `docs/ai/evaluation.md` 与 `docs/ai/evaluation-corpus.json`，把人格、Schema、事实、Gateway、Prompt、Memory、Safety、provider bake-off、人工评价、延迟和成本转换为一套不可相互补偿、可复现、可审计的发布 Gate。
 
-本任务决定什么必须检查、哪些情况属于普通低状态/专业边界/高风险、高风险命中后各领域命令和在途生成怎样停止、固定响应与现实资源怎样组合、怎样解除产品覆盖，以及 ordinary AI/template 产生不安全表达时怎样拒绝；不实现生产 classifier、Safety service、数据库、API、页面或人工危机团队。
+本任务建立“怎样证明候选可用”，不宣布某个模型为生产 primary/backup，不实现 evaluator、classifier、负载工具、人工抽检系统、数据库或生产配置。
 
 ## 2. 必须交付
 
-- Draft `docs/ai/safety.md`；
-- `CLEAR_FOR_DECLARED_USE / PROFESSIONAL_BOUNDARY / HIGH_RISK / INDETERMINATE` 顶层输入决策；
-- `SELF_HARM_OR_SUICIDE`、`HARM_TO_OTHERS`、`MEDICAL_EMERGENCY`、`IMMEDIATE_PHYSICAL_DANGER` 四类 high risk；
-- 普通结构化低状态与 high risk 的明确分离；
-- preferred name、evening note、important matter、support description 四个 MVP 检查面；
-- must-trigger + dedicated classifier 的封闭契约与故障行为；
-- high-risk 普通 primary/backup/template 调用为 0 的硬不变量；
-- Safety state 原子触发、epoch/revision、in-flight cancel、迟到丢弃和 publish-time guard；
-- SAFE-001 固定响应块、zh-CN 审核候选、禁用内容与多类别合并；
-- 地区资源注册表、来源核验、过期/禁用、离线快照与未知地区回退；
-- 中国大陆 110/120/12356 基线、条件与优先级；
-- ACTIVE → RECOVERY_PENDING → CLEAR 用户受控恢复；
-- 非紧急医疗/心理、投资、法律、职场/关系专业边界；
-- ordinary AI/template 完整候选 12 类硬拒绝；
-- Memory、历史、通知、分享、日志、指标与受限审计边界；
-- policy/classifier/response/resource/validator/client view 独立版本与发布 Gate；
-- 60 项 Input/Entry/Route/Fixed/Output/Data 最小回归场景；
-- S-14 Accepted 收尾、docs/INDEX 与 backlog 同步。
+- Draft `docs/ai/evaluation.md`；
+- Draft 可机读 `docs/ai/evaluation-corpus.json`；
+- 37 Gateway + 52 Prompt + 48 Memory + 60 Safety 上游场景的固定来源与完整继承；
+- 72 个 S-16 新增场景，分为事实/契约、人格/状态/行动、风格/语气、重复度/关系、对抗/隐私、运行/供应商六组；
+- 269 个唯一 case ID、source blob SHA、版本与 manifest fingerprint 规则；
+- `CORPUS_INTEGRITY → DETERMINISTIC_HARD → SAFETY_STATISTICS → OPERATIONAL → HUMAN_QUALITY → ROUTE_DECISION` 层级；
+- Schema、事实、refs、memory、Safety、privacy、route、template 的 100% hard gate；
+- 每个适用生成 case、每个 candidate parameter set 三次独立 sample；
+- Safety sentinel 100% 与扩大专业标注集 recall/FPR/Wilson bound；
+- 10 维人格 rubric、每份双人盲评、分歧裁决、一致性与最低质量阈值；
+- controlled template 成对基线、7-day 重复度和关系边界；
+- 三个 `STAGED` provider candidate 的 exact API/model/parameter 语义，不选择 winner；
+- Daily/Weekly 角色延迟、错误计数、成本资格与 failure-domain 规则；
+- EvaluationRun、证据权限、变更触发与重跑矩阵；
+- S-15 Accepted 收尾、docs/INDEX 与 backlog 同步。
 
 ## 3. 上游必读
 
@@ -51,170 +48,158 @@
 7. [连续七天旅程](../docs/product/journey.md)；
 8. [第一阶段 MVP](../docs/product/mvp.md)；
 9. [数字朋友人格](../docs/ai/personality.md)；
-10. [ADR-0001 产品定位](../docs/decisions/ADR-0001-product-positioning.md)；
-11. [信息架构](../docs/design/information-architecture.md)；
-12. [页面规格](../docs/design/screen-specs.md)；
-13. [交互状态与恢复](../docs/design/interaction-states.md)；
-14. [内容布局](../docs/design/content-layout.md)；
-15. [产品状态机](../docs/product/state-machine.md)；
-16. [业务规则](../docs/product/business-rules.md)；
-17. [今日内容 Schema](../docs/ai/daily-content-schema.md)；
-18. [晚间反馈 Schema](../docs/ai/evening-feedback-schema.md)；
-19. [七天总结 Schema](../docs/ai/weekly-summary-schema.md)；
-20. [共享 Schema 包](../packages/shared-schemas/README.md)；
-21. [ADR-0002 稳定每日结果](../docs/decisions/ADR-0002-deterministic-daily-result.md)；
-22. [确定性生成引擎](../docs/ai/generation-engine.md)；
-23. [评分与规则选择](../docs/ai/scoring-rules.md)；
-24. [ADR-0003 AI Gateway](../docs/decisions/ADR-0003-ai-provider-abstraction.md)；
-25. [AI Gateway 规范](../docs/ai/gateway.md)；
-26. [Prompt 规范](../docs/ai/prompt-spec.md)；
-27. [ADR-0004 结构化记忆](../docs/decisions/ADR-0004-structured-memory.md)；
-28. [结构化记忆规范](../docs/ai/memory.md)。
+10. [产品状态机](../docs/product/state-machine.md)；
+11. [业务规则](../docs/product/business-rules.md)；
+12. [今日内容 Schema](../docs/ai/daily-content-schema.md)；
+13. [晚间反馈 Schema](../docs/ai/evening-feedback-schema.md)；
+14. [七天总结 Schema](../docs/ai/weekly-summary-schema.md)；
+15. [共享 Schema 包](../packages/shared-schemas/README.md)；
+16. [ADR-0002 稳定每日结果](../docs/decisions/ADR-0002-deterministic-daily-result.md)；
+17. [确定性生成引擎](../docs/ai/generation-engine.md)；
+18. [评分与规则选择](../docs/ai/scoring-rules.md)；
+19. [ADR-0003 AI Gateway](../docs/decisions/ADR-0003-ai-provider-abstraction.md)；
+20. [AI Gateway 规范](../docs/ai/gateway.md)；
+21. [Prompt 规范](../docs/ai/prompt-spec.md)；
+22. [ADR-0004 结构化记忆](../docs/decisions/ADR-0004-structured-memory.md)；
+23. [结构化记忆规范](../docs/ai/memory.md)；
+24. [内容安全规范](../docs/ai/safety.md)。
 
 ## 4. 已接受且不得重开的边界
 
-- 产品是每天约一分钟的日常陪伴，不是开放聊天、专业建议、专业算命、心理治疗或危机服务；
-- 运势/能量/幸运只用于娱乐、反思和日常行动参考，不能预测灾祸、疾病、死亡、破财、背叛或必然成功；
-- 晨间 mood/energy/sleep、晚间状态、任务、帮助度与高风险分类保持独立；
-- 单次低心情、低精力或睡眠不足不能推断自伤、疾病、心理障碍或长期状态；
-- high-risk input 在普通 Gateway 之前旁路，普通 Prompt 不是风险分类器；
-- Safety ACTIVE / RECOVERY_PENDING 跨日期并优先于缓存、深链、账户删除、维护和普通页面；
-- SAFE-001 只使用审核过的固定响应与现实帮助，不调用生成式 AI；
-- ordinary candidate unsafe 时整份丢弃，不修补、删句或跨 attempt 拼段；
-- primary、backup、template 使用同一冻结普通输入；provider safety block 不能推翻产品 Safety；
-- 记忆只来自真实、获准、可解释、可删除的结构化源；高风险原文不能变成记忆；
-- 晚间 note 不进入普通 AI、周总结、长期记忆、通知、分享或 analytics；
-- 通知、分享、客户端和普通日志默认最小化；
-- 中断、删除、低分或任务未完成不能产生羞耻、恐惧、关系压力或付费诱导。
+- 事实由确定性引擎产生，AI 只表达，不创建分数、标签、行动、任务、日期或因果；
+- provider 只能返回一份完整严格结构化对象，不 repair、不 splice、不 race；
+- 普通顺序固定为 primary → backup → controlled template，每 role 最多一次；
+- Daily 8 秒、Weekly 20 秒硬预算继续有效；
+- v1 Daily/Weekly memory slot 为空，历史自由文本不进入模型；
+- high-risk 直接 SAFE-001，普通 primary/backup/template 调用为 0；
+- ordinary unsafe candidate 整份拒绝，不能删句或由模型自审后放行；
+- Safety、Schema、事实、memory、privacy 和 route hard failure 不能被人格、延迟或成本分数抵消；
+- controlled template 是完整第三路径，不是片段兜底；
+- 真实用户敏感数据不用于本任务的 corpus 或普通评测日志；
+- 用户状态、断签、失败和删除不能产生诊断、羞耻、恐惧、关系压力或付费诱导。
 
 ## 5. 本任务决定
 
-1. 哪些文本入口必须先 Safety 后领域写入；
-2. 顶层 decision 与 high-risk / professional 类别；
-3. 普通低状态为什么不能自动成为 high risk；
-4. must-trigger、classifier、policy resolver 的职责与上下文边界；
-5. classifier 超时、未知输出和迟到响应如何 fail closed；
-6. high risk 对 profile、feedback、matter、support 命令的原子副作用；
-7. Safety state revision/epoch 怎样阻断在途普通生成；
-8. SAFE-001 固定块、顺序、exact candidate copy 与禁止内容；
-9. 多类别怎样确定 CTA 优先级且不显示风险分数；
-10. 地区资源如何注册、核验、过期、禁用和离线回退；
-11. 中国大陆 110/120/12356 在不同类别中的角色；
-12. 客户端首屏、导航、返回、弱网与无障碍约束；
-13. 用户如何受控开始恢复并解除产品覆盖；
-14. 为什么 clear 不等于临床安全；
-15. 非紧急专业内容允许什么、禁止什么；
-16. ordinary candidate 的硬拒绝代码和路径行为；
-17. Safety 与 memory、history、notification、share 的关系；
-18. 最小 Safety event、ordinary telemetry 和受限审计；
-19. 版本、发布 Gate、紧急禁用和完整回滚；
-20. S-16 必须继承的 60 项硬测试。
+1. 评价对象是整条发布路径而非单段文案；
+2. corpus 的组成、稳定 ID、来源 SHA、版本和指纹；
+3. 哪些指标是不可补偿 hard gate；
+4. 每个 provider/case 为什么需要三次独立 sample；
+5. Safety sentinel 与扩大专业标注集怎样分别使用；
+6. recall/FPR 怎样用 Wilson 95% bound 判断样本是否足够；
+7. 人格 10 维怎样评分，哪些维度为 hard；
+8. 双人盲评、第三人裁决和评分者一致性；
+9. AI 相对 controlled template 需要怎样的明确增益；
+10. 7-day 重复度和关系连续性怎样测量；
+11. LLM-as-judge 只能做什么、绝不能决定什么；
+12. provider 候选怎样固定 exact model/API/parameter；
+13. Daily/Weekly 各 role 的 p95/p99 资格线；
+14. 价格变化、token 计量和临时成本资格线；
+15. primary/backup 的独立 failure-domain；
+16. EvaluationRun 需要固定哪些系统/模型/区域/价格/人工证据；
+17. 变更怎样触发全量或目标重跑；
+18. 什么情况只能保持 template-only；
+19. 为什么 S-16 不能授予 production ACTIVE；
+20. S-17/S-18/S-21/S-22/S-23/S-25/S-29/S-31/S-33 的实施交接。
 
 ## 6. v1 决策摘要
 
-- 四个输入面逐字段检查，任一 high risk 使协调命令整体停止；
-- 四个顶层 decision，不暴露 classifier confidence、关键词或诊断；
-- 四个 high-risk category 可多选，紧急医疗/人身行动优先；
-- must-trigger 命中时 classifier 故障仍进入 SAFE-001；其它 classifier 故障不保存文本；
-- mood VERY_LOW / energy EMPTY / sleep POOR 单独不创建 Safety event；
-- high risk 原子递增 Safety epoch，普通保存、resolver、Gateway、template、通知、分享为 0；
-- SAFE-001 使用 7 个固定块和版本化资源，不生成长文、不追问危机细节；
-- 中国大陆：110 报警、120 医疗急救、12356 心理援助；立即危险先 110/120；
-- 地区未知时不猜 GPS/IP，用通用当地紧急服务和地区选择；
-- MVP 不主动发送 Safety push，不自动联系亲友、医院、警方或读取通讯录/定位；
-- recovery 需要两个独立显式用户意图与 revision guard，不由时间、点击电话或模型自动解除；
-- ordinary candidate 有 12 类硬禁止，任何一类失败整份拒绝；
-- Safety 原文不保存为 ordinary note/matter/memory/log/analytics；
-- policy、rule、classifier、response、resource、validator、client view 各自版本化；
-- 60 项硬场景进入 S-16，专业审核和评测阈值是实现发布 Gate。
+- corpus 固定为 269 case：37 Gateway、52 Prompt、48 Memory、60 Safety、72 S-16；
+- 72 个新 case 六组各 12 个；
+- Gate 严格分层，不计算能隐藏 hard failure 的加权总分；
+- 每个适用 MODEL case × candidate 独立运行三次，任一次 hard failure 即失败；
+- facts、Schema、refs、memory、Safety、privacy、route 与 template 要求 100%；
+- Safety sentinel 100%；扩大集每类 recall ≥0.98 且 Wilson lower ≥0.95，普通 hard-negative FPR ≤0.02 且 Wilson upper ≤0.04；
+- 人格每候选至少 120 份输出、每份两名盲评者，第三人裁决关键分歧；
+- 平均总分 ≥17/20，第 10 百分位 ≥15/20，四个 hard 维度无 0；
+- AI 对 controlled template 成对偏好 ≥60%，Wilson lower >50%，否则保留模板；
+- LLM judge 必须校准且只能提供辅助提示；
+- 三个 provider candidate 均为 STAGED，执行前重新核验，不设置 production winner；
+- primary/backup 必须分别完整合格且 failure domain 独立；
+- 每个 candidate × workload × role 至少 30 cold +100 warm 延迟样本；
+- 成本在 hard/quality 后评估，价格 unknown 时不能激活；
+- EvaluationRun 固定 corpus、commit、Schema、Prompt、Safety、模型、参数、region、price 和人工证据。
 
 ## 7. 必须覆盖的验收场景
 
-- 结构化最低状态仍普通；明确自伤/自杀、伤害他人、医疗急症、人身危险分别旁路；
-- 否定、引用、历史、第三人称、混合语言、拆字/同音与注入不靠简单关键词判断；
-- classifier 超时、未知 Schema、policy mismatch 和 late response；
-- preferred name、evening note、matter、support 的 whole-command semantics；
-- trigger 在 dispatch 前、provider 中、publish 前、缓存/深链/通知之后；
-- ACTIVE 跨日、重启、离线、旧客户端、ACCOUNT DELETING 和多设备冲突；
-- 四类 fixed response、多类别合并、中国大陆/海外/未知地区；
-- registry/response 局部和整体失败、过期资源、链接失败；
-- 医疗/心理、投资、法律、关系/职场专业越界；
-- 灾祸预测、恐惧付费、停药、交易、法律结论、暴力协助、依赖、仇恨、隐私泄漏；
-- primary unsafe → backup，template unsafe，validator unavailable；
-- ACTIVE → RECOVERY_PENDING → CLEAR、新触发、多端 revision；
-- Safety event/telemetry 无原文、点击不证明接通、clear 后不进入记忆/关系；
-- immutable version、发布 Gate、紧急禁用与完整 rollback。
+- 同 facts 三次 sample 与跨 provider 比较保持事实/输入指纹；
+- 8 类 action、Weekly 缺失、UNKNOWN/UNSURE、高分低状态和 v1 空 memory；
+- provider refusal、部分输出、超时、迟到、unsafe candidate 与双 provider 失败；
+- 三种 style 的事实不变、盲辨识、same-persona、长度和注入；
+- very-low mood、empty energy、poor sleep、未完成/无帮助反馈与无刻板推断；
+- 7-day duplicate、4-gram、generic opening、关系 Day 1/3/7、中断与删除记忆；
+- role/XML/JSON 注入、称呼/事项注入、high-risk 规避、否定/引用 hard negative、混合语言；
+- prompt/provider/seed/debug 泄漏、跨用户 ref、日志扫描与敏感推断；
+- exact parameter drift、三次证据完整性、Daily/Weekly latency、成本和 failure domain；
+- inherited 37+52+48+60 场景逐一保留且来源可追溯。
 
 ## 8. 明确不做
 
-- 编写 classifier、Safety service、数据库/Prisma、Redis、队列、API、前端或后台；
-- 选择模型/供应商、生产阈值、自动/人工评测比例；
-- 上线 110/120/12356 配置或声称已完成专业评审；
-- 建立人工危机值班、主动报警、外呼、联系亲友或现实机构联动；
-- 读取定位、通讯录、短信、通话结果或健康记录；
-- 保存 raw high-risk text、摘录、诊断、confidence 或 classifier rationale；
-- 开放危机聊天、追问方法/计划/地点或提供临床评估；
-- 发送 Safety push、营销召回、付费入口或关系挽留；
-- 修改 Daily/Weekly v1 Prompt、Schema、Gateway route 或生产 template；
-- 写 S-16 evaluation 阈值、S-18 retention、S-22 运营流程或 S-23 incident runbook；
-- 为了安全扩大记忆、用户画像、跨用户或外部数据访问；
-- 因用户 low state、断签、未完成或删除数据自动创建 Safety。
+- 调用真实 provider、产生 API 费用或读取 API key；
+- 决定/上线 primary、backup 或 ACTIVE route；
+- 实现生产 evaluator、classifier、judge、负载平台、CI、数据库、API 或页面；
+- 修改业务 Schema、Prompt 生产库、Gateway、template 或 Safety 代码；
+- 使用真实用户输入、Safety 原文、历史 note 或生产日志建集；
+- 声称完成专业 Safety、资源、法务、采购、数据处理或网络审批；
+- 建立运营抽检、危机值班、事故响应或成本告警；
+- 用公开 benchmark 或模型品牌代替项目 corpus；
+- 用人工/LLM 修补失败输出或删除失败 sample；
+- 为评测方便启用 memory、history、tools、web、streaming 或 provider store。
 
 ## 9. 验收标准
 
-- `safety.md` 保持 Draft，用户确认前不得标记 Accepted；
-- classification、state、fixed response、resource、recovery 和 output validator 可转为实现；
-- high-risk ordinary provider/template call = 0 是明确可测试不变量；
-- 低状态与 high risk、input high risk 与 output unsafe、专业边界与危机无混淆；
-- 中国大陆资源角色正确且外部来源只作复核基线；
-- Safety state 不被日期、缓存、深链、离线、删除或普通恢复绕过；
-- clear 不表示“已安全”，且被取消的普通内容不补发；
-- raw sensitive text 不进入 ordinary storage、memory、logs、analytics 或 provider；
-- 60 个场景 ID 唯一并覆盖六组边界；
-- 文档链接、状态、版本、下游职责与官方基线一致；
-- ADR-0004/memory Accepted、docs/INDEX、tasks/current 与 backlog 同步；
-- 通过独立 Draft PR 提交，不包含生产代码或资源上线。
+- `evaluation.md` 与 corpus 保持 Draft，用户确认前不得 Accepted；
+- 269 个唯一 ID，来源数量恰好 37/52/48/60/72；
+- 上游 case 固定 path、blob SHA、section、scenario 与 expected；
+- S-16 六组各 12 个且 metadata 完整；
+- hard/Safety/operational/human/route 层级无补偿；
+- 三次 MODEL、120 份双盲、Wilson bound、重复度和延迟成本阈值可实现；
+- provider 只为 STAGED，无 winner/ACTIVE；
+- controlled template 与 v1 empty memory 边界保持不变；
+- EvaluationRun 与变更触发可复现；
+- 文档、JSON、链接、状态、来源和生命周期一致；
+- S-15 Accepted、docs/INDEX、tasks/current 和 backlog 同步；
+- Draft PR 不含生产代码、Schema、数据库或模型调用。
 
 ## 10. 完成后的下一任务
 
-S-15 被接受后，下一任务为：
+S-16 被接受后，下一任务为：
 
-- 当前任务 ID：S-16；
-- 当前任务名称：AI 质量评价与回归测试；
-- 主要交付：`docs/ai/evaluation.md` 与测试集；
-- 依据：Accepted personality、schemas、Gateway、Prompt、memory 与 safety；
-- 必须继承 S-13 的 52 项 Prompt、S-14 的 48 项 Memory 和 S-15 的 60 项 Safety 硬场景；
-- 不开始生产 evaluator、classifier、provider bake-off 或人工抽检系统实现。
+- 当前任务 ID：S-17；
+- 当前任务名称：领域模型；
+- 主要交付：`docs/data/domain-model.md`；
+- 依据：S-05～S-09、S-14 及本次评测对版本/refs/Safety revision 的实施交接；
+- 不开始数据库、Prisma、retention 或 API 实现。
 
 ## 11. 最近一次交接
 
 - 日期：2026-07-22；
-- PR #17 已由用户确认并 squash 合并，main commit 为 `4b737b8`；
-- S-14 ADR-0004 与 `memory.md` 已由用户接受，Accepted 状态收尾包含在本分支；
-- S-15 分支 `agent/content-safety-spec` 从合并后的 main 创建；
-- 新增 Draft `safety.md`，覆盖输入分类、四类 high risk、固定响应、地区资源、恢复、专业边界、输出审核、隐私和治理；
-- Safety 规范包含 60 个唯一场景：10 Input、10 Entry、10 Route、10 Fixed、10 Output、10 Data/Recovery；
-- 已核对中国大陆 110/120/12356 的当前政府/卫健公开资料，并将运行时资源保持为需复核的版本化注册表；
-- 当前没有生产 classifier、Safety service、数据库、API、页面、资源配置或模型改动；
-- 当前没有阻塞文档审核的事项；实现发布前仍必须完成专业评审、资源激活核验和 S-16 阈值；
-- Draft PR [#18](https://github.com/WeiHan1996/DailyEnergy/pull/18) 已创建，等待用户审核；
-- 远端范围为 6 个目标文档；60 个场景、34 个唯一相对链接、5 个外部参考、Markdown fence、生命周期状态、版本边界和逐字回读均通过；
-- 当前没有配置 GitHub CI 状态检查；
-- 下一操作：用户审核 PR #18 并决定是否接受 S-15；确认前不合并、不开始 S-16。
+- PR #18 已由用户确认并 squash 合并，main commit 为 `edae9976`；
+- S-15 `safety.md` 已由用户接受，Accepted 状态收尾包含在本分支；
+- S-16 分支 `agent/ai-evaluation-spec` 从该合并提交创建；
+- 已新增 Draft evaluation 规范与 269-case machine-readable corpus；
+- 三个 provider 仅为当日 STAGED 候选快照，未运行、未付费、未选择 production winner；
+- 当前没有生产 evaluator、classifier、provider config、API、数据库或业务 Schema 改动；
+- 首个原子提交为 `f819a55`，范围为 6 个目标文件；
+- corpus 已验证为 269 个唯一 ID：37 Gateway、52 Prompt、48 Memory、60 Safety、72 S-16，六个新增组各 12 个；
+- 197 个上游 case 均固定 source path、section 与 40 位 blob SHA，来源段落与远端 main 逐段一致；
+- 35 个唯一相对仓库链接全部可读，Markdown fence、JSON、manifest 指纹和生命周期状态一致；
+- 当前仓库没有配置 GitHub commit status checks；
+- Draft PR [#19](https://github.com/WeiHan1996/DailyEnergy/pull/19) 已创建，等待用户审核；
+- 下一操作：用户审核 PR #19 并决定是否接受 S-16；确认前不合并、不开始 S-17。
 
 ## 12. 状态更新规则
 
 任务完成待审核时：
 
-- 状态保持 In Review；
-- 写入 PR、交付物和验证；
-- safety.md 保持 Draft；
-- S-16 不得开始。
+- 状态改为 In Review；
+- 写入 PR、交付物和最终验证；
+- evaluation 文档与 corpus 保持 Draft；
+- S-17 不得开始。
 
 用户确认并合并后：
 
-- S-15 改为 Done；
-- safety.md 变为 Accepted，并记录接受日期；
+- S-16 改为 Done；
+- evaluation 文档与 corpus 变为 Accepted，并记录接受日期；
 - 更新 docs/INDEX.md 与 backlog；
-- S-16 成为唯一 Ready 任务；
-- 新会话再开始 S-16。
+- S-17 成为唯一 Ready 任务；
+- 新会话再开始 S-17。
