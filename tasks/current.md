@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-11
 - **当前任务名称**：规则引擎规范
-- **任务状态**：Ready
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：不开始正式业务代码；允许规范、规则表、伪代码和确定性测试用例
-- **当前分支**：待创建
-- **关联 PR**：待创建
+- **当前分支**：`agent/rule-engine-spec`
+- **关联 PR**：[#14](https://github.com/WeiHan1996/DailyEnergy/pull/14)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -93,10 +93,10 @@
 
 - 每一种合法签到枚举和“说不准”输入；
 - 低精力、睡眠一般、稳定状态及信号相互冲突；
-- 分数 0、100 和每个档位阈值的前后边界；
+- 可达分数 0、算法上界 clamp 100 和每个档位阈值的前后边界；
 - 五维全并列、部分并列和唯一最高/最低；
 - 相同输入、seed 和 manifest 重复执行得到逐字段相同 RuleFacts；
-- 新增无关 namespace 不改变既有具名选择；
+- 同一 manifest 内额外计算已登记但本次未消费的 namespace，不改变既有具名选择；registry 变化必须升级版本；
 - 候选顺序、目录版本或算法语义改变时必须升级对应版本；
 - 一个候选、多个候选、候选过滤后为空和 rejection counter 递增；
 - 主要行动、可选任务和仪式引用都指向合法稳定 ID；
@@ -145,13 +145,15 @@ S-11 被接受后，下一任务为：
 ## 10. 最近一次交接
 
 - 日期：2026-07-21；
-- PR #13 已由用户确认，本提交完成 S-10 接受收尾；
-- ADR-0002 已标记为 Accepted，73 个确定性断言保持通过；
-- S-10 已标记为 Done，S-11 已设为唯一 Ready 任务；
-- S-11 分支和 PR 尚未创建，任务尚未启动；
+- S-11 Draft PR [#14](https://github.com/WeiHan1996/DailyEnergy/pull/14) 已创建，等待用户审核；
+- 新增 Draft `generation-engine.md`、`scoring-rules.md` 与 `s11-test-vectors.json`，未修改生产业务代码；
+- 已冻结整数权重/阈值、focus/care/supporting、行动与任务目录、独立仪式、模板资格、四种表达 token、manifest 闭包和七天事实优先级；
+- 共享 Schema 包验证通过：4 个测试文件、34 个测试，以及格式、类型检查和构建；
+- 独立规则复算通过：5 个完整 RuleFacts、2 个定向日用例、180 种合法签到、12 个周 direction、8 个 coverage 边界和 1 条完整七日 source→aggregate→plan 链路；
+- 最终独立契约审计与 `git diff --check` 通过；
 - 当前没有正式前端、后端、数据库或 AI 业务实现；
 - 当前没有阻塞项；
-- 下一操作：PR #13 squash 合并并验证 main；之后等待“继续 DailyEnergy 当前任务”再启动 S-11。
+- 下一操作：用户审核 PR #14 并决定是否接受 S-11；确认前不标记 Accepted、不合并、不开始 S-12。
 
 ## 11. 状态更新规则
 

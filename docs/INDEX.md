@@ -126,8 +126,9 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
-| docs/ai/generation-engine.md | Planned | 稳定种子、版本、缓存和幂等 | state-machine、daily-content-schema |
-| docs/ai/scoring-rules.md | Planned | 五维分数和行动候选规则 | generation-engine |
+| [docs/ai/generation-engine.md](./ai/generation-engine.md) | Draft | 稳定种子、版本、缓存、幂等和受控表达计划 | state-machine、daily-content-schema、ADR-0002 |
+| [docs/ai/scoring-rules.md](./ai/scoring-rules.md) | Draft | 五维分数、行动候选与七天真实记录聚合规则 | generation-engine、weekly-summary-schema |
+| [docs/ai/s11-test-vectors.json](./ai/s11-test-vectors.json) | Draft | 每日与七天规则的跨语言 golden vectors | generation-engine、scoring-rules、shared-schemas |
 | docs/ai/gateway.md | Planned | 供应商、超时、重试、降级和成本 | generation-engine |
 | docs/ai/prompt-spec.md | Planned | Prompt 输入、输出、版本和人格 | personality、schemas、gateway |
 | docs/ai/memory.md | Planned | 结构化记忆、用途、有效期和删除 | persona、journey、personality |
@@ -225,7 +226,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一 Ready 任务是 S-11 规则引擎规范。开始该任务前读取：
+当前唯一 In Review 任务是 S-11 规则引擎规范。审核该任务时依次读取：
 
 1. AGENTS.md；
 2. README.md；
