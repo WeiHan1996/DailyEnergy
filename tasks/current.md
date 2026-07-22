@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **代码工作**：不开始正式业务代码；只允许 ADR、记忆契约、用途/状态/投影伪结构和验收矩阵
 - **当前分支**：`agent/structured-memory-spec`
-- **关联 PR**：待创建
+- **关联 PR**：[#17](https://github.com/WeiHan1996/DailyEnergy/pull/17)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
@@ -176,8 +176,10 @@ S-14 被接受后，下一任务为：
 - 记忆规范包含 48 个唯一场景：12 Common、12 Source/Grant、12 Resolver/Expression、12 Deletion/Lifecycle；
 - 当前没有生产记忆、数据库、API、Prompt v2 或 Safety 实现；
 - 当前没有阻塞项；
-- Draft PR 尚未创建；创建后写回编号、远端范围和最终验证；
-- 下一操作：完成文档校验、创建 Draft PR 并等待用户审核；确认前不合并、不开始 S-15。
+- Draft PR [#17](https://github.com/WeiHan1996/DailyEnergy/pull/17) 已创建，等待用户审核；
+- 远端范围为 6 个目标文档；48 个场景、95 个引用/33 个唯一链接、Markdown fence、生命周期状态、版本边界和内容回读均通过；
+- 当前没有配置 GitHub CI 状态检查；
+- 下一操作：用户审核 PR #17 并决定是否接受 S-14；确认前不合并、不开始 S-15。
 
 ## 12. 状态更新规则
 
