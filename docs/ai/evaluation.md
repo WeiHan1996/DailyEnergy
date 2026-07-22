@@ -1,6 +1,6 @@
 # DailyEnergy AI 质量评价与回归测试规范
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
 - **所属任务**：S-16 — AI 质量评价与回归测试
 - **最后更新**：2026-07-22
 - **适用范围**：Daily / Weekly / controlled template、Prompt、Gateway、结构化记忆、内容安全、供应商候选、人工评价、延迟与成本回归
@@ -617,7 +617,7 @@ canonical manifest 使用 UTF-8、LF、对象 key 字典序、case 固定 ID 顺
 {
   "schema_version": "dailyenergy.ai-evaluation-corpus.v1",
   "corpus_version": "s16-v1",
-  "status": "DRAFT",
+  "status": "ACCEPTED",
   "generated_at": "2026-07-22",
   "counts": {
     "gateway_s12": 37,
@@ -634,11 +634,11 @@ canonical manifest 使用 UTF-8、LF、对象 key 字典序、case 固定 ID 顺
 
 每个 case 必须有：`id`、`source_task`、`source_path`、`group`、`workload`、`severity`、`scenario`、`expected`、`modes`、`tags`。上游 case 另保存 `source_blob_sha` 与 `source_section`；S-16 case 的 source 是本文和同提交 corpus。
 
-`status=DRAFT` 表示语料和阈值尚待用户接受，不表示 case 可以在评测时忽略。接受后 corpus version 不原位修改；新增/修正进入 `s16-v2` 或后续版本并保存差异。
+`status=ACCEPTED` 表示该固定语料和阈值已经由项目决策者接受；任何新增或修正都不得原位修改 `s16-v1`，必须进入 `s16-v2` 或后续版本并保存差异。
 
 ## 20. S-16 验收标准
 
-- `evaluation.md` 与 `evaluation-corpus.json` 保持 Draft，用户确认前不得标记 Accepted；
+- `evaluation.md` 与 `evaluation-corpus.json` 已在用户确认后标记 Accepted；后续语义变更必须创建新版本并重新审核；
 - corpus 恰好包含 37 + 52 + 48 + 60 + 72 = 269 个唯一 ID；
 - 每个上游 case 可追到固定 path、blob SHA、section 和原始场景/预期；
 - 72 个新 case 六组各 12 个，ID、workload、severity、mode 和 tag 完整；
@@ -649,7 +649,7 @@ canonical manifest 使用 UTF-8、LF、对象 key 字典序、case 固定 ID 顺
 - EvaluationRun 能固定 corpus、系统、模型、参数、区域、价格和人工证据；
 - 真实用户敏感数据不进入本 corpus、普通日志或无期限 evaluation artifact；
 - S-15 被用户接受并收尾为 Accepted，docs/INDEX、tasks/current 与 backlog 同步；
-- 独立 Draft PR 只包含 S-16 文档、语料和任务控制，不包含生产代码、模型调用或数据库变更。
+- 独立 PR 只包含 S-16 文档、语料和任务控制，不包含生产代码、模型调用或数据库变更。
 
 ## 21. 实施交接
 
@@ -687,7 +687,7 @@ canonical manifest 使用 UTF-8、LF、对象 key 字典序、case 固定 ID 顺
 ## 23. 验收记录
 
 - Draft PR：[#19](https://github.com/WeiHan1996/DailyEnergy/pull/19)；
-- 接受状态：未接受；
-- 接受日期：待用户确认；
+- 接受状态：已接受；
+- 接受日期：2026-07-22；
 - 接受范围：本文、`evaluation-corpus.json`、269-case manifest、Gate 阈值、STAGED 候选与实施交接；
 - 当前没有 provider winner、ACTIVE route、专业 Safety 签字或生产实现。
