@@ -1,6 +1,7 @@
 # DailyEnergy 领域模型
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-22
 - **所属任务**：S-17 — 领域模型
 - **最后更新**：2026-07-22
 - **适用范围**：Phase 0B / P0 账户、每日记录、稳定生成、互动、关系、事项与记忆、七天回望、Safety、通知、数据任务和版本证据
@@ -1113,14 +1114,14 @@ UNKNOWN_OUTCOME
 - v1 empty memory、历史冻结、AI 只表达、high-risk ordinary call=0 和 no same-day rebuild 保持不变；
 - EvaluationRun 与真实用户域隔离；
 - 48 项场景 ID 唯一并覆盖正常、并发、跨日、失败、删除、安全和隐私；
-- 本文保持 Draft，S-16 evaluation/corpus 在本分支收尾为 Accepted；
+- 本文已在用户确认并合并 PR #20 后进入 Accepted，S-16 evaluation/corpus 保持 Accepted；
 - docs/INDEX、tasks/current 与 backlog 同步；
 - PR 不包含数据库、Prisma、API、生产代码或真实用户数据。
 
 ## 23. 审核记录
 
-- Draft PR：[#20](https://github.com/WeiHan1996/DailyEnergy/pull/20)；
-- 接受状态：未接受；
-- 接受日期：待用户确认；
-- 需要审核：聚合边界、RelationshipCycle、DailyInteraction 原子边界、唯一性、发布栅栏、失效链和 S-18 交接；
+- PR：[#20](https://github.com/WeiHan1996/DailyEnergy/pull/20)；
+- 接受状态：Accepted（用户已确认并 squash 合并）；
+- 接受日期：2026-07-22；
+- 接受范围：13 个上下文、主要聚合、DailyInteraction 原子边界、RelationshipCycle 防复活、唯一性、发布栅栏、失效链与 S-18 交接；
 - 下一任务：S-18 数据保存和删除决策（ADR-0005）。

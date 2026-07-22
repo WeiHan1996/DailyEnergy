@@ -3,35 +3,36 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-22
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务 ID**：S-17
-- **当前任务名称**：领域模型
+- **当前任务 ID**：S-18
+- **当前任务名称**：数据保存和删除决策
 - **任务状态**：In Review
 - **优先级**：最高
-- **代码工作**：不开始数据库、Prisma、API 或正式业务代码；只定义领域语言、聚合、实体、关系、唯一性、修订、幂等、发布栅栏和删除失效概念契约
-- **当前分支**：`agent/domain-model`
-- **关联 PR**：[#20](https://github.com/WeiHan1996/DailyEnergy/pull/20)
+- **代码工作**：不开始数据库、Prisma、API 或生产删除 worker；只固定保存期限、删除语义、备份、provider、审计和同日重记边界
+- **当前分支**：agent/data-retention-deletion
+- **关联 PR**：[#21](https://github.com/WeiHan1996/DailyEnergy/pull/21)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
 ## 1. 当前目标
 
-创建 Draft [docs/data/domain-model.md](../docs/data/domain-model.md)，把 S-05～S-16 已接受的状态、Schema、稳定生成、Gateway、Prompt、结构化记忆、Safety 与评价交接转换为可直接指导 S-18～S-20 的领域模型。
+创建 Proposed [ADR-0005](../docs/decisions/ADR-0005-data-retention-and-deletion.md)，把已接受领域模型中的 source、revision、DataTask、deletion guard 和失效链转换为可直接指导 S-19 数据库规格的保存与删除决策。
 
-本任务确定“谁拥有哪项事实、哪些对象必须原子、哪些对象不可变、哪些引用必须随源删除失效”。它不决定 PostgreSQL 表、Prisma model、保存期限、软删/硬删、API DTO 或生产实现。
+本任务决定“保存多久、删除何时生效、在线与备份何时清理、失败如何重试、最小证据可留什么、同日怎样重新记录”。它不创建数据库表、Prisma model、API DTO、生产作业或隐私政策最终文本。
 
 ## 2. 必须交付
 
-- Draft `docs/data/domain-model.md`；
-- 账户、同意、资料、产品时间、Daily、Generation、Publication、Interaction、Relationship、Matter/Memory、Weekly、Safety、Notification、Data Rights/Evidence 上下文地图；
-- UserAccount、Profile、Checkin、GenerationIntent、PublishedDailyResult、DailyInteraction、RelationshipCycle、ImportantMatter、WeeklyWindow、SafetyState、NotificationIntent、DataTask 等聚合边界；
-- OwnerRef、StableSubjectId、ProductDate、Revision、Fingerprint、Epoch、Intent、Attempt、Snapshot、SourceDependency 的统一语义；
-- owner + product date 的 intent/result 唯一性与 Gateway attempt、notification intent、DataTask 等语义唯一性；
-- DailyInteraction 的反馈/帮助度/任务协调原子边界；
-- RelationshipCycle + EncounterLink 的删除后不复活边界；
-- Safety revision/epoch 与 deletion guard 的 PublishGuard；
-- DAY / MATTER / RELATIONSHIP_DATA / ACCOUNT 删除失效矩阵；
+- Proposed ADR-0005；
+- 中国大陆现行官方法规基线与上线前复核边界；
+- T0～T4 数据层级；
+- 账户、日记录、事项、关系、生成、通知、分享、导出、Safety、日志、评测和配置保存期；
+- 24 个月无主动使用自动 ACCOUNT 删除；
+- deletion guard、在线清理、provider、备份和用户可见完成语义；
+- DAY / MATTER / RELATIONSHIP_DATA / ACCOUNT 精确范围；
+- DayErasureGuardV1 与当前日显式重新记录；
+- 72 小时在线清理、7 天任务结果、35 天备份、30 天 provider 等硬期限；
+- legal hold、影响评估、受限审计和删除回执；
 - 48 项最小验收场景；
-- S-16 evaluation 与 corpus Accepted 收尾；
+- S-17 domain model Accepted 收尾；
 - docs/INDEX、backlog 和任务交接同步。
 
 ## 3. 上游必读
@@ -42,158 +43,146 @@
 4. [docs/INDEX.md](../docs/INDEX.md)；
 5. [产品状态机](../docs/product/state-machine.md)；
 6. [业务规则](../docs/product/business-rules.md)；
-7. [今日内容 Schema](../docs/ai/daily-content-schema.md)；
-8. [晚间反馈 Schema](../docs/ai/evening-feedback-schema.md)；
-9. [七天总结 Schema](../docs/ai/weekly-summary-schema.md)；
-10. [共享 Schema 包](../packages/shared-schemas/README.md)；
-11. [ADR-0002 稳定每日结果](../docs/decisions/ADR-0002-deterministic-daily-result.md)；
-12. [确定性生成引擎](../docs/ai/generation-engine.md)；
-13. [评分与规则选择](../docs/ai/scoring-rules.md)；
-14. [ADR-0003 AI Gateway](../docs/decisions/ADR-0003-ai-provider-abstraction.md)；
-15. [AI Gateway](../docs/ai/gateway.md)；
-16. [Prompt 规范](../docs/ai/prompt-spec.md)；
-17. [ADR-0004 结构化记忆](../docs/decisions/ADR-0004-structured-memory.md)；
-18. [结构化记忆](../docs/ai/memory.md)；
-19. [内容安全](../docs/ai/safety.md)；
-20. [AI 评价与回归](../docs/ai/evaluation.md)。
+7. [ADR-0002 稳定每日结果](../docs/decisions/ADR-0002-deterministic-daily-result.md)；
+8. [ADR-0003 AI Gateway](../docs/decisions/ADR-0003-ai-provider-abstraction.md)；
+9. [AI Gateway](../docs/ai/gateway.md)；
+10. [ADR-0004 结构化记忆](../docs/decisions/ADR-0004-structured-memory.md)；
+11. [结构化记忆](../docs/ai/memory.md)；
+12. [内容安全](../docs/ai/safety.md)；
+13. [AI 评价与回归](../docs/ai/evaluation.md)；
+14. [领域模型](../docs/data/domain-model.md)。
 
 ## 4. 已接受且不得重开的边界
 
-- 产品日期固定 `Asia/Shanghai`、04:00，命令接受时冻结日期和 policy version；
-- 同一用户同一产品日期只有一个生成意图和一个 AVAILABLE 结果，唯一性不包含 result version；
-- Checkin 可修订但不会重写生成快照或已发布结果；
-- 规则写事实，AI 只表达；主、备、模板使用同一冻结输入且只返回完整对象；
-- 每日结果和周总结修订不可原地重写；
-- 点亮、任务、帮助度、晚间反馈和关系不能合成一个可写 daily status；
-- 关系来自有效点亮源日，不是连续签到、积分或亲密度；
-- 记忆来自领域源 + 精确用途授权 + 确定性投影，不使用 generic memory text、embedding 或向量库；
-- Daily/Weekly v1 memory 仍为空；
-- high-risk 先于普通领域写入，ordinary primary/backup/template call = 0；
-- Safety 独立于日期且不保存原文、诊断、confidence 或 classifier rationale；
-- 晚间 note 不进入普通 AI、周总结、记忆、通知、分享或 analytics；
-- 删除任务与对象状态分开；源删除后派生、缓存、队列和迟到候选不得复活；
-- ADR-0005 接受前 DAY 删除后同日重新开始保持禁用；
-- EvaluationRun 和 synthetic evidence 不得关联真实 AccountRef 或用户数据。
+- 产品日期是 Asia/Shanghai、04:00，稳定根种子使用 StableSubjectId + product date + result version；
+- 同一用户同一产品日期只有一个生成意图和一个 AVAILABLE 结果；
+- DAY 删除不自动重建；显式重记必须复用原 product date 与 result version；
+- 删除任务与业务对象状态分开，任务创建时 guard 先于后台清理；
+- source 删除后派生、缓存、队列、迟到候选和备份恢复不得复活；
+- ACCOUNT 删除后不为保持 seed 单独保存 StableSubjectId 或外部身份映射；
+- 关系数据来自当前 cycle 的有效 EncounterLink，旧 lights 不导入新 cycle；
+- 事项、grant、snapshot 与 dependency 分开，模型和日志不是记忆源；
+- Safety 不保存原文、诊断、confidence 或 classifier rationale；
+- provider request body 与 invalid raw response 默认不持久化；
+- synthetic evaluation 不能引用真实 AccountRef；
+- read model、cache、analytics、audit 和 deletion receipt 都不是业务真相。
 
 ## 5. 本任务决定
 
-1. 13 个领域上下文和单向依赖；
-2. 业务实体、值对象、派生投影和不可变目录的分类；
-3. UserAccount、Consent、Profile 与 Onboarding Completion 的分离；
-4. ProductDate、continuation grant 与命令接受身份；
-5. MorningCheckin 的唯一性、revision 和结果冻结关系；
-6. GenerationIntent / Invocation / Attempt / Candidate / PublishedResult 的分离；
-7. DailyInteraction 是否为晚间协调保存的一致性边界；
-8. RelationshipCycle、EncounterLink 和 NodeReceipt 如何阻止删除后旧关系复活；
-9. Matter、Grant、MentionReceipt、ContextSnapshot、Dependency/Fallback 的分离；
-10. WeeklyWindow 的 source fingerprint 和不可变 summary revision；
-11. SafetyDecision/State/Event/ResponsePlan/ResourceEntry 的分离；
-12. NotificationPreference/PermissionSnapshot/Intent/DeliveryAttempt 的分离；
-13. DataTask 与业务删除状态怎样配合；
-14. Revision、Fingerprint、Epoch 各自解决什么问题；
-15. PublishGuard 需要冻结/比较哪些权威版本；
-16. 跨聚合哪些操作必须原子或使用等价 fence；
-17. SourceDependency 和 source invalidation 的传播；
-18. 内部数据分类与客户端/provider/日志边界；
-19. 48 项领域模型验收场景；
-20. S-18/S-19/S-20 以及隐私、架构、测试与观测交接。
+1. 个人数据保存期限的默认层级、锚点和到期动作；
+2. 用户主动使用与 24 个月无使用的定义；
+3. T0 transient、T1 active、T2 restricted、T3 backup、T4 anonymous/system 边界；
+4. 账户、资料、日记录、事项、关系和周总结的最长保存期；
+5. generation attempt、notification、share、export 和 evaluation artifact 的短期 TTL；
+6. Safety、网络安全日志、删除回执、影响评估和 legal hold 的受限期限；
+7. 删除的 semantic blocked、online erased、backup expired 三层语义；
+8. guard、清理顺序、SLA、FAILED 和同任务重试；
+9. DAY / MATTER / RELATIONSHIP_DATA / ACCOUNT 精确范围；
+10. relationship-only delete 默认保留真实 DAY，额外日期用 DAY 子任务；
+11. DayErasureGuardV1 的字段、45 天上限和透明说明；
+12. 当前日显式重记的资格与 CONTROLLED_TEMPLATE 路径；
+13. 35 天备份与恢复前删除账本重放；
+14. provider training/retention/data-handling profile 硬门；
+15. 导出、客户端缓存、对象/CDN 和外部副本边界；
+16. RetentionPolicyEntry、DeletionReceiptV1 与下游验证；
+17. 48 项验收矩阵；
+18. S-19～S-33 与工程任务交接。
 
 ## 6. v1 决策摘要
 
-- 一个 UserAccount 生命周期使用一个不可变高熵 StableSubjectId；删除后新账户不复用；
-- Profile 是可修订资料，Onboarding Completion 是独立一次完成事实；
-- 每个按日命令保存 target ProductDate、policy version、accepted_at、command ref 和 payload fingerprint；
-- MorningCheckin 同用户同日一份，revision 更正不修改 PublishedDailyResult；
-- GenerationIntent 同用户同日一个，冻结 manifest/snapshot/seed identity；
-- GatewayAttempt 唯一键为 invocation + role + ordinal，无效 raw output 默认不持久化；
-- PublishedDailyResult 独立不可变并一次性发布；
-- DailyInteraction 只包含 light/task/helpfulness/evening feedback，支持组件 revision 与原子 evening save；
-- RelationshipCycle 只计算当前 cycle 的有效 EncounterLinks；关系删除关闭旧 cycle，旧 lights 不导入新 cycle；
-- ImportantMatter 与 MemoryPurposeGrant 分开；提及回执不复制文本；
-- WeeklyWindow 恰好七个连续日期，source fingerprint 改变先失效旧 summary；
-- SafetyState 每用户一份，revision + epoch 对所有普通发布形成硬 fence；
-- Notification SENT 只表示提交平台，不表示送达/接通；
-- DataTask 创建时先让 deletion guard 生效，物理 retention 延期给 S-18；
-- EvaluationRun 只使用 SyntheticSubjectRef；
-- read model、cache、event analytics 均不拥有业务真相。
+- 核心用户数据在账户 ACTIVE 期间保存；连续 24 个月无主动使用自动进入 ACCOUNT 删除；
+- COMPLETED / EXPIRED matter 最多 90 天；
+- provider body/raw invalid output 为零持久化，attempt metadata 30 天；
+- notification terminal 35 天，share draft 24 小时，share object 7 天，export artifact 24 小时；
+- Safety event 到 CLEAR + 30 天，普通 trace 30 天；
+- 网络安全日志 6 个自然月，删除回执 6 个自然月，影响评估记录至少 3 年；
+- synthetic evaluation artifact 90 天，manifest/聚合 365 天；
+- guard 同步生效；session/cache/queue URL 15 分钟清理、在线数据 72 小时、任务最迟 7 天给出真实结果；
+- provider retention 最长 30 天、training off；备份最长 35 天；
+- DataTask SUCCEEDED 表示产品和在线副本已不可用，并登记 backup purge deadline；
+- generic soft delete 不能作为最终完成；
+- DAY 同日显式重记复用 original result version，默认走确定性 CONTROLLED_TEMPLATE；
+- DayErasureGuard 最多 45 天且不含被删内容、分数、结果、seed 或外部身份；
+- relationship-only delete 保留真实日记录；用户另选日期时创建 DAY 子任务；
+- legal hold 只允许明确法律依据、最小范围、90 天复核，绝不成为 active source。
 
 ## 7. 必须覆盖的验收场景
 
-- 外部身份恢复、账户删除后新身份周期、同意撤回与 Profile 修订；
-- 04:00 日期边界、continuation 失效、命令接受和未知结果；
-- 同日签到并发、同键同载荷、同键不同载荷和签到更正；
-- manifest 冻结、partial JSON、完整模板、并发发布和 Safety epoch race；
-- 多端点亮、任务不惩罚、晚间原子冲突和 high-risk note；
-- DAY 删除关系重算、relationship cycle 删除后旧事件重放；
-- purpose grant 隔离、matter revision race、提及频率、fallback 和周 fingerprint；
-- low state 与 Safety 分离、资源 fallback、recovery 与通知发送前校验；
-- DAY/MATTER/RELATIONSHIP/ACCOUNT 删除和旧缓存/迟到 candidate 复活；
-- version/fingerprint drift、客户端白名单、日志扫描、synthetic evaluation 隔离和旧客户端 major。
+- retention 读取不续期、后台事件不更新主动使用、23/24 个月边界；
+- terminal matter 自动删除与 policy 非法延长；
+- DAY in-flight、当前日重记、历史日禁用、旧 result version、guard 丢失和字段扫描；
+- MATTER fallback、relationship-only、DAY 子任务和旧 cycle 不重放；
+- ACCOUNT 删除中的 export、新账户、新 subject、失败不解封和外部副本说明；
+- cache、offline device、dead-letter、20 天备份恢复、35 天越界和主动失效；
+- Safety/raw log、六个月安全日志、legal hold、三年影响评估；
+- provider training/30 天、删除请求、分享对象和微信通知；
+- DataTask 幂等、scope 冲突、7 天 FAILED、receipt 字段与自动到期。
 
 ## 8. 明确不做
 
-- 写 PostgreSQL/Prisma、索引、迁移、SQL 或生产代码；
-- 决定 soft delete/hard delete、retention、backup、audit 或删除 SLA；
-- 定义 API、OpenAPI、HTTP code、鉴权或客户端 DTO；
-- 修改共享 Schema、Prompt、Gateway、Safety、memory 或生成规则；
-- 运行真实 provider、评测、classifier 或产生费用；
-- 选择生产主备模型、ACTIVE route 或模型 winner；
-- 开放同日删除后重新开始；
-- 创建 generic user data、daily status、memory text、诊断或风险分数；
-- 保存真实用户内容、Safety 原文或 provider raw response；
-- 建立运营、客服、专业审核、事故响应、指标或实验流程。
+- 编写 PostgreSQL、Prisma、迁移、API、队列 worker 或生产代码；
+- 选择云数据库、对象存储、密钥服务、provider 或生产路由；
+- 定义隐私政策最终法律文本、用户身份核验材料或客服权限；
+- 运行真实删除、provider 调用、备份恢复或产生费用；
+- 保存真实用户数据、Safety 原文、provider raw response 或 Prompt；
+- 修改现有 Schema、生成事实、安全响应或记忆来源；
+- 以 generic soft delete、无限期日志或 provider 默认值代替正式决策。
 
 ## 9. 验收标准
 
-- `domain-model.md` 保持 Draft，用户确认前不得 Accepted；
-- 所有 P0 权威事实有唯一 owner/context/aggregate；
-- 主要聚合、关系、唯一性、revision/fingerprint/epoch 和 state ownership 清晰；
-- DailyInteraction、RelationshipCycle、WeeklyWindow、SafetyState 和 DataTask 边界可由下游实现；
-- intent/result/attempt/notification/task 等关键唯一性明确；
-- 发布、晚间保存、Safety trigger、deletion guard 和 dispatch 原子不变量闭合；
-- DAY/MATTER/RELATIONSHIP_DATA/ACCOUNT 的失效链不允许旧源复活；
-- 48 个场景 ID 唯一；
-- S-16 evaluation/corpus 已转 Accepted，项目控制文件一致；
-- Draft PR 只含本任务文档与任务状态，不含数据库、API 或业务代码。
+- ADR 包含目的、期限总表、scope、失败、备份、受托方、审计、替代方案和影响；
+- 期限与上游状态、Gateway、Memory、Safety、Evaluation、Domain Model 一致；
+- 同日显式重记不保留被删内容或 seed，且不使用 latest manifest；
+- 四种删除范围的在线、派生、provider、备份和客户端行为闭合；
+- 48 个 S18 场景 ID 唯一；
+- S-17 domain model 转 Accepted 并记录 PR #20；
+- docs/INDEX、backlog、current 只有 S-18 为 In Review；
+- 所有相对链接可读，外部法规链接已核验；
+- Draft PR 只含文档，不含数据库、API、生产代码或真实用户数据。
 
-## 10. 完成后的下一任务
+## 10. 下一步
 
-S-17 被接受后，下一任务为：
+S-18 被接受后，下一任务为：
 
-- 当前任务 ID：S-18；
-- 当前任务名称：数据保存和删除决策；
-- 主要交付：`docs/decisions/ADR-0005-data-retention-and-deletion.md`；
-- 依据：本领域模型的源、派生、受限证据、DataTask、guard 与删除失效链；
-- 不开始数据库、Prisma 或 API 实现。
+- 当前任务 ID：S-19；
+- 当前任务名称：数据库规格；
+- 主要交付：docs/technical/database.md 与 Prisma 草案；
+- 依据：Accepted domain model + ADR-0005 的唯一性、TTL、guard、删除任务、备份和证据边界；
+- 不提前开始 API 或生产业务实现。
 
 ## 11. 最近一次交接
 
-- 日期：2026-07-22；
-- PR #19 已由用户确认并 squash 合并，main commit 为 `736e1d1d1c742a5b311baf9aa00e5d8964e41e3a`；
-- S-16 evaluation 规范与 269-case corpus 已由用户接受，Accepted 状态收尾包含在本分支；
-- S-17 分支 `agent/domain-model` 已从该 main commit 创建，首个 domain model 提交为 `3cfb524`；
-- Draft PR [#20](https://github.com/WeiHan1996/DailyEnergy/pull/20) 已创建；
-- 最终范围为 6 个目标文件：domain model、evaluation、corpus、INDEX、backlog、current；
-- 领域模型覆盖 13 个上下文、主要聚合、48 个唯一验收场景和 S-18～S-33 下游交接；
-- 6 份远端文件与预期内容逐字一致，分支基于 `736e1d1` 且未落后 main；
-- 91 个相对引用落到 36 个唯一仓库文件且全部可读，Markdown fence 闭合；
-- S-16 corpus 仍含 269 个唯一 case，来源计数 37/52/48/60/72，manifest SHA-256 重算一致；
-- backlog 中只有 S-17 为 In Review；当前没有数据库、Prisma、API、生产代码、模型调用或真实用户数据改动；
-- 下一操作：用户审核 PR #20 并决定是否接受 S-17；确认前不合并、不开始 S-18。
+- PR #20 已以 squash 方式合并到 main；
+- 合并提交：452170864caafd3b634bcce96e8c29848a712a46；
+- S-17 domain model 已由用户确认，当前分支负责将其收尾为 Accepted；
+- S-18 分支 agent/data-retention-deletion 从该 main commit 创建；
+- Proposed ADR-0005 已完成，覆盖保存期限、四种删除范围、DayErasureGuard、provider、备份、受限证据和 48 项验收场景；
+- Draft PR [#21](https://github.com/WeiHan1996/DailyEnergy/pull/21) 已创建；
+- 最终范围为 5 个 Markdown 文件，分支未落后 main；
+- 86 个相对引用落到 37 个唯一仓库文件且全部可读，4 个官方法规页面已核验；
+- Markdown fence、文档状态与任务生命周期一致，backlog 中只有 S-18 为 In Review；
+- 当前仓库没有配置 GitHub commit status checks；
+- 当前没有数据库、Prisma、API、生产代码、provider 调用或真实用户数据改动；
+- 下一操作：用户审核 PR #21 并决定是否接受 S-18；确认前不合并、不开始 S-19。
 
 ## 12. 状态更新规则
 
-任务完成待审核时：
+PR 创建前：
 
-- 状态保持 In Review；
-- 写入 PR、交付物和最终验证；
-- domain model 保持 Draft；
-- S-18 不得开始。
+- ADR 保持 Proposed；
+- S-17 domain model 转 Accepted；
+- backlog 中 S-17 为 Done、S-18 为 In Review；
+- 关联 PR 为待创建。
+
+PR 创建后：
+
+- 写入实际 PR 链接、提交范围和最终验证；
+- ADR 仍保持 Proposed；
+- S-19 不得开始。
 
 用户确认并合并后：
 
-- S-17 改为 Done；
-- domain model 变为 Accepted，并记录接受日期；
-- 更新 docs/INDEX.md 与 backlog；
-- S-18 成为唯一 Ready 任务；
-- 新会话再开始 S-18。
+- ADR-0005 变为 Accepted 并记录接受日期；
+- 更新 docs/INDEX 与 backlog；
+- S-19 成为唯一 Ready/当前任务；
+- 新分支再开始数据库规格。

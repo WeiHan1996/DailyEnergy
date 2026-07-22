@@ -140,7 +140,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
-| [docs/data/domain-model.md](./data/domain-model.md) | Draft | 领域上下文、聚合、实体、关系、唯一性、修订与失效 | state-machine、schemas、memory、safety、evaluation |
+| [docs/data/domain-model.md](./data/domain-model.md) | Accepted | 领域上下文、聚合、实体、关系、唯一性、修订与失效 | state-machine、schemas、memory、safety、evaluation |
 | docs/technical/database.md | Planned | 表、索引、约束、迁移和删除 | domain-model |
 | prisma/schema.prisma | Planned | 可执行数据库 Schema | Accepted database spec |
 | docs/technical/api.md | Planned | 小程序、后端和后台接口契约 | domain、schemas |
@@ -177,7 +177,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md) | Accepted | 稳定种子、产品日期、历史不变与重生成 | 规则引擎开发前 |
 | [ADR-0003-ai-provider-abstraction.md](./decisions/ADR-0003-ai-provider-abstraction.md) | Accepted | AI Gateway 与供应商隔离 | AI Gateway 开发前 |
 | [ADR-0004-structured-memory.md](./decisions/ADR-0004-structured-memory.md) | Accepted | 用途受限结构化记忆与不用向量库 | 记忆开发前 |
-| ADR-0005-data-retention-and-deletion.md | Planned | 保存期限、删除和审计 | 数据库开发前 |
+| [ADR-0005-data-retention-and-deletion.md](./decisions/ADR-0005-data-retention-and-deletion.md) | Proposed | 保存期限、删除、备份、受托方和受限证据 | 数据库开发前 |
 | ADR-0006-monorepo-and-stack.md | Planned | TypeScript Monorepo 与既定技术栈 | 工程初始化前 |
 
 如果实际决策发生变化，应调整 ADR 名称和顺序，不为填满编号而创建无价值文档。
@@ -227,7 +227,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一 In Review 任务是 S-17 领域模型。执行与审核该任务时依次读取：
+当前唯一 In Review 任务是 S-18 数据保存和删除决策。执行与审核该任务时依次读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -236,19 +236,13 @@ Phase 1 开始后逐步增加：
 5. tasks/current.md；
 6. docs/product/state-machine.md；
 7. docs/product/business-rules.md；
-8. docs/ai/daily-content-schema.md；
-9. docs/ai/evening-feedback-schema.md；
-10. docs/ai/weekly-summary-schema.md；
-11. packages/shared-schemas/README.md；
-12. docs/decisions/ADR-0002-deterministic-daily-result.md；
-13. docs/ai/generation-engine.md；
-14. docs/ai/scoring-rules.md；
-15. docs/decisions/ADR-0003-ai-provider-abstraction.md；
-16. docs/ai/gateway.md；
-17. docs/ai/prompt-spec.md；
-18. docs/decisions/ADR-0004-structured-memory.md；
-19. docs/ai/memory.md；
-20. docs/ai/safety.md；
-21. docs/ai/evaluation.md。
+8. docs/decisions/ADR-0002-deterministic-daily-result.md；
+9. docs/decisions/ADR-0003-ai-provider-abstraction.md；
+10. docs/ai/gateway.md；
+11. docs/decisions/ADR-0004-structured-memory.md；
+12. docs/ai/memory.md；
+13. docs/ai/safety.md；
+14. docs/ai/evaluation.md；
+15. docs/data/domain-model.md。
 
-S-17 只产出 Draft `docs/data/domain-model.md`，并完成 S-16 evaluation/corpus 的 Accepted 状态收尾与任务控制更新；在单独 PR 通过审核前，不开始 S-18 ADR-0005、数据库/Prisma、API、隐私保存期限或正式业务代码。
+S-18 只产出 Proposed ADR-0005，并完成 S-17 domain model 的 Accepted 状态收尾与任务控制更新；在独立 PR 通过审核前，不开始 S-19 数据库/Prisma、API、生产删除作业、真实 provider 调用或隐私政策上线。
