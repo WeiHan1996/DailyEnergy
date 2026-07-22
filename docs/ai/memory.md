@@ -132,7 +132,7 @@ flowchart TD
 
 ### 7.2 Profile setting
 
-- Preferred name 必须通过现有 1～20 字共享 Schema和 `preferred-name-prompt-v1` 安全投影；不合格时省略，不修复或发送原值。
+- Preferred name 必须通过现有 1～20 字共享 Schema 和 `preferred-name-prompt-v1` 安全投影；不合格时省略，不修复或发送原值。
 - Expression style 只能是 `BALANCED / GENTLE / LIGHT_HUMOR / CLEAR_DIRECT`；风格不能改变事实和 Safety ceiling。
 - Profile 修改只影响后续允许变化的表达；不改写当天核心结果或历史。
 - 恢复默认创建新修订，旧称呼或风格不再用于新上下文。
