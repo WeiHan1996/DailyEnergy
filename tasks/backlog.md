@@ -1,9 +1,9 @@
 # DailyEnergy 项目 Backlog
 
 - **文档状态**：Active
-- **最后更新**：2026-07-21
+- **最后更新**：2026-07-22
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-11 规则引擎规范](./current.md)
+- **当前任务**：[S-12 AI Gateway 决策与规范](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -22,6 +22,7 @@
 状态：
 
 - Done：已确认完成；
+- In Progress：唯一当前任务正在执行；
 - In Review：PR 等待审核；
 - Ready：唯一下一任务；
 - Planned：已排序但未开始；
@@ -66,8 +67,8 @@
 | ID | 任务 | 状态 | 主要交付 | 依赖 |
 |---|---|---|---|---|
 | S-10 | 稳定种子与产品日期决策 | Done | ADR-0002 | S-05 |
-| S-11 | 规则引擎规范 | In Review | generation-engine、scoring-rules | S-07、S-10 |
-| S-12 | AI Gateway 决策与规范 | Planned | ADR-0003、gateway.md | S-07、S-11 |
+| S-11 | 规则引擎规范 | Done | generation-engine、scoring-rules | S-07、S-10 |
+| S-12 | AI Gateway 决策与规范 | In Review | ADR-0003、gateway.md | S-07、S-11 |
 | S-13 | Prompt 规范 | Planned | prompt-spec.md | S-12、personality |
 | S-14 | 结构化记忆决策与规范 | Planned | ADR-0004、memory.md | S-05、S-07 |
 | S-15 | 内容安全规范 | Planned | safety.md | personality、schemas |

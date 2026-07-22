@@ -1,8 +1,9 @@
 # DailyEnergy 评分与规则选择规范
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-22
 - **所属任务**：S-11 — 规则引擎规范
-- **最后更新**：2026-07-21
+- **最后更新**：2026-07-22
 - **适用范围**：每日五维评分、重点维度、行动、任务、仪式、展示顺序，以及七天真实记录的确定性聚合与事实选择
 - **上游规范**：[今日内容 Schema](./daily-content-schema.md)、[七天趋势与总结 Schema](./weekly-summary-schema.md)、[共享 Schema](../../packages/shared-schemas/README.md)、[ADR-0002](../decisions/ADR-0002-deterministic-daily-result.md)
 - **配套规范**：[生成引擎](./generation-engine.md)、[S-11 测试向量](./s11-test-vectors.json)
@@ -16,7 +17,7 @@
 
 ## 2. 规范版本
 
-本 Draft 的规则闭包使用以下稳定 token：
+本规范 的规则闭包使用以下稳定 token：
 
 | 责任                | 版本                    |
 | ------------------- | ----------------------- |
@@ -580,3 +581,10 @@ coverage_level = aggregate.coverage.coverage_level
 ## 17. 待下游完成
 
 本文不实现 TypeScript 包、数据库、API、AI Gateway、Prompt、完整模板文案、Safety 分类或指纹字节协议。S-16 应把本文件和 JSON fixture 转成跨语言 golden corpus、属性测试和分布校准；任何校准改变 v1 语义都必须升级版本，不能修改历史结果。
+
+## 18. 接受记录
+
+- 用户于 2026-07-22 确认 S-11；
+- 整数评分、候选目录、具名选择、模板资格和周聚合 v1 语义正式生效；
+- 配套 `s11-test-vectors.json` 作为 Accepted 跨语言 golden fixture；
+- 任何权重、阈值、目录顺序或事实优先级变化必须创建新版本，不得原地修改 v1。
