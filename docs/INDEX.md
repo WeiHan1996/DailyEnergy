@@ -133,14 +133,14 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/ai/prompt-spec.md](./ai/prompt-spec.md) | Accepted | Prompt package、封闭输入、规范指令、事实绑定、版本与回归 | personality、schemas、gateway |
 | [docs/ai/memory.md](./ai/memory.md) | Accepted | 领域源、用途授权、确定性投影、有效期、无源回退与删除 | persona、journey、personality、prompt |
 | [docs/ai/safety.md](./ai/safety.md) | Accepted | 输入分类、专业边界、固定响应、地区资源、恢复与全候选审核 | vision、personality、schemas、gateway、prompt、memory |
-| [docs/ai/evaluation.md](./ai/evaluation.md) | Draft | 不可补偿 Gate、自动/人工评价、provider bake-off、延迟成本与变更回归 | personality、schemas、gateway、prompt、memory、safety |
-| [docs/ai/evaluation-corpus.json](./ai/evaluation-corpus.json) | Draft | 37+52+48+60+72 共 269 项版本化机器可读测试清单 | gateway、prompt、memory、safety、evaluation |
+| [docs/ai/evaluation.md](./ai/evaluation.md) | Accepted | 不可补偿 Gate、自动/人工评价、provider bake-off、延迟成本与变更回归 | personality、schemas、gateway、prompt、memory、safety |
+| [docs/ai/evaluation-corpus.json](./ai/evaluation-corpus.json) | Accepted | 37+52+48+60+72 共 269 项版本化机器可读测试清单 | gateway、prompt、memory、safety、evaluation |
 
 ### 7.4 数据与接口
 
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
-| docs/technical/domain-model.md | Planned | 业务实体和关系 | state-machine、schemas |
+| [docs/data/domain-model.md](./data/domain-model.md) | Draft | 领域上下文、聚合、实体、关系、唯一性、修订与失效 | state-machine、schemas、memory、safety、evaluation |
 | docs/technical/database.md | Planned | 表、索引、约束、迁移和删除 | domain-model |
 | prisma/schema.prisma | Planned | 可执行数据库 Schema | Accepted database spec |
 | docs/technical/api.md | Planned | 小程序、后端和后台接口契约 | domain、schemas |
@@ -227,37 +227,28 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一 In Review 任务是 S-16 AI 质量评价与回归测试。执行与审核该任务时依次读取：
+当前唯一 In Review 任务是 S-17 领域模型。执行与审核该任务时依次读取：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. docs/INDEX.md；
 5. tasks/current.md；
-6. docs/product/vision.md；
-7. docs/product/persona.md；
-8. docs/product/journey.md；
-9. docs/product/mvp.md；
-10. docs/ai/personality.md；
-11. docs/decisions/ADR-0001-product-positioning.md；
-12. docs/design/information-architecture.md；
-13. docs/design/screen-specs.md；
-14. docs/design/interaction-states.md；
-15. docs/design/content-layout.md；
-16. docs/product/state-machine.md；
-17. docs/product/business-rules.md；
-18. docs/ai/daily-content-schema.md；
-19. docs/ai/evening-feedback-schema.md；
-20. docs/ai/weekly-summary-schema.md；
-21. packages/shared-schemas/README.md；
-22. docs/decisions/ADR-0002-deterministic-daily-result.md；
-23. docs/ai/generation-engine.md；
-24. docs/ai/scoring-rules.md；
-25. docs/decisions/ADR-0003-ai-provider-abstraction.md；
-26. docs/ai/gateway.md；
-27. docs/ai/prompt-spec.md；
-28. docs/decisions/ADR-0004-structured-memory.md；
-29. docs/ai/memory.md；
-30. docs/ai/safety.md。
+6. docs/product/state-machine.md；
+7. docs/product/business-rules.md；
+8. docs/ai/daily-content-schema.md；
+9. docs/ai/evening-feedback-schema.md；
+10. docs/ai/weekly-summary-schema.md；
+11. packages/shared-schemas/README.md；
+12. docs/decisions/ADR-0002-deterministic-daily-result.md；
+13. docs/ai/generation-engine.md；
+14. docs/ai/scoring-rules.md；
+15. docs/decisions/ADR-0003-ai-provider-abstraction.md；
+16. docs/ai/gateway.md；
+17. docs/ai/prompt-spec.md；
+18. docs/decisions/ADR-0004-structured-memory.md；
+19. docs/ai/memory.md；
+20. docs/ai/safety.md；
+21. docs/ai/evaluation.md。
 
-S-16 只产出 Draft `evaluation.md`、Draft `evaluation-corpus.json`，并完成 S-15 的 Accepted 状态收尾与任务控制更新；在单独 PR 通过审核前，不开始 S-17、生产 evaluator/classifier、真实 provider bake-off、模型配置、数据库/API、专业 Safety 签字或人工抽检系统实现。
+S-17 只产出 Draft `docs/data/domain-model.md`，并完成 S-16 evaluation/corpus 的 Accepted 状态收尾与任务控制更新；在单独 PR 通过审核前，不开始 S-18 ADR-0005、数据库/Prisma、API、隐私保存期限或正式业务代码。
