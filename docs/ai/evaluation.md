@@ -686,9 +686,8 @@ canonical manifest 使用 UTF-8、LF、对象 key 字典序、case 固定 ID 顺
 
 ## 23. 验收记录
 
-- Draft PR：待创建；
+- Draft PR：[#19](https://github.com/WeiHan1996/DailyEnergy/pull/19)；
 - 接受状态：未接受；
 - 接受日期：待用户确认；
 - 接受范围：本文、`evaluation-corpus.json`、269-case manifest、Gate 阈值、STAGED 候选与实施交接；
 - 当前没有 provider winner、ACTIVE route、专业 Safety 签字或生产实现。
-

@@ -72,7 +72,7 @@
 | S-13 | Prompt 规范 | Done | prompt-spec.md | S-12、personality |
 | S-14 | 结构化记忆决策与规范 | Done | ADR-0004、memory.md | S-05、S-07、S-13 |
 | S-15 | 内容安全规范 | Done | safety.md | personality、schemas |
-| S-16 | AI 质量评价与回归测试 | In Progress | evaluation.md、evaluation-corpus.json | S-13、S-15 |
+| S-16 | AI 质量评价与回归测试 | In Review | evaluation.md、evaluation-corpus.json | S-13、S-15 |
 
 ### 数据、接口与隐私
 

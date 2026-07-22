@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-16
 - **当前任务名称**：AI 质量评价与回归测试
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：不开始正式业务代码；只允许评价 Gate、版本化测试语料、候选参数、人工盲评、延迟/成本与变更触发的概念契约
 - **当前分支**：`agent/ai-evaluation-spec`
-- **关联 PR**：待创建
+- **关联 PR**：[#19](https://github.com/WeiHan1996/DailyEnergy/pull/19)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
@@ -176,11 +176,16 @@ S-16 被接受后，下一任务为：
 - PR #18 已由用户确认并 squash 合并，main commit 为 `edae9976`；
 - S-15 `safety.md` 已由用户接受，Accepted 状态收尾包含在本分支；
 - S-16 分支 `agent/ai-evaluation-spec` 从该合并提交创建；
-- 当前正在新增 Draft evaluation 规范与 269-case machine-readable corpus；
+- 已新增 Draft evaluation 规范与 269-case machine-readable corpus；
 - 三个 provider 仅为当日 STAGED 候选快照，未运行、未付费、未选择 production winner；
 - 当前没有生产 evaluator、classifier、provider config、API、数据库或业务 Schema 改动；
-- 关联 Draft PR 待创建；
-- 下一操作：完成远端逐字回读、JSON/链接/数量/来源校验后创建 Draft PR，等待用户审核。
+- 首个原子提交为 `f819a55`，范围为 6 个目标文件；
+- corpus 已验证为 269 个唯一 ID：37 Gateway、52 Prompt、48 Memory、60 Safety、72 S-16，六个新增组各 12 个；
+- 197 个上游 case 均固定 source path、section 与 40 位 blob SHA，来源段落与远端 main 逐段一致；
+- 35 个唯一相对仓库链接全部可读，Markdown fence、JSON、manifest 指纹和生命周期状态一致；
+- 当前仓库没有配置 GitHub commit status checks；
+- Draft PR [#19](https://github.com/WeiHan1996/DailyEnergy/pull/19) 已创建，等待用户审核；
+- 下一操作：用户审核 PR #19 并决定是否接受 S-16；确认前不合并、不开始 S-17。
 
 ## 12. 状态更新规则
 
@@ -198,4 +203,3 @@ S-16 被接受后，下一任务为：
 - 更新 docs/INDEX.md 与 backlog；
 - S-17 成为唯一 Ready 任务；
 - 新会话再开始 S-17。
-
