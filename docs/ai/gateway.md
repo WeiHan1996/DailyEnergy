@@ -1,6 +1,7 @@
 # DailyEnergy AI Gateway 规范
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-22
 - **所属任务**：S-12 — AI Gateway 决策与规范
 - **最后更新**：2026-07-22
 - **适用范围**：Daily / Weekly 受控表达调用、provider adapter、路由、超时、失败、降级、熔断、成本、隐私和可观测性
@@ -868,3 +869,11 @@ route 从 STAGED 到 ACTIVE 前必须：
 - provider 合同、数据区域和 retention 法务结论：S-21/S-28/S-29 前的采购与隐私评审。
 
 延期不得削弱：AI 不改事实、完整候选、顺序降级、template 必需、同日唯一、历史冻结、最小披露、高风险旁路和删除不复活。
+
+## 25. 接受记录
+
+- 用户于 2026-07-22 确认 S-12 并 squash 合并 PR #15；
+- ADR-0003 与本文同时进入 Accepted；
+- 37 项正常、降级、生命周期、熔断、成本和隐私场景保持为下游硬约束；
+- S-13 可以在本文的 16/24 KiB、strict output、顺序降级和最小披露边界内定义 Prompt；
+- 生产 Gateway、provider adapter 与 route 仍须等待后续实现任务和 S-16 评测。

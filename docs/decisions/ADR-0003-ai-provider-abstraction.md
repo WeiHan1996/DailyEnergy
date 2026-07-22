@@ -1,7 +1,8 @@
 # ADR-0003：服务端 AI Gateway 与供应商隔离
 
-- **状态**：Proposed
+- **状态**：Accepted
 - **日期**：2026-07-22
+- **接受日期**：2026-07-22
 - **所属任务**：S-12 — AI Gateway 决策与规范
 - **决策范围**：AI 调用边界、供应商与模型隔离、完整表达路径、路由版本、失败降级、成本与隐私
 - **决策所有者**：DailyEnergy 项目
@@ -188,4 +189,6 @@ Gateway 只接受受控表达计划和最小批准事实，只返回一份完整
 
 ## 9. 决策状态
 
-本 ADR 当前为 Proposed。只有用户确认后才能改为 Accepted。在此之前不得据此开始生产 AI Gateway 实现。
+- 用户于 2026-07-22 明确确认并合并 S-12；
+- 本 ADR 与配套 `gateway.md` 同时进入 Accepted；
+- 后续实现必须通过受审 route manifest、Prompt/Safety 兼容性和 S-16 评测，不得恢复业务直连 provider。
