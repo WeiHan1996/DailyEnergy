@@ -723,8 +723,10 @@ S-19 文档审核要求：
 
 ## 20. 审核记录
 
-- Draft PR：待创建；
+- Draft PR：[#22](https://github.com/WeiHan1996/DailyEnergy/pull/22)；
 - 接受状态：未接受；
 - 接受日期：待用户确认；
 - 本次需审核：表边界、Prisma 结构、SQL-001～020、事务、加密、TTL/删除、outbox/inbox、迁移与 64 项场景；
+- 提交范围：6 个文档/Schema 文件；首个提交 `70f2056fd45fa6c9fa706c9486aadafc0e72ae53`；
+- 验证结果：Prisma 7.9.0 format/validate、70 model、35 enum、20 SQL-ID、9 TX-ID、64 个唯一场景与 39 个唯一仓库链接均通过；
 - 接受后下一任务：S-20 API 契约。

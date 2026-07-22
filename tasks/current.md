@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **代码工作**：只定义 PostgreSQL/Prisma 结构、约束、事务、保存、删除、迁移与测试契约；不创建 migration、数据库、API、worker 或生产业务代码
 - **当前分支**：`agent/database-spec`
-- **关联 PR**：待创建
+- **关联 PR**：[Draft PR #22](https://github.com/WeiHan1996/DailyEnergy/pull/22)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
@@ -176,9 +176,11 @@ S-19 被接受后，下一任务为：
 - S-18 ADR-0005 已由用户接受，当前分支负责将其收尾为 Accepted；
 - S-19 分支 `agent/database-spec` 从该 main commit 创建；
 - 目标范围为 6 个文件：database spec、Prisma draft、ADR-0005、INDEX、backlog、current；
-- database spec、Prisma schema、SQL-001～020 与 64 项验收场景已完成本地初稿；
-- Prisma format/validate、链接、字段扫描、状态和远端逐文件回读待最终执行；
-- Draft PR 待创建；
+- database spec、Prisma schema、SQL-001～020、TX-01～09 与 64 项验收场景已提交到 [Draft PR #22](https://github.com/WeiHan1996/DailyEnergy/pull/22)；
+- 首个远端提交为 `70f2056fd45fa6c9fa706c9486aadafc0e72ae53`，只修改约定的 6 个文件，分支相对 main 领先 1 个提交、落后 0 个提交；
+- 6 个远端 blob 与本地验证内容逐字一致；Prisma 7.9.0 `format`/`validate` 通过，70 个 model、35 个 enum、20 个 SQL-ID、9 个 TX-ID 与 64 个场景 ID 均唯一；
+- 90 个相对链接引用落到 39 个唯一仓库文件且全部可读；字段、保存元数据、closed allowlist、生命周期和范围扫描均通过；
+- 当前提交未配置 GitHub Actions 状态检查；PR 保持 Draft，等待用户审核；
 - 当前没有 migration、数据库、API、worker、生产代码、provider 调用或真实数据改动。
 
 ## 12. 状态更新规则
