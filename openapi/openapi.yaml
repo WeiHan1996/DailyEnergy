@@ -1,7 +1,10 @@
 openapi: 3.0.3
+x-document-status: Accepted
+x-accepted-date: '2026-07-22'
+x-accepted-via: PR #24 / squash commit 207de0e
 info:
   title: DailyEnergy API
-  description: Executable Draft contract for S-20. docs/technical/api.md and error-codes.md define semantics; x-source-contract
+  description: Executable Accepted contract for S-20. docs/technical/api.md and error-codes.md define semantics; x-source-contract
     points to accepted Zod authorities.
   version: api-contract-v1
   contact:

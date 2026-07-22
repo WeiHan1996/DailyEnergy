@@ -1,6 +1,7 @@
 # DailyEnergy API 错误码
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-22
 - **所属任务**：S-20 — API 契约
 - **最后更新**：2026-07-22
 - **适用范围**：`/v1` 小程序与管理端 HTTP 错误语义、重试与客户端恢复
@@ -215,6 +216,8 @@
 
 ## 11. 审核记录
 
-- 状态：Draft；
-- 与 `api-contract-v1` 同步；
+- 状态：Accepted；
+- 接受日期：2026-07-22；
+- 内容 PR：[PR #24](https://github.com/WeiHan1996/DailyEnergy/pull/24)，squash 合并提交 `207de0e`；
+- 16 个错误场景唯一，与 Accepted `api-contract-v1` 和 OpenAPI 同步；
 - 实现时 code 表可进 shared 常量，但语义变更需改本文版本。

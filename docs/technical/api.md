@@ -1,6 +1,7 @@
 # DailyEnergy API 契约
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-22
 - **所属任务**：S-20 — API 契约
 - **最后更新**：2026-07-22
 - **适用范围**：微信小程序、NestJS API、最小管理后台的 HTTP 契约；幂等、权限、revision/CAS、Safety/deletion 阻断与 Unknown outcome
@@ -539,7 +540,9 @@ CommandReceiptV1 {
 
 ## 26. 审核记录
 
-- 状态：Draft；
-- 分支：`agent/api-contract-spec`；
-- PR：[修订中的 #24](https://github.com/WeiHan1996/DailyEnergy/pull/24)；已按审核修复 DAY 重记、Safety-first、删除确认、签到 CAS 与 OpenAPI 可执行性；
-- 下一任务：S-21 隐私数据地图（S-20 Accepted 后）。
+- 状态：Accepted；
+- 接受日期：2026-07-22；
+- 内容 PR：[PR #24](https://github.com/WeiHan1996/DailyEnergy/pull/24)，squash 合并提交 `207de0e`；
+- 审核修复：DAY 重记、Safety-first、删除确认、签到 CAS 与 OpenAPI 可执行性；
+- 最终验证：48 个 API 场景唯一；OpenAPI 62 paths / 65 operations / 136 schemas；Redocly recommended 0 errors / 0 warnings；
+- 下一任务：S-21 隐私数据地图。

@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-19 已 Accepted，S-20 In Review，尚未开始业务编码
-当前目标：完成页面、状态、Schema、AI、数据、API、指标和工程规范
-当前任务：S-20 API 契约（In Review，PR #24）
+状态：S-20 已 Accepted，S-21 Ready，尚未开始业务编码
+当前目标：完成页面、状态、Schema、AI、数据、API、隐私、指标和工程规范
+当前任务：S-21 隐私数据地图（Ready）
 ```
 
 长期工作入口：
@@ -361,11 +361,11 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- Draft `docs/technical/api.md`；
-- Draft `docs/technical/error-codes.md`；
-- OpenAPI 或等价可执行契约草案。
+- Draft `docs/operations/privacy-data-map.md`；
+- 对齐个人信息分类、处理目的、来源、流转、存储、访问、受托方、保存与删除；
+- 以已 Accepted 的领域、数据库、API、记忆、安全和 ADR-0005 为边界。
 
-S-20 不创建 NestJS controller、migration、数据库、worker 或生产代码。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+S-21 不创建数据库、埋点、同意页面、用户协议、供应商配置或生产代码。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 
