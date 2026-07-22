@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **代码工作**：不开始数据库、migration、NestJS、埋点、同意页面、供应商配置或生产实现；只允许 Draft 隐私数据地图
 - **当前分支**：`agent/s20-accept-handoff`（本 PR 仅 S-20 Accepted 收尾；S-21 在合并后新分支开始）
-- **关联 PR**：S-20 内容已由 [PR #24](https://github.com/WeiHan1996/DailyEnergy/pull/24) 合并；Accepted 收尾 PR 待创建
+- **关联 PR**：[Draft Accepted 收尾 PR #25](https://github.com/WeiHan1996/DailyEnergy/pull/25)；S-20 内容已由 [PR #24](https://github.com/WeiHan1996/DailyEnergy/pull/24) 合并
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
@@ -76,7 +76,8 @@
 - Redocly recommended 已验证为 0 errors / 0 warnings；
 - 本分支只做 S-20 Accepted 生命周期收尾和 S-21 Ready 指针切换；
 - 无 NestJS、migration、数据库、worker 或生产代码；
-- **下一步**：创建并审核本收尾 PR；合并后从新的 S-21 分支开始隐私数据地图正文。
+- Draft PR [#25](https://github.com/WeiHan1996/DailyEnergy/pull/25) 已创建，**不会自动 merge**；
+- **下一步**：用户审核并合并 PR #25；合并后从新的 S-21 分支开始隐私数据地图正文。
 
 ## 8. 状态更新规则
 
