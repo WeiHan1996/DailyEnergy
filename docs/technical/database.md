@@ -1,7 +1,7 @@
 # DailyEnergy 数据库规格
 
-- **文档状态**：Draft
-- **接受日期**：待用户确认
+- **文档状态**：Accepted
+- **接受日期**：2026-07-22
 - **所属任务**：S-19 — 数据库规格与 Prisma 草案
 - **最后更新**：2026-07-22
 - **适用范围**：Phase 0B / P0 账户、每日事实、生成、互动、关系、事项、结构化记忆、七天回望、Safety、通知、数据任务、保存与删除
@@ -723,10 +723,11 @@ S-19 文档审核要求：
 
 ## 20. 审核记录
 
-- Draft PR：[#22](https://github.com/WeiHan1996/DailyEnergy/pull/22)；
-- 接受状态：未接受；
-- 接受日期：待用户确认；
-- 本次需审核：表边界、Prisma 结构、SQL-001～020、事务、加密、TTL/删除、outbox/inbox、迁移与 64 项场景；
-- 提交范围：6 个文档/Schema 文件；首个提交 `70f2056fd45fa6c9fa706c9486aadafc0e72ae53`；
+- PR：[#22](https://github.com/WeiHan1996/DailyEnergy/pull/22) 已 squash 合并至 main（`5412bfc`）；
+- 接受状态：Accepted（用户于 2026-07-22 确认方案 A 收尾）；
+- 接受日期：2026-07-22；
+- 接受范围：PostgreSQL 表边界、Prisma 结构草案、SQL-001～020、TX-01～09、加密与 TTL/删除、outbox/inbox、迁移规则与 64 项场景；
+- 提交范围：原 Draft 为 6 个文档/Schema 文件；首个提交 `70f2056fd45fa6c9fa706c9486aadafc0e72ae53`；
 - 验证结果：Prisma 7.9.0 format/validate、70 model、35 enum、20 SQL-ID、9 TX-ID、64 个唯一场景与 39 个唯一仓库链接均通过；
-- 接受后下一任务：S-20 API 契约。
+- 本文与 `prisma/schema.prisma` 同时进入 Accepted；仍不是生产 migration，E-006 前须固定版本并审核 SQL migration；
+- 下一任务：S-20 API 契约。
