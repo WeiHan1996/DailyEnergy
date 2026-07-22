@@ -236,24 +236,25 @@ S-19 数据库规格与 Prisma 草案已由用户确认并进入 Accepted。下�
 5. tasks/current.md；
 6. docs/product/state-machine.md；
 7. docs/product/business-rules.md；
-8. docs/design/interaction-states.md；
-9. docs/ai/daily-content-schema.md；
-10. docs/ai/evening-feedback-schema.md；
-11. docs/ai/weekly-summary-schema.md；
-12. packages/shared-schemas/README.md；
-13. docs/decisions/ADR-0002-deterministic-daily-result.md；
-14. docs/ai/generation-engine.md；
-15. docs/decisions/ADR-0003-ai-provider-abstraction.md；
-16. docs/ai/gateway.md；
-17. docs/ai/prompt-spec.md；
-18. docs/decisions/ADR-0004-structured-memory.md；
-19. docs/ai/memory.md；
-20. docs/ai/safety.md；
-21. docs/ai/evaluation.md；
-22. docs/data/domain-model.md；
-23. docs/decisions/ADR-0005-data-retention-and-deletion.md；
-24. docs/technical/database.md；
-25. prisma/schema.prisma。
+8. docs/design/screen-specs.md；
+9. docs/design/interaction-states.md；
+10. docs/ai/daily-content-schema.md；
+11. docs/ai/evening-feedback-schema.md；
+12. docs/ai/weekly-summary-schema.md；
+13. packages/shared-schemas/README.md；
+14. docs/decisions/ADR-0002-deterministic-daily-result.md；
+15. docs/ai/generation-engine.md；
+16. docs/decisions/ADR-0003-ai-provider-abstraction.md；
+17. docs/ai/gateway.md；
+18. docs/ai/prompt-spec.md；
+19. docs/decisions/ADR-0004-structured-memory.md；
+20. docs/ai/memory.md；
+21. docs/ai/safety.md；
+22. docs/ai/evaluation.md；
+23. docs/data/domain-model.md；
+24. docs/decisions/ADR-0005-data-retention-and-deletion.md；
+25. docs/technical/database.md；
+26. prisma/schema.prisma。
 
 S-20 只产出 Draft `docs/technical/api.md`、`docs/technical/error-codes.md` 与 OpenAPI 草案；在独立 PR 通过审核前，不创建 NestJS controller、migration、数据库、worker、生产代码、provider 调用或真实数据。
 
