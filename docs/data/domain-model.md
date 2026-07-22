@@ -1119,7 +1119,7 @@ UNKNOWN_OUTCOME
 
 ## 23. 审核记录
 
-- Draft PR：待创建；
+- Draft PR：[#20](https://github.com/WeiHan1996/DailyEnergy/pull/20)；
 - 接受状态：未接受；
 - 接受日期：待用户确认；
 - 需要审核：聚合边界、RelationshipCycle、DailyInteraction 原子边界、唯一性、发布栅栏、失效链和 S-18 交接；
