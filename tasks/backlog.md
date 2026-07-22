@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-22
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-16 AI 质量评价与回归测试](./current.md)
+- **当前任务**：[S-17 领域模型](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -72,13 +72,13 @@
 | S-13 | Prompt 规范 | Done | prompt-spec.md | S-12、personality |
 | S-14 | 结构化记忆决策与规范 | Done | ADR-0004、memory.md | S-05、S-07、S-13 |
 | S-15 | 内容安全规范 | Done | safety.md | personality、schemas |
-| S-16 | AI 质量评价与回归测试 | In Review | evaluation.md、evaluation-corpus.json | S-13、S-15 |
+| S-16 | AI 质量评价与回归测试 | Done | evaluation.md、evaluation-corpus.json | S-13、S-15 |
 
 ### 数据、接口与隐私
 
 | ID | 任务 | 状态 | 主要交付 | 依赖 |
 |---|---|---|---|---|
-| S-17 | 领域模型 | Planned | domain-model.md | S-05～S-09、S-14 |
+| S-17 | 领域模型 | In Review | domain-model.md | S-05～S-09、S-14 |
 | S-18 | 数据保存和删除决策 | Planned | ADR-0005 | S-17 |
 | S-19 | 数据库规格 | Planned | database.md、Prisma 草案 | S-17、S-18 |
 | S-20 | API 契约 | Planned | api.md、error-codes、OpenAPI | S-09、S-19 |
