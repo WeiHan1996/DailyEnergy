@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **代码工作**：不开始数据库、Prisma、API 或生产删除 worker；只固定保存期限、删除语义、备份、provider、审计和同日重记边界
 - **当前分支**：agent/data-retention-deletion
-- **关联 PR**：待创建
+- **关联 PR**：[#21](https://github.com/WeiHan1996/DailyEnergy/pull/21)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
@@ -155,8 +155,15 @@ S-18 被接受后，下一任务为：
 - PR #20 已以 squash 方式合并到 main；
 - 合并提交：452170864caafd3b634bcce96e8c29848a712a46；
 - S-17 domain model 已由用户确认，当前分支负责将其收尾为 Accepted；
-- S-18 ADR 初稿已完成，等待远端提交、验证与 Draft PR；
-- 当前没有数据库、Prisma、API、生产代码、provider 调用或真实用户数据改动。
+- S-18 分支 agent/data-retention-deletion 从该 main commit 创建；
+- Proposed ADR-0005 已完成，覆盖保存期限、四种删除范围、DayErasureGuard、provider、备份、受限证据和 48 项验收场景；
+- Draft PR [#21](https://github.com/WeiHan1996/DailyEnergy/pull/21) 已创建；
+- 最终范围为 5 个 Markdown 文件，分支未落后 main；
+- 86 个相对引用落到 37 个唯一仓库文件且全部可读，4 个官方法规页面已核验；
+- Markdown fence、文档状态与任务生命周期一致，backlog 中只有 S-18 为 In Review；
+- 当前仓库没有配置 GitHub commit status checks；
+- 当前没有数据库、Prisma、API、生产代码、provider 调用或真实用户数据改动；
+- 下一操作：用户审核 PR #21 并决定是否接受 S-18；确认前不合并、不开始 S-19。
 
 ## 12. 状态更新规则
 
