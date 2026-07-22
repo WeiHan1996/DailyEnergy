@@ -3,40 +3,37 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-22
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务 ID**：S-12
-- **当前任务名称**：AI Gateway 决策与规范
+- **当前任务 ID**：S-13
+- **当前任务名称**：Prompt 规范
 - **任务状态**：In Review
 - **优先级**：最高
-- **代码工作**：不开始正式业务代码；只允许 ADR、规范、接口伪结构、策略表和验收矩阵
-- **当前分支**：`agent/ai-gateway-spec`
-- **关联 PR**：[#15](https://github.com/WeiHan1996/DailyEnergy/pull/15)
+- **代码工作**：不开始正式业务代码；只允许 Prompt 规范、封闭输入伪结构、规范指令、语义目录和验收矩阵
+- **当前分支**：`agent/prompt-spec`
+- **关联 PR**：[#16](https://github.com/WeiHan1996/DailyEnergy/pull/16)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
-- **完整 Backlog**：[tasks/backlog.md](./backlog.md)
 
 ## 1. 当前目标
 
-创建 `docs/decisions/ADR-0003-ai-provider-abstraction.md` 与 `docs/ai/gateway.md`，把已接受的 RuleFacts、Daily/Weekly ExpressionPlan、严格输出 Schema 和降级边界转换为唯一的服务端 AI 调用与失败编排规范。
+创建 `docs/ai/prompt-spec.md`，把已接受的人格、Daily/Weekly 严格输出 Schema、受控表达计划和 AI Gateway 转换为两套版本化、封闭、可测试的 Prompt 契约。
 
-本任务只决定 Gateway、provider adapter、route manifest、primary/backup/template、超时、熔断、成本、隐私、验证与可观测性；不实现生产 Gateway，不编写 Prompt 全文，不选择未经评测的具体供应商/模型，也不设计数据库或外部 API。
+本任务只决定 Prompt package、prepared input、规范指令、Daily/Weekly 字段语义、三种表达偏好、事实引用、注入防护、版本和回归；不实现生产 Prompt library，不选择具体模型，不启用记忆，也不编写高风险固定响应。
 
 ## 2. 必须交付
 
-- 一份 Proposed ADR-0003，决定统一服务端 Gateway 与供应商隔离；
-- 一份 Draft `gateway.md`，定义 Daily / Weekly 两个 workload；
-- Gateway、orchestrator、provider adapter、template、validator 与 publish service 的职责边界；
-- 不可变 route manifest、精确 model ID、capability、data handling、timeout、cost 与 compatibility 关系；
-- primary → backup → controlled template 的有限顺序和禁止竞速/拼接规则；
-- invocation、route snapshot、attempt、candidate 和 outcome 的概念契约；
-- Daily / Weekly 输入最小化、大小上限和严格结构化输出；
-- timeout、取消、未知 provider outcome、幂等、并发胜者和迟到响应语义；
-- infrastructure / quality breaker、限流、容量隔离和 budget state；
-- candidate 的结构、事实绑定、人格、隐私、Safety 与 projection 校验顺序；
-- provider error / output failure / budget / lifecycle 的稳定内部 reason；
-- secret、provider retention、raw request/response、日志、trace、usage 和成本边界；
-- route 发布、canary、紧急禁用、回滚和 adapter conformance；
-- 正常、降级、超时、结构越界、熔断、成本、并发、删除与隐私验收矩阵；
-- 对 S-13～S-20、S-25、S-29、S-31、S-33 和 AI-001～AI-006 的约束。
+- 一份 Draft `docs/ai/prompt-spec.md`；
+- `daily-expression-zh-cn-v1` 与 `weekly-expression-zh-cn-v1` 两个唯一 workload Prompt；
+- PromptPackage、RenderedPromptRequest 与 Daily/Weekly prepared input 概念契约；
+- common、Daily、Weekly 三段规范运行指令；
+- instruction/data 隔离、canonical JSON、safe preferred name 和输入大小预算；
+- Daily assertion/care、BALANCED/GENTLE/LIGHT_HUMOR/CLEAR_DIRECT、称呼与关系边界；
+- 15 个签到语义、五维、8 组 action/task、仪式元素的安全映射；
+- Weekly approved fact 安全投影、逐段 exact fact refs、样本披露与非因果表达；
+- strict single-object 输出、LOW_VARIANCE_STRUCTURED 参数意图与无 repair 行为；
+- Prompt immutable version、fingerprint、发布、回滚、provenance 和日志边界；
+- 与 controlled template、Gateway validators、S-15/S-16 的职责关系；
+- 52 项 Common/Daily/Weekly 最小回归场景；
+- S-12 Accepted 收尾、docs/INDEX 与 backlog 同步。
 
 ## 3. 上游必读
 
@@ -45,157 +42,148 @@
 3. [ROADMAP.md](../ROADMAP.md)；
 4. [docs/INDEX.md](../docs/INDEX.md)；
 5. [产品愿景](../docs/product/vision.md)；
-6. [第一阶段 MVP](../docs/product/mvp.md)；
-7. [数字朋友人格](../docs/ai/personality.md)；
-8. [ADR-0001 产品定位](../docs/decisions/ADR-0001-product-positioning.md)；
-9. [交互状态与恢复](../docs/design/interaction-states.md)；
-10. [产品状态机](../docs/product/state-machine.md)；
-11. [业务规则](../docs/product/business-rules.md)；
-12. [今日内容 Schema](../docs/ai/daily-content-schema.md)；
-13. [七天总结 Schema](../docs/ai/weekly-summary-schema.md)；
-14. [共享 Schema 包](../packages/shared-schemas/README.md)；
-15. [ADR-0002 稳定每日结果](../docs/decisions/ADR-0002-deterministic-daily-result.md)；
-16. [确定性生成引擎](../docs/ai/generation-engine.md)；
-17. [评分与规则选择](../docs/ai/scoring-rules.md)；
-18. [S-11 测试向量](../docs/ai/s11-test-vectors.json)。
+6. [首批用户画像](../docs/product/persona.md)；
+7. [第一阶段 MVP](../docs/product/mvp.md)；
+8. [数字朋友人格](../docs/ai/personality.md)；
+9. [ADR-0001 产品定位](../docs/decisions/ADR-0001-product-positioning.md)；
+10. [内容布局](../docs/design/content-layout.md)；
+11. [交互状态与恢复](../docs/design/interaction-states.md)；
+12. [产品状态机](../docs/product/state-machine.md)；
+13. [业务规则](../docs/product/business-rules.md)；
+14. [今日内容 Schema](../docs/ai/daily-content-schema.md)；
+15. [七天总结 Schema](../docs/ai/weekly-summary-schema.md)；
+16. [共享 Schema 包](../packages/shared-schemas/README.md)；
+17. [ADR-0002 稳定每日结果](../docs/decisions/ADR-0002-deterministic-daily-result.md)；
+18. [确定性生成引擎](../docs/ai/generation-engine.md)；
+19. [评分与规则选择](../docs/ai/scoring-rules.md)；
+20. [ADR-0003 AI Gateway](../docs/decisions/ADR-0003-ai-provider-abstraction.md)；
+21. [AI Gateway 规范](../docs/ai/gateway.md)。
 
 ## 4. 已接受且不得重开的边界
 
-- 产品是日常陪伴与娱乐行动参考，不是算命、诊断、投资或法律工具；
-- 规则引擎独占 RuleFacts，AI 不得改分数、档位、排序、行动、任务、仪式或周事实；
-- Daily/Weekly plan 是模型和 template 的封闭输入边界；
-- primary、backup、template 必须返回同构完整 payload，任一段失败不局部发布；
-- 同一用户同一产品日期只有一份 AVAILABLE 每日结果，历史不因模型恢复重写；
-- Weekly 表达失败不遮挡真实记录、计数和图表；
-- Safety、Deleting、账户与日期窗口优先，high-risk 退出普通娱乐流程；
-- Client view 不接收 provider、model、Prompt、Token、成本、失败或审核元数据；
-- v1 Daily 不解析 permitted context，Weekly 不读取晚间 note、AI 文本或娱乐分数；
-- 完整 template 是正式 F2 路径，不是临时错误拼接；
-- F3 表示上下文减少，不表示 provider failure；
-- 已发布结果使用当时 provenance，模型文本不承诺字节级确定。
+- 产品是每天约一分钟的日常陪伴与娱乐行动参考，不是算命、专业建议或无限聊天；
+- RuleFacts、Daily plan、Weekly AggregateFacts/plan、行动、任务、仪式和 fact selection 都由规则层决定；
+- AI 只填严格文本槽位，不能改变 ID、顺序、band、fact refs 或事实；
+- primary、backup、template 使用同一冻结计划，禁止 repair、拼接、竞速和历史替换；
+- Daily v1 不解析 permitted context，不发送关系阶段、记忆、重要事项或历史自由文本；
+- Weekly 只使用 approved facts，不读取 note、每日 AI 文本、娱乐分数或源 refs；
+- high-risk input 在普通 Gateway 前旁路，普通 Prompt 不生成安全固定响应；
+- Client 不接收 Prompt、provider、model、Token、失败链或内部事实；
+- Daily 16 KiB、Weekly 24 KiB 输入 hard limit 与 strict single JSON object 不得放宽；
+- 已发布结果不因 Prompt/模型/route 更新而重写。
 
-## 5. 本任务必须推荐并决定
+## 5. 本任务决定
 
-1. 是否允许业务模块直连模型，Gateway 的唯一边界是什么；
-2. provider adapter 可以和不能承担哪些职责；
-3. route manifest 如何冻结 provider、model、参数、能力、数据处理和兼容性；
-4. exact provider/model 是否写死在 ADR，怎样通过 S-16 评测后发布；
-5. primary、backup 与 template 是顺序还是并行，最多调用几次；
-6. Daily / Weekly 的 hard deadline、单 route deadline 和 template reserve；
-7. 429/5xx、timeout、protocol、Schema、事实、安全失败是否重试或切换；
-8. 是否允许 JSON repair、Markdown 提取、模型修复或跨尝试拼接；
-9. 结构化输出、事实绑定、人格、隐私与 Safety 的验证顺序；
-10. infrastructure / quality breaker 的 key、阈值、half-open 与状态故障行为；
-11. input/output size、Token、per-invocation cost、global budget 与并发上限；
-12. duplicate attempt、unknown provider outcome、迟到响应和并发 candidate 如何处理；
-13. template 怎样预检、版本化且不依赖模型失败内容；
-14. request/response、invalid raw output、Prompt、usage、trace 和日志保存什么；
-15. route 怎样 staged、canary、emergency disable、rollback 且不重写历史；
-16. 哪些故障注入与隐私测试足以进入 S-13 和后续实现。
+1. 生产 v1 有哪两个 Prompt version，怎样与 workload/input/output 一一绑定；
+2. Prompt package、renderer 与 adapter 的职责和不可变 fingerprint；
+3. common/workload 指令和惰性 JSON data 怎样组合；
+4. 是否使用 few-shot、history、chain-of-thought 或失败 sentinel；
+5. Daily 模型能收到哪些 facts、style、evidence、action/task/ritual；
+6. LOW/PARTIAL/STANDARD assertion 和 care 怎样约束文本；
+7. 三种可见表达偏好与 BALANCED 默认怎样共享同一人格；
+8. preferred name 如何防止 data 提升为指令；
+9. Daily 每个字段、五维、行动、任务和仪式怎样绑定；
+10. Weekly fact values 怎样最小投影，exact fact refs 怎样逐段固定；
+11. direction/mode/helpful/coverage 怎样避免因果、诊断与长期结论；
+12. 16/24 KiB 内部子预算和超限行为；
+13. provider-neutral 低变异参数意图与 S-16 numeric 参数边界；
+14. Prompt/template/validator/Safety 的边界；
+15. 版本发布、回滚、provenance、日志和调试内容；
+16. 哪些正常、边界、对抗和降级场景构成最小回归。
 
 ## 6. v1 决策摘要
 
-- 所有普通 AI 调用只通过服务端 `ExpressionGateway`；
-- 业务只依赖 provider-neutral 契约，只有 adapter 依赖 provider SDK；
-- 路由使用 immutable manifest，不允许 `latest` 或同版本换 model；
-- 具体 provider/model 由 S-16 bake-off 后进入 route manifest，不写死在业务 ADR；
-- primary、backup、template 严格顺序执行，禁止 hedge/race；
-- 每个 provider role 最多一次调用，总 provider calls 最多两次；
-- Daily 8 秒、Weekly 20 秒总 hard deadline，并保留 template/local validation 预算；
-- provider 失败或 candidate 失败直接进入下一完整路径，不在同角色盲重试；
-- 只接受单个严格 JSON object，禁止 fence stripping、宽松解析、字段修补和跨路径拼接；
-- template 在付费调用前 preflight，并使用同一 frozen plan；
-- infrastructure 与 output quality 使用独立 breaker，breaker 状态不可用时 fail closed 到 template；
-- budget hard stop、route concurrency full 或 price catalog 无效时跳过 provider，template 不受影响；
-- invalid raw output 默认不持久保存，日志/指标只记录脱敏元数据；
-- high-risk input 不进入普通 Gateway，candidate unsafe 只拒绝该完整候选；
-- Gateway 只返回 candidate，最终唯一性和原子发布仍由 publish service 负责。
+- 两个版本：`daily-expression-zh-cn-v1`、`weekly-expression-zh-cn-v1`；
+- common + workload 指令、canonical input JSON、out-of-band strict Schema；
+- 生产请求没有 few-shot、历史输出、自由 note、chain-of-thought 或 repair prompt；
+- adapter 只做协议映射，不增删业务 Prompt；
+- Daily 只接收安全 plan 投影和可选安全称呼，关系模式固定 GENERIC；
+- Weekly 每段 refs 由 renderer exact 分配，模型不能自行选 fact；
+- care 覆盖幽默/压力，LOW_ASSERTION 不把内部 STEADY 当用户状态；
+- LIGHT_HUMOR 最多一个轻量生活比喻，ceiling NONE 时完全不用幽默；
+- 输出只有一个 strict object，没有 error/partial/refusal 格式；
+- 参数意图为 LOW_VARIANCE_STRUCTURED，具体数字由 S-16/route 冻结；
+- package、renderer、Schema 与 compatibility 全部不可变版本化；
+- 52 项最小回归进入 S-16 corpus 的硬基线。
 
 ## 7. 必须覆盖的验收场景
 
-- primary 正常、backup 正常、template 正常的三条完整路径；
-- primary timeout/429/5xx/protocol/structure/fact/safety 失败；
-- backup 继续使用原 frozen plan，不读取 primary 输出；
-- all AI fail 但 Daily template 可用；Weekly summary FAILED 但 facts 可读；
-- JSON 前后文本、Markdown fence、unknown field、null、URL、HTML、emoji 和超长输出；
-- AI 修改 action/task/ritual/dimension 或 Weekly 引用未批准 fact；
-- LOW_ASSERTION/低状态下越界断言、幽默或压力；
-- route manifest 缺失、fingerprint mismatch、latest、model drift 和 incompatibility；
-- primary/backup 同故障域时不能误报 provider-level redundancy；
-- 5 连败、20 次窗口、quality breaker、half-open 和 auth invalid；
-- breaker state 不可用、cost hard stop、price missing、concurrency full；
-- duplicate attempt、unknown outcome、late response、并发发布胜者；
-- Safety、Deleting、DAY 删除、window closed 和 existing result 中止在途链路；
-- provider request 不含 ID、seed、score、source refs、notes 和 permitted context；
-- invalid raw output、Prompt、称呼、secret 和 expression 不进入普通日志；
-- route canary、rollback 和紧急禁用不改变历史。
+- 单 object、fence/prose、unknown/null、超限、无 repair；
+- data role/prompt injection、称呼注入、Prompt 泄漏和日志最小化；
+- primary、backup、template 使用同一事实且不拼接；
+- 四种 style token、三种 assertion mode、care 和高/低状态；
+- 8 种 action、8 个 task、无/颜色/数字/两种 ritual；
+- safe name/无 name、无关系/记忆、五维专业边界；
+- Daily 字段与核心/全文预算；
+- Weekly PARTIAL/COMPLETE、1/2 observations、helpful 有/无；
+- HIGHER/LOWER/VARIABLE/SIMILAR/mode 的样本克制语言；
+- exact segment refs、未分配/未批准 refs、新数字/日期/状态；
+- Weekly 所有表达失败时真实事实与图表仍可读。
 
 ## 8. 明确不做
 
-- 编写 NestJS Gateway、provider adapters、Redis breaker、BullMQ 或数据库；
-- 创建外部 API 路径、表结构、缓存 key 或精确错误码；
-- 编写 S-13 Prompt 全文、模板完整中文或风格句式库；
-- 决定 S-14 结构化记忆、S-15 high-risk 分类或固定安全资源；
-- 在没有 S-16 corpus 与评测时宣称某个模型是最终主/备；
-- 保存或分析用户原始模型输入/无效输出；
-- 引入 streaming、tools、web、files、code、embedding、图片、语音或开放聊天；
-- 自研/自托管模型、多区域微服务或智能动态模型竞价；
-- 为提高成功率放宽 Schema、修补 JSON、拼段或绕过 template reserve；
-- 修改 ADR-0002 的日期、seed、唯一性、历史和删除决定。
+- 编写生产 Prompt library、renderer、Gateway、adapter、数据库、API 或管理后台；
+- 选择主备 provider/model，或宣称跨 provider numeric temperature 等价；
+- 修改 RuleFacts、评分、行动、任务、仪式、周聚合或 Gateway 路由规则；
+- 启用 Daily/Weekly 记忆、important matter、relationship history 或自由文本；
+- 编写 S-15 风险分类、地区资源和高风险固定响应；
+- 决定 S-16 judge、评分阈值、模型排名和人工抽检比例；
+- 编写完整 controlled template 中文目录；
+- 引入聊天、streaming、tools、web、files、code、图片、语音或 embedding；
+- 把测试样例或真实用户内容默认发送给 provider；
+- 用 Prompt 放宽 Schema、事实 validator、Safety、删除或原子发布。
 
 ## 9. 验收标准
 
-- ADR 为 Proposed、gateway.md 为 Draft，用户确认前不标记 Accepted；
-- 组件职责、依赖方向和禁止直连 provider 明确；
-- Daily/Weekly 输入、输出、版本、大小和 failure isolation 明确；
-- route manifest、attempt、candidate 与 outcome 可以无歧义转换为实现；
-- primary/backup/template 的次数、顺序、deadline、取消与降级有限；
-- candidate 全链路严格校验，不存在 repair 或 partial publish；
-- breaker、rate、budget、cost、concurrency 和 unknown outcome 有精确行为；
-- secret、retention、raw body、provenance、日志和指标边界明确；
-- route 发布、model drift、rollback 和故障域边界明确；
-- 正常、异常、生命周期、成本和隐私矩阵可转为自动测试；
-- 文档索引、tasks/current.md 和 backlog 同步；
+- Prompt 规范状态为 Draft，用户确认前不得标记 Accepted；
+- 两个 Prompt version、输入、输出、指令和兼容性无歧义；
+- Daily/Weekly prepared input 在 Gateway hard limit 内且没有隐含来源；
+- style、assertion、care、称呼、action/task/ritual 和 fact refs 可转为实现；
+- 事实、安全、隐私与 strict output 不依赖模型自律；
+- Prompt 与 template 语义槽位同构，任一失败不局部发布；
+- 52 项回归矩阵 ID 唯一且覆盖 Common/Daily/Weekly；
+- 文档链接、fence、状态与版本 token 一致，不含未完成占位；
+- docs/INDEX、tasks/current 与 backlog 同步；
 - 通过独立 Draft PR 提交；
-- 用户确认前不进入 S-13，也不开始生产 Gateway 实现。
+- 用户确认前不进入 S-14，也不开始生产 Prompt 实现。
 
 ## 10. 完成后的下一任务
 
-S-12 被接受后，下一任务为：
+S-13 被接受后，下一任务为：
 
-- 当前任务 ID：S-13；
-- 当前任务名称：Prompt 规范；
-- 主要交付：`docs/ai/prompt-spec.md`；
-- 依据：Accepted personality、Schema、RuleFacts/plan、ADR-0003 与 gateway.md；
-- 不开始生产 Prompt library 或模型调用实现。
+- 当前任务 ID：S-14；
+- 当前任务名称：结构化记忆决策与规范；
+- 主要交付：`docs/decisions/ADR-0004-structured-memory.md`、`docs/ai/memory.md`；
+- 依据：Accepted product state、Schema、personality、Gateway 与 Prompt boundaries；
+- 不开始生产 memory store、vector database 或模型上下文实现。
 
 ## 11. 最近一次交接
 
 - 日期：2026-07-22；
-- PR #14 已由用户确认并 squash 合并，main commit 为 `9db8672`；
-- S-11 的 generation-engine、scoring-rules 和 test vectors 已获接受，状态收尾包含在本分支；
-- S-12 分支 `agent/ai-gateway-spec` 已从合并后的 main 创建；
-- 新增 Proposed ADR-0003 与 Draft `gateway.md`，覆盖 Daily/Weekly workload、immutable route manifest、顺序主备/模板、严格输出、8/20 秒预算、两类熔断、成本、隐私、可观测性和 route 发布；
-- Draft PR [#15](https://github.com/WeiHan1996/DailyEnergy/pull/15) 已创建，等待用户审核；
-- 远端范围复核为 8 个目标文件，无生产业务代码；S-11 fixture JSON 可解析，21 个仓库链接全部可读；
-- Markdown 结构、任务生命周期和 37 项故障注入场景校验通过；无 TODO/TBD；
-- 当前没有正式前端、后端、数据库或 AI Gateway 实现；
+- PR #15 已由用户确认并 squash 合并，main commit 为 `cfe9876`；
+- S-12 的 ADR-0003 与 gateway.md 已由用户接受，Accepted 状态收尾包含在本分支；
+- S-13 分支 `agent/prompt-spec` 从合并后的 main 创建；
+- 新增 Draft `docs/ai/prompt-spec.md`，固定 Daily/Weekly Prompt、prepared input、规范指令、语义目录、exact refs、版本和回归；
+- Prompt 规范包含 52 个唯一场景：10 Common、24 Daily、18 Weekly；
+- 当前分支仅修改 6 个文档文件，不含生产业务代码；
 - 当前没有阻塞项；
-- 下一操作：用户审核 PR #15 并决定是否接受 S-12；确认前不标记 Accepted、不合并、不开始 S-13。
+- Draft PR [#16](https://github.com/WeiHan1996/DailyEnergy/pull/16) 已创建，等待用户审核；
+- 远端范围为 6 个目标文档；52 个场景、30 个引用/21 个唯一链接、Markdown fence、状态和内容回读均通过；
+- 下一操作：用户审核 PR #16 并决定是否接受 S-13；确认前不合并、不开始 S-14。
 
 ## 12. 状态更新规则
 
 任务完成待审核时：
 
-- 状态改为 In Review；
+- 状态保持 In Review；
 - 写入 PR、交付物和验证；
-- ADR 保持 Proposed、gateway.md 保持 Draft；
-- S-13 不得开始。
+- prompt-spec.md 保持 Draft；
+- S-14 不得开始。
 
 用户确认并合并后：
 
-- S-12 改为 Done；
-- ADR-0003 与 gateway.md 变为 Accepted，并记录接受日期；
+- S-13 改为 Done；
+- prompt-spec.md 变为 Accepted，并记录接受日期；
 - 更新 docs/INDEX.md 与 backlog；
-- S-13 成为唯一 Ready 任务；
-- 新会话再开始 S-13。
+- S-14 成为唯一 Ready 任务；
+- 新会话再开始 S-14。

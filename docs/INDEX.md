@@ -129,8 +129,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/ai/generation-engine.md](./ai/generation-engine.md) | Accepted | 稳定种子、版本、缓存、幂等和受控表达计划 | state-machine、daily-content-schema、ADR-0002 |
 | [docs/ai/scoring-rules.md](./ai/scoring-rules.md) | Accepted | 五维分数、行动候选与七天真实记录聚合规则 | generation-engine、weekly-summary-schema |
 | [docs/ai/s11-test-vectors.json](./ai/s11-test-vectors.json) | Accepted | 每日与七天规则的跨语言 golden vectors | generation-engine、scoring-rules、shared-schemas |
-| [docs/ai/gateway.md](./ai/gateway.md) | Draft | 供应商隔离、路由、超时、降级、熔断、成本与隐私 | generation-engine、schemas、ADR-0003 |
-| docs/ai/prompt-spec.md | Planned | Prompt 输入、输出、版本和人格 | personality、schemas、gateway |
+| [docs/ai/gateway.md](./ai/gateway.md) | Accepted | 供应商隔离、路由、超时、降级、熔断、成本与隐私 | generation-engine、schemas、ADR-0003 |
+| [docs/ai/prompt-spec.md](./ai/prompt-spec.md) | Draft | Prompt package、封闭输入、规范指令、事实绑定、版本与回归 | personality、schemas、gateway |
 | docs/ai/memory.md | Planned | 结构化记忆、用途、有效期和删除 | persona、journey、personality |
 | docs/ai/safety.md | Planned | 风险分类、固定响应和审核 | vision、personality |
 | docs/ai/evaluation.md | Planned | 自动评价、人工抽检和回归测试 | personality、prompt、safety |
@@ -174,7 +174,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | 文件 | 状态 | 决策主题 | 最晚完成点 |
 |---|---|---|---|
 | [ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md) | Accepted | 稳定种子、产品日期、历史不变与重生成 | 规则引擎开发前 |
-| [ADR-0003-ai-provider-abstraction.md](./decisions/ADR-0003-ai-provider-abstraction.md) | Proposed | AI Gateway 与供应商隔离 | AI Gateway 开发前 |
+| [ADR-0003-ai-provider-abstraction.md](./decisions/ADR-0003-ai-provider-abstraction.md) | Accepted | AI Gateway 与供应商隔离 | AI Gateway 开发前 |
 | ADR-0004-structured-memory.md | Planned | 结构化记忆与不用向量库 | 记忆开发前 |
 | ADR-0005-data-retention-and-deletion.md | Planned | 保存期限、删除和审计 | 数据库开发前 |
 | ADR-0006-monorepo-and-stack.md | Planned | TypeScript Monorepo 与既定技术栈 | 工程初始化前 |
@@ -226,7 +226,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一 In Review 任务是 S-12 AI Gateway 决策与规范。审核该任务时依次读取：
+当前唯一 In Review 任务是 S-13 Prompt 规范。审核该任务时依次读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -234,18 +234,21 @@ Phase 1 开始后逐步增加：
 4. docs/INDEX.md；
 5. tasks/current.md；
 6. docs/product/vision.md；
-7. docs/product/mvp.md；
-8. docs/ai/personality.md；
-9. docs/decisions/ADR-0001-product-positioning.md；
-10. docs/design/interaction-states.md；
-11. docs/product/state-machine.md；
-12. docs/product/business-rules.md；
-13. docs/ai/daily-content-schema.md；
-14. docs/ai/weekly-summary-schema.md；
-15. packages/shared-schemas/README.md；
-16. docs/decisions/ADR-0002-deterministic-daily-result.md；
-17. docs/ai/generation-engine.md；
-18. docs/ai/scoring-rules.md；
-19. docs/ai/s11-test-vectors.json。
+7. docs/product/persona.md；
+8. docs/product/mvp.md；
+9. docs/ai/personality.md；
+10. docs/decisions/ADR-0001-product-positioning.md；
+11. docs/design/content-layout.md；
+12. docs/design/interaction-states.md；
+13. docs/product/state-machine.md；
+14. docs/product/business-rules.md；
+15. docs/ai/daily-content-schema.md；
+16. docs/ai/weekly-summary-schema.md；
+17. packages/shared-schemas/README.md；
+18. docs/decisions/ADR-0002-deterministic-daily-result.md；
+19. docs/ai/generation-engine.md；
+20. docs/ai/scoring-rules.md；
+21. docs/decisions/ADR-0003-ai-provider-abstraction.md；
+22. docs/ai/gateway.md。
 
-S-12 只产出 Proposed ADR-0003 与 Draft gateway.md，以及 S-11 接受收尾和任务控制更新；在单独 PR 通过审核前，不开始 S-13、生产 AI Gateway、provider adapter、数据库或 API 实现。
+S-13 只产出 Draft `prompt-spec.md`，并完成 S-12 的 Accepted 状态收尾与任务控制更新；在单独 PR 通过审核前，不开始 S-14、生产 Prompt library、provider 选择、记忆或 Safety 实现。
