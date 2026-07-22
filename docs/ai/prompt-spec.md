@@ -1,6 +1,7 @@
 # DailyEnergy Prompt 规范
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-22
 - **所属任务**：S-13 — Prompt 规范
 - **最后更新**：2026-07-22
 - **适用范围**：Daily / Weekly 普通受控表达、Prompt 包、Prepared Input、事实绑定、语气、版本、失败与回归
@@ -818,3 +819,13 @@ S-16 在此基础上增加跨 provider corpus、对抗变体、人工评分、�
 - 除 `zh-CN` 外 locale 与其它 workload：MVP 证据出现后另行版本化。
 
 延期不得削弱：事实闭合、单对象、无修补、严格绑定、低状态优先、专业边界、最小披露、高风险旁路、模板可用和历史不重写。
+
+
+## 28. 接受记录
+
+- 用户于 2026-07-22 确认 S-13 并 squash 合并 PR #16；
+- 本文与两套规范 Prompt 契约同时进入 Accepted；
+- 52 项 Common/Daily/Weekly 回归场景继续作为 S-16 硬基线；
+- S-14 可以在“新 plan/input/Prompt/Schema 版本、exact source purpose、segment refs 与无源回退”的前提下定义结构化记忆；
+- 现有 `daily-expression-zh-cn-v1` 与 `weekly-expression-zh-cn-v1` 仍不得接收事项、近期状态、关系记忆或历史自由文本；
+- 生产 Prompt library、provider/model 与 parameter set 仍须等待后续实现和 S-16 评测。
