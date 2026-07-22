@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **代码工作**：不开始数据库、Prisma、API 或正式业务代码；只定义领域语言、聚合、实体、关系、唯一性、修订、幂等、发布栅栏和删除失效概念契约
 - **当前分支**：`agent/domain-model`
-- **关联 PR**：待创建
+- **关联 PR**：[#20](https://github.com/WeiHan1996/DailyEnergy/pull/20)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
@@ -171,12 +171,15 @@ S-17 被接受后，下一任务为：
 - 日期：2026-07-22；
 - PR #19 已由用户确认并 squash 合并，main commit 为 `736e1d1d1c742a5b311baf9aa00e5d8964e41e3a`；
 - S-16 evaluation 规范与 269-case corpus 已由用户接受，Accepted 状态收尾包含在本分支；
-- S-17 分支计划为 `agent/domain-model`，从该 main commit 创建；
-- 目标文件范围为 6 个：domain model、evaluation、corpus、INDEX、backlog、current；
-- 本地 Draft domain model 已覆盖 13 个上下文、主要聚合、48 个唯一验收场景和下游交接；
-- 当前没有数据库、Prisma、API、生产代码、模型调用或真实用户数据改动；
-- Draft PR 待创建；
-- 下一操作：完成远端提交、逐文件回读、链接与生命周期验证后创建 Draft PR。
+- S-17 分支 `agent/domain-model` 已从该 main commit 创建，首个 domain model 提交为 `3cfb524`；
+- Draft PR [#20](https://github.com/WeiHan1996/DailyEnergy/pull/20) 已创建；
+- 最终范围为 6 个目标文件：domain model、evaluation、corpus、INDEX、backlog、current；
+- 领域模型覆盖 13 个上下文、主要聚合、48 个唯一验收场景和 S-18～S-33 下游交接；
+- 6 份远端文件与预期内容逐字一致，分支基于 `736e1d1` 且未落后 main；
+- 91 个相对引用落到 36 个唯一仓库文件且全部可读，Markdown fence 闭合；
+- S-16 corpus 仍含 269 个唯一 case，来源计数 37/52/48/60/72，manifest SHA-256 重算一致；
+- backlog 中只有 S-17 为 In Review；当前没有数据库、Prisma、API、生产代码、模型调用或真实用户数据改动；
+- 下一操作：用户审核 PR #20 并决定是否接受 S-17；确认前不合并、不开始 S-18。
 
 ## 12. 状态更新规则
 
