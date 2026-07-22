@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-22
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-14 结构化记忆决策与规范](./current.md)
+- **当前任务**：[S-15 内容安全规范](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -70,8 +70,8 @@
 | S-11 | 规则引擎规范 | Done | generation-engine、scoring-rules | S-07、S-10 |
 | S-12 | AI Gateway 决策与规范 | Done | ADR-0003、gateway.md | S-07、S-11 |
 | S-13 | Prompt 规范 | Done | prompt-spec.md | S-12、personality |
-| S-14 | 结构化记忆决策与规范 | In Review | ADR-0004、memory.md | S-05、S-07、S-13 |
-| S-15 | 内容安全规范 | Planned | safety.md | personality、schemas |
+| S-14 | 结构化记忆决策与规范 | Done | ADR-0004、memory.md | S-05、S-07、S-13 |
+| S-15 | 内容安全规范 | In Review | safety.md | personality、schemas |
 | S-16 | AI 质量评价与回归测试 | Planned | evaluation.md、测试集 | S-13、S-15 |
 
 ### 数据、接口与隐私
