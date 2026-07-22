@@ -1,0 +1,1279 @@
+openapi: 3.0.3
+info:
+  title: DailyEnergy API
+  description: |
+    Draft OpenAPI for S-20. Semantic authority is docs/technical/api.md and
+    docs/technical/error-codes.md. Content field shapes for daily/evening/weekly
+    client views remain defined by packages/shared-schemas (Zod).
+  version: api-contract-v1
+  contact:
+    name: DailyEnergy
+servers:
+  - url: https://api.example.invalid/v1
+    description: Placeholder host — environment fixed in deployment docs
+tags:
+  - name: Auth
+  - name: Bootstrap
+  - name: Consent
+  - name: Profile
+  - name: Daily
+  - name: Evening
+  - name: Weekly
+  - name: History
+  - name: Matters
+  - name: Memory
+  - name: Notifications
+  - name: Share
+  - name: Safety
+  - name: DataRights
+  - name: Support
+  - name: Admin
+
+paths:
+  /auth/wechat/session:
+    post:
+      tags: [Auth]
+      operationId: createWechatSession
+      summary: Exchange wx.login code for a server session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WechatSessionRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessSession'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /auth/session/refresh:
+    post:
+      tags: [Auth]
+      operationId: refreshSession
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessSession'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /auth/session/logout:
+    post:
+      tags: [Auth]
+      operationId: logoutSession
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessEmpty'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /bootstrap/launch:
+    get:
+      tags: [Bootstrap]
+      operationId: getLaunchState
+      security:
+        - bearerAuth: []
+      summary: SYS-001 launch snapshot with guard priority
+      responses:
+        '200':
+          description: LaunchStateSnapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessLaunch'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /consent/current:
+    get:
+      tags: [Consent]
+      operationId: getCurrentConsent
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /consent/accept:
+    post:
+      tags: [Consent]
+      operationId: acceptConsent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandWithNoticeVersion'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /consent/withdraw:
+    post:
+      tags: [Consent]
+      operationId: withdrawConsent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /profile:
+    get:
+      tags: [Profile]
+      operationId: getProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /onboarding/complete:
+    post:
+      tags: [Profile]
+      operationId: completeOnboarding
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnboardingCompleteRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /profile/update:
+    post:
+      tags: [Profile]
+      operationId: updateProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /profile/style-calibration:
+    post:
+      tags: [Profile]
+      operationId: submitStyleCalibration
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/today/checkin:
+    get:
+      tags: [Daily]
+      operationId: getTodayCheckin
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/checkin/submit:
+    post:
+      tags: [Daily]
+      operationId: submitCheckin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckinSubmitRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/checkin/correct:
+    post:
+      tags: [Daily]
+      operationId: correctCheckin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckinCorrectRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/generation/start:
+    post:
+      tags: [Daily]
+      operationId: startGeneration
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/generation/{intent_ref}:
+    get:
+      tags: [Daily]
+      operationId: getGenerationIntent
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IntentRef'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/today:
+    get:
+      tags: [Daily]
+      operationId: getTodayView
+      security:
+        - bearerAuth: []
+      summary: TodayView whitelist projection
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/by-date/{product_date}:
+    get:
+      tags: [Daily]
+      operationId: getDailyByDate
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProductDate'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/interaction:
+    get:
+      tags: [Daily]
+      operationId: getDailyInteraction
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/interaction/light:
+    post:
+      tags: [Daily]
+      operationId: lightDay
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/interaction/task:
+    post:
+      tags: [Daily]
+      operationId: updateTaskState
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevisionedCommand'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /daily/interaction/helpfulness:
+    post:
+      tags: [Daily]
+      operationId: updateHelpfulness
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevisionedCommand'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /evening/today:
+    get:
+      tags: [Evening]
+      operationId: getEveningToday
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /evening/save:
+    post:
+      tags: [Evening]
+      operationId: saveEveningCoordinated
+      security:
+        - bearerAuth: []
+      summary: Atomic feedback + helpfulness + optional task patch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EveningSaveRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /evening/skip:
+    post:
+      tags: [Evening]
+      operationId: skipEvening
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /weekly/current:
+    get:
+      tags: [Weekly]
+      operationId: getWeeklyCurrent
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /weekly/window/{end_date}:
+    get:
+      tags: [Weekly]
+      operationId: getWeeklyWindow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: end_date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /history/days:
+    get:
+      tags: [History]
+      operationId: listHistoryDays
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessList'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /history/days/{product_date}:
+    get:
+      tags: [History]
+      operationId: getHistoryDay
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProductDate'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /matters:
+    get:
+      tags: [Matters]
+      operationId: listMatters
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessList'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      tags: [Matters]
+      operationId: createMatter
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /matters/{matter_ref}:
+    patch:
+      tags: [Matters]
+      operationId: updateMatter
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatterRef'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevisionedCommand'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /matters/{matter_ref}/pause:
+    post:
+      tags: [Matters]
+      operationId: pauseMatter
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatterRef'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevisionedCommand'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /matters/{matter_ref}/resume:
+    post:
+      tags: [Matters]
+      operationId: resumeMatter
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatterRef'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevisionedCommand'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /matters/{matter_ref}/complete:
+    post:
+      tags: [Matters]
+      operationId: completeMatter
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatterRef'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevisionedCommand'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /matters/{matter_ref}/delete:
+    post:
+      tags: [Matters]
+      operationId: deleteMatter
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatterRef'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /memory/preferences:
+    get:
+      tags: [Memory]
+      operationId: getMemoryPreferences
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      tags: [Memory]
+      operationId: updateMemoryPreferences
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevisionedCommand'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /notifications/settings:
+    get:
+      tags: [Notifications]
+      operationId: getNotificationSettings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      tags: [Notifications]
+      operationId: updateNotificationSettings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevisionedCommand'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /notifications/permission-sync:
+    post:
+      tags: [Notifications]
+      operationId: syncNotificationPermission
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /share/preview:
+    post:
+      tags: [Share]
+      operationId: createSharePreview
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /share/intent:
+    post:
+      tags: [Share]
+      operationId: recordShareIntent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /safety/current:
+    get:
+      tags: [Safety]
+      operationId: getSafetyCurrent
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /safety/recovery/start:
+    post:
+      tags: [Safety]
+      operationId: startSafetyRecovery
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevisionedCommand'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /safety/recovery/confirm:
+    post:
+      tags: [Safety]
+      operationId: confirmSafetyRecovery
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevisionedCommand'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /data-rights/tasks:
+    get:
+      tags: [DataRights]
+      operationId: listDataTasks
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessList'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /data-rights/tasks/{task_ref}:
+    get:
+      tags: [DataRights]
+      operationId: getDataTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TaskRef'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /data-rights/export:
+    post:
+      tags: [DataRights]
+      operationId: createExportTask
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /data-rights/delete/day:
+    post:
+      tags: [DataRights]
+      operationId: deleteDay
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /data-rights/delete/matter:
+    post:
+      tags: [DataRights]
+      operationId: deleteMatterScope
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /data-rights/delete/relationship:
+    post:
+      tags: [DataRights]
+      operationId: deleteRelationshipData
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /data-rights/delete/account:
+    post:
+      tags: [DataRights]
+      operationId: deleteAccount
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /data-rights/tasks/{task_ref}/cancel:
+    post:
+      tags: [DataRights]
+      operationId: cancelDataTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TaskRef'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /support/faq:
+    get:
+      tags: [Support]
+      operationId: getFaq
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /support/feedback:
+    post:
+      tags: [Support]
+      operationId: submitFeedback
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /admin/auth/login:
+    post:
+      tags: [Admin]
+      operationId: adminLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /admin/ops/overview:
+    get:
+      tags: [Admin]
+      operationId: adminOpsOverview
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /admin/safety/events:
+    get:
+      tags: [Admin]
+      operationId: adminListSafetyEvents
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessList'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /admin/data-rights/tasks:
+    get:
+      tags: [Admin]
+      operationId: adminListDataTasks
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessList'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /admin/data-rights/tasks/{task_ref}/advance:
+    post:
+      tags: [Admin]
+      operationId: adminAdvanceDataTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TaskRef'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: session_token
+
+  parameters:
+    IntentRef:
+      name: intent_ref
+      in: path
+      required: true
+      schema:
+        type: string
+    ProductDate:
+      name: product_date
+      in: path
+      required: true
+      schema:
+        type: string
+        format: date
+    MatterRef:
+      name: matter_ref
+      in: path
+      required: true
+      schema:
+        type: string
+    TaskRef:
+      name: task_ref
+      in: path
+      required: true
+      schema:
+        type: string
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
+
+  schemas:
+    CommandRequest:
+      type: object
+      required: [command_ref]
+      properties:
+        command_ref:
+          type: string
+          minLength: 8
+        client_context:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+
+    RevisionedCommand:
+      allOf:
+        - $ref: '#/components/schemas/CommandRequest'
+        - type: object
+          properties:
+            expected_revision:
+              type: integer
+              minimum: 0
+            expected_revisions:
+              type: object
+              additionalProperties:
+                type: integer
+                minimum: 0
+
+    CommandWithNoticeVersion:
+      allOf:
+        - $ref: '#/components/schemas/CommandRequest'
+        - type: object
+          required: [notice_version]
+          properties:
+            notice_version:
+              type: string
+
+    WechatSessionRequest:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+        channel:
+          type: string
+          description: Optional acquisition channel summary
+
+    OnboardingCompleteRequest:
+      allOf:
+        - $ref: '#/components/schemas/CommandRequest'
+        - type: object
+          properties:
+            preferred_name:
+              type: string
+            expression_style:
+              type: string
+              enum: [BALANCED, GENTLE, LIGHT_HUMOR, CLEAR_DIRECT]
+
+    ProfileUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/RevisionedCommand'
+        - type: object
+          properties:
+            preferred_name:
+              type: string
+            expression_style:
+              type: string
+              enum: [BALANCED, GENTLE, LIGHT_HUMOR, CLEAR_DIRECT]
+
+    CheckinSubmitRequest:
+      allOf:
+        - $ref: '#/components/schemas/CommandRequest'
+        - type: object
+          required: [mood, energy, sleep]
+          properties:
+            mood:
+              type: string
+            energy:
+              type: string
+            sleep:
+              type: string
+
+    CheckinCorrectRequest:
+      allOf:
+        - $ref: '#/components/schemas/RevisionedCommand'
+        - type: object
+          properties:
+            mood:
+              type: string
+            energy:
+              type: string
+            sleep:
+              type: string
+
+    EveningSaveRequest:
+      allOf:
+        - $ref: '#/components/schemas/RevisionedCommand'
+        - type: object
+          description: Coordinated multi-component save; field shapes follow shared-schemas
+          properties:
+            overall_feeling:
+              type: string
+            note:
+              type: object
+              additionalProperties: true
+            helpfulness:
+              type: string
+            task_patch:
+              type: object
+              additionalProperties: true
+
+    ApiErrorBody:
+      type: object
+      required: [ok, request_id, server_now, error]
+      properties:
+        ok:
+          type: boolean
+          enum: [false]
+        request_id:
+          type: string
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          type: string
+          format: date
+        error:
+          type: object
+          required: [code, category, message_key, message, retryable]
+          properties:
+            code:
+              type: string
+            category:
+              type: string
+              enum:
+                - AUTH
+                - GUARD
+                - VALIDATION
+                - CONFLICT
+                - NOT_FOUND
+                - RATE_LIMIT
+                - TRANSIENT
+                - TERMINAL
+                - SAFETY
+            message_key:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean
+            details:
+              type: object
+              additionalProperties: true
+            safety_view:
+              type: object
+              additionalProperties: true
+            command_receipt:
+              type: object
+              additionalProperties: true
+
+    ApiSuccessBase:
+      type: object
+      required: [ok, request_id, server_now, product_date, product_date_policy_version, data]
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+        request_id:
+          type: string
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          type: string
+          format: date
+        product_date_policy_version:
+          type: string
+        data: {}
+
+    ApiSuccessLaunch:
+      allOf:
+        - $ref: '#/components/schemas/ApiSuccessBase'
+
+  responses:
+    Error:
+      description: Normalized API error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorBody'
+    SuccessObject:
+      description: Successful object payload
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessBase'
+    SuccessList:
+      description: Successful list payload
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessBase'
+    SuccessCommand:
+      description: Command receipt
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessBase'
+    SuccessSession:
+      description: Session established
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessBase'
+    SuccessEmpty:
+      description: Empty success
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessBase'

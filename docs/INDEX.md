@@ -143,9 +143,9 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/data/domain-model.md](./data/domain-model.md) | Accepted | 领域上下文、聚合、实体、关系、唯一性、修订与失效 | state-machine、schemas、memory、safety、evaluation |
 | [docs/technical/database.md](./technical/database.md) | Accepted | PostgreSQL 表、索引、约束、事务、迁移和删除规格 | domain-model、ADR-0005 |
 | [prisma/schema.prisma](../prisma/schema.prisma) | Accepted | Prisma ORM 7 / PostgreSQL 可执行结构草案 | database spec |
-| docs/technical/api.md | Planned | 小程序、后端和后台接口契约 | domain、schemas、database |
-| docs/technical/error-codes.md | Planned | 错误、恢复和降级语义 | API、interaction-states |
-| OpenAPI 契约 | Planned | 可执行接口契约 | Accepted API spec |
+| [docs/technical/api.md](./technical/api.md) | Draft | 小程序、后端和后台接口契约 | domain、schemas、database |
+| [docs/technical/error-codes.md](./technical/error-codes.md) | Draft | 错误、恢复和降级语义 | API、interaction-states |
+| [openapi/openapi.yaml](../openapi/openapi.yaml) | Draft | OpenAPI 3 可执行路径草案 | api.md |
 
 ### 7.5 数据分析、隐私与运营
 
@@ -227,7 +227,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-19 数据库规格与 Prisma 草案已由用户确认并进入 Accepted。下一唯一 Ready 任务是 S-20 API 契约。开始 S-20 时依次读取：
+当前唯一 In Review 任务是 S-20 API 契约。执行与审核该任务时依次读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -236,25 +236,22 @@ S-19 数据库规格与 Prisma 草案已由用户确认并进入 Accepted。下�
 5. tasks/current.md；
 6. docs/product/state-machine.md；
 7. docs/product/business-rules.md；
-8. docs/design/screen-specs.md；
-9. docs/design/interaction-states.md；
+8. docs/design/interaction-states.md；
+9. docs/design/screen-specs.md；
 10. docs/ai/daily-content-schema.md；
 11. docs/ai/evening-feedback-schema.md；
 12. docs/ai/weekly-summary-schema.md；
 13. packages/shared-schemas/README.md；
-14. docs/decisions/ADR-0002-deterministic-daily-result.md；
-15. docs/ai/generation-engine.md；
-16. docs/decisions/ADR-0003-ai-provider-abstraction.md；
-17. docs/ai/gateway.md；
-18. docs/ai/prompt-spec.md；
-19. docs/decisions/ADR-0004-structured-memory.md；
+14. docs/data/domain-model.md；
+15. docs/decisions/ADR-0005-data-retention-and-deletion.md；
+16. docs/technical/database.md；
+17. prisma/schema.prisma；
+18. docs/ai/gateway.md；
+19. docs/ai/safety.md；
 20. docs/ai/memory.md；
-21. docs/ai/safety.md；
-22. docs/ai/evaluation.md；
-23. docs/data/domain-model.md；
-24. docs/decisions/ADR-0005-data-retention-and-deletion.md；
-25. docs/technical/database.md；
-26. prisma/schema.prisma。
+21. docs/technical/api.md；
+22. docs/technical/error-codes.md；
+23. openapi/openapi.yaml。
 
-S-20 只产出 Draft `docs/technical/api.md`、`docs/technical/error-codes.md` 与 OpenAPI 草案；在独立 PR 通过审核前，不创建 NestJS controller、migration、数据库、worker、生产代码、provider 调用或真实数据。
+S-20 只产出 Draft `docs/technical/api.md`、`docs/technical/error-codes.md` 与 `openapi/openapi.yaml`；在独立 PR 通过审核前，不创建 NestJS controller、migration、数据库、worker、生产代码、provider 调用或真实数据。
 

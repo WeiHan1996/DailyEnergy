@@ -5,97 +5,79 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-20
 - **当前任务名称**：API 契约
-- **任务状态**：Ready
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：不开始 NestJS controller、migration、数据库、worker 或生产实现；只允许 Draft API / 错误码 / OpenAPI 契约
-- **当前分支**：`agent/s19-accept-handoff`（本 PR 仅 S-19 Accepted 收尾；S-20 在合并后新分支开始）
-- **关联 PR**：[Accepted 收尾 PR #23](https://github.com/WeiHan1996/DailyEnergy/pull/23)；S-19 内容已在 [#22](https://github.com/WeiHan1996/DailyEnergy/pull/22) 合并
+- **当前分支**：`agent/api-contract-spec`
+- **关联 PR**：待创建
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
 ## 1. 当前目标
 
-在 S-19 被用户确认 Accepted 并合并本收尾 PR 后，创建 Draft：
+创建 Draft：
 
 - `docs/technical/api.md`
 - `docs/technical/error-codes.md`
-- OpenAPI 草案
+- `openapi/openapi.yaml`
 
-把 Accepted 领域模型、数据库规格、共享 Schema、状态机与交互状态转换为小程序 / 后端 / 管理端可独立开发的接口契约。
+把 Accepted 领域模型、数据库规格、共享 Schema、状态机与交互状态转换为小程序 / 后端 / 管理端可独立开发的 HTTP 契约。
 
-**本 PR 不开始写 API 正文**；只完成 S-19 Accepted 状态收尾与任务指针切换。
+## 2. 必须交付
 
-## 2. S-20 必须交付（合并本 PR 后的下一实现 PR）
+- Draft `docs/technical/api.md`（协议、命令/查询、页面映射、守卫、48 场景）；
+- Draft `docs/technical/error-codes.md`（稳定 code、category、Unknown 恢复、16 场景）；
+- OpenAPI 3 草案 `openapi/openapi.yaml`（`/v1` 路径与组件）；
+- 身份、同意、资料、签到、生成/读取、点亮、晚间协调保存、趋势、事项/记忆、分享/通知、Safety、导出删除、支持、管理端最小接口；
+- 幂等 `command_ref`、expected revision/CAS、Safety/deletion 阻断；
+- 白名单 view；DTO ≠ Prisma model；
+- docs/INDEX、backlog、current 同步；
+- S-19 Accepted 已在 main（#23）。
 
-- Draft `docs/technical/api.md`；
-- Draft `docs/technical/error-codes.md`；
-- OpenAPI 或等价可执行契约草案；
-- 身份、同意、资料、签到、生成/读取、点亮、晚间反馈、趋势、事项/记忆、分享/通知、隐私导出与删除、管理端最小接口；
-- 幂等、权限、revision/CAS、Safety/deletion 阻断与 Unknown outcome 语义；
-- 与 interaction-states、state-machine、database 一致的错误与降级；
-- 不创建 NestJS、Prisma Client 生产接入或 migration。
+## 3. 上游必读
 
-## 3. 上游必读（S-20 开始时）
-
-1. [AGENTS.md](../AGENTS.md)；
-2. [README.md](../README.md)；
-3. [ROADMAP.md](../ROADMAP.md)；
-4. [docs/INDEX.md](../docs/INDEX.md)；
-5. 本文；
-6. [产品状态机](../docs/product/state-machine.md)；
-7. [业务规则](../docs/product/business-rules.md)；
-8. [交互状态](../docs/design/interaction-states.md)；
-9. [页面规格](../docs/design/screen-specs.md)；
-10. Daily / Evening / Weekly Schema 与 [shared-schemas](../packages/shared-schemas/README.md)；
-11. [领域模型](../docs/data/domain-model.md)；
-12. [ADR-0005](../docs/decisions/ADR-0005-data-retention-and-deletion.md)；
-13. [数据库规格](../docs/technical/database.md)；
-14. [prisma/schema.prisma](../prisma/schema.prisma)；
-15. Gateway / Prompt / Memory / Safety 中与入口和错误相关的边界。
+见 docs/INDEX 第 12 节 S-20 读取顺序。
 
 ## 4. 已接受且不得重开的边界
 
-- 规则出事实、AI 只表达；同日结果稳定；
-- Safety / Deleting / 账户阻断优先于普通 API；
-- high-risk ordinary provider/template call = 0；
-- 数据库 UUID 不是授权；API 必须再做 owner/日期/状态校验；
-- 客户端不得提交 Safety/deletion epoch、seed、ciphertext 或内部 fingerprint；
-- 删除与导出遵循 ADR-0005；不暴露 raw Safety / provider / Prompt；
-- DTO 不直接等于 Prisma model。
+- 产品日期服务端权威；同日唯一 intent/结果；
+- 规则出事实、AI 只表达；
+- Safety / Deleting 优先；high-risk ordinary call = 0；
+- UUID 非授权；客户端不提交 epoch/seed/ciphertext；
+- 晚间 note 不进 Weekly/AI/memory/通知/分享；
+- 删除遵循 ADR-0005；DAY 删除后同日重建禁止。
 
-## 5. 明确不做（本收尾 PR 与 S-20 Draft PR）
+## 5. 明确不做
 
-- 合并本 PR 前开始 S-20 正文实现以外的生产代码；
-- 创建或运行 migration、真实数据库、NestJS controller；
-- 改写 S-19 表结构或重开 ADR-0005；
-- 自动 merge 任何 PR。
+- NestJS 实现、migration、真实微信证书配置；
+- 改写 S-19 表结构或 shared-schemas 生产包；
+- 自动 merge PR；
+- 埋点字典（S-24）与完整运营 RBAC（S-22）。
 
-## 6. 验收标准（本收尾 PR）
+## 6. 验收标准
 
-- `docs/technical/database.md` 与 `prisma/schema.prisma` 为 Accepted，接受日期 2026-07-22；
-- docs/INDEX、backlog 中 S-19 Done、S-20 Ready；
-- 本 PR 无 migration、无生产代码、无 secret；
-- **不自动 merge**；用户审核合并后，新会话/新分支再将 S-20 设为 In Progress 并撰写 API Draft。
+- api.md / error-codes.md / openapi.yaml 保持 Draft；
+- P0 页面可映射接口；
+- 错误码与交互状态/领域 Unknown 规则一致；
+- OpenAPI 路径覆盖 api.md 清单；
+- 48+16 场景 ID 唯一；
+- 无生产代码；用户确认前不标 Accepted。
 
-## 7. 最近一次交接
+## 7. 完成后的下一任务
+
+- S-21 隐私数据地图（S-20 Accepted 后）。
+
+## 8. 最近一次交接
 
 - 日期：2026-07-22；
-- 用户确认方案 A：接受 S-19 并做 Accepted 收尾；
-- PR #22 已合并，main 含 Draft 版 database/Prisma 内容；
-- 本分支 `agent/s19-accept-handoff` 仅状态与控制文件收尾；
-- S-19 内容不重开设计；
-- Draft/Open PR [#23](https://github.com/WeiHan1996/DailyEnergy/pull/23) 已创建，**不会自动 merge**；
-- **下一步**：用户审核并合并 PR #23；合并前不开始 S-20 文档正文。
+- PR #23 已合并，main `eac46d6`；S-19 Accepted；
+- 分支 `agent/api-contract-spec` 从 main 创建；
+- 新增 Draft api.md、error-codes.md、openapi/openapi.yaml；
+- 无 NestJS/migration/生产代码；
+- **不自动 merge**；等待用户审核 Draft PR。
 
-## 8. 状态更新规则
+## 9. 状态更新规则
 
-本 PR 合并前：
-
-- database.md / schema.prisma 在分支上为 Accepted；
-- S-20 保持 Ready，不写 api.md 正文。
-
-用户合并本 PR 后：
-
-- main 上 S-19 正式 Accepted/Done；
-- 新分支将 S-20 改为 In Progress 并创建 Draft API 文档；
-- 再开独立 Draft PR，仍不自动 merge。
+- In Review：Draft PR 打开；三份交付保持 Draft；
+- 用户确认并合并后：三份 → Accepted；S-20 Done；S-21 Ready；
+- 新会话再开始 S-21。
