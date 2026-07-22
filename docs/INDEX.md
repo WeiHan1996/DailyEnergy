@@ -131,8 +131,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/ai/s11-test-vectors.json](./ai/s11-test-vectors.json) | Accepted | 每日与七天规则的跨语言 golden vectors | generation-engine、scoring-rules、shared-schemas |
 | [docs/ai/gateway.md](./ai/gateway.md) | Accepted | 供应商隔离、路由、超时、降级、熔断、成本与隐私 | generation-engine、schemas、ADR-0003 |
 | [docs/ai/prompt-spec.md](./ai/prompt-spec.md) | Accepted | Prompt package、封闭输入、规范指令、事实绑定、版本与回归 | personality、schemas、gateway |
-| [docs/ai/memory.md](./ai/memory.md) | Draft | 领域源、用途授权、确定性投影、有效期、无源回退与删除 | persona、journey、personality、prompt |
-| docs/ai/safety.md | Planned | 风险分类、固定响应和审核 | vision、personality |
+| [docs/ai/memory.md](./ai/memory.md) | Accepted | 领域源、用途授权、确定性投影、有效期、无源回退与删除 | persona、journey、personality、prompt |
+| [docs/ai/safety.md](./ai/safety.md) | Draft | 输入分类、专业边界、固定响应、地区资源、恢复与全候选审核 | vision、personality、schemas、gateway、prompt、memory |
 | docs/ai/evaluation.md | Planned | 自动评价、人工抽检和回归测试 | personality、prompt、safety |
 
 ### 7.4 数据与接口
@@ -175,7 +175,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 |---|---|---|---|
 | [ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md) | Accepted | 稳定种子、产品日期、历史不变与重生成 | 规则引擎开发前 |
 | [ADR-0003-ai-provider-abstraction.md](./decisions/ADR-0003-ai-provider-abstraction.md) | Accepted | AI Gateway 与供应商隔离 | AI Gateway 开发前 |
-| [ADR-0004-structured-memory.md](./decisions/ADR-0004-structured-memory.md) | Proposed | 用途受限结构化记忆与不用向量库 | 记忆开发前 |
+| [ADR-0004-structured-memory.md](./decisions/ADR-0004-structured-memory.md) | Accepted | 用途受限结构化记忆与不用向量库 | 记忆开发前 |
 | ADR-0005-data-retention-and-deletion.md | Planned | 保存期限、删除和审计 | 数据库开发前 |
 | ADR-0006-monorepo-and-stack.md | Planned | TypeScript Monorepo 与既定技术栈 | 工程初始化前 |
 
@@ -226,7 +226,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一 In Review 任务是 S-14 结构化记忆决策与规范。执行与审核该任务时依次读取：
+当前唯一 In Review 任务是 S-15 内容安全规范。执行与审核该任务时依次读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -246,13 +246,16 @@ Phase 1 开始后逐步增加：
 16. docs/product/state-machine.md；
 17. docs/product/business-rules.md；
 18. docs/ai/daily-content-schema.md；
-19. docs/ai/weekly-summary-schema.md；
-20. packages/shared-schemas/README.md；
-21. docs/decisions/ADR-0002-deterministic-daily-result.md；
-22. docs/ai/generation-engine.md；
-23. docs/ai/scoring-rules.md；
-24. docs/decisions/ADR-0003-ai-provider-abstraction.md；
-25. docs/ai/gateway.md；
-26. docs/ai/prompt-spec.md。
+19. docs/ai/evening-feedback-schema.md；
+20. docs/ai/weekly-summary-schema.md；
+21. packages/shared-schemas/README.md；
+22. docs/decisions/ADR-0002-deterministic-daily-result.md；
+23. docs/ai/generation-engine.md；
+24. docs/ai/scoring-rules.md；
+25. docs/decisions/ADR-0003-ai-provider-abstraction.md；
+26. docs/ai/gateway.md；
+27. docs/ai/prompt-spec.md；
+28. docs/decisions/ADR-0004-structured-memory.md；
+29. docs/ai/memory.md。
 
-S-14 只产出 Proposed ADR-0004 与 Draft `memory.md`，并完成 S-13 的 Accepted 状态收尾与任务控制更新；在单独 PR 通过审核前，不开始 S-15、生产记忆服务、Prompt v2、向量数据库、数据模型或 API 实现。
+S-15 只产出 Draft `safety.md`，并完成 S-14 的 Accepted 状态收尾与任务控制更新；在单独 PR 通过审核前，不开始 S-16、生产分类器、Safety service、数据库/API、地区资源上线、人工危机值班或普通模型接入。
