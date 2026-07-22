@@ -68,7 +68,7 @@
 |---|---|---|---|---|
 | S-10 | 稳定种子与产品日期决策 | Done | ADR-0002 | S-05 |
 | S-11 | 规则引擎规范 | Done | generation-engine、scoring-rules | S-07、S-10 |
-| S-12 | AI Gateway 决策与规范 | In Progress | ADR-0003、gateway.md | S-07、S-11 |
+| S-12 | AI Gateway 决策与规范 | In Review | ADR-0003、gateway.md | S-07、S-11 |
 | S-13 | Prompt 规范 | Planned | prompt-spec.md | S-12、personality |
 | S-14 | 结构化记忆决策与规范 | Planned | ADR-0004、memory.md | S-05、S-07 |
 | S-15 | 内容安全规范 | Planned | safety.md | personality、schemas |

@@ -226,7 +226,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一 In Progress 任务是 S-12 AI Gateway 决策与规范。执行或审核该任务时依次读取：
+当前唯一 In Review 任务是 S-12 AI Gateway 决策与规范。审核该任务时依次读取：
 
 1. AGENTS.md；
 2. README.md；

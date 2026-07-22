@@ -5,11 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-12
 - **当前任务名称**：AI Gateway 决策与规范
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **优先级**：最高
 - **代码工作**：不开始正式业务代码；只允许 ADR、规范、接口伪结构、策略表和验收矩阵
 - **当前分支**：`agent/ai-gateway-spec`
-- **关联 PR**：待创建
+- **关联 PR**：[#15](https://github.com/WeiHan1996/DailyEnergy/pull/15)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 - **完整 Backlog**：[tasks/backlog.md](./backlog.md)
@@ -175,10 +175,13 @@ S-12 被接受后，下一任务为：
 - PR #14 已由用户确认并 squash 合并，main commit 为 `9db8672`；
 - S-11 的 generation-engine、scoring-rules 和 test vectors 已获接受，状态收尾包含在本分支；
 - S-12 分支 `agent/ai-gateway-spec` 已从合并后的 main 创建；
-- 已完成上游规范复核并开始 ADR-0003 / gateway.md；
+- 新增 Proposed ADR-0003 与 Draft `gateway.md`，覆盖 Daily/Weekly workload、immutable route manifest、顺序主备/模板、严格输出、8/20 秒预算、两类熔断、成本、隐私、可观测性和 route 发布；
+- Draft PR [#15](https://github.com/WeiHan1996/DailyEnergy/pull/15) 已创建，等待用户审核；
+- 远端范围复核为 8 个目标文件，无生产业务代码；S-11 fixture JSON 可解析，21 个仓库链接全部可读；
+- Markdown 结构、任务生命周期和 37 项故障注入场景校验通过；无 TODO/TBD；
 - 当前没有正式前端、后端、数据库或 AI Gateway 实现；
 - 当前没有阻塞项；
-- 下一操作：完成文档与契约校验，创建 Draft PR 供用户审核。
+- 下一操作：用户审核 PR #15 并决定是否接受 S-12；确认前不标记 Accepted、不合并、不开始 S-13。
 
 ## 12. 状态更新规则
 
