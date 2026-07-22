@@ -23,7 +23,7 @@ API 负责“授权边界上的命令与投影”，不负责“分数怎么算�
 - 产品日期由服务端 `product-date-v1` 解析（`Asia/Shanghai`，04:00 边界）；客户端不得提交 ProductDate 真值作为权威；
 - 同一逻辑用户、同一产品日期最多一个生成意图与一个 AVAILABLE 每日结果；
 - 规则出事实、AI 只表达；primary/backup/template 不竞速、不修补、不拼接；
-- Safety / Deleting / 账户阻断优先于普通写与普通读投影；
+- Safety ACTIVE / RECOVERY_PENDING 是最高优先级覆盖，高于账户删除、维护、会话、同意以及普通写与普通读投影；
 - high-risk 时 ordinary Gateway/template 调用数 = 0；
 - DTO **不直接等于** Prisma model；数据库 UUID 不是授权；
 - 客户端不得提交 owner、Safety/deletion epoch、seed、ciphertext、内部 fingerprint 或 raw provider 字段；
@@ -62,7 +62,7 @@ API 负责“授权边界上的命令与投影”，不负责“分数怎么算�
 4. **CommandIdentity**：每个可重试写携带 `command_ref` + 规范化 payload；同 ref 同 payload 幂等；同 ref 不同 payload → `IDEMPOTENCY_CONFLICT`。
 5. **CAS**：可变事实写携带 `expected_revision`（不存在为 0）；冲突返回最新投影 + `REVISION_CONFLICT`。
 6. **Server time/date**：响应暴露 `server_now` 与 `product_date`；客户端显示用，不作为写权威。
-7. **Guards 顺序**（服务端）：会话 → 账户/删除 → Safety → 产品日期/窗口 → 领域校验 → 写入/查询。
+7. **Guards 顺序**（服务端）：解析最小 Safety 路由上下文 → Safety 覆盖 → 普通会话 → 账户/删除 → 维护/同意/认识 → 产品日期/窗口 → owner/revision/领域校验 → 写入/查询。
 8. **Unknown outcome**：超时后先 `GET` 原 command/聚合，禁止换 `command_ref` 重开第二意图。
 9. **Views only**：成功读返回白名单 view；永不返回 Prisma 行、ciphertext、epoch、seed、attempt、Prompt、Safety 原文。
 10. **Safety**：HIGH_RISK 写命令返回 `SAFETY_OVERLAY` + `SafetyView`，不完成普通写；恢复需两步显式命令。
@@ -79,9 +79,11 @@ API 负责“授权边界上的命令与投影”，不负责“分数怎么算�
 | Content-Type | `application/json; charset=utf-8` |
 | 字符 | UTF-8；文本字段 grapheme 规则遵循 shared-schemas |
 | 时间 | ISO-8601 带时区；产品日期 `YYYY-MM-DD` |
-| 认证头 | `Authorization: Bearer {session_token}` |
-| 幂等头 | `Idempotency-Key: {command_ref}`（与 body `command_ref` 必须一致；只送一处时以 body 为准并回显） |
-| 追踪 | `X-Request-Id`（客户端可选；服务端必回） |
+| 认证头 | 小程序 `Authorization: Bearer {session_token}`；管理端使用独立 `admin_session_token`；二者不可互换 |
+| Safety 连续凭证 | `X-Safety-Continuation: {opaque_token}`；只允许 bootstrap、SafetyView 与 recovery 白名单，绝不授予普通权限 |
+| 幂等头 | 所有写命令必须同时发送 `Idempotency-Key: {command_ref}` 与 body `command_ref`，二者不同即 `IDEMPOTENCY_CONFLICT` |
+| 追踪 | 请求 `X-Request-Id` 可选；所有响应都必须返回同名 header 与 body `request_id` |
+| 退避 | 429/503 在可确定时返回 `Retry-After`，并与 body `retry_after_seconds` 一致 |
 | 语言 | `Accept-Language` 默认 `zh-CN`；未支持 locale 不静默混用未审文案 |
 
 ### 5.2 成功响应信封
@@ -143,12 +145,16 @@ CommandRequestV1 {
 }
 ```
 
-协调写（多组件）额外：
+所有请求 DTO 默认封闭：未知字段必须返回 `VALIDATION_FAILED`。`client_context` 只允许 `app_version` 与 `scene`；owner、epoch、seed、内部 revision map、provider 或任意 Prisma 字段一律不得透传。
+
+协调写（多组件）使用封闭的逐组件字段，不接收任意 revision map：
 
 ```text
-  expected_revisions: {
-    [component: string]: number  // 0 = 不存在
-  }
+EveningSaveRequestV1 {
+  expected_feedback_revision: number
+  expected_helpfulness_revision: number
+  task_patch?: { task_ref, expected_revision, status }
+}
 ```
 
 ### 5.5 Command 回执
@@ -158,12 +164,25 @@ CommandReceiptV1 {
   command_ref: string
   operation: string
   outcome: ACCEPTED | DUPLICATE | CONFLICT | REJECTED | UNKNOWN_PENDING
-  resource_refs?: { [k: string]: string }
-  current?: object               // 最新白名单投影片段
+  resource_refs?: { checkin_ref?, intent_ref?, result_ref?, task_ref?, matter_ref?, feedback_ref?, share_ref?, recovery_ref? }
 }
 ```
 
+冲突的最新状态只允许放在错误信封 `details.current`，并且必须是 OpenAPI 列出的白名单 View 之一；回执和错误均不接受任意对象。
+
 ## 6. 认证与启动
+
+### 6.0 Safety-first 路由解析
+
+服务端必须先解析“最小路由身份”，再决定是否进入普通认证：
+
+1. 有效普通会话可以解析账户与 Safety 状态；
+2. Safety ACTIVE / RECOVERY_PENDING 时，服务端签发短期、可撤销、不含风险类别或用户原文的 `safety_continuation_token`；
+3. 普通会话过期、账户 RESTRICTED/DELETING 或维护 BLOCKING 时，该 token 仍只可读取 `GET /bootstrap/launch`、`GET /safety/current` 和提交两步 recovery；
+4. token 不能刷新普通会话、读取普通资料/历史、执行普通业务写，也不能覆盖账户删除；Safety CLEAR、账户 DELETED 或 token 到期后立即失效；
+5. 普通 token 与 Safety token 都不可验证时，保持 SYS-001 最小骨架或进入 ENT-002；不得猜测 Safety 已 CLEAR，也不得凭本地缓存恢复普通权限。
+
+这使“Safety 高于会话/删除”成为可实现的路由能力，而不是绕过认证的匿名数据入口。
 
 ### 6.1 微信会话
 
@@ -172,6 +191,7 @@ CommandReceiptV1 {
 | POST | `/auth/wechat/session` | `wx.login` code → 建立/恢复会话；返回 `session_token`、账户摘要、是否需同意 |
 | POST | `/auth/session/refresh` | 刷新会话 |
 | POST | `/auth/session/logout` | 注销本会话 |
+| POST | `/auth/reauth/verify` | 对删除确认 challenge 做微信身份复核；返回仅绑定该 challenge 的 `identity_verification_ref` |
 
 `POST /auth/wechat/session` **不**把 openid 返回客户端。失败不泄露“是否已注册”。
 
@@ -210,15 +230,19 @@ CommandReceiptV1 {
 | Method | Path | 说明 |
 | --- | --- | --- |
 | GET | `/daily/today/checkin` | 当前产品日签到投影（若有） |
-| POST | `/daily/checkin/submit` | 创建/更新晨间 mood/energy/sleep；窗口内可更正 |
+| POST | `/daily/checkin/submit` | 仅创建晨间 mood/energy/sleep；`expected_revision` 固定为 0 |
 | POST | `/daily/checkin/correct` | 显式更正（OPEN 窗口，`expected_revision`） |
+| POST | `/daily/checkin/rebuild` | DAY 删除成功后的“重新记录今天”；显式确认并原子创建新的签到 |
 
 规则：
 
 - 服务端绑定当前 `product_date`；
 - “说不准”是合法枚举；
+- `submit` 仅允许不存在时创建：同 command + 同 payload 返回原 revision；已有签到且 payload 不同返回 `CHECKIN_ALREADY_EXISTS`，必须改走 `correct`；
+- `correct` 必须携带当前正 revision；冲突返回最新 `CheckinView`，不做 last-write-wins；
 - 更正**不**重写已发布每日结果；
-- 幂等：同 command 同 payload 返回同一 checkin revision。
+- `rebuild` 只在 ADR-0005 §10 的全部条件成立时接受：当前权威产品日、OPEN 窗口、原 DAY DataTask SUCCEEDED、普通守卫通过、用户再次明确确认、DayErasureGuard 与原 `result_version` 可验证；客户端不得提交 epoch、seed 或 result_version；
+- 同日重记后生成必须由服务端复用原 `result_version`，默认使用兼容 `CONTROLLED_TEMPLATE`；删除前从未创建 intent 时才可冻结当前版本。
 
 ### 8.2 生成与读取
 
@@ -322,13 +346,18 @@ CommandReceiptV1 {
 | GET | `/data-rights/tasks` | 当前 DataTask 列表摘要 |
 | GET | `/data-rights/tasks/{task_ref}` | `DataTaskView`：阶段、范围、online erased、backup deadline |
 | POST | `/data-rights/export` | 创建导出任务 |
-| POST | `/data-rights/delete/day` | DAY 删除任务（禁用同日重建，遵循 ADR-0005） |
-| POST | `/data-rights/delete/matter` | 事项删除 |
-| POST | `/data-rights/delete/relationship` | 关系数据删除（不静默扩大 DAY） |
-| POST | `/data-rights/delete/account` | 账户删除/注销流程启动（二次确认） |
+| POST | `/data-rights/delete/day` | DAY 一次明确确认；target 为 `product_date` |
+| POST | `/data-rights/delete/matter` | MATTER 一次明确确认；target 为 `matter_ref` |
+| POST | `/data-rights/delete/relationship/prepare` | 第一阶段：冻结范围并返回一次性 confirmation challenge |
+| POST | `/data-rights/delete/relationship/confirm` | 第二阶段：校验 challenge、确认版本、范围、修订和必要身份复核后创建任务 |
+| POST | `/data-rights/delete/account/prepare` | 第一阶段：返回账户删除影响与一次性 challenge |
+| POST | `/data-rights/delete/account/confirm` | 第二阶段：校验 challenge 与身份复核后启动账户删除 |
 | POST | `/data-rights/tasks/{task_ref}/cancel` | 仅允许在领域规定可取消阶段 |
 
-- 确认页字段与范围必须显式；RELATIONSHIP 删除不默认带光所有 DAY；
+- DAY / MATTER DTO 必须包含 `command_ref`、固定 `scope`、封闭 `target`、`confirmation_version`、`confirmed=true` 与 `expected_revision`；它们是一次明确确认，不是无参删除按钮；
+- RELATIONSHIP_DATA / ACCOUNT 的 prepare 返回 `confirmation_challenge_ref`、规范化 scope/target、影响摘要、`confirmation_version`、过期时间与 `identity_reverification_required`；confirm 必须逐项原样回传并携带 `expected_revision(s)`，需要时还要携带 challenge-scoped `identity_verification_ref`；
+- challenge 单次、短期、绑定 owner + scope + target + confirmation_version + expected revision；任一字段变化、过期或复用均拒绝，不允许服务端替客户端扩大范围；
+- RELATIONSHIP_DATA 可显式选择 `included_day_product_dates`，并逐日提交同序的 `included_day_expected_revisions`；每个日期创建或关联 DAY 子任务；两个数组默认都为空，不能静默删除全部 DAY；
 - 响应不回显被删业务正文；
 - Deleting 账户：普通写拒绝；bootstrap 给 SYS-003 类投影。
 
@@ -349,7 +378,7 @@ CommandReceiptV1 {
 | GET | `/admin/ops/overview` | 成功率、延迟、降级、队列、安全告警、成本摘要（聚合） |
 | GET | `/admin/safety/events` | 脱敏 Safety 事件列表 |
 | GET | `/admin/data-rights/tasks` | 数据任务队列 |
-| POST | `/admin/data-rights/tasks/{id}/advance` | 受控推进（审计）；不能改写用户原文解除 Safety |
+| POST | `/admin/data-rights/tasks/{task_ref}/advance` | 受控推进（审计）；不能改写用户原文解除 Safety |
 
 禁止：任意用户全文浏览、编辑已发布结果、下调 Safety 政策、导出未脱敏语料到通用分析。
 
@@ -360,24 +389,24 @@ CommandReceiptV1 {
 | SYS-001 | `GET /bootstrap/launch` |
 | ENT-002 | session refresh / re-login |
 | ONB-001 | `POST /onboarding/complete` |
-| DLY-001 | `POST /daily/checkin/submit` |
-| DLY-002 | `POST /daily/generation/start` + `GET .../generation/{id}` |
+| DLY-001 | `POST /daily/checkin/submit`；同日删除后使用 `POST /daily/checkin/rebuild` |
+| DLY-002 | `POST /daily/generation/start` + `GET /daily/generation/{intent_ref}` |
 | DLY-003 | `GET /daily/today` + light/task/helpfulness |
 | EVE-001 | `GET/POST /evening/*` |
 | REC-001 | `GET /weekly/current` |
 | REC-002 | `GET /history/days/{date}` |
 | MEM-* | `/matters*` `/memory/preferences` |
-| SET-* | profile、notifications、data-rights、support |
+| SET-* | profile、notifications、data-rights prepare/confirm、support |
 | SAFE-001 | `GET /safety/current` + recovery commands |
 
 ## 18. 权限与守卫矩阵（摘要）
 
 | 条件 | 写 | 普通读 |
 | --- | --- | --- |
-| 无会话 | 401 | 401 |
-| 账户 RESTRICTED | 按能力拒绝 | 有限 |
-| 账户 DELETING/DELETED | 拒绝业务写 | DataTask/结束态 |
-| Safety ACTIVE/RECOVERY_PENDING | 仅 recovery 等白名单 | SafetyView / 阻断今日娱乐 |
+| Safety ACTIVE/RECOVERY_PENDING | 仅 recovery 等 Safety 白名单 | 先返回 SafetyView；可用 Safety continuation，不恢复普通权限 |
+| 无普通会话且无 Safety continuation | 401 | 401 / ENT-002 |
+| 账户 RESTRICTED（Safety CLEAR） | 按能力拒绝 | 有限 |
+| 账户 DELETING/DELETED（Safety CLEAR） | 拒绝业务写 | DataTask/结束态 |
 | 产品日写窗口关闭 | 拒绝对应写 | 可读历史/冻结 |
 | revision 不匹配 | 409 CONFLICT | — |
 | 资源非 owner | 404 或 403（不泄露存在性策略：默认 404） | 同左 |
@@ -421,7 +450,7 @@ CommandReceiptV1 {
 
 | ID | 场景 | 期望 |
 | --- | --- | --- |
-| S20-D01 | 签到提交幂等 | 同 revision |
+| S20-D01 | 签到 submit 重放 / 已存在不同 payload | 同 payload 同 revision；不同 payload 拒绝并要求 correct |
 | S20-D02 | 生成 start 双击 | 单 intent |
 | S20-D03 | 生成 Unknown 恢复 | GET 原 intent |
 | S20-D04 | 点亮幂等 | 单 light fact |
@@ -456,9 +485,9 @@ CommandReceiptV1 {
 | S20-S03 | 两步 + 条件满足 | CLEAR |
 | S20-S04 | 资源点击不 CLEAR | 状态不变 |
 | S20-S05 | 导出任务创建 | DataTaskView |
-| S20-S06 | 账户删除确认 | DELETING |
-| S20-S07 | DAY 删除 | 无同日重建 |
-| S20-S08 | 关系删除范围 | 不默删全部 DAY |
+| S20-S06 | 账户删除 prepare → reauth → confirm | challenge 绑定一致后才 DELETING |
+| S20-S07 | DAY 删除成功后显式重新记录今天 | 满足 ADR 条件并复用原 result_version；否则稳定错误 |
+| S20-S08 | 关系删除 prepare/confirm 范围 | 不默删全部 DAY；选中日期建 DAY 子任务 |
 | S20-S09 | 任务查询不回正文 | 无被删内容 |
 | S20-S10 | 跨日仍 ACTIVE | bootstrap 仍 overlay |
 
@@ -482,6 +511,7 @@ CommandReceiptV1 {
 - P0 页面均可映射到命令/查询；
 - 错误码表覆盖 Auth/Guard/Validation/Conflict/Safety/Transient/Terminal；
 - OpenAPI 草案列出全部 `/v1` 路径与主要 schema 组件；
+- Auth、Bootstrap、Checkin、Generation、Evening、Safety、DataRights 的请求与白名单 View 使用封闭 Schema；所有 operation 明确 4xx，所有命令声明幂等头；
 - 与 domain-model、database、interaction-states、safety 无冲突；
 - 48 场景 ID 唯一；
 - 无 NestJS/migration/生产代码；
@@ -511,4 +541,5 @@ CommandReceiptV1 {
 
 - 状态：Draft；
 - 分支：`agent/api-contract-spec`；
+- PR：[修订中的 #24](https://github.com/WeiHan1996/DailyEnergy/pull/24)；已按审核修复 DAY 重记、Safety-first、删除确认、签到 CAS 与 OpenAPI 可执行性；
 - 下一任务：S-21 隐私数据地图（S-20 Accepted 后）。

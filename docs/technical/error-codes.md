@@ -18,7 +18,7 @@
 3. **retryable**：仅表示“用同一 command_ref 或同一查询再试可能成功”；不表示换参数硬撞。
 4. **HTTP 状态** 为提示；**code 为权威**。映射见第 4 节。
 5. **message** 面向用户；**message_key** 用于 i18n；均不得含内部细节。
-6. **details** 仅白名单：`fields[]`、`current_revision`、`current_product_date`、`command_receipt`、`retry_after_seconds`。
+6. **details** 按 code 使用封闭白名单：`fields[]`、`current_revision`、`current_product_date`、`current` 白名单 View、`retry_after_seconds`、`reason`；`command_receipt` 是 error 的独立白名单字段；禁止任意键值对象。
 7. Safety 命中时 category=`SAFETY`，可附 `safety_view`；不附 raw 输入。
 8. 不存在性：默认 `NOT_FOUND`，避免跨用户探测（管理端可另议，仍不返回他用户正文）。
 
@@ -64,6 +64,8 @@
 | `AUTH_SESSION_EXPIRED` | AUTH | no | 会话过期 |
 | `AUTH_WECHAT_CODE_INVALID` | AUTH | no | wx code 无效/已用 |
 | `AUTH_ADMIN_REQUIRED` | AUTH | no | 管理端权限不足 |
+| `AUTH_REVERIFICATION_REQUIRED` | AUTH | no | 危险操作需要绑定当前 challenge 的身份复核 |
+| `AUTH_REVERIFICATION_FAILED` | AUTH | no | 身份复核失败或 verification ref 与 challenge 不匹配 |
 
 ### 5.2 Account / Consent / Maintenance guards
 
@@ -99,6 +101,7 @@
 | `INVALID_COMMAND_REF` | VALIDATION | no | command_ref 格式非法 |
 | `CHECKIN_INCOMPLETE` | VALIDATION | no | 生成前签到不完整 |
 | `NOTE_OPERATION_INVALID` | VALIDATION | no | note SET/CLEAR 判别错误 |
+| `CONFIRMATION_REQUIRED` | VALIDATION | no | 一次确认缺少 confirmed=true 或必要确认版本 |
 
 ### 5.5 Conflict / concurrency
 
@@ -109,6 +112,9 @@
 | `UNIQUE_ALREADY_EXISTS` | CONFLICT | no | 唯一业务事实已存在（如同日 intent） |
 | `STATE_PRECONDITION_FAILED` | CONFLICT | no | 状态机不允许该迁移 |
 | `SOURCE_CHANGED` | CONFLICT | no | 发布前源/grant revision 变化 |
+| `CHECKIN_ALREADY_EXISTS` | CONFLICT | no | submit 仅创建；已有不同签到必须走 correct + expected_revision |
+| `CONFIRMATION_MISMATCH` | CONFLICT | no | challenge 的 scope/target/version/revision 与 confirm 不一致 |
+| `CONFIRMATION_CHALLENGE_USED` | CONFLICT | no | 一次性 challenge 已使用，不可创建第二任务 |
 
 ### 5.6 Not found
 
@@ -135,7 +141,12 @@
 | --- | --- | --- | --- |
 | `DATA_TASK_NOT_CANCELLABLE` | GUARD | no | 任务阶段不可取消 |
 | `DATA_TASK_SCOPE_INVALID` | VALIDATION | no | 删除/导出范围非法 |
-| `DAY_REBUILD_FORBIDDEN` | GUARD | no | DAY 删除后同日重建禁止 |
+| `CONFIRMATION_CHALLENGE_EXPIRED` | GUARD | no | 两阶段确认 challenge 已过期，必须重新 prepare |
+| `DAY_REBUILD_NOT_CURRENT` | GUARD | no | target 不是当前权威产品日 |
+| `DAY_REBUILD_TASK_PENDING` | GUARD | yes | 原 DAY 删除任务尚未 SUCCEEDED；查询原任务 |
+| `DAY_REBUILD_TASK_FAILED` | GUARD | no | 原 DAY 删除任务 FAILED；必须先沿原 task ref 解决，不能重记 |
+| `DAY_REBUILD_GUARD_UNAVAILABLE` | GUARD | no | 最小删除 guard 不可验证，不能安全重记 |
+| `DAY_REBUILD_VERSION_UNAVAILABLE` | TERMINAL | no | 原 result_version/template 已不可安全执行，不回退 latest |
 | `EXPORT_NOT_READY` | TRANSIENT | yes | 导出未完成 |
 
 ### 5.9 Contract / terminal
@@ -195,7 +206,7 @@
 | S20-ERR08 | 窗口外更正签到 | `WRITE_WINDOW_CLOSED` |
 | S20-ERR09 | 生成中轮询 | `GENERATION_PENDING` 或 200 RUNNING |
 | S20-ERR10 | 超时后同 ref 恢复 | 不双写 |
-| S20-ERR11 | DAY 重建 | `DAY_REBUILD_FORBIDDEN` |
+| S20-ERR11 | DAY 删除后重记 | 满足条件则成功并复用版本；否则返回对应 `DAY_REBUILD_*` / 普通 guard code |
 | S20-ERR12 | 限流 | `RATE_LIMITED` + retry_after |
 | S20-ERR13 | 校验失败 | `VALIDATION_FAILED` + fields |
 | S20-ERR14 | DELETING 写 | `ACCOUNT_DELETING` |

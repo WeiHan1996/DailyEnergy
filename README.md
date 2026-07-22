@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-19 已 Accepted，S-20 Ready，尚未开始业务编码
+状态：S-19 已 Accepted，S-20 In Review，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、指标和工程规范
-当前任务：S-20 API 契约（Ready）
+当前任务：S-20 API 契约（In Review，PR #24）
 ```
 
 长期工作入口：

@@ -42,10 +42,10 @@
 
 - 产品日期服务端权威；同日唯一 intent/结果；
 - 规则出事实、AI 只表达；
-- Safety / Deleting 优先；high-risk ordinary call = 0；
+- Safety ACTIVE / RECOVERY_PENDING 最高优先；high-risk ordinary call = 0；
 - UUID 非授权；客户端不提交 epoch/seed/ciphertext；
 - 晚间 note 不进 Weekly/AI/memory/通知/分享；
-- 删除遵循 ADR-0005；DAY 删除后同日重建禁止。
+- 删除遵循 ADR-0005；DAY 删除成功后仅在当前 OPEN 窗口显式重记，并复用原 result_version。
 
 ## 5. 明确不做
 
@@ -73,7 +73,8 @@
 - PR #23 已合并，main `eac46d6`；S-19 Accepted；
 - 分支 `agent/api-contract-spec` 从 main 创建；
 - 新增 Draft api.md、error-codes.md、openapi/openapi.yaml；
-- 64 个唯一 S20 场景（48 API + 16 error）；OpenAPI 58 paths；
+- 审核发现并修复 DAY 同日重记、Safety-first、删除确认、签到 CAS 与 OpenAPI 可执行性问题；
+- 64 个唯一 S20 场景（48 API + 16 error）；OpenAPI 62 paths / 65 operations / 136 schemas，核心 DTO 与 View 全部封闭；
 - Draft PR [#24](https://github.com/WeiHan1996/DailyEnergy/pull/24) 已创建，**不会自动 merge**；
 - 无 NestJS/migration/生产代码；
 - **下一步**：用户审核 PR #24；确认前保持 Draft，不开始 S-21。

@@ -236,8 +236,8 @@ Phase 1 开始后逐步增加：
 5. tasks/current.md；
 6. docs/product/state-machine.md；
 7. docs/product/business-rules.md；
-8. docs/design/interaction-states.md；
-9. docs/design/screen-specs.md；
+8. docs/design/screen-specs.md；
+9. docs/design/interaction-states.md；
 10. docs/ai/daily-content-schema.md；
 11. docs/ai/evening-feedback-schema.md；
 12. docs/ai/weekly-summary-schema.md；
@@ -254,4 +254,3 @@ Phase 1 开始后逐步增加：
 23. openapi/openapi.yaml。
 
 S-20 只产出 Draft `docs/technical/api.md`、`docs/technical/error-codes.md` 与 `openapi/openapi.yaml`；在独立 PR 通过审核前，不创建 NestJS controller、migration、数据库、worker、生产代码、provider 调用或真实数据。
-
