@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **代码工作**：不开始 NestJS controller、migration、数据库、worker 或生产实现；只允许 Draft API / 错误码 / OpenAPI 契约
 - **当前分支**：`agent/api-contract-spec`
-- **关联 PR**：待创建
+- **关联 PR**：[Draft PR #24](https://github.com/WeiHan1996/DailyEnergy/pull/24)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
@@ -73,8 +73,10 @@
 - PR #23 已合并，main `eac46d6`；S-19 Accepted；
 - 分支 `agent/api-contract-spec` 从 main 创建；
 - 新增 Draft api.md、error-codes.md、openapi/openapi.yaml；
+- 64 个唯一 S20 场景（48 API + 16 error）；OpenAPI 58 paths；
+- Draft PR [#24](https://github.com/WeiHan1996/DailyEnergy/pull/24) 已创建，**不会自动 merge**；
 - 无 NestJS/migration/生产代码；
-- **不自动 merge**；等待用户审核 Draft PR。
+- **下一步**：用户审核 PR #24；确认前保持 Draft，不开始 S-21。
 
 ## 9. 状态更新规则
 
