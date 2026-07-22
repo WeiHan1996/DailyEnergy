@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **代码工作**：不开始正式业务代码；只允许 Prompt 规范、封闭输入伪结构、规范指令、语义目录和验收矩阵
 - **当前分支**：`agent/prompt-spec`
-- **关联 PR**：待创建
+- **关联 PR**：[#16](https://github.com/WeiHan1996/DailyEnergy/pull/16)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
@@ -165,9 +165,11 @@ S-13 被接受后，下一任务为：
 - S-13 分支 `agent/prompt-spec` 从合并后的 main 创建；
 - 新增 Draft `docs/ai/prompt-spec.md`，固定 Daily/Weekly Prompt、prepared input、规范指令、语义目录、exact refs、版本和回归；
 - Prompt 规范包含 52 个唯一场景：10 Common、24 Daily、18 Weekly；
-- 当前分支只计划修改 6 个文档文件，不含生产业务代码；
+- 当前分支仅修改 6 个文档文件，不含生产业务代码；
 - 当前没有阻塞项；
-- 下一操作：创建 Draft PR，完成远端范围、链接、Markdown、状态和内容复核；用户确认前不合并、不开始 S-14。
+- Draft PR [#16](https://github.com/WeiHan1996/DailyEnergy/pull/16) 已创建，等待用户审核；
+- 远端范围为 6 个目标文档；52 个场景、30 个引用/21 个唯一链接、Markdown fence、状态和内容回读均通过；
+- 下一操作：用户审核 PR #16 并决定是否接受 S-13；确认前不合并、不开始 S-14。
 
 ## 12. 状态更新规则
 
