@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **代码工作**：不开始 NestJS controller、migration、数据库、worker 或生产实现；只允许 Draft API / 错误码 / OpenAPI 契约
 - **当前分支**：`agent/s19-accept-handoff`（本 PR 仅 S-19 Accepted 收尾；S-20 在合并后新分支开始）
-- **关联 PR**：本 Accepted 收尾 PR（待创建）；S-19 内容已在 [#22](https://github.com/WeiHan1996/DailyEnergy/pull/22) 合并
+- **关联 PR**：[Accepted 收尾 PR #23](https://github.com/WeiHan1996/DailyEnergy/pull/23)；S-19 内容已在 [#22](https://github.com/WeiHan1996/DailyEnergy/pull/22) 合并
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
 
@@ -84,7 +84,8 @@
 - PR #22 已合并，main 含 Draft 版 database/Prisma 内容；
 - 本分支 `agent/s19-accept-handoff` 仅状态与控制文件收尾；
 - S-19 内容不重开设计；
-- **下一步**：用户审核并合并本 Accepted 收尾 PR；确认前不开始 S-20 文档正文，且不 merge。
+- Draft/Open PR [#23](https://github.com/WeiHan1996/DailyEnergy/pull/23) 已创建，**不会自动 merge**；
+- **下一步**：用户审核并合并 PR #23；合并前不开始 S-20 文档正文。
 
 ## 8. 状态更新规则
 
