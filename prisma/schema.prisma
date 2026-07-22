@@ -1,4 +1,5 @@
-// DailyEnergy S-19 Prisma draft.
+// DailyEnergy S-19 Prisma structure draft — Accepted 2026-07-22 with
+// docs/technical/database.md (PR #22 merged; acceptance handoff follows).
 //
 // Target syntax: Prisma ORM 7 with PostgreSQL. Connection configuration belongs
 // in prisma.config.ts and is intentionally not created in this specification PR.
