@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：Phase 0A 产品基线已完成，尚未开始业务编码
+状态：S-19 已 Accepted，S-20 Ready，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、指标和工程规范
-当前任务：S-02 信息架构与页面地图
+当前任务：S-20 API 契约（Ready）
 ```
 
 长期工作入口：
@@ -359,12 +359,13 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 4. [tasks/backlog.md](./tasks/backlog.md)：有序候选任务；
 5. [AGENTS.md](./AGENTS.md)：AI 与开发协作规则。
 
-当前任务只完成：
+当前任务范围：
 
-- `docs/design/information-architecture.md`；
-- `docs/design/screen-inventory.md`。
+- Draft `docs/technical/api.md`；
+- Draft `docs/technical/error-codes.md`；
+- OpenAPI 或等价可执行契约草案。
 
-完成并接受 S-02 后，才进入 S-03 交互状态与页面规格。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+S-20 不创建 NestJS controller、migration、数据库、worker 或生产代码。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 
