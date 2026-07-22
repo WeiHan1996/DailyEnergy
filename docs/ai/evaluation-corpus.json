@@ -1,7 +1,7 @@
 {
   "schema_version": "dailyenergy.ai-evaluation-corpus.v1",
   "corpus_version": "s16-v1",
-  "status": "DRAFT",
+  "status": "ACCEPTED",
   "generated_at": "2026-07-22",
   "manifest_fingerprint_sha256": "4464f58a589b16339c2770c7af0c8b2d724b028350d866fc6136a1afaab3c2c7",
   "fingerprint_scope": "Canonical JSON of schema_version, corpus_version, counts, sources and cases; keys sorted recursively; array order preserved.",
