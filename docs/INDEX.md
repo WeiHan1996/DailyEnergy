@@ -143,9 +143,9 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/data/domain-model.md](./data/domain-model.md) | Accepted | 领域上下文、聚合、实体、关系、唯一性、修订与失效 | state-machine、schemas、memory、safety、evaluation |
 | [docs/technical/database.md](./technical/database.md) | Accepted | PostgreSQL 表、索引、约束、事务、迁移和删除规格 | domain-model、ADR-0005 |
 | [prisma/schema.prisma](../prisma/schema.prisma) | Accepted | Prisma ORM 7 / PostgreSQL 可执行结构草案 | database spec |
-| [docs/technical/api.md](./technical/api.md) | Draft | 小程序、后端和后台接口契约 | domain、schemas、database |
-| [docs/technical/error-codes.md](./technical/error-codes.md) | Draft | 错误、恢复和降级语义 | API、interaction-states |
-| [openapi/openapi.yaml](../openapi/openapi.yaml) | Draft | OpenAPI 3 可执行路径草案 | api.md |
+| [docs/technical/api.md](./technical/api.md) | Accepted | 小程序、后端和后台接口契约 | domain、schemas、database |
+| [docs/technical/error-codes.md](./technical/error-codes.md) | Accepted | 错误、恢复和降级语义 | API、interaction-states |
+| [openapi/openapi.yaml](../openapi/openapi.yaml) | Accepted | OpenAPI 3 可执行路径草案 | api.md |
 
 ### 7.5 数据分析、隐私与运营
 
@@ -227,30 +227,38 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-当前唯一 In Review 任务是 S-20 API 契约。执行与审核该任务时依次读取：
+S-20 API 契约已由用户确认并合并，三份契约进入 Accepted。下一唯一 Ready 任务是 S-21 隐私数据地图。开始 S-21 时依次读取：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. docs/INDEX.md；
 5. tasks/current.md；
-6. docs/product/state-machine.md；
-7. docs/product/business-rules.md；
-8. docs/design/screen-specs.md；
-9. docs/design/interaction-states.md；
-10. docs/ai/daily-content-schema.md；
-11. docs/ai/evening-feedback-schema.md；
-12. docs/ai/weekly-summary-schema.md；
-13. packages/shared-schemas/README.md；
-14. docs/data/domain-model.md；
-15. docs/decisions/ADR-0005-data-retention-and-deletion.md；
-16. docs/technical/database.md；
-17. prisma/schema.prisma；
-18. docs/ai/gateway.md；
-19. docs/ai/safety.md；
-20. docs/ai/memory.md；
-21. docs/technical/api.md；
-22. docs/technical/error-codes.md；
-23. openapi/openapi.yaml。
+6. docs/product/vision.md；
+7. docs/product/persona.md；
+8. docs/product/journey.md；
+9. docs/product/mvp.md；
+10. docs/product/state-machine.md；
+11. docs/product/business-rules.md；
+12. docs/design/screen-specs.md；
+13. docs/design/interaction-states.md；
+14. docs/ai/daily-content-schema.md；
+15. docs/ai/evening-feedback-schema.md；
+16. docs/ai/weekly-summary-schema.md；
+17. packages/shared-schemas/README.md；
+18. docs/decisions/ADR-0003-ai-provider-abstraction.md；
+19. docs/ai/gateway.md；
+20. docs/decisions/ADR-0004-structured-memory.md；
+21. docs/ai/memory.md；
+22. docs/ai/safety.md；
+23. docs/ai/evaluation.md；
+24. docs/data/domain-model.md；
+25. docs/decisions/ADR-0005-data-retention-and-deletion.md；
+26. docs/technical/database.md；
+27. prisma/schema.prisma；
+28. docs/technical/api.md；
+29. docs/technical/error-codes.md；
+30. openapi/openapi.yaml。
 
-S-20 只产出 Draft `docs/technical/api.md`、`docs/technical/error-codes.md` 与 `openapi/openapi.yaml`；在独立 PR 通过审核前，不创建 NestJS controller、migration、数据库、worker、生产代码、provider 调用或真实数据。
+S-21 只产出 Draft `docs/operations/privacy-data-map.md` 并同步项目控制文件；不创建或修改数据库、migration、NestJS、埋点 Schema、同意页面、用户协议、供应商配置、真实处理活动或生产代码。
+
