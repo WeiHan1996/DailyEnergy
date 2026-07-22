@@ -1,0 +1,5782 @@
+openapi: 3.0.3
+info:
+  title: DailyEnergy API
+  description: Executable Draft contract for S-20. docs/technical/api.md and error-codes.md define semantics; x-source-contract
+    points to accepted Zod authorities.
+  version: api-contract-v1
+  contact:
+    name: DailyEnergy
+  license:
+    name: Proprietary - internal project
+    url: https://github.com/WeiHan1996/DailyEnergy
+servers:
+- url: https://api.dailyenergy.example/v1
+  description: Placeholder; deployment selects the real host.
+tags:
+- name: Auth
+  description: Auth operations
+- name: Bootstrap
+  description: Bootstrap operations
+- name: Consent
+  description: Consent operations
+- name: Profile
+  description: Profile operations
+- name: Daily
+  description: Daily operations
+- name: Evening
+  description: Evening operations
+- name: Weekly
+  description: Weekly operations
+- name: History
+  description: History operations
+- name: Matters
+  description: Matters operations
+- name: Memory
+  description: Memory operations
+- name: Notifications
+  description: Notifications operations
+- name: Share
+  description: Share operations
+- name: Safety
+  description: Safety operations
+- name: DataRights
+  description: DataRights operations
+- name: Support
+  description: Support operations
+- name: Admin
+  description: Admin operations
+paths:
+  /auth/wechat/session:
+    post:
+      tags:
+      - Auth
+      operationId: createWechatSession
+      summary: Exchange wx.login code for a server session
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessSession'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WechatSessionRequest'
+  /auth/session/refresh:
+    post:
+      tags:
+      - Auth
+      operationId: refreshSession
+      summary: Refresh the current user session
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessSession'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /auth/session/logout:
+    post:
+      tags:
+      - Auth
+      operationId: logoutSession
+      summary: Revoke the current user session
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+  /auth/reauth/verify:
+    post:
+      tags:
+      - Auth
+      operationId: verifyDeletionIdentity
+      summary: Reverify identity for one deletion challenge
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessIdentityVerification'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReauthVerifyRequest'
+  /bootstrap/launch:
+    get:
+      tags:
+      - Bootstrap
+      operationId: getLaunchState
+      summary: Resolve the unique launch route with Safety-first priority
+      security:
+      - userBearerAuth: []
+      - safetyContinuationAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessLaunch'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /consent/current:
+    get:
+      tags:
+      - Consent
+      operationId: getCurrentConsent
+      summary: Read current required-consent state
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessConsent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /consent/accept:
+    post:
+      tags:
+      - Consent
+      operationId: acceptConsent
+      summary: Accept a required notice version
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentAcceptRequest'
+  /consent/withdraw:
+    post:
+      tags:
+      - Consent
+      operationId: withdrawConsent
+      summary: Withdraw required consent
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentWithdrawRequest'
+  /profile:
+    get:
+      tags:
+      - Profile
+      operationId: getProfile
+      summary: Read the client profile view
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /onboarding/complete:
+    post:
+      tags:
+      - Profile
+      operationId: completeOnboarding
+      summary: Complete first acquaintance
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnboardingCompleteRequest'
+  /profile/update:
+    post:
+      tags:
+      - Profile
+      operationId: updateProfile
+      summary: Update preferred name or expression style with CAS
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+  /profile/style-calibration:
+    post:
+      tags:
+      - Profile
+      operationId: submitStyleCalibration
+      summary: Record controlled style calibration
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StyleCalibrationRequest'
+  /daily/today/checkin:
+    get:
+      tags:
+      - Daily
+      operationId: getTodayCheckin
+      summary: Read today's check-in view
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCheckin'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /daily/checkin/submit:
+    post:
+      tags:
+      - Daily
+      operationId: submitCheckin
+      summary: Create today's check-in only
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCheckin'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckinSubmitRequest'
+  /daily/checkin/correct:
+    post:
+      tags:
+      - Daily
+      operationId: correctCheckin
+      summary: Correct today's check-in using CAS
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCheckin'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckinCorrectRequest'
+  /daily/checkin/rebuild:
+    post:
+      tags:
+      - Daily
+      operationId: rebuildCheckinAfterErasure
+      summary: Explicitly re-record today after successful DAY deletion
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCheckin'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckinRebuildRequest'
+  /daily/generation/start:
+    post:
+      tags:
+      - Daily
+      operationId: startGeneration
+      summary: Start or resume the unique generation intent
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessGenerationIntent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerationStartRequest'
+  /daily/generation/{intent_ref}:
+    get:
+      tags:
+      - Daily
+      operationId: getGenerationIntent
+      summary: Read generation intent state
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IntentRef'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessGenerationIntent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /daily/today:
+    get:
+      tags:
+      - Daily
+      operationId: getTodayView
+      summary: Read today's whitelist content and interaction view
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessToday'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /daily/by-date/{product_date}:
+    get:
+      tags:
+      - Daily
+      operationId: getDailyByDate
+      summary: Read a historical whitelist day view
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/ProductDatePath'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessHistoryDay'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /daily/interaction:
+    get:
+      tags:
+      - Daily
+      operationId: getDailyInteraction
+      summary: Read today's interaction view
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessInteraction'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /daily/interaction/light:
+    post:
+      tags:
+      - Daily
+      operationId: lightDay
+      summary: Light today idempotently
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessInteraction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LightDayRequest'
+  /daily/interaction/task:
+    post:
+      tags:
+      - Daily
+      operationId: updateTaskState
+      summary: Update daily task state with CAS
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessInteraction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskStateUpdateRequest'
+  /daily/interaction/helpfulness:
+    post:
+      tags:
+      - Daily
+      operationId: updateHelpfulness
+      summary: Update content helpfulness with CAS
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessInteraction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HelpfulnessUpdateRequest'
+  /evening/today:
+    get:
+      tags:
+      - Evening
+      operationId: getEveningToday
+      summary: Read today's evening feedback view
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessEvening'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /evening/save:
+    post:
+      tags:
+      - Evening
+      operationId: saveEveningCoordinated
+      summary: Atomically save feedback, helpfulness, and optional task patch
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessEvening'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EveningSaveRequest'
+  /evening/skip:
+    post:
+      tags:
+      - Evening
+      operationId: skipEvening
+      summary: Record an explicit non-punitive skip intent
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EveningSkipRequest'
+  /weekly/current:
+    get:
+      tags:
+      - Weekly
+      operationId: getWeeklyCurrent
+      summary: Read the current seven-day whitelist view
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessWeekly'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /weekly/window/{end_date}:
+    get:
+      tags:
+      - Weekly
+      operationId: getWeeklyWindow
+      summary: Read a seven-day window ending on the requested product date
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/EndDatePath'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessWeekly'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /history/days:
+    get:
+      tags:
+      - History
+      operationId: listHistoryDays
+      summary: List paged history day summaries
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessHistoryList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /history/days/{product_date}:
+    get:
+      tags:
+      - History
+      operationId: getHistoryDay
+      summary: Read one historical day
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/ProductDatePath'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessHistoryDay'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /matters:
+    get:
+      tags:
+      - Matters
+      operationId: listMatters
+      summary: List user-managed important matters
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessMatterList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    post:
+      tags:
+      - Matters
+      operationId: createMatter
+      summary: Create an important matter
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessMatter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatterCreateRequest'
+  /matters/{matter_ref}:
+    patch:
+      tags:
+      - Matters
+      operationId: updateMatter
+      summary: Update an important matter with CAS
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/MatterRef'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessMatter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatterUpdateRequest'
+  /matters/{matter_ref}/pause:
+    post:
+      tags:
+      - Matters
+      operationId: pauseMatter
+      summary: Pause an important matter
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/MatterRef'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessMatter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatterTransitionRequest'
+  /matters/{matter_ref}/resume:
+    post:
+      tags:
+      - Matters
+      operationId: resumeMatter
+      summary: Resume an important matter
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/MatterRef'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessMatter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatterTransitionRequest'
+  /matters/{matter_ref}/complete:
+    post:
+      tags:
+      - Matters
+      operationId: completeMatter
+      summary: Complete an important matter
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/MatterRef'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessMatter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatterTransitionRequest'
+  /matters/{matter_ref}/delete:
+    post:
+      tags:
+      - Matters
+      operationId: deleteMatter
+      summary: Start the explicit matter deletion flow
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/MatterRef'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessDataTask'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatterDeleteRequest'
+  /memory/preferences:
+    get:
+      tags:
+      - Memory
+      operationId: getMemoryPreferences
+      summary: Read memory-purpose preferences
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessMemoryPreferences'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    post:
+      tags:
+      - Memory
+      operationId: updateMemoryPreferences
+      summary: Update memory-purpose preferences with CAS
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessMemoryPreferences'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemoryPreferencesUpdateRequest'
+  /notifications/settings:
+    get:
+      tags:
+      - Notifications
+      operationId: getNotificationSettings
+      summary: Read reminder preferences and observed permission
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessNotificationSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    post:
+      tags:
+      - Notifications
+      operationId: updateNotificationSettings
+      summary: Update reminder preferences with CAS
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessNotificationSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSettingsUpdateRequest'
+  /notifications/permission-sync:
+    post:
+      tags:
+      - Notifications
+      operationId: syncNotificationPermission
+      summary: Record the observed WeChat subscription permission
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessNotificationSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationPermissionSyncRequest'
+  /share/preview:
+    post:
+      tags:
+      - Share
+      operationId: createSharePreview
+      summary: Create a short-lived privacy-safe share preview
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessSharePreview'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SharePreviewRequest'
+  /share/intent:
+    post:
+      tags:
+      - Share
+      operationId: recordShareIntent
+      summary: Record a user share intent without claiming delivery
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShareIntentRequest'
+  /safety/current:
+    get:
+      tags:
+      - Safety
+      operationId: getSafetyCurrent
+      summary: Read the fixed Safety overlay view
+      security:
+      - userBearerAuth: []
+      - safetyContinuationAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessSafety'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /safety/recovery/start:
+    post:
+      tags:
+      - Safety
+      operationId: startSafetyRecovery
+      summary: Record recovery intent step one
+      security:
+      - userBearerAuth: []
+      - safetyContinuationAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessSafety'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SafetyRecoveryStartRequest'
+  /safety/recovery/confirm:
+    post:
+      tags:
+      - Safety
+      operationId: confirmSafetyRecovery
+      summary: Confirm recovery intent step two
+      security:
+      - userBearerAuth: []
+      - safetyContinuationAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessSafety'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SafetyRecoveryConfirmRequest'
+  /data-rights/tasks:
+    get:
+      tags:
+      - DataRights
+      operationId: listDataTasks
+      summary: List user data-rights tasks
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessDataTaskList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /data-rights/tasks/{task_ref}:
+    get:
+      tags:
+      - DataRights
+      operationId: getDataTask
+      summary: Read one data-rights task
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/TaskRef'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessDataTask'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /data-rights/export:
+    post:
+      tags:
+      - DataRights
+      operationId: createExportTask
+      summary: Create a data export task
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '202':
+          $ref: '#/components/responses/SuccessDataTask'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRequest'
+  /data-rights/delete/day:
+    post:
+      tags:
+      - DataRights
+      operationId: deleteDay
+      summary: Confirm and create one DAY deletion task
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '202':
+          $ref: '#/components/responses/SuccessDataTask'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteDayRequest'
+  /data-rights/delete/matter:
+    post:
+      tags:
+      - DataRights
+      operationId: deleteMatterScope
+      summary: Confirm and create one MATTER deletion task
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '202':
+          $ref: '#/components/responses/SuccessDataTask'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteMatterRequest'
+  /data-rights/delete/relationship/prepare:
+    post:
+      tags:
+      - DataRights
+      operationId: prepareRelationshipDeletion
+      summary: Prepare relationship-data deletion and freeze its exact scope
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessDeletionConfirmation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRelationshipPrepareRequest'
+  /data-rights/delete/relationship/confirm:
+    post:
+      tags:
+      - DataRights
+      operationId: confirmRelationshipDeletion
+      summary: Confirm the prepared relationship-data deletion
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '202':
+          $ref: '#/components/responses/SuccessDataTask'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRelationshipConfirmRequest'
+  /data-rights/delete/account/prepare:
+    post:
+      tags:
+      - DataRights
+      operationId: prepareAccountDeletion
+      summary: Prepare account deletion and freeze its exact impact
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessDeletionConfirmation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteAccountPrepareRequest'
+  /data-rights/delete/account/confirm:
+    post:
+      tags:
+      - DataRights
+      operationId: confirmAccountDeletion
+      summary: Confirm account deletion after required identity reverification
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '202':
+          $ref: '#/components/responses/SuccessDataTask'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteAccountConfirmRequest'
+  /data-rights/tasks/{task_ref}/cancel:
+    post:
+      tags:
+      - DataRights
+      operationId: cancelDataTask
+      summary: Cancel a task only while its domain stage permits
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/TaskRef'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessDataTask'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataTaskCancelRequest'
+  /support/faq:
+    get:
+      tags:
+      - Support
+      operationId: getFaq
+      summary: Read versioned FAQ entries
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessFaq'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /support/feedback:
+    post:
+      tags:
+      - Support
+      operationId: submitFeedback
+      summary: Submit categorized product feedback
+      security:
+      - userBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCommand'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportFeedbackRequest'
+  /admin/auth/login:
+    post:
+      tags:
+      - Admin
+      operationId: adminLogin
+      summary: Establish an independent admin session
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessAdminSession'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLoginRequest'
+  /admin/ops/overview:
+    get:
+      tags:
+      - Admin
+      operationId: adminOpsOverview
+      summary: Read aggregated operational health
+      security:
+      - adminBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessAdminOps'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /admin/safety/events:
+    get:
+      tags:
+      - Admin
+      operationId: adminListSafetyEvents
+      summary: List redacted Safety event summaries
+      security:
+      - adminBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessAdminSafetyEvents'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /admin/data-rights/tasks:
+    get:
+      tags:
+      - Admin
+      operationId: adminListDataTasks
+      summary: List redacted data-rights task summaries
+      security:
+      - adminBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessDataTaskList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /admin/data-rights/tasks/{task_ref}/advance:
+    post:
+      tags:
+      - Admin
+      operationId: adminAdvanceDataTask
+      summary: Advance one task checkpoint with an audited admin command
+      security:
+      - adminBearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/RequestIdHeader'
+      - $ref: '#/components/parameters/AcceptLanguageHeader'
+      - $ref: '#/components/parameters/TaskRef'
+      - $ref: '#/components/parameters/IdempotencyKeyHeader'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessDataTask'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminAdvanceDataTaskRequest'
+components:
+  securitySchemes:
+    userBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: user_session_token
+      description: Ordinary miniapp session; never accepted as an admin session.
+    adminBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: admin_session_token
+      description: Independent admin identity and MFA session.
+    safetyContinuationAuth:
+      type: apiKey
+      in: header
+      name: X-Safety-Continuation
+      description: Opaque, short-lived Safety-only continuation. Grants no ordinary account access.
+  parameters:
+    RequestIdHeader:
+      name: X-Request-Id
+      in: header
+      required: false
+      schema:
+        $ref: '#/components/schemas/RequestId'
+      description: Optional client correlation id; server always returns the canonical id.
+    AcceptLanguageHeader:
+      name: Accept-Language
+      in: header
+      required: false
+      schema:
+        type: string
+        default: zh-CN
+        enum:
+        - zh-CN
+    IdempotencyKeyHeader:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        $ref: '#/components/schemas/CommandRef'
+      description: Must exactly equal body command_ref.
+    IntentRef:
+      name: intent_ref
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/OpaqueRef'
+    ProductDatePath:
+      name: product_date
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/ProductDate'
+    EndDatePath:
+      name: end_date
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/ProductDate'
+    MatterRef:
+      name: matter_ref
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/OpaqueRef'
+    TaskRef:
+      name: task_ref
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/OpaqueRef'
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 512
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
+  headers:
+    RequestIdResponseHeader:
+      description: Canonical request correlation id; equals body request_id.
+      schema:
+        $ref: '#/components/schemas/RequestId'
+    RetryAfterResponseHeader:
+      description: Delay in seconds before retry; equals error.details.retry_after_seconds when present.
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 86400
+  schemas:
+    OpaqueRef:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: ^[^\s\x00-\x1F\x7F]+$
+    CommandRef:
+      type: string
+      minLength: 8
+      maxLength: 128
+      pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$
+    RequestId:
+      type: string
+      minLength: 8
+      maxLength: 128
+    ProductDate:
+      type: string
+      format: date
+    VersionToken:
+      type: string
+      minLength: 1
+      maxLength: 64
+      pattern: ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$
+    Semver:
+      type: string
+      pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$
+    Revision:
+      type: integer
+      minimum: 0
+    PositiveRevision:
+      type: integer
+      minimum: 1
+    ClientContext:
+      type: object
+      properties:
+        app_version:
+          type: string
+          minLength: 1
+          maxLength: 64
+        scene:
+          type: string
+          minLength: 1
+          maxLength: 64
+      additionalProperties: false
+    ExpressionStyle:
+      type: string
+      enum:
+      - BALANCED
+      - GENTLE
+      - LIGHT_HUMOR
+      - CLEAR_DIRECT
+    Mood:
+      type: string
+      enum:
+      - VERY_LOW
+      - LOW
+      - STEADY
+      - GOOD
+      - LIGHT
+      - UNSURE
+    Energy:
+      type: string
+      enum:
+      - EMPTY
+      - LOW
+      - STEADY
+      - HIGH
+      - FULL
+      - UNSURE
+    Sleep:
+      type: string
+      enum:
+      - POOR
+      - LOW
+      - OKAY
+      - GOOD
+      - UNSURE
+    OverallFeeling:
+      type: string
+      enum:
+      - VERY_HEAVY
+      - SOMEWHAT_HEAVY
+      - STEADY
+      - PRETTY_GOOD
+      - LIGHT
+      - UNSURE
+    HelpfulnessRating:
+      type: string
+      enum:
+      - HELPFUL
+      - NEUTRAL
+      - NOT_HELPFUL
+      - NOT_USED
+    HelpfulnessState:
+      type: string
+      enum:
+      - UNRATED
+      - HELPFUL
+      - NEUTRAL
+      - NOT_HELPFUL
+      - NOT_USED
+    TaskStatus:
+      type: string
+      enum:
+      - UNMARKED
+      - INTERESTED
+      - COMPLETED
+      - SKIPPED
+    WriteWindow:
+      type: string
+      enum:
+      - OPEN
+      - CONTINUATION_ONLY
+      - CLOSED
+    WechatSessionRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 256
+        channel:
+          type: string
+          minLength: 1
+          maxLength: 64
+      additionalProperties: false
+      required:
+      - code
+    LogoutRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+      additionalProperties: false
+      required:
+      - command_ref
+    ReauthVerifyRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        confirmation_challenge_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        wechat_code:
+          type: string
+          minLength: 1
+          maxLength: 256
+      additionalProperties: false
+      required:
+      - command_ref
+      - confirmation_challenge_ref
+      - wechat_code
+    ConsentAcceptRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        notice_version:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - command_ref
+      - notice_version
+    ConsentWithdrawRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        notice_version:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - command_ref
+      - notice_version
+    OnboardingCompleteRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        preferred_name:
+          type: string
+          minLength: 1
+          maxLength: 24
+        expression_style:
+          $ref: '#/components/schemas/ExpressionStyle'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expression_style
+    ProfileUpdateRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        preferred_name:
+          type: string
+          minLength: 1
+          maxLength: 24
+        clear_preferred_name:
+          type: boolean
+        expression_style:
+          $ref: '#/components/schemas/ExpressionStyle'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+    StyleCalibrationRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        expression_style:
+          $ref: '#/components/schemas/ExpressionStyle'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+      - expression_style
+    CheckinSubmitRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          type: integer
+          enum:
+          - 0
+        mood:
+          $ref: '#/components/schemas/Mood'
+        energy:
+          $ref: '#/components/schemas/Energy'
+        sleep:
+          $ref: '#/components/schemas/Sleep'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+      - mood
+      - energy
+      - sleep
+    CheckinCorrectRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        mood:
+          $ref: '#/components/schemas/Mood'
+        energy:
+          $ref: '#/components/schemas/Energy'
+        sleep:
+          $ref: '#/components/schemas/Sleep'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+      - mood
+      - energy
+      - sleep
+    CheckinRebuildRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          type: integer
+          enum:
+          - 0
+        deletion_task_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        confirmation_version:
+          $ref: '#/components/schemas/VersionToken'
+        confirmed:
+          type: boolean
+          enum:
+          - true
+        mood:
+          $ref: '#/components/schemas/Mood'
+        energy:
+          $ref: '#/components/schemas/Energy'
+        sleep:
+          $ref: '#/components/schemas/Sleep'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+      - deletion_task_ref
+      - confirmation_version
+      - confirmed
+      - mood
+      - energy
+      - sleep
+    GenerationStartRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_checkin_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_checkin_revision
+    LightDayRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        result_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+      additionalProperties: false
+      required:
+      - command_ref
+      - result_ref
+    TaskStateUpdateRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        task_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+      additionalProperties: false
+      required:
+      - command_ref
+      - task_ref
+      - expected_revision
+      - status
+    HelpfulnessUpdateRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          $ref: '#/components/schemas/Revision'
+        rating:
+          $ref: '#/components/schemas/HelpfulnessRating'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+      - rating
+    NotePatch:
+      oneOf:
+      - type: object
+        properties:
+          operation:
+            type: string
+            enum:
+            - SET
+          value:
+            type: string
+            minLength: 1
+            maxLength: 80
+        additionalProperties: false
+        required:
+        - operation
+        - value
+      - type: object
+        properties:
+          operation:
+            type: string
+            enum:
+            - CLEAR
+        additionalProperties: false
+        required:
+        - operation
+    EveningTaskPatch:
+      type: object
+      properties:
+        task_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+      additionalProperties: false
+      required:
+      - task_ref
+      - expected_revision
+      - status
+    EveningSaveRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        expected_feedback_revision:
+          $ref: '#/components/schemas/Revision'
+        expected_helpfulness_revision:
+          $ref: '#/components/schemas/Revision'
+        overall_feeling:
+          $ref: '#/components/schemas/OverallFeeling'
+        helpfulness_rating:
+          $ref: '#/components/schemas/HelpfulnessRating'
+        task_patch:
+          $ref: '#/components/schemas/EveningTaskPatch'
+        note_patch:
+          $ref: '#/components/schemas/NotePatch'
+        client_context:
+          type: object
+          properties:
+            app_version:
+              type: string
+              minLength: 1
+              maxLength: 64
+            entry_source:
+              $ref: '#/components/schemas/VersionToken'
+            view_schema_version:
+              $ref: '#/components/schemas/Semver'
+          additionalProperties: false
+          required:
+          - entry_source
+          - view_schema_version
+      additionalProperties: false
+      required:
+      - command_ref
+      - product_date
+      - expected_feedback_revision
+      - expected_helpfulness_revision
+      - overall_feeling
+      - helpfulness_rating
+      - client_context
+      x-source-contract: EveningReflectionSubmissionSchema
+    EveningSkipRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+      additionalProperties: false
+      required:
+      - command_ref
+      - product_date
+    MatterCreateRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 80
+        target_date:
+          $ref: '#/components/schemas/ProductDate'
+        daily_use_granted:
+          type: boolean
+        weekly_use_granted:
+          type: boolean
+      additionalProperties: false
+      required:
+      - command_ref
+      - title
+      - daily_use_granted
+      - weekly_use_granted
+    MatterUpdateRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 80
+        target_date:
+          $ref: '#/components/schemas/ProductDate'
+        clear_target_date:
+          type: boolean
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+    MatterTransitionRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+    MatterDeleteRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        confirmation_version:
+          $ref: '#/components/schemas/VersionToken'
+        confirmed:
+          type: boolean
+          enum:
+          - true
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+      - confirmation_version
+      - confirmed
+    MemoryPreferencesUpdateRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        master_enabled:
+          type: boolean
+        daily_use_enabled:
+          type: boolean
+        weekly_use_enabled:
+          type: boolean
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+      - master_enabled
+      - daily_use_enabled
+      - weekly_use_enabled
+    NotificationSettingsUpdateRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        morning_enabled:
+          type: boolean
+        evening_enabled:
+          type: boolean
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_revision
+      - morning_enabled
+      - evening_enabled
+    NotificationPermissionSyncRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        observed_permission:
+          type: string
+          enum:
+          - UNKNOWN
+          - GRANTED
+          - DENIED
+          - REVOKED
+        observed_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - command_ref
+      - observed_permission
+      - observed_at
+    SharePreviewRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        kind:
+          type: string
+          enum:
+          - TODAY
+          - WEEKLY
+        source_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        template_version:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - command_ref
+      - kind
+      - source_ref
+      - template_version
+    ShareIntentRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        preview_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+      additionalProperties: false
+      required:
+      - command_ref
+      - preview_ref
+    SafetyRecoveryStartRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_safety_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        recovery_action_version:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_safety_revision
+      - recovery_action_version
+    SafetyRecoveryConfirmRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_safety_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        recovery_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        recovery_action_version:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_safety_revision
+      - recovery_ref
+      - recovery_action_version
+    ExportRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        export_format:
+          type: string
+          enum:
+          - JSON
+        confirmation_version:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - command_ref
+      - export_format
+      - confirmation_version
+    DeleteDayRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        scope:
+          type: string
+          enum:
+          - DAY
+        target:
+          type: object
+          properties:
+            product_date:
+              $ref: '#/components/schemas/ProductDate'
+          additionalProperties: false
+          required:
+          - product_date
+        confirmation_version:
+          $ref: '#/components/schemas/VersionToken'
+        confirmed:
+          type: boolean
+          enum:
+          - true
+        expected_revision:
+          $ref: '#/components/schemas/Revision'
+      additionalProperties: false
+      required:
+      - command_ref
+      - scope
+      - target
+      - confirmation_version
+      - confirmed
+      - expected_revision
+    DeleteMatterRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        scope:
+          type: string
+          enum:
+          - MATTER
+        target:
+          type: object
+          properties:
+            matter_ref:
+              $ref: '#/components/schemas/OpaqueRef'
+          additionalProperties: false
+          required:
+          - matter_ref
+        confirmation_version:
+          $ref: '#/components/schemas/VersionToken'
+        confirmed:
+          type: boolean
+          enum:
+          - true
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+      additionalProperties: false
+      required:
+      - command_ref
+      - scope
+      - target
+      - confirmation_version
+      - confirmed
+      - expected_revision
+    DayExpectedRevision:
+      type: object
+      properties:
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        expected_revision:
+          $ref: '#/components/schemas/Revision'
+      additionalProperties: false
+      required:
+      - product_date
+      - expected_revision
+    DeleteRelationshipPrepareRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        scope:
+          type: string
+          enum:
+          - RELATIONSHIP_DATA
+        target:
+          type: object
+          properties:
+            relationship_scope:
+              type: string
+              enum:
+              - CURRENT_CYCLE_AND_HISTORY
+            included_day_product_dates:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductDate'
+              maxItems: 45
+              uniqueItems: true
+          additionalProperties: false
+          required:
+          - relationship_scope
+          - included_day_product_dates
+        expected_relationship_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        included_day_expected_revisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayExpectedRevision'
+          maxItems: 45
+        confirmation_version:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - command_ref
+      - scope
+      - target
+      - expected_relationship_revision
+      - included_day_expected_revisions
+      - confirmation_version
+    DeleteRelationshipConfirmRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        confirmation_challenge_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        scope:
+          type: string
+          enum:
+          - RELATIONSHIP_DATA
+        target:
+          $ref: '#/components/schemas/RelationshipDeletionTarget'
+        expected_relationship_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        included_day_expected_revisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayExpectedRevision'
+          maxItems: 45
+        confirmation_version:
+          $ref: '#/components/schemas/VersionToken'
+        confirmed:
+          type: boolean
+          enum:
+          - true
+        identity_verification_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+      additionalProperties: false
+      required:
+      - command_ref
+      - confirmation_challenge_ref
+      - scope
+      - target
+      - expected_relationship_revision
+      - included_day_expected_revisions
+      - confirmation_version
+      - confirmed
+    RelationshipDeletionTarget:
+      type: object
+      properties:
+        relationship_scope:
+          type: string
+          enum:
+          - CURRENT_CYCLE_AND_HISTORY
+        included_day_product_dates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductDate'
+          maxItems: 45
+          uniqueItems: true
+      additionalProperties: false
+      required:
+      - relationship_scope
+      - included_day_product_dates
+    DeleteAccountPrepareRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        scope:
+          type: string
+          enum:
+          - ACCOUNT
+        target:
+          type: object
+          properties:
+            subject:
+              type: string
+              enum:
+              - SELF
+          additionalProperties: false
+          required:
+          - subject
+        expected_account_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        confirmation_version:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - command_ref
+      - scope
+      - target
+      - expected_account_revision
+      - confirmation_version
+    DeleteAccountConfirmRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        confirmation_challenge_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        scope:
+          type: string
+          enum:
+          - ACCOUNT
+        target:
+          type: object
+          properties:
+            subject:
+              type: string
+              enum:
+              - SELF
+          additionalProperties: false
+          required:
+          - subject
+        expected_account_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        confirmation_version:
+          $ref: '#/components/schemas/VersionToken'
+        confirmed:
+          type: boolean
+          enum:
+          - true
+        identity_verification_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+      additionalProperties: false
+      required:
+      - command_ref
+      - confirmation_challenge_ref
+      - scope
+      - target
+      - expected_account_revision
+      - confirmation_version
+      - confirmed
+      - identity_verification_ref
+    DataTaskCancelRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_task_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_task_revision
+    SupportFeedbackRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        category:
+          type: string
+          enum:
+          - BUG
+          - CONTENT
+          - PRIVACY
+          - ACCOUNT
+          - OTHER
+        description:
+          type: string
+          minLength: 1
+          maxLength: 500
+      additionalProperties: false
+      required:
+      - command_ref
+      - category
+    AdminLoginRequest:
+      type: object
+      properties:
+        authorization_code:
+          type: string
+          minLength: 1
+          maxLength: 1024
+        mfa_code:
+          type: string
+          minLength: 6
+          maxLength: 12
+      additionalProperties: false
+      required:
+      - authorization_code
+      - mfa_code
+    AdminAdvanceDataTaskRequest:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        client_context:
+          $ref: '#/components/schemas/ClientContext'
+        expected_task_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        checkpoint:
+          $ref: '#/components/schemas/VersionToken'
+        reason_code:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - command_ref
+      - expected_task_revision
+      - checkpoint
+      - reason_code
+    CommandResourceRefs:
+      type: object
+      properties:
+        checkin_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        intent_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        result_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        task_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        matter_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        feedback_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        share_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        recovery_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+      additionalProperties: false
+    CommandReceiptView:
+      type: object
+      properties:
+        command_ref:
+          $ref: '#/components/schemas/CommandRef'
+        operation:
+          $ref: '#/components/schemas/VersionToken'
+        outcome:
+          type: string
+          enum:
+          - ACCEPTED
+          - DUPLICATE
+          - CONFLICT
+          - REJECTED
+          - UNKNOWN_PENDING
+        resource_refs:
+          $ref: '#/components/schemas/CommandResourceRefs'
+      additionalProperties: false
+      required:
+      - command_ref
+      - operation
+      - outcome
+    SessionView:
+      type: object
+      properties:
+        session_token:
+          type: string
+          minLength: 32
+        expires_at:
+          type: string
+          format: date-time
+        refresh_after:
+          type: string
+          format: date-time
+        account_state:
+          type: string
+          enum:
+          - ACTIVE
+          - RESTRICTED
+          - DELETING
+          - DELETED
+        consent_required:
+          type: boolean
+        onboarding_required:
+          type: boolean
+        safety_continuation_token:
+          type: string
+          minLength: 32
+      additionalProperties: false
+      required:
+      - session_token
+      - expires_at
+      - refresh_after
+      - account_state
+      - consent_required
+      - onboarding_required
+    IdentityVerificationView:
+      type: object
+      properties:
+        identity_verification_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        confirmation_challenge_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        expires_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - identity_verification_ref
+      - confirmation_challenge_ref
+      - expires_at
+    ConsentView:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+          - MISSING
+          - ACCEPTED
+          - WITHDRAWN
+        notice_version:
+          $ref: '#/components/schemas/VersionToken'
+        accepted_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - state
+      - notice_version
+    ProfileView:
+      type: object
+      properties:
+        revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        preferred_name:
+          type: string
+          minLength: 1
+          maxLength: 24
+        expression_style:
+          $ref: '#/components/schemas/ExpressionStyle'
+        onboarding_completed:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - revision
+      - expression_style
+      - onboarding_completed
+      - updated_at
+    CheckinView:
+      type: object
+      properties:
+        checkin_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        mood:
+          $ref: '#/components/schemas/Mood'
+        energy:
+          $ref: '#/components/schemas/Energy'
+        sleep:
+          $ref: '#/components/schemas/Sleep'
+        write_window:
+          $ref: '#/components/schemas/WriteWindow'
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - checkin_ref
+      - product_date
+      - revision
+      - mood
+      - energy
+      - sleep
+      - write_window
+      - updated_at
+    GenerationIntentView:
+      type: object
+      properties:
+        intent_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - RUNNING
+          - FALLBACK_RUNNING
+          - RETRYABLE_FAILED
+          - SUCCEEDED
+          - TERMINAL_FAILED
+          - CANCELLED
+        result_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        retry_after_seconds:
+          type: integer
+          minimum: 0
+          maximum: 3600
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - intent_ref
+      - product_date
+      - status
+      - updated_at
+    ClientDimensionView:
+      type: object
+      properties:
+        id:
+          type: string
+          enum:
+          - pace
+          - action
+          - connection
+          - resources
+          - recovery
+        label:
+          type: string
+        band:
+          type: string
+          enum:
+          - LOW
+          - STEADY
+          - HIGH
+        band_label:
+          type: string
+        explanation:
+          type: string
+        is_focus:
+          type: boolean
+      additionalProperties: false
+      required:
+      - id
+      - label
+      - band
+      - band_label
+      - explanation
+      - is_focus
+    PrimaryActionView:
+      type: object
+      properties:
+        action_id:
+          $ref: '#/components/schemas/OpaqueRef'
+        instruction:
+          type: string
+        rationale:
+          type: string
+        constraint_label:
+          type: string
+      additionalProperties: false
+      required:
+      - action_id
+      - instruction
+    OptionalTaskView:
+      type: object
+      properties:
+        task_id:
+          $ref: '#/components/schemas/OpaqueRef'
+        instruction:
+          type: string
+      additionalProperties: false
+      required:
+      - task_id
+      - instruction
+    ClientRitualView:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+          - COLOR
+          - NUMBER
+        display_value:
+          type: string
+        note:
+          type: string
+      additionalProperties: false
+      required:
+      - kind
+      - display_value
+      - note
+    ClientDailyContentView:
+      type: object
+      properties:
+        contract:
+          type: string
+          enum:
+          - daily-content-view
+        schema_version:
+          $ref: '#/components/schemas/Semver'
+        result_id:
+          $ref: '#/components/schemas/OpaqueRef'
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        result_version:
+          $ref: '#/components/schemas/VersionToken'
+        generated_at:
+          type: string
+          format: date-time
+        content_label:
+          type: string
+          enum:
+          - 娱乐与行动参考
+        greeting:
+          type: string
+        state_response:
+          type: string
+        overall:
+          type: object
+          properties:
+            band:
+              type: string
+              enum:
+              - LOW
+              - STEADY
+              - HIGH
+            band_label:
+              type: string
+            summary:
+              type: string
+          additionalProperties: false
+          required:
+          - band
+          - band_label
+          - summary
+        focus_dimension_id:
+          type: string
+          enum:
+          - pace
+          - action
+          - connection
+          - resources
+          - recovery
+        dimensions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientDimensionView'
+          minItems: 5
+          maxItems: 5
+        core_tip:
+          type: string
+        explanation_paragraphs:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 2
+        primary_action:
+          $ref: '#/components/schemas/PrimaryActionView'
+        optional_task:
+          $ref: '#/components/schemas/OptionalTaskView'
+        rituals:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientRitualView'
+          maxItems: 2
+        closing:
+          type: string
+        personalization_notice:
+          type: string
+          enum:
+          - NONE
+          - PERSONALIZATION_REDUCED
+      additionalProperties: false
+      required:
+      - contract
+      - schema_version
+      - result_id
+      - product_date
+      - result_version
+      - generated_at
+      - content_label
+      - greeting
+      - state_response
+      - overall
+      - focus_dimension_id
+      - dimensions
+      - core_tip
+      - explanation_paragraphs
+      - primary_action
+      - optional_task
+      - rituals
+      - closing
+      - personalization_notice
+      x-source-contract: ClientDailyContentViewSchema
+    DailyInteractionView:
+      type: object
+      properties:
+        contract:
+          type: string
+          enum:
+          - daily-interaction-state
+        schema_version:
+          $ref: '#/components/schemas/Semver'
+        result_id:
+          $ref: '#/components/schemas/OpaqueRef'
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        is_lit:
+          type: boolean
+        task:
+          type: object
+          properties:
+            task_id:
+              $ref: '#/components/schemas/OpaqueRef'
+            revision:
+              $ref: '#/components/schemas/PositiveRevision'
+            status:
+              $ref: '#/components/schemas/TaskStatus'
+          additionalProperties: false
+          required:
+          - task_id
+          - revision
+          - status
+        helpfulness:
+          type: object
+          properties:
+            revision:
+              $ref: '#/components/schemas/Revision'
+            rating:
+              $ref: '#/components/schemas/HelpfulnessState'
+          additionalProperties: false
+          required:
+          - revision
+          - rating
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - contract
+      - schema_version
+      - result_id
+      - product_date
+      - is_lit
+      - task
+      - helpfulness
+      - updated_at
+      x-source-contract: DailyInteractionStateSchema
+    RelationshipView:
+      type: object
+      properties:
+        stage:
+          type: string
+          enum:
+          - BEFORE_FIRST_MEETING
+          - NEWLY_MET
+          - BECOMING_FAMILIAR
+          - FIRST_WEEK_RECORDED
+        encounter_day_count:
+          type: integer
+          minimum: 0
+        display_token:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - stage
+      - encounter_day_count
+    TodayView:
+      type: object
+      properties:
+        content:
+          $ref: '#/components/schemas/ClientDailyContentView'
+        interaction:
+          $ref: '#/components/schemas/DailyInteractionView'
+        relationship:
+          $ref: '#/components/schemas/RelationshipView'
+      additionalProperties: false
+      required:
+      - content
+      - interaction
+      - relationship
+    EveningFeedbackValue:
+      type: object
+      properties:
+        revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        overall_feeling:
+          $ref: '#/components/schemas/OverallFeeling'
+        note:
+          type: string
+          minLength: 1
+          maxLength: 80
+        first_submitted_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - revision
+      - overall_feeling
+      - first_submitted_at
+      - updated_at
+    EveningView:
+      type: object
+      properties:
+        contract:
+          type: string
+          enum:
+          - evening-feedback-view
+        schema_version:
+          $ref: '#/components/schemas/Semver'
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        availability:
+          type: string
+          enum:
+          - UNAVAILABLE
+          - EDITABLE_EMPTY
+          - EDITABLE_SUBMITTED
+          - READ_ONLY_SUBMITTED
+          - READ_ONLY_EMPTY
+        write_window:
+          $ref: '#/components/schemas/WriteWindow'
+        unavailable_message:
+          type: string
+        feedback:
+          $ref: '#/components/schemas/EveningFeedbackValue'
+        helpfulness:
+          type: object
+          properties:
+            revision:
+              $ref: '#/components/schemas/Revision'
+            rating:
+              $ref: '#/components/schemas/HelpfulnessState'
+          additionalProperties: false
+          required:
+          - revision
+          - rating
+        task:
+          type: object
+          properties:
+            task_id:
+              $ref: '#/components/schemas/OpaqueRef'
+            instruction:
+              type: string
+            revision:
+              $ref: '#/components/schemas/PositiveRevision'
+            status:
+              $ref: '#/components/schemas/TaskStatus'
+          additionalProperties: false
+          required:
+          - task_id
+          - instruction
+          - revision
+          - status
+        options:
+          type: object
+          properties:
+            overall_feeling:
+              type: array
+              items:
+                $ref: '#/components/schemas/OverallFeeling'
+              minItems: 6
+              maxItems: 6
+            helpfulness:
+              type: array
+              items:
+                $ref: '#/components/schemas/HelpfulnessRating'
+              minItems: 4
+              maxItems: 4
+            task_status:
+              type: array
+              items:
+                $ref: '#/components/schemas/TaskStatus'
+              minItems: 4
+              maxItems: 4
+          additionalProperties: false
+          required:
+          - overall_feeling
+          - helpfulness
+          - task_status
+        note_max_characters:
+          type: integer
+          enum:
+          - 80
+        primary_action:
+          type: string
+          enum:
+          - SAVE
+          - SAVE_CHANGES
+          - READ_ONLY
+        completion_message:
+          type: string
+      additionalProperties: false
+      required:
+      - contract
+      - schema_version
+      - product_date
+      - availability
+      - write_window
+      - helpfulness
+      - options
+      - note_max_characters
+      - primary_action
+      - completion_message
+      x-source-contract: ClientEveningFeedbackViewSchema
+    WeeklyDayView:
+      type: object
+      properties:
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        state:
+          type: string
+          enum:
+          - RECORDED
+          - MISSING
+        morning:
+          type: object
+          properties:
+            mood:
+              $ref: '#/components/schemas/Mood'
+            energy:
+              $ref: '#/components/schemas/Energy'
+            sleep:
+              $ref: '#/components/schemas/Sleep'
+          additionalProperties: false
+          required:
+          - mood
+          - energy
+          - sleep
+        evening:
+          type: object
+          properties:
+            overall_feeling:
+              $ref: '#/components/schemas/OverallFeeling'
+          additionalProperties: false
+          required:
+          - overall_feeling
+        is_lit:
+          type: boolean
+        helpfulness:
+          $ref: '#/components/schemas/HelpfulnessState'
+        task_status:
+          $ref: '#/components/schemas/TaskStatus'
+      additionalProperties: false
+      required:
+      - product_date
+      - state
+      - is_lit
+    WeeklyView:
+      type: object
+      properties:
+        contract:
+          type: string
+          enum:
+          - weekly-summary-view
+        schema_version:
+          $ref: '#/components/schemas/Semver'
+        window_id:
+          $ref: '#/components/schemas/OpaqueRef'
+        window_start_date:
+          $ref: '#/components/schemas/ProductDate'
+        window_end_date:
+          $ref: '#/components/schemas/ProductDate'
+        projection_version:
+          $ref: '#/components/schemas/VersionToken'
+        coverage:
+          type: object
+          properties:
+            level:
+              type: string
+              enum:
+              - EMPTY
+              - POINTS_ONLY
+              - PARTIAL
+              - COMPLETE
+            window_day_count:
+              type: integer
+              enum:
+              - 7
+            real_state_day_count:
+              type: integer
+              minimum: 0
+              maximum: 7
+            checkin_day_count:
+              type: integer
+              minimum: 0
+              maximum: 7
+            evening_feedback_day_count:
+              type: integer
+              minimum: 0
+              maximum: 7
+            lit_day_count:
+              type: integer
+              minimum: 0
+              maximum: 7
+            missing_dates:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductDate'
+              maxItems: 7
+          additionalProperties: false
+          required:
+          - level
+          - window_day_count
+          - real_state_day_count
+          - checkin_day_count
+          - evening_feedback_day_count
+          - lit_day_count
+          - missing_dates
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeeklyDayView'
+          minItems: 7
+          maxItems: 7
+        metrics:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '#/components/schemas/VersionToken'
+              observed_count:
+                type: integer
+                minimum: 0
+                maximum: 7
+              unsure_count:
+                type: integer
+                minimum: 0
+                maximum: 7
+              missing_count:
+                type: integer
+                minimum: 0
+                maximum: 7
+              direction:
+                type: string
+                enum:
+                - RISING
+                - FALLING
+                - STABLE
+                - MIXED
+                - INSUFFICIENT_DATA
+              direction_label:
+                type: string
+            additionalProperties: false
+            required:
+            - id
+            - observed_count
+            - unsure_count
+            - missing_count
+            - direction
+            - direction_label
+          minItems: 4
+          maxItems: 4
+        activity:
+          type: object
+          properties:
+            lit_day_count:
+              type: integer
+              minimum: 0
+              maximum: 7
+            helpfulness:
+              type: object
+              properties:
+                rated_count:
+                  type: integer
+                  minimum: 0
+                  maximum: 7
+                helpful_count:
+                  type: integer
+                  minimum: 0
+                  maximum: 7
+              additionalProperties: false
+              required:
+              - rated_count
+              - helpful_count
+            tasks:
+              type: object
+              properties:
+                marked_count:
+                  type: integer
+                  minimum: 0
+                  maximum: 7
+                completed_count:
+                  type: integer
+                  minimum: 0
+                  maximum: 7
+              additionalProperties: false
+              required:
+              - marked_count
+              - completed_count
+          additionalProperties: false
+          required:
+          - lit_day_count
+          - helpfulness
+          - tasks
+        summary:
+          type: object
+          properties:
+            summary_id:
+              $ref: '#/components/schemas/OpaqueRef'
+            revision:
+              $ref: '#/components/schemas/PositiveRevision'
+            kind:
+              type: string
+              enum:
+              - PARTIAL_REVIEW
+              - COMPLETE_REVIEW
+            title:
+              type: string
+            paragraphs:
+              type: array
+              items:
+                type: string
+              minItems: 2
+              maxItems: 5
+          additionalProperties: false
+          required:
+          - summary_id
+          - revision
+          - kind
+          - title
+          - paragraphs
+        summary_status:
+          type: string
+          enum:
+          - NOT_ELIGIBLE
+          - ELIGIBLE
+          - GENERATING
+          - AVAILABLE
+          - INVALIDATED
+          - FAILED
+        data_disclosure:
+          type: string
+        relationship_display_token:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - contract
+      - schema_version
+      - window_id
+      - window_start_date
+      - window_end_date
+      - projection_version
+      - coverage
+      - days
+      - metrics
+      - activity
+      - summary_status
+      - data_disclosure
+      x-source-contract: ClientWeeklySummaryViewSchema
+    HistoryDaySummaryView:
+      type: object
+      properties:
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        state:
+          type: string
+          enum:
+          - RECORDED
+          - MISSING
+        is_lit:
+          type: boolean
+        has_result:
+          type: boolean
+        has_evening_feedback:
+          type: boolean
+      additionalProperties: false
+      required:
+      - product_date
+      - state
+      - is_lit
+      - has_result
+      - has_evening_feedback
+    HistoryDayView:
+      type: object
+      properties:
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        checkin:
+          $ref: '#/components/schemas/CheckinView'
+        content:
+          $ref: '#/components/schemas/ClientDailyContentView'
+        interaction:
+          $ref: '#/components/schemas/DailyInteractionView'
+        evening:
+          $ref: '#/components/schemas/EveningView'
+      additionalProperties: false
+      required:
+      - product_date
+    MatterView:
+      type: object
+      properties:
+        matter_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 80
+        target_date:
+          $ref: '#/components/schemas/ProductDate'
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - PAUSED
+          - COMPLETED
+          - EXPIRED
+        daily_use_granted:
+          type: boolean
+        weekly_use_granted:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - matter_ref
+      - revision
+      - title
+      - status
+      - daily_use_granted
+      - weekly_use_granted
+      - updated_at
+    MemoryPreferencesView:
+      type: object
+      properties:
+        revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        master_enabled:
+          type: boolean
+        daily_use_enabled:
+          type: boolean
+        weekly_use_enabled:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - revision
+      - master_enabled
+      - daily_use_enabled
+      - weekly_use_enabled
+      - updated_at
+    NotificationSettingsView:
+      type: object
+      properties:
+        revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        morning_enabled:
+          type: boolean
+        evening_enabled:
+          type: boolean
+        observed_permission:
+          type: string
+          enum:
+          - UNKNOWN
+          - GRANTED
+          - DENIED
+          - REVOKED
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - revision
+      - morning_enabled
+      - evening_enabled
+      - observed_permission
+      - updated_at
+    SharePreviewView:
+      type: object
+      properties:
+        preview_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        kind:
+          type: string
+          enum:
+          - TODAY
+          - WEEKLY
+        image_url:
+          type: string
+          format: uri
+        expires_at:
+          type: string
+          format: date-time
+        visible_fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/VersionToken'
+          maxItems: 12
+      additionalProperties: false
+      required:
+      - preview_ref
+      - kind
+      - image_url
+      - expires_at
+      - visible_fields
+    SafetyResourceView:
+      type: object
+      properties:
+        resource_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        label:
+          type: string
+        action:
+          type: string
+          enum:
+          - CALL
+          - OPEN_URL
+          - SHOW_TEXT
+        target:
+          type: string
+      additionalProperties: false
+      required:
+      - resource_ref
+      - label
+      - action
+      - target
+    SafetyBlockView:
+      type: object
+      properties:
+        block_id:
+          $ref: '#/components/schemas/VersionToken'
+        kind:
+          type: string
+          enum:
+          - DIRECT_ACKNOWLEDGEMENT
+          - IMMEDIATE_ACTION
+          - EMERGENCY_RESOURCE
+          - TRUSTED_PERSON
+          - SUPPORT_RESOURCE
+          - PRODUCT_LIMIT
+          - RECOVERY_ACTION
+        copy:
+          type: string
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/SafetyResourceView'
+          maxItems: 8
+      additionalProperties: false
+      required:
+      - block_id
+      - kind
+      - copy
+      - resources
+    SafetyClearView:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+          - CLEAR
+        revision:
+          $ref: '#/components/schemas/Revision'
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - state
+      - revision
+      - updated_at
+    SafetyOverlayView:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+          - ACTIVE
+          - RECOVERY_PENDING
+        revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        response_bundle_version:
+          $ref: '#/components/schemas/VersionToken'
+        blocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/SafetyBlockView'
+          minItems: 1
+          maxItems: 7
+        recovery_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        safety_continuation_token:
+          type: string
+          minLength: 32
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - state
+      - revision
+      - response_bundle_version
+      - blocks
+      - updated_at
+    SafetyView:
+      oneOf:
+      - $ref: '#/components/schemas/SafetyClearView'
+      - $ref: '#/components/schemas/SafetyOverlayView'
+      discriminator:
+        propertyName: state
+        mapping:
+          CLEAR: '#/components/schemas/SafetyClearView'
+          ACTIVE: '#/components/schemas/SafetyOverlayView'
+          RECOVERY_PENDING: '#/components/schemas/SafetyOverlayView'
+    LaunchStateSnapshot:
+      type: object
+      properties:
+        route:
+          type: string
+          enum:
+          - SAFE_001
+          - SET_006_COMPLETED
+          - SYS_003_DELETING
+          - SYS_003_BLOCKED
+          - ENT_002
+          - ENT_001
+          - ONB_001
+          - EVE_001
+          - DLY_003
+          - DLY_002
+          - DLY_001
+        account_state:
+          type: string
+          enum:
+          - ACTIVE
+          - RESTRICTED
+          - DELETING
+          - DELETED
+        session_state:
+          type: string
+          enum:
+          - VALID
+          - REFRESHING
+          - RECOVERABLE_FAILURE
+          - INVALID
+        consent_state:
+          type: string
+          enum:
+          - MISSING
+          - ACCEPTED
+          - WITHDRAWN
+        onboarding_completed:
+          type: boolean
+        daily_state:
+          type: string
+          enum:
+          - CHECKIN_REQUIRED
+          - GENERATION_PENDING
+          - RESULT_AVAILABLE
+          - TERMINAL_FAILURE
+        maintenance_state:
+          type: string
+          enum:
+          - NORMAL
+          - DEGRADED
+          - BLOCKING
+        safety:
+          $ref: '#/components/schemas/SafetyView'
+        active_data_task:
+          $ref: '#/components/schemas/OpaqueRef'
+      additionalProperties: false
+      required:
+      - route
+      - account_state
+      - session_state
+      - consent_state
+      - onboarding_completed
+      - daily_state
+      - maintenance_state
+    DataTaskView:
+      type: object
+      properties:
+        task_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        kind:
+          type: string
+          enum:
+          - EXPORT
+          - DELETE
+        scope:
+          type: string
+          enum:
+          - DAY
+          - MATTER
+          - RELATIONSHIP_DATA
+          - ACCOUNT
+        target_summary:
+          type: string
+          maxLength: 120
+        status:
+          type: string
+          enum:
+          - PENDING
+          - RUNNING
+          - SUCCEEDED
+          - FAILED
+          - CANCELLED
+        online_erased_at:
+          type: string
+          format: date-time
+        provider_expiry_at:
+          type: string
+          format: date-time
+        backup_purge_deadline:
+          type: string
+          format: date-time
+        can_cancel:
+          type: boolean
+        failure_summary_code:
+          $ref: '#/components/schemas/VersionToken'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - task_ref
+      - revision
+      - kind
+      - scope
+      - target_summary
+      - status
+      - can_cancel
+      - created_at
+      - updated_at
+    DeletionConfirmationView:
+      type: object
+      properties:
+        confirmation_challenge_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        scope:
+          type: string
+          enum:
+          - RELATIONSHIP_DATA
+          - ACCOUNT
+        target:
+          oneOf:
+          - $ref: '#/components/schemas/RelationshipDeletionTarget'
+          - type: object
+            properties:
+              subject:
+                type: string
+                enum:
+                - SELF
+            additionalProperties: false
+            required:
+            - subject
+        confirmation_version:
+          $ref: '#/components/schemas/VersionToken'
+        expected_revision:
+          $ref: '#/components/schemas/PositiveRevision'
+        expected_day_revisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayExpectedRevision'
+          maxItems: 45
+        immediate_effects:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 12
+        derived_effects:
+          type: array
+          items:
+            type: string
+          maxItems: 12
+        online_erasure_sla_hours:
+          type: integer
+          enum:
+          - 72
+        backup_max_days:
+          type: integer
+          enum:
+          - 35
+        identity_reverification_required:
+          type: boolean
+        expires_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - confirmation_challenge_ref
+      - scope
+      - target
+      - confirmation_version
+      - expected_revision
+      - immediate_effects
+      - derived_effects
+      - online_erasure_sla_hours
+      - backup_max_days
+      - identity_reverification_required
+      - expires_at
+    FaqEntryView:
+      type: object
+      properties:
+        entry_id:
+          $ref: '#/components/schemas/VersionToken'
+        title:
+          type: string
+        body:
+          type: string
+      additionalProperties: false
+      required:
+      - entry_id
+      - title
+      - body
+    FaqView:
+      type: object
+      properties:
+        version:
+          $ref: '#/components/schemas/VersionToken'
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/FaqEntryView'
+      additionalProperties: false
+      required:
+      - version
+      - entries
+    AdminSessionView:
+      type: object
+      properties:
+        admin_session_token:
+          type: string
+          minLength: 32
+        expires_at:
+          type: string
+          format: date-time
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/VersionToken'
+          minItems: 1
+      additionalProperties: false
+      required:
+      - admin_session_token
+      - expires_at
+      - roles
+    AdminOpsOverviewView:
+      type: object
+      properties:
+        window_start:
+          type: string
+          format: date-time
+        window_end:
+          type: string
+          format: date-time
+        request_success_rate:
+          type: number
+          minimum: 0
+          maximum: 1
+        p95_latency_ms:
+          type: integer
+          minimum: 0
+        degraded_count:
+          type: integer
+          minimum: 0
+        queue_depth:
+          type: integer
+          minimum: 0
+        safety_alert_count:
+          type: integer
+          minimum: 0
+        cost_minor_units:
+          type: integer
+          minimum: 0
+      additionalProperties: false
+      required:
+      - window_start
+      - window_end
+      - request_success_rate
+      - p95_latency_ms
+      - degraded_count
+      - queue_depth
+      - safety_alert_count
+      - cost_minor_units
+    AdminSafetyEventView:
+      type: object
+      properties:
+        event_ref:
+          $ref: '#/components/schemas/OpaqueRef'
+        category_bucket:
+          $ref: '#/components/schemas/VersionToken'
+        policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        created_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+      required:
+      - event_ref
+      - category_bucket
+      - policy_version
+      - created_at
+    HistoryListView:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoryDaySummaryView'
+        next_cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+        page_info:
+          type: object
+          properties:
+            has_more:
+              type: boolean
+          additionalProperties: false
+          required:
+          - has_more
+      additionalProperties: false
+      required:
+      - items
+      - page_info
+    MatterListView:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatterView'
+        next_cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+        page_info:
+          type: object
+          properties:
+            has_more:
+              type: boolean
+          additionalProperties: false
+          required:
+          - has_more
+      additionalProperties: false
+      required:
+      - items
+      - page_info
+    DataTaskListView:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataTaskView'
+        next_cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+        page_info:
+          type: object
+          properties:
+            has_more:
+              type: boolean
+          additionalProperties: false
+          required:
+          - has_more
+      additionalProperties: false
+      required:
+      - items
+      - page_info
+    AdminSafetyEventListView:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminSafetyEventView'
+        next_cursor:
+          type: string
+          minLength: 1
+          maxLength: 512
+        page_info:
+          type: object
+          properties:
+            has_more:
+              type: boolean
+          additionalProperties: false
+          required:
+          - has_more
+      additionalProperties: false
+      required:
+      - items
+      - page_info
+    FieldError:
+      type: object
+      properties:
+        field:
+          type: string
+          minLength: 1
+          maxLength: 160
+        reason:
+          $ref: '#/components/schemas/VersionToken'
+      additionalProperties: false
+      required:
+      - field
+      - reason
+    ErrorCurrentView:
+      oneOf:
+      - $ref: '#/components/schemas/CheckinView'
+      - $ref: '#/components/schemas/ProfileView'
+      - $ref: '#/components/schemas/DailyInteractionView'
+      - $ref: '#/components/schemas/EveningView'
+      - $ref: '#/components/schemas/MatterView'
+      - $ref: '#/components/schemas/MemoryPreferencesView'
+      - $ref: '#/components/schemas/NotificationSettingsView'
+      - $ref: '#/components/schemas/SafetyView'
+      - $ref: '#/components/schemas/DataTaskView'
+    ErrorDetails:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
+          maxItems: 32
+        current_revision:
+          $ref: '#/components/schemas/Revision'
+        current_product_date:
+          $ref: '#/components/schemas/ProductDate'
+        retry_after_seconds:
+          type: integer
+          minimum: 0
+          maximum: 86400
+        reason:
+          $ref: '#/components/schemas/VersionToken'
+        current:
+          $ref: '#/components/schemas/ErrorCurrentView'
+      additionalProperties: false
+    ApiError:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/VersionToken'
+        category:
+          type: string
+          enum:
+          - AUTH
+          - GUARD
+          - VALIDATION
+          - CONFLICT
+          - NOT_FOUND
+          - RATE_LIMIT
+          - TRANSIENT
+          - TERMINAL
+          - SAFETY
+        message_key:
+          $ref: '#/components/schemas/VersionToken'
+        message:
+          type: string
+          minLength: 1
+          maxLength: 160
+        retryable:
+          type: boolean
+        details:
+          $ref: '#/components/schemas/ErrorDetails'
+        safety_view:
+          $ref: '#/components/schemas/SafetyView'
+        command_receipt:
+          $ref: '#/components/schemas/CommandReceiptView'
+      additionalProperties: false
+      required:
+      - code
+      - category
+      - message_key
+      - message
+      - retryable
+    ApiErrorBody:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - false
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        error:
+          $ref: '#/components/schemas/ApiError'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - error
+    ApiSuccessCommand:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/CommandReceiptView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessSession:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/SessionView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessIdentityVerification:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/IdentityVerificationView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessLaunch:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/LaunchStateSnapshot'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessConsent:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/ConsentView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessProfile:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/ProfileView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessCheckin:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/CheckinView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessGenerationIntent:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/GenerationIntentView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessToday:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/TodayView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessInteraction:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/DailyInteractionView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessEvening:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/EveningView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessWeekly:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/WeeklyView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessHistoryList:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/HistoryListView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessHistoryDay:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/HistoryDayView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessMatter:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/MatterView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessMatterList:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/MatterListView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessMemoryPreferences:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/MemoryPreferencesView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessNotificationSettings:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/NotificationSettingsView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessSharePreview:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/SharePreviewView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessSafety:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/SafetyView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessDataTask:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/DataTaskView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessDataTaskList:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/DataTaskListView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessDeletionConfirmation:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/DeletionConfirmationView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessFaq:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/FaqView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessAdminSession:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/AdminSessionView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessAdminOps:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/AdminOpsOverviewView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+    ApiSuccessAdminSafetyEvents:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+          - true
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: '#/components/schemas/ProductDate'
+        product_date_policy_version:
+          $ref: '#/components/schemas/VersionToken'
+        data:
+          $ref: '#/components/schemas/AdminSafetyEventListView'
+      additionalProperties: false
+      required:
+      - ok
+      - request_id
+      - server_now
+      - product_date
+      - product_date_policy_version
+      - data
+  responses:
+    SuccessCommand:
+      description: Successful Command response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessCommand'
+    SuccessSession:
+      description: Successful Session response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessSession'
+    SuccessIdentityVerification:
+      description: Successful IdentityVerification response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessIdentityVerification'
+    SuccessLaunch:
+      description: Successful Launch response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessLaunch'
+    SuccessConsent:
+      description: Successful Consent response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessConsent'
+    SuccessProfile:
+      description: Successful Profile response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessProfile'
+    SuccessCheckin:
+      description: Successful Checkin response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessCheckin'
+    SuccessGenerationIntent:
+      description: Successful GenerationIntent response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessGenerationIntent'
+    SuccessToday:
+      description: Successful Today response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessToday'
+    SuccessInteraction:
+      description: Successful Interaction response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessInteraction'
+    SuccessEvening:
+      description: Successful Evening response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessEvening'
+    SuccessWeekly:
+      description: Successful Weekly response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessWeekly'
+    SuccessHistoryList:
+      description: Successful HistoryList response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessHistoryList'
+    SuccessHistoryDay:
+      description: Successful HistoryDay response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessHistoryDay'
+    SuccessMatter:
+      description: Successful Matter response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessMatter'
+    SuccessMatterList:
+      description: Successful MatterList response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessMatterList'
+    SuccessMemoryPreferences:
+      description: Successful MemoryPreferences response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessMemoryPreferences'
+    SuccessNotificationSettings:
+      description: Successful NotificationSettings response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessNotificationSettings'
+    SuccessSharePreview:
+      description: Successful SharePreview response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessSharePreview'
+    SuccessSafety:
+      description: Successful Safety response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessSafety'
+    SuccessDataTask:
+      description: Successful DataTask response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessDataTask'
+    SuccessDataTaskList:
+      description: Successful DataTaskList response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessDataTaskList'
+    SuccessDeletionConfirmation:
+      description: Successful DeletionConfirmation response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessDeletionConfirmation'
+    SuccessFaq:
+      description: Successful Faq response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessFaq'
+    SuccessAdminSession:
+      description: Successful AdminSession response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessAdminSession'
+    SuccessAdminOps:
+      description: Successful AdminOps response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessAdminOps'
+    SuccessAdminSafetyEvents:
+      description: Successful AdminSafetyEvents response
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiSuccessAdminSafetyEvents'
+    BadRequest:
+      description: Request validation failed
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorBody'
+    Unauthorized:
+      description: Authentication failed
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorBody'
+    Forbidden:
+      description: A guard blocked the operation
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorBody'
+    NotFound:
+      description: Resource not found or not owned
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorBody'
+    Conflict:
+      description: Revision, idempotency, state, or confirmation conflict
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorBody'
+    UnprocessableEntity:
+      description: Contract or state precondition failed
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorBody'
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfterResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorBody'
+    ServiceUnavailable:
+      description: A retryable dependency or service failure occurred
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestIdResponseHeader'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfterResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorBody'
