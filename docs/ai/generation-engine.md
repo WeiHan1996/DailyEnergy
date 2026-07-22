@@ -1,8 +1,9 @@
 # DailyEnergy 确定性生成引擎规范
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-22
 - **所属任务**：S-11 — 规则引擎规范
-- **最后更新**：2026-07-21
+- **最后更新**：2026-07-22
 - **适用范围**：GenerationManifest、冻结输入、确定性规则流水线、具名选择、RuleFacts、受控表达计划、失败与生命周期边界
 - **上游规范**：[产品状态机](../product/state-machine.md)、[业务规则](../product/business-rules.md)、[今日内容 Schema](./daily-content-schema.md)、[七天趋势与总结 Schema](./weekly-summary-schema.md)、[共享 Schema](../../packages/shared-schemas/README.md)、[ADR-0002](../decisions/ADR-0002-deterministic-daily-result.md)
 - **配套规范**：[评分与规则选择](./scoring-rules.md)、[S-11 测试向量](./s11-test-vectors.json)
@@ -18,7 +19,7 @@
 
 ## 2. 权威层级与不可重开决定
 
-本 Draft 继承并不得改写：
+本规范 继承并不得改写：
 
 - `Asia/Shanghai` 04:00 与 `product-date-v1`；
 - command commit、30 分钟 view continuation 与 15 分钟 generation completion 的区别；
@@ -87,7 +88,7 @@ flowchart TD
 
 ### 5.1 定义
 
-`result_version` 是服务端不可变 GenerationManifest 的 ID，不是 semver 拼接、部署时间或客户端配置。`daily-v1` 在本 Draft 中解析为以下概念闭包：
+`result_version` 是服务端不可变 GenerationManifest 的 ID，不是 semver 拼接、部署时间或客户端配置。`daily-v1` 在本规范 中解析为以下概念闭包：
 
 ```text
 GenerationManifest {
@@ -120,7 +121,7 @@ GenerationManifest {
 
 这是内部概念对象，不得把这些字段加入严格 `GenerationInputSnapshot`、`RuleFacts` 或 `ExpressionPayload`。manifest registry 必须在发布 `result_version` 时冻结并保存一个不可变 `manifest_fingerprint`；S-17/S-19 只负责固化其最终 canonical bytes，不授权省略、运行时重算或替换 fingerprint。同一 `result_version` 必须始终只解析到这个 fingerprint。
 
-`safety-baseline-v1` 在本 Draft 中只表示当前 Accepted 产品定位、人格和 Schema 的静态禁止边界，不冒充 S-15 风险分类器。生产 manifest 必须在 S-15 接受后解析到相容且不低于该边界的真实 Safety contract；不相容时按 `SAFETY_CONTRACT_INCOMPATIBLE` 失败。
+`safety-baseline-v1` 在本规范 中只表示当前 Accepted 产品定位、人格和 Schema 的静态禁止边界，不冒充 S-15 风险分类器。生产 manifest 必须在 S-15 接受后解析到相容且不低于该边界的真实 Safety contract；不相容时按 `SAFETY_CONTRACT_INCOMPATIBLE` 失败。
 
 ### 5.2 完整性规则
 
@@ -632,3 +633,10 @@ ACCOUNT DELETING / DELETED 取消生成。删除后不得为了保持 seed 单�
 以下决定延期不影响本规范确定性：生产包结构、API error code、数据库格式、fingerprint 最终字节协议、provider/Prompt 策略、完整模板中文、S-15 风险分类、S-18 最小删除 guard、S-14 上下文内容解析。
 
 延期不得削弱 exact manifest、frozen envelope、deterministic RuleFacts、AI 不改事实、单结果原子发布、历史不重算和删除不复活。
+
+## 22. 接受记录
+
+- 用户于 2026-07-22 确认 S-11；
+- 配套评分规范与测试向量同时接受；
+- 34 项共享 Schema 测试、180 种合法签到组合、周聚合 golden 链路与独立契约审计保持通过；
+- 本规范进入 Accepted，后续修改确定性语义必须升级对应版本并重新评审。
