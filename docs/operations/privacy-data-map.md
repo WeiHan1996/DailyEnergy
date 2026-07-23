@@ -33,6 +33,8 @@
 - **删除优先**：deletion guard 一旦提交，被删范围同步停止普通读取、写入、生成、通知、分享、缓存和派生使用。
 - **受限证据隔离**：Safety、删除、网络安全和依法保留证据不能成为产品、记忆、分析、营销或普通支持数据源。
 - **匿名不靠命名**：UUID、HMAC、opaque ref、去标识 token 仍可能属于个人信息；只有不可识别且不能复原的结果才可进入匿名聚合。
+- **分析默认关闭**：S-24 接受前不发送、持久化或委托处理用户级 analytics 事件；只有 T0 内存投影经不可逆匿名化后形成的 T4 聚合可以保留。
+- **未成年人 fail closed**：年龄适用和不满十四周岁用户处理策略未冻结前，不得把“目标用户为成年人”当作年龄证明，也不得为补缺口擅自新增生日、证件或监护人字段。
 - **缺口 fail closed**：没有明确权威模型、期限、接收方条件或删除路径的数据，不得持久化或对外传输。
 
 ## 3. 分类口径
@@ -47,11 +49,15 @@
 | T3 Isolated Backup | 与普通服务隔离的加密数据库/对象备份 | 否 |
 | T4 Anonymous/System | 不可识别匿名聚合或非个人版本配置 | 不适用 |
 
+`app_*`、`runtime_*`、`restricted_*`、`evaluation_*` 和 `system_*` 是物理/职责域，不是新的数据层级。资产的“层级”列只允许使用上表 T0～T4；一项资产跨层时必须明确列出每个层级。
+
 ### 3.2 敏感级别
 
 - **高**：身份映射、自由文本、Safety、删除证据、网络安全日志或可连接多类用户事实的记录。
 - **中**：结构化状态、行为、偏好、每日/周派生内容和通知设置。
 - **低/非个人**：不含真实用户引用的版本目录、公开资源配置和不可识别聚合。
+
+这里的“高/中/低”是工程保护等级，不等同于最终法律上的敏感个人信息判定。mood、energy、sleep、evening note 和 Safety 数据在上线法律核验完成前按“可能涉及敏感个人信息”处理，不得因本表写为“中”而降低告知、访问控制或影响评估要求。
 
 ### 3.3 处理依据代码
 
@@ -74,6 +80,7 @@
 | PDM-ACCOUNT-001 | 用户 | 微信外部身份映射、AccountRef、StableSubjectId | 权威身份事实 | 高 | T1 | 建立唯一账户并恢复合法会话 | BASIS-CORE |
 | PDM-SESSION-001 | 用户 | session/refresh token hash、设备会话 ref、Safety/view continuation | 认证运行数据 | 高 | T1 | 会话、撤销和受限连续访问 | BASIS-CORE / SECURITY |
 | PDM-CONSENT-001 | 用户 | notice version、动作、状态、时间、command ref | 同意回执 | 中 | T1/T2 | 证明当前必要告知和撤回状态 | BASIS-EXPLICIT |
+| PDM-ONBOARDING-001 | 用户 | completion、profile revision、consent record、command ref、时间 | 系统派生完成事实 | 中 | T1 | 幂等证明首次认识已完成 | BASIS-CORE |
 | PDM-PROFILE-001 | 用户 | preferred name、expression style、profile revision | 用户提供资料 | 高/中 | T1 | 称呼与表达偏好 | BASIS-EXPLICIT |
 | PDM-CHECKIN-001 | 用户 | product date、mood、energy、sleep、revision | 结构化真实状态 | 中 | T1 | 今日生成、真实趋势与历史 | BASIS-EXPLICIT |
 | PDM-GEN-INTENT-001 | 用户 | generation intent、冻结输入 revision/version/fingerprint | 运行与冻结快照 | 中 | T1 | 幂等生成和发布前守卫 | BASIS-CORE |
@@ -88,48 +95,61 @@
 | PDM-SAFETY-STATE-001 | 用户 | CLEAR/ACTIVE/RECOVERY_PENDING、revision、epoch、固定响应计划 ref | 受限安全状态 | 高 | T2 | 覆盖普通旅程并提供固定安全响应 | BASIS-SAFETY |
 | PDM-SAFETY-EVENT-001 | 用户 | 最小 decision/event/resource action 元数据 | 受限安全证据 | 高 | T2 | 状态一致性、受限审计和故障排查 | BASIS-SAFETY |
 | PDM-NOTIFY-PREF-001 | 用户 | 通知偏好、平台权限快照 | 用户设置/外部观察 | 中 | T1 | 用户控制通知与判断平台是否可投递 | BASIS-GRANT |
-| PDM-NOTIFY-RUNTIME-001 | 用户 | semantic intent、投递 attempt、平台 opaque ref、outcome | 运行元数据 | 中 | T1/Runtime | 幂等投递、失败恢复和限频 | BASIS-GRANT / PROCESSOR |
+| PDM-NOTIFY-RUNTIME-001 | 用户 | semantic intent、投递 attempt、平台 opaque ref、outcome | 运行元数据 | 中 | T1 | 幂等投递、失败恢复和限频 | BASIS-GRANT / PROCESSOR |
 | PDM-SHARE-001 | 用户 | 分享预览、短期草稿、图片对象、intent | 临时派生 | 中 | T0/T1 | 用户明确生成并分享隐私安全卡片 | BASIS-EXPLICIT |
 | PDM-EXPORT-001 | 用户 | 导出任务、短期 artifact、下载状态 | 用户权利数据 | 高 | T0/T1/T2 | 向用户提供自身数据副本 | BASIS-EXPLICIT |
 | PDM-RIGHTS-TASK-001 | 用户 | DataTask、DeletionGuard、step checkpoint、failure scope | 受限权利流程 | 高 | T2 | 同步阻断、执行和展示删除/导出状态 | BASIS-EXPLICIT |
 | PDM-RIGHTS-EVIDENCE-001 | 用户 | deletion receipt、provider deletion、restore deny、backup deadline | 最小受限证据 | 高 | T2 | 证明删除、跟踪外部到期、防止备份复活 | BASIS-SECURITY / LEGAL |
-| PDM-RUNTIME-001 | 用户 | command receipt、gateway attempt、outbox/inbox、trace ref、usage/cost/failure | 脱敏运行元数据 | 中 | Runtime/T2 | 幂等、可靠执行、成本和故障观察 | BASIS-SECURITY |
+| PDM-RESTRICTED-AUDIT-001 | 用户、受限操作人员 | actor/service/role、purpose、policy、opaque object token、ticket/hold ref、outcome、时间 | 受限访问证据 | 高 | T2 | 证明受限读取、删除、Safety 与 legal hold 操作 | BASIS-SECURITY / LEGAL |
+| PDM-LEGAL-HOLD-001 | 用户、审批人员 | 最小 scope、依据、审批、复核、release/expiry | 依法冻结证据 | 高 | T2 | 仅在明确法律依据下限制删除并定期复核 | BASIS-LEGAL |
+| PDM-RUNTIME-001 | 用户 | command receipt、gateway attempt、outbox/inbox、trace ref、usage/cost/failure | 脱敏运行元数据 | 中 | T1/T2 | 幂等、可靠执行、成本和故障观察 | BASIS-SECURITY |
 | PDM-SECURITY-LOG-001 | 用户 | 必需 IP/网络/认证安全事件 | 受限网络安全日志 | 高 | T2 | 安全保护和法定义务 | BASIS-SECURITY / LEGAL |
 | PDM-BACKUP-001 | 用户 | 可能覆盖用户数据的隔离加密备份 | 灾备副本 | 高 | T3 | 灾难恢复 | BASIS-SECURITY |
-| PDM-SUPPORT-001 | 用户 | 支持分类与可选文本 | 用户主动自由文本 | 高 | 未冻结 | 接收用户问题和反馈 | BASIS-EXPLICIT |
-| PDM-EVALUATION-001 | 合成主体 | SyntheticSubjectRef、合成 response/artifact | 合成评测数据 | 低 | Evaluation/T4 | AI 质量与回归 | 非真实个人数据 |
-| PDM-SYSTEM-001 | 不适用 | Schema、Prompt、route、policy、resource、retention、provider profile 版本 | 系统配置 | 低/非个人 | T4/System | 可追踪发布、回滚和数据治理 | 不适用 |
+| PDM-SUPPORT-001 | 用户 | 支持分类与可选文本 | 用户主动自由文本 | 高 | T0 | S-22 前仅做单次 Safety/Schema 处理，不形成工单 | BASIS-EXPLICIT |
+| PDM-ANALYTICS-001 | 用户（T0）/不适用（T4） | 经批准的非文本候选投影、不可识别聚合 | 候选运行投影/匿名聚合 | 中/低 | T0/T4 | S-24 评审候选；禁止用户级持久化 | 不适用（未授权生产） |
+| PDM-EVALUATION-001 | 合成主体 | SyntheticSubjectRef、合成 response/artifact | 合成评测数据 | 低 | T4 | AI 质量与回归 | 非真实个人数据 |
+| PDM-IMPACT-ASSESSMENT-001 | 不适用 | 数据类别、流程、版本、风险、控制和处理记录 | 文档级合规证据 | 低/非个人 | T4 | 证明影响评估和处理情况，不嵌入真实用户样本 | BASIS-LEGAL |
+| PDM-SYSTEM-001 | 不适用 | Schema、Prompt、route、policy、resource、retention、provider profile 版本 | 系统配置 | 低/非个人 | T4 | 可追踪发布、回滚和数据治理 | 不适用 |
 
-`PDM-SUPPORT-001` 在 S-19 中没有权威 model、保存期限和删除传播。S-22 或上游变更完成前，只能采用不持久化的受控提交/人工转交方案，不能自行新建长期支持文本库。
+`PDM-SUPPORT-001` 在 S-19 中没有权威 model、保存期限、人员和删除传播。S-22 或上游变更完成前，自由文本只能在单次请求内完成 Schema/Safety 处理后丢弃，不得持久化、建立工单、发送邮件/IM 或人工转交；分类字段也不得形成用户级支持历史。
 
 ## 5. 收集入口、API、领域与 Prisma 映射
 
 | 数据 ID | 页面/来源 | API DTO / 白名单 View | 领域对象 | Prisma / 主要字段 | 客户端可见 |
 |---|---|---|---|---|---|
-| ACCOUNT-001 | `wx.login` | `POST /auth/wechat/session`、LaunchStateSnapshot | Account / External Identity | `UserAccount`、`ExternalIdentity(providerCode, subjectLookupToken, subjectCiphertext)` | account 状态摘要；不返回 openid/unionid/密文 |
-| SESSION-001 | 登录/刷新/跨日继续 | auth session、Safety continuation、bootstrap | Session / Continuation Grant | `SessionCredential(tokenHash, deviceRef, expiresAt, revokedAt)`、`ViewContinuationGrant` | opaque token；不返回 hash/内部 scope map |
-| CONSENT-001 | 必要告知页 | `/consent/current|accept|withdraw` | Necessary Consent | `NecessaryConsentRecord(noticeVersion, logicalIntent, status, acceptedAt, withdrawnAt)` | 当前版本与状态 |
-| PROFILE-001 | 首次认识/资料设置 | ProfileView、onboarding/profile commands | Profile | `UserProfile`、`UserProfileRevision(preferredNameCiphertext, expressionStyle, revision)` | 解密后的自身称呼、风格与 revision |
-| CHECKIN-001 | 晨间签到 | CheckinView、submit/correct/rebuild | Morning Checkin | `MorningCheckin(productDate, mood, energy, sleep, revision)`及 revision | 自身结构值与 revision |
-| GEN-INTENT-001 | 启动今日生成 | Generation status view | Generation Intent / Input Snapshot | `GenerationIntent`、`GenerationInputSnapshot`、`GatewayInvocation` | intent 状态；不返回 seed、fingerprint、route、Prompt |
-| DAILY-RESULT-001 | 今日/历史详情 | TodayView、ClientDailyContentView | Published Daily Result | `PublishedDailyResult`、content slot/fragment、visibility、dependency | 白名单正文与展示状态；不返回 provider attempt/内部 refs |
-| INTERACTION-001 | 今日点亮/任务/帮助度 | InteractionView、interaction commands | Daily Interaction | `DailyInteraction`、`DailyLightFact`、`DailyTaskState`、`DailyHelpfulnessRecord` | 自身状态与 revision |
-| EVENING-001 | 晚间反馈 | EveningView、`POST /evening/save` | Evening Feedback | `EveningFeedbackRecord/Revision(overallFeeling, noteCiphertext)` | 自身 feeling/note；note 不进入其它 View |
-| RELATIONSHIP-001 | 今日关系模块 | TodayView 关系白名单 | Relationship Cycle / Encounter | `RelationshipCycle`、`RelationshipEncounterLink`、`RelationshipNodeReceipt` | 阶段/节点展示；不返回 link 图或内部 fingerprint |
-| MATTER-001 | 事项管理 | MatterView、matter commands | Important Matter | `ImportantMatter`、revision title ciphertext/status/date | 自身事项与用途开关摘要 |
-| MEMORY-GRANT-001 | 记忆设置 | MemoryManagementView、memory preferences | Purpose Grant | `MemoryPurposeGrant`、`MemoryMasterPreference` | 可理解的开关与来源说明；不返回内部 grant ref |
-| MEMORY-RUNTIME-001 | resolver 内部 | 不提供通用客户端接口 | Context Snapshot / Dependency | `MemoryMentionReceipt`、`MemoryContextSnapshot`、`SourceDependency` | 仅经批准的可见文本与来源说明 |
-| WEEKLY-001 | 七天趋势 | WeeklyView、history views | Weekly Window / Summary | `WeeklyWindow`、source snapshot、summary intent/revision、content/dependency | 真实聚合、coverage、当前有效 summary |
-| SAFETY-STATE-001 | 任一可检查自由文本、Safety 页 | SafetyView、recovery commands | Safety State / Response Plan | `SafetyState`、`SafetyResponsePlan`、`RecoveryCommandReceipt` | 固定状态与资源；不返回类别、confidence、原文、rationale |
-| SAFETY-EVENT-001 | Safety gate/资源操作 | 管理端脱敏 Safety event view | Safety Decision / Event | `SafetyDecision`、`SafetyEvent`、最小 resource action | 用户端不见内部事件；管理端仅脱敏 |
-| NOTIFY-PREF-001 | 通知设置 | NotificationSettingsView、permission-sync | Preference / Platform Snapshot | `NotificationPreference`、`PlatformPermissionSnapshot` | 自身偏好与平台观察状态 |
-| NOTIFY-RUNTIME-001 | 排期/投递 | 普通客户端只见结果性状态 | Notification Intent / Attempt | `NotificationIntent`、`NotificationDeliveryAttempt` | 不返回平台 ref、payload、内部失败细节 |
-| SHARE-001 | 分享预览/点击分享 | `/share/preview`、`/share/intent` | Share Draft / Intent | 当前无独立 Prisma 权威 model；短期对象/运行记录 | 默认隐藏称呼、原始状态、自由文本和记忆 |
-| EXPORT-001 | 数据管理页 | DataTaskView、export command | Export DataTask | `DataTask(kind=EXPORT)` + 24h 对象 artifact | 下载链接和真实到期时间 |
-| RIGHTS-TASK-001 | 删除确认/任务页 | DataTaskView、prepare/confirm/task queries | Data Task / Guard | `DataTask`、`DeletionGuard`、`DeletionStepCheckpoint` | scope、阶段、online erased、backup deadline；无被删正文 |
-| RIGHTS-EVIDENCE-001 | 删除 worker/恢复演练 | 普通用户仅通过 DataTaskView 间接获知 | Receipt / Provider / Restore Deny | `DeletionReceipt`、`ProviderDeletionRequest`、`RestoreDenyRecord`、`DayErasureGuard` | 不返回 blinded token、epoch、provider 内部 ref |
-| RUNTIME-001 | 所有可重试命令与后台执行 | CommandReceiptView 的封闭子集 | Command / Gateway / Event Delivery | `CommandReceipt`、`GatewayAttempt`、`OutboxEvent`、`InboxReceipt` | command outcome/ref；不返回请求正文、模型名、成本链 |
-| SUPPORT-001 | FAQ/支持反馈 | `POST /support/feedback` | 尚未冻结 | 尚无 Prisma 权威模型 | 仅提交结果；不得回显或扩散文本 |
+| PDM-ACCOUNT-001 | `wx.login` | `POST /auth/wechat/session`、LaunchStateSnapshot | Account / External Identity | `UserAccount`；`ExternalIdentity(providerCode, subjectLookupToken, subjectCiphertext)` | account 状态摘要；不返回 openid/unionid/密文 |
+| PDM-SESSION-001 | 登录/刷新/跨日继续 | auth session、Safety continuation、bootstrap | Session / Continuation Grant | `SessionCredential(tokenHash, deviceRef, expiresAt, revokedAt)`；`ViewContinuationGrant` | opaque token；不返回 hash/内部 scope map |
+| PDM-CONSENT-001 | 必要告知页 | `/consent/current|accept|withdraw` | Necessary Consent | `NecessaryConsentRecord(noticeVersion, logicalIntent, status, acceptedAt, withdrawnAt)` | 当前版本与状态 |
+| PDM-ONBOARDING-001 | 首次认识完成 | onboarding command、LaunchStateSnapshot | Onboarding Completion | `OnboardingCompletion(profileRevision, consentRecordId, completionCommandRef, completedAt)` | 仅完成状态；不返回内部 refs |
+| PDM-PROFILE-001 | 首次认识/资料设置 | ProfileView、onboarding/profile commands | Profile | `UserProfile`；`UserProfileRevision(preferredNameCiphertext, expressionStyle, revision)` | 解密后的自身称呼、风格与 revision |
+| PDM-CHECKIN-001 | 晨间签到 | CheckinView、submit/correct/rebuild | Morning Checkin | `MorningCheckin(productDate, mood, energy, sleep, revision)`；`MorningCheckinRevision(mood, energy, sleep, revision)` | 自身结构值与 revision |
+| PDM-GEN-INTENT-001 | 启动今日生成 | Generation status view | Generation Intent / Input Snapshot | `GenerationIntent`；`GenerationInputSnapshot`；`GatewayInvocation`；`GatewayCandidate` | intent 状态；不返回 seed、fingerprint、route、Prompt |
+| PDM-DAILY-RESULT-001 | 今日/历史详情 | TodayView、ClientDailyContentView | Published Daily Result | `PublishedDailyResult`；`PublishedResultVisibility`；`ResultContentSlot`；`PersonalizedContentFragment`；`SourceDependency` | 白名单正文与展示状态；不返回 provider attempt/内部 refs |
+| PDM-INTERACTION-001 | 今日点亮/任务/帮助度 | InteractionView、interaction commands | Daily Interaction | `DailyInteraction`；`DailyLightFact`；`DailyTaskState`；`DailyHelpfulnessRecord` | 自身状态与 revision |
+| PDM-EVENING-001 | 晚间反馈 | EveningView、`POST /evening/save` | Evening Feedback | `EveningFeedbackRecord(overallFeeling, noteCiphertext)`；`EveningFeedbackRevision` | 自身 feeling/note；note 不进入其它 View |
+| PDM-RELATIONSHIP-001 | 今日关系模块 | TodayView 关系白名单 | Relationship Cycle / Encounter | `RelationshipCycle`；`RelationshipEncounterLink`；`RelationshipNodeReceipt` | 阶段/节点展示；不返回 link 图或内部 fingerprint |
+| PDM-MATTER-001 | 事项管理 | MatterView、matter commands | Important Matter | `ImportantMatter`；`ImportantMatterRevision(titleCiphertext, targetProductDate, state, revision)` | 自身事项与用途开关摘要 |
+| PDM-MEMORY-GRANT-001 | 记忆设置 | MemoryManagementView、memory preferences | Purpose Grant | `MemoryPurposeGrant`；`MemoryMasterPreference` | 可理解的开关与来源说明；不返回内部 grant ref |
+| PDM-MEMORY-RUNTIME-001 | resolver 内部 | 不提供通用客户端接口 | Context Snapshot / Dependency | `MemoryMentionReceipt`；`MemoryContextSnapshot`；`SourceDependency` | 仅经批准的可见文本与来源说明 |
+| PDM-WEEKLY-001 | 七天趋势 | WeeklyView、history views | Weekly Window / Summary | `WeeklyWindow`；`WeeklySourceSnapshot`；`WeeklySummaryIntent`；`PublishedWeeklySummaryRevision`；`WeeklyContentSlot`；`WeeklyPersonalizedContentFragment`；`WeeklySourceDependency` | 真实聚合、coverage、当前有效 summary |
+| PDM-SAFETY-STATE-001 | 任一可检查自由文本、Safety 页 | SafetyView、recovery commands | Safety State / Response Plan | `SafetyState`；`SafetyResponsePlan`；`RecoveryCommandReceipt` | 固定状态与资源；不返回类别、confidence、原文、rationale |
+| PDM-SAFETY-EVENT-001 | Safety gate/资源操作 | 仅经权利或受限管理投影 | Safety Decision / Event / Resource | `SafetyDecision`；`SafetyEvent`；`SafetyResourceEntry` | 用户端仅见第 12.1 节权利摘要；管理端仅脱敏 |
+| PDM-NOTIFY-PREF-001 | 通知设置 | NotificationSettingsView、permission-sync | Preference / Platform Snapshot | `NotificationPreference`；`PlatformPermissionSnapshot` | 自身偏好与平台观察状态 |
+| PDM-NOTIFY-RUNTIME-001 | 排期/投递 | 普通客户端只见结果性状态 | Notification Intent / Attempt | `NotificationIntent`；`NotificationDeliveryAttempt` | 不返回平台 ref、payload、内部失败细节 |
+| PDM-SHARE-001 | 分享预览/点击分享 | `/share/preview`、`/share/intent` | Share Draft / Intent | 当前无独立 Prisma 权威 model；仅短期对象/运行记录 | 默认隐藏称呼、原始状态、自由文本和记忆 |
+| PDM-EXPORT-001 | 数据管理页 | DataTaskView、export command | Export DataTask | `DataTask(kind=EXPORT)` + 24h 对象 artifact | 下载链接和真实到期时间 |
+| PDM-RIGHTS-TASK-001 | 删除确认/任务页 | DataTaskView、prepare/confirm/task queries | Data Task / Guard | `DataTask`；`DeletionGuard`；`DeletionStepCheckpoint` | scope、阶段、online erased、backup deadline；无被删正文 |
+| PDM-RIGHTS-EVIDENCE-001 | 删除 worker/恢复演练 | 普通用户仅通过权利摘要间接获知 | Receipt / Provider / Restore Deny | `DeletionReceipt`；`ProviderDeletionRequest`；`RestoreDenyRecord`；`DayErasureGuard` | 不返回 blinded token、epoch、provider 内部 ref |
+| PDM-RESTRICTED-AUDIT-001 | 受限读取、删除、Safety、legal hold | 无普通客户端接口；权利请求生成最小摘要 | Restricted Audit | `RestrictedAuditEvent` | 不直接返回原始审计行；按第 12.1 节提供摘要 |
+| PDM-LEGAL-HOLD-001 | 经批准法律要求 | 无普通客户端接口 | Legal Hold | `LegalHold` | 仅在法律允许范围内告知状态/限制，不返回审批或案件秘密 |
+| PDM-RUNTIME-001 | 所有可重试命令与后台执行 | CommandReceiptView 的封闭子集 | Command / Gateway / Event Delivery | `CommandReceipt`；`GatewayAttempt`；`OutboxEvent`；`InboxReceipt` | command outcome/ref；不返回请求正文、模型名、成本链 |
+| PDM-SECURITY-LOG-001 | 认证、网络与安全设施 | 无普通客户端接口 | Security Log | 外部安全日志域；不进入 Prisma 产品表 | 仅在适用权利请求中提供不损害安全的摘要 |
+| PDM-BACKUP-001 | PostgreSQL/对象/WAL/PITR 复制 | 无 API/View | Isolated Backup | `BackupCatalogEntry` 只登记目录；备份载荷在隔离介质 | 不直接读取；恢复前先应用删除账本 |
+| PDM-SUPPORT-001 | FAQ/支持反馈 | `POST /support/feedback` | S-22 前仅 T0 请求 | 尚无 Prisma 权威模型 | 仅中性提交结果；文本不持久化、不转交 |
+| PDM-ANALYTICS-001 | 受审产品/运行投影 | S-24 前无生产 API/SDK | T0 Projection / T4 Aggregate | 不建立用户级 analytics model；匿名聚合位置由 S-24 冻结 | 不返回用户级事件历史 |
+| PDM-EVALUATION-001 | 合成 corpus/评测任务 | 无用户 API/View | Evaluation Run / Sample | `EvaluationRun`；`EvaluationSample` | 不适用；禁止真实 AccountRef |
+| PDM-IMPACT-ASSESSMENT-001 | 隐私评估与变更评审 | 无用户 API/View | Impact Assessment / Processing Record | 文档级受限证据；不写入真实样本 | 不适用；必要时公开结论摘要 |
+| PDM-SYSTEM-001 | 发布与运维配置 | 无用户 API/View | Version / Retention / Provider Profile | `VersionCatalogEntry`；`RetentionPolicyEntry`；`ProviderDataHandlingProfile`；`BackupCatalogEntry` | 仅公开版本/政策所需部分 |
 
 字段映射原则：API DTO 只能提交 OpenAPI 明确允许的字段；owner、账户 ID、Safety/deletion epoch、seed、ciphertext、provider、内部 fingerprint 和任意 Prisma 字段均由服务端解析或生成。
 
@@ -151,7 +171,18 @@
 | Share | 用户主动生成隐私安全卡片 | 可选 | 默认包含称呼、签到、note、事项、Safety 或隐藏记忆 |
 | Runtime / Logs | 幂等、可靠执行、安全、故障与成本 | 技术必要 | 保存请求/响应 body、自由文本或高基数用户画像标签 |
 | Rights / Evidence | 完成访问、导出、删除和防复活 | 权利与安全必要 | 恢复被删内容、用删除回执做产品行为分析 |
-| Support | 响应用户主动问题 | 可选 | 自动进入普通 AI、记忆或长期内容库；未冻结前不得持久化 |
+| Restricted Audit / Legal Hold | 证明受限操作或履行明确法律要求 | 受限必要 | 作为通用排障借口、恢复正文、进入产品或分析 |
+| Analytics | S-24 评审最小匿名聚合 | 未授权生产 | 用户级事件持久化、跨日身份拼接、SDK 自动采集 |
+| Support | 响应用户主动问题 | 可选 | 自动进入普通 AI、记忆或长期内容库；S-22 前不得持久化或人工转交 |
+
+### 6.1 法定敏感个人信息与未成年人
+
+- 本文工程敏感级别不替代上线法律分类。签到中的 mood/energy/sleep、evening note 和 Safety 数据先按可能涉及敏感个人信息采用高保护措施；最终是否需要单独同意、额外告知或影响评估由实际处理方式决定。
+- 当前权威模型没有年龄、出生日期、证件或监护人关系字段；目标画像为 22～35 岁不等于已经验证用户年龄，非目标用户也没有被产品规范禁止进入。
+- 在生产开放前必须二选一并形成 Accepted 规范：
+  1. 明确不向不满十四周岁用户提供服务，设计不额外收集生日/证件的最小 eligibility gate、拒绝路径和误判申诉；
+  2. 允许不满十四周岁用户时，先定义监护人同意、专门处理规则、敏感个人信息必要性、受托方、访问、期限、权利和删除传播。
+- 上述选择未完成时，生产 Gate 必须失败；不得为了“先上线再判断”采集生日、身份证、人脸或监护人联系方式。
 
 ## 7. 存储位置与数据流
 
@@ -168,6 +199,8 @@
 | 对象存储 / CDN | 短期分享图、导出 artifact、加密备份 | 默认长期用户内容仓库 | 分享 7 天、导出 24h、在线删除 72h、备份 35 天 |
 | 应用日志 / Trace | request id、opaque refs、稳定 reason、版本、时间、usage | 称呼、签到值、事项、note、Prompt、provider body、Safety 原文 | ordinary trace 30 天；严格 allowlist 和脱敏 |
 | 网络安全日志 | 必要 IP、网络与认证安全事件 | 产品画像、普通分析、内容恢复 | 独立安全域，六个自然月 |
+| Analytics / 实验平台 | S-24 后仅可接收获批且已完成映射的数据；当前只允许 T4 不可识别聚合 | 用户/设备/session ref、精确轨迹、自由文本、请求体和本表禁止字段 | S-24 前用户级采集关闭；供应商、区域、TTL、删除未冻结则不得启用 |
+| 邮件 / IM / 工单 | S-22 后按 Accepted 支持规格允许的最小工单 | S-22 前的支持文本、Safety 原文、任意产品全文 | S-22 前不得转交；未来须有人员、TTL、删除和审计 |
 | AI Provider | 单次批准 prepared input 与 strict Schema | 身份、seed、raw score、note、未授权事项、完整历史 | body 不在本方落库；training off；服务端最长 30 天 |
 | 微信平台 | 登录 code 交换、订阅权限/投递所需平台字段 | 业务事实、记忆、Safety 原文 | 按平台规则和合同核验；平台观察不等于用户偏好 |
 | 管理后台 | 聚合运行指标、脱敏 Safety/DataTask 状态 | 任意用户全文、密文、Prompt、provider body | 独立企业身份、二次验证占位、访问审计 |
@@ -191,7 +224,8 @@
 用户确认删除
   → DataTask + DeletionGuard 原子提交
   → 同步 semantic blocked
-  → session/cache/queue/in-flight/share/export URL 失效
+  → 按删除 scope 使相关 cache/queue/in-flight/share/export URL 失效
+  → 仅 ACCOUNT 删除吊销全部 session；DAY/MATTER/RELATIONSHIP_DATA 不终止无关会话
   → 权威库、派生、对象/CDN、受托在线副本清理
   → provider expiry + backup purge deadline 登记
   → DeletionReceipt + RestoreDenyRecord
@@ -213,7 +247,7 @@
 | 普通运营后台 | — | 聚合/M | — | 聚合 route 成功率 | — | 聚合/M | 聚合 |
 | 受限 Safety 管理 | — | — | — | — | M 脱敏事件 | — | 受限审计 |
 | 受限数据权利管理 | M task owner token | — | — | — | M guard | R/W task step，不读正文 | 受限审计 |
-| Support | 用户主动提供的最小联系上下文 | 用户提交的必要摘要 | 仅本次/工单若 S-22 批准 | — | 不可浏览危机原文 | M 用户可见任务状态 | 工单审计待 S-22 |
+| Support | S-22 前 — | S-22 前 — | S-22 前 —；未来仅获批工单字段 | — | 不可浏览危机原文 | M 用户可见任务状态 | 工单审计待 S-22 |
 | Security/DB 运维 | M/密文 | 密文或受控 break-glass | 默认不可解密 | — | restricted 需审批 | restricted 需审批 | R 安全域 |
 | 微信/AI/云受托方 | 平台所需最小字段 | 仅合同允许投影 | 仅明确批准的单次输入 | 受托处理 | 不获得普通 Safety 原文 | 按删除指令 | 自有受限运行记录 |
 
@@ -272,6 +306,7 @@
 | PostgreSQL/Redis/Queue 托管 | 部署商未冻结 | 区域、加密、访问角色、备份、日志、删除和迁移退出条款 | 不部署真实数据 |
 | 对象存储/CDN | 厂商未冻结 | 区域、对象版本、CDN purge、密钥销毁、访问日志和最长 35 天备份 | 分享/导出生产能力关闭 |
 | 日志/监控平台 | 厂商未冻结 | allowlist、采样、区域、TTL、访问、导出、删除和禁止正文 | 只使用本地脱敏最小日志 |
+| Analytics / 实验平台 | S-24 未冻结，当前禁用用户级采集 | 事件/属性 allowlist、不可关联证明或合法处理边界、区域、TTL、访问、删除、SDK 自动采集关闭证据 | 不发送用户级事件；只保留本地 T4 聚合 |
 | 企业身份/管理后台 | 厂商未冻结 | SSO/MFA、角色、离职撤权、审计和区域 | 不开放生产后台 |
 | 用户支持/工单 | S-22 未冻结 | 工单字段、自由文本边界、人员、TTL、删除、Safety 路由 | 不持久化支持文本 |
 
@@ -283,36 +318,46 @@
 
 | 数据 ID | 活跃/最长期限 | 终止后 | 删除范围与传播 |
 |---|---|---|---|
-| ACCOUNT-001 | 账户 ACTIVE；24 个月无主动认证使用自动触发删除 | guard 后立即不可用，在线 72h 清除 | ACCOUNT；身份、profile、日数据、关系、事项、周数据、会话、对象和派生 |
-| SESSION-001 | session 最长 30 天，可主动撤销 | 登出/Restricted/Deleting/删除时立即吊销 | ACCOUNT；缓存和 continuation 同步失效 |
-| CONSENT-001 | 当前必要回执随账户 ACTIVE | 被替代最小回执最多 6 个自然月 | ACCOUNT/withdrawal；正文不存在 |
-| PROFILE-001 | 当前 revision 随账户 ACTIVE | 被替换结构值最多 30 天；旧自由文本 72h | ACCOUNT/source clear；context/candidate 失效 |
-| CHECKIN/RESULT/INTERACTION/EVENING | 账户 ACTIVE，允许逐日删除 | DAY 在线 72h；24 月无使用触发 ACCOUNT | DAY/ACCOUNT；生成、周、关系、memory、通知、分享、导出、缓存、队列 |
-| RELATIONSHIP-001 | 账户 ACTIVE | RELATIONSHIP_DATA 在线 72h | 关闭 cycle、删除 links/receipts；默认不删真实 DAY，显式日期生成 DAY 子任务 |
-| WEEKLY-001 | 所有 source 有效且账户 ACTIVE | 普通旧 revision 30 天；source 删除版本 72h | DAY/RELATIONSHIP/ACCOUNT；旧 summary 不再可见 |
-| MATTER-001 | ACTIVE/PAUSED 至用户删除；COMPLETED/EXPIRED 最多 90 天 | 到期或删除在线 72h | MATTER/ACCOUNT；grant、snapshot、dependency、提醒、缓存和个性化片段 |
-| MEMORY-GRANT-001 | 不晚于 source/purpose/account | revoke 后 30 天仅最小变更证据，正文 0 | 对应 source/purpose；新使用立即停止 |
-| MEMORY-RUNTIME-001 | invocation/result 所需期间；mention 不晚于 source+30 天 | source/revoke 后立即失效，72h 清除 | 删除 dependency；切换无源 fallback |
-| GEN-INTENT-001 | 不晚于对应 DAY 事实 | DAY/ACCOUNT 清除 | invocation、candidate、queue、cache 取消 |
-| Gateway attempt metadata | terminal 后 30 天 | 物理删除；仅匿名聚合可留 | DAY/ACCOUNT/Runtime |
-| Command receipt | terminal 后 7 天 | 整体清除 | 对应 scope；不保存请求正文 |
-| NOTIFY runtime | terminal 后 35 天 | 物理删除 | DAY/MATTER/ACCOUNT；平台 ref 和队列清理 |
-| SHARE draft/object | 草稿 24h；对象最长 7 天 | URL 先失效，对象 72h | DAY/ACCOUNT/显式对象删除 |
-| EXPORT artifact | READY 后 24h | 链接先失效，对象删除 | EXPORT/ACCOUNT；task 元数据 terminal 后 30 天 |
-| SAFETY state | 状态所需期间且账户存在 | CLEAR 后 event 最长 30 天 | ACCOUNT；窄 legal hold 例外 |
-| Safety resource action | 7 天 | 物理删除 | ACCOUNT/Safety；不记录接通或通话内容 |
-| Ordinary trace | 30 天 | 物理删除 | Runtime/ACCOUNT；仅 allowlist |
-| SECURITY-LOG-001 | 六个自然月 | 到期删除 | Restricted frozen；不得用于产品分析 |
-| DataTask active | 直到完成或失败解决 | task/export 元数据按策略清理 | guard 失败时仍保持生效 |
-| Deletion receipt | terminal 后 6 个自然月 | token/key 一并销毁 | T2；ACCOUNT receipt 不留 AccountRef/openid/内容 |
-| Provider body | 本方 T0；provider 合同最长 30 天 | 到期/删除指令 | provider request 24h 内发出，restricted retention 不得普通使用 |
-| BACKUP-001 | 最长 35 个自然日 | 自动过期/密钥销毁 | restore 前应用 ledger、guard、deny record |
-| DayErasureGuard | 最长 45 天 | 到期硬删 | 只含最小 version/epoch/task ref，不含被删内容/seed |
-| 影响评估和处理记录 | 至少 3 年 | 按适用要求 | 文档级证据，不嵌入真实用户样本 |
-| Legal hold | 明确依据要求期间，每 90 天复核 | release/expiry 后 72h 清理 | 只限获批最小范围 |
-| Evaluation artifact | response 90 天；run manifest 365 天 | 到期删除 | 只用 SyntheticSubjectRef |
+| PDM-ACCOUNT-001 | 账户 ACTIVE；24 个月无主动认证使用自动触发删除 | guard 后立即不可用，在线 72h 清除 | ACCOUNT；身份、profile、日数据、关系、事项、周数据、会话、对象和派生 |
+| PDM-SESSION-001 | session 最长 30 天，可主动撤销 | 登出/Restricted/Deleting/ACCOUNT 删除时立即吊销 | ACCOUNT；缓存和 continuation 同步失效 |
+| PDM-CONSENT-001 | 当前必要回执随账户 ACTIVE | 被替代最小回执最多 6 个自然月 | ACCOUNT/withdrawal；正文不存在 |
+| PDM-ONBOARDING-001 | completion 随账户 ACTIVE | ACCOUNT 在线 72h 清除 | ACCOUNT；引用的 consent/profile 随各自策略处理 |
+| PDM-PROFILE-001 | 当前 revision 随账户 ACTIVE | 被替换结构值最多 30 天；旧自由文本 72h | ACCOUNT/source clear；context/candidate 失效 |
+| PDM-CHECKIN-001 | 账户 ACTIVE，允许逐日删除 | DAY 在线 72h；24 月无使用触发 ACCOUNT | DAY/ACCOUNT；生成、周、关系、memory、通知、分享、导出、缓存、队列 |
+| PDM-DAILY-RESULT-001 | 账户 ACTIVE，允许逐日删除 | DAY 在线 72h；24 月无使用触发 ACCOUNT | DAY/ACCOUNT；历史 View、fragment、visibility、dependency |
+| PDM-INTERACTION-001 | 账户 ACTIVE，允许逐日删除 | DAY 在线 72h；24 月无使用触发 ACCOUNT | DAY/ACCOUNT；点亮、任务、帮助度和关系派生 |
+| PDM-EVENING-001 | 账户 ACTIVE，允许逐日删除 | DAY 在线 72h；旧 note ciphertext 72h | DAY/ACCOUNT；note 不传播到 Weekly/AI/memory |
+| PDM-RELATIONSHIP-001 | 账户 ACTIVE | RELATIONSHIP_DATA 在线 72h | 关闭 cycle、删除 links/receipts；默认不删真实 DAY，显式日期生成 DAY 子任务 |
+| PDM-WEEKLY-001 | 所有 source 有效且账户 ACTIVE | 普通旧 revision 30 天；source 删除版本 72h | DAY/RELATIONSHIP/ACCOUNT；旧 summary 不再可见 |
+| PDM-MATTER-001 | ACTIVE/PAUSED 至用户删除；COMPLETED/EXPIRED 最多 90 天 | 到期或删除在线 72h | MATTER/ACCOUNT；grant、snapshot、dependency、提醒、缓存和个性化片段 |
+| PDM-MEMORY-GRANT-001 | 不晚于 source/purpose/account | revoke 后 30 天仅最小变更证据，正文 0 | 对应 source/purpose；新使用立即停止 |
+| PDM-MEMORY-RUNTIME-001 | invocation/result 所需期间；mention 不晚于 source+30 天 | source/revoke 后立即失效，72h 清除 | 删除 dependency；切换无源 fallback |
+| PDM-GEN-INTENT-001 | 不晚于对应 DAY 事实 | DAY/ACCOUNT 清除 | invocation、snapshot、candidate、queue、cache 取消 |
+| PDM-RUNTIME-001 · GatewayAttempt | terminal 后 30 天 | 物理删除；仅不可识别聚合可留 | DAY/ACCOUNT/Runtime |
+| PDM-RUNTIME-001 · CommandReceipt | terminal 后 7 天 | 整体清除 | 对应 scope；不保存请求正文 |
+| PDM-NOTIFY-PREF-001 | 当前偏好随账户 ACTIVE，可随时关闭 | ACCOUNT 在线 72h 清除；关闭后新 intent 立即停止 | ACCOUNT/preference withdrawal；不延长既有 attempt TTL |
+| PDM-NOTIFY-RUNTIME-001 | terminal 后 35 天 | 物理删除 | DAY/MATTER/ACCOUNT；平台 ref 和队列清理 |
+| PDM-SHARE-001 | 草稿 24h；对象最长 7 天 | URL 先失效，对象 72h | DAY/ACCOUNT/显式对象删除 |
+| PDM-EXPORT-001 | READY 后 24h | 链接先失效，对象删除 | EXPORT/ACCOUNT；task 元数据 terminal 后 30 天 |
+| PDM-SAFETY-STATE-001 | 状态所需期间且账户存在 | ACCOUNT 在线 72h 清除 | ACCOUNT；窄 legal hold 例外 |
+| PDM-SAFETY-EVENT-001 · Event | CLEAR 后最长 30 天 | 物理删除 | ACCOUNT/Safety；窄 legal hold 例外 |
+| PDM-SAFETY-EVENT-001 · ResourceAction | 7 天 | 物理删除 | ACCOUNT/Safety；不记录接通或通话内容 |
+| PDM-RUNTIME-001 · OrdinaryTrace | 30 天 | 物理删除 | Runtime/ACCOUNT；仅 allowlist |
+| PDM-SECURITY-LOG-001 | 六个自然月 | 到期删除 | Restricted frozen；不得用于产品分析 |
+| PDM-RIGHTS-TASK-001 | 直到完成或失败解决 | task/export 元数据按策略清理 | guard 失败时仍保持生效 |
+| PDM-RIGHTS-EVIDENCE-001 · DeletionReceipt | terminal 后 6 个自然月 | token/key 一并销毁 | T2；ACCOUNT receipt 不留 AccountRef/openid/内容 |
+| PDM-RIGHTS-EVIDENCE-001 · DayErasureGuard | 最长 45 天 | 到期硬删 | 只含最小 version/epoch/task ref，不含被删内容/seed |
+| PDM-GEN-INTENT-001 · ProviderBody | 本方 T0；provider 合同最长 30 天 | 到期/删除指令 | provider request 24h 内发出，restricted retention 不得普通使用 |
+| PDM-BACKUP-001 | 最长 35 个自然日 | 自动过期/密钥销毁 | restore 前应用 ledger、guard、deny record |
+| PDM-RESTRICTED-AUDIT-001 | `expiresAt` 必填；最大期限待 S-22/S-29 冻结 | 到期清除；若 scope 被删则停止普通查询 | 未冻结最大期限前不得开放生产受限后台；legal hold 仅冻结批准最小范围 |
+| PDM-LEGAL-HOLD-001 | 明确依据要求期间，每 90 天复核 | release/expiry 后 72h 清理 | 只限获批最小范围 |
+| PDM-SUPPORT-001 | 仅当前请求 T0 | 响应完成立即丢弃 | 无持久副本、工单、人工转交或用户级支持历史 |
+| PDM-ANALYTICS-001 | T0 仅单次内存；T4 按 S-24 聚合策略 | T0 请求结束即丢弃；T4 不含个人 scope | S-24 前无用户级 analytics 数据可删除或恢复 |
+| PDM-EVALUATION-001 | response 90 天；run manifest 365 天 | 到期删除 | 只用 SyntheticSubjectRef |
+| PDM-IMPACT-ASSESSMENT-001 | 至少 3 年 | 按适用要求 | 文档级证据，不嵌入真实用户样本 |
+| PDM-SYSTEM-001 | 按版本发布、回滚和审计需要；不含个人数据 | 被替代后按版本目录策略清理 | 不进入用户 scope 删除；任何真实用户引用都使该记录重新归入对应个人数据资产 |
 
-删除 SLA：guard 同步；旧 session/cache/queue/in-flight/URL 在读取时立即拒绝且后台 15 分钟内清理；在线权威库、活动副本、对象/CDN 和普通受托副本 72 小时内；用户可见最终结果最迟 7 天；provider 删除/到期请求 24 小时内发出；provider 最长 30 天；备份最长 35 天。
+删除 SLA：guard 同步；相关 cache/queue/in-flight/URL 在读取时立即拒绝且后台 15 分钟内清理；仅 ACCOUNT scope 吊销全部 session。在线权威库、活动副本、对象/CDN 和普通受托副本 72 小时内；用户可见最终结果最迟 7 天；provider 删除/到期请求 24 小时内发出；provider 最长 30 天；备份最长 35 天。
 
 ## 12. 用户权利入口
 
@@ -322,19 +367,41 @@
 | 更正 | profile update、checkin correct、matter patch、notification/memory preferences | expected revision/CAS；不静默改写已发布历史事实 |
 | 撤回必要同意 | `POST /consent/withdraw` | 撤回状态立即影响普通旅程；不等于自动伪造删除结果 |
 | 撤回可选用途 | memory/notification preference commands | 新使用立即停止；source 是否删除由用户另行决定 |
-| 导出 | `POST /data-rights/export` + DataTaskView | artifact 24h；不包含 secret、Prompt、Safety 受限原文或其它用户数据 |
+| 导出 | `POST /data-rights/export` + DataTaskView | artifact 24h；包含自身 active product 数据和第 12.1 节允许的受限摘要；不包含 secret、Prompt、其它用户数据或会损害系统安全的内部字段 |
+| 查阅/复制受限证据 | 自助 View + 受限权利请求流程（S-22/S-29/A-005 冻结） | 不得因为数据位于 restricted 域自动拒绝；按第 12.1 节输出可理解摘要而非原始数据库行 |
 | 删除 DAY | 一次明确确认 | 删除当日权威事实和派生；同日重记仅符合 ADR 条件并复用原 result version |
 | 删除 MATTER | 一次明确确认 | 删除事项及 grants/dependencies/reminders/fragments，不扩大到其它事项 |
 | 删除 RELATIONSHIP_DATA | prepare → confirm，可显式选 DAY 子任务 | 默认不删除真实 DAY；两个 included day 数组默认空 |
 | 删除 ACCOUNT | prepare → reauth → confirm | guard 后普通登录不能取消；在线/外部/备份期限如实展示 |
 | 取消任务 | `/data-rights/tasks/{ref}/cancel` | 仅领域规定的 guard 前可取消阶段；不能解除已生效 guard |
-| 申诉/支持 | FAQ + support feedback | S-22 前不建立未冻结的长期支持文本库 |
+| 申诉/支持 | FAQ + support feedback | S-22 前文本仅 T0 处理后丢弃，不持久化、不建工单、不人工转交 |
 
 用户界面不得声称外部或离线介质已即时逐字节擦除；DataTaskView 必须展示 online erased、provider expiry 和 backup deadline 的真实阶段。
 
+### 12.1 Safety、删除与受限审计的查阅/复制决定
+
+| 资产 | 自助入口/导出 | 可提供内容 | 不提供内容与原因 |
+|---|---|---|---|
+| PDM-SAFETY-STATE-001 | SafetyView；export 中的当前状态摘要 | 当前 CLEAR/ACTIVE/RECOVERY_PENDING、用户可见固定资源、更新时间 | epoch、内部 guard、检测规则；避免绕过安全控制 |
+| PDM-SAFETY-EVENT-001 | 标准页面不显示；权利请求生成最小摘要 | 与本人相关的事件存在时间、状态动作、policy/resource version、资源动作结果 | 原始输入（本就不保存）、risk 类别、confidence、rationale、内部 event ref |
+| PDM-RIGHTS-TASK-001 | DataTaskView；export task summary | scope、阶段、用户可见 deadline、结果和稳定失败范围 | step checkpoint 内部 ref、worker 拓扑、其它用户或 provider 内部 ref |
+| PDM-RIGHTS-EVIDENCE-001 | DataTaskView 间接展示；权利请求生成完成证明 | 删除已发生、scope、完成时间、provider/backup 到期状态 | blinded token、restore deny key、DayErasureGuard epoch/version 细节；防止恢复/关联已删内容 |
+| PDM-RESTRICTED-AUDIT-001 | 无原始行接口；权利请求生成访问摘要 | 与本人数据相关的访问时间、actor 类别、purpose、outcome | 员工身份、ticket/hold ref、opaque object token、安全调查细节和其它个人信息 |
+| PDM-SECURITY-LOG-001 | 无原始日志接口；适用权利请求提供必要摘要 | 与本人相关且披露不损害网络安全的事件类别、时间和处置结果 | 完整 IP、检测规则、关联账号、攻击证据和第三方信息 |
+| PDM-LEGAL-HOLD-001 | 仅在法律允许告知时通过受限权利流程 | 是否存在影响本人删除/访问的限制、范围和预计复核状态 | 法律禁止披露的案件、审批和第三方内容 |
+
+S-22/S-29/A-005 必须实现或明确承接上述受限权利请求流程；在只能读取数据库原始行、无法生成最小摘要时，不得开放生产受限后台或宣称用户权利闭环已完成。
+
 ## 13. Analytics 允许候选与禁止内容
 
-S-24 只能从本节候选中选择并进一步定义事件、属性、基数、TTL 和匿名化；本节不是埋点字典。
+S-24 只能从本节候选中选择并进一步定义事件、属性、基数、TTL 和匿名化；本节不是埋点字典，也不授权当前发送或保存用户级事件。
+
+S-24 Accepted 前：
+
+- 不接入会自动采集页面、请求、设备、IP、session 或用户标识的 analytics SDK；
+- 候选投影只可在当前服务请求内以 T0 处理，不得写入事件表、日志、队列或第三方；
+- 只有经过书面不可识别/不可复原验证的 T4 聚合可以保留；
+- 如果 S-24 需要用户、设备或跨日可链接事件，必须先更新 `PDM-ANALYTICS-001` 的目的、依据、标识、位置、受托方、访问、TTL、权利和删除传播，再进入实现。
 
 ### 13.1 可进入 S-24 评审的最小候选
 
@@ -347,6 +414,8 @@ S-24 只能从本节候选中选择并进一步定义事件、属性、基数、
 - 通知设置是否开启、intent outcome 的有限枚举，不含平台 opaque ref；
 - DAY/ACCOUNT DataTask 的阶段与 SLA 是否达标的聚合；
 - 已证明不可识别且不可复原的按日/版本聚合计数。
+
+前八类只是字段候选，不代表可以原样写入 analytics。它们必须先证明不会与用户、设备、session、精确时间线或高基数组合重新关联；无法证明时按个人数据处理，并因本阶段缺少完整映射而禁止生产。
 
 ### 13.2 永久禁止进入普通 analytics
 
@@ -371,9 +440,9 @@ Safety、网络安全、删除和受限审计可以有独立的合规/运行计�
 - 指标 label 禁止真实用户值和高基数 refs；需要单次追踪时仅进入受限 trace。
 - 日志平台不可用时，服务不得退化为打印完整 body；应减少日志并保留稳定错误码。
 
-## 15. 最小验证场景（32）
+## 15. 最小验证场景（34）
 
-### 15.1 收集与映射（8）
+### 15.1 收集与映射（9）
 
 | ID | 场景 | 期望 |
 |---|---|---|
@@ -382,9 +451,10 @@ Safety、网络安全、删除和受限审计可以有独立的合规/运行计�
 | PDM-C03 | Checkin 提交未知字段 | 拒绝，未知字段不落库 |
 | PDM-C04 | Evening note 提交 | 先 Safety；通过后只写 evening 权威源 |
 | PDM-C05 | Matter 创建且 grant 默认关闭 | source 存在但不进入未授权用途 |
-| PDM-C06 | 支持反馈在权威模型未冻结时 | 不建立长期持久化；返回中性受控结果 |
+| PDM-C06 | 支持反馈在权威模型未冻结时 | 文本仅 T0 Safety/Schema 处理后丢弃；不持久化、不建工单、不人工转交 |
 | PDM-C07 | 分享预览 | 默认不含称呼、状态、事项、note、Safety |
 | PDM-C08 | 管理端查询用户 ref | 无任意全文浏览接口，非 owner/ref 猜测不能获得数据 |
+| PDM-C09 | 未满十四周岁策略尚未 Accepted | 生产 Gate 失败；不擅自新增生日、证件或监护人字段 |
 
 ### 15.2 使用、访问与 AI（8）
 
@@ -397,9 +467,9 @@ Safety、网络安全、删除和受限审计可以有独立的合规/运行计�
 | PDM-U05 | provider raw response invalid | 整份丢弃，不落库、不进日志/analytics |
 | PDM-U06 | 普通运营查看 Safety | 只能看到聚合告警，无事件原文或类别详情 |
 | PDM-U07 | Privacy worker 删除密文 | 仅按 refs 清理，不向人员或日志展示正文 |
-| PDM-U08 | analytics 扫描字段 | 自由文本、身份、Safety、Prompt、provider body 全部拒绝 |
+| PDM-U08 | S-24 前 analytics SDK/事件写入 | 用户级发送与持久化为 0；仅验证完成的 T4 聚合可留 |
 
-### 15.3 撤回、删除与用户权利（8）
+### 15.3 撤回、删除与用户权利（9）
 
 | ID | 场景 | 期望 |
 |---|---|---|
@@ -411,6 +481,7 @@ Safety、网络安全、删除和受限审计可以有独立的合规/运行计�
 | PDM-D06 | ACCOUNT 删除任务失败 | 账户保持 DELETING/blocked，不恢复 ACTIVE |
 | PDM-D07 | Export READY | 链接 24h 到期，DataTask 不暴露受限内部字段 |
 | PDM-D08 | 用户撤回必要同意 | 普通写按 guard 拦截；不伪造已完成账户删除 |
+| PDM-D09 | 用户请求受限访问记录 | 只生成本人相关 actor 类别/purpose/outcome 摘要；不返回原始审计行、员工身份或安全细节 |
 
 ### 15.4 受托方、备份、日志与故障（8）
 
@@ -434,30 +505,34 @@ Safety、网络安全、删除和受限审计可以有独立的合规/运行计�
 - 数据库角色、KMS、日志 allowlist、Redis/Queue TTL、对象/CDN purge、备份 35 天已验证；
 - ProviderDataHandlingProfile 的 ACTIVE gate 已实现并测试；
 - 用户访问、更正、导出、撤回、四类删除和任务状态端到端可用；
+- Safety/删除/受限审计的查阅复制摘要路径已实现，不以 restricted 域为由自动排除用户权利；
 - DAY/RELATIONSHIP/ACCOUNT 删除演练证明缓存、队列、对象、provider 和备份不复活；
 - 管理后台无任意全文浏览，break-glass 有审批和审计；
-- S-24 事件字典只使用本节允许候选；
+- 未成年人适用策略已 Accepted；不允许不满十四周岁用户时有最小拒绝路径，允许时具备监护人同意和专门处理规则；
+- S-24 事件字典只使用本节允许候选，并补齐用户级事件的处理依据、位置、受托方、TTL、权利和删除；
 - S-22 已解决 support feedback 的权威模型、期限、人员和删除流程；
 - 专业 Safety 评审、资源核验和固定响应 Gate 已完成。
 
 ## 17. 已识别缺口与下游约束
 
-1. **支持反馈**：API 已有入口，但 S-19 尚无权威 model/期限/删除路径；S-22 必须解决，之前不得长期持久化。
+1. **支持反馈**：API 已有入口，但 S-19 尚无权威 model/期限/删除路径；S-22 必须解决，之前文本只允许 T0 处理后丢弃，不得持久化、建工单或人工转交。
 2. **分享运行记录**：API/ADR 定义短期对象和 intent，但没有独立长期事实模型；实现只能使用必要短期记录，不能建立分享画像。
 3. **实际受托方和跨境**：尚未选择生产厂商；所有状态均为 UNVERIFIED，不能据此宣称无跨境或已合规。
-4. **完整运营 RBAC**：由 S-22/S-29/A-005 冻结；当前默认普通后台无用户全文能力。
-5. **Analytics**：S-24 只能从第 13 节选择最小候选，不能通过 SDK 自动采集页面文本或请求体。
-6. **最终法律文本**：必须在实际主体、部署和受托方确定后生成，并与本文一致；不得用本文直接替代。
+4. **完整运营 RBAC 与受限权利摘要**：由 S-22/S-29/A-005 冻结；当前默认普通后台无用户全文能力，无法生成第 12.1 节摘要前不得开放生产受限后台。
+5. **受限审计期限**：`RestrictedAuditEvent.expiresAt` 已强制存在，但最大期限未被 Accepted 上游冻结；S-22/S-29 必须按最短必要确定，之前不得生产写入。
+6. **Analytics**：S-24 只能从第 13 节选择最小候选；当前用户级 SDK、事件表、队列和第三方发送全部关闭。
+7. **未成年人**：目标画像不能证明实际用户年龄；必须在生产前 Accepted“排除不满十四周岁”或“监护人同意 + 专门规则”路径，不得静默采集年龄证明。
+8. **最终法律文本**：必须在实际主体、部署和受托方确定后生成，并与本文一致；不得用本文直接替代。
 
 ## 18. S-21 验收标准
 
-- 数据资产使用稳定且唯一的 `PDM-*` ID；
-- 每项个人数据均有来源、目的、依据、入口、权威对象、位置、访问、期限和删除范围；
+- 数据资产总表使用稳定且唯一的 `PDM-*` ID；其它表必须精确引用这些 ID，必要的组成项使用 `PDM-* · Component`，不得创建简写 ID；
+- 每项个人数据均有来源、目的、依据、入口、权威对象、位置、访问、期限和删除范围；上游未冻结最大期限时必须记录 owner、生产阻塞条件和解决任务；
 - 页面/API/View、领域对象与 Prisma/运行位置能够交叉追踪；
 - AI、memory、Safety、通知、分享、导出、日志、备份和受托方边界完整；
 - 用户访问、更正、撤回、导出、DAY/MATTER/RELATIONSHIP_DATA/ACCOUNT 删除入口完整；
 - Analytics 明确允许候选和永久禁止内容，但未提前创建事件字典；
-- 32 个验证场景 ID 唯一，覆盖正常、缺失、撤回、删除、provider、备份、Safety 和日志；
+- 34 个验证场景 ID 唯一，覆盖正常、缺失、撤回、删除、provider、备份、Safety、日志、未成年人、analytics 和受限权利摘要；
 - 缺口被标记为阻塞项，没有发明新表、字段、目的、期限、接收方或跨境安排；
 - 无数据库、Prisma、migration、API、NestJS、worker、云配置、真实账号、secret 或生产数据变更；
 - 用户确认前本文保持 Draft。

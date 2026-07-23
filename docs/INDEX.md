@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-07-22
+- **最后更新**：2026-07-23
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -154,7 +154,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | docs/analytics/event-tracking.md | Planned | 事件、属性和归因 | journey、mvp |
 | docs/analytics/metrics.md | Planned | D1/D3/D7 等唯一口径 | event-tracking |
 | docs/analytics/experiments.md | Planned | 实验、样本和停止规则 | metrics |
-| docs/operations/privacy-data-map.md | Planned | 数据、用途、位置和保存期 | domain、database、analytics |
+| [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md) | Draft | 数据、用途、位置、访问、保存、删除和用户权利 | domain、database、API、ADR-0005 |
 | docs/operations/content-moderation.md | Planned | 审核、抽检和申诉 | safety、evaluation |
 | docs/operations/user-support.md | Planned | 内测反馈和用户请求 | journey、privacy |
 | docs/operations/incident-response.md | Planned | 故障和安全事件流程 | architecture、safety |
@@ -227,7 +227,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-20 API 契约已由用户确认并合并，三份契约进入 Accepted。下一唯一 Ready 任务是 S-21 隐私数据地图。开始 S-21 时依次读取：
+S-20 API 契约已由用户确认并合并，三份契约进入 Accepted。S-21 隐私数据地图已创建 Draft，并在 [PR #26](https://github.com/WeiHan1996/DailyEnergy/pull/26) 中处于 In Review。继续审核或修订 S-21 时依次读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -260,5 +260,4 @@ S-20 API 契约已由用户确认并合并，三份契约进入 Accepted。下�
 29. docs/technical/error-codes.md；
 30. openapi/openapi.yaml。
 
-S-21 只产出 Draft `docs/operations/privacy-data-map.md` 并同步项目控制文件；不创建或修改数据库、migration、NestJS、埋点 Schema、同意页面、用户协议、供应商配置、真实处理活动或生产代码。
-
+S-21 只产出 Draft `docs/operations/privacy-data-map.md` 并同步项目控制文件；不创建或修改数据库、migration、NestJS、埋点 Schema、同意页面、用户协议、供应商配置、真实处理活动或生产代码。用户确认前文档保持 Draft、任务保持 In Review；确认后先更新状态/接受日期，再合并并交接 S-22。
