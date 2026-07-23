@@ -4,106 +4,131 @@
 - **所属任务**：S-21 — 隐私数据地图
 - **最后更新**：2026-07-23
 - **范围**：Phase 0B 开发前详细规格
-- **目的**：将已接受的产品、AI、领域、数据库、API 与保存删除规则映射为可审计的数据流。
 
-## 1. 原则
+## 1. 目的与边界
 
-DailyEnergy 仅处理一分钟陪伴体验所必需的数据。数据地图不是新增采集清单，也不改变已接受 ADR、Schema、API 或数据库设计。
+本文将 Accepted 产品、AI、领域、数据库、API 和保存删除规则映射为可审计的数据流。
 
-核心规则：
+不新增采集，不改变 ADR、Schema、API 或数据库设计。
+
+核心原则：
 
 - 数据来源必须明确；
 - 用途必须绑定；
-- 客户端只接收白名单 View；
-- 自由文本默认高约束处理；
+- DTO/View 不等于数据库授权；
 - 删除优先于派生、缓存、生成和分析；
-- 未明确授权的数据不进入 AI、memory、analytics。
+- 未授权数据不得进入 AI、memory、analytics。
 
-## 2. 数据分类
+## 2. 数据资产登记
 
-| ID | 数据主体 | 数据 | 分类 | 敏感级别 | 类型 | 处理目的 |
+| ID | 数据主体 | 数据 | 分类 | 类型 | 敏感级别 | 权威来源 |
 |---|---|---|---|---|---|---|
-| PDM-ACCOUNT-001 | 用户 | 微信身份映射、账户引用 | 身份信息 | 高 | 权威事实 | 建立账户与会话 |
-| PDM-PROFILE-001 | 用户 | 称呼、表达风格 | 基本资料 | 中 | 用户提供 | 个性化表达 |
-| PDM-DAILY-001 | 用户 | mood、energy、sleep 签到 | 使用状态 | 中 | 用户提供/结构化 | 今日反馈与趋势 |
-| PDM-INTERACTION-001 | 用户 | 点亮、任务、帮助度 | 行为记录 | 中 | 派生/用户行为 | 连续体验 |
-| PDM-MATTER-001 | 用户 | 重要事项标题与状态 | 用户内容 | 高 | 自由文本 | 用户主动记忆 |
-| PDM-EVENING-001 | 用户 | evening note | 用户内容 | 高 | 自由文本 | 晚间反馈 |
-| PDM-SAFETY-001 | 用户 | Safety 最小事件 | 受限证据 | 高 | 运行证据 | 安全流程 |
-| PDM-GENERATION-001 | 用户 | 生成结果与版本信息 | 派生内容 | 中 | 系统生成 | 展示今日内容 |
+| PDM-ACCOUNT-001 | 用户 | 微信身份映射、账户引用 | 身份信息 | 权威事实 | 高 | UserAccount / ExternalIdentity |
+| PDM-PROFILE-001 | 用户 | 称呼、表达风格 | 基本资料 | 用户提供 | 中 | UserProfile |
+| PDM-CHECKIN-001 | 用户 | mood/energy/sleep | 状态记录 | 用户提供结构化数据 | 中 | MorningCheckin |
+| PDM-INTERACTION-001 | 用户 | 点亮、任务、帮助度 | 行为记录 | 用户行为/派生 | 中 | DailyInteraction |
+| PDM-MATTER-001 | 用户 | 重要事项标题、状态、授权 | 用户内容 | 自由文本 | 高 | ImportantMatter |
+| PDM-EVENING-001 | 用户 | evening note | 用户内容 | 自由文本 | 高 | EveningFeedback |
+| PDM-SAFETY-001 | 用户 | Safety 最小事件和状态 | 受限证据 | 运行证据 | 高 | SafetyState/SafetyEvent |
+| PDM-GENERATION-001 | 用户 | 今日结果、版本、来源信息 | 派生内容 | 系统生成 | 中 | PublishedDailyResult |
 
-## 3. 入口、来源和去向映射
+## 3. API / View / Domain / Storage 映射
 
-| 数据 ID | 收集入口 | API/View | 权威来源 | 存储区域 | 主要访问者 |
-|---|---|---|---|---|---|
-| ACCOUNT-001 | 微信登录 | auth/session、bootstrap | UserAccount / ExternalIdentity | app_* | 会话服务 |
-| PROFILE-001 | 首次认识、资料设置 | ProfileView | UserProfile Revision | app_* | 资料服务 |
-| DAILY-001 | 晨间签到 | CheckinView | MorningCheckin | app_* | Daily 服务 |
-| MATTER-001 | 事项管理 | MatterView | ImportantMatter | app_* | Matter 服务 |
-| SAFETY-001 | 安全入口 | SafetyView | restricted_* | restricted_* | Safety 专用角色 |
-| GENERATION-001 | 今日页面 | TodayView | PublishedDailyResult | app_* | 展示服务 |
+| 数据 | API/View | Domain | Prisma/存储 | 访问边界 |
+|---|---|---|---|---|
+| ACCOUNT | auth/session、bootstrap | Account | UserAccount、ExternalIdentity、SessionCredential | Auth 服务 |
+| PROFILE | ProfileView | Profile | UserProfile、Revision | Profile 服务 |
+| CHECKIN | CheckinView | Daily Checkin | MorningCheckin | Daily 服务 |
+| MATTER | MatterView | Important Matter | ImportantMatter、MemoryPurposeGrant | Matter 服务 |
+| SAFETY | SafetyView | Safety | SafetyState、SafetyEvent | Safety 受限角色 |
+| GENERATION | TodayView | Published Result | PublishedDailyResult | 展示服务 |
+| DATA RIGHTS | DataTaskView | Data Task | DataTask、DeletionGuard | Privacy 受限角色 |
 
-## 4. AI 与第三方流转
+## 4. 处理目的和禁止用途
 
-### AI Provider
+| 数据 | 允许目的 | 禁止用途 |
+|---|---|---|
+| Profile | 称呼、表达风格 | 推断身份画像 |
+| Checkin | 今日体验、趋势 | 医疗诊断、人格判断 |
+| Matter | 用户主动记忆 | 自动建立长期画像 |
+| Evening note | 用户反馈处理 | AI记忆、分析、分享 |
+| Safety | 安全流程 | 用户画像、风险评分营销 |
+| Generation | 展示历史 | 重新推断用户事实 |
 
-允许发送：
+## 5. AI Provider 数据边界
 
-- 已批准结构化表达输入；
+允许：
+
+- 封闭结构化表达输入；
 - 必要版本信息；
 - 安全投影后的最小事实。
 
-禁止发送：
+禁止：
 
-- openid、手机号、stable subject；
-- root seed、raw score；
+- openid、手机号、设备标识；
+- stable subject；
+- raw score、seed、choice trace；
 - evening note；
 - 未授权事项；
-- provider raw body。
+- provider raw request/response。
 
-Provider 数据处理要求：
+Provider 激活条件：
 
-- 使用已审核 data_handling_profile；
-- training 必须关闭；
-- 服务端保留最长 30 天；
-- 不满足条件不得 ACTIVE。
+- 存在 data_handling_profile；
+- training 设置符合要求；
+- retention、删除能力、区域和合同证据已确认。
 
-### 微信平台
+## 6. 第三方与受托方核验
 
-仅用于身份、会话和平台能力，不作为业务画像来源。
+| 接收方 | 用途 | 必须确认 |
+|---|---|---|
+| 微信平台 | 登录、会话、平台能力 | 平台规则、字段范围、合同状态 |
+| AI Provider | 受控表达生成 | 区域、训练策略、保留、删除能力 |
+| 云存储/日志服务 | 技术运行 | 脱敏、访问控制、TTL |
 
-## 5. 保存与删除
+跨境状态：
+
+- MVP 不假设存在跨境；
+- 上线前必须根据实际 Provider 和基础设施重新核验。
+
+## 7. 保存与删除
 
 继承 ADR-0005：
 
-| 数据 | 保存规则 | 删除范围 |
+| 类别 | 保存 | 删除 |
 |---|---|---|
-| 账户身份 | 活跃期间；24个月无主动使用触发 ACCOUNT 删除 | ACCOUNT |
-| 日记录 | 账户活跃期间；用户可删除 | DAY / ACCOUNT |
-| 事项与记忆依赖 | 授权有效期间 | MATTER |
-| Safety 证据 | 最小受限期限 | restricted |
-| Provider 数据 | 最长30天 | provider |
-| 备份 | 最长35天隔离过期 | backup |
+| Account/Profile | 活跃期间及策略期限 | ACCOUNT |
+| DAY 数据 | 产品记录期限 | DAY/ACCOUNT |
+| Matter/Memory | 授权有效期间 | MATTER |
+| Safety | 最小受限期限 | restricted |
+| Provider | 最长30天 | provider |
+| Backup | 最长35天隔离过期 | backup |
 
-删除流程必须先阻断普通读取、生成、通知、分享和缓存，再执行物理清理。
+删除顺序：
 
-## 6. 用户权利入口
+1. 创建删除阻断；
+2. 停止读取、生成、通知、分享；
+3. 清理在线数据；
+4. 跟踪 Provider/Backup 到期；
+5. 防止恢复复活。
 
-| 权利 | 入口 |
+## 8. 用户权利
+
+| 权利 | API |
 |---|---|
-| 查看 | 数据管理页、对应 View |
-| 更正 | profile/checkin/matter revision 命令 |
+| 查看 | 对应白名单 View |
+| 更正 | profile/checkin/matter revision command |
 | 导出 | data-rights/export |
-| 删除 | DAY、MATTER、RELATIONSHIP_DATA、ACCOUNT 删除流程 |
+| 删除 | DAY/MATTER/RELATIONSHIP/ACCOUNT |
 | 撤回同意 | consent/withdraw |
 
-## 7. Analytics 白名单边界
+## 9. Analytics 白名单边界
 
-允许未来 S-24 使用：
+允许：
 
 - 产品日期；
-- 功能使用状态；
-- 匿名化聚合结果；
+- 功能状态；
+- 匿名聚合结果；
 - 脱敏性能和稳定性指标。
 
 禁止：
@@ -111,22 +136,22 @@ Provider 数据处理要求：
 - 原始自由文本；
 - evening note；
 - Safety 原文；
-- 称呼、事项内容组合画像；
-- AI Prompt 或 provider 输入。
+- 事项内容组合画像；
+- Prompt/provider 输入。
 
-## 8. 验证场景
+## 10. 验证场景
 
 | 场景 | 预期 |
 |---|---|
-| 用户撤回记忆授权 | 后续生成不再使用对应 source |
-| 删除 DAY | 派生结果、缓存、队列不可继续使用 |
-| Provider 删除失败 | 保持受限，不恢复普通使用 |
-| 备份恢复 | 先应用 deletion ledger，禁止旧数据复活 |
-| Safety 输入 | 不进入普通 AI 和 analytics |
-| 日志检查 | 无自由文本和敏感字段 |
+| 撤回 memory grant | 后续上下文不使用 source |
+| 删除 DAY | 派生、缓存、队列不可复活 |
+| Provider 删除失败 | 保持限制状态并持续追踪 |
+| 备份恢复 | 应用 deletion ledger，拒绝旧数据恢复 |
+| Safety 输入 | 不进入普通 AI/analytics |
+| 日志审计 | 无原文、无敏感字段 |
 
-## 9. 未决项
+## 11. 未决项
 
-- 实际云厂商、对象存储、微信合同和跨境状态需上线前确认；
-- 不在本阶段确定法律隐私政策文本；
-- 不提前创建埋点字典。
+- 实际云厂商、微信合同、Provider、跨境状态上线前确认；
+- 不在 S-21 输出最终隐私政策或法律意见；
+- 不提前定义 S-24 埋点字典。
