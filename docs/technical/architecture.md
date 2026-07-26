@@ -1,6 +1,6 @@
 # DailyEnergy 系统架构
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
 - **所属任务**：S-29 — 系统架构
 - **最后更新**：2026-07-26
 - **适用范围**：Phase 0B / Phase 1～3 的系统上下文、运行时、同步与异步边界、事务、Worker、AI Gateway、Redis/BullMQ、数据访问和故障恢复
@@ -637,7 +637,7 @@ SSO 厂商、网络 allowlist、break-glass 与具体 RBAC 由 S-22/S-32 落地�
 - 48 个 `S29-ARCH-*` 场景完整且唯一；
 - S-30～S-33、E-003/E-006/E-007 的交接清楚；
 - PR 只包含架构与项目控制 Markdown，不包含代码、workspace、migration、队列或生产配置；
-- 用户确认前本文保持 Draft，S-29 保持 In Review。
+- 本文已随 PR #34 获用户确认并记录为 Accepted；后续实现不得静默改写架构语义。
 
 ## 23. 下游交接
 
@@ -691,9 +691,8 @@ SSO 厂商、网络 allowlist、break-glass 与具体 RBAC 由 S-22/S-32 落地�
 
 ## 25. 审核记录
 
-- 状态：Draft；
-- 接受日期：待用户确认；
-- 内容 PR：[Draft PR #34](https://github.com/WeiHan1996/DailyEnergy/pull/34)；
-- 基线：`main`（ADR-0006 / S-28 已随 PR #33 合并并获用户确认）；
-- 待确认范围：模块化单体、运行时与 Worker profiles、单数据库/schema、事务/outbox/inbox、Gateway、Redis/cache、roles、故障恢复、48 个场景；
-- 下一任务：S-30 仓库结构和模块边界；S-29 被接受前不初始化业务模块或运行时。
+- 状态：Accepted；
+- 接受日期：2026-07-26；
+- 内容 PR：[PR #34](https://github.com/WeiHan1996/DailyEnergy/pull/34)；
+- 已确认范围：模块化单体、运行时与 Worker profiles、单数据库/schema、事务/outbox/inbox、Gateway、Redis/cache、roles、故障恢复与 48 个场景；
+- 下一任务：S-30 仓库结构和模块边界；Phase 1 工程初始化仍须等待 Phase 0B Gate 与对应工程任务。
