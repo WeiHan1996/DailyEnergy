@@ -429,6 +429,6 @@ v1 不增加公共 `experiment_id` 事件属性，也不创建 exposure event �
 
 - 状态：Draft；
 - 接受日期：待用户确认；
-- 内容 PR：待创建；
+- 内容 PR：[Draft PR #31](https://github.com/WeiHan1996/DailyEnergy/pull/31)；
 - 待确认范围：不可实验边界、支持方法、个人 assignment Blocked、主指标/Gate、样本与停止、switchback、32 个验证场景和 Production Gates；
 - 下一任务：S-27 渠道归因规范；S-26 被接受前不把实验能力视为可生产启用。
