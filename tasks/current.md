@@ -5,10 +5,11 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-22
 - **当前任务名称**：内容审核和用户支持流程
-- **任务状态**：Ready
+- **任务状态**：In Review
 - **优先级**：最高
-- **当前分支**：`main`
+- **当前分支**：`agent/content-moderation-support`
 - **上游 PR**：[S-21 PR #26](https://github.com/WeiHan1996/DailyEnergy/pull/26)
+- **当前 PR**：Draft PR 待创建
 - **交付文件**：`docs/operations/content-moderation.md`、`docs/operations/user-support.md`
 
 ## 1. 当前目标
@@ -85,8 +86,9 @@
 
 ## 7. 最近交接
 
-- 用户已于 2026-07-26 确认 S-21；Privacy Data Map 进入 Accepted；
-- S-21 共冻结 33 个数据资产、34 个验证场景及页面/API/View/Prisma 交叉映射；
-- S-21 遗留给 S-22 的核心事项是 support feedback 权威流程、受限权利摘要、运营 RBAC 与 `RestrictedAuditEvent` 最大期限；
-- PR #26 包含本次验收与 S-22 交接，并采用 squash merge；
-- 下一动作：从最新 `main` 创建 `agent/content-moderation-support`，起草两份交付文档。
+- 两份运营 Draft 已完成，共包含 24 个内容审核场景与 30 个用户支持场景；
+- 内容审核冻结全候选硬 Gate、合成抽检、用户主动反馈、独立 Safety 复核与资源 90 天核验；
+- 用户支持冻结现有 OpenAPI 五类入口、SupportCase 目标合同、正文关闭后 30 天/元数据 90 天/正文绝对 180 天上限；
+- break-glass 冻结为案例级、只读、独立审批、最长 60 分钟；`RestrictedAuditEvent.expiresAt` 普通上限为 6 个自然月；
+- 数据模型、API、独立 case 删除/导出、受限摘要、RBAC 与到期 worker 仍是 S-29/C-014 等下游 production Gate；
+- 当前动作：创建 Draft PR，等待用户审核；不自动接受或合并，不开始 S-23。
