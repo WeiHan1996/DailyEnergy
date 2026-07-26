@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/testing-strategy`
 - **上游 PR**：[S-30 PR #35](https://github.com/WeiHan1996/DailyEnergy/pull/35)
-- **当前 PR**：创建后补充
+- **当前 PR**：[Draft PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/36)
 - **交付文件**：`docs/technical/testing.md`
 
 ## 1. 当前目标
@@ -101,4 +101,4 @@
 - S-31 Draft 定义 source-ID coverage registry、十类测试层级与真实依赖/替身边界；
 - PostgreSQL/Redis/BullMQ 关键语义使用真实容器；微信小程序需 DevTools automator 与真机 RC，不由浏览器替代；
 - 已定义 48 个测试策略场景；S-32 是下一任务；
-- 当前动作：创建 Draft PR 后等待用户审核；不自动接受、合并或开始 S-32。
+- 当前动作：等待用户审核 [Draft PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/36)；不自动接受、合并或开始 S-32。
