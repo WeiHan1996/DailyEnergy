@@ -874,7 +874,7 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 - 状态：Draft；
 - 接受日期：待用户确认；
-- 内容 PR：待创建；
+- 内容 PR：[Draft PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)；
 - 基线：`main`（S-31 测试策略已随 PR #36 合并并获用户确认）；
 - 待确认范围：环境、单 host Compose、profile 能力、Release Manifest、配置/secret、migration、发布/回滚、backup/PITR、隔离恢复、artifact/供应链与 48 个场景；
 - 下一任务：S-33 可观测性和成本监控；S-32 被接受前不创建部署流水线、环境或生产资源。
