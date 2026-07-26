@@ -1,93 +1,92 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-07-22
+- **最后更新**：2026-07-26
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务 ID**：S-21
-- **当前任务名称**：隐私数据地图
+- **当前任务 ID**：S-22
+- **当前任务名称**：内容审核和用户支持流程
 - **任务状态**：Ready
 - **优先级**：最高
-- **代码工作**：不开始数据库、migration、NestJS、埋点、同意页面、供应商配置或生产实现；只允许 Draft 隐私数据地图
-- **当前分支**：`agent/s20-accept-handoff`（本 PR 仅 S-20 Accepted 收尾；S-21 在合并后新分支开始）
-- **关联 PR**：[Draft Accepted 收尾 PR #25](https://github.com/WeiHan1996/DailyEnergy/pull/25)；S-20 内容已由 [PR #24](https://github.com/WeiHan1996/DailyEnergy/pull/24) 合并
-- **路线图**：[ROADMAP.md](../ROADMAP.md)
-- **文档索引**：[docs/INDEX.md](../docs/INDEX.md)
+- **当前分支**：`main`
+- **上游 PR**：[S-21 PR #26](https://github.com/WeiHan1996/DailyEnergy/pull/26)
+- **交付文件**：`docs/operations/content-moderation.md`、`docs/operations/user-support.md`
 
 ## 1. 当前目标
 
-在 S-20 被用户确认、PR #24 合并并完成本收尾 PR 后，创建 Draft：
+把 Accepted 的内容安全、评测和隐私边界转换为 Alpha 可执行的运营流程，明确：
 
-- `docs/operations/privacy-data-map.md`
+- 内容怎样分类、抽检、处置、复核和申诉；
+- 用户支持怎样受理、分级、答复、升级和关闭；
+- 运营人员能看到什么，何时需要审批与受限访问审计；
+- Safety 原文、普通支持反馈、受限审计和用户权利摘要怎样隔离；
+- 哪些流程仍是 production Gate，不能靠人工兜底或文档描述视为已实现。
 
-把 Accepted 产品、AI、领域、保存删除、数据库与 API 契约整理成一张可审计的数据地图，回答每项个人信息“从哪里来、为什么处理、到哪里去、谁能访问、保存多久、怎样删除”。
+## 2. 必须交付
 
-**本 PR 不开始写隐私数据地图正文**；只完成 S-20 Accepted 状态收尾与任务指针切换。
+### 2.1 内容审核
 
-## 2. S-21 必须交付（合并本 PR 后的下一实现 PR）
+- 风险分类、处置动作、抽检策略、复核与申诉路径；
+- 生成内容、固定 Safety 响应、用户自由文本和分享内容的不同边界；
+- 高风险内容只能进入专业安全路径，不得落入普通客服或常规审核队列；
+- 角色、最小权限、break-glass、审批和访问审计；
+- 能覆盖正常、误判、漏判、重复提交、升级失败和删除中的验证场景。
 
-- Draft `docs/operations/privacy-data-map.md`；
-- 为每类数据分配稳定条目 ID，并标注数据主体、分类、敏感级别、是否自由文本/派生/运行证据；
-- 映射收集入口和权威来源：页面、API DTO/View、领域对象、Prisma model/字段与生成/记忆/Safety 流程；
-- 记录处理目的、必要性、处理依据、用途限制和明确禁止用途；
-- 记录在线库、缓存、队列、对象存储、日志、备份、AI provider、微信平台及管理端等位置与流转；
-- 记录访问角色、脱敏/加密、受托方或接收方、跨境状态及上线前待签约/核验项；
-- 逐项对齐 ADR-0005 的保存期限、TTL、删除范围、在线清除、备份过期、恢复防复活与最小受限证据；
-- 覆盖访问、更正、导出、删除、撤回同意和账户删除等用户权利入口；
-- 明确 analytics 允许的最小候选属性与禁止采集内容，为 S-24 提供白名单上游，但不提前编写埋点字典；
-- 给出正常、缺失、撤回、删除、受托方失败、备份恢复、Safety 与日志脱敏等可验证场景。
+### 2.2 用户支持
 
-## 3. 上游必读（S-21 开始时）
+- 咨询、故障、反馈、账户与用户权利请求的受理和分流；
+- FAQ、状态反馈、服务级别、升级、关闭、纠正与申诉路径；
+- 支持记录的最小字段、权威位置、访问者、保存期限、删除、导出和受托方约束；
+- 解决 S-21 `support feedback` 当前仅允许 T0 处理后丢弃、不得持久化或人工转交的 Gate；
+- 定义 Safety/删除/受限审计查阅复制摘要路径，但不得向普通支持暴露原文。
 
-见 [docs/INDEX.md](../docs/INDEX.md) 第 12 节 S-21 读取顺序。
+### 2.3 受限访问与下游交接
 
-## 4. 已接受且不得重开的边界
+- 按最短必要原则冻结 `RestrictedAuditEvent.expiresAt` 的最大期限，或在无法冻结时明确 ADR owner 与 production blocker；
+- 将需要数据库/API/架构实现的内容交给 S-29 及后续工程任务，不在 S-22 直接改 Schema 或接口；
+- 将安全事件响应留给 S-23，将 analytics 事件和指标留给 S-24/S-25。
 
-- 只处理实现明确产品目的所必需的数据；禁止未经授权抓取外部个人数据；
-- 记忆必须真实、用途受限、可解释、可关闭、可删除；关闭 grant 后不得继续进入普通生成；
-- 晚间 note 不进入 Weekly、普通 AI、memory、通知、分享或 analytics；
-- Safety 原文、Prompt、provider raw body、seed、ciphertext、内部 epoch 不进入客户端或普通运营后台；
-- API 只暴露封闭白名单 View；DTO 不等于 Prisma model；UUID 不是授权；
-- 删除遵循 ADR-0005：先同步阻断使用，在线副本最长 72 小时，备份最长 35 天隔离过期，provider 最长 30 天，DAY guard 最长 45 天且不保留被删内容；
-- 数据地图不得创造新字段、处理目的、接收方、保存期限或跨境安排；发现缺口时必须回报上游冲突。
+## 3. 上游读取顺序
 
-## 5. 明确不做（本收尾 PR 与 S-21 Draft PR）
+1. `AGENTS.md`、`README.md`、`ROADMAP.md`、`docs/INDEX.md`、本文；
+2. `docs/operations/privacy-data-map.md`；
+3. `docs/ai/safety.md`、`docs/ai/evaluation.md`、`docs/ai/personality.md`；
+4. `docs/product/journey.md`、`docs/product/mvp.md`；
+5. `docs/design/screen-specs.md`、`docs/design/interaction-states.md`；
+6. `docs/data/domain-model.md`、`docs/decisions/ADR-0005-data-retention-and-deletion.md`；
+7. `docs/technical/database.md`、`prisma/schema.prisma`；
+8. `docs/technical/api.md`、`docs/technical/error-codes.md`、`openapi/openapi.yaml`。
 
-- 创建或修改数据库、Prisma、migration、API、NestJS、worker、缓存或生产代码；
-- 编写 S-24 埋点事件字典、S-25 指标口径或完整运营 RBAC；
-- 起草最终隐私政策、用户协议、同意页面文案或替代上线前法律意见；
-- 配置真实微信、AI provider、云存储、日志平台、数据出境或生产账号；
-- 为填表方便扩大采集、长期保存自由文本或重开 Accepted ADR；
-- 自动 merge 任何 PR。
+## 4. 已接受边界
 
-## 6. 验收标准（本收尾 PR）
+- 普通支持、审核、日志和通知不得收集或复制 Safety 原始输入；
+- 普通运营后台不得提供任意用户全文浏览；
+- 在 S-22 冻结支持模型和流程前，`support feedback` 只能 T0 处理后丢弃，不得持久化、建工单或人工转交；
+- 用户权利摘要按 Privacy Data Map 第 12.1 节执行，restricted 域不能成为自动拒绝访问、复制或删除请求的理由；
+- 未成年人生产策略、analytics 用户级收集、真实受托方和跨境状态继续保持 Gate；S-22 不得静默解除；
+- 所有新保存期限、字段、目的、接收方或系统能力必须有 Accepted 上游；缺失时记录阻塞项，不自行发明。
 
-- `docs/technical/api.md`、`docs/technical/error-codes.md` 与 `openapi/openapi.yaml` 为 Accepted，接受日期 2026-07-22；
-- docs/INDEX、backlog、README 和技术目录中 S-20 Done / Accepted、S-21 Ready 一致；
-- 同一时间只有 S-21 一个 Ready 任务；
-- 本 PR 不创建 `privacy-data-map.md`，无生产代码、无真实数据、无 secret；
-- 用户审核本收尾 PR 后再合并；合并前不开始 S-21 正文。
+## 5. 不做
 
-## 7. 最近一次交接
+- 不修改数据库、Prisma、migration、API、OpenAPI、NestJS、worker 或生产代码；
+- 不配置真实客服、审核、AI provider、云服务、账号或 secret；
+- 不写最终隐私政策、用户协议或法律意见；
+- 不创建真实工单、使用真实用户数据或启用人工高风险处置；
+- 不提前完成 S-23 故障和安全事件响应、S-24 埋点或 S-25 指标口径。
 
-- 日期：2026-07-22；
-- PR #24 已 squash 合并到 main，提交 `207de0e`；
-- S-20 交付包含 API、错误码与 OpenAPI 3 契约；
-- 64 个唯一 S20 场景（48 API + 16 error）；OpenAPI 62 paths / 65 operations / 136 schemas；
-- Redocly recommended 已验证为 0 errors / 0 warnings；
-- 本分支只做 S-20 Accepted 生命周期收尾和 S-21 Ready 指针切换；
-- 无 NestJS、migration、数据库、worker 或生产代码；
-- Draft PR [#25](https://github.com/WeiHan1996/DailyEnergy/pull/25) 已创建，**不会自动 merge**；
-- **下一步**：用户审核并合并 PR #25；合并后从新的 S-21 分支开始隐私数据地图正文。
+## 6. 验收标准
 
-## 8. 状态更新规则
+- 两份 Draft 文档覆盖角色、入口、状态、处置、升级、审计、保存删除和用户权利；
+- moderation/support 场景具有稳定唯一 ID，并覆盖正常、异常、权限、删除和 Safety 隔离；
+- 每项记录都能追踪到权威对象、位置、访问者、期限和删除路径；未冻结项有 owner、任务与阻塞条件；
+- ordinary support/moderation 不出现 Safety 原文、任意全文后台或隐式永久保存；
+- docs/INDEX、tasks/current、backlog 和 README 状态一致；
+- PR 不包含业务代码、Schema、接口、真实配置、secret 或真实用户数据；
+- 用户确认前两份文档保持 Draft，任务保持 In Review。
 
-本收尾 PR 合并前：
+## 7. 最近交接
 
-- 三份 S-20 契约在分支上为 Accepted；
-- S-21 保持 Ready，不创建隐私数据地图正文。
-
-用户合并本收尾 PR 后：
-
-- main 上 S-20 正式 Accepted / Done；
-- 新分支将 S-21 改为 In Progress，并创建 Draft `docs/operations/privacy-data-map.md`；
-- 再开独立 Draft PR，仍不自动 merge。
+- 用户已于 2026-07-26 确认 S-21；Privacy Data Map 进入 Accepted；
+- S-21 共冻结 33 个数据资产、34 个验证场景及页面/API/View/Prisma 交叉映射；
+- S-21 遗留给 S-22 的核心事项是 support feedback 权威流程、受限权利摘要、运营 RBAC 与 `RestrictedAuditEvent` 最大期限；
+- PR #26 包含本次验收与 S-22 交接，并采用 squash merge；
+- 下一动作：从最新 `main` 创建 `agent/content-moderation-support`，起草两份交付文档。
