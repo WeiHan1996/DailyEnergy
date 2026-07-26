@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-21 已 Accepted，S-22 Ready，尚未开始业务编码
+状态：S-22 两份运营 Draft 已完成，当前 In Review，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、隐私、指标和工程规范
-当前任务：S-22 内容审核和用户支持流程（Ready）
+当前任务：S-22 内容审核和用户支持流程（In Review）
 ```
 
 长期工作入口：
@@ -361,8 +361,8 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- Draft `docs/operations/content-moderation.md`；
-- Draft `docs/operations/user-support.md`；
+- 审核 Draft `docs/operations/content-moderation.md`；
+- 审核 Draft `docs/operations/user-support.md`；
 - 对齐审核、抽检、申诉、支持受理、升级、RBAC、受限审计与用户权利摘要；
 - 以已 Accepted 的 Safety、Evaluation、Privacy Data Map、领域、数据库、API 和 ADR-0005 为边界。
 
