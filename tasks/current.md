@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/event-tracking`
 - **上游 PR**：[S-23 PR #28](https://github.com/WeiHan1996/DailyEnergy/pull/28)
-- **当前 PR**：待创建 Draft PR
+- **当前 PR**：[Draft PR #29](https://github.com/WeiHan1996/DailyEnergy/pull/29)
 - **交付文件**：`docs/analytics/event-tracking.md`
 
 ## 1. 当前目标
@@ -108,4 +108,4 @@
 - 已定义 PRODUCT、RUNTIME、GOVERNANCE、SAFETY_CONTROL 四个隔离平面；
 - 已定义 58 个逻辑事件、T0/T4 合同、k=10、最多两个维度、13 个月上限和 48 个验证场景；
 - D1/D3/D7、实验、渠道归因与具体实现仍分别由 S-25～S-27、S-29/S-31～S-33/C-015 负责；
-- 当前动作：创建并审核 S-24 Draft PR；不自动接受或合并，不开始 S-25。
+- 当前动作：等待用户审核 [Draft PR #29](https://github.com/WeiHan1996/DailyEnergy/pull/29)；不自动接受或合并，不开始 S-25。
