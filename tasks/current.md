@@ -91,4 +91,4 @@
 - 用户支持冻结现有 OpenAPI 五类入口、SupportCase 目标合同、正文关闭后 30 天/元数据 90 天/正文绝对 180 天上限；
 - break-glass 冻结为案例级、只读、独立审批、最长 60 分钟；`RestrictedAuditEvent.expiresAt` 普通上限为 6 个自然月；
 - 数据模型、API、独立 case 删除/导出、受限摘要、RBAC 与到期 worker 仍是 S-29/C-014 等下游 production Gate；
-- 当前动作：创建 Draft PR，等待用户审核；不自动接受或合并，不开始 S-23。
+- 当前动作：等待用户审核 [Draft PR #27](https://github.com/WeiHan1996/DailyEnergy/pull/27)；不自动接受或合并，不开始 S-23。
