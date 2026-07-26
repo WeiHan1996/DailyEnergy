@@ -622,6 +622,6 @@ WHERE product_date BETWEEN :start_date AND :end_date
 
 - 状态：Draft；
 - 接受日期：待用户确认；
-- 内容 PR：待创建；
+- 内容 PR：[Draft PR #30](https://github.com/WeiHan1996/DailyEnergy/pull/30)；
 - 待确认范围：主指标、激活/活跃/cohort、23 个指标、D1/D3/D7、帮助度、任务、降级、成本、小样本、研究缺口、40 个验证场景和 Production Gates；
 - 下一任务：S-26 实验规范；S-25 被接受前不提前开始。
