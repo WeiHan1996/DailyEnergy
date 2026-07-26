@@ -151,13 +151,13 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
-| docs/analytics/event-tracking.md | Planned | 事件、属性和归因 | journey、mvp |
+| [docs/analytics/event-tracking.md](./analytics/event-tracking.md) | Draft | 事件、属性、平面、匿名聚合与质量 Gate | information-architecture、state-machine、API、privacy |
 | docs/analytics/metrics.md | Planned | D1/D3/D7 等唯一口径 | event-tracking |
 | docs/analytics/experiments.md | Planned | 实验、样本和停止规则 | metrics |
 | [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md) | Accepted | 数据、用途、位置、访问、保存、删除和用户权利 | domain、database、API、ADR-0005 |
 | [docs/operations/content-moderation.md](./operations/content-moderation.md) | Accepted | 审核、抽检和申诉 | safety、evaluation、privacy |
 | [docs/operations/user-support.md](./operations/user-support.md) | Accepted | FAQ、支持、升级、用户权利摘要与受限访问 | journey、privacy、moderation |
-| [docs/operations/incident-response.md](./operations/incident-response.md) | Draft | 故障和安全事件流程 | safety、privacy、moderation、support |
+| [docs/operations/incident-response.md](./operations/incident-response.md) | Accepted | 故障和安全事件流程 | safety、privacy、moderation、support |
 
 ### 7.6 工程架构与交付
 
@@ -227,23 +227,22 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-22 内容审核和用户支持流程已于 [PR #27](https://github.com/WeiHan1996/DailyEnergy/pull/27) 合并并获用户确认，两份文档现为 Accepted。S-23 故障和安全事件响应 Draft 已完成，当前处于 In Review。审核时依次读取：
+S-23 故障和安全事件响应已随 [PR #28](https://github.com/WeiHan1996/DailyEnergy/pull/28) 合并并获用户确认，文档现为 Accepted。S-24 埋点事件字典 Draft 已完成，当前处于 In Review。审核时依次读取：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. docs/INDEX.md；
 5. tasks/current.md；
-6. docs/operations/incident-response.md；
-7. docs/ai/safety.md；
-8. docs/ai/gateway.md；
-9. docs/operations/privacy-data-map.md；
-10. docs/operations/content-moderation.md；
-11. docs/operations/user-support.md；
-12. docs/decisions/ADR-0005-data-retention-and-deletion.md；
-13. docs/technical/error-codes.md、docs/technical/api.md；
-14. docs/technical/database.md 与 prisma/schema.prisma。
+6. docs/design/information-architecture.md、screen-specs.md；
+7. docs/product/state-machine.md、business-rules.md；
+8. docs/decisions/ADR-0002-deterministic-daily-result.md；
+9. docs/technical/api.md、error-codes.md、openapi/openapi.yaml；
+10. docs/operations/privacy-data-map.md；
+11. docs/decisions/ADR-0005-data-retention-and-deletion.md；
+12. docs/ai/gateway.md、safety.md；
+13. docs/analytics/event-tracking.md。
 
-本次审核重点是：单个 high-risk 输入是否始终留在 SAFE-001、不会进入 incident/客服/人工危机队列；7 类事件、4 级严重度和强制升级是否合理；SEV0/1 服务目标是否只作为实现后的 readiness 目标；内部严重度与法定报告/个人通知是否彻底分离；IncidentRecord、证据、期限、恢复、复盘和 40 个验证场景是否满足最小化；S-29/S-31～S-33/A-005～A-008 production Gate 是否完整。
+本次审核重点是：是否彻底避免用户级 event stream、第三方 SDK 与自动采集；核心完成事实是否只由权威业务对象派生；客户端信号是否明确为 best-effort 且不能提供唯一用户漏斗；四个事件平面是否隔离；58 个事件的触发和属性是否最小；T0/T4、`k=10`、两维上限、13 个月期限与 48 个验证场景是否可执行；S-25～S-27 与 S-29/S-31～S-33/C-015 的 Gate 是否完整。
 
-用户明确接受且 PR 合并前，incident-response.md 保持 Draft，S-23 保持 In Review；S-24 不提前开始。
+用户明确接受且 PR 合并前，event-tracking.md 保持 Draft，S-24 保持 In Review；S-25 不提前开始。
