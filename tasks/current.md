@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/metrics-definition`
 - **上游 PR**：[S-24 PR #29](https://github.com/WeiHan1996/DailyEnergy/pull/29)
-- **当前 PR**：待创建
+- **当前 PR**：[Draft PR #30](https://github.com/WeiHan1996/DailyEnergy/pull/30)
 - **交付文件**：`docs/analytics/metrics.md`
 
 ## 1. 当前目标
@@ -110,4 +110,4 @@
 - 已定义 23 个正式指标、4 个硬 Gate、2 个研究指标、10 个 fixtures 和 40 个验证场景；
 - Q01/Q02 在独立研究合同接受前保持 UNAVAILABLE；
 - S-26 实验、S-27 渠道归因与 S-29/S-31/S-33/C-015 实现仍是后续任务；
-- 当前动作：创建并等待用户审核 S-25 Draft PR；不自动接受或合并，不开始 S-26。
+- 当前动作：等待用户审核 [Draft PR #30](https://github.com/WeiHan1996/DailyEnergy/pull/30)；不自动接受或合并，不开始 S-26。
