@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/repository-structure`
 - **上游 PR**：[S-29 PR #34](https://github.com/WeiHan1996/DailyEnergy/pull/34)
-- **当前 PR**：待创建
+- **当前 PR**：[Draft PR #35](https://github.com/WeiHan1996/DailyEnergy/pull/35)
 - **交付文件**：`docs/technical/repository-structure.md`
 
 ## 1. 当前目标
@@ -97,4 +97,4 @@
 - S-30 Draft 冻结目标目录、薄 app、七类 package、15 个 server-core 模块和 public exports/SPI；
 - Worker 使用一个 artifact 和 Interactive/Background/Restricted/Migration 四个入口，各自 capability 不可越界；
 - 已定义 12 类自动 Gate 与 48 个仓库边界场景，S-31 是下一任务；
-- 当前动作：等待用户审核当前 Draft PR；不自动接受、合并或开始 S-31。
+- 当前动作：等待用户审核 [Draft PR #35](https://github.com/WeiHan1996/DailyEnergy/pull/35)；不自动接受、合并或开始 S-31。
