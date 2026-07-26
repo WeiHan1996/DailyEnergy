@@ -1,6 +1,7 @@
 # DailyEnergy 实验规范
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-26
 - **所属任务**：S-26 — 实验规范
 - **最后更新**：2026-07-26
 - **适用范围**：Phase 0B / 原型可用性、内部 Alpha、50～100 人种子 Beta 的产品与内容实验
@@ -427,8 +428,8 @@ v1 不增加公共 `experiment_id` 事件属性，也不创建 exposure event �
 
 ## 17. 审核记录
 
-- 状态：Draft；
-- 接受日期：待用户确认；
-- 内容 PR：[Draft PR #31](https://github.com/WeiHan1996/DailyEnergy/pull/31)；
-- 待确认范围：不可实验边界、支持方法、个人 assignment Blocked、主指标/Gate、样本与停止、switchback、32 个验证场景和 Production Gates；
-- 下一任务：S-27 渠道归因规范；S-26 被接受前不把实验能力视为可生产启用。
+- 状态：Accepted；
+- 接受日期：2026-07-26；
+- 内容 PR：[PR #31](https://github.com/WeiHan1996/DailyEnergy/pull/31)；
+- 已确认范围：不可实验边界、支持方法、个人 assignment Blocked、主指标/Gate、样本与停止、switchback、32 个验证场景和 Production Gates；
+- 下一任务：S-27 渠道归因规范；实验实现 Gate 仍未解除。
