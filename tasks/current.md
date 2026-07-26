@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/monorepo-stack`
 - **上游 PR**：[S-27 PR #32](https://github.com/WeiHan1996/DailyEnergy/pull/32)
-- **当前 PR**：待创建
+- **当前 PR**：[Draft PR #33](https://github.com/WeiHan1996/DailyEnergy/pull/33)
 - **交付文件**：`docs/decisions/ADR-0006-monorepo-and-stack.md`
 
 ## 1. 当前目标
@@ -101,4 +101,4 @@
 - S-28 Proposed 已冻结 pnpm/Turbo 单仓、Node 24 LTS、TypeScript 7 与现有框架主版本；
 - 精确 patch、root workspace、lockfile 和命令由 E-001 在 ADR Accepted 后落地；
 - S-29 系统架构是下一任务，未提前开始；
-- 当前动作：创建 Draft PR 后等待用户审核；不自动接受或合并。
+- 当前动作：等待用户审核 [Draft PR #33](https://github.com/WeiHan1996/DailyEnergy/pull/33)；不自动接受或合并。
