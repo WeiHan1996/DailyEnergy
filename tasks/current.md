@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/experiments-spec`
 - **上游 PR**：[S-25 PR #30](https://github.com/WeiHan1996/DailyEnergy/pull/30)
-- **当前 PR**：待创建
+- **当前 PR**：[Draft PR #31](https://github.com/WeiHan1996/DailyEnergy/pull/31)
 - **交付文件**：`docs/analytics/experiments.md`
 
 ## 1. 当前目标
@@ -99,4 +99,4 @@
 - S-26 Draft 已冻结不可实验边界、四类证据方法和个人 assignment Blocked；
 - 已定义一个主指标、G01～G04、样本/停止规则、10 个 fixtures 和 32 个验证场景；
 - S-27 渠道归因与 S-29/S-31/S-33/C-015 实现仍是后续任务；
-- 当前动作：创建并等待审核 S-26 Draft PR；不自动接受或合并。
+- 当前动作：等待用户审核 [Draft PR #31](https://github.com/WeiHan1996/DailyEnergy/pull/31)；不自动接受或合并。
