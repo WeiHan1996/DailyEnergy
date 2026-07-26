@@ -1,8 +1,8 @@
 # ADR-0006：pnpm/Turborepo TypeScript Monorepo 与主版本基线
 
-- **状态**：Proposed
+- **状态**：Accepted
 - **日期**：2026-07-26
-- **接受日期**：待用户确认
+- **接受日期**：2026-07-26
 - **所属任务**：S-28 — Monorepo 与技术栈决策
 - **决策范围**：仓库模型、包管理、任务编排、运行时、框架、数据组件、模块格式、依赖边界、版本与供应链治理
 - **决策所有者**：DailyEnergy 项目
@@ -430,8 +430,8 @@ E-001 必须：
 
 ## 13. 决策状态
 
-- 状态：Proposed；
-- 接受日期：待用户确认；
-- 内容 PR：[Draft PR #33](https://github.com/WeiHan1996/DailyEnergy/pull/33)；
-- 待确认范围：pnpm/Turbo 单仓、Node 24 LTS、主版本矩阵、ESM/miniapp 边界、Schema 权威、依赖/缓存/升级规则、32 个场景和下游 Gate；
-- 下一任务：S-29 系统架构；ADR-0006 被接受前不初始化 Phase 1 Monorepo。
+- 状态：Accepted；
+- 接受日期：2026-07-26；
+- 内容 PR：[PR #33](https://github.com/WeiHan1996/DailyEnergy/pull/33)；
+- 已确认范围：pnpm/Turbo 单仓、Node 24 LTS、主版本矩阵、ESM/miniapp 边界、Schema 权威、依赖/缓存/升级规则、32 个场景和下游 Gate；
+- 下一任务：S-29 系统架构；Phase 1 工程初始化仍须等待 Phase 0B Gate 与对应工程任务。
