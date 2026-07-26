@@ -518,7 +518,7 @@ PDM 变更未 Accepted 前，上述是 proposed contract，不授权持久化。
 
 - 状态：Draft（叠加草案）；
 - 接受日期：待用户确认；
-- 内容 PR：待创建；
+- 内容 PR：[Draft PR #32](https://github.com/WeiHan1996/DailyEnergy/pull/32)；
 - 基线：`agent/experiments-spec` / Draft PR #31；
 - 待确认范围：平台能力 fail-closed、registry、共享 token、first touch、30 天 proposed mapping、渠道指标状态、32 个验证场景和 Production Gates；
 - 下一动作：先审核/合并 S-26；随后将本 PR 基线切换到 `main`、补齐 README/INDEX/current/backlog，再单独审核 S-27。
