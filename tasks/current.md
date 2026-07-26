@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/system-architecture`
 - **上游 PR**：[S-28 PR #33](https://github.com/WeiHan1996/DailyEnergy/pull/33)
-- **当前 PR**：待创建
+- **当前 PR**：[Draft PR #34](https://github.com/WeiHan1996/DailyEnergy/pull/34)
 - **交付文件**：`docs/technical/architecture.md`
 
 ## 1. 当前目标
@@ -98,4 +98,4 @@
 - S-29 Draft 冻结模块化单体、运行时/Worker profiles、单数据库/schema、事务/outbox/inbox 与 Gateway 边界；
 - Redis/cache/queue 仅承担可恢复运行能力，guard、命令和发布事实仍在 PostgreSQL；
 - 已定义 48 个架构验证场景，S-30 是下一任务；
-- 当前动作：等待用户审核本任务 Draft PR；不自动接受或合并。
+- 当前动作：等待用户审核 [Draft PR #34](https://github.com/WeiHan1996/DailyEnergy/pull/34)；不自动接受、合并或开始 S-30。
