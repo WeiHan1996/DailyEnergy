@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-26
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-27 渠道归因规范](./current.md)
+- **当前任务**：[S-28 Monorepo 与技术栈决策](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -93,13 +93,13 @@
 | S-24 | 埋点事件字典 | Done | event-tracking.md | S-02、S-05、S-20 |
 | S-25 | 指标唯一口径 | Done | metrics.md | S-24 |
 | S-26 | 实验规范 | Done | experiments.md | S-25 |
-| S-27 | 渠道归因规范 | In Review | channel-attribution.md | S-24、S-25、S-26 |
+| S-27 | 渠道归因规范 | Done | channel-attribution.md | S-24、S-25、S-26 |
 
 ### 工程架构与执行拆分
 
 | ID | 任务 | 状态 | 主要交付 | 依赖 |
 |---|---|---|---|---|
-| S-28 | Monorepo 与技术栈决策 | Planned | ADR-0006 | 主要业务规格 |
+| S-28 | Monorepo 与技术栈决策 | In Review | ADR-0006 | 主要业务规格 |
 | S-29 | 系统架构 | Planned | architecture.md | S-12、S-19、S-20、S-28 |
 | S-30 | 仓库结构和模块边界 | Planned | repository-structure.md | S-29 |
 | S-31 | 测试策略 | Planned | testing.md | S-09、S-16、S-20、S-29 |

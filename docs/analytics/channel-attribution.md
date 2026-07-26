@@ -1,6 +1,7 @@
 # DailyEnergy 小红书与抖音渠道归因规范
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-26
 - **所属任务**：S-27 — 渠道归因规范
 - **最后更新**：2026-07-26
 - **适用范围**：Phase 0B / 小红书、抖音种子内容到微信小程序承接、首次价值与 D1/D3/D7 的归因设计
@@ -516,9 +517,9 @@ PDM 变更未 Accepted 前，上述是 proposed contract，不授权持久化。
 
 ## 19. 审核记录
 
-- 状态：Draft；
-- 接受日期：待用户确认；
-- 内容 PR：[Draft PR #32](https://github.com/WeiHan1996/DailyEnergy/pull/32)；
+- 状态：Accepted；
+- 接受日期：2026-07-26；
+- 内容 PR：[PR #32](https://github.com/WeiHan1996/DailyEnergy/pull/32)；
 - 基线：`main`（S-26 已随 PR #31 合并并获用户确认）；
-- 待确认范围：平台能力 fail-closed、registry、共享 token、first touch、30 天 proposed mapping、渠道指标状态、32 个验证场景和 Production Gates；
-- 下一任务：S-28 Monorepo 与技术栈决策；S-27 被接受前不把渠道归因能力视为可生产启用。
+- 已确认范围：平台能力 fail-closed、registry、共享 token、first touch、30 天 proposed mapping、渠道指标状态、32 个验证场景和 Production Gates；
+- 下一任务：S-28 Monorepo 与技术栈决策；渠道归因实现 Gate 仍未解除。
