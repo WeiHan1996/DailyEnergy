@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-28 已 Accepted；S-29 系统架构 Draft 已完成并进入 In Review，尚未开始业务编码
+状态：S-29 系统架构已 Accepted；S-30 仓库结构 Draft 已完成并进入 In Review，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、隐私、分析与工程规范
-当前任务：S-29 系统架构（In Review）
+当前任务：S-30 仓库结构和模块边界（In Review）
 ```
 
 长期工作入口：
@@ -361,14 +361,14 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 审核 Draft `docs/technical/architecture.md`；
-- 审核模块化单体、运行时、Worker profiles、单 PostgreSQL database/schema 与最小角色；
-- 审核同步命令、TX-01～09、事务型 outbox/inbox 与 BullMQ 至少一次传递；
-- 审核 Daily/Weekly AI Gateway、容量隔离、provider/template 与发布边界；
-- 审核 Redis/cache/breaker/queue 的非权威职责、Safety/删除与故障恢复；
-- 以 Accepted 的 ADR-0003/0005/0006、Gateway、数据库、API、隐私与分析合同为边界。
+- 审核 Draft `docs/technical/repository-structure.md`；
+- 审核 root/apps/packages/Prisma/OpenAPI/tests/tooling 的目录所有权；
+- 审核 Mini Program、API、Admin、Worker 的薄 app 与 composition root 边界；
+- 审核七类 package、15 个 server-core 模块、public exports/SPI 和允许依赖；
+- 审核 Interactive/Background/Restricted/Migration capability 隔离；
+- 审核 12 类自动 Gate、48 个场景和 E-001～E-011 交接。
 
-S-29 不创建应用/Worker 代码、workspace、migration、Redis/BullMQ、Docker 或生产配置，也不提前定义 S-30 目录、S-31 测试、S-32 部署或 S-33 告警。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+S-30 不创建 workspace、目录骨架、app/package、配置、代码、migration、queue 或容器，也不提前实现 S-31 测试、S-32 部署或 S-33 可观测性。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 
