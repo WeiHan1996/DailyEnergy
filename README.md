@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-23 已 Accepted；S-24 埋点事件字典 Draft 已完成并进入 In Review，尚未开始业务编码
+状态：S-24 已 Accepted；S-25 指标唯一口径 Draft 已完成并进入 In Review，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、隐私、指标和工程规范
-当前任务：S-24 埋点事件字典（In Review）
+当前任务：S-25 指标唯一口径（In Review）
 ```
 
 长期工作入口：
@@ -361,13 +361,13 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 审核 Draft `docs/analytics/event-tracking.md`；
-- 审核无用户级 event stream、权威事实优先与客户端信号限制；
-- 审核 PRODUCT、RUNTIME、GOVERNANCE、SAFETY_CONTROL 四平面隔离；
-- 审核 58 个事件、T0/T4 合同、`k=10`、两维上限、13 个月期限与 48 个验证场景；
-- 以 Accepted 的页面、状态机、API、Privacy Data Map、ADR-0005、Gateway、Safety 和 incident response 为边界。
+- 审核 Draft `docs/analytics/metrics.md`；
+- 审核 D1 主指标、ActivationCycle、CoreActiveUserDay、成熟 cohort 和最终状态口径；
+- 审核 23 个指标、4 个硬 Gate、2 个研究指标、10 个 fixtures 和 40 个验证场景；
+- 审核模板降级、Unknown、删除/重建、`k=10`、Wilson 95% 区间、两维上限和 13 个月期限；
+- 以 Accepted 的 MVP、状态机、领域模型、数据库、API、Privacy Data Map、ADR-0005 和事件字典为边界。
 
-S-24 不创建 analytics API、SDK、Prisma、migration、queue、Dashboard、第三方平台或生产代码，也不提前定义 S-25 指标公式、S-26 实验或 S-27 渠道归因。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+S-25 不创建 analytics API、SDK、Prisma、migration、worker、Dashboard、问卷字段、第三方平台或生产代码，也不提前开始 S-26 实验或 S-27 渠道归因。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 
