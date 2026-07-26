@@ -1,6 +1,6 @@
 # DailyEnergy 小红书与抖音渠道归因规范
 
-- **文档状态**：Draft（叠加草案；等待 S-26 审核后进入唯一 current task）
+- **文档状态**：Draft
 - **所属任务**：S-27 — 渠道归因规范
 - **最后更新**：2026-07-26
 - **适用范围**：Phase 0B / 小红书、抖音种子内容到微信小程序承接、首次价值与 D1/D3/D7 的归因设计
@@ -511,14 +511,14 @@ PDM 变更未 Accepted 前，上述是 proposed contract，不授权持久化。
 - k=10、最多两个维度、Wilson 95% 区间与 T4 13 个月一致；
 - 10 个固定 fixtures 和 32 个验证场景 ID 唯一；
 - 与 MVP、领域模型、PDM、ADR-0005、事件字典、指标和实验合同无冲突；
-- 本叠加 PR 仅新增本 Draft，不改变 S-26 Accepted 状态或唯一 current task；
-- 本文只有在用户确认、S-26 合并且项目指针补齐后转为正式 In Review / Accepted。
+- PR 只包含本文与项目控制状态更新，不包含代码、Schema、OpenAPI、Prisma、数据库、migration、SDK、生产配置或真实用户数据；
+- 本文只有在用户确认后转为 Accepted。
 
 ## 19. 审核记录
 
-- 状态：Draft（叠加草案）；
+- 状态：Draft；
 - 接受日期：待用户确认；
 - 内容 PR：[Draft PR #32](https://github.com/WeiHan1996/DailyEnergy/pull/32)；
-- 基线：`agent/experiments-spec` / Draft PR #31；
+- 基线：`main`（S-26 已随 PR #31 合并并获用户确认）；
 - 待确认范围：平台能力 fail-closed、registry、共享 token、first touch、30 天 proposed mapping、渠道指标状态、32 个验证场景和 Production Gates；
-- 下一动作：先审核/合并 S-26；随后将本 PR 基线切换到 `main`、补齐 README/INDEX/current/backlog，再单独审核 S-27。
+- 下一任务：S-28 Monorepo 与技术栈决策；S-27 被接受前不把渠道归因能力视为可生产启用。
