@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/incident-response`
 - **上游 PR**：[S-22 PR #27](https://github.com/WeiHan1996/DailyEnergy/pull/27)
-- **当前 PR**：待创建 Draft PR
+- **当前 PR**：[Draft PR #28](https://github.com/WeiHan1996/DailyEnergy/pull/28)
 - **交付文件**：`docs/operations/incident-response.md`
 
 ## 1. 当前目标
@@ -98,4 +98,4 @@
 - S-23 Draft 已定义 7 类事件、4 级严重度、8 个核心角色、事件状态、前 30 分钟流程和 5 类 Runbook；
 - 已冻结 SEV0/1 响应目标、法律/监管独立研判、IncidentRecord 最小合同、12 个月普通记录上限、恢复/观察/复盘与 40 个验证场景；
 - Incident 模型、RBAC、告警、kill switch、状态页、真实值班、用户通知与监管联系人仍为 S-29/S-31～S-33/A-005～A-008 production Gate；
-- 当前动作：等待用户审核即将创建的 Draft PR；不自动接受或合并，不开始 S-24。
+- 当前动作：等待用户审核 [Draft PR #28](https://github.com/WeiHan1996/DailyEnergy/pull/28)；不自动接受或合并，不开始 S-24。
