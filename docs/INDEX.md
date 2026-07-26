@@ -164,7 +164,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
-| docs/technical/architecture.md | Planned | 系统边界和模块依赖 | 所有核心规格 |
+| [docs/technical/architecture.md](./technical/architecture.md) | Draft | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复 | Gateway、database、API、ADR-0006 |
 | docs/technical/repository-structure.md | Planned | Monorepo 目录与包职责 | architecture |
 | docs/technical/testing.md | Planned | 单元、集成、契约、端到端和 AI 测试 | schemas、API、safety |
 | docs/technical/deployment.md | Planned | 环境、发布、迁移和回滚 | architecture |
@@ -179,7 +179,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [ADR-0003-ai-provider-abstraction.md](./decisions/ADR-0003-ai-provider-abstraction.md) | Accepted | AI Gateway 与供应商隔离 | AI Gateway 开发前 |
 | [ADR-0004-structured-memory.md](./decisions/ADR-0004-structured-memory.md) | Accepted | 用途受限结构化记忆与不用向量库 | 记忆开发前 |
 | [ADR-0005-data-retention-and-deletion.md](./decisions/ADR-0005-data-retention-and-deletion.md) | Accepted | 保存期限、删除、备份、受托方和受限证据 | 数据库开发前 |
-| [ADR-0006-monorepo-and-stack.md](./decisions/ADR-0006-monorepo-and-stack.md) | Proposed | pnpm/Turbo 单仓、运行时、框架、数据与版本治理 | 工程初始化前 |
+| [ADR-0006-monorepo-and-stack.md](./decisions/ADR-0006-monorepo-and-stack.md) | Accepted | pnpm/Turbo 单仓、运行时、框架、数据与版本治理 | 工程初始化前 |
 
 如果实际决策发生变化，应调整 ADR 名称和顺序，不为填满编号而创建无价值文档。
 
@@ -228,23 +228,22 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-27 渠道归因规范已随 [PR #32](https://github.com/WeiHan1996/DailyEnergy/pull/32) 合并并获用户确认，文档现为 Accepted。S-28 Monorepo 与技术栈 ADR 已完成，当前处于 Proposed / In Review。审核时依次读取：
+ADR-0006 / S-28 已随 [PR #33](https://github.com/WeiHan1996/DailyEnergy/pull/33) 合并并获用户确认，决策现为 Accepted。S-29 系统架构 Draft 已完成，当前处于 In Review。审核时依次读取：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. docs/decisions/ADR-0002～ADR-0005；
+6. docs/decisions/ADR-0002、ADR-0003、ADR-0005、ADR-0006；
 7. docs/ai/gateway.md；
 8. docs/data/domain-model.md；
 9. docs/technical/database.md、api.md、error-codes.md；
-10. docs/operations/privacy-data-map.md；
-11. docs/analytics/event-tracking.md、metrics.md、experiments.md、channel-attribution.md；
-12. packages/shared-schemas/README.md、package.json、tsconfig 与测试；
-13. prisma/schema.prisma；
-14. docs/decisions/ADR-0006-monorepo-and-stack.md。
+10. docs/operations/privacy-data-map.md、incident-response.md；
+11. docs/analytics/event-tracking.md、metrics.md；
+12. packages/shared-schemas、prisma/schema.prisma、openapi/openapi.yaml；
+13. docs/technical/architecture.md。
 
-本次审核重点是：单仓、pnpm workspace、Turbo 和单 lockfile 是否足够且不过度；Node 24 LTS 与各主版本是否相互兼容；共享 Zod、Nest DTO、Prisma 和 OpenAPI 的权威边界是否唯一；ESM 与微信小程序输出是否隔离；workspace dependency、frozen install、exact package manager、容器 digest、缓存和供应链升级规则是否可执行；是否明确把 S-29 架构、S-30 目录、S-31 测试和 S-32 部署留给下游。
+本次审核重点是：模块化单体与无内部 RPC 是否清楚；API/Admin/三类 Worker profile 是否职责隔离；一个 PostgreSQL database/application schema 与最小角色是否足够；TX-01～09、outbox/BullMQ/inbox 与未知结果是否可恢复；Daily/Weekly Gateway、provider/template 和容量是否隔离；Redis/cache/queue 丢失是否不会丢事实或绕过 Safety/删除；48 个架构场景及 S-30～S-33 交接是否完整。
 
-用户明确接受且 PR 合并前，ADR-0006 保持 Proposed，S-28 保持 In Review；不得把本文理解为已经初始化 Monorepo 或部署环境。
+用户明确接受且 PR 合并前，architecture.md 保持 Draft，S-29 保持 In Review；不得把本文理解为已经创建应用、Worker、数据库、Redis/BullMQ 或生产环境。
