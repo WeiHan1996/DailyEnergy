@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-26 已 Accepted；S-27 渠道归因规范 Draft 已完成并进入 In Review，尚未开始业务编码
+状态：S-27 已 Accepted；S-28 Monorepo 与技术栈 ADR 已完成 Proposed 并进入 In Review，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、隐私、分析与工程规范
-当前任务：S-27 渠道归因规范（In Review）
+当前任务：S-28 Monorepo 与技术栈决策（In Review）
 ```
 
 长期工作入口：
@@ -361,14 +361,14 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 审核 Draft `docs/analytics/channel-attribution.md`；
-- 审核小红书/抖音平台能力 fail-closed、承接页与二维码 fallback、真机验证矩阵；
-- 审核低基数 registry、共享签名 source token、first-valid-touch、转发和反作弊规则；
-- 审核当前可用的承接/解析质量与 Blocked 的渠道 Activation、D1/D3/D7、CAC；
-- 审核 proposed Acquisition Mapping 的 PDM、最长 30 天、删除/导出和实现 Gate；
-- 以 Accepted 的 MVP、领域、PDM、ADR-0005、事件、指标和实验合同为边界。
+- 审核 Proposed `docs/decisions/ADR-0006-monorepo-and-stack.md`；
+- 审核单 Git 仓库、pnpm workspace、Turborepo、单 lockfile 与 workspace protocol；
+- 审核 Node 24 LTS、TypeScript 7 及 NestJS/Next.js/PostgreSQL/Prisma/Redis/BullMQ/Zod 主版本基线；
+- 审核 ESM、小程序兼容构建、共享 Schema 权威、包边界与禁止跨应用源码引用；
+- 审核版本升级、frozen install、容器 digest、缓存、密钥和供应链 Gate；
+- 以 Accepted 的技术 guardrails、Schema、数据库、API、AI Gateway、隐私与渠道合同为边界。
 
-S-27 不创建渠道持久化、click ID、source cookie、第三方归因 SDK、Prisma、migration、生产配置或用户级追踪；Production Gates 完成前不发布素材级 Activation、D1/D3/D7 或 CAC。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+S-28 不创建 root package、workspace、lockfile、Turbo 配置、应用骨架、migration、Docker 服务或生产代码，也不提前定义 S-29 系统架构和 S-30 模块目录。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 
