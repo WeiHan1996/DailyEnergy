@@ -165,9 +165,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
 | [docs/technical/architecture.md](./technical/architecture.md) | Accepted | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复 | Gateway、database、API、ADR-0006 |
-| [docs/technical/repository-structure.md](./technical/repository-structure.md) | Draft | Monorepo 目录、app/package/module、public exports 与依赖 Gate | architecture、ADR-0006 |
-| docs/technical/repository-structure.md | Planned | Monorepo 目录与包职责 | architecture |
-| docs/technical/testing.md | Planned | 单元、集成、契约、端到端和 AI 测试 | schemas、API、safety |
+| [docs/technical/repository-structure.md](./technical/repository-structure.md) | Accepted | Monorepo 目录、app/package/module、public exports 与依赖 Gate | architecture、ADR-0006 |
+| [docs/technical/testing.md](./technical/testing.md) | Draft | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵 | schemas、API、architecture、repository-structure |
 | docs/technical/deployment.md | Planned | 环境、发布、迁移和回滚 | architecture |
 | docs/technical/observability.md | Planned | 日志、指标、告警和成本 | architecture、analytics |
 | GitHub Milestones 与 Issues | Planned | Phase 1～3 工程执行 | Accepted Phase 0B specs |
@@ -229,20 +228,27 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-29 系统架构已随 [PR #34](https://github.com/WeiHan1996/DailyEnergy/pull/34) 合并并获用户确认，现为 Accepted。S-30 仓库结构与模块边界 Draft 已完成，当前处于 In Review。审核时依次读取：
+S-29 系统架
+
+## 12. 当前读取顺序
+
+S-30 仓库结构与模块边界已随 [PR #35](https://github.com/WeiHan1996/DailyEnergy/pull/35) 合并并获用户确认，现为 Accepted。S-31 测试策略与覆盖矩阵 Draft 已完成，当前处于 In Review。审核时依次读取：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. docs/decisions/ADR-0006；
+6. docs/decisions/ADR-0006-monorepo-and-stack.md；
 7. docs/technical/architecture.md；
-8. packages/shared-schemas/README.md 与现有 package exports；
-9. docs/technical/database.md、api.md；
-10. prisma/schema.prisma、openapi/openapi.yaml；
-11. docs/technical/repository-structure.md。
+8. docs/technical/repository-structure.md；
+9. packages/shared-schemas/README.md、现有 exports 与测试向量；
+10. docs/ai/evaluation.md、evaluation-corpus.json 与 gateway.md；
+11. docs/technical/database.md、api.md 与 error-codes.md；
+12. prisma/schema.prisma 与 openapi/openapi.yaml；
+13. docs/operations/privacy-data-map.md；
+14. docs/technical/testing.md。
 
-本次审核重点是：目标目录是否只有一个职责；四个 deployable app 是否足够薄且不互相依赖；七类 package 与 15 个 server-core 模块是否不过度拆分；public exports/SPI、client/server/provider/restricted/migration capability 是否可静态验证；Schema/OpenAPI/client/Prisma 的权威方向是否唯一；48 个场景及 E-001～E-011 交接是否完整。
+本次审核重点是：十层测试矩阵和工具边界是否可执行；Accepted 场景能否通过 Source-ID 注册表追踪到自动或人工证据；SQL/TX、outbox/inbox、队列、Worker profile、客户端、AI 与恢复验证是否覆盖真实故障；CI lane、覆盖率、flaky、重试、隔离和证据保存规则是否明确；48 个 S-31 场景是否完整。
 
-用户明确接受且 PR 合并前，repository-structure.md 保持 Draft，S-30 保持 In Review；不得把本文理解为已经创建 workspace、app、package、配置、migration、queue、容器或业务代码。
+用户明确接受且 PR 合并前，testing.md 保持 Draft，S-31 保持 In Review；不得把本文理解为已经创建测试代码、workspace 配置、CI、容器、数据库、队列、密钥或生产环境。

@@ -1,6 +1,6 @@
 # DailyEnergy 仓库结构与模块边界
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
 - **所属任务**：S-30 — 仓库结构和模块边界
 - **最后更新**：2026-07-26
 - **适用范围**：Phase 0B / Phase 1～3 的 Monorepo 目录、workspace package、模块 public API、依赖方向、Worker profile 入口和静态边界 Gate
@@ -655,7 +655,7 @@ E-001/E-002/E-008/E-011 必须最终提供下列 clean-checkout Gate：
 - 当前 `shared-schemas` 迁入 root workspace 的兼容顺序可执行；
 - E-001～E-011 交接清楚；
 - PR 只包含本文、S-29 接受记录和项目控制 Markdown，不创建目录、package、配置、代码或 migration；
-- 用户确认前本文保持 Draft，S-30 保持 In Review。
+- 本文已随 PR #35 获用户确认并记录为 Accepted；后续实现不得静默改变目录、依赖、capability 或合同权威。
 
 ## 19. 下游交接
 
@@ -702,9 +702,9 @@ E-001/E-002/E-008/E-011 必须最终提供下列 clean-checkout Gate：
 
 ## 21. 审核记录
 
-- 状态：Draft；
-- 接受日期：待用户确认；
-- 内容 PR：[Draft PR #35](https://github.com/WeiHan1996/DailyEnergy/pull/35)；
+- 状态：Accepted；
+- 接受日期：2026-07-26；
+- 内容 PR：[PR #35](https://github.com/WeiHan1996/DailyEnergy/pull/35)；
 - 基线：`main`（S-29 系统架构已随 PR #34 合并并获用户确认）；
-- 待确认范围：目标目录、薄 app、七类 package、15 个 server-core 模块、public exports/SPI、Worker profile capability、Schema/codegen 方向、12 类 Gate 与 48 个场景；
-- 下一任务：S-31 测试策略；S-30 被接受前不初始化 workspace 或应用代码。
+- 已确认范围：目标目录、薄 app、七类 package、15 个 server-core 模块、public exports/SPI、Worker profile capability、Schema/codegen 方向、12 类 Gate 与 48 个场景；
+- 下一任务：S-31 测试策略；Phase 1 工程初始化仍须等待 Phase 0B Gate 与对应工程任务。
