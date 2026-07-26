@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-22 两份运营 Draft 已完成，当前 In Review，尚未开始业务编码
+状态：S-22 已 Accepted；S-23 事件响应 Draft 已完成并进入 In Review，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、隐私、指标和工程规范
-当前任务：S-22 内容审核和用户支持流程（In Review）
+当前任务：S-23 故障和安全事件响应（In Review）
 ```
 
 长期工作入口：
@@ -361,12 +361,12 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 审核 Draft `docs/operations/content-moderation.md`；
-- 审核 Draft `docs/operations/user-support.md`；
-- 对齐审核、抽检、申诉、支持受理、升级、RBAC、受限审计与用户权利摘要；
-- 以已 Accepted 的 Safety、Evaluation、Privacy Data Map、领域、数据库、API 和 ADR-0005 为边界。
+- 审核 Draft `docs/operations/incident-response.md`；
+- 审核事件类别、四级严重度、角色、声明、停用/降级/回滚、恢复、沟通和复盘；
+- 审核 user Safety 与 system incident 隔离、证据最小化、法律/监管独立研判和 40 个验证场景；
+- 以已 Accepted 的 Safety、Gateway、Privacy Data Map、moderation、support、ADR-0005 和 API 错误语义为边界。
 
-S-22 不创建数据库、Prisma、migration、API、埋点、真实工单、供应商配置或生产代码，也不提前承担 S-23 事件响应和 S-24 analytics。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+S-23 不创建数据库、Prisma、migration、API、告警、真实值班/联系人、供应商配置或生产代码，也不提前承担 S-24 analytics。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 
