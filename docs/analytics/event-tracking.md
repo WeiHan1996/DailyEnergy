@@ -679,6 +679,6 @@ S-25 必须逐指标定义：
 
 - 状态：Draft；
 - 接受日期：待用户确认；
-- 内容 PR：待创建；
+- 内容 PR：[Draft PR #29](https://github.com/WeiHan1996/DailyEnergy/pull/29)；
 - 待确认范围：无用户级 event stream、事实优先、客户端信号限制、4 个平面、58 个事件、T4/k=10/13 个月、第三方关闭、48 个验证场景和 Production Gates；
 - 下一任务：S-25 指标唯一口径；S-24 被接受前不提前开始。
