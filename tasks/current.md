@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/deployment-config-rollback`
 - **上游 PR**：[S-31 PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/36)
-- **当前 PR**：待创建
+- **当前 PR**：[Draft PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)
 - **交付文件**：`docs/technical/deployment.md`
 
 ## 1. 当前目标
@@ -106,4 +106,4 @@
 - migration 使用 expand/backfill/contract；发布 consumer-before-producer；普通回滚不执行 down migration；
 - PostgreSQL 使用 encrypted base backup + WAL/PITR，Redis 从 PostgreSQL 重建，restore 先重放删除/restore-deny；
 - 云厂商、主体、region、跨境、SSO、真实受托方和账号仍是 Production Blocked Gate；
-- 当前动作：等待用户审核 Draft PR；不自动接受、合并或开始 S-33。
+- 当前动作：等待用户审核 [Draft PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)；不自动接受、合并或开始 S-33。
