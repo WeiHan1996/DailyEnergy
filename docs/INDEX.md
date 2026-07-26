@@ -164,7 +164,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
-| [docs/technical/architecture.md](./technical/architecture.md) | Draft | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复 | Gateway、database、API、ADR-0006 |
+| [docs/technical/architecture.md](./technical/architecture.md) | Accepted | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复 | Gateway、database、API、ADR-0006 |
+| [docs/technical/repository-structure.md](./technical/repository-structure.md) | Draft | Monorepo 目录、app/package/module、public exports 与依赖 Gate | architecture、ADR-0006 |
 | docs/technical/repository-structure.md | Planned | Monorepo 目录与包职责 | architecture |
 | docs/technical/testing.md | Planned | 单元、集成、契约、端到端和 AI 测试 | schemas、API、safety |
 | docs/technical/deployment.md | Planned | 环境、发布、迁移和回滚 | architecture |
@@ -228,22 +229,20 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-ADR-0006 / S-28 已随 [PR #33](https://github.com/WeiHan1996/DailyEnergy/pull/33) 合并并获用户确认，决策现为 Accepted。S-29 系统架构 Draft 已完成，当前处于 In Review。审核时依次读取：
+S-29 系统架构已随 [PR #34](https://github.com/WeiHan1996/DailyEnergy/pull/34) 合并并获用户确认，现为 Accepted。S-30 仓库结构与模块边界 Draft 已完成，当前处于 In Review。审核时依次读取：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. docs/decisions/ADR-0002、ADR-0003、ADR-0005、ADR-0006；
-7. docs/ai/gateway.md；
-8. docs/data/domain-model.md；
-9. docs/technical/database.md、api.md、error-codes.md；
-10. docs/operations/privacy-data-map.md、incident-response.md；
-11. docs/analytics/event-tracking.md、metrics.md；
-12. packages/shared-schemas、prisma/schema.prisma、openapi/openapi.yaml；
-13. docs/technical/architecture.md。
+6. docs/decisions/ADR-0006；
+7. docs/technical/architecture.md；
+8. packages/shared-schemas/README.md 与现有 package exports；
+9. docs/technical/database.md、api.md；
+10. prisma/schema.prisma、openapi/openapi.yaml；
+11. docs/technical/repository-structure.md。
 
-本次审核重点是：模块化单体与无内部 RPC 是否清楚；API/Admin/三类 Worker profile 是否职责隔离；一个 PostgreSQL database/application schema 与最小角色是否足够；TX-01～09、outbox/BullMQ/inbox 与未知结果是否可恢复；Daily/Weekly Gateway、provider/template 和容量是否隔离；Redis/cache/queue 丢失是否不会丢事实或绕过 Safety/删除；48 个架构场景及 S-30～S-33 交接是否完整。
+本次审核重点是：目标目录是否只有一个职责；四个 deployable app 是否足够薄且不互相依赖；七类 package 与 15 个 server-core 模块是否不过度拆分；public exports/SPI、client/server/provider/restricted/migration capability 是否可静态验证；Schema/OpenAPI/client/Prisma 的权威方向是否唯一；48 个场景及 E-001～E-011 交接是否完整。
 
-用户明确接受且 PR 合并前，architecture.md 保持 Draft，S-29 保持 In Review；不得把本文理解为已经创建应用、Worker、数据库、Redis/BullMQ 或生产环境。
+用户明确接受且 PR 合并前，repository-structure.md 保持 Draft，S-30 保持 In Review；不得把本文理解为已经创建 workspace、app、package、配置、migration、queue、容器或业务代码。
