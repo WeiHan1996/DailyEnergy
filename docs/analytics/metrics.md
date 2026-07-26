@@ -1,6 +1,7 @@
 # DailyEnergy 指标唯一口径
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-26
 - **所属任务**：S-25 — 指标唯一口径
 - **最后更新**：2026-07-26
 - **适用范围**：Phase 0B / 内部 Alpha / 种子 Beta 的产品漏斗、激活、留存、互动、关系证据、运行质量、成本和治理 Gate
@@ -620,8 +621,8 @@ WHERE product_date BETWEEN :start_date AND :end_date
 
 ## 20. 审核记录
 
-- 状态：Draft；
-- 接受日期：待用户确认；
-- 内容 PR：[Draft PR #30](https://github.com/WeiHan1996/DailyEnergy/pull/30)；
-- 待确认范围：主指标、激活/活跃/cohort、23 个指标、D1/D3/D7、帮助度、任务、降级、成本、小样本、研究缺口、40 个验证场景和 Production Gates；
-- 下一任务：S-26 实验规范；S-25 被接受前不提前开始。
+- 状态：Accepted；
+- 接受日期：2026-07-26；
+- 内容 PR：[PR #30](https://github.com/WeiHan1996/DailyEnergy/pull/30)；
+- 已确认范围：主指标、激活/活跃/cohort、23 个指标、D1/D3/D7、帮助度、任务、降级、成本、小样本、研究缺口、40 个验证场景和 Production Gates；
+- 下一任务：S-26 实验规范。
