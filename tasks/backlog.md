@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-26
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-28 Monorepo 与技术栈决策](./current.md)
+- **当前任务**：[S-29 系统架构](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -99,8 +99,8 @@
 
 | ID | 任务 | 状态 | 主要交付 | 依赖 |
 |---|---|---|---|---|
-| S-28 | Monorepo 与技术栈决策 | In Review | ADR-0006 | 主要业务规格 |
-| S-29 | 系统架构 | Planned | architecture.md | S-12、S-19、S-20、S-28 |
+| S-28 | Monorepo 与技术栈决策 | Done | ADR-0006 | 主要业务规格 |
+| S-29 | 系统架构 | In Review | architecture.md | S-12、S-19、S-20、S-28 |
 | S-30 | 仓库结构和模块边界 | Planned | repository-structure.md | S-29 |
 | S-31 | 测试策略 | Planned | testing.md | S-09、S-16、S-20、S-29 |
 | S-32 | 部署、配置和回滚 | Planned | deployment.md | S-29 |
