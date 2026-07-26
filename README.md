@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-20 已 Accepted，S-21 Ready，尚未开始业务编码
+状态：S-21 已 Accepted，S-22 Ready，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、隐私、指标和工程规范
-当前任务：S-21 隐私数据地图（Ready）
+当前任务：S-22 内容审核和用户支持流程（Ready）
 ```
 
 长期工作入口：
@@ -361,11 +361,12 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- Draft `docs/operations/privacy-data-map.md`；
-- 对齐个人信息分类、处理目的、来源、流转、存储、访问、受托方、保存与删除；
-- 以已 Accepted 的领域、数据库、API、记忆、安全和 ADR-0005 为边界。
+- Draft `docs/operations/content-moderation.md`；
+- Draft `docs/operations/user-support.md`；
+- 对齐审核、抽检、申诉、支持受理、升级、RBAC、受限审计与用户权利摘要；
+- 以已 Accepted 的 Safety、Evaluation、Privacy Data Map、领域、数据库、API 和 ADR-0005 为边界。
 
-S-21 不创建数据库、埋点、同意页面、用户协议、供应商配置或生产代码。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+S-22 不创建数据库、Prisma、migration、API、埋点、真实工单、供应商配置或生产代码，也不提前承担 S-23 事件响应和 S-24 analytics。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 

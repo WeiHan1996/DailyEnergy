@@ -1,8 +1,9 @@
 # DailyEnergy 隐私数据地图
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-26
 - **所属任务**：S-21 — 隐私数据地图
-- **最后更新**：2026-07-23
+- **最后更新**：2026-07-26
 - **适用范围**：Phase 0B / P0～P1 数据收集、使用、存储、传输、访问、保存、删除与用户权利
 - **上游权威**：[产品状态机](../product/state-machine.md)、[业务规则](../product/business-rules.md)、[结构化记忆](../ai/memory.md)、[内容安全](../ai/safety.md)、[AI Gateway](../ai/gateway.md)、[领域模型](../data/domain-model.md)、[ADR-0005](../decisions/ADR-0005-data-retention-and-deletion.md)、[数据库规格](../technical/database.md)、[API 契约](../technical/api.md)、[Prisma 草案](../../prisma/schema.prisma)
 - **下游任务**：S-22～S-25、S-29、S-31～S-33、C-002、C-014、C-015、A-005～A-008
@@ -535,4 +536,12 @@ Safety、网络安全、删除和受限审计可以有独立的合规/运行计�
 - 34 个验证场景 ID 唯一，覆盖正常、缺失、撤回、删除、provider、备份、Safety、日志、未成年人、analytics 和受限权利摘要；
 - 缺口被标记为阻塞项，没有发明新表、字段、目的、期限、接收方或跨境安排；
 - 无数据库、Prisma、migration、API、NestJS、worker、云配置、真实账号、secret 或生产数据变更；
-- 用户确认前本文保持 Draft。
+- 本文仅在用户确认后转为 Accepted；已于 2026-07-26 完成确认。
+
+## 19. 审核记录
+
+- 状态：Accepted；
+- 接受日期：2026-07-26；
+- 内容 PR：[PR #26](https://github.com/WeiHan1996/DailyEnergy/pull/26)；
+- 接受范围：33 个数据资产、页面/API/View/Prisma 交叉映射、访问与保存删除矩阵、受托方边界、用户权利、34 个验证场景和明确的 production Gate；
+- 下游交接：S-22 内容审核和用户支持流程成为唯一 Ready 任务；不得把支持入口、受限审计或未成年人/analytics Gate 误解为已经可生产启用。

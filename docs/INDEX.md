@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-07-23
+- **最后更新**：2026-07-26
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -154,7 +154,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | docs/analytics/event-tracking.md | Planned | 事件、属性和归因 | journey、mvp |
 | docs/analytics/metrics.md | Planned | D1/D3/D7 等唯一口径 | event-tracking |
 | docs/analytics/experiments.md | Planned | 实验、样本和停止规则 | metrics |
-| [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md) | Draft | 数据、用途、位置、访问、保存、删除和用户权利 | domain、database、API、ADR-0005 |
+| [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md) | Accepted | 数据、用途、位置、访问、保存、删除和用户权利 | domain、database、API、ADR-0005 |
 | docs/operations/content-moderation.md | Planned | 审核、抽检和申诉 | safety、evaluation |
 | docs/operations/user-support.md | Planned | 内测反馈和用户请求 | journey、privacy |
 | docs/operations/incident-response.md | Planned | 故障和安全事件流程 | architecture、safety |
@@ -227,37 +227,27 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-20 API 契约已由用户确认并合并，三份契约进入 Accepted。S-21 隐私数据地图已创建 Draft，并在 [PR #26](https://github.com/WeiHan1996/DailyEnergy/pull/26) 中处于 In Review。继续审核或修订 S-21 时依次读取：
+S-21 隐私数据地图已由用户确认，并随 [PR #26](https://github.com/WeiHan1996/DailyEnergy/pull/26) 进入 Accepted。S-22 内容审核和用户支持流程是唯一 Ready 任务；开始 S-22 时依次读取：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. docs/INDEX.md；
 5. tasks/current.md；
-6. docs/product/vision.md；
-7. docs/product/persona.md；
-8. docs/product/journey.md；
-9. docs/product/mvp.md；
-10. docs/product/state-machine.md；
-11. docs/product/business-rules.md；
+6. docs/operations/privacy-data-map.md；
+7. docs/ai/safety.md；
+8. docs/ai/evaluation.md；
+9. docs/ai/personality.md；
+10. docs/product/journey.md；
+11. docs/product/mvp.md；
 12. docs/design/screen-specs.md；
 13. docs/design/interaction-states.md；
-14. docs/ai/daily-content-schema.md；
-15. docs/ai/evening-feedback-schema.md；
-16. docs/ai/weekly-summary-schema.md；
-17. packages/shared-schemas/README.md；
-18. docs/decisions/ADR-0003-ai-provider-abstraction.md；
-19. docs/ai/gateway.md；
-20. docs/decisions/ADR-0004-structured-memory.md；
-21. docs/ai/memory.md；
-22. docs/ai/safety.md；
-23. docs/ai/evaluation.md；
-24. docs/data/domain-model.md；
-25. docs/decisions/ADR-0005-data-retention-and-deletion.md；
-26. docs/technical/database.md；
-27. prisma/schema.prisma；
-28. docs/technical/api.md；
-29. docs/technical/error-codes.md；
-30. openapi/openapi.yaml。
+14. docs/data/domain-model.md；
+15. docs/decisions/ADR-0005-data-retention-and-deletion.md；
+16. docs/technical/database.md；
+17. prisma/schema.prisma；
+18. docs/technical/api.md；
+19. docs/technical/error-codes.md；
+20. openapi/openapi.yaml。
 
-S-21 只产出 Draft `docs/operations/privacy-data-map.md` 并同步项目控制文件；不创建或修改数据库、migration、NestJS、埋点 Schema、同意页面、用户协议、供应商配置、真实处理活动或生产代码。用户确认前文档保持 Draft、任务保持 In Review；确认后先更新状态/接受日期，再合并并交接 S-22。
+S-22 只起草 `docs/operations/content-moderation.md` 与 `docs/operations/user-support.md`，冻结审核、抽检、申诉、支持受理、升级、RBAC、受限审计和用户权利摘要流程；不创建或修改数据库、Prisma、migration、API、NestJS、埋点、供应商配置、真实工单或生产代码。S-21 明确的未成年人、analytics、受托方与跨境 Gate 仍保持阻塞，不能由运营文档静默解除。

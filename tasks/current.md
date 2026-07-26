@@ -1,57 +1,92 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-07-23
+- **最后更新**：2026-07-26
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务 ID**：S-21
-- **当前任务名称**：隐私数据地图
-- **任务状态**：In Review
+- **当前任务 ID**：S-22
+- **当前任务名称**：内容审核和用户支持流程
+- **任务状态**：Ready
 - **优先级**：最高
-- **当前分支**：`agent/privacy-data-map`
-- **交付文件**：`docs/operations/privacy-data-map.md`
-- **关联 PR**：[Draft PR #26](https://github.com/WeiHan1996/DailyEnergy/pull/26)
+- **当前分支**：`main`
+- **上游 PR**：[S-21 PR #26](https://github.com/WeiHan1996/DailyEnergy/pull/26)
+- **交付文件**：`docs/operations/content-moderation.md`、`docs/operations/user-support.md`
 
 ## 1. 当前目标
 
-将 Accepted 产品、AI、领域、保存删除、数据库和 API 契约整理为可审计的数据地图。
+把 Accepted 的内容安全、评测和隐私边界转换为 Alpha 可执行的运营流程，明确：
 
-回答每项个人信息：
+- 内容怎样分类、抽检、处置、复核和申诉；
+- 用户支持怎样受理、分级、答复、升级和关闭；
+- 运营人员能看到什么，何时需要审批与受限访问审计；
+- Safety 原文、普通支持反馈、受限审计和用户权利摘要怎样隔离；
+- 哪些流程仍是 production Gate，不能靠人工兜底或文档描述视为已实现。
 
-- 从哪里来；
-- 为什么处理；
-- 到哪里去；
-- 谁能访问；
-- 保存多久；
-- 怎样删除。
+## 2. 必须交付
 
-## 2. 已完成
+### 2.1 内容审核
 
-- 已从 main@eb75356 创建 S-21 独立分支；
-- 已创建 Draft `docs/operations/privacy-data-map.md`；
-- 已完成数据分类、完整 `PDM-*` 资产表、API/View/Prisma 交叉映射、存储与访问矩阵；
-- 已对齐 AI/provider、memory、Safety、通知、分享、导出、保存删除、备份和跨境边界；
-- 已补齐 Onboarding、受限审计、legal hold、analytics、未成年人和受限证据用户权利；
-- 已定义 34 个验证场景，并将未冻结事项显式设为 production Gate。
+- 风险分类、处置动作、抽检策略、复核与申诉路径；
+- 生成内容、固定 Safety 响应、用户自由文本和分享内容的不同边界；
+- 高风险内容只能进入专业安全路径，不得落入普通客服或常规审核队列；
+- 角色、最小权限、break-glass、审批和访问审计；
+- 能覆盖正常、误判、漏判、重复提交、升级失败和删除中的验证场景。
 
-## 3. 当前验证
+### 2.2 用户支持
 
-- 未修改数据库、Prisma、migration、API、NestJS、worker 或生产代码；
-- 未创建埋点字典；
-- 未配置真实微信、AI provider、云存储或账号；
-- 未改变任何 Accepted ADR。
-- 已校验 33 个唯一数据资产、34 个唯一场景、Prisma model/字段映射、相对链接和 EOF newline；
-- docs/INDEX、tasks/current 与 backlog 均指向 S-21 In Review / PR #26。
+- 咨询、故障、反馈、账户与用户权利请求的受理和分流；
+- FAQ、状态反馈、服务级别、升级、关闭、纠正与申诉路径；
+- 支持记录的最小字段、权威位置、访问者、保存期限、删除、导出和受托方约束；
+- 解决 S-21 `support feedback` 当前仅允许 T0 处理后丢弃、不得持久化或人工转交的 Gate；
+- 定义 Safety/删除/受限审计查阅复制摘要路径，但不得向普通支持暴露原文。
 
-## 4. 待审核决定
+### 2.3 受限访问与下游交接
 
-- 用户审核 PR #26 是否接受 S-21 数据地图；
-- `RestrictedAuditEvent` 最大保存期限仍由 S-22/S-29 按最短必要冻结，之前不得生产写入；
-- 未成年人生产策略必须在上线前选择“排除不满十四周岁”或“监护人同意 + 专门规则”，不得擅自新增年龄/证件字段；
-- S-24 前用户级 analytics SDK、事件表、队列和第三方发送保持关闭。
+- 按最短必要原则冻结 `RestrictedAuditEvent.expiresAt` 的最大期限，或在无法冻结时明确 ADR owner 与 production blocker；
+- 将需要数据库/API/架构实现的内容交给 S-29 及后续工程任务，不在 S-22 直接改 Schema 或接口；
+- 将安全事件响应留给 S-23，将 analytics 事件和指标留给 S-24/S-25。
 
-## 5. 下一步
+## 3. 上游读取顺序
 
-1. 用户提出修改时继续在 PR #26 修订；
-2. 用户确认后，将隐私数据地图状态改为 Accepted 并记录接受日期；
-3. squash merge PR #26；
-4. 合并后把 S-21 改为 Done，并将 S-22 内容审核和用户支持流程设为唯一 Ready。
+1. `AGENTS.md`、`README.md`、`ROADMAP.md`、`docs/INDEX.md`、本文；
+2. `docs/operations/privacy-data-map.md`；
+3. `docs/ai/safety.md`、`docs/ai/evaluation.md`、`docs/ai/personality.md`；
+4. `docs/product/journey.md`、`docs/product/mvp.md`；
+5. `docs/design/screen-specs.md`、`docs/design/interaction-states.md`；
+6. `docs/data/domain-model.md`、`docs/decisions/ADR-0005-data-retention-and-deletion.md`；
+7. `docs/technical/database.md`、`prisma/schema.prisma`；
+8. `docs/technical/api.md`、`docs/technical/error-codes.md`、`openapi/openapi.yaml`。
+
+## 4. 已接受边界
+
+- 普通支持、审核、日志和通知不得收集或复制 Safety 原始输入；
+- 普通运营后台不得提供任意用户全文浏览；
+- 在 S-22 冻结支持模型和流程前，`support feedback` 只能 T0 处理后丢弃，不得持久化、建工单或人工转交；
+- 用户权利摘要按 Privacy Data Map 第 12.1 节执行，restricted 域不能成为自动拒绝访问、复制或删除请求的理由；
+- 未成年人生产策略、analytics 用户级收集、真实受托方和跨境状态继续保持 Gate；S-22 不得静默解除；
+- 所有新保存期限、字段、目的、接收方或系统能力必须有 Accepted 上游；缺失时记录阻塞项，不自行发明。
+
+## 5. 不做
+
+- 不修改数据库、Prisma、migration、API、OpenAPI、NestJS、worker 或生产代码；
+- 不配置真实客服、审核、AI provider、云服务、账号或 secret；
+- 不写最终隐私政策、用户协议或法律意见；
+- 不创建真实工单、使用真实用户数据或启用人工高风险处置；
+- 不提前完成 S-23 故障和安全事件响应、S-24 埋点或 S-25 指标口径。
+
+## 6. 验收标准
+
+- 两份 Draft 文档覆盖角色、入口、状态、处置、升级、审计、保存删除和用户权利；
+- moderation/support 场景具有稳定唯一 ID，并覆盖正常、异常、权限、删除和 Safety 隔离；
+- 每项记录都能追踪到权威对象、位置、访问者、期限和删除路径；未冻结项有 owner、任务与阻塞条件；
+- ordinary support/moderation 不出现 Safety 原文、任意全文后台或隐式永久保存；
+- docs/INDEX、tasks/current、backlog 和 README 状态一致；
+- PR 不包含业务代码、Schema、接口、真实配置、secret 或真实用户数据；
+- 用户确认前两份文档保持 Draft，任务保持 In Review。
+
+## 7. 最近交接
+
+- 用户已于 2026-07-26 确认 S-21；Privacy Data Map 进入 Accepted；
+- S-21 共冻结 33 个数据资产、34 个验证场景及页面/API/View/Prisma 交叉映射；
+- S-21 遗留给 S-22 的核心事项是 support feedback 权威流程、受限权利摘要、运营 RBAC 与 `RestrictedAuditEvent` 最大期限；
+- PR #26 包含本次验收与 S-22 交接，并采用 squash merge；
+- 下一动作：从最新 `main` 创建 `agent/content-moderation-support`，起草两份交付文档。

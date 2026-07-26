@@ -1,9 +1,9 @@
 # DailyEnergy 项目 Backlog
 
 - **文档状态**：Active
-- **最后更新**：2026-07-23
+- **最后更新**：2026-07-26
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-21 隐私数据地图](./current.md)
+- **当前任务**：[S-22 内容审核和用户支持流程](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -82,8 +82,8 @@
 | S-18 | 数据保存和删除决策 | Done | ADR-0005 | S-17 |
 | S-19 | 数据库规格 | Done | database.md、Prisma 草案 | S-17、S-18 |
 | S-20 | API 契约 | Done | api.md、error-codes、OpenAPI | S-09、S-19 |
-| S-21 | 隐私数据地图 | In Review | privacy-data-map.md | S-17～S-20 |
-| S-22 | 内容审核和用户支持流程 | Planned | moderation、support | S-15、S-21 |
+| S-21 | 隐私数据地图 | Done | privacy-data-map.md | S-17～S-20 |
+| S-22 | 内容审核和用户支持流程 | Ready | moderation、support | S-15、S-21 |
 | S-23 | 故障和安全事件响应 | Planned | incident-response.md | S-15、S-21 |
 
 ### 数据分析与实验
