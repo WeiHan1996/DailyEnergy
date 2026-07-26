@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/content-moderation-support`
 - **上游 PR**：[S-21 PR #26](https://github.com/WeiHan1996/DailyEnergy/pull/26)
-- **当前 PR**：Draft PR 待创建
+- **当前 PR**：[Draft PR #27](https://github.com/WeiHan1996/DailyEnergy/pull/27)
 - **交付文件**：`docs/operations/content-moderation.md`、`docs/operations/user-support.md`
 
 ## 1. 当前目标
