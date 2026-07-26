@@ -704,7 +704,7 @@ E-001/E-002/E-008/E-011 必须最终提供下列 clean-checkout Gate：
 
 - 状态：Draft；
 - 接受日期：待用户确认；
-- 内容 PR：待创建；
+- 内容 PR：[Draft PR #35](https://github.com/WeiHan1996/DailyEnergy/pull/35)；
 - 基线：`main`（S-29 系统架构已随 PR #34 合并并获用户确认）；
 - 待确认范围：目标目录、薄 app、七类 package、15 个 server-core 模块、public exports/SPI、Worker profile capability、Schema/codegen 方向、12 类 Gate 与 48 个场景；
 - 下一任务：S-31 测试策略；S-30 被接受前不初始化 workspace 或应用代码。
