@@ -432,6 +432,6 @@ E-001 必须：
 
 - 状态：Proposed；
 - 接受日期：待用户确认；
-- 内容 PR：待创建；
+- 内容 PR：[Draft PR #33](https://github.com/WeiHan1996/DailyEnergy/pull/33)；
 - 待确认范围：pnpm/Turbo 单仓、Node 24 LTS、主版本矩阵、ESM/miniapp 边界、Schema 权威、依赖/缓存/升级规则、32 个场景和下游 Gate；
 - 下一任务：S-29 系统架构；ADR-0006 被接受前不初始化 Phase 1 Monorepo。
