@@ -153,7 +153,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 |---|---|---|---|
 | [docs/analytics/event-tracking.md](./analytics/event-tracking.md) | Accepted | 事件、属性、平面、匿名聚合与质量 Gate | information-architecture、state-machine、API、privacy |
 | [docs/analytics/metrics.md](./analytics/metrics.md) | Accepted | 激活、D1/D3/D7、互动、运行、成本、小样本与研究 Gate 的唯一口径 | event-tracking |
-| [docs/analytics/experiments.md](./analytics/experiments.md) | Draft | 实验边界、方法、主指标、样本、停止、回滚与个人 assignment Gate | metrics |
+| [docs/analytics/experiments.md](./analytics/experiments.md) | Accepted | 实验边界、方法、主指标、样本、停止、回滚与个人 assignment Gate | metrics |
+| [docs/analytics/channel-attribution.md](./analytics/channel-attribution.md) | Draft | 小红书/抖音承接、来源令牌、首次触达、渠道指标与隐私 Gate | event-tracking、metrics、experiments |
 | [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md) | Accepted | 数据、用途、位置、访问、保存、删除和用户权利 | domain、database、API、ADR-0005 |
 | [docs/operations/content-moderation.md](./operations/content-moderation.md) | Accepted | 审核、抽检和申诉 | safety、evaluation、privacy |
 | [docs/operations/user-support.md](./operations/user-support.md) | Accepted | FAQ、支持、升级、用户权利摘要与受限访问 | journey、privacy、moderation |
@@ -227,22 +228,24 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-25 指标唯一口径已随 [PR #30](https://github.com/WeiHan1996/DailyEnergy/pull/30) 合并并获用户确认，文档现为 Accepted。S-26 实验规范 Draft 已完成，当前处于 In Review。审核时依次读取：
+S-26 实验规范已随 [PR #31](https://github.com/WeiHan1996/DailyEnergy/pull/31) 合并并获用户确认，文档现为 Accepted。S-27 渠道归因规范 Draft 已完成，当前处于 In Review。审核时依次读取：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. docs/product/vision.md、mvp.md；
-7. docs/ai/personality.md、safety.md；
-8. docs/product/business-rules.md；
-9. docs/decisions/ADR-0005-data-retention-and-deletion.md；
-10. docs/operations/privacy-data-map.md；
-11. docs/analytics/event-tracking.md；
-12. docs/analytics/metrics.md；
-13. docs/analytics/experiments.md。
+6. docs/product/vision.md、persona.md、mvp.md；
+7. docs/product/business-rules.md；
+8. docs/data/domain-model.md；
+9. docs/technical/database.md、api.md；
+10. docs/decisions/ADR-0005-data-retention-and-deletion.md；
+11. docs/operations/privacy-data-map.md；
+12. docs/analytics/event-tracking.md；
+13. docs/analytics/metrics.md；
+14. docs/analytics/experiments.md；
+15. docs/analytics/channel-attribution.md。
 
-本次审核重点是：哪些边界永远不可实验；Alpha 与种子 Beta 的证据强度是否诚实；每个实验是否只有一个主指标并受 G01～G04 约束；个人随机 assignment 是否在 PDM 和工程合同变更前保持 Blocked；产品日期 switchback 是否不建立个人轨迹；样本、成熟、Unknown、模板降级、停止、回滚、k=10、Wilson 区间、两维上限、13 个月与 32 个验证场景是否可执行。
+本次审核重点是：平台能力与 fallback 是否 fail closed；registry 和共享 token 是否没有 click/user/device 标识；first valid touch、转发、参数丢失、冲突与反作弊是否唯一；当前可用质量指标是否没有冒充用户转化；Acquisition Mapping、30 天上限、删除/导出与 Production Gates 是否明确；k=10、两维、Wilson 区间、13 个月、10 个 fixtures 和 32 个场景是否一致。
 
-用户明确接受且 PR 合并前，experiments.md 保持 Draft，S-26 保持 In Review；不得把本文理解为已启用生产实验能力。
+用户明确接受且 PR 合并前，channel-attribution.md 保持 Draft，S-27 保持 In Review；不得把本文理解为已经具备生产渠道归因能力。
