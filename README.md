@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-30 仓库结构已 Accepted；S-31 测试策略 Draft 已完成并进入 In Review，尚未开始业务编码
+状态：S-31 测试策略已 Accepted；S-32 部署、配置与回滚 Draft 已完成并进入 In Review，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、隐私、分析与工程规范
-当前任务：S-31 测试策略（In Review）
+当前任务：S-32 部署、配置和回滚（In Review）
 ```
 
 长期工作入口：
@@ -361,14 +361,16 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 审核 Draft `docs/technical/testing.md`；
-- 审核 Static/Unit/Module/DB/Contract/Integration/E2E/Resilience/AI Eval/Manual RC 分层；
-- 审核 Vitest、Playwright、Testcontainers、微信 DevTools、Redocly、Prisma/SQL 与 architecture checker 职责；
-- 审核 Accepted source-ID registry、SQL-001～020、TX-01～09 和关键故障/恢复矩阵；
-- 审核 Worker profile、DB role、handler、config、queue 与 egress capability 证据；
-- 审核 CI lane、coverage、flaky/retry/quarantine、artifact 与 48 个 S-31 场景。
+- 审核 Draft `docs/technical/deployment.md`；
+- 审核 LOCAL/CI/DEV/STAGING/PRODUCTION/RECOVERY/EVALUATION/MINIAPP_RUNNER 环境边界；
+- 审核单 host Compose、独立 PG/Redis/object、runtime profile 与非 HA 限制；
+- 审核 build-once、image digest、Release Manifest、SBOM/provenance 和供应链 Gate；
+- 审核配置分级、secret/OIDC、启动指纹、migration 与 consumer-before-producer 发布；
+- 审核 rollback matrix、35 天 backup、WAL/PITR、Redis 重建和隔离恢复；
+- 审核 Production Blocked Gate、artifact/remote cache 和 48 个 S-32 场景。
 
-S-31 不创建测试代码、配置、CI workflow、容器、migration、secret 或生产资源，也不提前实现 S-32 部署/回滚或 S-33 可观测性。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+S-32 不创建 Docker/Compose、CI workflow、migration、secret、云资源或生产环境，也不提前实现 S-33 可观测性。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+
 ---
 
 ## 一句话共识
