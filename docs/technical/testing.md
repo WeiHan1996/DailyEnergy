@@ -917,7 +917,7 @@ E-010 不需要一次实现全部业务场景，但必须建立 registry，使�
 
 - 状态：Draft；
 - 接受日期：待用户确认；
-- 内容 PR：创建后补充；
+- 内容 PR：[Draft PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/36)；
 - 基线：`main`（S-30 仓库结构与模块边界已随 PR #35 合并并获用户确认）；
 - 待确认范围：测试层级/工具、真实依赖与替身边界、source-ID registry、DB/TX/queue/profile/客户端/AI/恢复矩阵、CI/flaky/artifact 和 48 个场景；
 - 下一任务：S-32 部署、配置和回滚；S-31 被接受前不创建测试骨架或 CI。
