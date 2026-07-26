@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-25 已 Accepted；S-26 实验规范 Draft 已完成并进入 In Review，尚未开始业务编码
+状态：S-26 已 Accepted；S-27 渠道归因规范 Draft 已完成并进入 In Review，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、隐私、分析与工程规范
-当前任务：S-26 实验规范（In Review）
+当前任务：S-27 渠道归因规范（In Review）
 ```
 
 长期工作入口：
@@ -361,13 +361,14 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 审核 Draft `docs/analytics/experiments.md`；
-- 审核不可实验边界、合成/可用性/批次/switchback 四类方法和个人 assignment Blocked；
-- 审核唯一主指标、G01～G04、最小有意义变化、成熟样本和停止规则；
-- 审核 10 个 fixtures、32 个验证场景、`k=10`、Wilson 95% 区间和 13 个月期限；
-- 以 Accepted 的 MVP、人格、Safety、PDM、ADR-0005、事件字典和指标合同为边界。
+- 审核 Draft `docs/analytics/channel-attribution.md`；
+- 审核小红书/抖音平台能力 fail-closed、承接页与二维码 fallback、真机验证矩阵；
+- 审核低基数 registry、共享签名 source token、first-valid-touch、转发和反作弊规则；
+- 审核当前可用的承接/解析质量与 Blocked 的渠道 Activation、D1/D3/D7、CAC；
+- 审核 proposed Acquisition Mapping 的 PDM、最长 30 天、删除/导出和实现 Gate；
+- 以 Accepted 的 MVP、领域、PDM、ADR-0005、事件、指标和实验合同为边界。
 
-S-26 不创建实验平台、feature flag、assignment/exposure 表、SDK、Prisma、migration、Dashboard、第三方平台或生产代码，也不提前实现 S-27 渠道归因。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+S-27 不创建渠道持久化、click ID、source cookie、第三方归因 SDK、Prisma、migration、生产配置或用户级追踪；Production Gates 完成前不发布素材级 Activation、D1/D3/D7 或 CAC。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 
