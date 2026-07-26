@@ -693,7 +693,7 @@ SSO 厂商、网络 allowlist、break-glass 与具体 RBAC 由 S-22/S-32 落地�
 
 - 状态：Draft；
 - 接受日期：待用户确认；
-- 内容 PR：待创建；
+- 内容 PR：[Draft PR #34](https://github.com/WeiHan1996/DailyEnergy/pull/34)；
 - 基线：`main`（ADR-0006 / S-28 已随 PR #33 合并并获用户确认）；
 - 待确认范围：模块化单体、运行时与 Worker profiles、单数据库/schema、事务/outbox/inbox、Gateway、Redis/cache、roles、故障恢复、48 个场景；
 - 下一任务：S-30 仓库结构和模块边界；S-29 被接受前不初始化业务模块或运行时。
