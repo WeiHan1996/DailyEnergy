@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-26
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-26 实验规范](./current.md)
+- **当前任务**：[S-27 渠道归因规范](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -92,8 +92,8 @@
 |---|---|---|---|---|
 | S-24 | 埋点事件字典 | Done | event-tracking.md | S-02、S-05、S-20 |
 | S-25 | 指标唯一口径 | Done | metrics.md | S-24 |
-| S-26 | 实验规范 | In Review | experiments.md | S-25 |
-| S-27 | 渠道归因规范 | Planned | 小红书、抖音归因方案 | S-24、S-25 |
+| S-26 | 实验规范 | Done | experiments.md | S-25 |
+| S-27 | 渠道归因规范 | In Review | channel-attribution.md | S-24、S-25、S-26 |
 
 ### 工程架构与执行拆分
 
