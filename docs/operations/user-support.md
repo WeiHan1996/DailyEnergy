@@ -1,6 +1,7 @@
 # DailyEnergy 用户支持流程
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-07-26
 - **所属任务**：S-22 — 内容审核和用户支持流程
 - **最后更新**：2026-07-26
 - **适用范围**：Phase 0B / P0～P1 的 FAQ、产品咨询、故障、内容反馈、账户问题、隐私与用户权利协助
@@ -314,3 +315,12 @@ S-22 冻结 `RestrictedAuditEvent.expiresAt` 的普通最大期限为：
 | 故障/安全事件 on-call 与外部通知 | S-23 | incident-response.md Accepted 并完成演练 |
 
 在上述前五项关键 Gate 完成前，`/support/feedback` 继续遵循 S-21：只在 T0 校验与分类后丢弃，不持久化、建工单或人工转交。S-22 被接受只冻结目标合同，不代表能力已实现。
+
+## 14. 审核记录
+
+- 状态：Accepted；
+- 接受日期：2026-07-26；
+- 内容 PR：[PR #27](https://github.com/WeiHan1996/DailyEnergy/pull/27)；
+- 接受范围：FAQ 与五类入口、SupportCase 目标合同、状态/SLA/升级、用户权利摘要、案例级 RBAC、保存删除和 30 个验证场景；
+- 关键期限：正文/回复/附件关闭后 30 天且创建后绝对 180 天，最小元数据关闭后 90 天；break-glass 60 分钟；受限审计 6 个自然月；
+- 下游交接：SupportCase 持久化、API/View、独立删除/导出、受限摘要、值班和外部通知仍是 S-23/S-29/C-014/A-005～A-008 production Gate；实现前 `/support/feedback` 继续 T0 丢弃。
