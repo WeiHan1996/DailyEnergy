@@ -154,7 +154,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/analytics/event-tracking.md](./analytics/event-tracking.md) | Accepted | 事件、属性、平面、匿名聚合与质量 Gate | information-architecture、state-machine、API、privacy |
 | [docs/analytics/metrics.md](./analytics/metrics.md) | Accepted | 激活、D1/D3/D7、互动、运行、成本、小样本与研究 Gate 的唯一口径 | event-tracking |
 | [docs/analytics/experiments.md](./analytics/experiments.md) | Accepted | 实验边界、方法、主指标、样本、停止、回滚与个人 assignment Gate | metrics |
-| [docs/analytics/channel-attribution.md](./analytics/channel-attribution.md) | Draft | 小红书/抖音承接、来源令牌、首次触达、渠道指标与隐私 Gate | event-tracking、metrics、experiments |
+| [docs/analytics/channel-attribution.md](./analytics/channel-attribution.md) | Accepted | 小红书/抖音承接、来源令牌、首次触达、渠道指标与隐私 Gate | event-tracking、metrics、experiments |
 | [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md) | Accepted | 数据、用途、位置、访问、保存、删除和用户权利 | domain、database、API、ADR-0005 |
 | [docs/operations/content-moderation.md](./operations/content-moderation.md) | Accepted | 审核、抽检和申诉 | safety、evaluation、privacy |
 | [docs/operations/user-support.md](./operations/user-support.md) | Accepted | FAQ、支持、升级、用户权利摘要与受限访问 | journey、privacy、moderation |
@@ -179,7 +179,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [ADR-0003-ai-provider-abstraction.md](./decisions/ADR-0003-ai-provider-abstraction.md) | Accepted | AI Gateway 与供应商隔离 | AI Gateway 开发前 |
 | [ADR-0004-structured-memory.md](./decisions/ADR-0004-structured-memory.md) | Accepted | 用途受限结构化记忆与不用向量库 | 记忆开发前 |
 | [ADR-0005-data-retention-and-deletion.md](./decisions/ADR-0005-data-retention-and-deletion.md) | Accepted | 保存期限、删除、备份、受托方和受限证据 | 数据库开发前 |
-| ADR-0006-monorepo-and-stack.md | Planned | TypeScript Monorepo 与既定技术栈 | 工程初始化前 |
+| [ADR-0006-monorepo-and-stack.md](./decisions/ADR-0006-monorepo-and-stack.md) | Proposed | pnpm/Turbo 单仓、运行时、框架、数据与版本治理 | 工程初始化前 |
 
 如果实际决策发生变化，应调整 ADR 名称和顺序，不为填满编号而创建无价值文档。
 
@@ -228,24 +228,23 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-26 实验规范已随 [PR #31](https://github.com/WeiHan1996/DailyEnergy/pull/31) 合并并获用户确认，文档现为 Accepted。S-27 渠道归因规范 Draft 已完成，当前处于 In Review。审核时依次读取：
+S-27 渠道归因规范已随 [PR #32](https://github.com/WeiHan1996/DailyEnergy/pull/32) 合并并获用户确认，文档现为 Accepted。S-28 Monorepo 与技术栈 ADR 已完成，当前处于 Proposed / In Review。审核时依次读取：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. docs/product/vision.md、persona.md、mvp.md；
-7. docs/product/business-rules.md；
+6. docs/decisions/ADR-0002～ADR-0005；
+7. docs/ai/gateway.md；
 8. docs/data/domain-model.md；
-9. docs/technical/database.md、api.md；
-10. docs/decisions/ADR-0005-data-retention-and-deletion.md；
-11. docs/operations/privacy-data-map.md；
-12. docs/analytics/event-tracking.md；
-13. docs/analytics/metrics.md；
-14. docs/analytics/experiments.md；
-15. docs/analytics/channel-attribution.md。
+9. docs/technical/database.md、api.md、error-codes.md；
+10. docs/operations/privacy-data-map.md；
+11. docs/analytics/event-tracking.md、metrics.md、experiments.md、channel-attribution.md；
+12. packages/shared-schemas/README.md、package.json、tsconfig 与测试；
+13. prisma/schema.prisma；
+14. docs/decisions/ADR-0006-monorepo-and-stack.md。
 
-本次审核重点是：平台能力与 fallback 是否 fail closed；registry 和共享 token 是否没有 click/user/device 标识；first valid touch、转发、参数丢失、冲突与反作弊是否唯一；当前可用质量指标是否没有冒充用户转化；Acquisition Mapping、30 天上限、删除/导出与 Production Gates 是否明确；k=10、两维、Wilson 区间、13 个月、10 个 fixtures 和 32 个场景是否一致。
+本次审核重点是：单仓、pnpm workspace、Turbo 和单 lockfile 是否足够且不过度；Node 24 LTS 与各主版本是否相互兼容；共享 Zod、Nest DTO、Prisma 和 OpenAPI 的权威边界是否唯一；ESM 与微信小程序输出是否隔离；workspace dependency、frozen install、exact package manager、容器 digest、缓存和供应链升级规则是否可执行；是否明确把 S-29 架构、S-30 目录、S-31 测试和 S-32 部署留给下游。
 
-用户明确接受且 PR 合并前，channel-attribution.md 保持 Draft，S-27 保持 In Review；不得把本文理解为已经具备生产渠道归因能力。
+用户明确接受且 PR 合并前，ADR-0006 保持 Proposed，S-28 保持 In Review；不得把本文理解为已经初始化 Monorepo 或部署环境。
