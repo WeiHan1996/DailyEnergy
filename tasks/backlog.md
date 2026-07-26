@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-26
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-23 故障和安全事件响应](./current.md)
+- **当前任务**：[S-24 埋点事件字典](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -84,13 +84,13 @@
 | S-20 | API 契约 | Done | api.md、error-codes、OpenAPI | S-09、S-19 |
 | S-21 | 隐私数据地图 | Done | privacy-data-map.md | S-17～S-20 |
 | S-22 | 内容审核和用户支持流程 | Done | moderation、support | S-15、S-21 |
-| S-23 | 故障和安全事件响应 | In Review | incident-response.md | S-15、S-21 |
+| S-23 | 故障和安全事件响应 | Done | incident-response.md | S-15、S-21 |
 
 ### 数据分析与实验
 
 | ID | 任务 | 状态 | 主要交付 | 依赖 |
 |---|---|---|---|---|
-| S-24 | 埋点事件字典 | Planned | event-tracking.md | S-02、S-05、S-20 |
+| S-24 | 埋点事件字典 | In Review | event-tracking.md | S-02、S-05、S-20 |
 | S-25 | 指标唯一口径 | Planned | metrics.md | S-24 |
 | S-26 | 实验规范 | Planned | experiments.md | S-25 |
 | S-27 | 渠道归因规范 | Planned | 小红书、抖音归因方案 | S-24、S-25 |
