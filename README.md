@@ -346,9 +346,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-33 可观测性与成本监控已 Accepted；S-34 已创建 48 个 Phase 1～3 工程 Issues 并绑定 3 个真实 Milestone，当前进入 In Review，尚未开始业务编码
-当前目标：把所有 Accepted 规格拆成可独立验收、依赖明确的工程任务
-当前任务：S-34 Phase 1～3 工程 Issues（In Review）
+状态：S-34 已完成；S-35 正在执行 Phase 0B 最终可开工性 Gate，尚未开始工程代码
+当前目标：证明规格、可执行契约与 48 个工程 Issue 足以让 E-001 无需重新讨论产品定义即可开始
+当前任务：S-35 Phase 0B Gate 评审（In Review）
+建议结论：GO_PENDING_USER_ACCEPTANCE
 ```
 
 长期工作入口：
@@ -361,13 +362,13 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 维护 Phase 1 的 14 个 E Issues、Phase 2 的 17 个 C Issues、Phase 3 的 17 个 AI Issues；
-- 为每项固定权威输入、范围、验收、测试、依赖、非目标和理想工程日；
-- 维护 [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1)、[Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2)、[Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) 三个真实 Milestone，并持续核对 14 / 17 / 17 绑定；
-- 不设置虚假 due date，先用 E-001～E-003 的实际 cycle time 校准；
-- S-34 完成后进入 S-35 Phase 0B Gate，不直接开始编码。
+- 评审 [Phase 0B Gate 报告](./docs/reports/phase-0b-gate.md) 的 6 项总退出门槛、端到端追踪和 48 个固定审计记录；
+- 确认 6 个 Accepted ADR、可执行 Schema/OpenAPI/Prisma/vectors/corpus 与三阶段工程 Issue 一致；
+- 保留正式视觉设计系统为非阻塞 Planned 项，不伪装为已完成；
+- 保留云厂商、域名、主体、跨境、真实账号/密钥、热线资源和值班等后续外部 Gate；
+- 用户确认和合并前，E-001 继续保持 Planned，不开始编码。
 
-当前 48 个 Issue 已创建并按 Phase 1 / 2 / 3 精确绑定为 14 / 17 / 17，S-34 等待 PR #87 审核确认。S-34 不创建工程代码、配置、workflow、migration、云资源或生产变更。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+[PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87) 已合并；48 个 open Issue 继续按 Phase 1 / 2 / 3 绑定为 14 / 17 / 17。S-35 当前建议通过 Phase 0B，但只有用户接受 Gate 报告后才会把 [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) 设为唯一 Ready。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 
