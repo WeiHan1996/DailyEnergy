@@ -345,30 +345,30 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 ## 当前状态
 
 ```text
-阶段：Phase 0B — 开发前详细规格
-状态：S-34 已完成；S-35 正在执行 Phase 0B 最终可开工性 Gate，尚未开始工程代码
-当前目标：证明规格、可执行契约与 48 个工程 Issue 足以让 E-001 无需重新讨论产品定义即可开始
-当前任务：S-35 Phase 0B Gate 评审（In Review）
-建议结论：GO_PENDING_USER_ACCEPTANCE
+阶段：Phase 1 — 工程基础
+状态：Phase 0B Gate 已通过；S-35 已完成
+当前目标：初始化可重复的 pnpm/Turborepo TypeScript Monorepo
+当前任务：E-001 初始化 TypeScript Monorepo（Ready）
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/39
 ```
 
 长期工作入口：
 
 1. [ROADMAP.md](./ROADMAP.md)：长期阶段、交付物和退出门槛；
 2. [docs/INDEX.md](./docs/INDEX.md)：文档依赖、状态和读取顺序；
-3. [tasks/current.md](./tasks/current.md)：唯一正在执行的任务；
+3. [tasks/current.md](./tasks/current.md)：唯一 Ready 或 In Progress 的任务；
 4. [tasks/backlog.md](./tasks/backlog.md)：有序候选任务；
 5. [AGENTS.md](./AGENTS.md)：AI 与开发协作规则。
 
 当前任务范围：
 
-- 评审 [Phase 0B Gate 报告](./docs/reports/phase-0b-gate.md) 的 6 项总退出门槛、端到端追踪和 48 个固定审计记录；
-- 确认 6 个 Accepted ADR、可执行 Schema/OpenAPI/Prisma/vectors/corpus 与三阶段工程 Issue 一致；
-- 保留正式视觉设计系统为非阻塞 Planned 项，不伪装为已完成；
-- 保留云厂商、域名、主体、跨境、真实账号/密钥、热线资源和值班等后续外部 Gate；
-- 用户确认和合并前，E-001 继续保持 Planned，不开始编码。
+- 读取 [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)、ADR-0006、repository-structure、testing 和现有 shared-schemas；
+- 只初始化 pnpm workspace、Turborepo 任务图、目标目录骨架和统一根脚本；
+- 保留 shared-schemas public exports 与 fixtures；
+- 不初始化 Nest/Next/小程序/数据库/队列业务；
+- E-002 及其他下游工程 Issue 继续保持 Planned，不并行启动。
 
-[PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87) 已合并；48 个 open Issue 继续按 Phase 1 / 2 / 3 绑定为 14 / 17 / 17。S-35 当前建议通过 Phase 0B，但只有用户接受 Gate 报告后才会把 [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) 设为唯一 Ready。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted，S-35 已完成，E-001 是唯一 Ready。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。等待用户明确开始 E-001 后再创建工程分支，不在本次状态迁移中编写代码。
 
 ---
 
