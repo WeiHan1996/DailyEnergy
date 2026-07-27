@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-27
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-34 Phase 1～3 工程 Issues](./current.md)
+- **当前任务**：[S-35 Phase 0B Gate 评审](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -105,10 +105,10 @@
 | S-31 | 测试策略 | Done | testing.md | S-09、S-16、S-20、S-29 |
 | S-32 | 部署、配置和回滚 | Done | deployment.md | S-29、S-31 |
 | S-33 | 可观测性和成本监控 | Done | observability.md | S-25、S-29、S-32 |
-| S-34 | Phase 1～3 工程 Issues | In Review | 3 个 GitHub Milestones、48 个 Issues | S-01～S-33 |
-| S-35 | Phase 0B Gate 评审 | Planned | 规格完整性报告 | S-34 |
+| S-34 | Phase 1～3 工程 Issues | Done | 3 个 GitHub Milestones、48 个 Issues | S-01～S-33 |
+| S-35 | Phase 0B Gate 评审 | In Review | [Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) | S-34 |
 
-S-34 已创建 48 个工程 Issues，并绑定到 [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1)、[Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2)、[Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) 三个真实 Milestone（14 / 17 / 17），当前处于 In Review。S-34 被确认前不承诺精确 Alpha 和 Beta 日期；理想工程日初始估算为 35 / 43.5 / 44，必须在 E-001～E-003 后按实际 cycle time 校准。
+S-34 已随 [PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87) 合并并完成 48 个工程 Issue 与三个真实 Milestone（14 / 17 / 17）。S-35 正在评审 [Phase 0B Gate](../docs/reports/phase-0b-gate.md)，建议结论为 `GO_PENDING_USER_ACCEPTANCE`；用户确认和合并前 E-001 继续保持 Planned。理想工程日初始估算仍为 35 / 43.5 / 44，必须在 E-001～E-003 后按实际 cycle time 校准。
 
 ## 4. Phase 1：工程基础
 
