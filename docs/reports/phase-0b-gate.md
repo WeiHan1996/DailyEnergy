@@ -1,13 +1,14 @@
 # DailyEnergy Phase 0B Gate 评审报告
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
 - **所属任务**：S-35 — Phase 0B Gate 评审
 - **评审日期**：2026-07-27
+- **接受日期**：2026-07-27
 - **评审基线**：`main@456de3ebcd1decf1ab9d6190f36c77ed648b5292`（[PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87) 合并提交）
 - **适用范围**：Phase 0B 规格完整性、可执行契约、工程任务可开工性与 Phase 1 入口
 - **上游**：[ROADMAP](../../ROADMAP.md)、[文档索引](../INDEX.md)、[当前任务](../../tasks/current.md)、[Backlog](../../tasks/backlog.md)
-- **建议结论**：`GO_PENDING_USER_ACCEPTANCE`
-- **建议入口**：[E-001 初始化 pnpm/Turborepo TypeScript Monorepo](https://github.com/WeiHan1996/DailyEnergy/issues/39)
+- **最终结论**：`GO`
+- **工程入口**：[E-001 初始化 pnpm/Turborepo TypeScript Monorepo](https://github.com/WeiHan1996/DailyEnergy/issues/39)
 
 ## 1. 目的与决策边界
 
@@ -30,9 +31,9 @@
 - 代码、迁移、容器、CI、监控或生产资源已经实现；
 - 48 个工程 Issue 可以绕过各自验收或阶段 Gate。
 
-## 2. 建议结论
+## 2. 最终结论
 
-建议在用户接受本报告后通过 Phase 0B Gate，并将 E-001 设为唯一 Ready。
+用户已于 2026-07-27 接受本报告。Phase 0B Gate 正式通过，E-001 成为唯一 Ready；此状态迁移不代表已开始实现。
 
 | 判定项 | 结果 | 说明 |
 |---|---|---|
@@ -44,7 +45,7 @@
 | 依赖图 | 通过 | 48 个唯一任务 ID，无缺失引用、无循环；E-001 无前置 |
 | 非阻塞延后项 | 1 类 | 正式视觉设计系统仍为 Planned，不阻塞 E-001 或工程基础阶段 |
 | 外部上线 Gate | 仍未解除 | 明确保留在后续 Issue、部署规范和 Production Gate 中 |
-| 最终状态 | `GO_PENDING_USER_ACCEPTANCE` | 用户确认和 PR 合并前不得把 S-35 标为 Done，也不得启动 E-001 |
+| 最终状态 | `GO` | S-35 已获用户确认；E-001 是唯一 Ready，等待明确开工指令 |
 
 如果本报告在审核期间发现新的代码阻塞项，结论必须改为 `NO_GO` 或 `CONDITIONAL_GO`，写明 owner、解锁证据和受影响 Issue；不得靠聊天承诺绕过。
 
@@ -90,7 +91,7 @@
 | 关键技术决策有 Accepted ADR | [ADR-0001](../decisions/ADR-0001-product-positioning.md)～[ADR-0006](../decisions/ADR-0006-monorepo-and-stack.md) | 各 Issue 必须服从对应 ADR；冲突先回到 ADR | PASS |
 | 指标和隐私口径明确 | [事件字典](../analytics/event-tracking.md)、[指标](../analytics/metrics.md)、[实验](../analytics/experiments.md)、[归因](../analytics/channel-attribution.md)、[隐私地图](../operations/privacy-data-map.md) | C-014～C-016、AI-016、E-013 | PASS |
 | Phase 1～3 已拆成可执行 Issues | 3 个真实 Milestone、48 个 open Issue、7 个必备章节、122.5 理想工程日 | E-001～E-014、C-001～C-017、AI-001～AI-017 | PASS |
-| tasks/current 指向第一个工程任务且无重大代码阻塞 | 本报告接受后才执行 `S-35 Done → E-001 Ready`；E-001 无前置 | E-001 | PASS PENDING ACCEPTANCE |
+| tasks/current 指向第一个工程任务且无重大代码阻塞 | 已执行 `S-35 Done → E-001 Ready`；E-001 无前置 | E-001 | PASS |
 
 ## 5. 端到端追踪矩阵
 
@@ -112,7 +113,7 @@
 
 ## 6. 固定审计记录
 
-结果含义：`PASS` 为基线满足；`DEFERRED_NON_BLOCKING` 为明确延后且不阻塞 E-001；`OWNED_GATE` 为后续 Issue/上线 Gate 有明确 owner；`WAIT_USER` 为只有用户接受后才能完成的状态迁移。
+结果含义：`PASS` 为基线满足；`DEFERRED_NON_BLOCKING` 为明确延后且不阻塞 E-001；`OWNED_GATE` 为后续 Issue/上线 Gate 有明确 owner。
 
 | ID | 审计断言 | 证据 | 结果 |
 |---|---|---|---|
@@ -162,8 +163,8 @@
 | S35-GATE-044 | E-001 无前置且不需要业务定义 | Issue #39、ADR-0006、repository-structure、testing | PASS |
 | S35-GATE-045 | 正式视觉设计系统未被伪装为已完成 | docs/INDEX 的 Planned 记录 | DEFERRED_NON_BLOCKING |
 | S35-GATE-046 | 外部账号、主体、域名、跨境、资源与值班仍受后续 Gate 约束 | deployment、privacy、safety、observability 与对应 Issue | OWNED_GATE |
-| S35-GATE-047 | 用户接受前不把 S-35 标 Done 或 E-001 设 Ready | AGENTS、tasks/current | WAIT_USER |
-| S35-GATE-048 | 接受后唯一入口为 E-001，不并行启动下游 | ROADMAP、Issue DAG | GO_PENDING_USER_ACCEPTANCE |
+| S35-GATE-047 | 用户已接受 Gate，S-35 可标 Done、E-001 可设 Ready | 用户确认、AGENTS、tasks/current | PASS |
+| S35-GATE-048 | 接受后唯一入口为 E-001，不并行启动下游 | ROADMAP、Issue DAG | PASS |
 
 ## 7. 非阻塞延后项与外部 Gate
 
@@ -194,7 +195,7 @@
 
 ## 8. E-001 开工合同
 
-用户接受本报告并合并 S-35 PR 后：
+用户已接受本报告；S-35 PR 合并后：
 
 1. S-35 标记 Done，报告状态改为 Accepted 并记录接受日期；
 2. [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) 成为唯一 Ready；
@@ -217,13 +218,13 @@ S-35 接受后仍可被新证据重开，但必须满足以下任一条件：
 
 重开时将当前工程 Issue 设为 Blocked，记录最小冲突和解锁证据；不得在实现中静默改变 Accepted 决策。
 
-## 10. 评审请求
+## 10. 接受记录
 
-请审核：
+用户于 2026-07-27 明确确认 Phase 0B Gate，并要求合并 [PR #88](https://github.com/WeiHan1996/DailyEnergy/pull/88)，同时将 E-001 设为唯一 Ready。
 
-- `GO_PENDING_USER_ACCEPTANCE` 是否可以转为 Accepted GO；
-- 正式视觉设计系统作为非阻塞延后项是否合理；
-- 外部 Gate 是否仍应保持未解除；
-- E-001 是否可以成为 Phase 1 唯一入口。
+接受范围：
 
-用户明确确认后，才执行第 8 节的状态迁移。
+- Gate 结论正式转为 Accepted `GO`；
+- 正式视觉设计系统继续作为非阻塞延后项；
+- 外部 Production Gate 继续保持未解除；
+- E-001 成为 Phase 1 唯一入口，但本次不启动实现。
