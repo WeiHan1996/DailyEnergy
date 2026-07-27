@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/phase-1-3-engineering-issues`
 - **上游 PR**：[S-33 PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)
-- **当前 PR**：Draft PR 待创建
+- **当前 PR**：[Draft PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87)
 - **交付**：3 个 GitHub Milestones、48 个工程 Issues、依赖/估算与项目控制同步
 
 ## 1. 当前目标
