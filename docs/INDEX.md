@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-07-26
+- **最后更新**：2026-07-27
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -168,8 +168,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/repository-structure.md](./technical/repository-structure.md) | Accepted | Monorepo 目录、app/package/module、public exports 与依赖 Gate | architecture、ADR-0006 |
 | [docs/technical/testing.md](./technical/testing.md) | Accepted | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵 | schemas、API、architecture、repository-structure |
 | [docs/technical/deployment.md](./technical/deployment.md) | Accepted | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复 | architecture、repository-structure、testing、privacy |
-| [docs/technical/observability.md](./technical/observability.md) | Draft | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本 | metrics、Gateway、privacy、incident、architecture、deployment |
-| GitHub Milestones 与 Issues | Planned | Phase 1～3 工程执行 | Accepted Phase 0B specs |
+| [docs/technical/observability.md](./technical/observability.md) | Accepted | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本 | metrics、Gateway、privacy、incident、architecture、deployment |
+| [GitHub Issues #39～#86](https://github.com/WeiHan1996/DailyEnergy/issues) | Blocked | 48 个 Issues 已建；3 个真实 Milestones 待创建并绑定 | Accepted Phase 0B specs |
 
 ## 8. 计划 ADR
 
@@ -228,25 +228,16 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-32 部署、配置与回滚已随 [PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37) 合并并获用户确认，现为 Accepted。S-33 可观测性与成本监控 Draft 已完成，当前处于 In Review。审核时依次读取：
+S-33 可观测性与成本监控已随 [PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38) 合并并获用户确认，现为 Accepted。S-34 正在把 S-01～S-33 拆成 Phase 1～3 工程 Issues；读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. docs/decisions/ADR-0006-monorepo-and-stack.md；
-7. docs/analytics/event-tracking.md；
-8. docs/analytics/metrics.md；
-9. docs/ai/gateway.md；
-10. docs/operations/privacy-data-map.md；
-11. docs/operations/incident-response.md；
-12. docs/technical/architecture.md；
-13. docs/technical/repository-structure.md；
-14. docs/technical/testing.md；
-15. docs/technical/deployment.md；
-16. docs/technical/observability.md。
+6. tasks/backlog.md；
+7. 6 个 Accepted ADR；
+8. 与目标 Issue 直接关联的 Accepted 产品、设计、AI、数据、API、隐私、安全、分析、测试、部署和可观测性规范；
+9. 对应可执行 Schema、OpenAPI、Prisma 草案、测试向量和 Source-ID registry。
 
-本次审核重点是：OTLP/OpenMetrics/JSON 与 reference/production backend 边界是否可替换；ordinary/restricted telemetry、字段 allowlist、cardinality、采样、期限和访问是否不泄露用户内容；7 个用户旅程 SLO、8 个运行目标、hard invariant、28 天 error budget 和 multi-window burn rate 是否可执行；低流量 synthetic/绝对故障是否避免误报；API、Worker、PG、Redis、DataTask、backup 和 telemetry health 指标是否完整；S25-M20～M23、CostEntry、BudgetEnvelope、70%/85%/100% 阈值和 UNKNOWN 是否一致；Dashboard、Runbook、routing、on-call Gate 与 48 个 S-33 场景是否完整。
-
-用户明确接受且 PR 合并前，observability.md 保持 Draft，S-33 保持 In Review；不得把本文理解为已经创建 SDK、Collector、监控服务、Dashboard、告警、值班账号、通知通道、secret 或生产资源。
+S-34 已创建 48 个 open Issues：Phase 1 为 14、Phase 2 为 17、Phase 3 为 17。当前只阻塞于创建三个真实 GitHub Milestone 并按阶段绑定；不使用标签、tracking issue 或 Projects board 冒充 Milestone。S-34 被确认前不标 Done，S-35 不标 Ready，也不开始 E-001。
