@@ -5,7 +5,7 @@
 - **当前阶段**：Phase 0B — 开发前详细规格
 - **当前任务 ID**：S-34
 - **当前任务名称**：Phase 1～3 工程 Issues
-- **任务状态**：Blocked
+- **任务状态**：In Review
 - **优先级**：最高
 - **当前分支**：`agent/phase-1-3-engineering-issues`
 - **上游 PR**：[S-33 PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)
@@ -31,27 +31,23 @@
   - E-001～E-014（[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)、[E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)、[E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)、[E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)、[E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)、[E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)、[E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45)、[E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)、[E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)、[E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)、[E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)、[E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)、[E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)、[E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)）
   - C-001～C-017（[C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53)、[C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54)、[C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55)、[C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56)、[C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57)、[C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58)、[C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59)、[C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62)、[C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60)、[C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61)、[C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63)、[C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64)、[C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70)、[C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65)、[C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68)、[C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66)、[C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69)）
   - AI-001～AI-017（[AI-001](https://github.com/WeiHan1996/DailyEnergy/issues/67)、[AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71)、[AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72)、[AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73)、[AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74)、[AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75)、[AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76)、[AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77)、[AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78)、[AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79)、[AI-011](https://github.com/WeiHan1996/DailyEnergy/issues/84)、[AI-012](https://github.com/WeiHan1996/DailyEnergy/issues/82)、[AI-013](https://github.com/WeiHan1996/DailyEnergy/issues/86)、[AI-014](https://github.com/WeiHan1996/DailyEnergy/issues/81)、[AI-015](https://github.com/WeiHan1996/DailyEnergy/issues/85)、[AI-016](https://github.com/WeiHan1996/DailyEnergy/issues/80)、[AI-017](https://github.com/WeiHan1996/DailyEnergy/issues/83)）
+- 已创建并绑定三个真实 GitHub Milestone：
+  - [Phase 1 — 工程基础](https://github.com/WeiHan1996/DailyEnergy/milestone/1)：14 个 Issues；
+  - [Phase 2 — 确定性核心闭环](https://github.com/WeiHan1996/DailyEnergy/milestone/2)：17 个 Issues；
+  - [Phase 3 — AI 陪伴层](https://github.com/WeiHan1996/DailyEnergy/milestone/3)：17 个 Issues；
 - 每项都包含权威输入、4 项左右范围、4 项验收、必须测试、依赖、非目标和 1.5～3 个理想工程日；
 - 估算基线：Phase 1 为 35、Phase 2 为 43.5、Phase 3 为 44，总计 122.5 个 AI 辅助理想工程日；
 - 估算不是发布日期，必须在 E-001～E-003 后按实际 cycle time 重新校准；
 - 外部实现 Gate 已写入对应 Issue，E-012 等任务不会假装云厂商、域名、生产凭据或值班已经确定。
 
-## 3. 当前阻塞
+## 3. Milestone 绑定结果
 
-当前 GitHub 连接器可以创建/更新 Issue 并按编号绑定已有 Milestone，但不提供创建或列出 Milestone 的动作。仓库此前没有 Issue；本轮 48 个 Issue 回读后 `milestone=null`。
-
-解除条件：仓库所有者在 GitHub 创建以下三个**空 Milestone**，然后提供各自 URL 或编号：
-
-1. `Phase 1 — 工程基础`
-2. `Phase 2 — 确定性核心闭环`
-3. `Phase 3 — AI 陪伴层`
-
-要求：
-
-- 暂不设置 due date，避免在 E-001～E-003 校准前制造虚假日期精度；
-- 不需要手工移动 48 个 Issue；
-- 获得三个 Milestone 编号后，由连接器批量绑定 14 / 17 / 17 个 Issue；
-- Milestone 描述、阶段目标与 Gate 在绑定后补齐；若 UI 创建时必须填写描述，可先留空。
+- [Phase 1 — 工程基础](https://github.com/WeiHan1996/DailyEnergy/milestone/1)：E-001～E-014，共 14 个 open Issues；
+- [Phase 2 — 确定性核心闭环](https://github.com/WeiHan1996/DailyEnergy/milestone/2)：C-001～C-017，共 17 个 open Issues；
+- [Phase 3 — AI 陪伴层](https://github.com/WeiHan1996/DailyEnergy/milestone/3)：AI-001～AI-017，共 17 个 open Issues；
+- GitHub 按三个精确 Milestone 名称搜索分别返回 14 / 17 / 17，Issue 标题与正文未改动；
+- S-34 已解除 Milestone 阻塞并进入 In Review；用户确认并合并 PR #87 前仍不标 Done；
+- Milestone 继续作为阶段容器，不将 122.5 个理想工程日直接换算为发布日期或 due date。
 
 ## 4. 验收标准
 
@@ -74,7 +70,7 @@
 
 ## 6. 最近交接
 
-- 当前动作：等待三个真实 Milestone 的 URL/编号；
-- 收到后：批量绑定 48 个 Issue → 回读 14/17/17 数量 → 回填 Draft PR 指针 → 完成 S-34 审核交接；
+- 当前动作：审核 [Draft PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87) 的 48 个工程 Issue、三阶段 Milestone、依赖和估算；
+- 已完成：批量绑定 48 个 Issue → 按精确 Milestone 名称回读 14 / 17 / 17 → 同步项目控制文档；
 - S-34 被用户确认并合并后：标记 S-34 Done，把 S-35 Phase 0B Gate 评审设为唯一 Ready；
 - 不自动开始 E-001；只有 S-35 明确通过后才进入 Phase 1。
