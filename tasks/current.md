@@ -2,75 +2,80 @@
 
 - **文档状态**：Active
 - **最后更新**：2026-07-27
-- **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务 ID**：S-34
-- **当前任务名称**：Phase 1～3 工程 Issues
-- **任务状态**：In Review
+- **当前阶段**：Phase 1 — 工程基础
+- **当前任务 ID**：E-001
+- **当前任务名称**：初始化 pnpm/Turborepo TypeScript Monorepo
+- **任务状态**：Ready
 - **优先级**：最高
-- **当前分支**：`agent/phase-1-3-engineering-issues`
-- **上游 PR**：[S-33 PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)
-- **当前 PR**：[Draft PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87)
-- **交付**：3 个 GitHub Milestones、48 个工程 Issues、依赖/估算与项目控制同步
+- **当前分支**：无（尚未开始）
+- **上游 PR**：[S-35 PR #88](https://github.com/WeiHan1996/DailyEnergy/pull/88)
+- **当前 Issue**：[E-001 Issue #39](https://github.com/WeiHan1996/DailyEnergy/issues/39)
+- **当前 PR**：无
+- **Gate 结论**：`GO`
 
 ## 1. 当前目标
 
-把 S-01～S-33 的 Accepted 结论转换为可以按一个主要 PR 独立验收的 Phase 1～3 工程任务：
+建立单一 pnpm workspace、Turborepo 任务图和目标目录骨架，把现有 shared-schemas 纳入根工作区，并为后续工程任务提供可重复的统一入口。
 
-- Phase 1 工程基础：14 个 E Issues；
-- Phase 2 确定性核心闭环：17 个 C Issues；
-- Phase 3 AI 陪伴层：17 个 AI Issues；
-- 每个 Issue 明确权威输入、范围、验收、测试、前置、非目标和理想工程日；
-- 三阶段各有真实 GitHub Milestone，不用标签或 tracking issue 冒充；
-- S-34 完成后由 S-35 做 Phase 0B Gate，尚不直接开始编码。
+E-001 当前为唯一 Ready，尚未开始实现。只有用户明确要求开始 E-001 后，才创建工程分支并进入 In Progress。
 
-## 2. 已完成
+## 2. 上游完成状态
 
-- [PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38) 已于 2026-07-27 合并，S-33 已获用户明确确认；
-- `docs/technical/observability.md` 已在本分支补记 Accepted，不改变信号、SLO、成本或 48 个场景；
-- 已创建并回读 48 个 open Issues，ID 和标题唯一：
-  - E-001～E-014（[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)、[E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)、[E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)、[E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)、[E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)、[E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)、[E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45)、[E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)、[E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)、[E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)、[E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)、[E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)、[E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)、[E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)）
-  - C-001～C-017（[C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53)、[C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54)、[C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55)、[C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56)、[C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57)、[C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58)、[C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59)、[C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62)、[C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60)、[C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61)、[C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63)、[C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64)、[C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70)、[C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65)、[C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68)、[C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66)、[C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69)）
-  - AI-001～AI-017（[AI-001](https://github.com/WeiHan1996/DailyEnergy/issues/67)、[AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71)、[AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72)、[AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73)、[AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74)、[AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75)、[AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76)、[AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77)、[AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78)、[AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79)、[AI-011](https://github.com/WeiHan1996/DailyEnergy/issues/84)、[AI-012](https://github.com/WeiHan1996/DailyEnergy/issues/82)、[AI-013](https://github.com/WeiHan1996/DailyEnergy/issues/86)、[AI-014](https://github.com/WeiHan1996/DailyEnergy/issues/81)、[AI-015](https://github.com/WeiHan1996/DailyEnergy/issues/85)、[AI-016](https://github.com/WeiHan1996/DailyEnergy/issues/80)、[AI-017](https://github.com/WeiHan1996/DailyEnergy/issues/83)）
-- 已创建并绑定三个真实 GitHub Milestone：
-  - [Phase 1 — 工程基础](https://github.com/WeiHan1996/DailyEnergy/milestone/1)：14 个 Issues；
-  - [Phase 2 — 确定性核心闭环](https://github.com/WeiHan1996/DailyEnergy/milestone/2)：17 个 Issues；
-  - [Phase 3 — AI 陪伴层](https://github.com/WeiHan1996/DailyEnergy/milestone/3)：17 个 Issues；
-- 每项都包含权威输入、4 项左右范围、4 项验收、必须测试、依赖、非目标和 1.5～3 个理想工程日；
-- 估算基线：Phase 1 为 35、Phase 2 为 43.5、Phase 3 为 44，总计 122.5 个 AI 辅助理想工程日；
-- 估算不是发布日期，必须在 E-001～E-003 后按实际 cycle time 重新校准；
-- 外部实现 Gate 已写入对应 Issue，E-012 等任务不会假装云厂商、域名、生产凭据或值班已经确定。
+- S-35 已获用户明确确认，[Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) 状态为 Accepted，结论为 `GO`；
+- Phase 0B 的 6 项退出门槛全部满足，48 个工程 Issue 的依赖图无缺失、无循环；
+- [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) 无前置任务，继续绑定 [Phase 1 — 工程基础](https://github.com/WeiHan1996/DailyEnergy/milestone/1)；
+- E-002 及其他 46 个下游工程 Issue 保持 Planned；
+- 正式视觉设计系统仍为非阻塞 Planned；
+- 云厂商、域名、主体、跨境、真实账号/密钥、热线、监控接收人和值班等外部 Gate 仍未解除；
+- 本次只完成状态迁移，没有开始工程代码。
 
-## 3. Milestone 绑定结果
+## 3. 开工前读取顺序
 
-- [Phase 1 — 工程基础](https://github.com/WeiHan1996/DailyEnergy/milestone/1)：E-001～E-014，共 14 个 open Issues；
-- [Phase 2 — 确定性核心闭环](https://github.com/WeiHan1996/DailyEnergy/milestone/2)：C-001～C-017，共 17 个 open Issues；
-- [Phase 3 — AI 陪伴层](https://github.com/WeiHan1996/DailyEnergy/milestone/3)：AI-001～AI-017，共 17 个 open Issues；
-- GitHub 按三个精确 Milestone 名称搜索分别返回 14 / 17 / 17，Issue 标题与正文未改动；
-- S-34 已解除 Milestone 阻塞并进入 In Review；用户确认并合并 PR #87 前仍不标 Done；
-- Milestone 继续作为阶段容器，不将 122.5 个理想工程日直接换算为发布日期或 due date。
+1. [E-001 Issue #39](https://github.com/WeiHan1996/DailyEnergy/issues/39)；
+2. [ADR-0006 Monorepo 与技术栈](../docs/decisions/ADR-0006-monorepo-and-stack.md)；
+3. [仓库结构和模块边界](../docs/technical/repository-structure.md)；
+4. [测试策略](../docs/technical/testing.md)；
+5. [shared-schemas](../packages/shared-schemas/README.md) 及现有 exports、fixtures 与测试；
+6. 仓库现状与任何未提交改动。
 
-## 4. 验收标准
+如果上述 Accepted 权威相互冲突、文件缺失或 E-001 验收无法在一个主要 PR 内完成，应停止并将 E-001 设为 Blocked，不得在实现中静默改写上游决定。
 
-- 三个真实 GitHub Milestone 存在，名称唯一且无虚假 due date；
-- 48 个 Issue 全部 open、ID/标题唯一并绑定到正确 Milestone；
-- 每个 Issue 均有权威输入、范围、验收、测试、前置、非目标和估算；
-- 依赖图只引用这 48 个已定义 ID，不存在缺失或循环；
-- Phase 1/2/3 Gate 分别为 E-014、C-017、AI-017；
-- README、INDEX、current、backlog 与 GitHub 外部状态一致；
-- PR 只包含 S-33 接受记录和项目控制 Markdown，不包含工程代码、配置、workflow、migration、云资源或生产变更；
-- 用户确认前 S-34 不标 Done，S-35 不标 Ready。
+## 4. E-001 范围
+
+- 创建根 `package.json`、`pnpm-workspace.yaml`、唯一 lockfile、`turbo.json` 与 Node/pnpm 版本约束；
+- 创建 apps/packages/tooling/tests/docker 的最小目录占位和 package manifest；
+- 保留 `@daily-energy/shared-schemas` 的现有 public exports 与 fixture 行为；
+- 提供 install、build、typecheck、lint、test、clean 的统一根脚本；
+- 提供 clean-checkout install、workspace graph、根脚本 dry-run 与 shared-schemas 回归证据。
 
 ## 5. 不做
 
-- 不开始 E-001 或任何业务代码；
-- 不创建假的 Milestone 标签、tracking issue 或 Projects board 代替 GitHub Milestone；
-- 不设置 Alpha/Beta 发布日期或 Phase due date；
-- 不创建云资源、域名、微信 AppID、provider key、监控账号、值班通道或生产 secret；
-- 不改变 Accepted 产品、Schema、API、隐私、Safety、架构、测试、部署或可观测性合同。
+- 不初始化 NestJS、Next.js、微信小程序、PostgreSQL、Prisma、Redis 或 BullMQ 业务实现；
+- 不选择或创建云资源、域名、生产账号、真实密钥或外部服务；
+- 不修改 Accepted 产品、Schema、API、隐私、Safety、架构、测试、部署或可观测性合同；
+- 不并行启动 E-002 或任何下游 Issue；
+- 不在用户明确开始前创建工程分支、提交代码或 Draft PR。
 
-## 6. 最近交接
+## 6. 验收标准
 
-- 当前动作：审核 [Draft PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87) 的 48 个工程 Issue、三阶段 Milestone、依赖和估算；
-- 已完成：批量绑定 48 个 Issue → 按精确 Milestone 名称回读 14 / 17 / 17 → 同步项目控制文档；
-- S-34 被用户确认并合并后：标记 S-34 Done，把 S-35 Phase 0B Gate 评审设为唯一 Ready；
-- 不自动开始 E-001；只有 S-35 明确通过后才进入 Phase 1。
+- 干净检出后使用 Node 24 LTS 与 pnpm 11 可重复安装，仓库只有一个 lockfile；
+- Turbo 能识别全部 workspace，缓存不包含 secret、用户数据或机器私有配置；
+- 现有 shared-schemas 测试与 fixture 行为不回退，客户端与服务端运行区元数据已声明；
+- 根脚本 dry-run 和 workspace graph 有可复核证据；
+- 未创建 Nest/Next/小程序/数据库/队列业务实现；
+- 交付一个聚焦的 Draft PR，等待用户审核。
+
+## 7. 当前阻塞与决策
+
+- **仓库/代码阻塞**：无；
+- **外部上线 Gate**：仍存在，但不阻塞 E-001；
+- **当前等待**：用户明确要求开始 E-001；
+- **唯一允许的下一状态**：收到开工指令后 E-001 从 Ready 进入 In Progress。
+
+## 8. 最近交接
+
+- 已完成：S-35 Gate 接受、Phase 0B 收尾、E-001 唯一 Ready 状态迁移；
+- 未开始：任何工程代码、配置、workflow、migration、容器或云资源；
+- 下一动作：读取第 3 节权威输入，从最新 main 创建 E-001 独立分支；
+- 下一交付：E-001 聚焦 Draft PR；
+- 禁止并行：E-002 及其他下游 Issue。

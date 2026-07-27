@@ -345,29 +345,30 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 ## 当前状态
 
 ```text
-阶段：Phase 0B — 开发前详细规格
-状态：S-33 可观测性与成本监控已 Accepted；S-34 已创建 48 个 Phase 1～3 工程 Issues 并绑定 3 个真实 Milestone，当前进入 In Review，尚未开始业务编码
-当前目标：把所有 Accepted 规格拆成可独立验收、依赖明确的工程任务
-当前任务：S-34 Phase 1～3 工程 Issues（In Review）
+阶段：Phase 1 — 工程基础
+状态：Phase 0B Gate 已通过；S-35 已完成
+当前目标：初始化可重复的 pnpm/Turborepo TypeScript Monorepo
+当前任务：E-001 初始化 TypeScript Monorepo（Ready）
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/39
 ```
 
 长期工作入口：
 
 1. [ROADMAP.md](./ROADMAP.md)：长期阶段、交付物和退出门槛；
 2. [docs/INDEX.md](./docs/INDEX.md)：文档依赖、状态和读取顺序；
-3. [tasks/current.md](./tasks/current.md)：唯一正在执行的任务；
+3. [tasks/current.md](./tasks/current.md)：唯一 Ready 或 In Progress 的任务；
 4. [tasks/backlog.md](./tasks/backlog.md)：有序候选任务；
 5. [AGENTS.md](./AGENTS.md)：AI 与开发协作规则。
 
 当前任务范围：
 
-- 维护 Phase 1 的 14 个 E Issues、Phase 2 的 17 个 C Issues、Phase 3 的 17 个 AI Issues；
-- 为每项固定权威输入、范围、验收、测试、依赖、非目标和理想工程日；
-- 维护 [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1)、[Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2)、[Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) 三个真实 Milestone，并持续核对 14 / 17 / 17 绑定；
-- 不设置虚假 due date，先用 E-001～E-003 的实际 cycle time 校准；
-- S-34 完成后进入 S-35 Phase 0B Gate，不直接开始编码。
+- 读取 [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)、ADR-0006、repository-structure、testing 和现有 shared-schemas；
+- 只初始化 pnpm workspace、Turborepo 任务图、目标目录骨架和统一根脚本；
+- 保留 shared-schemas public exports 与 fixtures；
+- 不初始化 Nest/Next/小程序/数据库/队列业务；
+- E-002 及其他下游工程 Issue 继续保持 Planned，不并行启动。
 
-当前 48 个 Issue 已创建并按 Phase 1 / 2 / 3 精确绑定为 14 / 17 / 17，S-34 等待 PR #87 审核确认。S-34 不创建工程代码、配置、workflow、migration、云资源或生产变更。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted，S-35 已完成，E-001 是唯一 Ready。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。等待用户明确开始 E-001 后再创建工程分支，不在本次状态迁移中编写代码。
 
 ---
 

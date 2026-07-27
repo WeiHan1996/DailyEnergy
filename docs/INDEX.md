@@ -169,7 +169,14 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/testing.md](./technical/testing.md) | Accepted | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵 | schemas、API、architecture、repository-structure |
 | [docs/technical/deployment.md](./technical/deployment.md) | Accepted | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复 | architecture、repository-structure、testing、privacy |
 | [docs/technical/observability.md](./technical/observability.md) | Accepted | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本 | metrics、Gateway、privacy、incident、architecture、deployment |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | In Review | 48 个 Issues 已按 14 / 17 / 17 绑定三个真实 Milestone | Accepted Phase 0B specs |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Accepted | 48 个 Issues 已按 14 / 17 / 17 绑定三个真实 Milestone | Accepted Phase 0B specs |
+
+
+### 7.7 Phase Gate
+
+| 文件 | 状态 | 目的 | 主要依赖 |
+|---|---|---|---|
+| [docs/reports/phase-0b-gate.md](./reports/phase-0b-gate.md) | Accepted | 复核 Phase 0B 总退出门槛、端到端追踪、延后项、外部 Gate 与 E-001 开工合同 | S-01～S-34、ROADMAP |
 
 ## 8. 计划 ADR
 
@@ -228,16 +235,18 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-33 可观测性与成本监控已随 [PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38) 合并并获用户确认，现为 Accepted。S-34 已把 S-01～S-33 拆成 Phase 1～3 工程 Issues 并完成 Milestone 绑定，当前处于 In Review；读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 结束，E-001 是 Phase 1 唯一 Ready。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. tasks/backlog.md；
-7. 6 个 Accepted ADR；
-8. 与目标 Issue 直接关联的 Accepted 产品、设计、AI、数据、API、隐私、安全、分析、测试、部署和可观测性规范；
-9. 对应可执行 Schema、OpenAPI、Prisma 草案、测试向量和 Source-ID registry。
+6. [E-001 Issue #39](https://github.com/WeiHan1996/DailyEnergy/issues/39)；
+7. [ADR-0006](./decisions/ADR-0006-monorepo-and-stack.md)；
+8. [仓库结构与模块边界](./technical/repository-structure.md)；
+9. [测试策略](./technical/testing.md)；
+10. [shared-schemas](../packages/shared-schemas/README.md) 及现有 fixtures；
+11. tasks/backlog.md（仅在需要重排优先级时）。
 
-S-34 已创建 48 个 open Issues，并绑定到三个真实 GitHub Milestone：Phase 1 为 14、Phase 2 为 17、Phase 3 为 17；不使用标签、tracking issue 或 Projects board 冒充 Milestone。S-34 被确认前不标 Done，S-35 不标 Ready，也不开始 E-001。
+E-001 只初始化 pnpm/Turborepo workspace、目标目录和统一脚本；不初始化 Nest/Next/小程序/数据库/队列业务。E-002 及其他 46 个下游工程 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。等待用户明确开始 E-001 后才创建工程分支和 Draft PR。

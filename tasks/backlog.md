@@ -2,8 +2,8 @@
 
 - **文档状态**：Active
 - **最后更新**：2026-07-27
-- **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-34 Phase 1～3 工程 Issues](./current.md)
+- **当前阶段**：Phase 1 — 工程基础
+- **当前任务**：[E-001 初始化 TypeScript Monorepo](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -105,16 +105,16 @@
 | S-31 | 测试策略 | Done | testing.md | S-09、S-16、S-20、S-29 |
 | S-32 | 部署、配置和回滚 | Done | deployment.md | S-29、S-31 |
 | S-33 | 可观测性和成本监控 | Done | observability.md | S-25、S-29、S-32 |
-| S-34 | Phase 1～3 工程 Issues | In Review | 3 个 GitHub Milestones、48 个 Issues | S-01～S-33 |
-| S-35 | Phase 0B Gate 评审 | Planned | 规格完整性报告 | S-34 |
+| S-34 | Phase 1～3 工程 Issues | Done | 3 个 GitHub Milestones、48 个 Issues | S-01～S-33 |
+| S-35 | Phase 0B Gate 评审 | Done | [Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) | S-34 |
 
-S-34 已创建 48 个工程 Issues，并绑定到 [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1)、[Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2)、[Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) 三个真实 Milestone（14 / 17 / 17），当前处于 In Review。S-34 被确认前不承诺精确 Alpha 和 Beta 日期；理想工程日初始估算为 35 / 43.5 / 44，必须在 E-001～E-003 后按实际 cycle time 校准。
+S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束，[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) 成为唯一 Ready。其余 47 个工程 Issue 保持 Planned，理想工程日初始估算仍为 35 / 43.5 / 44，必须在 E-001～E-003 后按实际 cycle time 校准。
 
 ## 4. Phase 1：工程基础
 
 | ID | 任务 | 状态 | 主要结果 |
 |---|---|---|---|
-| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) | 初始化 TypeScript Monorepo | Planned | Workspace、包管理和统一脚本 |
+| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) | 初始化 TypeScript Monorepo | Ready | Workspace、包管理和统一脚本 |
 | [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41) | 代码质量基线 | Planned | TypeScript、ESLint、Prettier、提交规范 |
 | [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) | NestJS API 骨架 | Planned | 配置、错误、健康检查和日志 |
 | [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42) | 微信小程序骨架 | Planned | 原生小程序、TypeScript、路由和环境 |
