@@ -3,107 +3,109 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-26
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务 ID**：S-32
-- **当前任务名称**：部署、配置和回滚
+- **当前任务 ID**：S-33
+- **当前任务名称**：可观测性和成本监控
 - **任务状态**：In Review
 - **优先级**：最高
-- **当前分支**：`agent/deployment-config-rollback`
-- **上游 PR**：[S-31 PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/36)
-- **当前 PR**：[Draft PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)
-- **交付文件**：`docs/technical/deployment.md`
+- **当前分支**：`agent/observability-cost-monitoring`
+- **上游 PR**：[S-32 PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)
+- **当前 PR**：[Draft PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)
+- **交付文件**：`docs/technical/observability.md`
 
 ## 1. 当前目标
 
-把 Accepted 的技术栈、系统架构、仓库边界和测试策略转换为可实施的环境、发布与恢复合同，明确：
+把 Accepted 的产品指标、AI Gateway、隐私、事件响应、系统架构、测试和部署合同转换为可实施的观测与成本控制规范，明确：
 
-- LOCAL、CI、DEV、STAGING、PRODUCTION、RECOVERY、EVALUATION 与 MINIAPP_RUNNER 边界；
-- 单区域、单活、单 application host 的 Docker Compose MVP 拓扑和非 HA 限制；
-- API、Admin、Interactive、Background、Restricted、Migration 与 Evaluation 的最小运行能力；
-- immutable image、digest promotion、Release Manifest、SBOM/provenance 和 supply-chain Gate；
-- public/deploy/secret/runtime catalog/emergency 配置分级、启动校验和指纹；
-- migration、发布顺序、queue/in-flight、回滚、PITR、隔离恢复和删除重放。
+- structured JSON、OpenTelemetry/OTLP、Prometheus/OpenMetrics 与 Collector 边界；
+- ordinary runtime、security、governance、Safety control、cost 和 product analytics 平面；
+- 日志字段、span attributes、metric labels、cardinality、采样、期限和访问；
+- 核心 API、生成、outbox/queue、PG/Redis、DataTask、backup 与 telemetry SLI/SLO；
+- 28 天 error budget、multi-window burn rate、低流量 synthetic/绝对失败告警；
+- Gateway token/cost、基础设施类别、预算 envelope、forecast 和 hard stop；
+- Dashboard、Runbook、alert routing、on-call、release 与 incident 证据。
 
 ## 2. 必须交付
 
-### 2.1 环境、产物与配置
+### 2.1 信号与数据边界
 
-- 环境封闭枚举、数据/身份/网络/外部调用规则；
-- production Compose 与独立 PostgreSQL/Redis/object 边界；
-- build-once、same digest promotion 和 `ReleaseManifestV1`；
-- Config Schema、profile/capability fingerprint 和 fail-closed startup；
-- OIDC/短期部署身份、service secret mount、轮换/吊销；
-- CI runner、artifact、source map、remote cache 和 evidence retention。
+- vendor-neutral OTLP/OpenMetrics/JSON 合同；
+- reference backend 与 production backend 替换 Gate；
+- resource/log/span/metric allowlist 与 cardinality budget；
+- ordinary/restricted 平面、raw-content/secret detector；
+- trace sampling、telemetry health、retention 与 RBAC；
+- 不建立用户级 analytics、RUM、session replay 或正文日志。
 
-### 2.2 Migration、发布与回滚
+### 2.2 SLO、告警与恢复
 
-- 独立 Migration Job、migration owner、checksum/drift/grant Gate；
-- expand → resumable backfill → contract compatibility；
-- staging、production preflight、consumer-before-producer 和小程序/server compatibility；
-- Worker drain、graceful shutdown、outbox/queue/in-flight 恢复；
-- 唯一 rollback target、代码/配置/catalog/secret/DB 回滚矩阵；
-- hard stop、maintenance/emergency switch 和 observation。
+- S33-SLO-01～07 和 S33-OBJ-01～08；
+- 28 天 good/bad/unknown/expected reject 语义；
+- 14.4×/6× multi-window burn rate 与 error budget release policy；
+- 低流量 synthetic、绝对数量和 hard trigger；
+- API、outbox、BullMQ、Worker、PG、Redis、host、DataTask、backup 指标；
+- alert contract、severity、inhibition、silence、Runbook 和 S-23 交接。
 
-### 2.3 Backup 与恢复
+### 2.3 AI 与成本
 
-- PostgreSQL encrypted base backup + WAL/PITR、35 天、RPO/RTO 工程目标；
-- backup integrity、synthetic/production-isolated restore drill；
-- Redis empty rebuild、object/provider/session/notification 恢复边界；
-- RECOVERY 隔离、当前 deletion/restore-deny ledger 重放和 deleted-data detector；
-- 48 个唯一 `S32-DEPLOY-*` 场景；
-- E-003～E-014 与 S-33～S-35 的交接。
+- S25-M20～M23 的运行实现边界，不复制改写产品口径；
+- provider/model/route、breaker、usage、UNKNOWN 与 observed drift；
+- `CostEntryV1`、`BudgetEnvelopeV1` 与成本分类；
+- 70%/85%/100% 阈值、Beta AI envelope 与 fail-closed template；
+- observability 自身成本、采样降级顺序和 hard signal 保留；
+- 48 个唯一 `S33-OBS-*` 场景及 E-013/E-014 交接。
 
 ## 3. 上游读取顺序
 
 1. `AGENTS.md`、`README.md`、`ROADMAP.md`、`docs/INDEX.md`、本文；
-2. `docs/decisions/ADR-0006-monorepo-and-stack.md`；
-3. `docs/technical/architecture.md`；
-4. `docs/technical/repository-structure.md`；
-5. `docs/technical/testing.md`；
-6. `docs/technical/database.md` 与 `prisma/schema.prisma`；
-7. `docs/technical/api.md`、`error-codes.md` 与 `openapi/openapi.yaml`；
-8. `docs/operations/privacy-data-map.md`；
-9. `docs/operations/incident-response.md`；
-10. `docs/ai/gateway.md` 与 `evaluation.md`；
-11. `docs/technical/deployment.md`。
+2. `docs/analytics/event-tracking.md`；
+3. `docs/analytics/metrics.md`；
+4. `docs/ai/gateway.md`；
+5. `docs/operations/privacy-data-map.md`；
+6. `docs/operations/incident-response.md`；
+7. `docs/technical/architecture.md`；
+8. `docs/technical/repository-structure.md`；
+9. `docs/technical/testing.md`；
+10. `docs/technical/deployment.md`；
+11. `docs/technical/observability.md`。
 
 ## 4. 已冻结边界
 
-- Node 24 LTS、TypeScript 7 strict、pnpm 11、Turbo 2、Docker Compose v2；
-- 微信原生小程序、NestJS/Express、Next/React、PostgreSQL/Prisma、Redis/BullMQ、Zod 不重新选型；
-- 模块化单体、一个 PostgreSQL database/schema、无内部 RPC；
-- PostgreSQL 是事实；Redis/BullMQ/cache/artifact/backup catalog 不是；
-- API/Admin/Worker profiles、事务/outbox/inbox/Gateway/Safety/删除语义不变；
-- production 禁止 `db push` 和应用启动 migration；
-- backup 最长 35 天，restore 前必须执行 deletion ledger/restore deny；
-- 普通 CI 只用合成数据，不调用生产微信/provider/object/notification；
-- S-33 决定 SLO/告警/成本阈值；S-32 不引入 Kubernetes、多云、微服务或自动扩缩。
+- S-25 是产品、留存、AI 运行与单核心活跃用户日成本的唯一指标口径；
+- PostgreSQL 是业务事实；telemetry、Dashboard、alert 和 cost panel 不是；
+- 不建立用户级 event stream、跨日 subject、device/session 轨迹或任意用户下钻；
+- API/Admin/Worker profiles、outbox/inbox、Gateway、Safety、删除和恢复语义不变；
+- ordinary trace 最长 30 天、security log 六个月、T4 匿名聚合 13 个月；
+- backup 最长 35 天、WAL/RPO ≤15 分钟、restore 先重放删除/restore-deny；
+- 单区域单活单 host Compose MVP，不声称 HA 或 24×7 已实现；
+- 监控厂商、region、跨境、真实通知通道、值班人和绝对基础设施预算仍是 Production Gate。
 
 ## 5. 不做
 
-- 不创建 Dockerfile、Compose、workflow、registry、runner、云主机、数据库、Redis 或 object store；
-- 不创建/执行 migration、backup、restore、部署、rollback 或 secret rotation；
-- 不选择云厂商、region、域名、备案主体、微信生产 AppID、SSO 或 provider；
-- 不提交 `.env`、secret、证书、key、生产账号或真实数据；
-- 不启用 remote cache、外部 source map/test report 或真实 provider evaluation；
-- 不定义 S-33 P95/P99、告警阈值、预算或 on-call；
-- 不提前开始 E-009～E-013 或 S-33。
+- 不创建 OTel/Prometheus/Loki/Tempo/Grafana/Alertmanager 配置或服务；
+- 不创建 SDK、logger、metrics endpoint、Collector、exporter、Dashboard、alert 或 Runbook 文件；
+- 不购买/连接 SaaS，不创建账号、secret、通知群、电话、状态页或云资源；
+- 不启用小程序自动 RUM、session replay、录屏、热力图或用户级 analytics；
+- 不记录请求/响应 body、Prompt、provider raw output、SQL bind、Safety 原文或 secret；
+- 不改 S-25、S-23、PDM、架构、部署、保存删除或事件分级；
+- 不承诺公开 SLA、HA、多区域、自动扩缩或 24×7 人工响应；
+- 不提前开始 E-013/E-014 或 S-34。
 
 ## 6. 验收标准
 
-- `deployment.md` 为 Draft，覆盖环境、拓扑、profile、镜像/manifest、配置/secret、migration、发布/回滚、backup/restore 与 artifact；
-- 48 个 `S32-DEPLOY-*` 场景完整且唯一；
+- `observability.md` 为 Draft，覆盖信号、平面、字段/基数、日志、Trace、Metrics、SLO、告警、成本、期限和实施交接；
+- 7 个用户旅程 SLO、8 个运行目标和硬不变量完整；
+- 48 个 `S33-OBS-*` 场景完整且唯一；
 - 所有相对链接可解析；
-- `testing.md` 根据用户确认转为 Accepted，S-31 backlog 为 Done；
-- README、INDEX、tasks/current 和 backlog 一致标记 S-32 In Review；
-- PR 仅包含 6 个 Markdown 文件，无配置、代码、workflow、container、migration、secret、云资源或生产变更；
-- 用户确认前 `deployment.md` 保持 Draft，S-32 保持 In Review。
+- `deployment.md` 根据用户确认转为 Accepted，S-32 backlog 为 Done；
+- README、INDEX、tasks/current 和 backlog 一致标记 S-33 In Review；
+- PR 仅包含 6 个 Markdown 文件，无 SDK、配置、服务、Dashboard、alert、secret、账号或生产变更；
+- 用户确认前 `observability.md` 保持 Draft，S-33 保持 In Review。
 
 ## 7. 最近交接
 
-- [PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/36) 已于 2026-07-26 合并，S-31 测试策略已获用户明确确认；
-- `testing.md` 在本分支补记 Accepted/接受日期，不改变测试层级、工具、Gate 或 48 个场景；
-- S-32 Draft 冻结环境、单 host Compose、profile capability、Release Manifest 和 config/secret 分级；
-- migration 使用 expand/backfill/contract；发布 consumer-before-producer；普通回滚不执行 down migration；
-- PostgreSQL 使用 encrypted base backup + WAL/PITR，Redis 从 PostgreSQL 重建，restore 先重放删除/restore-deny；
-- 云厂商、主体、region、跨境、SSO、真实受托方和账号仍是 Production Blocked Gate；
-- 当前动作：等待用户审核 [Draft PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)；不自动接受、合并或开始 S-33。
+- [PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37) 已于 2026-07-26 合并，S-32 部署、配置与回滚已获用户明确确认；
+- `deployment.md` 在本分支补记 Accepted/接受日期，不改变部署、迁移、回滚、备份或 48 个场景；
+- S-33 Draft 采用 structured JSON + OpenTelemetry/OTLP + Prometheus/OpenMetrics 的 vendor-neutral 合同；
+- reference backend 为 Prometheus/Loki/Tempo/Grafana/Alertmanager，生产后端仍须通过独立故障域、区域、TTL、RBAC 和跨境 Gate；
+- 28 天 SLO、14.4×/6× burn rate、低流量 synthetic/绝对故障、hard invariant 和 48 个场景已冻结；
+- AI 成本继承 ≤¥0.10/CoreActiveUserDay 与 ≥99% completeness，并使用 70%/85%/100% 预算状态；
+- 当前动作：等待用户审核 [Draft PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)；不自动接受、合并或开始 S-34。

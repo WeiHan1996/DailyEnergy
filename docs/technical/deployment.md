@@ -1,6 +1,6 @@
 # DailyEnergy 部署、配置与回滚规范
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
 - **最后更新**：2026-07-26
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
@@ -846,7 +846,7 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 - 48 个 `S32-DEPLOY-*` 场景完整且唯一；
 - E-003～E-014、S-33～S-35 的交接清楚；
 - PR 只包含本文、S-31 接受记录和项目控制 Markdown，不创建配置、workflow、容器、migration、secret、云资源或生产变更；
-- 用户确认前本文保持 Draft，S-32 保持 In Review。
+- 本文已随 PR #37 获用户确认并记录为 Accepted；后续实现不得静默降低环境隔离、发布指纹、迁移兼容、回滚、备份恢复、删除重放或 48 个场景。
 
 ## 30. 明确禁止
 
@@ -872,9 +872,9 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 ## 31. 审核记录
 
-- 状态：Draft；
-- 接受日期：待用户确认；
-- 内容 PR：[Draft PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)；
+- 状态：Accepted；
+- 接受日期：2026-07-26；
+- 内容 PR：[PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)；
 - 基线：`main`（S-31 测试策略已随 PR #36 合并并获用户确认）；
-- 待确认范围：环境、单 host Compose、profile 能力、Release Manifest、配置/secret、migration、发布/回滚、backup/PITR、隔离恢复、artifact/供应链与 48 个场景；
-- 下一任务：S-33 可观测性和成本监控；S-32 被接受前不创建部署流水线、环境或生产资源。
+- 已确认范围：环境、单 host Compose、profile 能力、Release Manifest、配置/secret、migration、发布/回滚、backup/PITR、隔离恢复、artifact/供应链与 48 个场景；
+- 下一任务：S-33 可观测性和成本监控；部署流水线、环境和生产资源仍须等待 E-009～E-013。

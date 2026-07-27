@@ -167,8 +167,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/architecture.md](./technical/architecture.md) | Accepted | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复 | Gateway、database、API、ADR-0006 |
 | [docs/technical/repository-structure.md](./technical/repository-structure.md) | Accepted | Monorepo 目录、app/package/module、public exports 与依赖 Gate | architecture、ADR-0006 |
 | [docs/technical/testing.md](./technical/testing.md) | Accepted | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵 | schemas、API、architecture、repository-structure |
-| [docs/technical/deployment.md](./technical/deployment.md) | Draft | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复 | architecture、repository-structure、testing、privacy |
-| docs/technical/observability.md | Planned | 日志、指标、告警和成本 | architecture、analytics |
+| [docs/technical/deployment.md](./technical/deployment.md) | Accepted | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复 | architecture、repository-structure、testing、privacy |
+| [docs/technical/observability.md](./technical/observability.md) | Draft | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本 | metrics、Gateway、privacy、incident、architecture、deployment |
 | GitHub Milestones 与 Issues | Planned | Phase 1～3 工程执行 | Accepted Phase 0B specs |
 
 ## 8. 计划 ADR
@@ -228,7 +228,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-31 测试策略已随 [PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/36) 合并并获用户确认，现为 Accepted。S-32 部署、配置与回滚 Draft 已完成，当前处于 In Review。审核时依次读取：
+S-32 部署、配置与回滚已随 [PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37) 合并并获用户确认，现为 Accepted。S-33 可观测性与成本监控 Draft 已完成，当前处于 In Review。审核时依次读取：
 
 1. AGENTS.md；
 2. README.md；
@@ -236,16 +236,17 @@ S-31 测试策略已随 [PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/
 4. 本文；
 5. tasks/current.md；
 6. docs/decisions/ADR-0006-monorepo-and-stack.md；
-7. docs/technical/architecture.md；
-8. docs/technical/repository-structure.md；
-9. docs/technical/testing.md；
-10. docs/technical/database.md 与 prisma/schema.prisma；
-11. docs/technical/api.md、error-codes.md 与 openapi/openapi.yaml；
-12. docs/operations/privacy-data-map.md；
-13. docs/operations/incident-response.md；
-14. docs/ai/gateway.md 与 evaluation.md；
-15. docs/technical/deployment.md。
+7. docs/analytics/event-tracking.md；
+8. docs/analytics/metrics.md；
+9. docs/ai/gateway.md；
+10. docs/operations/privacy-data-map.md；
+11. docs/operations/incident-response.md；
+12. docs/technical/architecture.md；
+13. docs/technical/repository-structure.md；
+14. docs/technical/testing.md；
+15. docs/technical/deployment.md；
+16. docs/technical/observability.md。
 
-本次审核重点是：环境和数据/网络边界是否封闭；单 host Compose 与外部 PostgreSQL/Redis/object 的职责是否明确；runtime profile、Release Manifest、配置/secret 和供应链 Gate 是否可验证；migration、consumer-before-producer、回滚矩阵和小程序/server compatibility 是否安全；35 天 backup、WAL/PITR、Redis 重建、隔离恢复和删除/restore-deny 重放是否完整；48 个 S-32 场景是否覆盖关键失败。
+本次审核重点是：OTLP/OpenMetrics/JSON 与 reference/production backend 边界是否可替换；ordinary/restricted telemetry、字段 allowlist、cardinality、采样、期限和访问是否不泄露用户内容；7 个用户旅程 SLO、8 个运行目标、hard invariant、28 天 error budget 和 multi-window burn rate 是否可执行；低流量 synthetic/绝对故障是否避免误报；API、Worker、PG、Redis、DataTask、backup 和 telemetry health 指标是否完整；S25-M20～M23、CostEntry、BudgetEnvelope、70%/85%/100% 阈值和 UNKNOWN 是否一致；Dashboard、Runbook、routing、on-call Gate 与 48 个 S-33 场景是否完整。
 
-用户明确接受且 PR 合并前，deployment.md 保持 Draft，S-32 保持 In Review；不得把本文理解为已经创建 Docker/Compose、workflow、migration、secret、云资源、账号、域名、备份或生产环境。
+用户明确接受且 PR 合并前，observability.md 保持 Draft，S-33 保持 In Review；不得把本文理解为已经创建 SDK、Collector、监控服务、Dashboard、告警、值班账号、通知通道、secret 或生产资源。
