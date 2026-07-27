@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/observability-cost-monitoring`
 - **上游 PR**：[S-32 PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)
-- **当前 PR**：待创建
+- **当前 PR**：[Draft PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)
 - **交付文件**：`docs/technical/observability.md`
 
 ## 1. 当前目标
@@ -108,4 +108,4 @@
 - reference backend 为 Prometheus/Loki/Tempo/Grafana/Alertmanager，生产后端仍须通过独立故障域、区域、TTL、RBAC 和跨境 Gate；
 - 28 天 SLO、14.4×/6× burn rate、低流量 synthetic/绝对故障、hard invariant 和 48 个场景已冻结；
 - AI 成本继承 ≤¥0.10/CoreActiveUserDay 与 ≥99% completeness，并使用 70%/85%/100% 预算状态；
-- 当前动作：等待 Draft PR 创建并由用户审核；不自动接受、合并或开始 S-34。
+- 当前动作：等待用户审核 [Draft PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)；不自动接受、合并或开始 S-34。
