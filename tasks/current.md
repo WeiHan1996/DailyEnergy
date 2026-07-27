@@ -9,7 +9,7 @@
 - **优先级**：最高
 - **当前分支**：`agent/phase-0b-gate-review`
 - **上游 PR**：[S-34 PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87)
-- **当前 PR**：待创建
+- **当前 PR**：[Draft PR #88](https://github.com/WeiHan1996/DailyEnergy/pull/88)
 - **主要交付**：[Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md)
 - **建议结论**：`GO_PENDING_USER_ACCEPTANCE`
 
