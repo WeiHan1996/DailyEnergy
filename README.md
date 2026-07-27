@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-32 部署、配置与回滚已 Accepted；S-33 可观测性与成本监控 Draft 已完成并进入 In Review，尚未开始业务编码
-当前目标：完成页面、状态、Schema、AI、数据、API、隐私、分析与工程规范
-当前任务：S-33 可观测性和成本监控（In Review）
+状态：S-33 可观测性与成本监控已 Accepted；S-34 已创建 48 个 Phase 1～3 工程 Issues 并绑定 3 个真实 Milestone，当前进入 In Review，尚未开始业务编码
+当前目标：把所有 Accepted 规格拆成可独立验收、依赖明确的工程任务
+当前任务：S-34 Phase 1～3 工程 Issues（In Review）
 ```
 
 长期工作入口：
@@ -361,15 +361,13 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 审核 Draft `docs/technical/observability.md`；
-- 审核 structured JSON、OpenTelemetry/OTLP、Prometheus/OpenMetrics 与 reference/production backend 边界；
-- 审核 telemetry 平面、字段 allowlist、cardinality、采样、期限、RBAC 与 raw-content Gate；
-- 审核 28 天 SLO、核心 API/生成目标、multi-window burn rate 和低流量告警；
-- 审核 outbox/BullMQ/Worker、PostgreSQL、Redis、DataTask、backup 与 telemetry health 指标；
-- 审核 AI usage/cost、CostEntry/BudgetEnvelope、70%/85%/100% 阈值与 UNKNOWN；
-- 审核 Dashboard、Runbook、alert routing、on-call Production Gate 和 48 个 S-33 场景。
+- 维护 Phase 1 的 14 个 E Issues、Phase 2 的 17 个 C Issues、Phase 3 的 17 个 AI Issues；
+- 为每项固定权威输入、范围、验收、测试、依赖、非目标和理想工程日；
+- 维护 [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1)、[Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2)、[Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) 三个真实 Milestone，并持续核对 14 / 17 / 17 绑定；
+- 不设置虚假 due date，先用 E-001～E-003 的实际 cycle time 校准；
+- S-34 完成后进入 S-35 Phase 0B Gate，不直接开始编码。
 
-S-33 不创建监控 SDK、服务、配置、Dashboard、告警、账号或生产资源，也不提前开始 S-34 工程 Issues。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+当前 48 个 Issue 已创建并按 Phase 1 / 2 / 3 精确绑定为 14 / 17 / 17，S-34 等待 PR #87 审核确认。S-34 不创建工程代码、配置、workflow、migration、云资源或生产变更。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 

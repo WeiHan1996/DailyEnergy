@@ -1,9 +1,9 @@
 # DailyEnergy 项目 Backlog
 
 - **文档状态**：Active
-- **最后更新**：2026-07-26
+- **最后更新**：2026-07-27
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-33 可观测性和成本监控](./current.md)
+- **当前任务**：[S-34 Phase 1～3 工程 Issues](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -104,74 +104,74 @@
 | S-30 | 仓库结构和模块边界 | Done | repository-structure.md | S-29 |
 | S-31 | 测试策略 | Done | testing.md | S-09、S-16、S-20、S-29 |
 | S-32 | 部署、配置和回滚 | Done | deployment.md | S-29、S-31 |
-| S-33 | 可观测性和成本监控 | In Review | observability.md | S-25、S-29、S-32 |
-| S-34 | Phase 1～3 工程 Issues | Planned | GitHub Milestones、Issues | S-01～S-33 |
+| S-33 | 可观测性和成本监控 | Done | observability.md | S-25、S-29、S-32 |
+| S-34 | Phase 1～3 工程 Issues | In Review | 3 个 GitHub Milestones、48 个 Issues | S-01～S-33 |
 | S-35 | Phase 0B Gate 评审 | Planned | 规格完整性报告 | S-34 |
 
-S-34 完成前不承诺精确 Alpha 和 Beta 日期。
+S-34 已创建 48 个工程 Issues，并绑定到 [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1)、[Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2)、[Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) 三个真实 Milestone（14 / 17 / 17），当前处于 In Review。S-34 被确认前不承诺精确 Alpha 和 Beta 日期；理想工程日初始估算为 35 / 43.5 / 44，必须在 E-001～E-003 后按实际 cycle time 校准。
 
 ## 4. Phase 1：工程基础
 
 | ID | 任务 | 状态 | 主要结果 |
 |---|---|---|---|
-| E-001 | 初始化 TypeScript Monorepo | Planned | Workspace、包管理和统一脚本 |
-| E-002 | 代码质量基线 | Planned | TypeScript、ESLint、Prettier、提交规范 |
-| E-003 | NestJS API 骨架 | Planned | 配置、错误、健康检查和日志 |
-| E-004 | 微信小程序骨架 | Planned | 原生小程序、TypeScript、路由和环境 |
-| E-005 | Next.js 管理后台骨架 | Planned | 登录外壳和基础布局 |
-| E-006 | PostgreSQL 与 Prisma | Planned | 初始 Schema、迁移和测试数据 |
-| E-007 | Redis 与 BullMQ | Planned | 缓存、队列和连接管理 |
-| E-008 | 共享类型与 Schema | Planned | 前后端共用契约 |
-| E-009 | 本地 Docker Compose | Planned | 可重复本地环境 |
-| E-010 | 测试骨架 | Planned | 单元、集成、契约和端到端 |
-| E-011 | CI | Planned | 格式、类型、测试、构建和安全检查 |
-| E-012 | 开发环境部署 | Planned | 固定开发地址和发布流程 |
-| E-013 | 日志与监控基线 | Planned | 脱敏日志、指标和告警 |
-| E-014 | Phase 1 Gate | Planned | 环境可重复、CI 通过、服务可访问 |
+| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) | 初始化 TypeScript Monorepo | Planned | Workspace、包管理和统一脚本 |
+| [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41) | 代码质量基线 | Planned | TypeScript、ESLint、Prettier、提交规范 |
+| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) | NestJS API 骨架 | Planned | 配置、错误、健康检查和日志 |
+| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42) | 微信小程序骨架 | Planned | 原生小程序、TypeScript、路由和环境 |
+| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43) | Next.js 管理后台骨架 | Planned | 登录外壳和基础布局 |
+| [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44) | PostgreSQL 与 Prisma | Planned | 初始 Schema、迁移和测试数据 |
+| [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45) | Redis 与 BullMQ | Planned | 缓存、队列和连接管理 |
+| [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46) | 共享类型与 Schema | Planned | 前后端共用契约 |
+| [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47) | 本地 Docker Compose | Planned | 可重复本地环境 |
+| [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49) | 测试骨架 | Planned | 单元、集成、契约和端到端 |
+| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48) | CI | Planned | 格式、类型、测试、构建和安全检查 |
+| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50) | 开发环境部署 | Planned | 固定开发地址和发布流程 |
+| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51) | 日志与监控基线 | Planned | 脱敏日志、指标和告警 |
+| [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52) | Phase 1 Gate | Planned | 环境可重复、CI 通过、服务可访问 |
 
 ## 5. Phase 2：确定性核心闭环
 
 | ID | 任务 | 状态 | 主要结果 |
 |---|---|---|---|
-| C-001 | 微信身份与会话 | Planned | 唯一用户和安全会话 |
-| C-002 | 隐私同意与用户资料 | Planned | 最小授权和可修改资料 |
-| C-003 | 首次认识 | Planned | 称呼和表达偏好 |
-| C-004 | 每日签到 | Planned | 情绪、精力和睡眠 |
-| C-005 | 稳定种子 | Planned | 用户、日期和版本驱动 |
-| C-006 | 规则引擎 | Planned | 五维状态和行动候选 |
-| C-007 | 本地模板内容 | Planned | 无 AI 完整今日结果 |
-| C-008 | 今日结果幂等与缓存 | Planned | 并发唯一、重复读取 |
-| C-009 | 今日内容页面 | Planned | 结构化展示和回看 |
-| C-010 | 行动任务 | Planned | 一个主要行动和可选任务 |
-| C-011 | 点亮与连续记录 | Planned | 幂等、不惩罚中断 |
-| C-012 | 晚间反馈 | Planned | 真实状态和帮助度 |
-| C-013 | 七天趋势 | Planned | 真实数据和缺失处理 |
-| C-014 | 数据查看与删除 | Planned | 用户权利闭环 |
-| C-015 | 核心埋点 | Planned | D1/D3/D7 可计算 |
-| C-016 | 核心端到端测试 | Planned | 首次到七天全路径 |
-| C-017 | Phase 2 Gate | Planned | 不依赖 AI 完成核心闭环 |
+| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话 | Planned | 唯一用户和安全会话 |
+| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Planned | 最小授权和可修改资料 |
+| [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识 | Planned | 称呼和表达偏好 |
+| [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到 | Planned | 情绪、精力和睡眠 |
+| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子 | Planned | 用户、日期和版本驱动 |
+| [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎 | Planned | 五维状态和行动候选 |
+| [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容 | Planned | 无 AI 完整今日结果 |
+| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | Planned | 并发唯一、重复读取 |
+| [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面 | Planned | 结构化展示和回看 |
+| [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务 | Planned | 一个主要行动和可选任务 |
+| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录 | Planned | 幂等、不惩罚中断 |
+| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈 | Planned | 真实状态和帮助度 |
+| [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势 | Planned | 真实数据和缺失处理 |
+| [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除 | Planned | 用户权利闭环 |
+| [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 核心埋点 | Planned | D1/D3/D7 可计算 |
+| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试 | Planned | 首次到七天全路径 |
+| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate | Planned | 不依赖 AI 完成核心闭环 |
 
 ## 6. Phase 3：AI 陪伴层
 
 | ID | 任务 | 状态 | 主要结果 |
 |---|---|---|---|
-| AI-001 | AI Gateway 基础 | Planned | 统一供应商调用 |
-| AI-002 | 主模型与备用模型 | Planned | 超时、重试和熔断 |
-| AI-003 | Prompt 版本管理 | Planned | 可追踪输入和输出 |
-| AI-004 | 结构化输出校验 | Planned | Schema 失败不可展示 |
-| AI-005 | 三种表达偏好 | Planned | 同一人格不同语气 |
-| AI-006 | 本地模板降级 | Planned | 模型故障仍可完成 |
-| AI-007 | 关系阶段 | Planned | 第 1、3、7 天连续性 |
-| AI-008 | 重要事项 | Planned | 用户主动添加和删除 |
-| AI-009 | 结构化记忆 | Planned | 来源、用途和有效期 |
-| AI-010 | 第 3 天风格校准 | Planned | 反馈影响后续表达 |
-| AI-011 | 七天 AI 总结 | Planned | 只引用真实数据 |
-| AI-012 | 内容安全分类 | Planned | 专业边界与敏感内容 |
-| AI-013 | 高风险固定响应 | Planned | 退出普通运势流程 |
-| AI-014 | 自动人格评价 | Planned | 质量评分和回归 |
-| AI-015 | 人工内容抽检 | Planned | 样本和问题分类 |
-| AI-016 | 延迟、Token 和成本 | Planned | 达到 MVP 工程目标 |
-| AI-017 | Phase 3 Gate | Planned | AI 稳定、安全、可降级 |
+| [AI-001](https://github.com/WeiHan1996/DailyEnergy/issues/67) | AI Gateway 基础 | Planned | 统一供应商调用 |
+| [AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71) | 主模型与备用模型 | Planned | 超时、重试和熔断 |
+| [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理 | Planned | 可追踪输入和输出 |
+| [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验 | Planned | Schema 失败不可展示 |
+| [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好 | Planned | 同一人格不同语气 |
+| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级 | Planned | 模型故障仍可完成 |
+| [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段 | Planned | 第 1、3、7 天连续性 |
+| [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项 | Planned | 用户主动添加和删除 |
+| [AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78) | 结构化记忆 | Planned | 来源、用途和有效期 |
+| [AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79) | 第 3 天风格校准 | Planned | 反馈影响后续表达 |
+| [AI-011](https://github.com/WeiHan1996/DailyEnergy/issues/84) | 七天 AI 总结 | Planned | 只引用真实数据 |
+| [AI-012](https://github.com/WeiHan1996/DailyEnergy/issues/82) | 内容安全分类 | Planned | 专业边界与敏感内容 |
+| [AI-013](https://github.com/WeiHan1996/DailyEnergy/issues/86) | 高风险固定响应 | Planned | 退出普通运势流程 |
+| [AI-014](https://github.com/WeiHan1996/DailyEnergy/issues/81) | 自动人格评价 | Planned | 质量评分和回归 |
+| [AI-015](https://github.com/WeiHan1996/DailyEnergy/issues/85) | 人工内容抽检 | Planned | 样本和问题分类 |
+| [AI-016](https://github.com/WeiHan1996/DailyEnergy/issues/80) | 延迟、Token 和成本 | Planned | 达到 MVP 工程目标 |
+| [AI-017](https://github.com/WeiHan1996/DailyEnergy/issues/83) | Phase 3 Gate | Planned | AI 稳定、安全、可降级 |
 
 ## 7. Phase 4：内部 Alpha
 

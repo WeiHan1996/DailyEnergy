@@ -1,6 +1,6 @@
 # DailyEnergy 可观测性与成本监控规范
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
 - **所属任务**：S-33 — 可观测性和成本监控
 - **最后更新**：2026-07-26
 - **适用范围**：Phase 1～3 的 API、Admin、Worker、PostgreSQL、Redis/BullMQ、AI Gateway、数据权利、发布、备份恢复、日志、指标、Trace、SLO、告警与成本治理
@@ -1008,7 +1008,7 @@ E-013 不是“接入一个日志 SaaS”即可完成。必须交付信号合同
 - 48 个 `S33-OBS-*` 场景完整且唯一；
 - E-003/E-006～E-014、C-015、AI-016、A-005 的实施交接清楚；
 - PR 只包含本文、S-32 接受记录和项目控制 Markdown，不创建 SDK、配置、Dashboard、告警、账号或生产资源；
-- 用户确认前本文保持 Draft，S-33 保持 In Review。
+- 本文已随 PR #38 获用户明确确认并记录为 Accepted；后续实现不得静默降低信号/平面、字段/基数、SLO、告警、成本、期限、运行 Gate 或 48 个固定场景。
 
 ## 30. 明确禁止
 
@@ -1056,9 +1056,9 @@ E-013 不是“接入一个日志 SaaS”即可完成。必须交付信号合同
 
 ## 32. 审核记录
 
-- 状态：Draft；
-- 接受日期：待用户确认；
-- 内容 PR：[Draft PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)；
+- 状态：Accepted；
+- 接受日期：2026-07-27；
+- 内容 PR：[PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)；
 - 基线：`main`（S-32 部署、配置与回滚已随 PR #37 合并并获用户确认）；
-- 待确认范围：信号/后端、字段/基数/期限、SLO/error budget、低流量告警、API/Worker/数据/AI 指标、成本预算、Dashboard/Runbook/on-call 与 48 个场景；
-- 下一任务：S-34 Phase 1～3 工程 Issues；S-33 被接受前不创建监控实现、生产告警或工程 Issues。
+- 已确认范围：信号/后端、字段/基数/期限、SLO/error budget、低流量告警、API/Worker/数据/AI 指标、成本预算、Dashboard/Runbook/on-call 与 48 个场景；
+- 下一任务：S-34 Phase 1～3 工程 Issues；监控实现和生产告警仍须等待 E-013/E-014。
