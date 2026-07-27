@@ -1058,7 +1058,7 @@ E-013 不是“接入一个日志 SaaS”即可完成。必须交付信号合同
 
 - 状态：Draft；
 - 接受日期：待用户确认；
-- 内容 PR：待创建；
+- 内容 PR：[Draft PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)；
 - 基线：`main`（S-32 部署、配置与回滚已随 PR #37 合并并获用户确认）；
 - 待确认范围：信号/后端、字段/基数/期限、SLO/error budget、低流量告警、API/Worker/数据/AI 指标、成本预算、Dashboard/Runbook/on-call 与 48 个场景；
 - 下一任务：S-34 Phase 1～3 工程 Issues；S-33 被接受前不创建监控实现、生产告警或工程 Issues。
