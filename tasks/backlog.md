@@ -105,10 +105,10 @@
 | S-31 | 测试策略 | Done | testing.md | S-09、S-16、S-20、S-29 |
 | S-32 | 部署、配置和回滚 | Done | deployment.md | S-29、S-31 |
 | S-33 | 可观测性和成本监控 | Done | observability.md | S-25、S-29、S-32 |
-| S-34 | Phase 1～3 工程 Issues | Blocked | 3 个 GitHub Milestones、48 个 Issues | S-01～S-33 |
+| S-34 | Phase 1～3 工程 Issues | In Review | 3 个 GitHub Milestones、48 个 Issues | S-01～S-33 |
 | S-35 | Phase 0B Gate 评审 | Planned | 规格完整性报告 | S-34 |
 
-S-34 已创建 48 个工程 Issues（Phase 1/2/3 为 14/17/17）；当前只阻塞于创建三个真实 GitHub Milestone 并批量绑定。完成前不承诺精确 Alpha 和 Beta 日期。理想工程日初始估算为 35 / 43.5 / 44，必须在 E-001～E-003 后按实际 cycle time 校准。
+S-34 已创建 48 个工程 Issues，并绑定到 [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1)、[Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2)、[Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) 三个真实 Milestone（14 / 17 / 17），当前处于 In Review。S-34 被确认前不承诺精确 Alpha 和 Beta 日期；理想工程日初始估算为 35 / 43.5 / 44，必须在 E-001～E-003 后按实际 cycle time 校准。
 
 ## 4. Phase 1：工程基础
 
