@@ -169,7 +169,14 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/testing.md](./technical/testing.md) | Accepted | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵 | schemas、API、architecture、repository-structure |
 | [docs/technical/deployment.md](./technical/deployment.md) | Accepted | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复 | architecture、repository-structure、testing、privacy |
 | [docs/technical/observability.md](./technical/observability.md) | Accepted | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本 | metrics、Gateway、privacy、incident、architecture、deployment |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | In Review | 48 个 Issues 已按 14 / 17 / 17 绑定三个真实 Milestone | Accepted Phase 0B specs |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Accepted | 48 个 Issues 已按 14 / 17 / 17 绑定三个真实 Milestone | Accepted Phase 0B specs |
+
+
+### 7.7 Phase Gate
+
+| 文件 | 状态 | 目的 | 主要依赖 |
+|---|---|---|---|
+| [docs/reports/phase-0b-gate.md](./reports/phase-0b-gate.md) | Draft | 复核 Phase 0B 总退出门槛、端到端追踪、延后项、外部 Gate 与 E-001 开工合同 | S-01～S-34、ROADMAP |
 
 ## 8. 计划 ADR
 
@@ -228,7 +235,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-33 可观测性与成本监控已随 [PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38) 合并并获用户确认，现为 Accepted。S-34 已把 S-01～S-33 拆成 Phase 1～3 工程 Issues 并完成 Milestone 绑定，当前处于 In Review；读取顺序：
+S-34 已随 [PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87) 合并并获用户确认，三个真实 Milestone 与 48 个 open Issue 现为 Accepted 工程计划。S-35 正在评审 [Phase 0B Gate](./reports/phase-0b-gate.md)，读取顺序：
 
 1. AGENTS.md；
 2. README.md；
@@ -236,8 +243,9 @@ S-33 可观测性与成本监控已随 [PR #38](https://github.com/WeiHan1996/Da
 4. 本文；
 5. tasks/current.md；
 6. tasks/backlog.md；
-7. 6 个 Accepted ADR；
-8. 与目标 Issue 直接关联的 Accepted 产品、设计、AI、数据、API、隐私、安全、分析、测试、部署和可观测性规范；
-9. 对应可执行 Schema、OpenAPI、Prisma 草案、测试向量和 Source-ID registry。
+7. [Phase 0B Gate 评审报告](./reports/phase-0b-gate.md)；
+8. 6 个 Accepted ADR；
+9. Gate 报告或目标 Issue 直接关联的 Accepted 产品、设计、AI、数据、API、隐私、安全、分析、测试、部署和可观测性规范；
+10. 对应可执行 Schema、OpenAPI、Prisma 草案、测试向量、AI corpus 和 Source-ID registry。
 
-S-34 已创建 48 个 open Issues，并绑定到三个真实 GitHub Milestone：Phase 1 为 14、Phase 2 为 17、Phase 3 为 17；不使用标签、tracking issue 或 Projects board 冒充 Milestone。S-34 被确认前不标 Done，S-35 不标 Ready，也不开始 E-001。
+S-35 当前建议为 `GO_PENDING_USER_ACCEPTANCE`：6 项 Phase 0B 总退出门槛均有证据，48 个 Issue 的 ID/章节/依赖完整，E-001 无前置。正式视觉设计系统仍为 Planned 且不得误报完成；云厂商、域名、主体、跨境、真实账号/密钥、热线与值班继续保留为后续外部 Gate。用户确认和合并 S-35 前，报告保持 Draft，E-001 保持 Planned，也不开始工程代码。
