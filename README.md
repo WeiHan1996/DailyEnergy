@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 0B — 开发前详细规格
-状态：S-31 测试策略已 Accepted；S-32 部署、配置与回滚 Draft 已完成并进入 In Review，尚未开始业务编码
+状态：S-32 部署、配置与回滚已 Accepted；S-33 可观测性与成本监控 Draft 已完成并进入 In Review，尚未开始业务编码
 当前目标：完成页面、状态、Schema、AI、数据、API、隐私、分析与工程规范
-当前任务：S-32 部署、配置和回滚（In Review）
+当前任务：S-33 可观测性和成本监控（In Review）
 ```
 
 长期工作入口：
@@ -361,15 +361,15 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 审核 Draft `docs/technical/deployment.md`；
-- 审核 LOCAL/CI/DEV/STAGING/PRODUCTION/RECOVERY/EVALUATION/MINIAPP_RUNNER 环境边界；
-- 审核单 host Compose、独立 PG/Redis/object、runtime profile 与非 HA 限制；
-- 审核 build-once、image digest、Release Manifest、SBOM/provenance 和供应链 Gate；
-- 审核配置分级、secret/OIDC、启动指纹、migration 与 consumer-before-producer 发布；
-- 审核 rollback matrix、35 天 backup、WAL/PITR、Redis 重建和隔离恢复；
-- 审核 Production Blocked Gate、artifact/remote cache 和 48 个 S-32 场景。
+- 审核 Draft `docs/technical/observability.md`；
+- 审核 structured JSON、OpenTelemetry/OTLP、Prometheus/OpenMetrics 与 reference/production backend 边界；
+- 审核 telemetry 平面、字段 allowlist、cardinality、采样、期限、RBAC 与 raw-content Gate；
+- 审核 28 天 SLO、核心 API/生成目标、multi-window burn rate 和低流量告警；
+- 审核 outbox/BullMQ/Worker、PostgreSQL、Redis、DataTask、backup 与 telemetry health 指标；
+- 审核 AI usage/cost、CostEntry/BudgetEnvelope、70%/85%/100% 阈值与 UNKNOWN；
+- 审核 Dashboard、Runbook、alert routing、on-call Production Gate 和 48 个 S-33 场景。
 
-S-32 不创建 Docker/Compose、CI workflow、migration、secret、云资源或生产环境，也不提前实现 S-33 可观测性。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
+S-33 不创建监控 SDK、服务、配置、Dashboard、告警、账号或生产资源，也不提前开始 S-34 工程 Issues。新的 AI 会话应先读取 `AGENTS.md` 和 `tasks/current.md`，不要根据聊天记录猜测进度。
 
 ---
 
