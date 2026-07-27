@@ -10,7 +10,7 @@
 - **当前分支**：`agent/e-001-monorepo`
 - **上游 PR**：[S-35 PR #88](https://github.com/WeiHan1996/DailyEnergy/pull/88)
 - **当前 Issue**：[E-001 Issue #39](https://github.com/WeiHan1996/DailyEnergy/issues/39)
-- **当前 PR**：Draft PR（待创建）
+- **当前 PR**：[Draft PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89)
 - **Gate 结论**：`GO`
 
 ## 1. 当前目标
@@ -18,8 +18,8 @@
 建立单一 pnpm workspace、Turborepo 任务图和目标目录骨架，把现有 shared-schemas 纳入根工作区，并为后续工程任务提供可重复的统一入口。
 
 E-001 当前为唯一 In Review。pnpm/Turborepo workspace、目标目录骨架、统一根
-脚本和现有 shared-schemas 兼容迁移已完成并通过干净检出验证，等待 Draft PR
-审核。
+脚本和现有 shared-schemas 兼容迁移已完成并通过干净检出验证，正在
+[Draft PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 审核。
 
 ## 2. 上游完成状态
 
@@ -94,6 +94,7 @@ E-001 当前为唯一 In Review。pnpm/Turborepo workspace、目标目录骨架�
   shared-schemas 任务、strict env 且无 configured env；public root export 与
   `./json-schema` 的 19 个稳定 ID 可运行；
 - 未开始：E-002、业务代码、workflow、migration、容器或云资源；
-- 下一动作：创建并审核 E-001 聚焦 Draft PR；
+- 下一动作：审核 [E-001 Draft PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89)，
+  并决定是否批准 Source-ID registry 的 `NA_WITH_REASON`；
 - 接受后的下一任务：E-002 统一 TypeScript、ESLint 和 Prettier 配置；本 PR 不启动；
 - 禁止并行：E-002 及其他下游 Issue。

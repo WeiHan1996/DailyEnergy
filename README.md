@@ -368,7 +368,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 - 不初始化 Nest/Next/小程序/数据库/队列业务；
 - E-002 及其他下游工程 Issue 继续保持 Planned，不并行启动。
 
-[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted，S-35 已完成。E-001 已在独立分支完成 workspace 骨架和 clean-checkout 验证，等待 Draft PR 审核；E-002 仍为 Planned。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted，S-35 已完成。E-001 已在独立分支完成 workspace 骨架和 clean-checkout 验证，正在 [Draft PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 审核；E-002 仍为 Planned。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
 
 ---
 
