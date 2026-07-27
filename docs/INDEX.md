@@ -176,7 +176,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 | 文件 | 状态 | 目的 | 主要依赖 |
 |---|---|---|---|
-| [docs/reports/phase-0b-gate.md](./reports/phase-0b-gate.md) | Draft | 复核 Phase 0B 总退出门槛、端到端追踪、延后项、外部 Gate 与 E-001 开工合同 | S-01～S-34、ROADMAP |
+| [docs/reports/phase-0b-gate.md](./reports/phase-0b-gate.md) | Accepted | 复核 Phase 0B 总退出门槛、端到端追踪、延后项、外部 Gate 与 E-001 开工合同 | S-01～S-34、ROADMAP |
 
 ## 8. 计划 ADR
 
@@ -235,17 +235,18 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-34 已随 [PR #87](https://github.com/WeiHan1996/DailyEnergy/pull/87) 合并并获用户确认，三个真实 Milestone 与 48 个 open Issue 现为 Accepted 工程计划。S-35 正在评审 [Phase 0B Gate](./reports/phase-0b-gate.md)，读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 结束，E-001 是 Phase 1 唯一 Ready。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. tasks/backlog.md；
-7. [Phase 0B Gate 评审报告](./reports/phase-0b-gate.md)；
-8. 6 个 Accepted ADR；
-9. Gate 报告或目标 Issue 直接关联的 Accepted 产品、设计、AI、数据、API、隐私、安全、分析、测试、部署和可观测性规范；
-10. 对应可执行 Schema、OpenAPI、Prisma 草案、测试向量、AI corpus 和 Source-ID registry。
+6. [E-001 Issue #39](https://github.com/WeiHan1996/DailyEnergy/issues/39)；
+7. [ADR-0006](./decisions/ADR-0006-monorepo-and-stack.md)；
+8. [仓库结构与模块边界](./technical/repository-structure.md)；
+9. [测试策略](./technical/testing.md)；
+10. [shared-schemas](../packages/shared-schemas/README.md) 及现有 fixtures；
+11. tasks/backlog.md（仅在需要重排优先级时）。
 
-S-35 当前建议为 `GO_PENDING_USER_ACCEPTANCE`：6 项 Phase 0B 总退出门槛均有证据，48 个 Issue 的 ID/章节/依赖完整，E-001 无前置。正式视觉设计系统仍为 Planned 且不得误报完成；云厂商、域名、主体、跨境、真实账号/密钥、热线与值班继续保留为后续外部 Gate。用户确认和合并 S-35 前，报告保持 Draft，E-001 保持 Planned，也不开始工程代码。
+E-001 只初始化 pnpm/Turborepo workspace、目标目录和统一脚本；不初始化 Nest/Next/小程序/数据库/队列业务。E-002 及其他 46 个下游工程 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。等待用户明确开始 E-001 后才创建工程分支和 Draft PR。
