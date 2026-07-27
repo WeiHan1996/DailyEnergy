@@ -6,11 +6,11 @@ DailyEnergy Phase 0B 的自包含运行时契约包。它把已接受的今日�
 
 ## 使用
 
-在本目录独立安装和验证：
+在仓库根目录通过统一 pnpm workspace 安装和验证：
 
 ```bash
-npm ci
-npm run validate
+pnpm install --frozen-lockfile
+pnpm --filter @daily-energy/shared-schemas validate
 ```
 
 运行时校验与类型共用同一个来源：
@@ -71,4 +71,7 @@ Zod 运行时 Schema 是完整校验权威。JSON Schema 用于字段发现、�
 
 ## 包边界
 
-这是 Phase 0B 契约草案包，版本从 `0.x` 开始。根 workspace、统一包管理、CI 和发布策略留给 S-28 / Phase 1；当前包只保证在自身目录可安装、格式化、类型检查、测试和构建。
+这是 Phase 0B 接受的可执行契约包，版本从 `0.x` 开始。E-001 已将其纳入根
+workspace，并声明 `dailyEnergy.runtime = client-safe`；包仍通过相同的 public
+exports、fixtures、格式化、类型检查、测试和构建行为保持兼容。CI 和发布策略由
+后续独立工程 Issue 实现。

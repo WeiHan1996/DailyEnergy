@@ -1,0 +1,11 @@
+{
+  "name": "@daily-energy/prompt-library",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {},
+  "dailyEnergy": {
+    "kind": "package",
+    "runtime": "server-asset"
+  }
+}

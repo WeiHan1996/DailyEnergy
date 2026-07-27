@@ -1,0 +1,31 @@
+{
+  "name": "daily-energy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.17.0",
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": "11.17.0"
+  },
+  "dailyEnergy": {
+    "kind": "root",
+    "runtime": "tooling"
+  },
+  "scripts": {
+    "install:check": "pnpm install --frozen-lockfile",
+    "workspace:check": "node tooling/check-workspace.mjs",
+    "workspace:graph": "turbo ls",
+    "dry-run": "turbo run format:check lint typecheck test build --dry=json",
+    "format:check": "turbo run format:check",
+    "lint": "pnpm run workspace:check && turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "build": "turbo run build",
+    "clean": "node tooling/clean.mjs",
+    "validate": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
+  },
+  "devDependencies": {
+    "turbo": "2.10.7"
+  }
+}

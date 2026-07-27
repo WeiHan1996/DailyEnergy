@@ -1,0 +1,11 @@
+{
+  "name": "@daily-energy/typescript-config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {},
+  "dailyEnergy": {
+    "kind": "package",
+    "runtime": "tooling"
+  }
+}
