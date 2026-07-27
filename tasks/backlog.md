@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-26
 - **当前阶段**：Phase 0B — 开发前详细规格
-- **当前任务**：[S-32 部署、配置和回滚](./current.md)
+- **当前任务**：[S-33 可观测性和成本监控](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -103,8 +103,8 @@
 | S-29 | 系统架构 | Done | architecture.md | S-12、S-19、S-20、S-28 |
 | S-30 | 仓库结构和模块边界 | Done | repository-structure.md | S-29 |
 | S-31 | 测试策略 | Done | testing.md | S-09、S-16、S-20、S-29 |
-| S-32 | 部署、配置和回滚 | In Review | deployment.md | S-29、S-31 |
-| S-33 | 可观测性和成本监控 | Planned | observability.md | S-25、S-29 |
+| S-32 | 部署、配置和回滚 | Done | deployment.md | S-29、S-31 |
+| S-33 | 可观测性和成本监控 | In Review | observability.md | S-25、S-29、S-32 |
 | S-34 | Phase 1～3 工程 Issues | Planned | GitHub Milestones、Issues | S-01～S-33 |
 | S-35 | Phase 0B Gate 评审 | Planned | 规格完整性报告 | S-34 |
 
