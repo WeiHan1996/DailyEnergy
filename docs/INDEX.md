@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-07-27
+- **最后更新**：2026-07-28
 - **当前阶段**：Phase 1 — 工程基础
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -171,7 +171,6 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/observability.md](./technical/observability.md) | Accepted | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本 | metrics、Gateway、privacy、incident、architecture、deployment |
 | [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Accepted | 48 个 Issues 已按 14 / 17 / 17 绑定三个真实 Milestone | Accepted Phase 0B specs |
 
-
 ### 7.7 Phase Gate
 
 | 文件 | 状态 | 目的 | 主要依赖 |
@@ -235,18 +234,19 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 结束，E-001 是 Phase 1 唯一 In Review。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001 已完成，E-002 是 Phase 1 唯一 Ready。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-001 Issue #39](https://github.com/WeiHan1996/DailyEnergy/issues/39)；
+6. [E-002 Issue #41](https://github.com/WeiHan1996/DailyEnergy/issues/41)；
 7. [ADR-0006](./decisions/ADR-0006-monorepo-and-stack.md)；
 8. [仓库结构与模块边界](./technical/repository-structure.md)；
 9. [测试策略](./technical/testing.md)；
-10. [shared-schemas](../packages/shared-schemas/README.md) 及现有 fixtures；
-11. tasks/backlog.md（仅在需要重排优先级时）。
+10. root `package.json`、`pnpm-workspace.yaml`、`turbo.json` 与 `tooling/check-workspace.mjs`；
+11. [shared-schemas](../packages/shared-schemas/README.md) 及现有配置、exports、fixtures 和测试；
+12. tasks/backlog.md（仅在需要重排优先级时）。
 
-E-001 只初始化 pnpm/Turborepo workspace、目标目录和统一脚本；未初始化 Nest/Next/小程序/数据库/队列业务。实现与 clean-checkout 验证已完成，正在 [Draft PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 审核。E-002 及其他 46 个下游工程 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
+E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done。E-002 只建立统一 TypeScript strict、ESLint、Prettier 与静态依赖边界，不初始化 Nest/Next/小程序/数据库/队列业务；E-003 及其他 45 个下游工程 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
