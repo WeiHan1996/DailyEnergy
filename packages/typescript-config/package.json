@@ -3,7 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": {},
+  "exports": {
+    "./base.json": "./base.json",
+    "./config.json": "./config.json",
+    "./miniapp.json": "./miniapp.json",
+    "./next.json": "./next.json",
+    "./node.json": "./node.json",
+    "./tooling.json": "./tooling.json"
+  },
+  "files": [
+    "*.json",
+    "README.md"
+  ],
+  "scripts": {
+    "typecheck": "node ../../tooling/typecheck-workspace.mjs"
+  },
   "dailyEnergy": {
     "kind": "package",
     "runtime": "tooling"

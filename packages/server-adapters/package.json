@@ -4,8 +4,14 @@
   "private": true,
   "type": "module",
   "exports": {},
+  "scripts": {
+    "typecheck": "node ../../tooling/typecheck-workspace.mjs"
+  },
   "dailyEnergy": {
     "kind": "package",
     "runtime": "server-adapter"
+  },
+  "devDependencies": {
+    "@daily-energy/typescript-config": "workspace:*"
   }
 }

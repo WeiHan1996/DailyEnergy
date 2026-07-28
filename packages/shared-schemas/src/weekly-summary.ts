@@ -146,9 +146,15 @@ const WeeklySourceDaySchema = z
 function expectedCoverageLevel(
   realDays: number,
 ): z.infer<typeof CoverageLevelSchema> {
-  if (realDays === 0) return "EMPTY";
-  if (realDays <= 2) return "POINTS_ONLY";
-  if (realDays <= 6) return "PARTIAL";
+  if (realDays === 0) {
+    return "EMPTY";
+  }
+  if (realDays <= 2) {
+    return "POINTS_ONLY";
+  }
+  if (realDays <= 6) {
+    return "PARTIAL";
+  }
   return "COMPLETE";
 }
 
