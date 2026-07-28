@@ -346,10 +346,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-001、E-002 已完成；E-003 Draft PR #93 等待审核
-当前目标：创建 NestJS API 组合根与运行基线
-当前任务：E-003 NestJS API 骨架（In Review）
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/40
+状态：E-001、E-002、E-003 已完成；E-004 是唯一 Ready
+当前目标：创建微信原生小程序 TypeScript 骨架
+当前任务：E-004 微信小程序骨架（Ready）
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/42
 ```
 
 长期工作入口：
@@ -362,13 +362,12 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 读取 [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)、API/error-codes、architecture、repository-structure、deployment、observability 和 testing；
-- 已创建无状态 NestJS 11 + Express 5 API 薄入口，固定公开/Admin transport、配置、错误、健康检查和 graceful shutdown；
-- 只注册返回稳定 `FEATURE_DISABLED` 的占位 handler，未实现业务 API、真实 SSO、provider、数据库或队列；
-- 36 项 API/config/进程/合同测试与 34 项 shared-schemas 回归测试通过，全仓 format、lint、typecheck、architecture、test、build Gate 全部通过；
-- E-004～E-014 及其他下游工程 Issue 继续保持 Planned，不并行启动。
+- 读取 [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)、information-architecture、screen-inventory、repository-structure、testing 和 deployment；
+- 建立微信原生小程序入口、启动路由、平台 port 和 client-only bundle 边界；
+- 不实现正式页面、真实微信登录、订阅消息或分享业务，也不提前实现 E-008 的 api-client/codegen；
+- E-004 尚未创建实现分支或 Draft PR；E-005～E-014 及其他下游工程 Issue 继续保持 Planned。
 
-[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done；E-003 已在 `agent/e-003-api-baseline` 完成实现与全仓验证，[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 正在等待审核。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并，E-003 已随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 合并并进入 Done；E-004 Issue #42 是唯一 Ready，尚未创建实现分支或 Draft PR。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
 
 ---
 
