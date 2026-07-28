@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build": "node ../../tooling/build-miniapp.mjs",
+    "bundle:check": "node ../../tooling/check-miniapp-bundle.mjs",
+    "format:check": "prettier --check README.md package.json project*.json public-build.config.json tsconfig*.json src",
+    "lint": "eslint --max-warnings=0 src",
+    "test": "vitest run src && node --no-warnings ../../tooling/test-miniapp-public-config.mjs && node ../../tooling/test-miniapp-devtools-result.mjs && node ../../tooling/test-miniapp-bundle.mjs",
+    "test:devtools": "node ../../tooling/run-miniapp-automator.mjs",
     "typecheck": "node ../../tooling/typecheck-workspace.mjs"
   },
   "dailyEnergy": {
@@ -10,6 +16,8 @@
     "runtime": "client-safe"
   },
   "devDependencies": {
-    "@daily-energy/typescript-config": "workspace:*"
+    "@daily-energy/typescript-config": "workspace:*",
+    "miniprogram-api-typings": "catalog:",
+    "vitest": "catalog:"
   }
 }

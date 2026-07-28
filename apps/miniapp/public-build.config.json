@@ -1,0 +1,5 @@
+{
+  "schemaVersion": "miniapp-public-build-config-v1",
+  "environment": "LOCAL",
+  "apiOrigin": "http://127.0.0.1:3000"
+}

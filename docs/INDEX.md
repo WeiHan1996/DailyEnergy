@@ -234,7 +234,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001、E-002、E-003 已完成，E-004 是 Phase 1 唯一 Ready。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001、E-002、E-003 已完成，E-004 是 Phase 1 唯一 In Review 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
@@ -250,4 +250,4 @@ S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-0
 12. E-003 API 运行合同和仓库现状；
 13. tasks/backlog.md（仅在需要重排优先级时）。
 
-E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done，E-003 已随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 合并并进入 Done。E-004 Issue #42 是唯一 Ready，尚未创建实现分支或 Draft PR；E-005～E-014、E-008 及其他下游 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
+E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done，E-003 已随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 合并并进入 Done。E-004 Issue #42 已在 `agent/e-004-miniapp-skeleton` 完成仓库内实现与 Gate，并以 [Draft PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96) 进入 In Review；review 的配置 parity、DevTools 结果分流与 bundle 逐规则 fixture 已修正，真实 DevTools 仍因启动握手超时准确记录为 `INFRA_BLOCKED`，不冒充平台 PASS。E-005～E-014、E-008 及其他下游 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。

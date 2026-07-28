@@ -10,6 +10,8 @@ catalog:
   "@nestjs/core": 11.1.28
   "@nestjs/platform-express": 11.1.28
   "@types/express": 5.0.6
+  miniprogram-api-typings: 5.2.2
+  miniprogram-automator: 0.12.1
   "@types/node": 24.13.3
   "@types/supertest": 7.2.1
   dependency-cruiser: 18.1.0
