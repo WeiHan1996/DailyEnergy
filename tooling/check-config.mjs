@@ -1,11 +1,14 @@
-import { execFile } from "node:child_process";
 import { readdir, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 
+import {
+  protectedCompilerOptions,
+  resolveTypeScriptConfig,
+  resolvedConfigDiagnostics,
+} from "./lib/typescript-config-gate.mjs";
+
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const executeFile = promisify(execFile);
 const typeScriptCli = resolve(
   repositoryRoot,
   "node_modules/typescript/bin/tsc",
@@ -22,16 +25,6 @@ const expectedExtends = new Map([
   ["packages/server-core", "@daily-energy/typescript-config/node.json"],
   ["packages/shared-schemas", "@daily-energy/typescript-config/node.json"],
   ["packages/typescript-config", "./config.json"],
-]);
-const protectedCompilerOptions = new Set([
-  "exactOptionalPropertyTypes",
-  "forceConsistentCasingInFileNames",
-  "noFallthroughCasesInSwitch",
-  "noImplicitOverride",
-  "noUncheckedIndexedAccess",
-  "noUncheckedSideEffectImports",
-  "strict",
-  "verbatimModuleSyntax",
 ]);
 const errors = [];
 
@@ -83,14 +76,17 @@ for (const [workspaceDirectory, expectedBase] of expectedExtends) {
     );
   }
   try {
-    await executeFile(
-      process.execPath,
-      [typeScriptCli, "-p", tsconfigPath, "--showConfig"],
-      {
-        cwd: repositoryRoot,
-        maxBuffer: 10 * 1024 * 1024,
-      },
-    );
+    const resolvedConfig = await resolveTypeScriptConfig({
+      cwd: repositoryRoot,
+      tsconfigPath,
+      typeScriptCli,
+    });
+    for (const diagnostic of resolvedConfigDiagnostics(
+      workspaceDirectory,
+      resolvedConfig,
+    )) {
+      errors.push(`${diagnostic.ruleId}: ${diagnostic.message}`);
+    }
   } catch {
     errors.push(
       `CONFIG_TSCONFIG_RESOLUTION: ${workspaceDirectory}/tsconfig.json is not loadable by TypeScript`,
@@ -100,6 +96,15 @@ for (const [workspaceDirectory, expectedBase] of expectedExtends) {
   const manifest = await readJson(
     resolve(repositoryRoot, workspaceDirectory, "package.json"),
   );
+  const expectedTypecheckScript =
+    workspaceDirectory === "packages/shared-schemas"
+      ? "node ../../tooling/typecheck-workspace.mjs tsconfig.check.json"
+      : "node ../../tooling/typecheck-workspace.mjs";
+  if (manifest.scripts?.typecheck !== expectedTypecheckScript) {
+    errors.push(
+      `CONFIG_TYPECHECK_SCRIPT: ${manifest.name} must provide deterministic workspace typecheck`,
+    );
+  }
   if (
     workspaceDirectory !== "packages/typescript-config" &&
     manifest.devDependencies?.["@daily-energy/typescript-config"] !==

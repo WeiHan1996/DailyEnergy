@@ -12,5 +12,7 @@ DailyEnergy 的共享 TypeScript 7 strict 配置包。
 - `./config.json`：ESLint、Prettier 等配置文件。
 
 workspace 可以补充 `rootDir`、`outDir`、`include` 与平台需要的选项，但
-`tooling/check-config.mjs` 会拒绝关闭 strict 子项或用 `paths` 跨越 package
-exports。
+`tooling/check-config.mjs` 会对每个 workspace 解析 TypeScript `--showConfig`
+结果，拒绝任何共享中间层或 workspace 关闭 protected strict 子项，也拒绝用
+`paths` 跨越 package exports。每个 workspace 的 `typecheck` script 使用自身
+tsconfig 执行 `tsc --noEmit`。

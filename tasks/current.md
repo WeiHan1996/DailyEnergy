@@ -77,7 +77,10 @@ E-001 已通过审核并随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/p
 - **Source-ID registry**：正式 registry 属于 E-010。E-002 必须在 PR 中按 `MACHINE_ENFORCED`、`PARTIAL / MANUAL_EVIDENCE`、`DEFERRED` 或经批准的 `NA_WITH_REASON` 准确记录证据，不得静默宣称完整覆盖；
 - **TypeScript ESLint parser**：`typescript-eslint@8.65.0` 尚未声明 TypeScript 7 兼容；E-002 不采用未受支持组合，使用 ESLint 10 flat config 配合独立于 TypeScript compiler 版本的 TypeScript 语法解析，并由真实 lint/typecheck 双 Gate 验证；
 - **dependency-cruiser**：`18.1.0` 尚未支持 TypeScript 7 compiler API，只作为 JS/ESM 图补充并会输出兼容警告；TypeScript import、source cycle、runtime zone 与 capability 由项目 Node Gate 直接验证，PR 未扩大证据结论；
-- **当前等待**：Draft PR #91 审核；
+- **PR #91 首轮审核**：`AI Review: CHANGES REQUIRED` 的全 workspace typecheck、
+  resolved strict、devDependency runtime-zone、decorator parser 与 known-pass fixture
+  五组阻断均已修复并验证；
+- **当前等待**：Draft PR #91 复审；
 - **下一状态**：用户批准并合并后进入 Done；E-003 在此之前保持 Planned。
 
 ## 8. 最近交接
@@ -89,18 +92,32 @@ E-001 已通过审核并随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/p
 - 当前 Workspace Gate 已覆盖实际 workspace 枚举、唯一 lockfile、exact toolchain、显式 exports、workspace protocol、循环、app→app、deep import 和基础 client allowlist；
 - E-002 需要把现有临时/局部 Gate 升级为统一 TypeScript、ESLint、Prettier 和依赖边界基线；
 - 已完成：6 类 TypeScript 配置、ESLint 10 flat config、Prettier、dependency-cruiser
-  补充检查、12 类项目静态 Gate、16 个 known-fail fixtures 与全 workspace clean；
+  补充检查、12 类项目静态 Gate、18 个 known-fail fixtures、1 个全 Gate
+  known-pass project 与全 workspace clean；
 - 已完成：11 个 workspace 全部继承批准 tsconfig，config Gate 使用 TypeScript 7
-  实际加载每个配置并拒绝 strict/path 绕过；
+  `--showConfig` 解析最终 JSON，并拒绝任意中间层/workspace strict/path 绕过；
+- 已完成：11 个 workspace 全部提供确定性 `typecheck` script，root Turbo
+  typecheck 实际调度 11/11；无源码预留 workspace 在新增匹配源码后立即执行真实
+  `tsc --noEmit`；
+- 已完成：生产源码不得通过 `devDependencies` 导入 workspace，且 source/target
+  runtime zone 直接校验；测试/测试工具路径保持显式 devDependency 例外；
+- 已完成：Babel 8 ESLint parser 启用 NestJS legacy TypeScript decorator 语法，
+  controller/method decorator 正向 fixture 通过；
 - 已完成：shared-schemas wildcard barrel 改为显式导出，34 项测试与 19 个 JSON
   Schema ID 均保持通过；
 - 已验证：Node `24.18.0` / pnpm `11.17.0` 隔离目录从无 `node_modules` 状态执行
   frozen install 与 `pnpm validate` 全部通过；
-- 已验证：format、Workspace、config、ESLint、12 类 architecture、16 个负向
-  fixtures、typecheck、34 tests、build 和 clean 全部通过；
+- 已验证：`pnpm install --frozen-lockfile`、`workspace:graph`、`dry-run`、
+  `validate` 与 `clean` 全部通过；
+- 已验证：非 shared-schemas workspace `TS2322` 使 root typecheck 失败；共享中间
+  config 关闭 strict 被 resolved Gate 拒绝；client-safe 通过 devDependencies
+  导入 server-core 被拒绝；
+- 已验证：format、Workspace、resolved config、ESLint decorator、12 类
+  architecture、18 个负向 fixtures、known-pass 零诊断、11/11 typecheck、34 tests、
+  build 和 clean 全部通过；
 - 当前 PR：[Draft PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91)；
 - 未开始：E-003、业务代码、workflow、migration、容器或云资源；
-- 下一动作：审核 Draft PR #91，重点确认 TypeScript 7 的 ESLint 解析兼容策略与
-  dependency-cruiser 的证据边界；
+- 下一动作：复审 Draft PR #91，重点确认首轮 `CHANGES REQUIRED` 五组阻断已闭环，
+  并继续保持 dependency-cruiser 的 TypeScript 7 证据边界；
 - 接受后的下一任务：E-003 NestJS API 骨架；本 PR 不启动；
 - 禁止并行：E-003 及其他下游 Issue。

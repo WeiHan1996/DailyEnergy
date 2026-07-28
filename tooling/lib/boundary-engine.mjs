@@ -116,6 +116,12 @@ function declaredDependencies(manifest) {
   );
 }
 
+function dependencyFieldsFor(manifest, dependencyName) {
+  return allDependencyFields.filter((field) =>
+    Object.hasOwn(manifest[field] ?? {}, dependencyName),
+  );
+}
+
 function isTestFile(path) {
   return /(^|\/)(test|tests|__tests__|testing)(\/|$)|\.test\.[^.]+$/u.test(
     path,
@@ -284,6 +290,45 @@ function checkManifest(input) {
             "BOUNDARY_MANIFEST_UNDECLARED_IMPORT",
             file.path,
             `${specifier} is not declared by ${workspace.manifest.name}`,
+          ),
+        );
+      }
+      const target = project.workspaces.find(
+        (candidate) => candidate.manifest.name === dependencyName,
+      );
+      if (!target) {
+        continue;
+      }
+      const dependencyFields = dependencyFieldsFor(
+        workspace.manifest,
+        dependencyName,
+      );
+      const hasProductionDeclaration = dependencyFields.some((field) =>
+        productionDependencyFields.includes(field),
+      );
+      if (
+        dependencyFields.includes("devDependencies") &&
+        !hasProductionDeclaration
+      ) {
+        errors.push(
+          diagnostic(
+            "BOUNDARY_MANIFEST_PRODUCTION_DEV_DEPENDENCY",
+            file.path,
+            `production source cannot import devDependency ${specifier}`,
+          ),
+        );
+      }
+      const sourceRuntime = workspace.manifest.dailyEnergy?.runtime;
+      const targetRuntime = target.manifest.dailyEnergy?.runtime;
+      if (
+        allowedRuntimes.has(sourceRuntime) &&
+        !allowedRuntimeDependencies.get(sourceRuntime)?.has(targetRuntime)
+      ) {
+        errors.push(
+          diagnostic(
+            "BOUNDARY_MANIFEST_SOURCE_RUNTIME_ZONE",
+            file.path,
+            `${sourceRuntime} production source cannot import ${targetRuntime} workspace ${specifier}`,
           ),
         );
       }

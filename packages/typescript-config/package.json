@@ -15,6 +15,9 @@
     "*.json",
     "README.md"
   ],
+  "scripts": {
+    "typecheck": "node ../../tooling/typecheck-workspace.mjs"
+  },
   "dailyEnergy": {
     "kind": "package",
     "runtime": "tooling"

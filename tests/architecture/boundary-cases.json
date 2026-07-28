@@ -1,5 +1,5 @@
 {
-  "fixture_version": "e-002-boundary-v1",
+  "fixture_version": "e-002-boundary-v2",
   "cases": [
     {
       "case_id": "workspace-root-runtime-export",
@@ -49,6 +49,98 @@
                 "runtime": "server-core"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "manifest-client-devdependency-to-server-source",
+      "gate": "manifest",
+      "expected_rule_id": "BOUNDARY_MANIFEST_SOURCE_RUNTIME_ZONE",
+      "project": {
+        "workspaces": [
+          {
+            "directory": "packages/client",
+            "manifest": {
+              "name": "@daily-energy/client",
+              "private": true,
+              "exports": {
+                ".": "./dist/index.js"
+              },
+              "devDependencies": {
+                "@daily-energy/core": "workspace:*"
+              },
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "client-safe"
+              }
+            }
+          },
+          {
+            "directory": "packages/core",
+            "manifest": {
+              "name": "@daily-energy/core",
+              "private": true,
+              "exports": {
+                ".": "./dist/index.js"
+              },
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "server-core"
+              }
+            }
+          }
+        ],
+        "files": [
+          {
+            "path": "packages/client/src/index.ts",
+            "content": "import \"@daily-energy/core\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "manifest-production-source-uses-workspace-devdependency",
+      "gate": "manifest",
+      "expected_rule_id": "BOUNDARY_MANIFEST_PRODUCTION_DEV_DEPENDENCY",
+      "project": {
+        "workspaces": [
+          {
+            "directory": "packages/client",
+            "manifest": {
+              "name": "@daily-energy/client",
+              "private": true,
+              "exports": {
+                ".": "./dist/index.js"
+              },
+              "devDependencies": {
+                "@daily-energy/core": "workspace:*"
+              },
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "client-safe"
+              }
+            }
+          },
+          {
+            "directory": "packages/core",
+            "manifest": {
+              "name": "@daily-energy/core",
+              "private": true,
+              "exports": {
+                ".": "./dist/index.js"
+              },
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "server-core"
+              }
+            }
+          }
+        ],
+        "files": [
+          {
+            "path": "packages/client/src/index.ts",
+            "content": "import \"@daily-energy/core\";\n"
           }
         ]
       }

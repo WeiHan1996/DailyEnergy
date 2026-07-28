@@ -2,6 +2,9 @@
   "name": "@daily-energy/app-miniapp",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "typecheck": "node ../../tooling/typecheck-workspace.mjs"
+  },
   "dailyEnergy": {
     "kind": "app",
     "runtime": "client-safe"

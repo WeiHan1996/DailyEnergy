@@ -1,0 +1,56 @@
+{
+  "fixture_version": "e-002-known-pass-v1",
+  "project": {
+    "rootManifest": {
+      "name": "known-pass-root",
+      "private": true,
+      "dailyEnergy": {
+        "kind": "root",
+        "runtime": "tooling"
+      }
+    },
+    "workspaces": [
+      {
+        "directory": "packages/shared",
+        "manifest": {
+          "name": "@daily-energy/shared",
+          "private": true,
+          "exports": {
+            ".": "./dist/index.js"
+          },
+          "dailyEnergy": {
+            "kind": "package",
+            "runtime": "client-safe"
+          }
+        }
+      },
+      {
+        "directory": "packages/core",
+        "manifest": {
+          "name": "@daily-energy/core",
+          "private": true,
+          "exports": {
+            ".": "./dist/index.js"
+          },
+          "dependencies": {
+            "@daily-energy/shared": "workspace:*"
+          },
+          "dailyEnergy": {
+            "kind": "package",
+            "runtime": "server-core"
+          }
+        }
+      }
+    ],
+    "files": [
+      {
+        "path": "packages/shared/src/index.ts",
+        "content": "export const sharedValue = \"safe\";\n"
+      },
+      {
+        "path": "packages/core/src/index.ts",
+        "content": "import { sharedValue } from \"@daily-energy/shared\";\nexport const coreValue = sharedValue;\n"
+      }
+    ]
+  }
+}
