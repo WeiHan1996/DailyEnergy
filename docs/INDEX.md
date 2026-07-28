@@ -234,7 +234,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001 已完成，E-002 是 Phase 1 唯一 In Progress。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001 已完成，E-002 是 Phase 1 唯一 In Review。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
@@ -249,4 +249,4 @@ S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-0
 11. [shared-schemas](../packages/shared-schemas/README.md) 及现有配置、exports、fixtures 和测试；
 12. tasks/backlog.md（仅在需要重排优先级时）。
 
-E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done。E-002 只建立统一 TypeScript strict、ESLint、Prettier 与静态依赖边界，不初始化 Nest/Next/小程序/数据库/队列业务；E-003 及其他 45 个下游工程 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
+E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done。E-002 已完成统一 TypeScript strict、ESLint、Prettier 与静态依赖边界，正在 [Draft PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 审核；未初始化 Nest/Next/小程序/数据库/队列业务。E-003 及其他 45 个下游工程 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
