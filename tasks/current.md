@@ -10,14 +10,14 @@
 - **当前分支**：`agent/e-003-api-baseline`
 - **上游 PR**：[E-002 PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91)
 - **当前 Issue**：[E-003 Issue #40](https://github.com/WeiHan1996/DailyEnergy/issues/40)
-- **当前 PR**：待创建
+- **当前 PR**：[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93)
 - **Gate 结论**：`GO`
 
 ## 1. 当前目标
 
 创建无状态 NestJS 11 + Express 5 API 薄入口，固定公开/Admin transport、配置、错误、健康检查和优雅关闭合同，为后续确定性业务闭环提供稳定的服务端组合根。
 
-E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) squash 合并，Issue #41 已自动关闭为 completed。用户已于 2026-07-28 明确开始 E-003；`agent/e-003-api-baseline` 已完成实现与全仓验证，正在创建 Draft PR。
+E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) squash 合并，Issue #41 已自动关闭为 completed。用户已于 2026-07-28 明确开始 E-003；`agent/e-003-api-baseline` 已完成实现与全仓验证，[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 正在等待用户审核。
 
 ## 2. 上游完成状态
 
@@ -84,7 +84,7 @@ E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEn
 - **Source-ID 证据**：`S29-ARCH-041`、`S30-REPO-025/048`、`S32-DEPLOY-002/006`、`S33-OBS-001/005/006/024`、`S31-TEST-035` 及对应 S-20 maintenance/validation/error/Admin 场景已有机器测试或静态 Gate；`S30-REPO-032`、`S32-DEPLOY-012`、`S33-OBS-017` 仅为 partial/manual，完整 DB role/image/metrics 证据仍由下游任务完成；
 - **registry 处理**：沿用 E-001/E-002 已批准的 `NA_WITH_REASON`；E-010 前不存在可更新的正式 registry，本任务在交接和 PR 中记录实际证据等级，不提前创建 E-010 资产；
 - **依赖审计**：npm 官方 audit 报告的 1 个 high 位于既有 ESLint → glob → brace-expansion 开发工具链，不在 API 运行时依赖图；不在 E-003 混入无关工具链升级；
-- **当前等待**：Draft PR 创建后等待用户审核；
+- **当前等待**：[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 等待用户审核；
 - **下一状态**：用户批准并合并后进入 Done，再单独选择下一个 Ready 任务。
 
 ## 8. 最近交接
@@ -103,7 +103,8 @@ E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEn
 - 已验证：`pnpm validate` 全部通过；11/11 workspace strict typecheck、12 类边界 Gate（50 source files）、20 个 known-fail + 1 个 known-pass、API 15 项测试、shared-schemas 34 项测试和 build 全部 PASS；
 - 当前任务：E-003 In Review；
 - 当前分支：`agent/e-003-api-baseline`；
+- 当前 PR：[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93)；
 - 未开始：E-004～E-014、业务代码、数据库、队列、容器、workflow 或云资源；
-- 下一动作：提交、推送并创建聚焦 Draft PR，补回 PR URL 后等待用户审核；
+- 下一动作：审核 [Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93)；获批后标记 ready、合并并执行 E-003 收尾；
 - 接受后的下一任务：候选为 E-004「创建微信原生小程序工程与运行基线」；当前仍保持 Planned，只有 E-003 获批合并并完成收尾后才移动为唯一 Ready；
 - 禁止并行：E-004 及其他下游 Issue。

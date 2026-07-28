@@ -346,7 +346,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-001、E-002 已完成；E-003 正在 Draft PR 前最终收尾
+状态：E-001、E-002 已完成；E-003 Draft PR #93 等待审核
 当前目标：创建 NestJS API 组合根与运行基线
 当前任务：E-003 NestJS API 骨架（In Review）
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/40
@@ -368,7 +368,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 - 15 项 API/config/进程测试与 34 项 shared-schemas 回归测试通过，全仓 format、lint、typecheck、architecture、test、build Gate 全部通过；
 - E-004～E-014 及其他下游工程 Issue 继续保持 Planned，不并行启动。
 
-[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done；E-003 已在 `agent/e-003-api-baseline` 完成实现与全仓验证，正在创建聚焦 Draft PR。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done；E-003 已在 `agent/e-003-api-baseline` 完成实现与全仓验证，[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 正在等待审核。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
 
 ---
 
