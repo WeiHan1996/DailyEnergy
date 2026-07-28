@@ -549,6 +549,36 @@ function checkCapability(input) {
   for (const file of project.files) {
     for (const specifier of importsFor(file)) {
       if (
+        file.path.startsWith("packages/server-core/") &&
+        (specifier.startsWith("@nestjs/") ||
+          specifier.startsWith("@daily-energy/server-adapters") ||
+          prismaPackages.has(packageNameFromSpecifier(specifier)) ||
+          providerPackages.has(packageNameFromSpecifier(specifier)) ||
+          ["bullmq", "dotenv", "ioredis"].includes(
+            packageNameFromSpecifier(specifier),
+          ))
+      ) {
+        errors.push(
+          diagnostic(
+            "BOUNDARY_CAPABILITY_SERVER_CORE",
+            file.path,
+            `server-core cannot import concrete runtime ${specifier}`,
+          ),
+        );
+      }
+      if (
+        file.path.includes("/application/") &&
+        /(^|\/)(controller|transport)(\/|$)/u.test(specifier)
+      ) {
+        errors.push(
+          diagnostic(
+            "BOUNDARY_CAPABILITY_APPLICATION_LAYER",
+            file.path,
+            `application source cannot import transport ${specifier}`,
+          ),
+        );
+      }
+      if (
         file.path.startsWith("apps/api/") &&
         (specifier === "@daily-energy/prompt-library" ||
           specifier.startsWith("@daily-energy/server-adapters/ai") ||
@@ -590,6 +620,18 @@ function checkCapability(input) {
           ),
         );
       }
+    }
+    if (
+      file.path.startsWith("packages/server-core/") &&
+      /\bprocess\.env\b/u.test(file.content)
+    ) {
+      errors.push(
+        diagnostic(
+          "BOUNDARY_CAPABILITY_SERVER_ENV",
+          file.path,
+          "server-core cannot read process.env directly",
+        ),
+      );
     }
   }
   return errors;

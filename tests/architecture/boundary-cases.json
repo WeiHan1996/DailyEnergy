@@ -221,6 +221,19 @@
       }
     },
     {
+      "case_id": "server-core-concrete-runtime",
+      "gate": "capability",
+      "expected_rule_id": "BOUNDARY_CAPABILITY_SERVER_CORE",
+      "project": {
+        "files": [
+          {
+            "path": "packages/server-core/src/modules/daily/domain/model.ts",
+            "content": "import { Queue } from \"bullmq\";\n"
+          }
+        ]
+      }
+    },
+    {
       "case_id": "provider-outside-ai-adapter",
       "gate": "provider",
       "expected_rule_id": "BOUNDARY_PROVIDER_LOCATION",
