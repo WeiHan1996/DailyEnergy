@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-28
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：[E-003 创建 NestJS API 组合根与运行基线](./current.md)
+- **当前任务**：[E-004 创建微信原生小程序 TypeScript 骨架](./current.md)
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -108,7 +108,7 @@
 | S-34 | Phase 1～3 工程 Issues | Done | 3 个 GitHub Milestones、48 个 Issues | S-01～S-33 |
 | S-35 | Phase 0B Gate 评审 | Done | [Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) | S-34 |
 
-S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) 与 [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41) 已完成并进入 Done，[E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) 是唯一 In Review。其余 45 个工程 Issue 保持 Planned，理想工程日初始估算仍为 35 / 43.5 / 44，必须在 E-001～E-003 后按实际 cycle time 校准。
+S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)、[E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41) 与 [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) 已完成并进入 Done，[E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42) 是唯一 Ready。其余 44 个工程 Issue 保持 Planned，理想工程日初始估算仍为 35 / 43.5 / 44，必须按实际 cycle time 持续校准。
 
 ## 4. Phase 1：工程基础
 
@@ -116,8 +116,8 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 |---|---|---|---|
 | [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) | 初始化 TypeScript Monorepo | Done | Workspace、包管理和统一脚本 |
 | [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41) | 代码质量基线 | Done | TypeScript、ESLint、Prettier、提交规范 |
-| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) | NestJS API 骨架 | In Review | 配置、错误、健康检查和日志 |
-| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42) | 微信小程序骨架 | Planned | 原生小程序、TypeScript、路由和环境 |
+| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) | NestJS API 骨架 | Done | 配置、错误、健康检查和日志 |
+| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42) | 微信小程序骨架 | Ready | 原生小程序、TypeScript、路由和环境 |
 | [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43) | Next.js 管理后台骨架 | Planned | 登录外壳和基础布局 |
 | [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44) | PostgreSQL 与 Prisma | Planned | 初始 Schema、迁移和测试数据 |
 | [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45) | Redis 与 BullMQ | Planned | 缓存、队列和连接管理 |
@@ -128,6 +128,8 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 | [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50) | 开发环境部署 | Planned | 固定开发地址和发布流程 |
 | [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51) | 日志与监控基线 | Planned | 脱敏日志、指标和告警 |
 | [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52) | Phase 1 Gate | Planned | 环境可重复、CI 通过、服务可访问 |
+
+E-004 的当前硬前置按 2026-07-28 明确指令修正为 E-001、E-002、E-003。E-008 仍负责 shared-schemas/client、api-client/miniapp 与 codegen/drift；E-004 只能建立未来接入这些 client-safe subpath 的边界，不得提前实现 E-008。
 
 ## 5. Phase 2：确定性核心闭环
 

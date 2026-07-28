@@ -3,114 +3,92 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-28
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务 ID**：E-003
-- **当前任务名称**：创建 NestJS API 组合根与运行基线
-- **任务状态**：In Review
+- **当前任务 ID**：E-004
+- **当前任务名称**：创建微信原生小程序 TypeScript 骨架
+- **任务状态**：Ready
 - **优先级**：最高
-- **当前分支**：`agent/e-003-api-baseline`
-- **上游 PR**：[E-002 PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91)
-- **当前 Issue**：[E-003 Issue #40](https://github.com/WeiHan1996/DailyEnergy/issues/40)
-- **当前 PR**：[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93)
+- **当前分支**：尚未创建
+- **上游 PR**：[E-003 PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93)
+- **当前 Issue**：[E-004 Issue #42](https://github.com/WeiHan1996/DailyEnergy/issues/42)
+- **当前 PR**：无
 - **Gate 结论**：`GO`
 
 ## 1. 当前目标
 
-创建无状态 NestJS 11 + Express 5 API 薄入口，固定公开/Admin transport、配置、错误、健康检查和优雅关闭合同，为后续确定性业务闭环提供稳定的服务端组合根。
+建立微信原生小程序入口、启动路由、平台适配层和 client-only 构建边界，为后续确定性业务页面提供可加载、可测试、不会泄漏服务端能力的运行骨架。
 
-E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) squash 合并，Issue #41 已自动关闭为 completed。用户已于 2026-07-28 明确开始 E-003；`agent/e-003-api-baseline` 已完成实现与全仓验证，[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 正在等待用户审核。
+E-003 已通过审核并随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) squash 合并，Issue #40 已自动关闭为 completed。E-004 现为唯一 Ready；尚未创建实现分支、提交代码或 Draft PR。
 
 ## 2. 上游完成状态
 
 - Phase 0B Gate 已获用户确认，结论为 Accepted `GO`；
 - E-001 已完成 pnpm/Turborepo Monorepo、11 个 workspace 和基础 Workspace Gate；
-- E-002 已完成 TypeScript 7 strict、ESLint 10 flat config、Prettier、11/11 workspace typecheck 和 12 类静态边界 Gate；
-- E-002 的 20 个 known-fail fixtures、全 Gate known-pass project、clean-checkout 验证和 Source-ID 证据分层均已通过审核；
-- E-003 的有效前置为 E-001、E-002，均已满足；Issue #40 中误写的 E-008 前置由本次用户指令批准修正；
-- E-004～E-014、E-008 及其他下游工程 Issue 继续保持 Planned；
-- 云厂商、域名、主体、跨境、真实账号/密钥、热线、监控接收人和值班等外部 Gate 仍未解除，但不阻塞 E-003 的本地工程骨架。
+- E-002 已完成 TypeScript 7 strict、ESLint、Prettier、11/11 workspace typecheck 和 12 类静态边界 Gate；
+- E-003 已完成 NestJS API 组合根、配置/能力指纹、Public/Admin/Safety 边界、错误与日志合同、健康检查及有界优雅关闭；
+- E-001、E-002、E-003 均已完成，满足 E-004 当前硬前置；
+- E-005～E-014、E-008 及其他下游工程 Issue 继续保持 Planned；
+- 云厂商、域名、主体、跨境、真实账号/密钥、热线、监控接收人和值班等外部 Gate 仍未解除，但不阻塞 E-004 的本地工程骨架。
 
 ## 3. 开工前读取顺序
 
-1. [E-003 Issue #40](https://github.com/WeiHan1996/DailyEnergy/issues/40)；
-2. [API 契约](../docs/technical/api.md)；
-3. [错误码规范](../docs/technical/error-codes.md)；
-4. [系统架构](../docs/technical/architecture.md)；
-5. [仓库结构与模块边界](../docs/technical/repository-structure.md)；
+1. [E-004 Issue #42](https://github.com/WeiHan1996/DailyEnergy/issues/42)；
+2. [信息架构](../docs/design/information-architecture.md)；
+3. [页面清单](../docs/design/screen-inventory.md)；
+4. [仓库结构与模块边界](../docs/technical/repository-structure.md)；
+5. [测试策略](../docs/technical/testing.md)；
 6. [部署、配置和回滚](../docs/technical/deployment.md)；
-7. [可观测性和成本监控](../docs/technical/observability.md)；
-8. [测试策略](../docs/technical/testing.md)；
-9. `apps/api`、root 配置、共享 TypeScript/ESLint 配置与 E-002 边界 Gate；
-10. 仓库现状与任何未提交改动。
+7. `apps/miniapp`、root 配置、共享 TypeScript/ESLint 配置与 E-002 边界 Gate；
+8. E-003 API 运行合同及仓库现状。
 
-如果上述 Accepted 权威互相冲突、文件缺失，或 E-003 无法在一个主要 PR 内完成，应停止并将 E-003 设为 Blocked，不得在实现中静默改写上游决定。
+如果上述 Accepted 权威互相冲突、文件缺失，或 E-004 无法在一个主要 PR 内完成，应停止并将 E-004 设为 Blocked，不得在实现中静默改写上游决定。
 
-## 4. E-003 范围
+## 4. E-004 范围
 
-- 创建 `apps/api` 的 bootstrap、`transport/public`、`transport/admin` 与 composition 目录；
-- 初始化 NestJS 11 + Express 5 的无状态 API 组合根；
-- 实现严格配置 Schema、启动指纹、liveness、readiness、维护响应和 graceful shutdown；
-- 统一 request context、错误 envelope、低基数 operation code 与脱敏 JSON 日志接口；
-- 为公开与 Admin transport 建立独立 auth/audience 组合点；
-- 只注册占位 handler，不实现业务用例；
-- 补充 bootstrap、HTTP envelope、auth 分区、health、配置失败、依赖不可用和关闭流程测试。
+- 创建 `apps/miniapp` 的 app/pages/components/features/platform/services/generated 结构；
+- 配置微信原生小程序 TypeScript 构建、环境 API origin、开发者工具项目示例与启动路由占位；
+- 封装 login、storage、network、share、subscription 平台 port，不实现真实业务流程；
+- 固定 client-only bundle allowlist；当前不得导入尚未由 E-008 交付的生成 API Client；
+- 建立最小启动、错误占位、平台 adapter 单元测试和 bundle forbidden-import scan；
+- 保留后续 DevTools automator runner 的明确入口，不在本任务伪造真机 conformance。
 
 ## 5. 不做
 
-- 不实现任何业务 API、领域规则或真实用户流程；
-- 不实现真实 SSO、生产监控后端或 provider 调用；
-- 不导入 AI/provider/Prompt、Worker、restricted 或 migration capability；
-- 不引入 PostgreSQL、Prisma、Redis、BullMQ、Docker、workflow 或云资源；
-- 不提前实现 E-004～E-014、E-008 或 Phase 2/3 任务；
-- 不降低 Accepted API、隐私、Safety、删除、幂等、事务、运行 profile 或可观测性边界；
-- 不在用户明确开始 E-003 前创建实现分支、提交代码或 Draft PR。
+- 不实现正式页面、首次认识、签到、今日内容、点亮、晚间反馈或周趋势业务；
+- 不实现真实微信登录、订阅消息、分享业务或生产 AppID/AppSecret；
+- 不提前实现 E-008 的 Zod/OpenAPI/api-client/codegen drift；
+- 不引入 Nest、Prisma、PostgreSQL、Redis、BullMQ、Prompt、provider、Worker 或 restricted capability；
+- 不创建生产云资源、域名、证书、真实账号或密钥；
+- 不提前启动 E-005～E-014 或 Phase 2/3 任务。
 
 ## 6. 验收标准
 
-- API 保持薄入口，不包含领域规则；
-- 公开与 Admin transport 使用独立 auth/audience 组合点；
-- 错误响应符合 OpenAPI 和 error-codes，未知字段与无效配置 fail closed；
-- liveness 不依赖外部服务，readiness 反映必需依赖且不泄露详情；
-- 启动、维护模式、依赖不可用、信号关闭和 graceful shutdown 有黑盒测试；
-- E-002 的 format、lint、typecheck、architecture 和 clean Gate 全部继续通过；
+- 微信开发者工具可加载最小应用，启动路由与错误占位可见；
+- TypeScript、format、lint、typecheck、architecture、test 和 build Gate 全部通过；
+- bundle 不含 `node:*`、Nest、Prisma、Redis、BullMQ、Prompt、provider、secret 或服务端 package；
+- `project.private.config.json` 等私有配置不入库，公开配置可校验并携带封闭环境标识；
+- login/storage/network/share/subscription adapter 使用可替换 port，纯逻辑可在 Vitest 运行；
+- DevTools 冒烟证据与纯逻辑测试层级准确区分，不把 Node/jsdom 测试冒充微信平台 conformance；
 - Source-ID 证据按 `MACHINE_ENFORCED`、`PARTIAL / MANUAL_EVIDENCE`、`DEFERRED` 或获批 `NA_WITH_REASON` 准确记录；
 - 交付一个聚焦的 Draft PR，等待用户审核。
 
 ## 7. 当前阻塞与决策
 
 - **仓库/代码阻塞**：无；
-- **依赖修正**：Issue #40 原正文将 E-008 列为前置，与 Accepted 执行顺序、Backlog 和“E-003 为 E-002 后下一任务”的交接冲突；本次用户明确要求 E-003 成为唯一 Ready，故修正为 E-001、E-002；
-- **外部上线 Gate**：仍存在，但不阻塞 E-003；
-- **Source-ID registry**：正式 registry 属于 E-010；E-003 PR 必须准确记录本任务实际证据，不得提前宣称下游能力完整覆盖；
-- **Source-ID 证据**：`S29-ARCH-041`、`S30-REPO-025`、`S32-DEPLOY-002/006`、`S33-OBS-001/005/006/024`、`S31-TEST-035` 及对应 S-20 Safety continuation、maintenance、validation、error/Admin 场景已有机器测试或静态 Gate；`S30-REPO-032/048`、`S32-DEPLOY-012`、`S33-OBS-017` 仅为 partial/manual，完整 contract drift、DB role、image 与 metrics 证据仍由 E-008/E-010 及其他下游任务完成；
-- **registry 处理**：沿用 E-001/E-002 已批准的 `NA_WITH_REASON`；E-010 前不存在可更新的正式 registry，本任务在交接和 PR 中记录实际证据等级，不提前创建 E-010 资产；
-- **依赖审计**：npm 官方 audit 报告的 1 个 high 位于既有 ESLint → glob → brace-expansion 开发工具链，不在 API 运行时依赖图；不在 E-003 混入无关工具链升级；
-- **AI Review 修复**：2026-07-28 的 CHANGES REQUIRED 四组意见均确认合理；Safety continuation、Accepted 环境/发布指纹、有界 shutdown、封闭 error/log 合同及证据口径已修复并通过全仓验证；
-- **AI Re-review 修复**：2026-07-28 的 CHANGES REQUIRED 三项意见均确认合理；能力指纹现绑定 Safety continuation/maintenance 精确白名单并提供同源计算器，`RECOVERY` 进入封闭 API 环境且强制 expected fingerprints，慢关闭 fixture 进入 app lint；验证中发现并修复“先记录启动、后安装信号处理器”的关闭竞态；
-- **当前等待**：[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 等待下一轮 AI re-review；
-- **下一状态**：用户批准并合并后进入 Done，再单独选择下一个 Ready 任务。
+- **依赖修正**：Issue #42 原正文将 E-008 列为硬前置，但 Accepted 执行顺序、Backlog、E-003 交接及 2026-07-28 用户明确指令均要求 E-004 成为下一任务；现将 E-004 硬前置明确为 E-001、E-002、E-003；
+- **E-008 边界**：E-008 仍负责 shared-schemas/client、api-client/miniapp 和 codegen/drift。E-004 只能建立允许未来接入这些 client-safe subpath 的边界，不得提前创建或复制生成客户端；
+- **Source-ID registry**：正式 registry 属于 E-010；E-004 只能记录实际证据等级，不得提前宣称完整覆盖；
+- **外部上线 Gate**：仍存在，但不阻塞本地小程序骨架；
+- **下一状态**：收到明确开工指令后，从最新 `main` 创建独立实现分支并进入 In Progress。
 
 ## 8. 最近交接
 
-- 已合并：[E-001 PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89)；
-- E-001 merge commit：`6ab172d72d7ab221e565303254bdf135437870dd`；
-- 已合并：[E-002 PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91)；
-- E-002 merge commit：`bce224eb55c1ca92b32aebfe9a46df480af27b5f`；
-- E-001 Issue #39、E-002 Issue #41 均已关闭为 completed；
-- 当前工具链基线：Node `24.18.0`、pnpm `11.17.0`、Turbo `2.10.7`、TypeScript `7.0.2`、ESLint `10.8.0`、Prettier `3.9.6`、Zod `4.4.3`、Vitest `4.1.10`；
-- 当前质量基线：11/11 workspace typecheck、resolved strict、Prettier、ESLint decorator 解析、12 类边界 Gate、20 个负向 fixtures、known-pass 零诊断和 clean-checkout validate；
-- 已实现：NestJS `11.1.28` + Express `5.2.1` 无状态组合根，公开/Admin 独立 audience verifier，严格 Zod 配置与同源 deploy/capability fingerprint 计算器；
-- 已实现：`/health/startup`、`/health/live`、`/health/ready`，BLOCKING/DEGRADED maintenance，统一 request ID、API error envelope、封闭 operation code 与脱敏 `OrdinaryLogV1`；
-- 已实现：Safety continuation 独立 verifier 与 launch/Safety/recovery 白名单，BLOCKING maintenance 只允许有效 Safety continuation 进入白名单且不授予 Admin/普通权限；
-- 已实现：Accepted `LOCAL/CI/DEV/STAGING/PRODUCTION/RECOVERY` API 环境子集，STAGING/PRODUCTION/RECOVERY expected deploy/capability fingerprint 必填；
-- 已实现：能力指纹绑定 Safety continuation/maintenance 精确路由白名单；关闭前 readiness drain、停止 intake、可组合 drain hooks、`shutdownGraceMs` 有界期限与固定超时终止结果，且信号处理器先于 `API_STARTED` 安装；
-- 已实现：慢关闭 fixture 进入 app lint/typecheck/format，但继续排除在确定性 production build 之外；
-- 已实现：中心化封闭 error catalog、按 code 封闭 details 投影，以及经运行时 Schema 强制的 message/reason/duration 普通日志合同；
-- 已测试：36 项 API/config/进程/合同测试覆盖 Safety × maintenance/audience、环境别名与 release fingerprint 缺失/匹配/漂移、旧 capability fingerprint 拒绝、RECOVERY、慢 hook deadline、动态 error/details/log code 拒绝、parser 413 → 合同 400、依赖不可用、未知路由和真实 `SIGTERM`；
-- 已验证：`pnpm install --frozen-lockfile` 与 `pnpm validate` 全部通过；11/11 workspace strict typecheck、12 类边界 Gate（55 source files）、20 个 known-fail + 1 个 known-pass、API 36 项测试、shared-schemas 34 项测试和 production build 全部 PASS；production `dist` 无 test/fixture 文件；
-- 当前任务：E-003 In Review；
-- 当前分支：`agent/e-003-api-baseline`；
-- 当前 PR：[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93)；
-- 未开始：E-004～E-014、业务代码、数据库、队列、容器、workflow 或云资源；
-- 下一动作：对 [Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 触发 AI re-review；获批后再标记 ready、合并并执行 E-003 收尾；
-- 接受后的下一任务：候选为 E-004「创建微信原生小程序工程与运行基线」；当前仍保持 Planned，只有 E-003 获批合并并完成收尾后才移动为唯一 Ready；
-- 禁止并行：E-004 及其他下游 Issue。
+- E-001 PR #89 merge commit：`6ab172d72d7ab221e565303254bdf135437870dd`；
+- E-002 PR #91 merge commit：`bce224eb55c1ca92b32aebfe9a46df480af27b5f`；
+- E-003 PR #93 merge commit：`fde441c9802d91aa707f47bfc09d9927a9e97b97`；
+- E-001 Issue #39、E-002 Issue #41、E-003 Issue #40 均已关闭为 completed；
+- 当前任务：E-004 Ready；
+- 当前分支：尚未创建；
+- 当前 PR：无；
+- 未开始：E-004 实现、E-005～E-014、业务代码、数据库、队列、容器、workflow 或云资源；
+- 下一动作：收到明确开工指令后开始 E-004；
+- 禁止并行：E-005 及其他下游 Issue。
