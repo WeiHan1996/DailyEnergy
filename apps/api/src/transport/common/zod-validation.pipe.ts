@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, type PipeTransform } from "@nestjs/common";
+import { Injectable, type PipeTransform } from "@nestjs/common";
 import type { ZodType } from "zod";
 
 import { ApiException } from "./api-exception.js";
@@ -13,18 +13,13 @@ export class ZodValidationPipe<T> implements PipeTransform<unknown, T> {
       return result.data;
     }
     throw new ApiException({
-      category: "VALIDATION",
       code: "VALIDATION_FAILED",
       details: {
         fields: result.error.issues.map((issue) => ({
-          code: issue.code,
-          field: issue.path.join("."),
+          field: issue.path.join(".") || "$",
+          reason: issue.code,
         })),
       },
-      message: "提交内容有误，请检查后重试。",
-      messageKey: "error.validation_failed",
-      retryable: false,
-      status: HttpStatus.BAD_REQUEST,
     });
   }
 }

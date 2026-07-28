@@ -5,11 +5,14 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "format:check": "prettier --check README.md package.json tsconfig*.json src",
+    "build:test-fixtures": "tsc -p tsconfig.test-fixtures.json",
+    "format:check": "prettier --check README.md package.json tsconfig*.json src test-fixtures",
     "lint": "eslint --max-warnings=0 src",
     "prebuild": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist', { force: true, recursive: true }))\"",
+    "prebuild:test-fixtures": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist-fixtures', { force: true, recursive: true }))\"",
+    "posttest": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist-fixtures', { force: true, recursive: true }))\"",
     "start": "node dist/main.js",
-    "test": "pnpm run build && vitest run src",
+    "test": "pnpm run build && pnpm run build:test-fixtures && vitest run src",
     "typecheck": "node ../../tooling/typecheck-workspace.mjs"
   },
   "dailyEnergy": {

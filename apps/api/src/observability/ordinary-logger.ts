@@ -6,15 +6,20 @@ import type {
 } from "../bootstrap/runtime-config.js";
 import { ORDINARY_LOG_SINK, RUNTIME_CONFIG } from "../composition/tokens.js";
 import type {
+  DurationMsBucket,
   OrdinaryLogEvent,
   OrdinaryLogSink,
 } from "./ordinary-log.types.js";
+import { OrdinaryLogEventSchema } from "./ordinary-log.types.js";
 
 export type {
   OperationCode,
+  DurationMsBucket,
+  MessageCode,
   OrdinaryLogEvent,
   OrdinaryLogSink,
   OutcomeCode,
+  ReasonCode,
 } from "./ordinary-log.types.js";
 
 export const STANDARD_OUTPUT_LOG_SINK: OrdinaryLogSink = {
@@ -23,7 +28,7 @@ export const STANDARD_OUTPUT_LOG_SINK: OrdinaryLogSink = {
       process.stdout.write(`${JSON.stringify(event)}\n`);
     } catch {
       process.stderr.write(
-        '{"severity":"ERROR","service":"api","runtime_profile":"API","operation_code":"API_LIFECYCLE","outcome_code":"TERMINAL","message_code":"LOG_SERIALIZATION_FAILED","contract_version":"ordinary-log-v1"}\n',
+        '{"severity":"ERROR","service":"api","runtime_profile":"API","operation_code":"API_LIFECYCLE","outcome_code":"TERMINAL","reason_code":"LOG_EVENT_INVALID","message_code":"LOG_SERIALIZATION_FAILED","contract_version":"ordinary-log-v1"}\n',
       );
     }
   },
@@ -56,7 +61,7 @@ export class OrdinaryLogger {
     if (severityRank(severity) < severityRank(this.config.logLevel)) {
       return;
     }
-    this.sink.write({
+    const candidate = {
       ...event,
       contract_version: "ordinary-log-v1",
       environment: this.config.environment,
@@ -65,6 +70,40 @@ export class OrdinaryLogger {
       service: "api",
       severity,
       timestamp: new Date().toISOString(),
-    });
+    };
+    const result = OrdinaryLogEventSchema.safeParse(candidate);
+    if (!result.success) {
+      this.sink.write({
+        contract_version: "ordinary-log-v1",
+        environment: this.config.environment,
+        message_code: "LOG_CONTRACT_REJECTED",
+        operation_code: "API_LIFECYCLE",
+        outcome_code: "TERMINAL",
+        reason_code: "LOG_EVENT_INVALID",
+        release_id: this.config.releaseId,
+        runtime_profile: "API",
+        service: "api",
+        severity: "ERROR",
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
+    this.sink.write(result.data as OrdinaryLogEvent);
+  }
+
+  public durationBucket(durationMs: number): DurationMsBucket {
+    if (durationMs < 10) {
+      return "LT_10";
+    }
+    if (durationMs < 50) {
+      return "LT_50";
+    }
+    if (durationMs < 250) {
+      return "LT_250";
+    }
+    if (durationMs < 1_000) {
+      return "LT_1000";
+    }
+    return "GTE_1000";
   }
 }

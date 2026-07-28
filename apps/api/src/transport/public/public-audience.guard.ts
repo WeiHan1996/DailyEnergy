@@ -1,5 +1,4 @@
 import {
-  HttpStatus,
   Inject,
   Injectable,
   type CanActivate,
@@ -24,12 +23,7 @@ export class PublicAudienceGuard implements CanActivate {
       return true;
     }
     throw new ApiException({
-      category: "AUTH",
       code: "AUTH_REQUIRED",
-      message: "请重新登录后继续。",
-      messageKey: "error.auth_required",
-      retryable: false,
-      status: HttpStatus.UNAUTHORIZED,
     });
   }
 }

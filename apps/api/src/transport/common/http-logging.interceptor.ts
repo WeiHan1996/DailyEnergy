@@ -11,22 +11,6 @@ import type { Response } from "express";
 import { OrdinaryLogger } from "../../observability/ordinary-logger.js";
 import { RequestContextStore } from "./request-context.js";
 
-function durationBucket(durationMs: number): string {
-  if (durationMs < 10) {
-    return "LT_10";
-  }
-  if (durationMs < 50) {
-    return "LT_50";
-  }
-  if (durationMs < 250) {
-    return "LT_250";
-  }
-  if (durationMs < 1_000) {
-    return "LT_1000";
-  }
-  return "GTE_1000";
-}
-
 @Injectable()
 export class HttpLoggingInterceptor implements NestInterceptor {
   public constructor(
@@ -47,7 +31,7 @@ export class HttpLoggingInterceptor implements NestInterceptor {
             requestContext.operationCode === "HEALTH_READY" &&
             response.statusCode === 503;
           this.logger.write(isUnavailableReadiness ? "WARN" : "INFO", {
-            duration_ms_bucket: durationBucket(
+            duration_ms_bucket: this.logger.durationBucket(
               performance.now() - requestContext.startedAt,
             ),
             message_code: "HTTP_REQUEST_COMPLETED",

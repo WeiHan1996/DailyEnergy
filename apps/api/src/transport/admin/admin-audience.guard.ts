@@ -1,5 +1,4 @@
 import {
-  HttpStatus,
   Inject,
   Injectable,
   type CanActivate,
@@ -24,12 +23,7 @@ export class AdminAudienceGuard implements CanActivate {
       return true;
     }
     throw new ApiException({
-      category: "AUTH",
       code: "AUTH_ADMIN_REQUIRED",
-      message: "当前管理会话无权访问此内容。",
-      messageKey: "error.auth_admin_required",
-      retryable: false,
-      status: HttpStatus.UNAUTHORIZED,
     });
   }
 }

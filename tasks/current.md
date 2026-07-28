@@ -81,10 +81,11 @@ E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEn
 - **依赖修正**：Issue #40 原正文将 E-008 列为前置，与 Accepted 执行顺序、Backlog 和“E-003 为 E-002 后下一任务”的交接冲突；本次用户明确要求 E-003 成为唯一 Ready，故修正为 E-001、E-002；
 - **外部上线 Gate**：仍存在，但不阻塞 E-003；
 - **Source-ID registry**：正式 registry 属于 E-010；E-003 PR 必须准确记录本任务实际证据，不得提前宣称下游能力完整覆盖；
-- **Source-ID 证据**：`S29-ARCH-041`、`S30-REPO-025/048`、`S32-DEPLOY-002/006`、`S33-OBS-001/005/006/024`、`S31-TEST-035` 及对应 S-20 maintenance/validation/error/Admin 场景已有机器测试或静态 Gate；`S30-REPO-032`、`S32-DEPLOY-012`、`S33-OBS-017` 仅为 partial/manual，完整 DB role/image/metrics 证据仍由下游任务完成；
+- **Source-ID 证据**：`S29-ARCH-041`、`S30-REPO-025`、`S32-DEPLOY-002/006`、`S33-OBS-001/005/006/024`、`S31-TEST-035` 及对应 S-20 Safety continuation、maintenance、validation、error/Admin 场景已有机器测试或静态 Gate；`S30-REPO-032/048`、`S32-DEPLOY-012`、`S33-OBS-017` 仅为 partial/manual，完整 contract drift、DB role、image 与 metrics 证据仍由 E-008/E-010 及其他下游任务完成；
 - **registry 处理**：沿用 E-001/E-002 已批准的 `NA_WITH_REASON`；E-010 前不存在可更新的正式 registry，本任务在交接和 PR 中记录实际证据等级，不提前创建 E-010 资产；
 - **依赖审计**：npm 官方 audit 报告的 1 个 high 位于既有 ESLint → glob → brace-expansion 开发工具链，不在 API 运行时依赖图；不在 E-003 混入无关工具链升级；
-- **当前等待**：[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 等待用户审核；
+- **AI Review 修复**：2026-07-28 的 CHANGES REQUIRED 四组意见均确认合理；Safety continuation、Accepted 环境/发布指纹、有界 shutdown、封闭 error/log 合同及证据口径已修复并通过全仓验证；
+- **当前等待**：[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 等待 AI re-review；
 - **下一状态**：用户批准并合并后进入 Done，再单独选择下一个 Ready 任务。
 
 ## 8. 最近交接
@@ -98,13 +99,16 @@ E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEn
 - 当前质量基线：11/11 workspace typecheck、resolved strict、Prettier、ESLint decorator 解析、12 类边界 Gate、20 个负向 fixtures、known-pass 零诊断和 clean-checkout validate；
 - 已实现：NestJS `11.1.28` + Express `5.2.1` 无状态组合根，公开/Admin 独立 audience verifier，严格 Zod 配置与 deploy/capability fingerprint；
 - 已实现：`/health/startup`、`/health/live`、`/health/ready`，BLOCKING/DEGRADED maintenance，统一 request ID、API error envelope、封闭 operation code 与脱敏 `OrdinaryLogV1`；
-- 已实现：关闭前 readiness drain、Nest `SIGINT/SIGTERM` shutdown hooks，以及不含测试文件的确定性生产 build；
-- 已测试：15 项 API/config/进程测试覆盖缺失/未知/错误指纹配置、未知字段、malformed JSON、公开/Admin audience 互斥、维护优先级、依赖不可用、日志脱敏、未知路由和真实 `SIGTERM`；
-- 已验证：`pnpm validate` 全部通过；11/11 workspace strict typecheck、12 类边界 Gate（50 source files）、20 个 known-fail + 1 个 known-pass、API 15 项测试、shared-schemas 34 项测试和 build 全部 PASS；
+- 已实现：Safety continuation 独立 verifier 与 launch/Safety/recovery 白名单，BLOCKING maintenance 只允许有效 Safety continuation 进入白名单且不授予 Admin/普通权限；
+- 已实现：Accepted `LOCAL/CI/DEV/STAGING/PRODUCTION` API 环境子集，STAGING/PRODUCTION expected deploy/capability fingerprint 必填；
+- 已实现：关闭前 readiness drain、停止 intake、可组合 drain hooks、`shutdownGraceMs` 有界期限与固定超时终止结果，以及不含测试文件的确定性生产 build；
+- 已实现：中心化封闭 error catalog、按 code 封闭 details 投影，以及经运行时 Schema 强制的 message/reason/duration 普通日志合同；
+- 已测试：30 项 API/config/进程/合同测试覆盖 Safety × maintenance/audience、环境别名与指纹缺失/漂移、慢 hook deadline、动态 error/details/log code 拒绝、parser 413 → 合同 400、依赖不可用、未知路由和真实 `SIGTERM`；
+- 已验证：`pnpm install --frozen-lockfile` 与 `pnpm validate` 全部通过；11/11 workspace strict typecheck、12 类边界 Gate（54 source files）、20 个 known-fail + 1 个 known-pass、API 30 项测试、shared-schemas 34 项测试和 production build 全部 PASS；
 - 当前任务：E-003 In Review；
 - 当前分支：`agent/e-003-api-baseline`；
 - 当前 PR：[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93)；
 - 未开始：E-004～E-014、业务代码、数据库、队列、容器、workflow 或云资源；
-- 下一动作：审核 [Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93)；获批后标记 ready、合并并执行 E-003 收尾；
+- 下一动作：对 [Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 触发 AI re-review；获批后再标记 ready、合并并执行 E-003 收尾；
 - 接受后的下一任务：候选为 E-004「创建微信原生小程序工程与运行基线」；当前仍保持 Planned，只有 E-003 获批合并并完成收尾后才移动为唯一 Ready；
 - 禁止并行：E-004 及其他下游 Issue。

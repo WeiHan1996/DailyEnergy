@@ -22,11 +22,16 @@ variables are accepted:
 - `DAILYENERGY_CONFIG_SCHEMA_VERSION` (`api-runtime-config-v1`)
 - `DAILYENERGY_CONTRACT_BUNDLE_VERSION` (`api-contract-v1`)
 - `DAILYENERGY_PRODUCT_DATE_POLICY_VERSION` (`product-date-v1`)
-- optional expected deploy/capability fingerprints
+- expected deploy/capability fingerprints (required in `STAGING` and
+  `PRODUCTION`)
 
 Unknown project variables, invalid values, and fingerprint mismatches fail
 before the HTTP listener starts. The application never prints configuration
 values or secrets.
+
+The API accepts only the Accepted environment subset `LOCAL`, `CI`, `DEV`,
+`STAGING`, and `PRODUCTION`. Tests use `CI`; aliases such as `TEST` and
+`DEVELOPMENT` are rejected.
 
 Internal probes:
 
@@ -43,3 +48,13 @@ The E-003 placeholder routes are:
 They validate transport and audience boundaries, then return stable
 `FEATURE_DISABLED` errors. They do not pretend that identity or business
 features have been implemented.
+
+`GET /v1/bootstrap/launch` accepts either the ordinary public audience or an
+independently verified `X-Safety-Continuation`. A valid Safety continuation can
+bypass blocking maintenance only for the Accepted launch/Safety/recovery
+allowlist; it grants no Admin or ordinary route access.
+
+Shutdown is bounded by `DAILYENERGY_SHUTDOWN_GRACE_MS`: readiness changes to
+not-ready before intake closes, registered drain hooks run within the same
+deadline, and expiry terminates with the fixed
+`SHUTDOWN_DEADLINE_EXCEEDED` reason code.

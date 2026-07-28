@@ -1,5 +1,4 @@
 import {
-  HttpStatus,
   Inject,
   Injectable,
   type CanActivate,
@@ -8,16 +7,26 @@ import {
 import type { Request, Response } from "express";
 
 import type { RuntimeConfig } from "../../bootstrap/runtime-config.js";
-import { RUNTIME_CONFIG } from "../../composition/tokens.js";
+import {
+  RUNTIME_CONFIG,
+  SAFETY_CONTINUATION_VERIFIER,
+} from "../../composition/tokens.js";
+import type { SafetyContinuationVerifier } from "../../composition/types.js";
 import { ApiException } from "./api-exception.js";
+import {
+  isSafetyContinuationRoute,
+  safetyContinuationFrom,
+} from "./safety-continuation.js";
 
 @Injectable()
 export class MaintenanceGuard implements CanActivate {
   public constructor(
     @Inject(RUNTIME_CONFIG) private readonly config: RuntimeConfig,
+    @Inject(SAFETY_CONTINUATION_VERIFIER)
+    private readonly safetyVerifier: SafetyContinuationVerifier,
   ) {}
 
-  public canActivate(context: ExecutionContext): boolean {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
     const response = context.switchToHttp().getResponse<Response>();
     if (!request.path.startsWith("/v1")) {
@@ -28,13 +37,14 @@ export class MaintenanceGuard implements CanActivate {
       return true;
     }
     if (this.config.maintenanceMode === "BLOCKING") {
+      if (
+        isSafetyContinuationRoute(request) &&
+        (await this.safetyVerifier.verify(safetyContinuationFrom(request)))
+      ) {
+        return true;
+      }
       throw new ApiException({
-        category: "GUARD",
         code: "MAINTENANCE_BLOCKING",
-        message: "服务正在短暂维护，请稍后再来。",
-        messageKey: "error.maintenance_blocking",
-        retryable: true,
-        status: HttpStatus.FORBIDDEN,
       });
     }
     return true;

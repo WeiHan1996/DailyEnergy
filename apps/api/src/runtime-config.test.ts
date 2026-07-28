@@ -12,7 +12,7 @@ function validEnvironment(): NodeJS.ProcessEnv {
   return {
     DAILYENERGY_CONFIG_SCHEMA_VERSION: API_RUNTIME_CONFIG_SCHEMA_VERSION,
     DAILYENERGY_CONTRACT_BUNDLE_VERSION: API_CONTRACT_BUNDLE_VERSION,
-    DAILYENERGY_ENVIRONMENT: "TEST",
+    DAILYENERGY_ENVIRONMENT: "CI",
     DAILYENERGY_LOG_LEVEL: "DEBUG",
     DAILYENERGY_MAINTENANCE_MODE: "OFF",
     DAILYENERGY_PORT: "0",
@@ -63,9 +63,80 @@ describe("RuntimeConfig", () => {
     );
   });
 
+  it("rejects a capability fingerprint mismatch without exposing values", () => {
+    const environment = {
+      ...validEnvironment(),
+      DAILYENERGY_CAPABILITY_FINGERPRINT_EXPECTED: "0".repeat(64),
+    };
+
+    expect(() => loadRuntimeConfig(environment)).toThrowError(
+      new RuntimeConfigError("CAPABILITY_FINGERPRINT_MISMATCH"),
+    );
+  });
+
+  it.each(["TEST", "DEVELOPMENT"])(
+    "rejects the unaccepted environment alias %s",
+    (environmentName) => {
+      const environment = {
+        ...validEnvironment(),
+        DAILYENERGY_ENVIRONMENT: environmentName,
+      };
+
+      expect(() => loadRuntimeConfig(environment)).toThrowError(
+        new RuntimeConfigError("RUNTIME_CONFIG_INVALID"),
+      );
+    },
+  );
+
+  it.each(["STAGING", "PRODUCTION"])(
+    "requires expected deploy and capability fingerprints in %s",
+    (environmentName) => {
+      const environment = {
+        ...validEnvironment(),
+        DAILYENERGY_ENVIRONMENT: environmentName,
+        DAILYENERGY_LOG_LEVEL: "INFO",
+        DAILYENERGY_PORT: "3000",
+      };
+
+      expect(() => loadRuntimeConfig(environment)).toThrowError(
+        new RuntimeConfigError("RUNTIME_CONFIG_INVALID"),
+      );
+    },
+  );
+
+  it("rejects STAGING when only the expected deploy fingerprint is missing", () => {
+    const environment = {
+      ...validEnvironment(),
+      DAILYENERGY_CAPABILITY_FINGERPRINT_EXPECTED: "0".repeat(64),
+      DAILYENERGY_ENVIRONMENT: "STAGING",
+      DAILYENERGY_LOG_LEVEL: "INFO",
+      DAILYENERGY_PORT: "3000",
+    };
+
+    expect(() => loadRuntimeConfig(environment)).toThrowError(
+      new RuntimeConfigError("RUNTIME_CONFIG_INVALID"),
+    );
+  });
+
+  it("rejects PRODUCTION when only the expected capability fingerprint is missing", () => {
+    const environment = {
+      ...validEnvironment(),
+      DAILYENERGY_DEPLOY_CONFIG_FINGERPRINT_EXPECTED: "0".repeat(64),
+      DAILYENERGY_ENVIRONMENT: "PRODUCTION",
+      DAILYENERGY_LOG_LEVEL: "INFO",
+      DAILYENERGY_PORT: "3000",
+    };
+
+    expect(() => loadRuntimeConfig(environment)).toThrowError(
+      new RuntimeConfigError("RUNTIME_CONFIG_INVALID"),
+    );
+  });
+
   it("forbids debug logging in production", () => {
     const environment = {
       ...validEnvironment(),
+      DAILYENERGY_CAPABILITY_FINGERPRINT_EXPECTED: "0".repeat(64),
+      DAILYENERGY_DEPLOY_CONFIG_FINGERPRINT_EXPECTED: "0".repeat(64),
       DAILYENERGY_ENVIRONMENT: "PRODUCTION",
       DAILYENERGY_PORT: "3000",
     };

@@ -19,6 +19,8 @@ import type {
   OrdinaryLogEvent,
   OrdinaryLogSink,
 } from "./observability/ordinary-logger.js";
+import type { SafetyContinuationVerifier } from "./composition/types.js";
+import { HealthService } from "./transport/public/health.service.js";
 
 function syntheticEnvironment(
   maintenanceMode: MaintenanceMode = "OFF",
@@ -26,7 +28,7 @@ function syntheticEnvironment(
   return {
     DAILYENERGY_CONFIG_SCHEMA_VERSION: API_RUNTIME_CONFIG_SCHEMA_VERSION,
     DAILYENERGY_CONTRACT_BUNDLE_VERSION: API_CONTRACT_BUNDLE_VERSION,
-    DAILYENERGY_ENVIRONMENT: "TEST",
+    DAILYENERGY_ENVIRONMENT: "CI",
     DAILYENERGY_LOG_LEVEL: "DEBUG",
     DAILYENERGY_MAINTENANCE_MODE: maintenanceMode,
     DAILYENERGY_PORT: "0",
@@ -40,6 +42,12 @@ function syntheticEnvironment(
 function exactBearer(token: string): AudienceVerifier {
   return {
     verify: (authorization) => authorization === `Bearer ${token}`,
+  };
+}
+
+function exactSafetyContinuation(token: string): SafetyContinuationVerifier {
+  return {
+    verify: (continuation) => continuation === token,
   };
 }
 
@@ -60,6 +68,7 @@ async function createTestApplication(options?: {
   readonly ordinaryLogSink?: OrdinaryLogSink;
   readonly publicAudienceVerifier?: AudienceVerifier;
   readonly readinessChecks?: readonly ReadinessCheck[];
+  readonly safetyContinuationVerifier?: SafetyContinuationVerifier;
 }): Promise<INestApplication> {
   const silentLogSink: OrdinaryLogSink = {
     write: () => undefined,
@@ -83,6 +92,11 @@ async function createTestApplication(options?: {
       ...(options?.readinessChecks === undefined
         ? {}
         : { readinessChecks: options.readinessChecks }),
+      ...(options?.safetyContinuationVerifier === undefined
+        ? {}
+        : {
+            safetyContinuationVerifier: options.safetyContinuationVerifier,
+          }),
     },
   );
   await application.listen(0, "127.0.0.1");
@@ -125,6 +139,18 @@ describe("API HTTP baseline", () => {
     expect(JSON.stringify(response.body)).not.toMatch(
       /host|url|credential|provider|database/iu,
     );
+  });
+
+  it("reports not-ready after shutdown draining begins", async () => {
+    const application = await createTestApplication();
+    application.get(HealthService).markDraining();
+
+    await request(application.getHttpServer())
+      .get("/health/ready")
+      .expect(503, {
+        reason_code: "REQUIRED_DEPENDENCY_UNAVAILABLE",
+        status: "NOT_READY",
+      });
   });
 
   it("returns a stable error envelope and echoes a safe request id", async () => {
@@ -171,6 +197,22 @@ describe("API HTTP baseline", () => {
     expect(JSON.stringify(response.body)).not.toMatch(
       /syntax|unexpected|express|stack/iu,
     );
+  });
+
+  it("normalizes parser 413 to the Accepted contract 400", async () => {
+    const application = await createTestApplication();
+    const response = await request(application.getHttpServer())
+      .post("/v1/auth/wechat/session")
+      .send({
+        code: "x".repeat(40_000),
+      })
+      .expect(400);
+
+    expect(response.body.error).toMatchObject({
+      category: "VALIDATION",
+      code: "PAYLOAD_TOO_LARGE",
+      retryable: false,
+    });
   });
 
   it("keeps public and Admin audience verifiers non-interchangeable", async () => {
@@ -224,6 +266,64 @@ describe("API HTTP baseline", () => {
       code: "MAINTENANCE_BLOCKING",
       retryable: true,
     });
+  });
+
+  it("keeps an accepted Safety continuation reachable during blocking maintenance", async () => {
+    const application = await createTestApplication({
+      maintenanceMode: "BLOCKING",
+      safetyContinuationVerifier: exactSafetyContinuation("safety-synthetic"),
+    });
+    const server = application.getHttpServer();
+
+    await request(server)
+      .get("/v1/bootstrap/launch")
+      .set("X-Safety-Continuation", "safety-synthetic")
+      .expect(403)
+      .expect((response) => {
+        expect(response.body.error.code).toBe("FEATURE_DISABLED");
+      });
+    await request(server)
+      .get("/v1/bootstrap/launch")
+      .set("X-Safety-Continuation", "invalid-safety")
+      .expect(403)
+      .expect((response) => {
+        expect(response.body.error.code).toBe("MAINTENANCE_BLOCKING");
+      });
+  });
+
+  it("does not let a Safety continuation enter Admin or ordinary routes", async () => {
+    const application = await createTestApplication({
+      maintenanceMode: "BLOCKING",
+      safetyContinuationVerifier: exactSafetyContinuation("safety-synthetic"),
+    });
+    const server = application.getHttpServer();
+
+    await request(server)
+      .get("/v1/admin/ops/overview")
+      .set("X-Safety-Continuation", "safety-synthetic")
+      .expect(403)
+      .expect((response) => {
+        expect(response.body.error.code).toBe("MAINTENANCE_BLOCKING");
+      });
+    await request(server)
+      .post("/v1/auth/wechat/session")
+      .set("X-Safety-Continuation", "safety-synthetic")
+      .send({ code: "synthetic-code" })
+      .expect(403)
+      .expect((response) => {
+        expect(response.body.error.code).toBe("MAINTENANCE_BLOCKING");
+      });
+
+    const ordinaryApplication = await createTestApplication({
+      safetyContinuationVerifier: exactSafetyContinuation("safety-synthetic"),
+    });
+    await request(ordinaryApplication.getHttpServer())
+      .get("/v1/admin/ops/overview")
+      .set("X-Safety-Continuation", "safety-synthetic")
+      .expect(401)
+      .expect((response) => {
+        expect(response.body.error.code).toBe("AUTH_ADMIN_REQUIRED");
+      });
   });
 
   it("normalizes unknown routes without exposing framework details", async () => {
@@ -336,14 +436,61 @@ describe("API process lifecycle", () => {
 
     await waitForOutput(child, output, '"message_code":"API_STARTED"');
     child.kill("SIGTERM");
-    const [, signal] = (await once(child, "exit")) as [
+    const [code, signal] = (await once(child, "exit")) as [
       number | null,
       NodeJS.Signals | null,
     ];
 
-    expect([null, "SIGTERM"]).toContain(signal);
+    expect(code).toBe(0);
+    expect(signal).toBeNull();
     expect(output.value).toContain('"message_code":"API_SHUTDOWN_STARTED"');
     expect(output.value).toContain('"message_code":"API_SHUTDOWN_COMPLETED"');
     expect(output.value).not.toMatch(/authorization|secret|stack/iu);
+  }, 10_000);
+
+  it("terminates with a fixed result when shutdown drain exceeds the grace deadline", async () => {
+    const child = spawn(
+      process.execPath,
+      [resolve("dist-fixtures/test-fixtures/slow-shutdown.js")],
+      {
+        env: {
+          PATH: process.env.PATH,
+          ...syntheticEnvironment(),
+          DAILYENERGY_SHUTDOWN_GRACE_MS: "1000",
+        },
+        stdio: ["ignore", "pipe", "pipe"],
+      },
+    );
+    const output = {
+      value: "",
+    };
+    child.stdout.on("data", (chunk: Buffer) => {
+      output.value += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk: Buffer) => {
+      output.value += chunk.toString("utf8");
+    });
+
+    await waitForOutput(child, output, '"message_code":"API_STARTED"');
+    const startedAt = performance.now();
+    child.kill("SIGTERM");
+    const [code, signal] = (await once(child, "exit")) as [
+      number | null,
+      NodeJS.Signals | null,
+    ];
+    const elapsedMs = performance.now() - startedAt;
+
+    expect(code).toBe(1);
+    expect(signal).toBeNull();
+    expect(elapsedMs).toBeGreaterThanOrEqual(800);
+    expect(elapsedMs).toBeLessThan(3_000);
+    expect(output.value).toContain('"message_code":"API_SHUTDOWN_STARTED"');
+    expect(output.value).toContain('"message_code":"API_SHUTDOWN_TIMED_OUT"');
+    expect(output.value).toContain(
+      '"reason_code":"SHUTDOWN_DEADLINE_EXCEEDED"',
+    );
+    expect(output.value).not.toContain(
+      '"message_code":"API_SHUTDOWN_COMPLETED"',
+    );
   }, 10_000);
 });

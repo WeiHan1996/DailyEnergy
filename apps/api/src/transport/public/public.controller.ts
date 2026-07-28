@@ -1,16 +1,9 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpStatus,
-  Post,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
 import { z } from "zod";
 
 import { ApiException } from "../common/api-exception.js";
 import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
-import { PublicAudienceGuard } from "./public-audience.guard.js";
+import { LaunchAudienceGuard } from "./launch-audience.guard.js";
 
 const WechatSessionRequestSchema = z.strictObject({
   channel: z.string().min(1).max(64).optional(),
@@ -21,12 +14,7 @@ type WechatSessionRequest = z.infer<typeof WechatSessionRequestSchema>;
 
 function featureDisabled(): never {
   throw new ApiException({
-    category: "GUARD",
     code: "FEATURE_DISABLED",
-    message: "该能力尚未开放。",
-    messageKey: "error.feature_disabled",
-    retryable: false,
-    status: HttpStatus.FORBIDDEN,
   });
 }
 
@@ -41,7 +29,7 @@ export class PublicController {
   }
 
   @Get("bootstrap/launch")
-  @UseGuards(PublicAudienceGuard)
+  @UseGuards(LaunchAudienceGuard)
   public getLaunchState(): never {
     return featureDisabled();
   }

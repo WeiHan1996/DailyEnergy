@@ -7,9 +7,13 @@ import {
   RuntimeConfigError,
 } from "./bootstrap/runtime-config.js";
 import { createApiApplication } from "./bootstrap/create-api-application.js";
+import { ShutdownObserver } from "./bootstrap/shutdown-observer.js";
 import { OrdinaryLogger } from "./observability/ordinary-logger.js";
 
-function writeStartupFailure(reasonCode: string): void {
+type StartupFailureReason =
+  RuntimeConfigError["reasonCode"] | "API_STARTUP_FAILED";
+
+function writeStartupFailure(reasonCode: StartupFailureReason): void {
   process.stderr.write(
     `${JSON.stringify({
       contract_version: "ordinary-log-v1",
@@ -39,6 +43,7 @@ async function main(): Promise<void> {
       outcome_code: "SUCCESS",
       reason_code: address === null ? "LISTENER_UNKNOWN" : "LISTENER_READY",
     });
+    application.get(ShutdownObserver).install(application);
   } catch (error) {
     writeStartupFailure(
       error instanceof RuntimeConfigError

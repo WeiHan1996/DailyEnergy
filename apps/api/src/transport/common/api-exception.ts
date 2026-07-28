@@ -1,4 +1,5 @@
-import type { HttpStatus } from "@nestjs/common";
+import { HttpStatus } from "@nestjs/common";
+import { z } from "zod";
 
 export type ApiErrorCategory =
   | "AUTH"
@@ -11,32 +12,145 @@ export type ApiErrorCategory =
   | "TERMINAL"
   | "SAFETY";
 
-export interface ApiExceptionOptions {
+interface ApiErrorDefinition {
   readonly category: ApiErrorCategory;
-  readonly code: string;
-  readonly details?: Readonly<Record<string, unknown>>;
   readonly message: string;
   readonly messageKey: string;
   readonly retryable: boolean;
   readonly status: HttpStatus;
 }
 
+export const API_ERROR_CATALOG = {
+  AUTH_ADMIN_REQUIRED: {
+    category: "AUTH",
+    message: "当前管理会话无权访问此内容。",
+    messageKey: "error.auth_admin_required",
+    retryable: false,
+    status: HttpStatus.UNAUTHORIZED,
+  },
+  AUTH_REQUIRED: {
+    category: "AUTH",
+    message: "请重新登录后继续。",
+    messageKey: "error.auth_required",
+    retryable: false,
+    status: HttpStatus.UNAUTHORIZED,
+  },
+  FEATURE_DISABLED: {
+    category: "GUARD",
+    message: "该能力尚未开放。",
+    messageKey: "error.feature_disabled",
+    retryable: false,
+    status: HttpStatus.FORBIDDEN,
+  },
+  INTERNAL_TERMINAL: {
+    category: "TERMINAL",
+    message: "暂时无法完成请求，请稍后再试。",
+    messageKey: "error.internal_terminal",
+    retryable: false,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+  },
+  MAINTENANCE_BLOCKING: {
+    category: "GUARD",
+    message: "服务正在短暂维护，请稍后再来。",
+    messageKey: "error.maintenance_blocking",
+    retryable: true,
+    status: HttpStatus.FORBIDDEN,
+  },
+  PAYLOAD_TOO_LARGE: {
+    category: "VALIDATION",
+    message: "请求内容过大，请精简后重试。",
+    messageKey: "error.payload_too_large",
+    retryable: false,
+    status: HttpStatus.BAD_REQUEST,
+  },
+  RESOURCE_NOT_FOUND: {
+    category: "NOT_FOUND",
+    message: "没有找到对应内容。",
+    messageKey: "error.resource_not_found",
+    retryable: false,
+    status: HttpStatus.NOT_FOUND,
+  },
+  VALIDATION_FAILED: {
+    category: "VALIDATION",
+    message: "提交内容有误，请检查后重试。",
+    messageKey: "error.validation_failed",
+    retryable: false,
+    status: HttpStatus.BAD_REQUEST,
+  },
+} as const satisfies Readonly<Record<string, ApiErrorDefinition>>;
+
+export type ApiErrorCode = keyof typeof API_ERROR_CATALOG;
+
+const VERSION_TOKEN_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/u;
+const ValidationErrorDetailsSchema = z.strictObject({
+  fields: z
+    .array(
+      z.strictObject({
+        field: z.string().min(1).max(160),
+        reason: z.string().regex(VERSION_TOKEN_PATTERN),
+      }),
+    )
+    .max(32),
+});
+
+export type ValidationErrorDetails = z.infer<
+  typeof ValidationErrorDetailsSchema
+>;
+
+type ApiExceptionOptions = {
+  [Code in ApiErrorCode]: Code extends "VALIDATION_FAILED"
+    ? {
+        readonly code: Code;
+        readonly details?: ValidationErrorDetails;
+      }
+    : {
+        readonly code: Code;
+        readonly details?: never;
+      };
+}[ApiErrorCode];
+
+function isApiErrorCode(value: unknown): value is ApiErrorCode {
+  return (
+    typeof value === "string" &&
+    Object.prototype.hasOwnProperty.call(API_ERROR_CATALOG, value)
+  );
+}
+
+function projectDetails(
+  code: ApiErrorCode,
+  details: unknown,
+): ValidationErrorDetails | undefined {
+  if (code !== "VALIDATION_FAILED" || details === undefined) {
+    return undefined;
+  }
+  const result = ValidationErrorDetailsSchema.safeParse(details);
+  return result.success ? result.data : undefined;
+}
+
 export class ApiException extends Error {
   public readonly category: ApiErrorCategory;
-  public readonly code: string;
-  public readonly details: Readonly<Record<string, unknown>> | undefined;
+  public readonly code: ApiErrorCode;
+  public readonly details: ValidationErrorDetails | undefined;
   public readonly messageKey: string;
   public readonly retryable: boolean;
   public readonly status: HttpStatus;
 
   public constructor(options: ApiExceptionOptions) {
-    super(options.message);
+    const requestedCode = (options as { readonly code?: unknown }).code;
+    const code = isApiErrorCode(requestedCode)
+      ? requestedCode
+      : "INTERNAL_TERMINAL";
+    const definition = API_ERROR_CATALOG[code];
+    super(definition.message);
     this.name = "ApiException";
-    this.category = options.category;
-    this.code = options.code;
-    this.details = options.details;
-    this.messageKey = options.messageKey;
-    this.retryable = options.retryable;
-    this.status = options.status;
+    this.category = definition.category;
+    this.code = code;
+    this.details = projectDetails(
+      code,
+      (options as { readonly details?: unknown }).details,
+    );
+    this.messageKey = definition.messageKey;
+    this.retryable = definition.retryable;
+    this.status = definition.status;
   }
 }

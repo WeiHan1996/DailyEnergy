@@ -10,6 +10,7 @@ import { MaintenanceGuard } from "../transport/common/maintenance.guard.js";
 import { RequestContextStore } from "../transport/common/request-context.js";
 import { HealthController } from "../transport/public/health.controller.js";
 import { HealthService } from "../transport/public/health.service.js";
+import { LaunchAudienceGuard } from "../transport/public/launch-audience.guard.js";
 import { PublicAudienceGuard } from "../transport/public/public-audience.guard.js";
 import { PublicController } from "../transport/public/public.controller.js";
 import {
@@ -19,8 +20,13 @@ import {
   PUBLIC_AUDIENCE_VERIFIER,
   READINESS_CHECKS,
   RUNTIME_CONFIG,
+  SAFETY_CONTINUATION_VERIFIER,
+  SHUTDOWN_DRAIN_HOOKS,
 } from "./tokens.js";
-import { DENY_ALL_AUDIENCE_VERIFIER } from "./types.js";
+import {
+  DENY_ALL_AUDIENCE_VERIFIER,
+  DENY_ALL_SAFETY_CONTINUATION_VERIFIER,
+} from "./types.js";
 import { STANDARD_OUTPUT_LOG_SINK } from "../observability/ordinary-logger.js";
 
 @Module({})
@@ -44,8 +50,18 @@ export class ApiModule {
           DENY_ALL_AUDIENCE_VERIFIER,
       },
       {
+        provide: SAFETY_CONTINUATION_VERIFIER,
+        useValue:
+          composition.overrides?.safetyContinuationVerifier ??
+          DENY_ALL_SAFETY_CONTINUATION_VERIFIER,
+      },
+      {
         provide: READINESS_CHECKS,
         useValue: composition.overrides?.readinessChecks ?? [],
+      },
+      {
+        provide: SHUTDOWN_DRAIN_HOOKS,
+        useValue: composition.overrides?.shutdownDrainHooks ?? [],
       },
       {
         provide: ORDINARY_LOG_SINK,
@@ -56,6 +72,7 @@ export class ApiModule {
       ApiExceptionFilter,
       HealthService,
       HttpLoggingInterceptor,
+      LaunchAudienceGuard,
       MaintenanceGuard,
       OrdinaryLogger,
       PublicAudienceGuard,

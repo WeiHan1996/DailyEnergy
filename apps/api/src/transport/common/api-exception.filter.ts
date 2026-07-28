@@ -11,22 +11,18 @@ import {
 import type { Response } from "express";
 
 import { OrdinaryLogger } from "../../observability/ordinary-logger.js";
-import { ApiException } from "./api-exception.js";
+import {
+  ApiException,
+  type ApiErrorCategory,
+  type ApiErrorCode,
+  type ValidationErrorDetails,
+} from "./api-exception.js";
 import { RequestContextStore } from "./request-context.js";
 
 interface NormalizedApiError {
-  readonly category:
-    | "AUTH"
-    | "GUARD"
-    | "VALIDATION"
-    | "CONFLICT"
-    | "NOT_FOUND"
-    | "RATE_LIMIT"
-    | "TRANSIENT"
-    | "TERMINAL"
-    | "SAFETY";
-  readonly code: string;
-  readonly details?: Readonly<Record<string, unknown>>;
+  readonly category: ApiErrorCategory;
+  readonly code: ApiErrorCode;
+  readonly details?: ValidationErrorDetails;
   readonly message: string;
   readonly messageKey: string;
   readonly retryable: boolean;
@@ -48,87 +44,51 @@ function parserStatus(exception: unknown): number | undefined {
 }
 
 function normalizeException(exception: unknown): NormalizedApiError {
+  let normalized: ApiException;
   if (exception instanceof ApiException) {
-    return {
-      category: exception.category,
-      code: exception.code,
-      ...(exception.details === undefined
-        ? {}
-        : { details: exception.details }),
-      message: exception.message,
-      messageKey: exception.messageKey,
-      retryable: exception.retryable,
-      status: exception.status,
-    };
-  }
-  if (
+    normalized = exception;
+  } else if (
     exception instanceof PayloadTooLargeException ||
     parserStatus(exception) === HttpStatus.PAYLOAD_TOO_LARGE ||
     (exception instanceof HttpException &&
       exception.getStatus() === HttpStatus.PAYLOAD_TOO_LARGE)
   ) {
-    return {
-      category: "VALIDATION",
+    normalized = new ApiException({
       code: "PAYLOAD_TOO_LARGE",
-      message: "请求内容过大，请精简后重试。",
-      messageKey: "error.payload_too_large",
-      retryable: false,
-      status: HttpStatus.BAD_REQUEST,
-    };
-  }
-  if (
+    });
+  } else if (
     exception instanceof BadRequestException ||
     parserStatus(exception) === HttpStatus.BAD_REQUEST ||
     parserStatus(exception) === HttpStatus.UNSUPPORTED_MEDIA_TYPE ||
     (exception instanceof HttpException &&
       exception.getStatus() === HttpStatus.BAD_REQUEST)
   ) {
-    return {
-      category: "VALIDATION",
+    normalized = new ApiException({
       code: "VALIDATION_FAILED",
-      message: "提交内容有误，请检查后重试。",
-      messageKey: "error.validation_failed",
-      retryable: false,
-      status: HttpStatus.BAD_REQUEST,
-    };
-  }
-  if (
+    });
+  } else if (
     exception instanceof HttpException &&
     exception.getStatus() === HttpStatus.NOT_FOUND
   ) {
-    return {
-      category: "NOT_FOUND",
+    normalized = new ApiException({
       code: "RESOURCE_NOT_FOUND",
-      message: "没有找到对应内容。",
-      messageKey: "error.resource_not_found",
-      retryable: false,
-      status: HttpStatus.NOT_FOUND,
-    };
+    });
+  } else {
+    normalized = new ApiException({
+      code: "INTERNAL_TERMINAL",
+    });
   }
   return {
-    category: "TERMINAL",
-    code: "INTERNAL_TERMINAL",
-    message: "暂时无法完成请求，请稍后再试。",
-    messageKey: "error.internal_terminal",
-    retryable: false,
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    category: normalized.category,
+    code: normalized.code,
+    ...(normalized.details === undefined
+      ? {}
+      : { details: normalized.details }),
+    message: normalized.message,
+    messageKey: normalized.messageKey,
+    retryable: normalized.retryable,
+    status: normalized.status,
   };
-}
-
-function durationBucket(durationMs: number): string {
-  if (durationMs < 10) {
-    return "LT_10";
-  }
-  if (durationMs < 50) {
-    return "LT_50";
-  }
-  if (durationMs < 250) {
-    return "LT_250";
-  }
-  if (durationMs < 1_000) {
-    return "LT_1000";
-  }
-  return "GTE_1000";
 }
 
 @Catch()
@@ -166,7 +126,9 @@ export class ApiExceptionFilter implements ExceptionFilter {
     });
 
     this.logger.write(normalized.status >= 500 ? "ERROR" : "INFO", {
-      duration_ms_bucket: durationBucket(performance.now() - context.startedAt),
+      duration_ms_bucket: this.logger.durationBucket(
+        performance.now() - context.startedAt,
+      ),
       message_code: "HTTP_REQUEST_COMPLETED",
       operation_code: context.operationCode,
       outcome_code: normalized.retryable

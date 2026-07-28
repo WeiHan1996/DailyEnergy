@@ -36,8 +36,8 @@ const RuntimeConfigInputSchema = z
       .optional(),
     DAILYENERGY_ENVIRONMENT: z.enum([
       "LOCAL",
-      "TEST",
-      "DEVELOPMENT",
+      "CI",
+      "DEV",
       "STAGING",
       "PRODUCTION",
     ]),
@@ -59,11 +59,11 @@ const RuntimeConfigInputSchema = z
   .superRefine((value, context) => {
     if (
       value.DAILYENERGY_PORT === 0 &&
-      value.DAILYENERGY_ENVIRONMENT !== "TEST"
+      value.DAILYENERGY_ENVIRONMENT !== "CI"
     ) {
       context.addIssue({
         code: "custom",
-        message: "port zero is allowed only in TEST",
+        message: "port zero is allowed only in CI",
         path: ["DAILYENERGY_PORT"],
       });
     }
@@ -85,6 +85,27 @@ const RuntimeConfigInputSchema = z
         code: "custom",
         message: "debug logging is forbidden in production",
         path: ["DAILYENERGY_LOG_LEVEL"],
+      });
+    }
+    if (
+      ["STAGING", "PRODUCTION"].includes(value.DAILYENERGY_ENVIRONMENT) &&
+      value.DAILYENERGY_DEPLOY_CONFIG_FINGERPRINT_EXPECTED === undefined
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "release environments require an expected deploy fingerprint",
+        path: ["DAILYENERGY_DEPLOY_CONFIG_FINGERPRINT_EXPECTED"],
+      });
+    }
+    if (
+      ["STAGING", "PRODUCTION"].includes(value.DAILYENERGY_ENVIRONMENT) &&
+      value.DAILYENERGY_CAPABILITY_FINGERPRINT_EXPECTED === undefined
+    ) {
+      context.addIssue({
+        code: "custom",
+        message:
+          "release environments require an expected capability fingerprint",
+        path: ["DAILYENERGY_CAPABILITY_FINGERPRINT_EXPECTED"],
       });
     }
   });

@@ -38,7 +38,6 @@ export async function createApiApplication(
   application.useGlobalGuards(application.get(MaintenanceGuard));
   application.useGlobalFilters(application.get(ApiExceptionFilter));
   application.useGlobalInterceptors(application.get(HttpLoggingInterceptor));
-  application.enableShutdownHooks(["SIGINT", "SIGTERM"]);
   await application.init();
   application.get(HealthService).markStarted();
   return application;
