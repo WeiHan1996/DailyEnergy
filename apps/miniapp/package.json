@@ -1,0 +1,9 @@
+{
+  "name": "@daily-energy/app-miniapp",
+  "version": "0.1.0",
+  "private": true,
+  "dailyEnergy": {
+    "kind": "app",
+    "runtime": "client-safe"
+  }
+}

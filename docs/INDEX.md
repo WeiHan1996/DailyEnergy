@@ -2,7 +2,7 @@
 
 - **文档状态**：Active
 - **最后更新**：2026-07-27
-- **当前阶段**：Phase 0B — 开发前详细规格
+- **当前阶段**：Phase 1 — 工程基础
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
 
@@ -235,7 +235,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 结束，E-001 是 Phase 1 唯一 Ready。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 结束，E-001 是 Phase 1 唯一 In Review。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
@@ -249,4 +249,4 @@ S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-0
 10. [shared-schemas](../packages/shared-schemas/README.md) 及现有 fixtures；
 11. tasks/backlog.md（仅在需要重排优先级时）。
 
-E-001 只初始化 pnpm/Turborepo workspace、目标目录和统一脚本；不初始化 Nest/Next/小程序/数据库/队列业务。E-002 及其他 46 个下游工程 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。等待用户明确开始 E-001 后才创建工程分支和 Draft PR。
+E-001 只初始化 pnpm/Turborepo workspace、目标目录和统一脚本；未初始化 Nest/Next/小程序/数据库/队列业务。实现与 clean-checkout 验证已完成，正在 [Draft PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 审核。E-002 及其他 46 个下游工程 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。

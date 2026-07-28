@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：Phase 0B Gate 已通过；S-35 已完成
+状态：E-001 实现与验证完成，进入 In Review
 当前目标：初始化可重复的 pnpm/Turborepo TypeScript Monorepo
-当前任务：E-001 初始化 TypeScript Monorepo（Ready）
+当前任务：E-001 初始化 TypeScript Monorepo（In Review）
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/39
 ```
 
@@ -356,7 +356,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 1. [ROADMAP.md](./ROADMAP.md)：长期阶段、交付物和退出门槛；
 2. [docs/INDEX.md](./docs/INDEX.md)：文档依赖、状态和读取顺序；
-3. [tasks/current.md](./tasks/current.md)：唯一 Ready 或 In Progress 的任务；
+3. [tasks/current.md](./tasks/current.md)：唯一当前任务及交接；
 4. [tasks/backlog.md](./tasks/backlog.md)：有序候选任务；
 5. [AGENTS.md](./AGENTS.md)：AI 与开发协作规则。
 
@@ -368,7 +368,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 - 不初始化 Nest/Next/小程序/数据库/队列业务；
 - E-002 及其他下游工程 Issue 继续保持 Planned，不并行启动。
 
-[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted，S-35 已完成，E-001 是唯一 Ready。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。等待用户明确开始 E-001 后再创建工程分支，不在本次状态迁移中编写代码。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted，S-35 已完成。E-001 已在独立分支完成 workspace 骨架和 clean-checkout 验证，正在 [Draft PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 审核；E-002 仍为 Planned。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
 
 ---
 

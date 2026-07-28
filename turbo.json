@@ -1,0 +1,61 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalDependencies": [
+    ".node-version",
+    ".nvmrc",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/.env*",
+        "!**/*.local",
+        "!**/coverage/**"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "format:check": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/.env*",
+        "!**/*.local",
+        "!**/coverage/**"
+      ],
+      "outputs": []
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/.env*",
+        "!**/*.local",
+        "!**/coverage/**"
+      ],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/.env*",
+        "!**/*.local",
+        "!**/coverage/**"
+      ],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/.env*",
+        "!**/*.local",
+        "!**/coverage/**"
+      ],
+      "outputs": []
+    }
+  }
+}

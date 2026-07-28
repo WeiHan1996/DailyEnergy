@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "description": "Executable DailyEnergy runtime contracts and inferred TypeScript types.",
+  "dailyEnergy": {
+    "kind": "package",
+    "runtime": "client-safe"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -25,14 +29,14 @@
     "typecheck": "tsc -p tsconfig.check.json",
     "test": "vitest run",
     "format:check": "prettier --check .",
-    "validate": "npm run format:check && npm run typecheck && npm test && npm run build"
+    "validate": "pnpm run format:check && pnpm run typecheck && pnpm run test && pnpm run build"
   },
   "dependencies": {
-    "zod": "^4.4.3"
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "prettier": "^3.9.5",
-    "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
