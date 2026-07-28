@@ -346,10 +346,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-001 已完成；E-002 进入 In Review
-当前目标：建立 TypeScript、Lint 与依赖边界基线
-当前任务：E-002 代码质量基线（In Review）
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/41
+状态：E-001、E-002 已完成；E-003 为唯一 Ready
+当前目标：创建 NestJS API 组合根与运行基线
+当前任务：E-003 NestJS API 骨架（Ready）
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/40
 ```
 
 长期工作入口：
@@ -362,13 +362,13 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 读取 [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)、ADR-0006、repository-structure、testing 和现有 workspace 配置；
-- 建立统一 TypeScript strict、ESLint flat config、Prettier 和依赖边界 Gate；
-- 为静态边界提供正负验证，保证全仓 format/lint/typecheck 可重复执行；
-- 不创建 Nest/Next/小程序业务骨架，不引入数据库、队列或业务逻辑；
-- E-003 及其他下游工程 Issue 继续保持 Planned，不并行启动。
+- 读取 [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)、API/error-codes、architecture、repository-structure、deployment、observability 和 testing；
+- 创建无状态 NestJS 11 + Express 5 API 薄入口，固定公开/Admin transport、配置、错误、健康检查和 graceful shutdown；
+- 只注册占位 handler，不实现业务 API、真实 SSO、provider、数据库或队列；
+- 保持 E-002 的 format、lint、typecheck 和静态边界 Gate 全部通过；
+- E-004～E-014 及其他下游工程 Issue 继续保持 Planned，不并行启动。
 
-[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done；E-002 已完成实现与隔离验证，正在 [Draft PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 审核。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done；E-003 现在是唯一 Ready，尚未创建实现分支或 Draft PR。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
 
 ---
 
