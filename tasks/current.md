@@ -5,19 +5,19 @@
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务 ID**：E-003
 - **当前任务名称**：创建 NestJS API 组合根与运行基线
-- **任务状态**：Ready
+- **任务状态**：In Review
 - **优先级**：最高
-- **当前分支**：尚未创建
+- **当前分支**：`agent/e-003-api-baseline`
 - **上游 PR**：[E-002 PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91)
 - **当前 Issue**：[E-003 Issue #40](https://github.com/WeiHan1996/DailyEnergy/issues/40)
-- **当前 PR**：无
+- **当前 PR**：待创建
 - **Gate 结论**：`GO`
 
 ## 1. 当前目标
 
 创建无状态 NestJS 11 + Express 5 API 薄入口，固定公开/Admin transport、配置、错误、健康检查和优雅关闭合同，为后续确定性业务闭环提供稳定的服务端组合根。
 
-E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) squash 合并，Issue #41 已自动关闭为 completed。E-003 现在是 Phase 1 唯一 Ready；尚未创建实现分支、提交代码或 Draft PR。
+E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) squash 合并，Issue #41 已自动关闭为 completed。用户已于 2026-07-28 明确开始 E-003；`agent/e-003-api-baseline` 已完成实现与全仓验证，正在创建 Draft PR。
 
 ## 2. 上游完成状态
 
@@ -81,8 +81,11 @@ E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEn
 - **依赖修正**：Issue #40 原正文将 E-008 列为前置，与 Accepted 执行顺序、Backlog 和“E-003 为 E-002 后下一任务”的交接冲突；本次用户明确要求 E-003 成为唯一 Ready，故修正为 E-001、E-002；
 - **外部上线 Gate**：仍存在，但不阻塞 E-003；
 - **Source-ID registry**：正式 registry 属于 E-010；E-003 PR 必须准确记录本任务实际证据，不得提前宣称下游能力完整覆盖；
-- **当前等待**：用户明确开始 E-003；
-- **下一状态**：开始后进入 In Progress 并创建 `agent/e-003-api-baseline` 分支及 Draft PR。
+- **Source-ID 证据**：`S29-ARCH-041`、`S30-REPO-025/048`、`S32-DEPLOY-002/006`、`S33-OBS-001/005/006/024`、`S31-TEST-035` 及对应 S-20 maintenance/validation/error/Admin 场景已有机器测试或静态 Gate；`S30-REPO-032`、`S32-DEPLOY-012`、`S33-OBS-017` 仅为 partial/manual，完整 DB role/image/metrics 证据仍由下游任务完成；
+- **registry 处理**：沿用 E-001/E-002 已批准的 `NA_WITH_REASON`；E-010 前不存在可更新的正式 registry，本任务在交接和 PR 中记录实际证据等级，不提前创建 E-010 资产；
+- **依赖审计**：npm 官方 audit 报告的 1 个 high 位于既有 ESLint → glob → brace-expansion 开发工具链，不在 API 运行时依赖图；不在 E-003 混入无关工具链升级；
+- **当前等待**：Draft PR 创建后等待用户审核；
+- **下一状态**：用户批准并合并后进入 Done，再单独选择下一个 Ready 任务。
 
 ## 8. 最近交接
 
@@ -93,7 +96,14 @@ E-002 已通过三轮审核并随 [PR #91](https://github.com/WeiHan1996/DailyEn
 - E-001 Issue #39、E-002 Issue #41 均已关闭为 completed；
 - 当前工具链基线：Node `24.18.0`、pnpm `11.17.0`、Turbo `2.10.7`、TypeScript `7.0.2`、ESLint `10.8.0`、Prettier `3.9.6`、Zod `4.4.3`、Vitest `4.1.10`；
 - 当前质量基线：11/11 workspace typecheck、resolved strict、Prettier、ESLint decorator 解析、12 类边界 Gate、20 个负向 fixtures、known-pass 零诊断和 clean-checkout validate；
-- 当前任务：E-003 Ready；
-- 未开始：E-003 实现、E-004～E-014、业务代码、数据库、队列、容器、workflow 或云资源；
-- 下一动作：用户明确开始 E-003 后，创建实现分支并交付聚焦 Draft PR；
+- 已实现：NestJS `11.1.28` + Express `5.2.1` 无状态组合根，公开/Admin 独立 audience verifier，严格 Zod 配置与 deploy/capability fingerprint；
+- 已实现：`/health/startup`、`/health/live`、`/health/ready`，BLOCKING/DEGRADED maintenance，统一 request ID、API error envelope、封闭 operation code 与脱敏 `OrdinaryLogV1`；
+- 已实现：关闭前 readiness drain、Nest `SIGINT/SIGTERM` shutdown hooks，以及不含测试文件的确定性生产 build；
+- 已测试：15 项 API/config/进程测试覆盖缺失/未知/错误指纹配置、未知字段、malformed JSON、公开/Admin audience 互斥、维护优先级、依赖不可用、日志脱敏、未知路由和真实 `SIGTERM`；
+- 已验证：`pnpm validate` 全部通过；11/11 workspace strict typecheck、12 类边界 Gate（50 source files）、20 个 known-fail + 1 个 known-pass、API 15 项测试、shared-schemas 34 项测试和 build 全部 PASS；
+- 当前任务：E-003 In Review；
+- 当前分支：`agent/e-003-api-baseline`；
+- 未开始：E-004～E-014、业务代码、数据库、队列、容器、workflow 或云资源；
+- 下一动作：提交、推送并创建聚焦 Draft PR，补回 PR URL 后等待用户审核；
+- 接受后的下一任务：候选为 E-004「创建微信原生小程序工程与运行基线」；当前仍保持 Planned，只有 E-003 获批合并并完成收尾后才移动为唯一 Ready；
 - 禁止并行：E-004 及其他下游 Issue。

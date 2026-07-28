@@ -1,6 +1,8 @@
 {
   "extends": "@daily-energy/typescript-config/node.json",
   "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "outDir": "dist",
     "rootDir": "src"
   },

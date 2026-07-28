@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-001、E-002 已完成；E-003 为唯一 Ready
+状态：E-001、E-002 已完成；E-003 正在 Draft PR 前最终收尾
 当前目标：创建 NestJS API 组合根与运行基线
-当前任务：E-003 NestJS API 骨架（Ready）
+当前任务：E-003 NestJS API 骨架（In Review）
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/40
 ```
 
@@ -363,12 +363,12 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 当前任务范围：
 
 - 读取 [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)、API/error-codes、architecture、repository-structure、deployment、observability 和 testing；
-- 创建无状态 NestJS 11 + Express 5 API 薄入口，固定公开/Admin transport、配置、错误、健康检查和 graceful shutdown；
-- 只注册占位 handler，不实现业务 API、真实 SSO、provider、数据库或队列；
-- 保持 E-002 的 format、lint、typecheck 和静态边界 Gate 全部通过；
+- 已创建无状态 NestJS 11 + Express 5 API 薄入口，固定公开/Admin transport、配置、错误、健康检查和 graceful shutdown；
+- 只注册返回稳定 `FEATURE_DISABLED` 的占位 handler，未实现业务 API、真实 SSO、provider、数据库或队列；
+- 15 项 API/config/进程测试与 34 项 shared-schemas 回归测试通过，全仓 format、lint、typecheck、architecture、test、build Gate 全部通过；
 - E-004～E-014 及其他下游工程 Issue 继续保持 Planned，不并行启动。
 
-[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done；E-003 现在是唯一 Ready，尚未创建实现分支或 Draft PR。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done；E-003 已在 `agent/e-003-api-baseline` 完成实现与全仓验证，正在创建聚焦 Draft PR。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
 
 ---
 
