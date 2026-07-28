@@ -60,6 +60,85 @@ export type {
   WriteWindow,
 } from "./common.js";
 
-export * from "./daily-content.js";
-export * from "./evening-feedback.js";
-export * from "./weekly-summary.js";
+export {
+  ClientDailyContentViewSchema,
+  DailyInteractionStateSchema,
+  ExpressionPayloadSchema,
+  GenerationInputSnapshotSchema,
+  OverallLabelTokenSchema,
+  OverallLabelTokenValues,
+  PublishedDailyResultSchema,
+  RitualFactSchema,
+  RuleFactsSchema,
+} from "./daily-content.js";
+export type {
+  ClientDailyContentView,
+  DailyInteractionState,
+  ExpressionPayload,
+  GenerationInputSnapshot,
+  OverallLabelToken,
+  PublishedDailyResult,
+  RitualFact,
+  RuleFacts,
+} from "./daily-content.js";
+
+export {
+  ClientEveningFeedbackViewSchema,
+  DailyHelpfulnessRecordSchema,
+  DailyTaskStateSchema,
+  EveningFeedbackAvailabilitySchema,
+  EveningFeedbackAvailabilityValues,
+  EveningFeedbackDraftSchema,
+  EveningFeedbackRecordSchema,
+  EveningFeedbackRevisionSchema,
+  EveningPrimaryActionSchema,
+  EveningPrimaryActionValues,
+  EveningReflectionSubmissionSchema,
+  NotePatchSchema,
+} from "./evening-feedback.js";
+export type {
+  ClientEveningFeedbackView,
+  DailyHelpfulnessRecord,
+  DailyTaskState,
+  EveningFeedbackAvailability,
+  EveningFeedbackDraft,
+  EveningFeedbackRecord,
+  EveningFeedbackRevision,
+  EveningPrimaryAction,
+  EveningReflectionSubmission,
+  NotePatch,
+} from "./evening-feedback.js";
+
+export {
+  ClientWeeklySummaryViewSchema,
+  CoverageLevelSchema,
+  CoverageLevelValues,
+  NextObservationPlanSchema,
+  NextObservationPlanValues,
+  PublishedWeeklySummarySchema,
+  StateMetricFactsSchema,
+  SummaryStatusSchema,
+  SummaryStatusValues,
+  WeeklyAggregateFactsSchema,
+  WeeklyDirectionSchema,
+  WeeklyDirectionValues,
+  WeeklyExpressionPayloadSchema,
+  WeeklyExpressionPlanSchema,
+  WeeklyMetricIdSchema,
+  WeeklyMetricIdValues,
+  WeeklySourceSnapshotSchema,
+} from "./weekly-summary.js";
+export type {
+  ClientWeeklySummaryView,
+  CoverageLevel,
+  NextObservationPlan,
+  PublishedWeeklySummary,
+  StateMetricFacts,
+  SummaryStatus,
+  WeeklyAggregateFacts,
+  WeeklyDirection,
+  WeeklyExpressionPayload,
+  WeeklyExpressionPlan,
+  WeeklyMetricId,
+  WeeklySourceSnapshot,
+} from "./weekly-summary.js";

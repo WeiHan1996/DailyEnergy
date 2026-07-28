@@ -7,5 +7,8 @@
   "dailyEnergy": {
     "kind": "package",
     "runtime": "server-asset"
+  },
+  "devDependencies": {
+    "@daily-energy/typescript-config": "workspace:*"
   }
 }

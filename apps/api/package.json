@@ -6,5 +6,8 @@
   "dailyEnergy": {
     "kind": "app",
     "runtime": "server-adapter"
+  },
+  "devDependencies": {
+    "@daily-energy/typescript-config": "workspace:*"
   }
 }

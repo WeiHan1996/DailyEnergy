@@ -1,0 +1,5 @@
+{
+  "extends": "@daily-energy/typescript-config/miniapp.json",
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}

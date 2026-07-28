@@ -5,9 +5,9 @@
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务 ID**：E-002
 - **当前任务名称**：建立 TypeScript、Lint 与依赖边界基线
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **优先级**：最高
-- **当前分支**：无
+- **当前分支**：`agent/e-002-code-quality`
 - **上游 PR**：[E-001 PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89)
 - **当前 Issue**：[E-002 Issue #41](https://github.com/WeiHan1996/DailyEnergy/issues/41)
 - **当前 PR**：无
@@ -17,7 +17,7 @@
 
 把 strict TypeScript、格式化、静态依赖区和 package exports 固化为机器可执行 Gate，为后续 NestJS、微信小程序、Next.js、数据库和 Worker 工程提供统一且不可绕过的代码质量基线。
 
-E-001 已通过审核并随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并，Issue #39 已关闭。E-002 现在是唯一 Ready；尚未创建实现分支、提交代码或 Draft PR。
+E-001 已通过审核并随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并，Issue #39 已关闭。E-002 现在是唯一 In Progress，已从最新 `main` 创建独立实现分支；尚未创建 Draft PR。
 
 ## 2. 上游完成状态
 
@@ -75,8 +75,9 @@ E-001 已通过审核并随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/p
 - **仓库/代码阻塞**：无；
 - **外部上线 Gate**：仍存在，但不阻塞 E-002；
 - **Source-ID registry**：正式 registry 属于 E-010。E-002 必须在 PR 中按 `MACHINE_ENFORCED`、`PARTIAL / MANUAL_EVIDENCE`、`DEFERRED` 或经批准的 `NA_WITH_REASON` 准确记录证据，不得静默宣称完整覆盖；
-- **当前等待**：用户明确开始 E-002；
-- **唯一允许的下一状态**：收到明确开工指令后进入 In Progress，并从最新 `main` 创建独立分支和 Draft PR。
+- **TypeScript ESLint parser**：`typescript-eslint@8.65.0` 尚未声明 TypeScript 7 兼容；E-002 不采用未受支持组合，使用 ESLint 10 flat config 配合独立于 TypeScript compiler 版本的 TypeScript 语法解析，并由真实 lint/typecheck 双 Gate 验证；
+- **当前等待**：无；
+- **下一状态**：实现与验证完成后进入 In Review，并创建聚焦 Draft PR。
 
 ## 8. 最近交接
 
@@ -86,6 +87,7 @@ E-001 已通过审核并随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/p
 - 当前工具链基线：Node `24.18.0`、pnpm `11.17.0`、Turbo `2.10.7`、TypeScript `7.0.2`、Zod `4.4.3`、Vitest `4.1.10`、Prettier `3.9.6`；
 - 当前 Workspace Gate 已覆盖实际 workspace 枚举、唯一 lockfile、exact toolchain、显式 exports、workspace protocol、循环、app→app、deep import 和基础 client allowlist；
 - E-002 需要把现有临时/局部 Gate 升级为统一 TypeScript、ESLint、Prettier 和依赖边界基线；
-- 未开始：E-002 实现、E-003、业务代码、workflow、migration、容器或云资源；
-- 下一动作：用户明确回复“开始 E-002”后，从最新 `main` 创建 E-002 实现分支；
+- 已开始：从最新 `main` 创建 `agent/e-002-code-quality` 分支，开始共享配置与静态边界 Gate；
+- 未开始：E-003、业务代码、workflow、migration、容器或云资源；
+- 下一动作：实现并验证 TypeScript、ESLint、Prettier、dependency graph 和 12 类静态边界 fixtures；
 - 禁止并行：E-003 及其他下游 Issue。

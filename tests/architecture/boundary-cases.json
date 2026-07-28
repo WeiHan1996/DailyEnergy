@@ -1,0 +1,302 @@
+{
+  "fixture_version": "e-002-boundary-v1",
+  "cases": [
+    {
+      "case_id": "workspace-root-runtime-export",
+      "gate": "workspace",
+      "expected_rule_id": "BOUNDARY_WORKSPACE_ROOT_EXPORT",
+      "project": {
+        "rootManifest": {
+          "name": "fixture-root",
+          "private": true,
+          "exports": {
+            ".": "./src/index.js"
+          },
+          "dailyEnergy": {
+            "kind": "root",
+            "runtime": "tooling"
+          }
+        }
+      }
+    },
+    {
+      "case_id": "manifest-client-to-server",
+      "gate": "manifest",
+      "expected_rule_id": "BOUNDARY_MANIFEST_RUNTIME_ZONE",
+      "project": {
+        "workspaces": [
+          {
+            "directory": "packages/client",
+            "manifest": {
+              "name": "@daily-energy/client",
+              "private": true,
+              "dependencies": {
+                "@daily-energy/core": "workspace:*"
+              },
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "client-safe"
+              }
+            }
+          },
+          {
+            "directory": "packages/core",
+            "manifest": {
+              "name": "@daily-energy/core",
+              "private": true,
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "server-core"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "manifest-ts-path-alias",
+      "gate": "manifest",
+      "expected_rule_id": "BOUNDARY_MANIFEST_PATH_ALIAS",
+      "project": {
+        "workspaces": [
+          {
+            "directory": "packages/core",
+            "manifest": {
+              "name": "@daily-energy/core",
+              "private": true,
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "server-core"
+              }
+            },
+            "tsconfig": {
+              "compilerOptions": {
+                "paths": {
+                  "@daily-energy/adapter/*": ["../adapter/src/*"]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "manifest-strict-override",
+      "gate": "manifest",
+      "expected_rule_id": "BOUNDARY_MANIFEST_STRICT_OVERRIDE",
+      "project": {
+        "workspaces": [
+          {
+            "directory": "packages/core",
+            "manifest": {
+              "name": "@daily-energy/core",
+              "private": true,
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "server-core"
+              }
+            },
+            "tsconfig": {
+              "compilerOptions": {
+                "strict": false
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "exports-wildcard",
+      "gate": "exports",
+      "expected_rule_id": "BOUNDARY_EXPORTS_WILDCARD",
+      "project": {
+        "workspaces": [
+          {
+            "directory": "packages/core",
+            "manifest": {
+              "name": "@daily-energy/core",
+              "private": true,
+              "exports": {
+                "./*": "./src/*.js"
+              },
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "server-core"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "exports-deep-import",
+      "gate": "exports",
+      "expected_rule_id": "BOUNDARY_EXPORTS_SUBPATH",
+      "project": {
+        "workspaces": [
+          {
+            "directory": "packages/core",
+            "manifest": {
+              "name": "@daily-energy/core",
+              "private": true,
+              "exports": {
+                ".": "./dist/index.js"
+              },
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "server-core"
+              }
+            }
+          }
+        ],
+        "files": [
+          {
+            "path": "apps/api/src/unsafe.ts",
+            "content": "import \"@daily-energy/core/src/internal/secret.js\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "module-cycle",
+      "gate": "module-graph",
+      "expected_rule_id": "BOUNDARY_MODULE_CYCLE",
+      "project": {
+        "workspaces": [
+          {
+            "directory": "packages/a",
+            "manifest": {
+              "name": "@daily-energy/a",
+              "private": true,
+              "dependencies": {
+                "@daily-energy/b": "workspace:*"
+              },
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "server-core"
+              }
+            }
+          },
+          {
+            "directory": "packages/b",
+            "manifest": {
+              "name": "@daily-energy/b",
+              "private": true,
+              "dependencies": {
+                "@daily-energy/a": "workspace:*"
+              },
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "server-core"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "client-node-import",
+      "gate": "client",
+      "expected_rule_id": "BOUNDARY_CLIENT_SERVER_IMPORT",
+      "project": {
+        "files": [
+          {
+            "path": "apps/miniapp/src/unsafe.ts",
+            "content": "import \"node:crypto\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "api-ai-capability",
+      "gate": "capability",
+      "expected_rule_id": "BOUNDARY_CAPABILITY_API",
+      "project": {
+        "files": [
+          {
+            "path": "apps/api/src/composition/unsafe.ts",
+            "content": "import \"@daily-energy/server-adapters/ai\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "provider-outside-ai-adapter",
+      "gate": "provider",
+      "expected_rule_id": "BOUNDARY_PROVIDER_LOCATION",
+      "project": {
+        "files": [
+          {
+            "path": "apps/api/src/provider.ts",
+            "content": "import OpenAI from \"openai\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "restricted-from-background",
+      "gate": "restricted",
+      "expected_rule_id": "BOUNDARY_RESTRICTED_LOCATION",
+      "project": {
+        "files": [
+          {
+            "path": "apps/worker/src/entrypoints/background.ts",
+            "content": "import \"@daily-energy/server-adapters/worker-restricted\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "runtime-imports-root-contract",
+      "gate": "contract",
+      "expected_rule_id": "BOUNDARY_CONTRACT_ROOT_SOURCE",
+      "project": {
+        "files": [
+          {
+            "path": "apps/api/src/contract.ts",
+            "content": "import contract from \"../../../openapi/openapi.yaml\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "prisma-outside-adapter",
+      "gate": "prisma",
+      "expected_rule_id": "BOUNDARY_PRISMA_LOCATION",
+      "project": {
+        "files": [
+          {
+            "path": "packages/server-core/src/modules/daily/domain/model.ts",
+            "content": "import { PrismaClient } from \"@prisma/client\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "generated-missing-marker",
+      "gate": "generated",
+      "expected_rule_id": "BOUNDARY_GENERATED_MARKER",
+      "project": {
+        "files": [
+          {
+            "path": "apps/admin/src/generated/client.ts",
+            "content": "export const generated = true;\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "client-secret-identifier",
+      "gate": "secret-content",
+      "expected_rule_id": "BOUNDARY_SECRET_CLIENT",
+      "project": {
+        "files": [
+          {
+            "path": "apps/miniapp/src/config.ts",
+            "content": "export const OPENAI_API_KEY = \"synthetic-canary\";\n"
+          }
+        ]
+      }
+    }
+  ]
+}

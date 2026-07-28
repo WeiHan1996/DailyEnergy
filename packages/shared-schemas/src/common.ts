@@ -20,7 +20,9 @@ export function countDisplayCharacters(value: string): number {
 
 export function isActualProductDate(value: string): boolean {
   const match = PRODUCT_DATE_PATTERN.exec(value);
-  if (!match) return false;
+  if (!match) {
+    return false;
+  }
 
   const year = Number(match[1]);
   const month = Number(match[2]);
@@ -36,7 +38,9 @@ export function isActualProductDate(value: string): boolean {
 
 export function areConsecutiveProductDates(values: readonly string[]): boolean {
   return values.every((value, index) => {
-    if (index === 0) return true;
+    if (index === 0) {
+      return true;
+    }
     const previous = values[index - 1];
     if (
       !previous ||

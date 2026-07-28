@@ -15,17 +15,35 @@
   "scripts": {
     "install:check": "pnpm install --frozen-lockfile",
     "workspace:check": "node tooling/check-workspace.mjs",
+    "config:check": "node tooling/check-config.mjs",
+    "architecture:deps": "dependency-cruise --config .dependency-cruiser.cjs --include-only '^(apps|packages|tooling|tests)' apps packages tooling tests",
+    "architecture:boundaries": "node tooling/check-boundaries.mjs",
+    "architecture:fixtures": "node tooling/test-boundaries.mjs",
+    "architecture:check": "pnpm run architecture:deps && pnpm run architecture:boundaries",
     "workspace:graph": "turbo ls",
     "dry-run": "turbo run format:check lint typecheck test build --dry=json",
-    "format:check": "turbo run format:check",
-    "lint": "pnpm run workspace:check && turbo run lint",
-    "typecheck": "turbo run typecheck",
-    "test": "turbo run test",
+    "format": "prettier --write package.json pnpm-workspace.yaml turbo.json eslint.config.mjs prettier.config.mjs .dependency-cruiser.cjs apps packages tooling tests",
+    "format:check": "prettier --check package.json pnpm-workspace.yaml turbo.json eslint.config.mjs prettier.config.mjs .dependency-cruiser.cjs apps packages tooling tests",
+    "lint:eslint": "eslint --max-warnings=0 --no-error-on-unmatched-pattern 'apps/**/*.{js,mjs,cjs,jsx,ts,tsx,mts,cts}' 'packages/**/*.{js,mjs,cjs,jsx,ts,tsx,mts,cts}' 'tooling/**/*.{js,mjs,cjs,jsx,ts,tsx,mts,cts}' 'tests/**/*.{js,mjs,cjs,jsx,ts,tsx,mts,cts}' eslint.config.mjs prettier.config.mjs .dependency-cruiser.cjs",
+    "lint": "pnpm run workspace:check && pnpm run config:check && pnpm run lint:eslint && pnpm run architecture:check",
+    "typecheck": "pnpm run config:check && turbo run typecheck",
+    "test": "pnpm run architecture:fixtures && turbo run test",
     "build": "turbo run build",
     "clean": "node tooling/clean.mjs",
     "validate": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
   },
   "devDependencies": {
-    "turbo": "2.10.7"
+    "@babel/core": "catalog:",
+    "@babel/eslint-parser": "catalog:",
+    "@daily-energy/eslint-config": "workspace:*",
+    "@daily-energy/typescript-config": "workspace:*",
+    "@eslint/js": "catalog:",
+    "@types/node": "catalog:",
+    "dependency-cruiser": "catalog:",
+    "eslint": "catalog:",
+    "globals": "catalog:",
+    "prettier": "catalog:",
+    "turbo": "2.10.7",
+    "typescript": "catalog:"
   }
 }

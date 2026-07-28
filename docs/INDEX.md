@@ -234,7 +234,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001 已完成，E-002 是 Phase 1 唯一 Ready。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001 已完成，E-002 是 Phase 1 唯一 In Progress。读取顺序：
 
 1. AGENTS.md；
 2. README.md；

@@ -346,9 +346,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-001 已完成；E-002 为唯一 Ready
+状态：E-001 已完成；E-002 正在实施
 当前目标：建立 TypeScript、Lint 与依赖边界基线
-当前任务：E-002 代码质量基线（Ready）
+当前任务：E-002 代码质量基线（In Progress）
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/41
 ```
 
@@ -368,7 +368,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 - 不创建 Nest/Next/小程序业务骨架，不引入数据库、队列或业务逻辑；
 - E-003 及其他下游工程 Issue 继续保持 Planned，不并行启动。
 
-[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done；E-002 现在是唯一 Ready，尚未创建实现分支或 Draft PR。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done；E-002 是唯一 In Progress，正在独立分支实施。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
 
 ---
 

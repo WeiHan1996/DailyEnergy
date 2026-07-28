@@ -1,0 +1,5 @@
+{
+  "extends": "@daily-energy/typescript-config/tooling.json",
+  "include": ["index.js"],
+  "exclude": ["node_modules"]
+}
