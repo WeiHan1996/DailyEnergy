@@ -90,7 +90,14 @@ export interface OrdinaryLogEvent {
 export const OrdinaryLogEventSchema = z.strictObject({
   contract_version: z.literal("ordinary-log-v1"),
   duration_ms_bucket: z.enum(DURATION_MS_BUCKETS).optional(),
-  environment: z.enum(["LOCAL", "CI", "DEV", "STAGING", "PRODUCTION"]),
+  environment: z.enum([
+    "LOCAL",
+    "CI",
+    "DEV",
+    "STAGING",
+    "PRODUCTION",
+    "RECOVERY",
+  ]),
   message_code: z.enum(MESSAGE_CODES),
   operation_code: z.enum(OPERATION_CODES),
   outcome_code: z.enum(OUTCOME_CODES),

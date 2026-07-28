@@ -22,16 +22,22 @@ variables are accepted:
 - `DAILYENERGY_CONFIG_SCHEMA_VERSION` (`api-runtime-config-v1`)
 - `DAILYENERGY_CONTRACT_BUNDLE_VERSION` (`api-contract-v1`)
 - `DAILYENERGY_PRODUCT_DATE_POLICY_VERSION` (`product-date-v1`)
-- expected deploy/capability fingerprints (required in `STAGING` and
-  `PRODUCTION`)
+- expected deploy/capability fingerprints (required in `STAGING`,
+  `PRODUCTION`, and `RECOVERY`)
 
 Unknown project variables, invalid values, and fingerprint mismatches fail
 before the HTTP listener starts. The application never prints configuration
 values or secrets.
 
+Release tooling must use the exported `calculateRuntimeFingerprints` function
+so expected deploy and capability fingerprints come from the same validation
+and hashing authority as API startup. The capability fingerprint binds both the
+named API capabilities and the exact privileged Safety continuation route
+allowlist.
+
 The API accepts only the Accepted environment subset `LOCAL`, `CI`, `DEV`,
-`STAGING`, and `PRODUCTION`. Tests use `CI`; aliases such as `TEST` and
-`DEVELOPMENT` are rejected.
+`STAGING`, `PRODUCTION`, and `RECOVERY`. Tests use `CI`; aliases such as `TEST`
+and `DEVELOPMENT` are rejected.
 
 Internal probes:
 

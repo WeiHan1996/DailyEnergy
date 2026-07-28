@@ -7,7 +7,7 @@
     "build": "tsc -p tsconfig.build.json",
     "build:test-fixtures": "tsc -p tsconfig.test-fixtures.json",
     "format:check": "prettier --check README.md package.json tsconfig*.json src test-fixtures",
-    "lint": "eslint --max-warnings=0 src",
+    "lint": "eslint --max-warnings=0 src test-fixtures",
     "prebuild": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist', { force: true, recursive: true }))\"",
     "prebuild:test-fixtures": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist-fixtures', { force: true, recursive: true }))\"",
     "posttest": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist-fixtures', { force: true, recursive: true }))\"",

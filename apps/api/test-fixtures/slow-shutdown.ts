@@ -19,10 +19,10 @@ await application.listen(config.port, config.host);
 const logger = application.get(OrdinaryLogger);
 const address = application.getHttpServer().address() as
   AddressInfo | string | null;
+application.get(ShutdownObserver).install(application);
 logger.write("INFO", {
   message_code: "API_STARTED",
   operation_code: "API_LIFECYCLE",
   outcome_code: "SUCCESS",
   reason_code: address === null ? "LISTENER_UNKNOWN" : "LISTENER_READY",
 });
-application.get(ShutdownObserver).install(application);
