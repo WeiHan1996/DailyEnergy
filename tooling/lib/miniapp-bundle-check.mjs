@@ -22,6 +22,18 @@ const forbiddenSecretIdentifier =
   /\b(?:OPENAI|ANTHROPIC|PROVIDER|DATABASE|REDIS)_(?:API_)?(?:KEY|SECRET|TOKEN|URL)\b/u;
 const esModulePattern = /^\s*(?:export\s|import\s)/mu;
 
+export const MINIAPP_BUNDLE_RULE_IDS = Object.freeze([
+  "MINIAPP_BUNDLE_APP_CONFIG_INVALID",
+  "MINIAPP_BUNDLE_ES_MODULE",
+  "MINIAPP_BUNDLE_FILE_MISSING",
+  "MINIAPP_BUNDLE_FORBIDDEN_IMPORT",
+  "MINIAPP_BUNDLE_GENERATED_CONFIG",
+  "MINIAPP_BUNDLE_PAGE_REGISTRY",
+  "MINIAPP_BUNDLE_SECRET_IDENTIFIER",
+  "MINIAPP_BUNDLE_TABBAR_FORBIDDEN",
+  "MINIAPP_BUNDLE_TYPESCRIPT_PRESENT",
+]);
+
 function diagnostic(ruleId, path, message) {
   return { message, path, ruleId };
 }
@@ -159,7 +171,11 @@ async function loadEntries(directory) {
         await walk(path);
         continue;
       }
-      if ([".js", ".json", ".wxml", ".wxs", ".wxss"].includes(extname(path))) {
+      if (
+        [".js", ".json", ".ts", ".tsx", ".wxml", ".wxs", ".wxss"].includes(
+          extname(path),
+        )
+      ) {
         entries.push({
           content: await readFile(path, "utf8"),
           path: relative(directory, path).split("\\").join("/"),

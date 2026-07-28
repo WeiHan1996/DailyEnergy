@@ -49,6 +49,11 @@ describe("public build configuration", () => {
         schemaVersion: MINIAPP_PUBLIC_BUILD_CONFIG_SCHEMA_VERSION,
       },
       {
+        apiOrigin: "https://api.daily-energy.example/",
+        environment: "PRODUCTION",
+        schemaVersion: MINIAPP_PUBLIC_BUILD_CONFIG_SCHEMA_VERSION,
+      },
+      {
         apiOrigin: "https://api.daily-energy.example",
         environment: "PRODUCTION",
         extra: true,

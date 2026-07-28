@@ -57,29 +57,35 @@ pnpm --filter @daily-energy/app-miniapp build
 
 ## 测试证据边界
 
-- `pnpm test`：Vitest 纯逻辑/adapter 单测与 bundle scanner known-fail；
+- `pnpm test`：10 项 Vitest 纯逻辑/adapter 单测、14 组公开配置
+  build/runtime parity、10 组 DevTools 结果分类、9 条 bundle 静态规则
+  known-fail 与 1 个 known-pass；
 - `pnpm build`：TypeScript 产物与 client-only bundle Gate；
 - `pnpm test:devtools`：需要
   `WECHAT_DEVTOOLS_CLI_PATH`，通过 `miniprogram-automator` 验证启动和恢复页。
 
-缺少开发者工具时，runner 明确返回 `INFRA_BLOCKED`，不能把 Node/Vitest
-结果标成微信平台 conformance。真机冒烟继续保留为 RC 人工证据。
+只有 CLI 缺失、automation endpoint 不可连接或启动握手超时等明确基础设施
+错误会返回 `INFRA_BLOCKED`（exit 2）。启动成功后的页面脚本、模块加载、
+生命周期、selector/data 或断言错误返回普通 `FAIL`（exit 1），并保留脱敏
+稳定类别。不能把 Node/Vitest 结果标成微信平台 conformance；真机冒烟继续
+保留为 RC 人工证据。
 
 ## E-004 Source-ID 证据
 
 正式全项目 registry 属于 E-010；本表只记录 E-004 实际触达的 Accepted
 场景，不声称覆盖尚未实现的业务旅程。
 
-| Source ID                                                                      | 证据等级                    | E-004 证据                                                                                                                                  |
-| ------------------------------------------------------------------------------ | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `S28-STACK-007`、`S28-STACK-008`                                               | `MACHINE_ENFORCED`          | workspace/client Gate 与最终 bundle scanner 拒绝 `node:*`、Prisma 等 server-only import                                                     |
-| `S30-REPO-017`、`S30-REPO-018`、`S30-REPO-023`                                 | `MACHINE_ENFORCED`          | 12 类 architecture Gate、client subpath allowlist、secret/content 与最终产物扫描                                                            |
-| `S31-TEST-013`                                                                 | `MACHINE_ENFORCED`          | 3 个 bundle known-fail、1 个 known-pass 和真实 `dist/` 扫描                                                                                 |
-| `S32-DEPLOY-002`、`S32-DEPLOY-005`                                             | `MACHINE_ENFORCED`          | 封闭环境枚举、origin 校验、私有配置忽略和客户端 secret identifier Gate                                                                      |
-| `S31-TEST-016`                                                                 | `PARTIAL / MANUAL_EVIDENCE` | DevTools automator runner 已建立；2026-07-28 本机启用服务端口并重启后仍返回 `MINIAPP_DEVTOOLS_INFRA_BLOCKED`，不能标记微信 conformance PASS |
-| `S30-REPO-019`、`S30-REPO-022`、`S31-TEST-010`、`S31-TEST-012`、`S31-TEST-015` | `DEFERRED`                  | shared-schemas/client、public/Admin api-client、codegen 与 drift 仍由 E-008 交付；E-004 未复制或伪造生成客户端                              |
-| 真机 iOS/Android、04:00、弱网与权限矩阵                                        | `DEFERRED`                  | 保留给 E-010/E-011 和 RC 真机证据，不用 Vitest 或 Node 冒充                                                                                 |
+| Source ID                                                                      | 证据等级                    | E-004 证据                                                                                                                 |
+| ------------------------------------------------------------------------------ | --------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `S28-STACK-007`、`S28-STACK-008`                                               | `MACHINE_ENFORCED`          | workspace/client Gate 与最终 bundle scanner 拒绝 `node:*`、Prisma 等 server-only import                                    |
+| `S30-REPO-017`、`S30-REPO-018`、`S30-REPO-023`                                 | `MACHINE_ENFORCED`          | 12 类 architecture Gate、client subpath allowlist、secret/content 与最终产物扫描                                           |
+| `S31-TEST-013`                                                                 | `MACHINE_ENFORCED`          | 9 条 bundle 静态规则各有 known-fail、1 个 known-pass 和真实 `dist/` 扫描                                                   |
+| `S32-DEPLOY-002`、`S32-DEPLOY-005`                                             | `MACHINE_ENFORCED`          | 封闭环境枚举、origin 校验、私有配置忽略和客户端 secret identifier Gate                                                     |
+| `S31-TEST-016`                                                                 | `PARTIAL / MANUAL_EVIDENCE` | DevTools automator runner 已建立；2026-07-28 本机重试返回 `MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT`，不能标记微信 conformance PASS |
+| `S30-REPO-019`、`S30-REPO-022`、`S31-TEST-010`、`S31-TEST-012`、`S31-TEST-015` | `DEFERRED`                  | shared-schemas/client、public/Admin api-client、codegen 与 drift 仍由 E-008 交付；E-004 未复制或伪造生成客户端             |
+| 真机 iOS/Android、04:00、弱网与权限矩阵                                        | `DEFERRED`                  | 保留给 E-010/E-011 和 RC 真机证据，不用 Vitest 或 Node 冒充                                                                |
 
 DevTools 解锁条件：本机 IDE automation endpoint 能被
-`miniprogram-automator` 连接后，重新运行 `pnpm test:devtools` 并保存基础库、
-DevTools 版本和合成页面结果；在此之前平台层状态保持 `INFRA_BLOCKED`。
+`miniprogram-automator` 完成启动握手后，重新运行 `pnpm test:devtools` 并
+保存基础库、DevTools 版本和合成页面结果；在此之前平台层状态保持
+`INFRA_BLOCKED`。

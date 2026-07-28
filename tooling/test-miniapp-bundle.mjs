@@ -1,4 +1,7 @@
-import { scanMiniappBundleEntries } from "./lib/miniapp-bundle-check.mjs";
+import {
+  MINIAPP_BUNDLE_RULE_IDS,
+  scanMiniappBundleEntries,
+} from "./lib/miniapp-bundle-check.mjs";
 
 const requiredPaths = [
   "app.js",
@@ -32,6 +35,17 @@ const validEntries = requiredPaths.map((path) => ({
   path,
 }));
 const errors = [];
+const expectedRuleIds = [
+  "MINIAPP_BUNDLE_APP_CONFIG_INVALID",
+  "MINIAPP_BUNDLE_ES_MODULE",
+  "MINIAPP_BUNDLE_FILE_MISSING",
+  "MINIAPP_BUNDLE_FORBIDDEN_IMPORT",
+  "MINIAPP_BUNDLE_GENERATED_CONFIG",
+  "MINIAPP_BUNDLE_PAGE_REGISTRY",
+  "MINIAPP_BUNDLE_SECRET_IDENTIFIER",
+  "MINIAPP_BUNDLE_TABBAR_FORBIDDEN",
+  "MINIAPP_BUNDLE_TYPESCRIPT_PRESENT",
+];
 
 if (scanMiniappBundleEntries(validEntries).length !== 0) {
   errors.push("MINIAPP_BUNDLE_FIXTURE_VALID_FAILED");
@@ -39,35 +53,85 @@ if (scanMiniappBundleEntries(validEntries).length !== 0) {
 
 const cases = [
   {
+    expectedRuleId: "MINIAPP_BUNDLE_FILE_MISSING",
+    mutate: (entries) => entries.filter((entry) => entry.path !== "app.wxss"),
+  },
+  {
+    expectedRuleId: "MINIAPP_BUNDLE_TYPESCRIPT_PRESENT",
+    mutate: (entries) => [
+      ...entries,
+      { content: "export {};", path: "synthetic-source.ts" },
+    ],
+  },
+  {
     expectedRuleId: "MINIAPP_BUNDLE_FORBIDDEN_IMPORT",
-    mutation: {
-      content: 'require("node:crypto");',
-      path: "pages/launch/index.js",
-    },
+    mutate: (entries) =>
+      replace(entries, "pages/launch/index.js", 'require("node:crypto");'),
   },
   {
     expectedRuleId: "MINIAPP_BUNDLE_SECRET_IDENTIFIER",
-    mutation: {
-      content: 'const OPENAI_API_KEY = "synthetic-canary";',
-      path: "pages/launch/index.js",
-    },
+    mutate: (entries) =>
+      replace(
+        entries,
+        "pages/launch/index.js",
+        'const OPENAI_API_KEY = "synthetic-canary";',
+      ),
+  },
+  {
+    expectedRuleId: "MINIAPP_BUNDLE_ES_MODULE",
+    mutate: (entries) =>
+      replace(entries, "pages/launch/index.js", "export const value = 1;"),
+  },
+  {
+    expectedRuleId: "MINIAPP_BUNDLE_APP_CONFIG_INVALID",
+    mutate: (entries) => replace(entries, "app.json", "{"),
   },
   {
     expectedRuleId: "MINIAPP_BUNDLE_TABBAR_FORBIDDEN",
-    mutation: {
-      content: JSON.stringify({
-        pages: ["pages/launch/index", "pages/recovery/index"],
-        tabBar: {},
-      }),
-      path: "app.json",
-    },
+    mutate: (entries) =>
+      replace(
+        entries,
+        "app.json",
+        JSON.stringify({
+          pages: ["pages/launch/index", "pages/recovery/index"],
+          tabBar: {},
+        }),
+      ),
+  },
+  {
+    expectedRuleId: "MINIAPP_BUNDLE_PAGE_REGISTRY",
+    mutate: (entries) =>
+      replace(
+        entries,
+        "app.json",
+        JSON.stringify({ pages: ["pages/launch/index"] }),
+      ),
+  },
+  {
+    expectedRuleId: "MINIAPP_BUNDLE_GENERATED_CONFIG",
+    mutate: (entries) =>
+      replace(
+        entries,
+        "generated/public-build-config.js",
+        "// synthetic generated config without provenance",
+      ),
   },
 ];
 
-for (const testCase of cases) {
-  const mutated = validEntries.map((entry) =>
-    entry.path === testCase.mutation.path ? testCase.mutation : entry,
+function replace(entries, path, content) {
+  return entries.map((entry) =>
+    entry.path === path ? { content, path } : entry,
   );
+}
+
+if (
+  JSON.stringify(MINIAPP_BUNDLE_RULE_IDS) !== JSON.stringify(expectedRuleIds)
+) {
+  errors.push("MINIAPP_BUNDLE_RULE_REGISTRY_DRIFT");
+}
+
+for (const testCase of cases) {
+  const mutated = testCase.mutate(validEntries);
   const diagnostics = scanMiniappBundleEntries(mutated);
   if (
     !diagnostics.some(

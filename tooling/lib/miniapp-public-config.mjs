@@ -12,6 +12,7 @@ const environments = new Set([
 const localEnvironments = new Set(["LOCAL", "MINIAPP_RUNNER"]);
 const localHostnames = new Set(["127.0.0.1", "localhost"]);
 const expectedKeys = ["apiOrigin", "environment", "schemaVersion"];
+const originPattern = /^(https?):\/\/([a-z0-9.-]+)(?::([0-9]{1,5}))?$/iu;
 
 function fail(code) {
   throw new Error(code);
@@ -41,36 +42,25 @@ export function parseMiniappPublicConfig(value) {
     fail("MINIAPP_PUBLIC_CONFIG_VALUE");
   }
 
-  let origin;
-  try {
-    origin = new URL(value.apiOrigin);
-  } catch {
+  const match = originPattern.exec(value.apiOrigin);
+  const scheme = match?.[1];
+  const hostname = match?.[2]?.toLowerCase();
+  const port = match?.[3];
+  if (scheme === undefined || hostname === undefined) {
     fail("MINIAPP_PUBLIC_CONFIG_ORIGIN");
   }
-  if (
-    origin.username !== "" ||
-    origin.password !== "" ||
-    origin.pathname !== "/" ||
-    origin.search !== "" ||
-    origin.hash !== ""
-  ) {
-    fail("MINIAPP_PUBLIC_CONFIG_ORIGIN");
+  if (port !== undefined && (Number(port) < 1 || Number(port) > 65_535)) {
+    fail("MINIAPP_PUBLIC_CONFIG_PORT");
   }
-  if (origin.protocol === "http:") {
+  if (scheme === "http") {
     if (
       !localEnvironments.has(value.environment) ||
-      !localHostnames.has(origin.hostname)
+      !localHostnames.has(hostname)
     ) {
       fail("MINIAPP_PUBLIC_CONFIG_TLS");
     }
-  } else if (origin.protocol !== "https:") {
+  } else if (scheme !== "https") {
     fail("MINIAPP_PUBLIC_CONFIG_TLS");
-  }
-  if (
-    origin.port !== "" &&
-    (Number(origin.port) < 1 || Number(origin.port) > 65_535)
-  ) {
-    fail("MINIAPP_PUBLIC_CONFIG_PORT");
   }
 
   return Object.freeze({

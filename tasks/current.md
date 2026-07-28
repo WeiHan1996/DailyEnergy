@@ -77,10 +77,12 @@ E-003 已通过审核并随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/p
 - **依赖修正**：Issue #42 原正文将 E-008 列为硬前置，但 Accepted 执行顺序、Backlog、E-003 交接及 2026-07-28 用户明确指令均要求 E-004 成为下一任务；现将 E-004 硬前置明确为 E-001、E-002、E-003；
 - **E-008 边界**：E-008 仍负责 shared-schemas/client、api-client/miniapp 和 codegen/drift。E-004 只能建立允许未来接入这些 client-safe subpath 的边界，不得提前创建或复制生成客户端；
 - **Source-ID registry**：正式 registry 属于 E-010；E-004 只能记录实际证据等级，不得提前宣称完整覆盖；
-- **DevTools 平台证据**：runner、项目配置和构建产物已就绪；2026-07-28 在本机微信开发者工具启用服务端口并重启后，`miniprogram-automator` 仍返回 `MINIAPP_DEVTOOLS_INFRA_BLOCKED`。当前证据等级为 `PARTIAL / MANUAL_EVIDENCE`，不能标记微信 conformance PASS；解锁条件是 IDE automation endpoint 可连接后重跑 `pnpm --filter @daily-energy/app-miniapp test:devtools`；
+- **审核修正**：[PR review #4797789713](https://github.com/WeiHan1996/DailyEnergy/pull/96#pullrequestreview-4797789713) 的三项可执行意见均已接受并实现：公开配置 build/runtime parity、DevTools 应用失败与基础设施阻塞分流、9 条 bundle 静态规则逐条 known-fail；
+- **CI 边界**：review 指出当前 head 无 GitHub Actions status，事实属实；但 Accepted S-31 实施交接将 CI lanes、required checks 与 artifact 交给 E-011，E-004 不越界新增 workflow，当前以完整本地 Gate 作为仓库证据；
+- **DevTools 平台证据**：runner、项目配置和构建产物已就绪；2026-07-28 本机重试准确返回 `MINIAPP_DEVTOOLS_INFRA_BLOCKED: MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT`。只有 CLI/endpoint/启动握手等明确基础设施错误返回 exit 2；启动成功后的页面、模块、生命周期、data 或断言异常返回普通 FAIL/exit 1。当前证据等级仍为 `PARTIAL / MANUAL_EVIDENCE`，不能标记微信 conformance PASS；解锁条件是 IDE automation endpoint 完成启动握手后重跑 `pnpm --filter @daily-energy/app-miniapp test:devtools`；
 - **外部上线 Gate**：仍存在，但不阻塞本地小程序骨架；
 - **审核决策**：用户需确认是否允许 Draft PR 在 DevTools 为 `INFRA_BLOCKED` 的情况下继续评审，或要求先由可用专用 runner 补齐 SYS-001/SYS-003 平台 PASS；
-- **下一状态**：等待用户审核 [Draft PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96)；不得自动标记 Ready 或合并。
+- **下一状态**：推送 review 修正后等待用户复审 [Draft PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96)；不得自动标记 Ready 或合并。
 
 ## 8. 最近交接
 
@@ -93,9 +95,10 @@ E-003 已通过审核并随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/p
 - 当前 PR：[E-004 Draft PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96)；
 - 已完成开工检查：Issue #42、Accepted 信息架构/页面清单、仓库结构、测试、部署和 ADR-0006 已复核，结论 `GO`；
 - 已完成交付：`SYS-001` 启动占位、`SYS-003` 恢复占位、微信原生 TypeScript/CommonJS 构建、封闭公开配置、login/storage/network/share/subscription ports/adapters、生成配置指纹、DevTools runner 与 client-only bundle Gate；
-- 已完成验证：`pnpm install --frozen-lockfile`；完整 `pnpm run validate` PASS（11/11 workspace typecheck、12 类 boundary Gate、miniapp 10 tests、shared-schemas 34 tests、API 36 tests、全部适用 build）；miniapp bundle 3 known-fail + 1 known-pass + 实际 `dist/` scan PASS；
-- 平台证据：DevTools runner 已真实执行，但 IDE automation endpoint 无法连接，结果 `MINIAPP_DEVTOOLS_INFRA_BLOCKED`；微信平台 conformance 未标 PASS；
+- 已完成 review 修正：公开配置构建期与运行期共享 14 组接受/拒绝 parity；DevTools 10 组稳定结果分类确保应用失败不冒充 infra；9 条 bundle 静态规则各有稳定 rule ID 与最小 known-fail；
+- 已完成验证：`pnpm install --frozen-lockfile`；review 修正后完整 `pnpm run validate` PASS（11/11 workspace typecheck、12 类 boundary Gate、miniapp 10 tests + 14 parity + 10 DevTools classification + 9 bundle known-fail/1 known-pass、shared-schemas 34 tests、API 36 tests、全部适用 build）；真实 `dist/` scan PASS；
+- 平台证据：DevTools runner 已真实重试，结果 `MINIAPP_DEVTOOLS_INFRA_BLOCKED: MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT`；微信平台 conformance 未标 PASS；
 - 未开始：E-005～E-014、业务代码、数据库、队列、容器、workflow 或云资源；
-- 下一动作：等待用户审核 Draft PR #96，并确认是否接受 DevTools `INFRA_BLOCKED` 作为当前阶段的受限证据；
+- 下一动作：提交并推送 review 修正，等待用户复审 Draft PR #96；真实 DevTools PASS 前继续保持 Draft / In Review；
 - 接受后的下一任务：E-005；当前仍保持 Planned，不提前启动；
 - 禁止并行：E-005 及其他下游 Issue。
