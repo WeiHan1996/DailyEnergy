@@ -1,0 +1,11 @@
+{
+  "pages": ["pages/launch/index", "pages/recovery/index"],
+  "sitemapLocation": "sitemap.json",
+  "window": {
+    "backgroundColor": "#f6f3ee",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#f6f3ee",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "DailyEnergy"
+  }
+}

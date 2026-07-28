@@ -5,19 +5,19 @@
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务 ID**：E-004
 - **当前任务名称**：创建微信原生小程序 TypeScript 骨架
-- **任务状态**：Ready
+- **任务状态**：In Review
 - **优先级**：最高
-- **当前分支**：尚未创建
+- **当前分支**：`agent/e-004-miniapp-skeleton`
 - **上游 PR**：[E-003 PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93)
 - **当前 Issue**：[E-004 Issue #42](https://github.com/WeiHan1996/DailyEnergy/issues/42)
-- **当前 PR**：无
+- **当前 PR**：待创建 Draft PR
 - **Gate 结论**：`GO`
 
 ## 1. 当前目标
 
 建立微信原生小程序入口、启动路由、平台适配层和 client-only 构建边界，为后续确定性业务页面提供可加载、可测试、不会泄漏服务端能力的运行骨架。
 
-E-003 已通过审核并随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) squash 合并，Issue #40 已自动关闭为 completed。E-004 现为唯一 Ready；尚未创建实现分支、提交代码或 Draft PR。
+E-003 已通过审核并随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) squash 合并，Issue #40 已自动关闭为 completed。E-004 已完成仓库内实现与验证，当前进入 In Review 并准备 Draft PR；任务不会在用户审核和平台证据处理前标记为 Done。
 
 ## 2. 上游完成状态
 
@@ -73,12 +73,14 @@ E-003 已通过审核并随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/p
 
 ## 7. 当前阻塞与决策
 
-- **仓库/代码阻塞**：无；
+- **仓库/代码阻塞**：无；frozen install、format、lint、typecheck、architecture、test、build 与 bundle Gate 均通过；
 - **依赖修正**：Issue #42 原正文将 E-008 列为硬前置，但 Accepted 执行顺序、Backlog、E-003 交接及 2026-07-28 用户明确指令均要求 E-004 成为下一任务；现将 E-004 硬前置明确为 E-001、E-002、E-003；
 - **E-008 边界**：E-008 仍负责 shared-schemas/client、api-client/miniapp 和 codegen/drift。E-004 只能建立允许未来接入这些 client-safe subpath 的边界，不得提前创建或复制生成客户端；
 - **Source-ID registry**：正式 registry 属于 E-010；E-004 只能记录实际证据等级，不得提前宣称完整覆盖；
+- **DevTools 平台证据**：runner、项目配置和构建产物已就绪；2026-07-28 在本机微信开发者工具启用服务端口并重启后，`miniprogram-automator` 仍返回 `MINIAPP_DEVTOOLS_INFRA_BLOCKED`。当前证据等级为 `PARTIAL / MANUAL_EVIDENCE`，不能标记微信 conformance PASS；解锁条件是 IDE automation endpoint 可连接后重跑 `pnpm --filter @daily-energy/app-miniapp test:devtools`；
 - **外部上线 Gate**：仍存在，但不阻塞本地小程序骨架；
-- **下一状态**：收到明确开工指令后，从最新 `main` 创建独立实现分支并进入 In Progress。
+- **审核决策**：用户需确认是否允许 Draft PR 在 DevTools 为 `INFRA_BLOCKED` 的情况下继续评审，或要求先由可用专用 runner 补齐 SYS-001/SYS-003 平台 PASS；
+- **下一状态**：创建 Draft PR 并等待用户审核；不得自动标记 Ready 或合并。
 
 ## 8. 最近交接
 
@@ -86,9 +88,14 @@ E-003 已通过审核并随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/p
 - E-002 PR #91 merge commit：`bce224eb55c1ca92b32aebfe9a46df480af27b5f`；
 - E-003 PR #93 merge commit：`fde441c9802d91aa707f47bfc09d9927a9e97b97`；
 - E-001 Issue #39、E-002 Issue #41、E-003 Issue #40 均已关闭为 completed；
-- 当前任务：E-004 Ready；
-- 当前分支：尚未创建；
-- 当前 PR：无；
-- 未开始：E-004 实现、E-005～E-014、业务代码、数据库、队列、容器、workflow 或云资源；
-- 下一动作：收到明确开工指令后开始 E-004；
+- 当前任务：E-004 In Review；
+- 当前分支：`agent/e-004-miniapp-skeleton`，基于 `main` / `origin/main` 的 `817955cd8be72b8ea961e4e102568a592a5e9adf`；
+- 当前 PR：待创建 Draft PR；
+- 已完成开工检查：Issue #42、Accepted 信息架构/页面清单、仓库结构、测试、部署和 ADR-0006 已复核，结论 `GO`；
+- 已完成交付：`SYS-001` 启动占位、`SYS-003` 恢复占位、微信原生 TypeScript/CommonJS 构建、封闭公开配置、login/storage/network/share/subscription ports/adapters、生成配置指纹、DevTools runner 与 client-only bundle Gate；
+- 已完成验证：`pnpm install --frozen-lockfile`；完整 `pnpm run validate` PASS（11/11 workspace typecheck、12 类 boundary Gate、miniapp 10 tests、shared-schemas 34 tests、API 36 tests、全部适用 build）；miniapp bundle 3 known-fail + 1 known-pass + 实际 `dist/` scan PASS；
+- 平台证据：DevTools runner 已真实执行，但 IDE automation endpoint 无法连接，结果 `MINIAPP_DEVTOOLS_INFRA_BLOCKED`；微信平台 conformance 未标 PASS；
+- 未开始：E-005～E-014、业务代码、数据库、队列、容器、workflow 或云资源；
+- 下一动作：提交并推送当前分支、创建 Draft PR，回填 PR URL 后等待用户审核；
+- 接受后的下一任务：E-005；当前仍保持 Planned，不提前启动；
 - 禁止并行：E-005 及其他下游 Issue。

@@ -1,0 +1,9 @@
+{
+  "desc": "E-004 本地骨架不参与微信索引。",
+  "rules": [
+    {
+      "action": "disallow",
+      "page": "*"
+    }
+  ]
+}

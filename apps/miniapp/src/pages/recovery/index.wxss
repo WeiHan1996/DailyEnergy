@@ -1,0 +1,44 @@
+.recovery {
+  box-sizing: border-box;
+  display: flex;
+  min-height: 100vh;
+  padding: 150rpx 72rpx 88rpx;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.recovery__eyebrow {
+  margin-bottom: 26rpx;
+  color: #607068;
+  font-size: 24rpx;
+  font-weight: 600;
+  letter-spacing: 4rpx;
+}
+
+.recovery__title {
+  color: #24302b;
+  font-size: 48rpx;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.recovery__message {
+  margin-top: 32rpx;
+  color: #607068;
+  font-size: 30rpx;
+  line-height: 1.75;
+}
+
+.recovery__button {
+  width: 100%;
+  margin-top: 64rpx;
+  background: #2f5b45;
+  color: #ffffff;
+  font-size: 30rpx;
+}
+
+.recovery__reason {
+  margin-top: auto;
+  color: #9aa49f;
+  font-size: 22rpx;
+}

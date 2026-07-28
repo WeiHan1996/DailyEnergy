@@ -1,0 +1,176 @@
+import { readdir, readFile } from "node:fs/promises";
+import { extname, relative, resolve } from "node:path";
+
+const requiredFiles = [
+  "app.js",
+  "app.json",
+  "app.wxss",
+  "generated/public-build-config.js",
+  "pages/launch/index.js",
+  "pages/launch/index.json",
+  "pages/launch/index.wxml",
+  "pages/launch/index.wxss",
+  "pages/recovery/index.js",
+  "pages/recovery/index.json",
+  "pages/recovery/index.wxml",
+  "pages/recovery/index.wxss",
+  "sitemap.json",
+];
+const forbiddenImportPattern =
+  /(?:node:|@nestjs\/|@prisma\/|@daily-energy\/(?:server-|prompt-library)|\b(?:bullmq|ioredis|openai|anthropic)\b|@anthropic-ai\/sdk|@google\/generative-ai)/iu;
+const forbiddenSecretIdentifier =
+  /\b(?:OPENAI|ANTHROPIC|PROVIDER|DATABASE|REDIS)_(?:API_)?(?:KEY|SECRET|TOKEN|URL)\b/u;
+const esModulePattern = /^\s*(?:export\s|import\s)/mu;
+
+function diagnostic(ruleId, path, message) {
+  return { message, path, ruleId };
+}
+
+function parseAppConfig(entry, diagnostics) {
+  let config;
+  try {
+    config = JSON.parse(entry.content);
+  } catch {
+    diagnostics.push(
+      diagnostic(
+        "MINIAPP_BUNDLE_APP_CONFIG_INVALID",
+        entry.path,
+        "app.json must be valid JSON",
+      ),
+    );
+    return;
+  }
+  if (Object.hasOwn(config, "tabBar")) {
+    diagnostics.push(
+      diagnostic(
+        "MINIAPP_BUNDLE_TABBAR_FORBIDDEN",
+        entry.path,
+        "E-004 app.json cannot define a tabBar",
+      ),
+    );
+  }
+  const pages = config.pages;
+  if (
+    !Array.isArray(pages) ||
+    pages.length !== 2 ||
+    pages[0] !== "pages/launch/index" ||
+    pages[1] !== "pages/recovery/index"
+  ) {
+    diagnostics.push(
+      diagnostic(
+        "MINIAPP_BUNDLE_PAGE_REGISTRY",
+        entry.path,
+        "app.json must register only SYS-001 and SYS-003 placeholders",
+      ),
+    );
+  }
+}
+
+export function scanMiniappBundleEntries(entries) {
+  const diagnostics = [];
+  const files = new Map(entries.map((entry) => [entry.path, entry]));
+
+  for (const path of requiredFiles) {
+    if (!files.has(path)) {
+      diagnostics.push(
+        diagnostic(
+          "MINIAPP_BUNDLE_FILE_MISSING",
+          path,
+          "required miniapp bundle file is missing",
+        ),
+      );
+    }
+  }
+
+  for (const entry of entries) {
+    if (entry.path.endsWith(".ts") || entry.path.endsWith(".tsx")) {
+      diagnostics.push(
+        diagnostic(
+          "MINIAPP_BUNDLE_TYPESCRIPT_PRESENT",
+          entry.path,
+          "compiled miniapp bundle cannot contain TypeScript source",
+        ),
+      );
+    }
+    if (forbiddenImportPattern.test(entry.content)) {
+      diagnostics.push(
+        diagnostic(
+          "MINIAPP_BUNDLE_FORBIDDEN_IMPORT",
+          entry.path,
+          "client bundle contains a server, provider, Prompt, or Node dependency",
+        ),
+      );
+    }
+    if (forbiddenSecretIdentifier.test(entry.content)) {
+      diagnostics.push(
+        diagnostic(
+          "MINIAPP_BUNDLE_SECRET_IDENTIFIER",
+          entry.path,
+          "client bundle contains a forbidden secret identifier",
+        ),
+      );
+    }
+    if (entry.path.endsWith(".js") && esModulePattern.test(entry.content)) {
+      diagnostics.push(
+        diagnostic(
+          "MINIAPP_BUNDLE_ES_MODULE",
+          entry.path,
+          "compiled miniapp JavaScript must use the CommonJS platform boundary",
+        ),
+      );
+    }
+  }
+
+  const appConfig = files.get("app.json");
+  if (appConfig !== undefined) {
+    parseAppConfig(appConfig, diagnostics);
+  }
+
+  const generatedConfig = files.get("generated/public-build-config.js");
+  const generatedHeader = generatedConfig?.content
+    .split(/\r?\n/u)
+    .slice(0, 5)
+    .join("\n");
+  if (
+    generatedHeader === undefined ||
+    !/@generated\b/u.test(generatedHeader) ||
+    !/source-fingerprint:\s*sha256:[a-f0-9]{64}\b/u.test(generatedHeader)
+  ) {
+    diagnostics.push(
+      diagnostic(
+        "MINIAPP_BUNDLE_GENERATED_CONFIG",
+        "generated/public-build-config.js",
+        "public build config must carry generated provenance",
+      ),
+    );
+  }
+
+  return diagnostics;
+}
+
+async function loadEntries(directory) {
+  const entries = [];
+  async function walk(currentDirectory) {
+    for (const entry of await readdir(currentDirectory, {
+      withFileTypes: true,
+    })) {
+      const path = resolve(currentDirectory, entry.name);
+      if (entry.isDirectory()) {
+        await walk(path);
+        continue;
+      }
+      if ([".js", ".json", ".wxml", ".wxs", ".wxss"].includes(extname(path))) {
+        entries.push({
+          content: await readFile(path, "utf8"),
+          path: relative(directory, path).split("\\").join("/"),
+        });
+      }
+    }
+  }
+  await walk(directory);
+  return entries;
+}
+
+export async function scanMiniappBundle(directory) {
+  return scanMiniappBundleEntries(await loadEntries(directory));
+}

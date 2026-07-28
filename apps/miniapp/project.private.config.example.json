@@ -1,0 +1,7 @@
+{
+  "description": "复制为 project.private.config.json 后按本机开发者工具调整；不得填写或提交生产密钥。",
+  "projectname": "daily-energy-miniapp-local",
+  "setting": {
+    "compileHotReLoad": true
+  }
+}

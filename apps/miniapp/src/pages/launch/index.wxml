@@ -1,0 +1,7 @@
+<view class="launch" data-screen-id="{{screenId}}">
+  <view class="launch__mark" aria-hidden="true">DE</view>
+  <view class="launch__eyebrow">DAILYENERGY</view>
+  <view class="launch__title">今天，先留一分钟给自己</view>
+  <view class="launch__status">{{statusText}}</view>
+  <view class="launch__environment">环境：{{environment}}</view>
+</view>

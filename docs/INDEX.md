@@ -250,4 +250,4 @@ S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-0
 12. E-003 API 运行合同和仓库现状；
 13. tasks/backlog.md（仅在需要重排优先级时）。
 
-E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done，E-003 已随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 合并并进入 Done。E-004 Issue #42 是唯一 Ready，尚未创建实现分支或 Draft PR；E-005～E-014、E-008 及其他下游 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
+E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done，E-003 已随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 合并并进入 Done。E-004 Issue #42 已在 `agent/e-004-miniapp-skeleton` 完成仓库内实现与 Gate，当前进入 In Review / Draft PR 交付；微信 DevTools automator 因本机 automation endpoint 无法连接而准确记录为 `INFRA_BLOCKED`，不冒充平台 PASS。E-005～E-014、E-008 及其他下游 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
