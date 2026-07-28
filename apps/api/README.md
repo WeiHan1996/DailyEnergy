@@ -1,13 +1,66 @@
-# API
+# DailyEnergy API
 
-DailyEnergy 核心业务后端，计划使用 NestJS + TypeScript。
+E-003 establishes a thin NestJS 11 + Express 5 composition root. It contains
+transport, runtime configuration, health, error-envelope, request-context,
+redacted logging, audience-boundary, and graceful-shutdown infrastructure only.
+It does not implement product use cases, persistence, queues, providers, or real
+identity.
 
-## 第一阶段职责
+## Local synthetic start
 
-- 用户、朋友配置与微信登录；
-- 每日能量规则引擎和幂等生成；
-- AI Gateway、Schema 校验与模板降级；
-- 打卡、趋势、勋章和结构化记忆；
-- 内容安全、审计、埋点与成本统计。
+The runtime configuration is closed. Only the following `DAILYENERGY_*`
+variables are accepted:
 
-业务模块应通过明确的 DTO 和共享 Schema 对外提供能力。
+- `DAILYENERGY_ENVIRONMENT`
+- `DAILYENERGY_RUNTIME_PROFILE` (`API`)
+- `DAILYENERGY_RELEASE_ID`
+- `DAILYENERGY_PORT`
+- `DAILYENERGY_HOST`
+- `DAILYENERGY_MAINTENANCE_MODE`
+- `DAILYENERGY_LOG_LEVEL`
+- `DAILYENERGY_SHUTDOWN_GRACE_MS`
+- `DAILYENERGY_CONFIG_SCHEMA_VERSION` (`api-runtime-config-v1`)
+- `DAILYENERGY_CONTRACT_BUNDLE_VERSION` (`api-contract-v1`)
+- `DAILYENERGY_PRODUCT_DATE_POLICY_VERSION` (`product-date-v1`)
+- expected deploy/capability fingerprints (required in `STAGING`,
+  `PRODUCTION`, and `RECOVERY`)
+
+Unknown project variables, invalid values, and fingerprint mismatches fail
+before the HTTP listener starts. The application never prints configuration
+values or secrets.
+
+Release tooling must use the exported `calculateRuntimeFingerprints` function
+so expected deploy and capability fingerprints come from the same validation
+and hashing authority as API startup. The capability fingerprint binds both the
+named API capabilities and the exact privileged Safety continuation route
+allowlist.
+
+The API accepts only the Accepted environment subset `LOCAL`, `CI`, `DEV`,
+`STAGING`, `PRODUCTION`, and `RECOVERY`. Tests use `CI`; aliases such as `TEST`
+and `DEVELOPMENT` are rejected.
+
+Internal probes:
+
+- `GET /health/startup`
+- `GET /health/live`
+- `GET /health/ready`
+
+The E-003 placeholder routes are:
+
+- `POST /v1/auth/wechat/session`
+- `GET /v1/bootstrap/launch`
+- `GET /v1/admin/ops/overview`
+
+They validate transport and audience boundaries, then return stable
+`FEATURE_DISABLED` errors. They do not pretend that identity or business
+features have been implemented.
+
+`GET /v1/bootstrap/launch` accepts either the ordinary public audience or an
+independently verified `X-Safety-Continuation`. A valid Safety continuation can
+bypass blocking maintenance only for the Accepted launch/Safety/recovery
+allowlist; it grants no Admin or ordinary route access.
+
+Shutdown is bounded by `DAILYENERGY_SHUTDOWN_GRACE_MS`: readiness changes to
+not-ready before intake closes, registered drain hooks run within the same
+deadline, and expiry terminates with the fixed
+`SHUTDOWN_DEADLINE_EXCEEDED` reason code.

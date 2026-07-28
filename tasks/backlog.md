@@ -108,7 +108,7 @@
 | S-34 | Phase 1～3 工程 Issues | Done | 3 个 GitHub Milestones、48 个 Issues | S-01～S-33 |
 | S-35 | Phase 0B Gate 评审 | Done | [Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) | S-34 |
 
-S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) 与 [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41) 已完成并进入 Done，[E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) 是唯一 Ready。其余 45 个工程 Issue 保持 Planned，理想工程日初始估算仍为 35 / 43.5 / 44，必须在 E-001～E-003 后按实际 cycle time 校准。
+S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) 与 [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41) 已完成并进入 Done，[E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) 是唯一 In Review。其余 45 个工程 Issue 保持 Planned，理想工程日初始估算仍为 35 / 43.5 / 44，必须在 E-001～E-003 后按实际 cycle time 校准。
 
 ## 4. Phase 1：工程基础
 
@@ -116,7 +116,7 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 |---|---|---|---|
 | [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39) | 初始化 TypeScript Monorepo | Done | Workspace、包管理和统一脚本 |
 | [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41) | 代码质量基线 | Done | TypeScript、ESLint、Prettier、提交规范 |
-| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) | NestJS API 骨架 | Ready | 配置、错误、健康检查和日志 |
+| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) | NestJS API 骨架 | In Review | 配置、错误、健康检查和日志 |
 | [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42) | 微信小程序骨架 | Planned | 原生小程序、TypeScript、路由和环境 |
 | [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43) | Next.js 管理后台骨架 | Planned | 登录外壳和基础布局 |
 | [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44) | PostgreSQL 与 Prisma | Planned | 初始 Schema、迁移和测试数据 |

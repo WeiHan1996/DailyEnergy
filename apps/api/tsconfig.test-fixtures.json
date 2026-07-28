@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist-fixtures",
+    "rootDir": "."
+  },
+  "exclude": ["dist", "dist-fixtures", "node_modules", "src/**/*.test.ts"],
+  "include": ["src/**/*.ts", "test-fixtures/**/*.ts"]
+}

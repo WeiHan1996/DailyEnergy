@@ -7,4 +7,5 @@
 .turbo/
 **/coverage/
 **/dist/
+**/dist-fixtures/
 **/node_modules/

@@ -234,7 +234,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001、E-002 已完成，E-003 是 Phase 1 唯一 Ready。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001、E-002 已完成，E-003 是 Phase 1 唯一 In Review。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
@@ -251,4 +251,4 @@ S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-0
 13. `apps/api`、root 配置、共享 TypeScript/ESLint 配置与 E-002 Gate；
 14. tasks/backlog.md（仅在需要重排优先级时）。
 
-E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done。E-003 现在是唯一 Ready，尚未创建实现分支或 Draft PR；E-004～E-014、E-008 及其他下游 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
+E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done。E-003 已在 `agent/e-003-api-baseline` 完成实现与全仓验证，[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 正在等待审核；E-004～E-014、E-008 及其他下游 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。

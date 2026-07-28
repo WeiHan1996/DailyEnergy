@@ -4,13 +4,36 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "build:test-fixtures": "tsc -p tsconfig.test-fixtures.json",
+    "format:check": "prettier --check README.md package.json tsconfig*.json src test-fixtures",
+    "lint": "eslint --max-warnings=0 src test-fixtures",
+    "prebuild": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist', { force: true, recursive: true }))\"",
+    "prebuild:test-fixtures": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist-fixtures', { force: true, recursive: true }))\"",
+    "posttest": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist-fixtures', { force: true, recursive: true }))\"",
+    "start": "node dist/main.js",
+    "test": "pnpm run build && pnpm run build:test-fixtures && vitest run src",
     "typecheck": "node ../../tooling/typecheck-workspace.mjs"
   },
   "dailyEnergy": {
     "kind": "app",
     "runtime": "server-adapter"
   },
+  "dependencies": {
+    "@nestjs/common": "catalog:",
+    "@nestjs/core": "catalog:",
+    "@nestjs/platform-express": "catalog:",
+    "express": "catalog:",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:",
+    "zod": "catalog:"
+  },
   "devDependencies": {
-    "@daily-energy/typescript-config": "workspace:*"
+    "@daily-energy/typescript-config": "workspace:*",
+    "@types/express": "catalog:",
+    "@types/node": "catalog:",
+    "@types/supertest": "catalog:",
+    "supertest": "catalog:",
+    "vitest": "catalog:"
   }
 }
