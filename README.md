@@ -346,10 +346,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-001 实现与验证完成，进入 In Review
-当前目标：初始化可重复的 pnpm/Turborepo TypeScript Monorepo
-当前任务：E-001 初始化 TypeScript Monorepo（In Review）
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/39
+状态：E-001 已完成；E-002 为唯一 Ready
+当前目标：建立 TypeScript、Lint 与依赖边界基线
+当前任务：E-002 代码质量基线（Ready）
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/41
 ```
 
 长期工作入口：
@@ -362,13 +362,13 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 读取 [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)、ADR-0006、repository-structure、testing 和现有 shared-schemas；
-- 只初始化 pnpm workspace、Turborepo 任务图、目标目录骨架和统一根脚本；
-- 保留 shared-schemas public exports 与 fixtures；
-- 不初始化 Nest/Next/小程序/数据库/队列业务；
-- E-002 及其他下游工程 Issue 继续保持 Planned，不并行启动。
+- 读取 [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)、ADR-0006、repository-structure、testing 和现有 workspace 配置；
+- 建立统一 TypeScript strict、ESLint flat config、Prettier 和依赖边界 Gate；
+- 为静态边界提供正负验证，保证全仓 format/lint/typecheck 可重复执行；
+- 不创建 Nest/Next/小程序业务骨架，不引入数据库、队列或业务逻辑；
+- E-003 及其他下游工程 Issue 继续保持 Planned，不并行启动。
 
-[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted，S-35 已完成。E-001 已在独立分支完成 workspace 骨架和 clean-checkout 验证，正在 [Draft PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 审核；E-002 仍为 Planned。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done；E-002 现在是唯一 Ready，尚未创建实现分支或 Draft PR。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
 
 ---
 
