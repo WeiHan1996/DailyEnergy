@@ -467,20 +467,21 @@ function checkModuleGraph(input) {
         const target = resolveRelativeImport(file.path, specifier, knownFiles);
         if (target) {
           edges.add(target);
-        }
-      }
-      if (file.path.startsWith("apps/") && specifier.startsWith(".")) {
-        const sourceApp = file.path.split("/")[1];
-        const target = resolveRelativeImport(file.path, specifier, knownFiles);
-        const targetApp = target?.split("/")[1];
-        if (target?.startsWith("apps/") && targetApp !== sourceApp) {
-          errors.push(
-            diagnostic(
-              "BOUNDARY_MODULE_CROSS_APP",
-              file.path,
-              `relative app import ${specifier} is forbidden`,
-            ),
-          );
+          const sourceWorkspace = workspaceForFile(project, file.path);
+          const targetWorkspace = workspaceForFile(project, target);
+          if (
+            sourceWorkspace &&
+            targetWorkspace &&
+            sourceWorkspace.directory !== targetWorkspace.directory
+          ) {
+            errors.push(
+              diagnostic(
+                "BOUNDARY_MODULE_CROSS_WORKSPACE_RELATIVE",
+                file.path,
+                `relative import ${specifier} crosses from ${sourceWorkspace.manifest.name} to ${targetWorkspace.manifest.name}; use package exports`,
+              ),
+            );
+          }
         }
       }
       if (

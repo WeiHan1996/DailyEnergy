@@ -16,14 +16,17 @@
 
 E-002 的版本化质量 fixtures 包括：
 
-- `architecture/boundary-cases.json`：18 个最小 known-fail case 覆盖 S-30
-  的 12 类静态 Gate，包括生产源码通过 `devDependencies` 跨 runtime zone；
+- `architecture/boundary-cases.json`：19 个最小 known-fail case 覆盖 S-30
+  的 12 类静态 Gate，包括生产源码通过 `devDependencies` 跨 runtime zone，以及
+  client-safe 通过相对路径穿越到 server-core workspace；
 - `architecture/known-pass-project.json`：隔离正向 project，全部 12 类 Gate
   的 diagnostics 必须严格为 0；
 - `config/shared-intermediate-strict-off`：共享中间 tsconfig 关闭 `strict` 时，
   resolved config Gate 必须失败；
 - `typecheck/fixtures/non-shared-workspace-error.ts`：root typecheck 的非
   shared-schemas workspace `TS2322` must-fail；
+- `typecheck/fixtures/excluded-workspace-source.ts`：workspace 已有 TypeScript
+  源码但 `tsconfig.include` 未覆盖时，root typecheck must-fail；
 - `eslint/fixtures/nest-controller.ts`：NestJS 风格 class/method decorators
   必须能由 ESLint 正向解析。
 

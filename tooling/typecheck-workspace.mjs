@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
-import { resolve } from "node:path";
+import { readdir } from "node:fs/promises";
+import { relative, resolve } from "node:path";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const typeScriptCli = resolve(
@@ -7,6 +8,31 @@ const typeScriptCli = resolve(
   "node_modules/typescript/bin/tsc",
 );
 const tsconfigPath = process.argv[2] ?? "tsconfig.json";
+const ignoredDirectories = new Set([
+  ".next",
+  ".turbo",
+  "coverage",
+  "dist",
+  "node_modules",
+]);
+const typeScriptSourceExtension = /\.(?:cts|mts|tsx?)$/u;
+
+async function findTypeScriptSources(directory, workspaceRoot = directory) {
+  const sources = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) {
+      continue;
+    }
+    const entryPath = resolve(directory, entry.name);
+    if (entry.isDirectory()) {
+      sources.push(...(await findTypeScriptSources(entryPath, workspaceRoot)));
+    } else if (entry.isFile() && typeScriptSourceExtension.test(entry.name)) {
+      sources.push(relative(workspaceRoot, entryPath));
+    }
+  }
+  return sources.sort();
+}
+
 const typecheck = spawnSync(
   process.execPath,
   [
@@ -43,9 +69,29 @@ if (typecheck.status === 0) {
     );
     process.exitCode = resolution.status ?? 1;
   } else {
-    console.log(
-      `Typecheck passed for ${tsconfigPath}: TypeScript resolved the project and found no source inputs yet.`,
-    );
+    try {
+      JSON.parse(resolution.stdout);
+    } catch {
+      process.stderr.write(resolution.stdout);
+      console.error(
+        `TYPECHECK_CONFIG_INVALID: ${tsconfigPath} --showConfig did not return JSON`,
+      );
+      process.exitCode = 1;
+    }
+    if (process.exitCode !== 1) {
+      const sources = await findTypeScriptSources(process.cwd());
+      if (sources.length > 0) {
+        process.stderr.write(output);
+        console.error(
+          `TYPECHECK_SOURCE_EXCLUDED: ${tsconfigPath} resolved no inputs while the workspace contains TypeScript source: ${sources.join(", ")}`,
+        );
+        process.exitCode = 1;
+      } else {
+        console.log(
+          `Typecheck passed for ${tsconfigPath}: TypeScript resolved the project and the workspace contains no TypeScript source.`,
+        );
+      }
+    }
   }
 } else {
   process.stderr.write(output);

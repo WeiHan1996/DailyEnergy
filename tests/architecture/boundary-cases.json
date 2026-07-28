@@ -1,5 +1,5 @@
 {
-  "fixture_version": "e-002-boundary-v2",
+  "fixture_version": "e-002-boundary-v3",
   "cases": [
     {
       "case_id": "workspace-root-runtime-export",
@@ -282,6 +282,50 @@
                 "runtime": "server-core"
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "module-client-relative-import-to-server-workspace",
+      "gate": "module-graph",
+      "expected_rule_id": "BOUNDARY_MODULE_CROSS_WORKSPACE_RELATIVE",
+      "project": {
+        "workspaces": [
+          {
+            "directory": "apps/admin",
+            "manifest": {
+              "name": "@daily-energy/app-admin",
+              "private": true,
+              "dailyEnergy": {
+                "kind": "app",
+                "runtime": "client-safe"
+              }
+            }
+          },
+          {
+            "directory": "packages/server-core",
+            "manifest": {
+              "name": "@daily-energy/server-core",
+              "private": true,
+              "exports": {
+                ".": "./dist/index.js"
+              },
+              "dailyEnergy": {
+                "kind": "package",
+                "runtime": "server-core"
+              }
+            }
+          }
+        ],
+        "files": [
+          {
+            "path": "apps/admin/src/unsafe.ts",
+            "content": "import \"../../../packages/server-core/src/internal/secret.js\";\n"
+          },
+          {
+            "path": "packages/server-core/src/internal/secret.ts",
+            "content": "export const secret = \"synthetic-canary\";\n"
           }
         ]
       }
