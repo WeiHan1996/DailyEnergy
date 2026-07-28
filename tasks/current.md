@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-07-27
+- **最后更新**：2026-07-28
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务 ID**：E-001
 - **当前任务名称**：初始化 pnpm/Turborepo TypeScript Monorepo
@@ -93,6 +93,13 @@ E-001 当前为唯一 In Review。pnpm/Turborepo workspace、目标目录骨架�
 - 已验证：Turbo 识别 11 个 workspace，dry-run 含 55 个任务定义、4 个现有可执行
   shared-schemas 任务、strict env 且无 configured env；public root export 与
   `./json-schema` 的 19 个稳定 ID 可运行；
+- PR #89 反馈已处理：Workspace Gate 改用 pnpm 实际 project list 枚举并拒绝
+  unexpected package；import scanner 支持 side-effect import；Mini Program/Admin
+  使用显式 client workspace allowlist，并单独拒绝 Mini Program 的 Admin
+  subpath；
+- 已验证：三个临时负向变更分别命中 `WORKSPACE_PACKAGE_UNEXPECTED`、
+  `WORKSPACE_ADMIN_IMPORT`、`WORKSPACE_MINIAPP_ADMIN_IMPORT`，移除负向变更后
+  `pnpm validate` 再次通过，shared-schemas 34 项测试全部通过；
 - 未开始：E-002、业务代码、workflow、migration、容器或云资源；
 - 下一动作：审核 [E-001 Draft PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89)，
   并决定是否批准 Source-ID registry 的 `NA_WITH_REASON`；

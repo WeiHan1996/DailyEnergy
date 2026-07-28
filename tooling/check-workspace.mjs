@@ -1,8 +1,11 @@
+import { execFile } from "node:child_process";
 import { readdir, readFile } from "node:fs/promises";
 import { dirname, relative, resolve, sep } from "node:path";
+import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const executeFile = promisify(execFile);
 const expectedWorkspaceDirectories = [
   "apps/admin",
   "apps/api",
@@ -37,6 +40,22 @@ const ignoredDirectories = new Set([
   "dist",
   "node_modules",
 ]);
+const clientWorkspaceImportAllowlist = new Map([
+  [
+    "admin",
+    new Set([
+      "@daily-energy/api-client/admin",
+      "@daily-energy/shared-schemas/client",
+    ]),
+  ],
+  [
+    "miniapp",
+    new Set([
+      "@daily-energy/api-client/miniapp",
+      "@daily-energy/shared-schemas/client",
+    ]),
+  ],
+]);
 const errors = [];
 
 async function readJson(path) {
@@ -56,6 +75,55 @@ async function walk(directory, visitor) {
       await visitor(entryPath);
     }
   }
+}
+
+async function enumerateWorkspaceDirectories() {
+  let projects;
+  try {
+    const { stdout } = await executeFile(
+      "pnpm",
+      ["list", "--recursive", "--depth", "-1", "--json"],
+      {
+        cwd: repositoryRoot,
+        maxBuffer: 10 * 1024 * 1024,
+      },
+    );
+    projects = JSON.parse(stdout);
+  } catch {
+    errors.push(
+      "WORKSPACE_ENUMERATION: pnpm could not enumerate workspace projects",
+    );
+    return [];
+  }
+
+  if (!Array.isArray(projects)) {
+    errors.push("WORKSPACE_ENUMERATION: pnpm returned an invalid project list");
+    return [];
+  }
+
+  const directories = new Set();
+  for (const project of projects) {
+    if (typeof project?.path !== "string") {
+      errors.push("WORKSPACE_ENUMERATION: project path is missing");
+      continue;
+    }
+
+    const workspaceDirectory = relative(repositoryRoot, project.path);
+    if (workspaceDirectory === "") {
+      continue;
+    }
+    if (
+      workspaceDirectory === ".." ||
+      workspaceDirectory.startsWith(`..${sep}`)
+    ) {
+      errors.push(`WORKSPACE_OUTSIDE_ROOT: ${project.path}`);
+      continue;
+    }
+
+    directories.add(workspaceDirectory.split(sep).join("/"));
+  }
+
+  return [...directories].sort((left, right) => left.localeCompare(right));
 }
 
 const rootManifest = await readJson(resolve(repositoryRoot, "package.json"));
@@ -83,8 +151,25 @@ for (const versionFile of [".node-version", ".nvmrc"]) {
   }
 }
 
-const manifests = new Map();
+const actualWorkspaceDirectories = await enumerateWorkspaceDirectories();
+const actualWorkspaceDirectorySet = new Set(actualWorkspaceDirectories);
+const expectedWorkspaceDirectorySet = new Set(expectedWorkspaceDirectories);
+
 for (const workspaceDirectory of expectedWorkspaceDirectories) {
+  if (!actualWorkspaceDirectorySet.has(workspaceDirectory)) {
+    errors.push(
+      `WORKSPACE_MANIFEST_MISSING: ${workspaceDirectory}/package.json`,
+    );
+  }
+}
+for (const workspaceDirectory of actualWorkspaceDirectories) {
+  if (!expectedWorkspaceDirectorySet.has(workspaceDirectory)) {
+    errors.push(`WORKSPACE_PACKAGE_UNEXPECTED: ${workspaceDirectory}`);
+  }
+}
+
+const manifests = new Map();
+for (const workspaceDirectory of actualWorkspaceDirectories) {
   const manifestPath = resolve(
     repositoryRoot,
     workspaceDirectory,
@@ -95,7 +180,7 @@ for (const workspaceDirectory of expectedWorkspaceDirectories) {
     manifest = await readJson(manifestPath);
   } catch {
     errors.push(
-      `WORKSPACE_MANIFEST_MISSING: ${workspaceDirectory}/package.json`,
+      `WORKSPACE_MANIFEST_INVALID: ${workspaceDirectory}/package.json`,
     );
     continue;
   }
@@ -219,7 +304,7 @@ if (lockfiles.length !== 1 || lockfiles[0] !== "pnpm-lock.yaml") {
 }
 
 const importPattern =
-  /(?:from\s*|import\s*\(\s*|require\s*\(\s*)["']([^"']+)["']/gu;
+  /(?:\bfrom\s*|\bimport\s*(?:\(\s*)?|\brequire\s*\(\s*)["']([^"']+)["']/gu;
 for (const sourceRoot of ["apps", "packages"]) {
   await walk(resolve(repositoryRoot, sourceRoot), async (path) => {
     if (!sourceExtensions.test(path)) {
@@ -229,6 +314,10 @@ for (const sourceRoot of ["apps", "packages"]) {
     const source = await readFile(path, "utf8");
     const sourcePath = relative(repositoryRoot, path);
     const [sourceArea, sourceApp] = sourcePath.split(sep);
+    const clientImportAllowlist =
+      sourceArea === "apps"
+        ? clientWorkspaceImportAllowlist.get(sourceApp)
+        : undefined;
     for (const match of source.matchAll(importPattern)) {
       const specifier = match[1];
       if (
@@ -256,10 +345,31 @@ for (const sourceRoot of ["apps", "packages"]) {
       }
 
       if (
+        sourceArea === "apps" &&
+        sourceApp === "miniapp" &&
+        (specifier === "@daily-energy/api-client/admin" ||
+          specifier.startsWith("@daily-energy/api-client/admin/"))
+      ) {
+        errors.push(
+          `WORKSPACE_MINIAPP_ADMIN_IMPORT: ${sourcePath} -> ${specifier}`,
+        );
+      } else if (
+        clientImportAllowlist !== undefined &&
+        specifier.startsWith("@daily-energy/") &&
+        !clientImportAllowlist.has(specifier)
+      ) {
+        errors.push(
+          `${
+            sourceApp === "miniapp"
+              ? "WORKSPACE_CLIENT_IMPORT"
+              : "WORKSPACE_ADMIN_IMPORT"
+          }: ${sourcePath} -> ${specifier}`,
+        );
+      }
+
+      if (
         sourcePath.startsWith(`apps${sep}miniapp${sep}`) &&
         (specifier.startsWith("node:") ||
-          specifier.startsWith("@daily-energy/server-") ||
-          specifier === "@daily-energy/prompt-library" ||
           specifier.startsWith("@nestjs/") ||
           specifier === "@prisma/client" ||
           specifier === "bullmq" ||
@@ -272,9 +382,7 @@ for (const sourceRoot of ["apps", "packages"]) {
 
       if (
         sourcePath.startsWith(`apps${sep}admin${sep}`) &&
-        (specifier.startsWith("@daily-energy/server-") ||
-          specifier === "@daily-energy/prompt-library" ||
-          specifier === "@prisma/client" ||
+        (specifier === "@prisma/client" ||
           specifier === "bullmq" ||
           specifier === "ioredis")
       ) {
