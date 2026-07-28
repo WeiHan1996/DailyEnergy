@@ -82,6 +82,8 @@ E-001 已通过审核并随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/p
   五组阻断均已修复并验证；
 - **PR #91 二轮审核**：跨 workspace 相对 import 绕过 exports/runtime-zone，以及
   已有 TypeScript 源码时 `TS18003` 被放行两项阻断已修复并补充 must-fail 证据；
+- **PR #91 三轮审核**：跨 workspace JSON/资源 import 未被 source loader 收集，
+  以及 typecheck 仅发现全项目零输入、不能发现部分源码漏检两项阻断已修复；
 - **当前等待**：Draft PR #91 复审；
 - **下一状态**：用户批准并合并后进入 Done；E-003 在此之前保持 Planned。
 
@@ -94,7 +96,7 @@ E-001 已通过审核并随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/p
 - 当前 Workspace Gate 已覆盖实际 workspace 枚举、唯一 lockfile、exact toolchain、显式 exports、workspace protocol、循环、app→app、deep import 和基础 client allowlist；
 - E-002 需要把现有临时/局部 Gate 升级为统一 TypeScript、ESLint、Prettier 和依赖边界基线；
 - 已完成：6 类 TypeScript 配置、ESLint 10 flat config、Prettier、dependency-cruiser
-  补充检查、12 类项目静态 Gate、19 个 known-fail fixtures、1 个全 Gate
+  补充检查、12 类项目静态 Gate、20 个 known-fail fixtures、1 个全 Gate
   known-pass project 与全 workspace clean；
 - 已完成：11 个 workspace 全部继承批准 tsconfig，config Gate 使用 TypeScript 7
   `--showConfig` 解析最终 JSON，并拒绝任意中间层/workspace strict/path 绕过；
@@ -104,9 +106,10 @@ E-001 已通过审核并随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/p
 - 已完成：生产源码不得通过 `devDependencies` 导入 workspace，且 source/target
   runtime zone 直接校验；测试/测试工具路径保持显式 devDependency 例外；
 - 已完成：相对 import 解析后比较 source/target workspace，任意跨 workspace
-  穿越均以稳定 rule ID 拒绝，不能绕过 package exports/public contract；
-- 已完成：`TS18003` 仅在扫描确认 workspace 无 TypeScript 源码时通过；已有
-  `.ts/.tsx/.mts/.cts` 但 resolved project 零输入时 root typecheck 失败；
+  规范化目标路径穿越均以稳定 rule ID 拒绝；不依赖目标文件类型或 source loader，
+  JSON/资源同样不能绕过 package exports/public contract；
+- 已完成：每次 typecheck 都把 resolved `--showConfig.files` 与 workspace 扫描到的
+  `.ts/.tsx/.mts/.cts` 比较；全部或部分源码漏检时 root typecheck 均失败；
 - 已完成：Babel 8 ESLint parser 启用 NestJS legacy TypeScript decorator 语法，
   controller/method decorator 正向 fixture 通过；
 - 已完成：shared-schemas wildcard barrel 改为显式导出，34 项测试与 19 个 JSON
@@ -119,11 +122,11 @@ E-001 已通过审核并随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/p
   config 关闭 strict 被 resolved Gate 拒绝；client-safe 通过 devDependencies
   导入 server-core 被拒绝；
 - 已验证：format、Workspace、resolved config、ESLint decorator、12 类
-  architecture、19 个负向 fixtures、known-pass 零诊断、11/11 typecheck、34 tests、
+  architecture、20 个负向 fixtures、known-pass 零诊断、11/11 typecheck、34 tests、
   build 和 clean 全部通过；
 - 当前 PR：[Draft PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91)；
 - 未开始：E-003、业务代码、workflow、migration、容器或云资源；
-- 下一动作：复审 Draft PR #91，重点确认两轮 `CHANGES REQUIRED` 阻断均已闭环，
+- 下一动作：复审 Draft PR #91，重点确认三轮 `CHANGES REQUIRED` 阻断均已闭环，
   并继续保持 dependency-cruiser 的 TypeScript 7 证据边界；
 - 接受后的下一任务：E-003 NestJS API 骨架；本 PR 不启动；
 - 禁止并行：E-003 及其他下游 Issue。

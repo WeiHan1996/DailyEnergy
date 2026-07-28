@@ -128,10 +128,12 @@ function isTestFile(path) {
   );
 }
 
+function normalizeRelativeImportTarget(filePath, specifier) {
+  return posix.normalize(posix.join(posix.dirname(filePath), specifier));
+}
+
 function resolveRelativeImport(filePath, specifier, knownFiles) {
-  const basePath = posix.normalize(
-    posix.join(posix.dirname(filePath), specifier),
-  );
+  const basePath = normalizeRelativeImportTarget(filePath, specifier);
   const candidates = new Set([
     basePath,
     `${basePath}.js`,
@@ -464,24 +466,25 @@ function checkModuleGraph(input) {
     const edges = new Set();
     for (const specifier of importsFor(file)) {
       if (specifier.startsWith(".")) {
+        const targetPath = normalizeRelativeImportTarget(file.path, specifier);
+        const sourceWorkspace = workspaceForFile(project, file.path);
+        const targetWorkspace = workspaceForFile(project, targetPath);
+        if (
+          sourceWorkspace &&
+          targetWorkspace &&
+          sourceWorkspace.directory !== targetWorkspace.directory
+        ) {
+          errors.push(
+            diagnostic(
+              "BOUNDARY_MODULE_CROSS_WORKSPACE_RELATIVE",
+              file.path,
+              `relative import ${specifier} crosses from ${sourceWorkspace.manifest.name} to ${targetWorkspace.manifest.name}; use package exports`,
+            ),
+          );
+        }
         const target = resolveRelativeImport(file.path, specifier, knownFiles);
         if (target) {
           edges.add(target);
-          const sourceWorkspace = workspaceForFile(project, file.path);
-          const targetWorkspace = workspaceForFile(project, target);
-          if (
-            sourceWorkspace &&
-            targetWorkspace &&
-            sourceWorkspace.directory !== targetWorkspace.directory
-          ) {
-            errors.push(
-              diagnostic(
-                "BOUNDARY_MODULE_CROSS_WORKSPACE_RELATIVE",
-                file.path,
-                `relative import ${specifier} crosses from ${sourceWorkspace.manifest.name} to ${targetWorkspace.manifest.name}; use package exports`,
-              ),
-            );
-          }
         }
       }
       if (

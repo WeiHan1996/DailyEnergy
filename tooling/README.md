@@ -6,20 +6,21 @@
 - `check-config.mjs`：对 11 个 workspace 执行 TypeScript `--showConfig`，验证最终
   resolved protected options 与确定性 typecheck script；
 - `typecheck-workspace.mjs`：用 workspace 自身 tsconfig 执行 `tsc --noEmit`；
-  当前无源码的预留 workspace 只在 TypeScript 明确返回 `TS18003` 且配置仍可解析时
-  扫描确认 workspace 内确实不存在 TypeScript 源码后通过；存在 `.ts`、`.tsx`、
-  `.mts` 或 `.cts` 但 resolved project 零输入时以 `TYPECHECK_SOURCE_EXCLUDED` 失败；
+  每次解析 TypeScript `--showConfig.files` 并与 workspace 内实际 `.ts`、`.tsx`、
+  `.mts`、`.cts` 源码比较；全部或部分源码未进入 resolved project 时都以
+  `TYPECHECK_SOURCE_EXCLUDED` 失败，`TS18003` 仅在实际零 TypeScript 源码时通过；
 - `test-config.mjs`：证明共享中间配置关闭 `strict` 会被 resolved config Gate 拒绝；
 - `test-typecheck.mjs`：分别临时注入非 shared-schemas workspace 合成 `TS2322`
-  和被 `include` 漏掉的 TypeScript 源码，证明 root `pnpm typecheck` 两种情况都必须
-  失败并在结束时清理；
+  和被 `include` 全部/部分漏掉的 TypeScript 源码，证明 root `pnpm typecheck`
+  三种情况都必须失败并在结束时清理；
 - `check-boundaries.mjs`：执行 12 类 runtime zone、exports、client、capability、
   provider、restricted、Prisma、generated 与 secret/content 静态 Gate；
-- `test-boundaries.mjs`：运行 19 个 known-fail fixtures，要求每一类 Gate 命中
+- `test-boundaries.mjs`：运行 20 个 known-fail fixtures，要求每一类 Gate 命中
   稳定 rule ID；同时让隔离 known-pass project 经过全部 12 类 Gate 且严格零诊断；
 - `lib/boundary-engine.mjs`：生产仓库与 fixture 共用的边界规则引擎；相对 import
-  解析到不同 workspace 时统一以 `BOUNDARY_MODULE_CROSS_WORKSPACE_RELATIVE` 拒绝，
-  跨 workspace 只能使用 package exports/public contract。
+  的规范化目标路径进入不同 workspace 时，独立于目标文件类型/扫描结果统一以
+  `BOUNDARY_MODULE_CROSS_WORKSPACE_RELATIVE` 拒绝；跨 workspace 只能使用 package
+  exports/public contract。
 
 `dependency-cruiser` 同时检查当前可解析的 JS/ESM 图。18.1.0 尚未支持 TypeScript
 7 compiler API，因此 TypeScript import、source cycle 与 zone/capability 判断由

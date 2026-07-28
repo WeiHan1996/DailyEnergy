@@ -12,6 +12,14 @@ const excludedSourceTarget = resolve(
   repositoryRoot,
   "apps/api/__e002-typecheck-excluded-source.ts",
 );
+const partialIncludedTarget = resolve(
+  sourceDirectory,
+  "__e002-typecheck-partial-included.ts",
+);
+const partialExcludedTarget = resolve(
+  repositoryRoot,
+  "apps/api/__e002-typecheck-partial-excluded.ts",
+);
 const typeErrorFixture = resolve(
   repositoryRoot,
   "tests/typecheck/fixtures/non-shared-workspace-error.ts",
@@ -54,6 +62,8 @@ function runRootTypecheck() {
 
 await assertTargetDoesNotExist(typeErrorTarget);
 await assertTargetDoesNotExist(excludedSourceTarget);
+await assertTargetDoesNotExist(partialIncludedTarget);
+await assertTargetDoesNotExist(partialExcludedTarget);
 
 try {
   await mkdir(sourceDirectory, { recursive: true });
@@ -100,6 +110,32 @@ try {
   }
 } finally {
   await rm(excludedSourceTarget, { force: true });
+}
+
+try {
+  await mkdir(sourceDirectory, { recursive: true });
+  await copyFile(excludedSourceFixture, partialIncludedTarget);
+  await copyFile(excludedSourceFixture, partialExcludedTarget);
+  const result = runRootTypecheck();
+  const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;
+  if (
+    result.status === 0 ||
+    !output.includes("__e002-typecheck-partial-excluded.ts") ||
+    !output.includes("TYPECHECK_SOURCE_EXCLUDED")
+  ) {
+    process.stderr.write(output);
+    console.error(
+      "TYPECHECK_FIXTURE_MISSED: root pnpm typecheck must reject partially excluded workspace TypeScript source",
+    );
+    process.exitCode = 1;
+  } else {
+    console.log(
+      "Typecheck fixture Gate passed: root pnpm typecheck rejected partially excluded workspace TypeScript source while another source remained included.",
+    );
+  }
+} finally {
+  await rm(partialIncludedTarget, { force: true });
+  await rm(partialExcludedTarget, { force: true });
   if (!sourceDirectoryExisted) {
     try {
       await rmdir(sourceDirectory);

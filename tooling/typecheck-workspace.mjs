@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { readdir } from "node:fs/promises";
-import { relative, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const typeScriptCli = resolve(
@@ -17,7 +17,7 @@ const ignoredDirectories = new Set([
 ]);
 const typeScriptSourceExtension = /\.(?:cts|mts|tsx?)$/u;
 
-async function findTypeScriptSources(directory, workspaceRoot = directory) {
+async function findTypeScriptSources(directory) {
   const sources = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     if (entry.isDirectory() && ignoredDirectories.has(entry.name)) {
@@ -25,41 +25,21 @@ async function findTypeScriptSources(directory, workspaceRoot = directory) {
     }
     const entryPath = resolve(directory, entry.name);
     if (entry.isDirectory()) {
-      sources.push(...(await findTypeScriptSources(entryPath, workspaceRoot)));
+      sources.push(...(await findTypeScriptSources(entryPath)));
     } else if (entry.isFile() && typeScriptSourceExtension.test(entry.name)) {
-      sources.push(relative(workspaceRoot, entryPath));
+      sources.push(entryPath);
     }
   }
   return sources.sort();
 }
 
-const typecheck = spawnSync(
-  process.execPath,
-  [
-    typeScriptCli,
-    "-p",
-    tsconfigPath,
-    "--noEmit",
-    "--incremental",
-    "false",
-    "--pretty",
-    "false",
-  ],
-  {
-    cwd: process.cwd(),
-    encoding: "utf8",
-  },
-);
-const output = `${typecheck.stdout ?? ""}${typecheck.stderr ?? ""}`;
-
-if (typecheck.status === 0) {
-  process.stdout.write(output);
-} else if (typecheck.status === 1 && /\berror TS18003:/u.test(output)) {
+async function main() {
+  const workspaceRoot = process.cwd();
   const resolution = spawnSync(
     process.execPath,
     [typeScriptCli, "-p", tsconfigPath, "--showConfig"],
     {
-      cwd: process.cwd(),
+      cwd: workspaceRoot,
       encoding: "utf8",
     },
   );
@@ -67,33 +47,71 @@ if (typecheck.status === 0) {
     process.stderr.write(
       `${resolution.stdout ?? ""}${resolution.stderr ?? ""}`,
     );
-    process.exitCode = resolution.status ?? 1;
-  } else {
-    try {
-      JSON.parse(resolution.stdout);
-    } catch {
-      process.stderr.write(resolution.stdout);
-      console.error(
-        `TYPECHECK_CONFIG_INVALID: ${tsconfigPath} --showConfig did not return JSON`,
-      );
-      process.exitCode = 1;
-    }
-    if (process.exitCode !== 1) {
-      const sources = await findTypeScriptSources(process.cwd());
-      if (sources.length > 0) {
-        process.stderr.write(output);
-        console.error(
-          `TYPECHECK_SOURCE_EXCLUDED: ${tsconfigPath} resolved no inputs while the workspace contains TypeScript source: ${sources.join(", ")}`,
-        );
-        process.exitCode = 1;
-      } else {
-        console.log(
-          `Typecheck passed for ${tsconfigPath}: TypeScript resolved the project and the workspace contains no TypeScript source.`,
-        );
-      }
-    }
+    return resolution.status ?? 1;
   }
-} else {
+
+  let resolvedConfig;
+  try {
+    resolvedConfig = JSON.parse(resolution.stdout);
+  } catch {
+    process.stderr.write(resolution.stdout);
+    console.error(
+      `TYPECHECK_CONFIG_INVALID: ${tsconfigPath} --showConfig did not return JSON`,
+    );
+    return 1;
+  }
+
+  const sources = await findTypeScriptSources(workspaceRoot);
+  const configDirectory = dirname(resolve(workspaceRoot, tsconfigPath));
+  const resolvedFiles = new Set(
+    (resolvedConfig.files ?? []).map((file) => resolve(configDirectory, file)),
+  );
+  const excludedSources = sources.filter(
+    (source) => !resolvedFiles.has(source),
+  );
+  const typecheck = spawnSync(
+    process.execPath,
+    [
+      typeScriptCli,
+      "-p",
+      tsconfigPath,
+      "--noEmit",
+      "--incremental",
+      "false",
+      "--pretty",
+      "false",
+    ],
+    {
+      cwd: workspaceRoot,
+      encoding: "utf8",
+    },
+  );
+  const output = `${typecheck.stdout ?? ""}${typecheck.stderr ?? ""}`;
+
+  if (excludedSources.length > 0) {
+    process.stderr.write(output);
+    console.error(
+      `TYPECHECK_SOURCE_EXCLUDED: ${tsconfigPath} does not include workspace TypeScript source: ${excludedSources.map((source) => relative(workspaceRoot, source)).join(", ")}`,
+    );
+    return 1;
+  }
+  if (typecheck.status === 0) {
+    process.stdout.write(output);
+    return 0;
+  }
+  if (
+    typecheck.status === 1 &&
+    /\berror TS18003:/u.test(output) &&
+    sources.length === 0
+  ) {
+    console.log(
+      `Typecheck passed for ${tsconfigPath}: TypeScript resolved the project and the workspace contains no TypeScript source.`,
+    );
+    return 0;
+  }
+
   process.stderr.write(output);
-  process.exitCode = typecheck.status ?? 1;
+  return typecheck.status ?? 1;
 }
+
+process.exitCode = await main();
