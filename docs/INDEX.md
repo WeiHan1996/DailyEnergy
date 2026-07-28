@@ -234,21 +234,20 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001、E-002 已完成，E-003 是 Phase 1 唯一 In Review。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001、E-002、E-003 已完成，E-004 是 Phase 1 唯一 Ready。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-003 Issue #40](https://github.com/WeiHan1996/DailyEnergy/issues/40)；
-7. [API 契约](./technical/api.md) 与 [错误码规范](./technical/error-codes.md)；
-8. [系统架构](./technical/architecture.md)；
-9. [仓库结构与模块边界](./technical/repository-structure.md)；
+6. [E-004 Issue #42](https://github.com/WeiHan1996/DailyEnergy/issues/42)；
+7. [信息架构](./design/information-architecture.md) 与 [页面清单](./design/screen-inventory.md)；
+8. [仓库结构与模块边界](./technical/repository-structure.md)；
+9. [测试策略](./technical/testing.md)；
 10. [部署、配置和回滚](./technical/deployment.md)；
-11. [可观测性和成本监控](./technical/observability.md)；
-12. [测试策略](./technical/testing.md)；
-13. `apps/api`、root 配置、共享 TypeScript/ESLint 配置与 E-002 Gate；
-14. tasks/backlog.md（仅在需要重排优先级时）。
+11. `apps/miniapp`、root 配置、共享 TypeScript/ESLint 配置与 E-002 Gate；
+12. E-003 API 运行合同和仓库现状；
+13. tasks/backlog.md（仅在需要重排优先级时）。
 
-E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done。E-003 已在 `agent/e-003-api-baseline` 完成实现与全仓验证，[Draft PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 正在等待审核；E-004～E-014、E-008 及其他下游 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
+E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done，E-003 已随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 合并并进入 Done。E-004 Issue #42 是唯一 Ready，尚未创建实现分支或 Draft PR；E-005～E-014、E-008 及其他下游 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
