@@ -69,124 +69,127 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 ## 4. 项目控制文档
 
-| 文件 | 状态 | 作用 | 更新时机 |
-|---|---|---|---|
-| [README.md](../README.md) | Active | 项目入口、定位和当前状态 | 阶段或入口变化 |
-| [ROADMAP.md](../ROADMAP.md) | Accepted | 长期阶段、交付物和退出门槛 | 里程碑或重大计划变化 |
-| [AGENTS.md](../AGENTS.md) | Active | AI 与开发协作规则 | 工作方式变化 |
-| [docs/INDEX.md](./INDEX.md) | Active | 文档状态和依赖索引 | 文档新增、接受或取代 |
-| [tasks/current.md](../tasks/current.md) | Active | 唯一当前任务和交接状态 | 每个任务开始、进展和完成 |
-| [tasks/backlog.md](../tasks/backlog.md) | Active | 有序候选任务 | 计划、优先级和依赖变化 |
+| 文件                                    | 状态     | 作用                       | 更新时机                 |
+| --------------------------------------- | -------- | -------------------------- | ------------------------ |
+| [README.md](../README.md)               | Active   | 项目入口、定位和当前状态   | 阶段或入口变化           |
+| [ROADMAP.md](../ROADMAP.md)             | Accepted | 长期阶段、交付物和退出门槛 | 里程碑或重大计划变化     |
+| [AGENTS.md](../AGENTS.md)               | Active   | AI 与开发协作规则          | 工作方式变化             |
+| [docs/INDEX.md](./INDEX.md)             | Active   | 文档状态和依赖索引         | 文档新增、接受或取代     |
+| [tasks/current.md](../tasks/current.md) | Active   | 唯一当前任务和交接状态     | 每个任务开始、进展和完成 |
+| [tasks/backlog.md](../tasks/backlog.md) | Active   | 有序候选任务               | 计划、优先级和依赖变化   |
 
 这些文件负责控制项目，不取代产品和技术规范。
 
 ## 5. 已接受产品基线
 
-| 文件 | 状态 | 主要内容 | 上游 |
-|---|---|---|---|
-| [docs/product/vision.md](./product/vision.md) | Accepted | 产品愿景、使命、价值、边界和成功表现 | 无 |
-| [docs/product/persona.md](./product/persona.md) | Accepted | 22～35 岁职场女性、小红书/抖音渠道、场景和招募标准 | vision |
-| [docs/product/journey.md](./product/journey.md) | Accepted | 渠道触达到连续 7 天的完整旅程 | vision、persona |
-| [docs/product/mvp.md](./product/mvp.md) | Accepted | P0/P1 范围、验收标准、指标、Gate 和完成定义 | vision、persona、journey |
+| 文件                                            | 状态     | 主要内容                                           | 上游                     |
+| ----------------------------------------------- | -------- | -------------------------------------------------- | ------------------------ |
+| [docs/product/vision.md](./product/vision.md)   | Accepted | 产品愿景、使命、价值、边界和成功表现               | 无                       |
+| [docs/product/persona.md](./product/persona.md) | Accepted | 22～35 岁职场女性、小红书/抖音渠道、场景和招募标准 | vision                   |
+| [docs/product/journey.md](./product/journey.md) | Accepted | 渠道触达到连续 7 天的完整旅程                      | vision、persona          |
+| [docs/product/mvp.md](./product/mvp.md)         | Accepted | P0/P1 范围、验收标准、指标、Gate 和完成定义        | vision、persona、journey |
 
 ## 6. 已接受 AI 与决策基线
 
-| 文件 | 状态 | 主要内容 | 上游 |
-|---|---|---|---|
-| [docs/ai/personality.md](./ai/personality.md) | Accepted | 数字朋友人格、表达风格、记忆语言和安全边界 | 产品基线 |
-| [docs/decisions/ADR-0001-product-positioning.md](./decisions/ADR-0001-product-positioning.md) | Accepted | 定位为日常陪伴，而非算命工具 | 产品与人格基线 |
+| 文件                                                                                                        | 状态     | 主要内容                                         | 上游                                   |
+| ----------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------ | -------------------------------------- |
+| [docs/ai/personality.md](./ai/personality.md)                                                               | Accepted | 数字朋友人格、表达风格、记忆语言和安全边界       | 产品基线                               |
+| [docs/decisions/ADR-0001-product-positioning.md](./decisions/ADR-0001-product-positioning.md)               | Accepted | 定位为日常陪伴，而非算命工具                     | 产品与人格基线                         |
 | [docs/decisions/ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md) | Accepted | 产品日期、稳定种子、结果身份、历史冻结与删除边界 | state-machine、business-rules、schemas |
 
 ## 7. Phase 0B 计划文档
 
 ### 7.1 设计与交互
 
-| 文件 | 状态 | 目的 | 主要依赖 |
-|---|---|---|---|
-| docs/design/information-architecture.md | Accepted | 页面层级、入口和导航 | journey、mvp |
-| docs/design/screen-inventory.md | Accepted | 页面、弹层、系统状态清单 | information-architecture |
-| [docs/design/screen-specs.md](./design/screen-specs.md) | Accepted | 每页字段、操作和验收 | screen-inventory |
-| [docs/design/interaction-states.md](./design/interaction-states.md) | Accepted | 加载、失败、降级、权限和恢复 | screen-specs |
-| [docs/design/content-layout.md](./design/content-layout.md) | Accepted | 今日内容、趋势和分享的信息层级 | personality、daily-content-schema |
-| docs/design/design-system.md | Planned | 颜色、排版、组件、动效和无障碍 | 页面规格 |
-| [docs/design/prototype-validation.md](./design/prototype-validation.md) | Accepted | [S-04 静态原型](../prototype/s04/README.md)、5～8 人测试计划和结果模板 | Accepted S-03 设计规格 |
+| 文件                                                                    | 状态     | 目的                                                                   | 主要依赖                          |
+| ----------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------- | --------------------------------- |
+| docs/design/information-architecture.md                                 | Accepted | 页面层级、入口和导航                                                   | journey、mvp                      |
+| docs/design/screen-inventory.md                                         | Accepted | 页面、弹层、系统状态清单                                               | information-architecture          |
+| [docs/design/screen-specs.md](./design/screen-specs.md)                 | Accepted | 每页字段、操作和验收                                                   | screen-inventory                  |
+| [docs/design/interaction-states.md](./design/interaction-states.md)     | Accepted | 加载、失败、降级、权限和恢复                                           | screen-specs                      |
+| [docs/design/content-layout.md](./design/content-layout.md)             | Accepted | 今日内容、趋势和分享的信息层级                                         | personality、daily-content-schema |
+| [docs/design/prototype-validation.md](./design/prototype-validation.md) | Accepted | [S-04 静态原型](../prototype/s04/README.md)、5～8 人测试计划和结果模板 | Accepted S-03 设计规格            |
+| docs/design/visual-direction.md                                         | Planned  | D-001 品牌人格、视觉路线和最终方向                                     | Accepted 页面与交互规格           |
+| docs/design/design-system.md                                            | Planned  | D-002 Variables、Design Tokens、组件、动效和无障碍                     | D-001、E-004                      |
+| docs/design/core-flow-high-fidelity.md                                  | Planned  | D-003 核心流程八页及关键状态高保真索引                                 | D-002                             |
+| docs/design/developer-handoff.md                                        | Planned  | D-004 可点击原型、验证结果、Frame ID 和视觉 QA 交付                    | D-003、prototype-validation       |
 
 ### 7.2 产品状态与 Schema
 
-| 文件 | 状态 | 目的 | 主要依赖 |
-|---|---|---|---|
-| [docs/product/state-machine.md](./product/state-machine.md) | Accepted | 用户、关系和每日体验状态 | journey、mvp |
-| [docs/product/business-rules.md](./product/business-rules.md) | Accepted | 点亮、中断、跨日、提醒和删除规则 | state-machine |
-| [docs/ai/daily-content-schema.md](./ai/daily-content-schema.md) | Accepted | 今日结构化结果和 AI 输出契约 | mvp、personality |
-| [docs/ai/evening-feedback-schema.md](./ai/evening-feedback-schema.md) | Accepted | 晚间反馈输入和输出 | journey、mvp |
-| [docs/ai/weekly-summary-schema.md](./ai/weekly-summary-schema.md) | Accepted | 七天趋势和总结契约 | daily-content、feedback |
-| [packages/shared-schemas](../packages/shared-schemas/README.md) | Accepted | 可执行 Zod Schema | 已接受 Schema 文档 |
+| 文件                                                                  | 状态     | 目的                             | 主要依赖                |
+| --------------------------------------------------------------------- | -------- | -------------------------------- | ----------------------- |
+| [docs/product/state-machine.md](./product/state-machine.md)           | Accepted | 用户、关系和每日体验状态         | journey、mvp            |
+| [docs/product/business-rules.md](./product/business-rules.md)         | Accepted | 点亮、中断、跨日、提醒和删除规则 | state-machine           |
+| [docs/ai/daily-content-schema.md](./ai/daily-content-schema.md)       | Accepted | 今日结构化结果和 AI 输出契约     | mvp、personality        |
+| [docs/ai/evening-feedback-schema.md](./ai/evening-feedback-schema.md) | Accepted | 晚间反馈输入和输出               | journey、mvp            |
+| [docs/ai/weekly-summary-schema.md](./ai/weekly-summary-schema.md)     | Accepted | 七天趋势和总结契约               | daily-content、feedback |
+| [packages/shared-schemas](../packages/shared-schemas/README.md)       | Accepted | 可执行 Zod Schema                | 已接受 Schema 文档      |
 
 ### 7.3 稳定生成与 AI
 
-| 文件 | 状态 | 目的 | 主要依赖 |
-|---|---|---|---|
-| [docs/ai/generation-engine.md](./ai/generation-engine.md) | Accepted | 稳定种子、版本、缓存、幂等和受控表达计划 | state-machine、daily-content-schema、ADR-0002 |
-| [docs/ai/scoring-rules.md](./ai/scoring-rules.md) | Accepted | 五维分数、行动候选与七天真实记录聚合规则 | generation-engine、weekly-summary-schema |
-| [docs/ai/s11-test-vectors.json](./ai/s11-test-vectors.json) | Accepted | 每日与七天规则的跨语言 golden vectors | generation-engine、scoring-rules、shared-schemas |
-| [docs/ai/gateway.md](./ai/gateway.md) | Accepted | 供应商隔离、路由、超时、降级、熔断、成本与隐私 | generation-engine、schemas、ADR-0003 |
-| [docs/ai/prompt-spec.md](./ai/prompt-spec.md) | Accepted | Prompt package、封闭输入、规范指令、事实绑定、版本与回归 | personality、schemas、gateway |
-| [docs/ai/memory.md](./ai/memory.md) | Accepted | 领域源、用途授权、确定性投影、有效期、无源回退与删除 | persona、journey、personality、prompt |
-| [docs/ai/safety.md](./ai/safety.md) | Accepted | 输入分类、专业边界、固定响应、地区资源、恢复与全候选审核 | vision、personality、schemas、gateway、prompt、memory |
-| [docs/ai/evaluation.md](./ai/evaluation.md) | Accepted | 不可补偿 Gate、自动/人工评价、provider bake-off、延迟成本与变更回归 | personality、schemas、gateway、prompt、memory、safety |
-| [docs/ai/evaluation-corpus.json](./ai/evaluation-corpus.json) | Accepted | 37+52+48+60+72 共 269 项版本化机器可读测试清单 | gateway、prompt、memory、safety、evaluation |
+| 文件                                                          | 状态     | 目的                                                                | 主要依赖                                              |
+| ------------------------------------------------------------- | -------- | ------------------------------------------------------------------- | ----------------------------------------------------- |
+| [docs/ai/generation-engine.md](./ai/generation-engine.md)     | Accepted | 稳定种子、版本、缓存、幂等和受控表达计划                            | state-machine、daily-content-schema、ADR-0002         |
+| [docs/ai/scoring-rules.md](./ai/scoring-rules.md)             | Accepted | 五维分数、行动候选与七天真实记录聚合规则                            | generation-engine、weekly-summary-schema              |
+| [docs/ai/s11-test-vectors.json](./ai/s11-test-vectors.json)   | Accepted | 每日与七天规则的跨语言 golden vectors                               | generation-engine、scoring-rules、shared-schemas      |
+| [docs/ai/gateway.md](./ai/gateway.md)                         | Accepted | 供应商隔离、路由、超时、降级、熔断、成本与隐私                      | generation-engine、schemas、ADR-0003                  |
+| [docs/ai/prompt-spec.md](./ai/prompt-spec.md)                 | Accepted | Prompt package、封闭输入、规范指令、事实绑定、版本与回归            | personality、schemas、gateway                         |
+| [docs/ai/memory.md](./ai/memory.md)                           | Accepted | 领域源、用途授权、确定性投影、有效期、无源回退与删除                | persona、journey、personality、prompt                 |
+| [docs/ai/safety.md](./ai/safety.md)                           | Accepted | 输入分类、专业边界、固定响应、地区资源、恢复与全候选审核            | vision、personality、schemas、gateway、prompt、memory |
+| [docs/ai/evaluation.md](./ai/evaluation.md)                   | Accepted | 不可补偿 Gate、自动/人工评价、provider bake-off、延迟成本与变更回归 | personality、schemas、gateway、prompt、memory、safety |
+| [docs/ai/evaluation-corpus.json](./ai/evaluation-corpus.json) | Accepted | 37+52+48+60+72 共 269 项版本化机器可读测试清单                      | gateway、prompt、memory、safety、evaluation           |
 
 ### 7.4 数据与接口
 
-| 文件 | 状态 | 目的 | 主要依赖 |
-|---|---|---|---|
-| [docs/data/domain-model.md](./data/domain-model.md) | Accepted | 领域上下文、聚合、实体、关系、唯一性、修订与失效 | state-machine、schemas、memory、safety、evaluation |
-| [docs/technical/database.md](./technical/database.md) | Accepted | PostgreSQL 表、索引、约束、事务、迁移和删除规格 | domain-model、ADR-0005 |
-| [prisma/schema.prisma](../prisma/schema.prisma) | Accepted | Prisma ORM 7 / PostgreSQL 可执行结构草案 | database spec |
-| [docs/technical/api.md](./technical/api.md) | Accepted | 小程序、后端和后台接口契约 | domain、schemas、database |
-| [docs/technical/error-codes.md](./technical/error-codes.md) | Accepted | 错误、恢复和降级语义 | API、interaction-states |
-| [openapi/openapi.yaml](../openapi/openapi.yaml) | Accepted | OpenAPI 3 可执行路径草案 | api.md |
-| [packages/api-client](../packages/api-client/README.md) | Draft | E-008 Public/Admin 生成客户端、mapper 与 drift 使用说明 | shared-schemas、OpenAPI、error-codes |
+| 文件                                                        | 状态     | 目的                                                    | 主要依赖                                           |
+| ----------------------------------------------------------- | -------- | ------------------------------------------------------- | -------------------------------------------------- |
+| [docs/data/domain-model.md](./data/domain-model.md)         | Accepted | 领域上下文、聚合、实体、关系、唯一性、修订与失效        | state-machine、schemas、memory、safety、evaluation |
+| [docs/technical/database.md](./technical/database.md)       | Accepted | PostgreSQL 表、索引、约束、事务、迁移和删除规格         | domain-model、ADR-0005                             |
+| [prisma/schema.prisma](../prisma/schema.prisma)             | Accepted | Prisma ORM 7 / PostgreSQL 可执行结构草案                | database spec                                      |
+| [docs/technical/api.md](./technical/api.md)                 | Accepted | 小程序、后端和后台接口契约                              | domain、schemas、database                          |
+| [docs/technical/error-codes.md](./technical/error-codes.md) | Accepted | 错误、恢复和降级语义                                    | API、interaction-states                            |
+| [openapi/openapi.yaml](../openapi/openapi.yaml)             | Accepted | OpenAPI 3 可执行路径草案                                | api.md                                             |
+| [packages/api-client](../packages/api-client/README.md)     | Draft    | E-008 Public/Admin 生成客户端、mapper 与 drift 使用说明 | shared-schemas、OpenAPI、error-codes               |
 
 ### 7.5 数据分析、隐私与运营
 
-| 文件 | 状态 | 目的 | 主要依赖 |
-|---|---|---|---|
-| [docs/analytics/event-tracking.md](./analytics/event-tracking.md) | Accepted | 事件、属性、平面、匿名聚合与质量 Gate | information-architecture、state-machine、API、privacy |
-| [docs/analytics/metrics.md](./analytics/metrics.md) | Accepted | 激活、D1/D3/D7、互动、运行、成本、小样本与研究 Gate 的唯一口径 | event-tracking |
-| [docs/analytics/experiments.md](./analytics/experiments.md) | Accepted | 实验边界、方法、主指标、样本、停止、回滚与个人 assignment Gate | metrics |
-| [docs/analytics/channel-attribution.md](./analytics/channel-attribution.md) | Accepted | 小红书/抖音承接、来源令牌、首次触达、渠道指标与隐私 Gate | event-tracking、metrics、experiments |
-| [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md) | Accepted | 数据、用途、位置、访问、保存、删除和用户权利 | domain、database、API、ADR-0005 |
-| [docs/operations/content-moderation.md](./operations/content-moderation.md) | Accepted | 审核、抽检和申诉 | safety、evaluation、privacy |
-| [docs/operations/user-support.md](./operations/user-support.md) | Accepted | FAQ、支持、升级、用户权利摘要与受限访问 | journey、privacy、moderation |
-| [docs/operations/incident-response.md](./operations/incident-response.md) | Accepted | 故障和安全事件流程 | safety、privacy、moderation、support |
+| 文件                                                                        | 状态     | 目的                                                           | 主要依赖                                              |
+| --------------------------------------------------------------------------- | -------- | -------------------------------------------------------------- | ----------------------------------------------------- |
+| [docs/analytics/event-tracking.md](./analytics/event-tracking.md)           | Accepted | 事件、属性、平面、匿名聚合与质量 Gate                          | information-architecture、state-machine、API、privacy |
+| [docs/analytics/metrics.md](./analytics/metrics.md)                         | Accepted | 激活、D1/D3/D7、互动、运行、成本、小样本与研究 Gate 的唯一口径 | event-tracking                                        |
+| [docs/analytics/experiments.md](./analytics/experiments.md)                 | Accepted | 实验边界、方法、主指标、样本、停止、回滚与个人 assignment Gate | metrics                                               |
+| [docs/analytics/channel-attribution.md](./analytics/channel-attribution.md) | Accepted | 小红书/抖音承接、来源令牌、首次触达、渠道指标与隐私 Gate       | event-tracking、metrics、experiments                  |
+| [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md)     | Accepted | 数据、用途、位置、访问、保存、删除和用户权利                   | domain、database、API、ADR-0005                       |
+| [docs/operations/content-moderation.md](./operations/content-moderation.md) | Accepted | 审核、抽检和申诉                                               | safety、evaluation、privacy                           |
+| [docs/operations/user-support.md](./operations/user-support.md)             | Accepted | FAQ、支持、升级、用户权利摘要与受限访问                        | journey、privacy、moderation                          |
+| [docs/operations/incident-response.md](./operations/incident-response.md)   | Accepted | 故障和安全事件流程                                             | safety、privacy、moderation、support                  |
 
 ### 7.6 工程架构与交付
 
-| 文件 | 状态 | 目的 | 主要依赖 |
-|---|---|---|---|
-| [docs/technical/architecture.md](./technical/architecture.md) | Accepted | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复 | Gateway、database、API、ADR-0006 |
-| [docs/technical/repository-structure.md](./technical/repository-structure.md) | Accepted | Monorepo 目录、app/package/module、public exports 与依赖 Gate | architecture、ADR-0006 |
-| [docs/technical/testing.md](./technical/testing.md) | Accepted | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵 | schemas、API、architecture、repository-structure |
-| [docs/technical/deployment.md](./technical/deployment.md) | Accepted | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复 | architecture、repository-structure、testing、privacy |
-| [docs/technical/observability.md](./technical/observability.md) | Accepted | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本 | metrics、Gateway、privacy、incident、architecture、deployment |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Accepted | 48 个 Issues 已按 14 / 17 / 17 绑定三个真实 Milestone | Accepted Phase 0B specs |
+| 文件                                                                                                                                                                                                   | 状态     | 目的                                                                                      | 主要依赖                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                 | Gateway、database、API、ADR-0006                              |
+| [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted | Monorepo 目录、app/package/module、public exports 与依赖 Gate                             | architecture、ADR-0006                                        |
+| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵                                      | schemas、API、architecture、repository-structure              |
+| [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复                                    | architecture、repository-structure、testing、privacy          |
+| [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                  | metrics、Gateway、privacy、incident、architecture、deployment |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active   | 52 个 Issues 已按 14 / 21 / 17 绑定三个真实 Milestone；其中新增 D-001～D-004 均为 Planned | Accepted Phase 0B specs、D 系列项目控制                       |
 
 ### 7.7 Phase Gate
 
-| 文件 | 状态 | 目的 | 主要依赖 |
-|---|---|---|---|
+| 文件                                                        | 状态     | 目的                                                                      | 主要依赖            |
+| ----------------------------------------------------------- | -------- | ------------------------------------------------------------------------- | ------------------- |
 | [docs/reports/phase-0b-gate.md](./reports/phase-0b-gate.md) | Accepted | 复核 Phase 0B 总退出门槛、端到端追踪、延后项、外部 Gate 与 E-001 开工合同 | S-01～S-34、ROADMAP |
 
 ## 8. 计划 ADR
 
-| 文件 | 状态 | 决策主题 | 最晚完成点 |
-|---|---|---|---|
-| [ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md) | Accepted | 稳定种子、产品日期、历史不变与重生成 | 规则引擎开发前 |
-| [ADR-0003-ai-provider-abstraction.md](./decisions/ADR-0003-ai-provider-abstraction.md) | Accepted | AI Gateway 与供应商隔离 | AI Gateway 开发前 |
-| [ADR-0004-structured-memory.md](./decisions/ADR-0004-structured-memory.md) | Accepted | 用途受限结构化记忆与不用向量库 | 记忆开发前 |
-| [ADR-0005-data-retention-and-deletion.md](./decisions/ADR-0005-data-retention-and-deletion.md) | Accepted | 保存期限、删除、备份、受托方和受限证据 | 数据库开发前 |
-| [ADR-0006-monorepo-and-stack.md](./decisions/ADR-0006-monorepo-and-stack.md) | Accepted | pnpm/Turbo 单仓、运行时、框架、数据与版本治理 | 工程初始化前 |
+| 文件                                                                                           | 状态     | 决策主题                                      | 最晚完成点        |
+| ---------------------------------------------------------------------------------------------- | -------- | --------------------------------------------- | ----------------- |
+| [ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md)   | Accepted | 稳定种子、产品日期、历史不变与重生成          | 规则引擎开发前    |
+| [ADR-0003-ai-provider-abstraction.md](./decisions/ADR-0003-ai-provider-abstraction.md)         | Accepted | AI Gateway 与供应商隔离                       | AI Gateway 开发前 |
+| [ADR-0004-structured-memory.md](./decisions/ADR-0004-structured-memory.md)                     | Accepted | 用途受限结构化记忆与不用向量库                | 记忆开发前        |
+| [ADR-0005-data-retention-and-deletion.md](./decisions/ADR-0005-data-retention-and-deletion.md) | Accepted | 保存期限、删除、备份、受托方和受限证据        | 数据库开发前      |
+| [ADR-0006-monorepo-and-stack.md](./decisions/ADR-0006-monorepo-and-stack.md)                   | Accepted | pnpm/Turbo 单仓、运行时、框架、数据与版本治理 | 工程初始化前      |
 
 如果实际决策发生变化，应调整 ADR 名称和顺序，不为填满编号而创建无价值文档。
 
@@ -235,30 +238,30 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-004 与 E-008 已完成，E-005 是 Phase 1 唯一 In Review 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-005 与 E-008 已完成，E-006 是 Phase 1 唯一 Ready 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)
-   与 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)；
-7. [页面清单](./design/screen-inventory.md)、[API 契约](./technical/api.md)、
-   [错误码](./technical/error-codes.md) 与 [API Client](../packages/api-client/README.md)；
+6. [E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)；
+7. [领域模型](./data/domain-model.md)、[数据库规格](./technical/database.md)
+   与 [隐私数据地图](./operations/privacy-data-map.md)；
 8. [仓库结构与模块边界](./technical/repository-structure.md)；
 9. [测试策略](./technical/testing.md)；
 10. [部署、配置和回滚](./technical/deployment.md)；
-11. E-003 API、E-004 Mini Program、E-008 contract/codegen Gate 和根工具链；
+11. E-003 API、E-005 Admin、E-008 contract/codegen Gate 和根工具链；
 12. tasks/backlog.md（仅在需要重排优先级时）。
 
 E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done；E-008 已随
-PR #97 squash 合并并关闭 Issue #46。E-005 已在
-`agent/e-005-admin-shell` 完成 Next.js Admin shell、production fail-closed、
-Admin API/session 边界、route typegen、静态 bundle + HTML/RSC/网络响应 Gate、
-真实 Next known-fail fixture 与 Playwright 证据，并以
-[Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98) 进入 In Review。
+PR #97 squash 合并并关闭 Issue #46。E-005 已随
+[PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98) 合并，merge commit
+为 `bde64fd60128ab699eac3251bcf2eace88f0a902`，Issue #43 已关闭。
+[D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)～
+[D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 已纳入
+Phase 2，D-004 已成为 C-003、C-004、C-009 的直接前置；四项均保持 Planned。
 正式 Source-ID registry 由 E-010 交付；E-005 已在固定 fixture 中记录对应
 Source IDs，并按 E-010 前的 `NA_WITH_REASON` 规则保留可执行证据。
 CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production
-Gate 未被自动解除；E-006 及其他工程任务保持 Planned。
+Gate 未被自动解除；E-006 是唯一 Ready，但尚未开工。
