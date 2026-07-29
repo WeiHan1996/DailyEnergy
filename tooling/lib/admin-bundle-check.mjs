@@ -30,15 +30,16 @@ function jsonStringContent(value) {
 
 function javascriptSafeContent(value, uppercase, hexadecimal) {
   const prefix = hexadecimal ? "\\x" : "\\u00";
-  const code = (value) => value.toString(16).padStart(2, "0");
+  const codePointHex = (codePoint) =>
+    codePoint.toString(16).padStart(2, "0");
   const escaped = jsonStringContent(value).replace(/[<>&']/gu, (character) => {
-    const digits = code(character.codePointAt(0));
+    const digits = codePointHex(character.codePointAt(0));
     return `${prefix}${uppercase ? digits.toUpperCase() : digits}`;
   });
 
   return escaped
-    .replaceAll(" ", uppercase ? "\\u2028" : "\\u2028")
-    .replaceAll(" ", uppercase ? "\\u2029" : "\\u2029");
+    .replaceAll("\u2028", "\\u2028")
+    .replaceAll("\u2029", "\\u2029");
 }
 
 function htmlEntityContent(value, style) {
