@@ -21,6 +21,31 @@
   的规范化目标路径进入不同 workspace 时，独立于目标文件类型/扫描结果统一以
   `BOUNDARY_MODULE_CROSS_WORKSPACE_RELATIVE` 拒绝；跨 workspace 只能使用 package
   exports/public contract。
+- `generate-contracts.mjs`：从 Zod、OpenAPI source 和 Accepted error catalog
+  确定性生成 20 份 JSON Schema、OpenAPI bundle 以及 miniapp/Admin TypeScript
+  client；`--write` 写入，`--check` 逐字节检查已提交产物；
+- `check-contracts.mjs`：检查 OpenAPI parse/operation/error/envelope/status、
+  Public/Admin audience、Zod projection、显式 mapper、package exports、API error
+  catalog 和 client-safe 字段/依赖；
+- `test-contracts.mjs`：运行正常 corpus、重复生成，并让 15 条稳定 rule ID
+  分别命中最小 known-fail mutation，包括生成文件删除、手改和来源指纹漂移；
+- `compile-api-client-entrypoints.mjs`：用独立 client-safe TypeScript project
+  编译 miniapp、Admin 与 testing 三个入口；
+- `lib/contract-codegen.mjs` 与 `lib/contract-gate.mjs`：生成和 Gate 的共享纯逻辑，
+  不读取环境密钥，不写时间戳、本机路径、用户名或真实内容。
+
+合同工作流：
+
+```bash
+pnpm codegen
+pnpm codegen:check
+pnpm contract:check
+pnpm contract:fixtures
+```
+
+Zod 不能被 JSON Schema 等价表达的 refinement（例如真实日历日期、Unicode
+grapheme 和跨对象等式）仍由 runtime Zod 强制；生成 JSON Schema 只承担可表示的
+跨语言预校验和文档投影。
 
 `dependency-cruiser` 同时检查当前可解析的 JS/ESM 图。18.1.0 尚未支持 TypeScript
 7 compiler API，因此 TypeScript import、source cycle 与 zone/capability 判断由

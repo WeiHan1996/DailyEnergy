@@ -1,104 +1,126 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-07-28
+- **最后更新**：2026-07-29
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务 ID**：E-004
-- **当前任务名称**：创建微信原生小程序 TypeScript 骨架
+- **当前任务**：E-008 — 统一 Zod Schema、OpenAPI 与生成 API Client
 - **任务状态**：In Review
-- **优先级**：最高
-- **当前分支**：`agent/e-004-miniapp-skeleton`
-- **上游 PR**：[E-003 PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93)
-- **当前 Issue**：[E-004 Issue #42](https://github.com/WeiHan1996/DailyEnergy/issues/42)
-- **当前 PR**：[E-004 Draft PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96)
+- **当前分支**：`agent/e-008-contract-codegen`
+- **当前 Issue**：[E-008 Issue #46](https://github.com/WeiHan1996/DailyEnergy/issues/46)
+- **当前 PR**：[Draft PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)
 - **Gate 结论**：`GO`
 
 ## 1. 当前目标
 
-建立微信原生小程序入口、启动路由、平台适配层和 client-only 构建边界，为后续确定性业务页面提供可加载、可测试、不会泄漏服务端能力的运行骨架。
+建立唯一、可执行且可重复生成的合同方向：
 
-E-003 已通过审核并随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) squash 合并，Issue #40 已自动关闭为 completed。E-004 已完成仓库内实现与验证，并以 [Draft PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96) 进入 In Review；任务不会在用户审核和平台证据处理前标记为 Done。
+```text
+Zod Schema
+  → client-safe 投影 / JSON Schema
+  → OpenAPI HTTP path / envelope
+  → 显式 mapper
+  → miniapp / admin API Client
+```
 
-## 2. 上游完成状态
+E-004 已随 [PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96)
+squash 合并，merge commit 为
+`84f06b14e77a0df7f57bda60870cb8f4f30cfb32`，Issue #42 已关闭。
+E-008 是唯一 In Review 任务；E-005、E-006 及其他工程任务不得并行开始。
 
-- Phase 0B Gate 已获用户确认，结论为 Accepted `GO`；
-- E-001 已完成 pnpm/Turborepo Monorepo、11 个 workspace 和基础 Workspace Gate；
-- E-002 已完成 TypeScript 7 strict、ESLint、Prettier、11/11 workspace typecheck 和 12 类静态边界 Gate；
-- E-003 已完成 NestJS API 组合根、配置/能力指纹、Public/Admin/Safety 边界、错误与日志合同、健康检查及有界优雅关闭；
-- E-001、E-002、E-003 均已完成，满足 E-004 当前硬前置；
-- E-005～E-014、E-008 及其他下游工程 Issue 继续保持 Planned；
-- 云厂商、域名、主体、跨境、真实账号/密钥、热线、监控接收人和值班等外部 Gate 仍未解除，但不阻塞 E-004 的本地工程骨架。
+## 2. 开工检查
 
-## 3. 开工前读取顺序
+- 当前分支、本地 `main` 与 `origin/main` 均基于 E-004 merge commit；
+- 工作区开工时无用户未提交改动；
+- Issue #46、Accepted API/error/OpenAPI、仓库结构、测试、部署与
+  ADR-0006 已复核；
+- Zod 的业务值权威、OpenAPI 的 transport 权威和显式 mapper 边界一致；
+- OpenAPI `EveningSaveRequest` 与
+  `EveningReflectionSubmissionSchema` 存在有意的 transport/domain 形状差异，
+  必须由单向 mapper 处理，不得复制或静默改写 Schema；
+- 正式 Source-ID registry 属于 E-010，本任务只记录实际机器证据，不创建伪
+  registry。
 
-1. [E-004 Issue #42](https://github.com/WeiHan1996/DailyEnergy/issues/42)；
-2. [信息架构](../docs/design/information-architecture.md)；
-3. [页面清单](../docs/design/screen-inventory.md)；
-4. [仓库结构与模块边界](../docs/technical/repository-structure.md)；
-5. [测试策略](../docs/technical/testing.md)；
-6. [部署、配置和回滚](../docs/technical/deployment.md)；
-7. `apps/miniapp`、root 配置、共享 TypeScript/ESLint 配置与 E-002 边界 Gate；
-8. E-003 API 运行合同及仓库现状。
+## 3. E-008 范围
 
-如果上述 Accepted 权威互相冲突、文件缺失，或 E-004 无法在一个主要 PR 内完成，应停止并将 E-004 设为 Blocked，不得在实现中静默改写上游决定。
+- 发布 `@daily-energy/shared-schemas` 的根、`./client` 和
+  `./json-schema` 显式出口；
+- 建立 Zod → JSON Schema / OpenAPI projection 的确定性生成；
+- 发布 `@daily-energy/api-client/miniapp`、`./admin` 和 `./testing`；
+- 固定 Public/Admin audience、client-safe import/field 与 mapper 边界；
+- 建立 source fingerprint、generated header、drift 和 clean-generation Gate；
+- 提供 Schema corpus、OpenAPI/error、client compile、mapper 与 codegen
+  正负测试；
+- 保持 E-003 API 与 E-004 Mini Program 现有 Gate 通过。
 
-## 4. E-004 范围
+## 4. 不做
 
-- 创建 `apps/miniapp` 的 app/pages/components/features/platform/services/generated 结构；
-- 配置微信原生小程序 TypeScript 构建、环境 API origin、开发者工具项目示例与启动路由占位；
-- 封装 login、storage、network、share、subscription 平台 port，不实现真实业务流程；
-- 固定 client-only bundle allowlist；当前不得导入尚未由 E-008 交付的生成 API Client；
-- 建立最小启动、错误占位、平台 adapter 单元测试和 bundle forbidden-import scan；
-- 保留后续 DevTools automator runner 的明确入口，不在本任务伪造真机 conformance。
+- 不实现真实 HTTP handler、领域 use case、业务页面或视觉设计；
+- 不实现数据库、Prisma migration、Redis、BullMQ、Worker 或 provider；
+- 不新增 GitHub Actions、required checks 或 CI artifact；
+- 不创建生产资源、账号、域名、密钥或真实用户 fixture；
+- 不提前启动 E-005、E-006、E-009、E-010、E-011 或 D 系列设计任务。
 
-## 5. 不做
+## 5. 验收与证据
 
-- 不实现正式页面、首次认识、签到、今日内容、点亮、晚间反馈或周趋势业务；
-- 不实现真实微信登录、订阅消息、分享业务或生产 AppID/AppSecret；
-- 不提前实现 E-008 的 Zod/OpenAPI/api-client/codegen drift；
-- 不引入 Nest、Prisma、PostgreSQL、Redis、BullMQ、Prompt、provider、Worker 或 restricted capability；
-- 不创建生产云资源、域名、证书、真实账号或密钥；
-- 不提前启动 E-005～E-014 或 Phase 2/3 任务。
+- **Schema/client-safe**：`./client` 使用独立白名单模块，不经根 barrel 或
+  internal daily/evening/weekly 模块；38 个 Schema 测试通过；
+- **生成**：20 个稳定 JSON Schema、OpenAPI bundle 和 Public/Admin client
+  均带 generator/version、source fingerprint 与 do-not-edit header；
+- **OpenAPI/error**：机器检查通过 56 个 error codes、62 条 paths、唯一
+  operation ID、封闭 envelope/status 和 Public/Admin audience；
+- **mapper**：`EveningSaveRequest` → `EveningReflectionSubmission` 为显式单向
+  mapper，并在边界重新执行 Zod 校验；
+- **client input/response**：生成 operation 保留 request body、path/header/query
+  的 OpenAPI 必填性；缺少登录 body 或 daily path 参数的 `@ts-expect-error`
+  负向类型用例通过；响应为精确 status/envelope 判别联合并可按 status 缩窄；
+- **静态失败证据**：15 个稳定 contract rule IDs 均有最小 known-fail，正常
+  corpus 与同输入重复生成通过；client field/import Gate 使用 TypeScript AST
+  与从入口递归解析的本地依赖图，真实未加引号属性和
+  `./generated/admin.js` fixture 均被拒绝；
+- **client compile/bundle**：miniapp、Admin、testing 三入口独立编译；E-004
+  bundle Gate 与 client dist 禁用依赖/字段/secret 扫描通过；
+- **clean generation**：四个生成文件在再次 `pnpm codegen` 前后 SHA-256
+  完全一致，`codegen:check` 与 `git diff --check` 通过；
+- **完整验证**：`pnpm install`、`pnpm install --frozen-lockfile` 和
+  `pnpm run validate` 为 `PASS`。沙箱内 API 测试因禁止监听
+  `127.0.0.1` 首次为 `INFRA_BLOCKED`，在获准的本机端口环境重跑后
+  36/36 API 测试与全仓 validate 通过。
+- **Source-ID 机器证据**：`S30-REPO-041`、`S30-REPO-044..048`、
+  `S31-TEST-009`、`S31-TEST-010`、`S31-TEST-012`、`S31-TEST-013`、
+  `S31-TEST-015`；
+- **Partial/manual**：`S30-REPO-042`、`S30-REPO-043` 与
+  `S31-TEST-011` 已有 canonical Schema/mapper/static leak 证据，但真实业务
+  handler 与 Prisma row 尚未实现，不能宣称完整 HTTP/DB 覆盖；
+- **Deferred**：`S31-TEST-014` 的真实 Admin app bundle 由 E-005 承接，
+  正式 Source-ID registry 由 E-010 承接，CI 选择器与 artifacts 由 E-011
+  承接。
 
-## 6. 验收标准
+## 6. 当前阻塞与决策
 
-- 微信开发者工具可加载最小应用，启动路由与错误占位可见；
-- TypeScript、format、lint、typecheck、architecture、test 和 build Gate 全部通过；
-- bundle 不含 `node:*`、Nest、Prisma、Redis、BullMQ、Prompt、provider、secret 或服务端 package；
-- `project.private.config.json` 等私有配置不入库，公开配置可校验并携带封闭环境标识；
-- login/storage/network/share/subscription adapter 使用可替换 port，纯逻辑可在 Vitest 运行；
-- DevTools 冒烟证据与纯逻辑测试层级准确区分，不把 Node/jsdom 测试冒充微信平台 conformance；
-- Source-ID 证据按 `MACHINE_ENFORCED`、`PARTIAL / MANUAL_EVIDENCE`、`DEFERRED` 或获批 `NA_WITH_REASON` 准确记录；
-- 交付一个聚焦的 Draft PR，等待用户审核。
+- **仓库/代码阻塞**：无；
+- **外部 Gate**：云、生产身份、CI runner 等仍未解除，但不阻塞本地 E-008；
+- **Source-ID registry**：`NA_WITH_REASON` — 正式 registry 由 E-010 交付；
+  本任务已记录命令、测试数量、rule IDs 和 fingerprint 机器证据；
+- **已知限制**：任意 Zod refinement（真实日历、Unicode grapheme、跨对象等式）
+  不能由 JSON Schema 完整表达，所有信任边界仍以 Zod runtime parse 为权威；
+- **transport 边界**：本包不实现真实网络 adapter；typed transport 只能返回
+  operation 声明的 status/envelope。未来 raw HTTP adapter 必须先执行运行时
+  status/envelope 校验，再满足该 transport 接口；
+- **下一状态**：等待用户审核
+  [Draft PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)；不得自动合并。
 
-## 7. 当前阻塞与决策
+## 7. 最近交接
 
-- **仓库/代码阻塞**：无；frozen install、format、lint、typecheck、architecture、test、build 与 bundle Gate 均通过；
-- **依赖修正**：Issue #42 原正文将 E-008 列为硬前置，但 Accepted 执行顺序、Backlog、E-003 交接及 2026-07-28 用户明确指令均要求 E-004 成为下一任务；现将 E-004 硬前置明确为 E-001、E-002、E-003；
-- **E-008 边界**：E-008 仍负责 shared-schemas/client、api-client/miniapp 和 codegen/drift。E-004 只能建立允许未来接入这些 client-safe subpath 的边界，不得提前创建或复制生成客户端；
-- **Source-ID registry**：正式 registry 属于 E-010；E-004 只能记录实际证据等级，不得提前宣称完整覆盖；
-- **审核修正**：[PR review #4797789713](https://github.com/WeiHan1996/DailyEnergy/pull/96#pullrequestreview-4797789713) 的三项可执行意见均已接受并实现：公开配置 build/runtime parity、DevTools 应用失败与基础设施阻塞分流、9 条 bundle 静态规则逐条 known-fail；
-- **CI 边界**：review 指出当前 head 无 GitHub Actions status，事实属实；但 Accepted S-31 实施交接将 CI lanes、required checks 与 artifact 交给 E-011，E-004 不越界新增 workflow，当前以完整本地 Gate 作为仓库证据；
-- **DevTools 平台证据**：runner、项目配置和构建产物已就绪；2026-07-28 本机重试准确返回 `MINIAPP_DEVTOOLS_INFRA_BLOCKED: MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT`。只有 CLI/endpoint/启动握手等明确基础设施错误返回 exit 2；启动成功后的页面、模块、生命周期、data 或断言异常返回普通 FAIL/exit 1。当前证据等级仍为 `PARTIAL / MANUAL_EVIDENCE`，不能标记微信 conformance PASS；解锁条件是 IDE automation endpoint 完成启动握手后重跑 `pnpm --filter @daily-energy/app-miniapp test:devtools`；
-- **外部上线 Gate**：仍存在，但不阻塞本地小程序骨架；
-- **审核决策**：用户需确认是否允许 Draft PR 在 DevTools 为 `INFRA_BLOCKED` 的情况下继续评审，或要求先由可用专用 runner 补齐 SYS-001/SYS-003 平台 PASS；
-- **下一状态**：推送 review 修正后等待用户复审 [Draft PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96)；不得自动标记 Ready 或合并。
-
-## 8. 最近交接
-
-- E-001 PR #89 merge commit：`6ab172d72d7ab221e565303254bdf135437870dd`；
-- E-002 PR #91 merge commit：`bce224eb55c1ca92b32aebfe9a46df480af27b5f`；
-- E-003 PR #93 merge commit：`fde441c9802d91aa707f47bfc09d9927a9e97b97`；
-- E-001 Issue #39、E-002 Issue #41、E-003 Issue #40 均已关闭为 completed；
-- 当前任务：E-004 In Review；
-- 当前分支：`agent/e-004-miniapp-skeleton`，基于 `main` / `origin/main` 的 `817955cd8be72b8ea961e4e102568a592a5e9adf`；
-- 当前 PR：[E-004 Draft PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96)；
-- 已完成开工检查：Issue #42、Accepted 信息架构/页面清单、仓库结构、测试、部署和 ADR-0006 已复核，结论 `GO`；
-- 已完成交付：`SYS-001` 启动占位、`SYS-003` 恢复占位、微信原生 TypeScript/CommonJS 构建、封闭公开配置、login/storage/network/share/subscription ports/adapters、生成配置指纹、DevTools runner 与 client-only bundle Gate；
-- 已完成 review 修正：公开配置构建期与运行期共享 14 组接受/拒绝 parity；DevTools 10 组稳定结果分类确保应用失败不冒充 infra；9 条 bundle 静态规则各有稳定 rule ID 与最小 known-fail；
-- 已完成验证：`pnpm install --frozen-lockfile`；review 修正后完整 `pnpm run validate` PASS（11/11 workspace typecheck、12 类 boundary Gate、miniapp 10 tests + 14 parity + 10 DevTools classification + 9 bundle known-fail/1 known-pass、shared-schemas 34 tests、API 36 tests、全部适用 build）；真实 `dist/` scan PASS；
-- 平台证据：DevTools runner 已真实重试，结果 `MINIAPP_DEVTOOLS_INFRA_BLOCKED: MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT`；微信平台 conformance 未标 PASS；
-- 未开始：E-005～E-014、业务代码、数据库、队列、容器、workflow 或云资源；
-- 下一动作：提交并推送 review 修正，等待用户复审 Draft PR #96；真实 DevTools PASS 前继续保持 Draft / In Review；
-- 接受后的下一任务：E-005；当前仍保持 Planned，不提前启动；
-- 禁止并行：E-005 及其他下游 Issue。
+- E-004 PR #96 已合并，Issue #42 已关闭；
+- E-008 Issue #46 已进入 In Review；
+- 当前分支：`agent/e-008-contract-codegen`；
+- 当前 PR：[Draft PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)；
+- 已完成：上下文恢复、基线校验、三类显式 exports、client-safe Zod 模块、
+  JSON Schema/OpenAPI/client codegen、one-way mapper、drift/static Gate、
+  known-fail fixtures、文档和全量验证；审核反馈中的必填输入、AST/递归依赖泄漏
+  Gate、status/envelope 判别联合均已修复；
+- 开工结论：`GO`；
+- 当前 fingerprint：
+  `sha256:133257cc7336ea5bc217cf713d14c85bfe6a3661d3ea3168406c53ceb41c092a`；
+- 当前动作：等待用户复审 Draft PR #97；不得自动合并；
+- 接受后的下一任务：E-005（仍为 Planned，不提前开始）。

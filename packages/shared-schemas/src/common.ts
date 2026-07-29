@@ -286,6 +286,15 @@ export const RelationshipStageValues = [
 export const RelationshipStageSchema = z.enum(RelationshipStageValues);
 export type RelationshipStage = z.infer<typeof RelationshipStageSchema>;
 
+export const ExpressionStyleValues = [
+  "BALANCED",
+  "GENTLE",
+  "LIGHT_HUMOR",
+  "CLEAR_DIRECT",
+] as const;
+export const ExpressionStyleSchema = z.enum(ExpressionStyleValues);
+export type ExpressionStyle = z.infer<typeof ExpressionStyleSchema>;
+
 export function addCustomIssue(
   context: z.RefinementCtx,
   path: Array<string | number>,

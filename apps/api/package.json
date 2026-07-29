@@ -20,6 +20,7 @@
     "runtime": "server-adapter"
   },
   "dependencies": {
+    "@daily-energy/shared-schemas": "workspace:*",
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",
     "@nestjs/platform-express": "catalog:",

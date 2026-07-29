@@ -5,6 +5,8 @@ export {
   BandValues,
   EnergySchema,
   EnergyValues,
+  ExpressionStyleSchema,
+  ExpressionStyleValues,
   GenerationModeSchema,
   GenerationModeValues,
   HelpfulnessRatingSchema,
@@ -42,6 +44,7 @@ export type {
   ActionKind,
   Band,
   Energy,
+  ExpressionStyle,
   GenerationMode,
   HelpfulnessRating,
   HelpfulnessState,
@@ -60,9 +63,19 @@ export type {
   WriteWindow,
 } from "./common.js";
 
+export { WechatSessionRequestSchema } from "./public-transport.js";
+export type { WechatSessionRequest } from "./public-transport.js";
+
 export {
   ClientDailyContentViewSchema,
   DailyInteractionStateSchema,
+} from "./client-daily-content.js";
+export type {
+  ClientDailyContentView,
+  DailyInteractionState,
+} from "./client-daily-content.js";
+
+export {
   ExpressionPayloadSchema,
   GenerationInputSnapshotSchema,
   OverallLabelTokenSchema,
@@ -72,8 +85,6 @@ export {
   RuleFactsSchema,
 } from "./daily-content.js";
 export type {
-  ClientDailyContentView,
-  DailyInteractionState,
   ExpressionPayload,
   GenerationInputSnapshot,
   OverallLabelToken,
@@ -84,61 +95,76 @@ export type {
 
 export {
   ClientEveningFeedbackViewSchema,
-  DailyHelpfulnessRecordSchema,
-  DailyTaskStateSchema,
   EveningFeedbackAvailabilitySchema,
   EveningFeedbackAvailabilityValues,
-  EveningFeedbackDraftSchema,
-  EveningFeedbackRecordSchema,
-  EveningFeedbackRevisionSchema,
   EveningPrimaryActionSchema,
   EveningPrimaryActionValues,
   EveningReflectionSubmissionSchema,
   NotePatchSchema,
-} from "./evening-feedback.js";
+} from "./client-evening-feedback.js";
 export type {
   ClientEveningFeedbackView,
-  DailyHelpfulnessRecord,
-  DailyTaskState,
   EveningFeedbackAvailability,
-  EveningFeedbackDraft,
-  EveningFeedbackRecord,
-  EveningFeedbackRevision,
   EveningPrimaryAction,
   EveningReflectionSubmission,
   NotePatch,
+} from "./client-evening-feedback.js";
+
+export {
+  DailyHelpfulnessRecordSchema,
+  DailyTaskStateSchema,
+  EveningFeedbackDraftSchema,
+  EveningFeedbackRecordSchema,
+  EveningFeedbackRevisionSchema,
+} from "./evening-feedback.js";
+export type {
+  DailyHelpfulnessRecord,
+  DailyTaskState,
+  EveningFeedbackDraft,
+  EveningFeedbackRecord,
+  EveningFeedbackRevision,
 } from "./evening-feedback.js";
 
 export {
   ClientWeeklySummaryViewSchema,
+  SummaryStatusSchema,
+  SummaryStatusValues,
+} from "./client-weekly-summary.js";
+export type {
+  ClientWeeklySummaryView,
+  SummaryStatus,
+} from "./client-weekly-summary.js";
+
+export {
   CoverageLevelSchema,
   CoverageLevelValues,
+  WeeklyDirectionSchema,
+  WeeklyDirectionValues,
+  WeeklyMetricIdSchema,
+  WeeklyMetricIdValues,
+} from "./weekly-contract-common.js";
+export type {
+  CoverageLevel,
+  WeeklyDirection,
+  WeeklyMetricId,
+} from "./weekly-contract-common.js";
+
+export {
   NextObservationPlanSchema,
   NextObservationPlanValues,
   PublishedWeeklySummarySchema,
   StateMetricFactsSchema,
-  SummaryStatusSchema,
-  SummaryStatusValues,
   WeeklyAggregateFactsSchema,
-  WeeklyDirectionSchema,
-  WeeklyDirectionValues,
   WeeklyExpressionPayloadSchema,
   WeeklyExpressionPlanSchema,
-  WeeklyMetricIdSchema,
-  WeeklyMetricIdValues,
   WeeklySourceSnapshotSchema,
 } from "./weekly-summary.js";
 export type {
-  ClientWeeklySummaryView,
-  CoverageLevel,
   NextObservationPlan,
   PublishedWeeklySummary,
   StateMetricFacts,
-  SummaryStatus,
   WeeklyAggregateFacts,
-  WeeklyDirection,
   WeeklyExpressionPayload,
   WeeklyExpressionPlan,
-  WeeklyMetricId,
   WeeklySourceSnapshot,
 } from "./weekly-summary.js";
