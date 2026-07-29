@@ -92,12 +92,19 @@
   GitHub Issue、远端 main、Node、pnpm、依赖与登录状态；
 - 已实现 `agent:validate` 的 changed/task/full 与六类 Profile，禁止显式 Profile
   降级，并对上下文冲突、D 系列依赖和人工/外部证据 fail closed；
+- Draft PR 首轮审核提出的 4 个阻塞项与 2 个 P1 缺口均已确认并修复：
+  topic source 会按变更路径合并且保留触发元数据，任务/路径/显式 Profile 取安全
+  组合，dry-run 与零变更不再报告 PASS，Git 作用域读取失败会阻断，任务状态冲突
+  保留来源并阻断，未知任务不再落入通配 docs Profile；
+- `--remote` 在 In Review 状态会继续核对 PR 是否 OPEN，以及 PR head
+  branch/commit 是否与本地任务分支一致；失败输出同时保留脱敏的根因邻域和尾部；
 - 为遵循 Accepted testing 规范，在 E-010 Source-ID dependency map 完成前，
   生产代码、测试、配置、tooling 和 Accepted 规范变化均保守升级 full；
-- 已通过 24 条版本化 Agent workflow cases 与 3 条 CLI cases，覆盖只读准备、
-  stale main、多活动任务、D-004/D-005 阻断、Profile 降级、输出边界与脱敏；
+- 已通过 41 条版本化 Agent workflow cases 与 5 条 CLI cases，覆盖只读准备、
+  stale main、状态来源冲突、D-004/D-005 阻断、topic source、Profile 组合、
+  normal/no-origin/detached/non-Git/读取失败、dry-run/零变更、根因邻域与脱敏；
 - `agent:prepare E-015 --remote --deep` 在可访问系统凭据的环境中全部 PASS；
-- 最终实现已通过完整 `pnpm run validate`：format、lint、typecheck、test、
+- 审核修复后的最终实现已通过完整 `pnpm run validate`：format、lint、typecheck、test、
   Playwright、bundle/contract/architecture Gate 与 build 全部 PASS；
 - 首次沙箱 run 因禁止监听 `127.0.0.1:3210` 以 `EPERM` 被环境阻断；在受控
   本地端口环境重跑同一完整 Gate 后 PASS，未放宽任何检查；

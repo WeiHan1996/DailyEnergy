@@ -68,7 +68,11 @@
     { "id": "hybrid-d002", "taskId": "D-002", "expectedProfile": "hybrid" },
     { "id": "design-d004", "taskId": "D-004", "expectedProfile": "design" },
     { "id": "research-r001", "taskId": "R-001", "expectedProfile": "research" },
-    { "id": "fallback-docs", "taskId": "S-999", "expectedProfile": "docs" }
+    {
+      "id": "known-fail-unknown-task",
+      "taskId": "S-999",
+      "expectedProfile": null
+    }
   ],
   "profileOverrideCases": [
     {
@@ -103,25 +107,188 @@
       "id": "known-full-agent-policy",
       "paths": ["docs/agent/workflow.md"],
       "expectedEscalation": "full",
-      "expectedRuleIds": ["AGENT_POLICY_REQUIRES_FULL"]
+      "expectedRuleIds": ["AGENT_POLICY_REQUIRES_FULL"],
+      "expectedImpactProfiles": ["code"]
     },
     {
       "id": "known-full-admin-without-source-map",
       "paths": ["apps/admin/app/page.tsx"],
       "expectedEscalation": "full",
-      "expectedRuleIds": ["APPLICATION_OR_TEST_REQUIRES_FULL"]
+      "expectedRuleIds": ["APPLICATION_OR_TEST_REQUIRES_FULL"],
+      "expectedImpactProfiles": ["code"]
     },
     {
       "id": "known-targeted-status-document",
       "paths": ["tasks/current.md"],
       "expectedCommandPrefix": "pnpm run agent:check",
-      "expectedRuleIds": ["STATUS_DOCS_TARGETED"]
+      "expectedRuleIds": ["STATUS_DOCS_TARGETED"],
+      "expectedImpactProfiles": ["docs"]
     },
     {
       "id": "known-full-unknown",
       "paths": ["unexpected/new-input.bin"],
       "expectedEscalation": "full",
-      "expectedUnknownPaths": ["unexpected/new-input.bin"]
+      "expectedUnknownPaths": ["unexpected/new-input.bin"],
+      "expectedImpactProfiles": ["security"]
+    },
+    {
+      "id": "known-full-security",
+      "paths": ["apps/api/src/auth/session.ts"],
+      "expectedEscalation": "full",
+      "expectedRuleIds": [
+        "APPLICATION_OR_TEST_REQUIRES_FULL",
+        "SECURITY_REQUIRES_FULL"
+      ],
+      "expectedImpactProfiles": ["code", "security"]
+    }
+  ],
+  "effectiveProfileCases": [
+    {
+      "id": "d004-plus-miniapp-is-hybrid-full",
+      "taskProfile": "design",
+      "paths": ["apps/miniapp/src/pages/index.ts"],
+      "expectedProfile": "hybrid",
+      "expectedEscalation": "full"
+    },
+    {
+      "id": "code-plus-security-path-is-security-full",
+      "taskProfile": "code",
+      "paths": ["apps/api/src/auth/session.ts"],
+      "expectedProfile": "security",
+      "expectedEscalation": "full"
+    },
+    {
+      "id": "code-plus-docs-remains-code",
+      "taskProfile": "code",
+      "impactProfiles": ["docs"],
+      "expectedProfile": "code"
+    },
+    {
+      "id": "research-plus-code-blocks",
+      "taskProfile": "research",
+      "impactProfiles": ["code"],
+      "expectedProfile": "research",
+      "expectedRuleId": "AGENT_PROFILE_COMBINATION_UNSUPPORTED"
+    }
+  ],
+  "topicSourceCases": [
+    {
+      "id": "agent-topic-adds-path-authorities",
+      "taskId": "E-015",
+      "paths": ["tooling/lib/git-change-scope.mjs"],
+      "expectedPaths": [
+        "AGENTS.md",
+        "docs/agent/workflow.md",
+        "docs/decisions/ADR-0006-monorepo-and-stack.md",
+        "docs/technical/deployment.md",
+        "docs/technical/observability.md",
+        "docs/technical/repository-structure.md",
+        "docs/technical/testing.md",
+        "tasks/current.md"
+      ],
+      "expectedTopicRuleId": "topic:agent-workflow",
+      "expectedTrigger": "path:tooling/lib/git-change-scope.mjs"
+    }
+  ],
+  "taskStateCases": [
+    {
+      "id": "same-state-across-files",
+      "documents": [
+        {
+          "path": "tasks/current.md",
+          "content": "**当前任务**： E-015\n**任务状态**： In Review"
+        },
+        {
+          "path": "tasks/backlog.md",
+          "content": "| E-015 | Name | In Review |"
+        }
+      ],
+      "expectedStates": { "E-015": "In Review" },
+      "expectedRuleIds": []
+    },
+    {
+      "id": "known-fail-conflicting-state",
+      "documents": [
+        {
+          "path": "tasks/current.md",
+          "content": "**当前任务**： E-015\n**任务状态**： In Review"
+        },
+        {
+          "path": "tasks/backlog.md",
+          "content": "| E-015 | Name | In Progress |"
+        }
+      ],
+      "expectedStates": {},
+      "expectedRuleIds": ["CONTEXT_TASK_STATE_CONFLICT"]
+    }
+  ],
+  "validationStatusCases": [
+    {
+      "id": "dry-run-is-planned",
+      "dryRun": true,
+      "expectedAutomatedStatus": "NOT_RUN",
+      "expectedFinalStatus": "PLANNED"
+    },
+    {
+      "id": "clean-change-scope-is-no-changes",
+      "noChanges": true,
+      "expectedAutomatedStatus": "NOT_RUN",
+      "expectedFinalStatus": "NO_CHANGES"
+    },
+    {
+      "id": "successful-code-run-is-pass",
+      "expectedAutomatedStatus": "PASS",
+      "expectedFinalStatus": "PASS"
+    }
+  ],
+  "profileFinalStatusCases": [
+    {
+      "id": "security-preserves-research-authorization",
+      "evidenceProfiles": ["research", "security"],
+      "expectedFinalStatus": "EXTERNAL_AUTHORIZATION_REQUIRED"
+    },
+    {
+      "id": "code-plus-design-needs-manual-evidence",
+      "evidenceProfiles": ["code", "design", "hybrid"],
+      "expectedFinalStatus": "MANUAL_EVIDENCE_REQUIRED"
+    }
+  ],
+  "remoteStateCases": [
+    {
+      "id": "in-progress-without-pr-is-allowed",
+      "issue": { "number": 105, "state": "OPEN" },
+      "localMainSha": "main-sha",
+      "remoteMainSha": "main-sha",
+      "gitScope": { "branch": "agent/task", "headSha": "head-sha" },
+      "expectedRuleIds": []
+    },
+    {
+      "id": "known-fail-pr-head-mismatch",
+      "issue": { "number": 105, "state": "OPEN" },
+      "localMainSha": "main-sha",
+      "remoteMainSha": "main-sha",
+      "gitScope": { "branch": "agent/task", "headSha": "head-sha" },
+      "pullRequest": {
+        "number": 106,
+        "state": "OPEN",
+        "headRefName": "agent/other",
+        "headRefOid": "other-sha"
+      },
+      "expectedRuleIds": ["REMOTE_PR_HEAD_MISMATCH"]
+    },
+    {
+      "id": "detached-head-matches-pr-commit",
+      "issue": { "number": 105, "state": "OPEN" },
+      "localMainSha": "main-sha",
+      "remoteMainSha": "main-sha",
+      "gitScope": { "headSha": "head-sha" },
+      "pullRequest": {
+        "number": 106,
+        "state": "OPEN",
+        "headRefName": "agent/task",
+        "headRefOid": "head-sha"
+      },
+      "expectedRuleIds": []
     }
   ],
   "redactionCases": [
@@ -143,9 +310,16 @@
       "id": "bounded-tail-only",
       "inputLineCount": 120,
       "lineLimit": 10,
-      "maxChars": 100,
+      "maxChars": 300,
       "required": "line-119",
       "forbidden": "line-000"
+    },
+    {
+      "id": "root-cause-and-tail",
+      "input": "start\nTypeError: first root cause\ncontext-a\ncontext-b\nnoise-1\nnoise-2\nnoise-3\nnoise-4\nnoise-5\nnoise-6\nfinal-tail",
+      "lineLimit": 2,
+      "maxChars": 500,
+      "requiredValues": ["TypeError: first root cause", "final-tail"]
     }
   ]
 }

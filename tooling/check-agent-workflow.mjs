@@ -71,9 +71,9 @@ report(
   "taskRules must be a non-empty array",
 );
 report(
-  authority.taskRules?.at(-1)?.match === "*",
-  "AGENT_AUTHORITY_FALLBACK",
-  "the final task rule must match *",
+  !(authority.taskRules ?? []).some((rule) => rule.match === "*"),
+  "AGENT_AUTHORITY_CATCH_ALL_FORBIDDEN",
+  "unknown task series must fail closed instead of using a catch-all route",
 );
 
 const allowedProfiles = new Set(policy.allowedProfiles ?? []);
@@ -96,6 +96,11 @@ for (const [index, rule] of (authority.taskRules ?? []).entries()) {
 
   for (const source of rule.sources ?? []) {
     report(
+      typeof source.required === "boolean",
+      "AGENT_AUTHORITY_REQUIRED_MISSING",
+      `${rule.match}: ${source.path}`,
+    );
+    report(
       typeof source.reason === "string" && source.reason.length > 0,
       "AGENT_AUTHORITY_REASON_MISSING",
       `${rule.match}: ${source.path}`,
@@ -116,11 +121,28 @@ for (const topic of authority.topicRules ?? []) {
     "AGENT_AUTHORITY_TOPIC_ID_INVALID",
     "topic rule id is required",
   );
-  for (const sourcePath of topic.sources ?? []) {
+  report(
+    Array.isArray(topic.patterns) &&
+      topic.patterns.length > 0 &&
+      topic.patterns.every((pattern) => typeof pattern === "string"),
+    "AGENT_AUTHORITY_TOPIC_PATTERNS_INVALID",
+    topic.id ?? "UNKNOWN",
+  );
+  for (const source of topic.sources ?? []) {
     report(
-      await sourceExists(sourcePath),
+      typeof source?.reason === "string" && source.reason.length > 0,
+      "AGENT_AUTHORITY_TOPIC_REASON_MISSING",
+      `${topic.id}: ${source?.path ?? "UNKNOWN"}`,
+    );
+    report(
+      typeof source?.required === "boolean",
+      "AGENT_AUTHORITY_TOPIC_REQUIRED_MISSING",
+      `${topic.id}: ${source?.path ?? "UNKNOWN"}`,
+    );
+    report(
+      await sourceExists(source?.path),
       "AGENT_AUTHORITY_TOPIC_SOURCE_MISSING",
-      `${topic.id}: ${sourcePath}`,
+      `${topic.id}: ${source?.path ?? "UNKNOWN"}`,
     );
   }
 }
@@ -128,6 +150,12 @@ for (const topic of authority.topicRules ?? []) {
 for (const profile of allowedProfiles) {
   const configuration = policy.profiles?.[profile];
   report(configuration !== undefined, "AGENT_POLICY_PROFILE_MISSING", profile);
+  report(
+    typeof configuration?.finalStatus === "string" &&
+      configuration.finalStatus.length > 0,
+    "AGENT_POLICY_FINAL_STATUS_MISSING",
+    profile,
+  );
   for (const mode of ["taskCommands", "fullCommands"]) {
     report(
       Array.isArray(configuration?.[mode]) && configuration[mode].length > 0,
@@ -156,7 +184,26 @@ for (const [index, rule] of (policy.pathRules ?? []).entries()) {
   for (const [commandIndex, command] of (rule.commands ?? []).entries()) {
     validateCommand(command, `${rule.id}.commands[${commandIndex}]`);
   }
+  report(
+    rule.escalation === "full" || (rule.commands ?? []).length > 0,
+    "AGENT_POLICY_PATH_ACTION_MISSING",
+    rule.id ?? `pathRules[${index}]`,
+  );
+  if (rule.impactProfile !== undefined) {
+    report(
+      allowedProfiles.has(rule.impactProfile),
+      "AGENT_POLICY_IMPACT_PROFILE_INVALID",
+      `${rule.id}: ${rule.impactProfile}`,
+    );
+  }
 }
+
+report(
+  policy.fallback?.escalation === "full" &&
+    allowedProfiles.has(policy.fallback?.impactProfile),
+  "AGENT_POLICY_FALLBACK_UNSAFE",
+  "unknown paths must expand to full with a valid impact profile",
+);
 
 const requiredDependencies = {
   "C-003": ["D-004"],

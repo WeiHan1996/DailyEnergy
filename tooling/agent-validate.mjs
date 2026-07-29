@@ -6,13 +6,19 @@ import { parse } from "yaml";
 
 import {
   boundedDiagnosticOutput,
+  collectManualEvidence,
   commandDisplay,
   dependencyDiagnostics,
-  parseTaskStates,
-  resolveProfileOverride,
+  determineValidationStatuses,
+  parseTaskStateObservations,
+  resolveEffectiveProfile,
+  resolveProfileFinalStatus,
+  resolveTaskStates,
   selectChangedValidation,
   selectTaskRule,
+  taskStateConflictDiagnostics,
 } from "./lib/agent-workflow.mjs";
+import { discoverGitChangeScope } from "./lib/git-change-scope.mjs";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 
@@ -90,41 +96,8 @@ function commandOutput(command) {
   };
 }
 
-function gitPaths() {
-  const commands = [
-    ["git", "diff", "--name-only", "origin/main...HEAD"],
-    ["git", "diff", "--name-only"],
-    ["git", "diff", "--cached", "--name-only"],
-    ["git", "ls-files", "--others", "--exclude-standard"],
-  ];
-  const paths = new Set();
-
-  for (const command of commands) {
-    const result = commandOutput(command);
-    if (result.status === 0) {
-      for (const path of result.combinedOutput.split("\n").filter(Boolean)) {
-        paths.add(path);
-      }
-    }
-  }
-
-  return [...paths].sort();
-}
-
-function inferTaskId() {
-  const current = readFileSync(
-    resolve(repositoryRoot, "tasks/current.md"),
-    "utf8",
-  );
-  return current.match(/\*\*当前任务\*\*：\s*([A-Z]+-\d+)\b/u)?.[1];
-}
-
-function readTaskStates() {
-  return parseTaskStates(
-    ["tasks/current.md", "tasks/backlog.md"].map((path) =>
-      readFileSync(resolve(repositoryRoot, path), "utf8"),
-    ),
-  );
+function inferTaskId(currentDocument) {
+  return currentDocument.match(/\*\*当前任务\*\*：\s*([A-Z]+-\d+)\b/u)?.[1];
 }
 
 function deduplicateCommands(commands) {
@@ -135,6 +108,12 @@ function deduplicateCommands(commands) {
   ];
 }
 
+function boundedList(values, limit = 8) {
+  return values.length <= limit
+    ? values.join(", ")
+    : `${values.slice(0, limit).join(", ")}, … +${values.length - limit}`;
+}
+
 let options;
 try {
   options = parseArguments(process.argv.slice(2));
@@ -143,22 +122,27 @@ try {
   process.exit(1);
 }
 
-const repositoryCurrentTaskId = inferTaskId();
+const stateDocuments = ["tasks/current.md", "tasks/backlog.md"].map((path) => ({
+  content: readFileSync(resolve(repositoryRoot, path), "utf8"),
+  path,
+}));
+const repositoryCurrentTaskId = inferTaskId(stateDocuments[0].content);
 const taskId = options.taskId ?? repositoryCurrentTaskId;
-const taskRule = taskId
-  ? selectTaskRule(taskId, authority.taskRules)
-  : undefined;
-const profileResolution = taskRule
-  ? resolveProfileOverride(taskRule.profile, options.profile)
-  : { profile: options.profile ?? "code" };
-if (profileResolution.diagnostic) {
-  console.error(
-    `${profileResolution.diagnostic.ruleId}: ${profileResolution.diagnostic.detail}`,
-  );
+if (!taskId) {
+  console.error("AGENT_VALIDATE_TASK_REQUIRED: no current or requested task");
   process.exit(1);
 }
-const profile = profileResolution.profile;
-const profilePolicy = policy.profiles[profile];
+const taskRule = selectTaskRule(taskId, authority.taskRules);
+if (!taskRule) {
+  console.error(`AGENT_VALIDATE_ROUTE_MISSING: ${taskId}`);
+  process.exit(1);
+}
+
+const taskStateObservations = parseTaskStateObservations(stateDocuments);
+const taskStates = resolveTaskStates(taskStateObservations);
+const stateConflictDiagnostics = taskStateConflictDiagnostics(
+  taskStateObservations,
+);
 const taskContextDiagnostics =
   options.taskId &&
   repositoryCurrentTaskId &&
@@ -170,33 +154,55 @@ const taskContextDiagnostics =
         },
       ]
     : [];
-const taskDependencyDiagnostics = taskId
-  ? dependencyDiagnostics({
-      completedStates: policy.completedStates,
-      dependencies: policy.dependencies,
-      taskId,
-      taskStates: readTaskStates(),
-    })
-  : [];
+taskContextDiagnostics.push(...stateConflictDiagnostics);
+const taskDependencyDiagnostics = dependencyDiagnostics({
+  completedStates: policy.completedStates,
+  dependencies: policy.dependencies,
+  taskId,
+  taskStates,
+});
+
+const gitScope = discoverGitChangeScope({ cwd: repositoryRoot });
+const selection = selectChangedValidation(gitScope.paths, policy);
+
+const profileResolution = resolveEffectiveProfile({
+  impactProfiles: selection.impactProfiles,
+  requestedProfile: options.profile,
+  taskProfile: taskRule.profile,
+});
+if (profileResolution.diagnostic) {
+  console.error(
+    `${profileResolution.diagnostic.ruleId}: ${profileResolution.diagnostic.detail}`,
+  );
+  process.exit(1);
+}
+
+const profile = profileResolution.profile;
+const profilePolicy = policy.profiles[profile];
+const manualEvidence = collectManualEvidence(
+  profileResolution.evidenceProfiles,
+  policy,
+);
+const profileFinalStatus = resolveProfileFinalStatus(
+  profileResolution.evidenceProfiles,
+  policy,
+);
+const gitDiagnostics = gitScope.diagnostics;
 let commands;
-let selection = {
-  escalation: undefined,
-  matchedRuleIds: [],
-  paths: [],
-  unknownPaths: [],
-};
 let effectiveMode = options.mode;
+const noChanges =
+  options.mode === "changed" &&
+  gitDiagnostics.length === 0 &&
+  selection.paths.length === 0;
 
 if (options.mode === "changed") {
-  selection = selectChangedValidation(gitPaths(), policy);
-  if (selection.escalation === "full") {
+  if (gitDiagnostics.length > 0 || noChanges) {
+    commands = [];
+  } else if (selection.escalation === "full") {
     commands = profilePolicy.fullCommands;
     effectiveMode = "full";
   } else {
-    commands =
-      selection.paths.length === 0
-        ? []
-        : deduplicateCommands(selection.commands);
+    commands = deduplicateCommands(selection.commands);
   }
 } else {
   commands =
@@ -205,7 +211,31 @@ if (options.mode === "changed") {
       : profilePolicy.taskCommands;
 }
 
-if (taskDependencyDiagnostics.length > 0 || taskContextDiagnostics.length > 0) {
+const validationPlanDiagnostics = [];
+if (
+  commands.length === 0 &&
+  !noChanges &&
+  taskContextDiagnostics.length === 0 &&
+  taskDependencyDiagnostics.length === 0 &&
+  gitDiagnostics.length === 0
+) {
+  validationPlanDiagnostics.push({
+    detail: "validation selected changes but produced no commands",
+    ruleId: "AGENT_VALIDATION_PLAN_EMPTY",
+  });
+}
+
+const blockedStatus =
+  taskContextDiagnostics.length > 0
+    ? "CONTEXT_BLOCKED"
+    : taskDependencyDiagnostics.length > 0
+      ? "DEPENDENCY_BLOCKED"
+      : gitDiagnostics.length > 0
+        ? "CONTEXT_BLOCKED"
+        : validationPlanDiagnostics.length > 0
+          ? "VALIDATION_BLOCKED"
+          : undefined;
+if (blockedStatus) {
   commands = [];
 }
 
@@ -213,11 +243,7 @@ const startedAt = Date.now();
 const completedCommands = [];
 let failure;
 
-if (
-  !options.dryRun &&
-  taskDependencyDiagnostics.length === 0 &&
-  taskContextDiagnostics.length === 0
-) {
+if (!options.dryRun && !blockedStatus && !noChanges) {
   for (const command of commands) {
     const commandStartedAt = Date.now();
     const execution = commandOutput(command);
@@ -236,43 +262,59 @@ if (
   }
 }
 
-const automatedStatus = failure ? "FAIL" : "PASS";
-const finalStatus =
-  taskContextDiagnostics.length > 0
-    ? "CONTEXT_BLOCKED"
-    : taskDependencyDiagnostics.length > 0
-      ? "DEPENDENCY_BLOCKED"
-      : automatedStatus === "PASS"
-        ? profilePolicy.finalStatus
-        : automatedStatus;
+const statuses = determineValidationStatuses({
+  blockedStatus,
+  dryRun: options.dryRun,
+  failure,
+  noChanges,
+  profileFinalStatus,
+});
 const result = {
-  automatedStatus,
+  automatedStatus: statuses.automatedStatus,
   commands: commands.map(commandDisplay),
+  completedCommands: completedCommands.map(({ command, durationMs }) => ({
+    command: commandDisplay(command),
+    durationMs,
+  })),
   contextDiagnostics: taskContextDiagnostics,
   dependencyDiagnostics: taskDependencyDiagnostics,
   durationMs: Date.now() - startedAt,
   effectiveMode,
+  executed: completedCommands.length > 0,
   failure,
-  finalStatus,
-  manualEvidence: profilePolicy.manualEvidence ?? [],
+  finalStatus: statuses.finalStatus,
+  git: {
+    baseline: gitScope.baseline,
+    diagnostics: gitDiagnostics,
+  },
+  manualEvidence,
   profile,
+  profileInputs: profileResolution.evidenceProfiles,
   selection,
   taskId,
+  validationPlanDiagnostics,
 };
 
 if (options.json) {
   console.log(JSON.stringify(result, undefined, 2));
 } else {
-  const verb = options.dryRun ? "planned" : "completed";
+  const activity = options.dryRun
+    ? `planned=${commands.length}`
+    : `executed=${completedCommands.length}`;
   console.log(
-    `Agent validation: ${result.finalStatus} | profile=${profile} | mode=${options.mode}→${effectiveMode} | ${verb}=${failure ? completedCommands.length : commands.length} | ${result.durationMs}ms`,
+    `Agent validation: ${result.finalStatus} | automated=${result.automatedStatus} | profile=${profile} | mode=${options.mode}→${effectiveMode} | ${activity} | ${result.durationMs}ms`,
   );
   if (selection.matchedRuleIds.length > 0) {
     console.log(`Matched rules: ${selection.matchedRuleIds.join(", ")}`);
   }
+  if (selection.impactProfiles.length > 0) {
+    console.log(
+      `Profile inputs: ${profileResolution.evidenceProfiles.join(" + ")} → ${profile}`,
+    );
+  }
   if (selection.unknownPaths.length > 0) {
     console.log(
-      `Full escalation: unknown paths (${selection.unknownPaths.join(", ")})`,
+      `Full escalation: unknown paths (${boundedList(selection.unknownPaths)})`,
     );
   }
   if (options.dryRun) {
@@ -286,28 +328,27 @@ if (options.json) {
     );
     console.error(failure.output);
   }
-  for (const diagnostic of taskDependencyDiagnostics) {
-    console.error(`${diagnostic.ruleId}: ${diagnostic.detail}`);
-  }
-  for (const diagnostic of taskContextDiagnostics) {
+  for (const diagnostic of [
+    ...taskDependencyDiagnostics,
+    ...taskContextDiagnostics,
+    ...gitDiagnostics,
+    ...validationPlanDiagnostics,
+  ]) {
     console.error(`${diagnostic.ruleId}: ${diagnostic.detail}`);
   }
   if (
     result.manualEvidence.length > 0 &&
     !failure &&
-    taskDependencyDiagnostics.length === 0 &&
-    taskContextDiagnostics.length === 0
+    !blockedStatus &&
+    !options.dryRun &&
+    !noChanges
   ) {
     console.log(`Required evidence: ${result.manualEvidence.join(", ")}`);
   }
 }
 
-if (
-  failure ||
-  taskDependencyDiagnostics.length > 0 ||
-  taskContextDiagnostics.length > 0
-) {
+if (failure || blockedStatus) {
   process.exitCode = 1;
-} else if (!options.dryRun && !["PASS"].includes(result.finalStatus)) {
+} else if (!options.dryRun && !noChanges && result.finalStatus !== "PASS") {
   process.exitCode = 2;
 }

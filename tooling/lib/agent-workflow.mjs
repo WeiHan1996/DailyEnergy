@@ -58,14 +58,26 @@ function normalizeTaskState(value) {
   );
 }
 
-export function parseTaskStates(documents) {
-  const states = new Map();
+export function parseTaskStateObservations(documents) {
+  const observations = new Map();
 
-  for (const document of documents) {
-    const currentTask = document.match(
+  function record(taskId, state, source, location) {
+    const taskObservations = observations.get(taskId) ?? [];
+    taskObservations.push({ location, source, state });
+    observations.set(taskId, taskObservations);
+  }
+
+  for (const [documentIndex, documentInput] of documents.entries()) {
+    const content =
+      typeof documentInput === "string" ? documentInput : documentInput.content;
+    const source =
+      typeof documentInput === "string"
+        ? `document[${documentIndex}]`
+        : documentInput.path;
+    const currentTask = content.match(
       /\*\*当前任务\*\*：\s*([A-Z]+-\d+)\b/u,
     )?.[1];
-    const currentStateValue = document.match(
+    const currentStateValue = content.match(
       /\*\*任务状态\*\*：\s*([^\n]+)/u,
     )?.[1];
     const currentState = currentStateValue
@@ -73,10 +85,10 @@ export function parseTaskStates(documents) {
       : undefined;
 
     if (currentTask && currentState) {
-      states.set(currentTask, currentState);
+      record(currentTask, currentState, source, "current-task");
     }
 
-    for (const line of document.split("\n")) {
+    for (const [lineIndex, line] of content.split("\n").entries()) {
       if (!line.startsWith("|")) {
         continue;
       }
@@ -91,12 +103,55 @@ export function parseTaskStates(documents) {
         .find(Boolean);
 
       if (taskId && state) {
-        states.set(taskId, state);
+        record(taskId, state, source, `line:${lineIndex + 1}`);
       }
     }
   }
 
+  return observations;
+}
+
+export function resolveTaskStates(observations) {
+  const states = new Map();
+  for (const [taskId, taskObservations] of observations) {
+    const uniqueStates = [
+      ...new Set(taskObservations.map(({ state }) => state)),
+    ];
+    if (uniqueStates.length === 1) {
+      states.set(taskId, uniqueStates[0]);
+    }
+  }
   return states;
+}
+
+export function parseTaskStates(documents) {
+  return resolveTaskStates(parseTaskStateObservations(documents));
+}
+
+export function taskStateConflictDiagnostics(observations) {
+  const diagnostics = [];
+
+  for (const [taskId, taskObservations] of observations) {
+    const uniqueStates = [
+      ...new Set(taskObservations.map(({ state }) => state)),
+    ];
+    if (uniqueStates.length <= 1) {
+      continue;
+    }
+    diagnostics.push({
+      detail: `${taskId} has conflicting states: ${taskObservations
+        .map(
+          ({ location, source, state }) =>
+            `${state} (${source}${location ? ` ${location}` : ""})`,
+        )
+        .join(", ")}`,
+      ruleId: "CONTEXT_TASK_STATE_CONFLICT",
+    });
+  }
+
+  return diagnostics.sort((left, right) =>
+    left.detail.localeCompare(right.detail),
+  );
 }
 
 export function findActiveTasks(taskStates) {
@@ -126,10 +181,10 @@ export function dependencyDiagnostics({
 
 const allowedProfileOverrides = {
   code: new Set(["code", "hybrid", "security"]),
-  design: new Set(["design", "hybrid"]),
-  docs: new Set(["code", "docs", "hybrid", "research", "security"]),
-  hybrid: new Set(["hybrid"]),
-  research: new Set(["research"]),
+  design: new Set(["design", "hybrid", "security"]),
+  docs: new Set(["code", "design", "docs", "hybrid", "research", "security"]),
+  hybrid: new Set(["hybrid", "security"]),
+  research: new Set(["research", "security"]),
   security: new Set(["security"]),
 };
 
@@ -148,6 +203,69 @@ export function resolveProfileOverride(inferredProfile, requestedProfile) {
       ruleId: "AGENT_PROFILE_DOWNGRADE_BLOCKED",
     },
     profile: inferredProfile,
+  };
+}
+
+function combineImplicitProfiles(profiles) {
+  const uniqueProfiles = new Set(profiles.filter(Boolean));
+  if (uniqueProfiles.size > 1) {
+    uniqueProfiles.delete("docs");
+  }
+
+  if (uniqueProfiles.has("security")) {
+    return { profile: "security" };
+  }
+  if (uniqueProfiles.has("hybrid")) {
+    return { profile: "hybrid" };
+  }
+  if (
+    uniqueProfiles.has("research") &&
+    (uniqueProfiles.has("code") || uniqueProfiles.has("design"))
+  ) {
+    return {
+      diagnostic: {
+        detail: `research impact cannot be safely combined with ${[
+          ...uniqueProfiles,
+        ].join(", ")}`,
+        ruleId: "AGENT_PROFILE_COMBINATION_UNSUPPORTED",
+      },
+      profile: "research",
+    };
+  }
+  if (uniqueProfiles.has("code") && uniqueProfiles.has("design")) {
+    return { profile: "hybrid" };
+  }
+
+  return { profile: [...uniqueProfiles][0] ?? "docs" };
+}
+
+export function resolveEffectiveProfile({
+  impactProfiles = [],
+  requestedProfile,
+  taskProfile,
+}) {
+  const implicitProfiles = [...new Set([taskProfile, ...impactProfiles])];
+  const implicit = combineImplicitProfiles(implicitProfiles);
+  if (implicit.diagnostic) {
+    return {
+      ...implicit,
+      evidenceProfiles: implicitProfiles,
+      implicitProfiles,
+    };
+  }
+
+  const override = resolveProfileOverride(implicit.profile, requestedProfile);
+  return {
+    diagnostic: override.diagnostic,
+    evidenceProfiles: [
+      ...new Set([
+        ...implicitProfiles,
+        ...(requestedProfile ? [requestedProfile] : []),
+        override.profile,
+      ]),
+    ],
+    implicitProfiles,
+    profile: override.profile,
   };
 }
 
@@ -192,6 +310,7 @@ function commandKey(command) {
 export function selectChangedValidation(paths, policy) {
   const normalizedPaths = [...new Set(paths.map(normalizePath))].sort();
   const matchedRuleIds = new Set();
+  const impactProfiles = new Set();
   const commands = new Map();
   const unknownPaths = [];
   let escalation;
@@ -211,6 +330,9 @@ export function selectChangedValidation(paths, policy) {
       if (rule.escalation === "full") {
         escalation = "full";
       }
+      if (rule.impactProfile) {
+        impactProfiles.add(rule.impactProfile);
+      }
       for (const command of rule.commands ?? []) {
         commands.set(commandKey(command), command);
       }
@@ -219,15 +341,186 @@ export function selectChangedValidation(paths, policy) {
 
   if (unknownPaths.length > 0) {
     escalation = policy.fallback.escalation;
+    if (policy.fallback.impactProfile) {
+      impactProfiles.add(policy.fallback.impactProfile);
+    }
   }
 
   return {
     commands: [...commands.values()],
     escalation,
+    impactProfiles: [...impactProfiles].sort(),
     matchedRuleIds: [...matchedRuleIds].sort(),
     paths: normalizedPaths,
     unknownPaths,
   };
+}
+
+function normalizeAuthoritySource(source, defaults = {}) {
+  const normalized =
+    typeof source === "string" ? { path: source } : { ...source };
+  return {
+    path: normalized.path,
+    reason: normalized.reason ?? defaults.reason,
+    required: normalized.required ?? defaults.required ?? true,
+  };
+}
+
+export function selectAuthoritySources({
+  paths,
+  taskId,
+  taskRule,
+  topicRules,
+}) {
+  const sources = new Map();
+
+  function addSource(source, metadata) {
+    const existing = sources.get(source.path);
+    const reasons = new Set([
+      ...(existing?.reasons ?? []),
+      ...(source.reason ? [source.reason] : []),
+    ]);
+    const ruleIds = new Set([
+      ...(existing?.ruleIds ?? []),
+      ...metadata.ruleIds,
+    ]);
+    const triggeredBy = new Set([
+      ...(existing?.triggeredBy ?? []),
+      ...metadata.triggeredBy,
+    ]);
+    sources.set(source.path, {
+      path: source.path,
+      reason: [...reasons].join("; "),
+      reasons: [...reasons],
+      required: Boolean(existing?.required || source.required),
+      ruleIds: [...ruleIds].sort(),
+      triggeredBy: [...triggeredBy].sort(),
+    });
+  }
+
+  for (const sourceInput of taskRule.sources) {
+    const source = normalizeAuthoritySource(sourceInput);
+    addSource(source, {
+      ruleIds: [`task:${taskRule.match}`],
+      triggeredBy: [`task:${taskId}`],
+    });
+  }
+
+  for (const topicRule of topicRules ?? []) {
+    const matchingPaths = paths.filter((path) =>
+      topicRule.patterns.some((pattern) => matchesGlob(path, pattern)),
+    );
+    if (matchingPaths.length === 0) {
+      continue;
+    }
+    for (const sourceInput of topicRule.sources ?? []) {
+      const source = normalizeAuthoritySource(sourceInput, {
+        reason: `Authority required by topic ${topicRule.id}`,
+      });
+      addSource(source, {
+        ruleIds: [`topic:${topicRule.id}`],
+        triggeredBy: matchingPaths.map((path) => `path:${path}`),
+      });
+    }
+  }
+
+  return [...sources.values()].sort((left, right) =>
+    left.path.localeCompare(right.path),
+  );
+}
+
+export function collectManualEvidence(evidenceProfiles, policy) {
+  return [
+    ...new Set(
+      evidenceProfiles.flatMap(
+        (profile) => policy.profiles[profile]?.manualEvidence ?? [],
+      ),
+    ),
+  ].sort();
+}
+
+export function resolveProfileFinalStatus(evidenceProfiles, policy) {
+  const statuses = new Set(
+    evidenceProfiles.map((profile) => policy.profiles[profile]?.finalStatus),
+  );
+  for (const status of [
+    "EXTERNAL_AUTHORIZATION_REQUIRED",
+    "MANUAL_EVIDENCE_REQUIRED",
+    "PASS",
+  ]) {
+    if (statuses.has(status)) {
+      return status;
+    }
+  }
+  return [...statuses].find(Boolean) ?? "VALIDATION_BLOCKED";
+}
+
+export function determineValidationStatuses({
+  blockedStatus,
+  dryRun,
+  failure,
+  noChanges,
+  profileFinalStatus,
+}) {
+  if (blockedStatus) {
+    return { automatedStatus: "NOT_RUN", finalStatus: blockedStatus };
+  }
+  if (noChanges) {
+    return { automatedStatus: "NOT_RUN", finalStatus: "NO_CHANGES" };
+  }
+  if (dryRun) {
+    return { automatedStatus: "NOT_RUN", finalStatus: "PLANNED" };
+  }
+  if (failure) {
+    return { automatedStatus: "FAIL", finalStatus: "FAIL" };
+  }
+  return { automatedStatus: "PASS", finalStatus: profileFinalStatus };
+}
+
+export function remoteStateDiagnostics({
+  gitScope,
+  issue,
+  localMainSha,
+  pullRequest,
+  remoteMainSha,
+}) {
+  if (issue.state !== "OPEN") {
+    return [
+      {
+        detail: `Issue #${issue.number} is ${issue.state}`,
+        ruleId: "REMOTE_ISSUE_NOT_OPEN",
+      },
+    ];
+  }
+  if (localMainSha !== remoteMainSha) {
+    return [
+      {
+        detail: "local main does not match GitHub main",
+        ruleId: "REMOTE_MAIN_STALE",
+      },
+    ];
+  }
+  if (pullRequest && pullRequest.state !== "OPEN") {
+    return [
+      {
+        detail: `PR #${pullRequest.number} is ${pullRequest.state}`,
+        ruleId: "REMOTE_PR_NOT_OPEN",
+      },
+    ];
+  }
+  if (
+    pullRequest &&
+    ((gitScope.branch && pullRequest.headRefName !== gitScope.branch) ||
+      pullRequest.headRefOid !== gitScope.headSha)
+  ) {
+    return [
+      {
+        detail: `PR #${pullRequest.number} head does not match local ${gitScope.branch ?? "detached HEAD"}@${gitScope.headSha ?? "UNKNOWN"}`,
+        ruleId: "REMOTE_PR_HEAD_MISMATCH",
+      },
+    ];
+  }
+  return [];
 }
 
 const redactRules = [
@@ -260,13 +553,49 @@ export function boundedDiagnosticOutput(
   { maxChars = 12_000, lines = 80 } = {},
 ) {
   const redacted = redactDiagnosticOutput(value);
-  const tail = redacted.split("\n").slice(-lines).join("\n");
+  const outputLines = redacted.split("\n");
+  const errorIndex = outputLines.findIndex((line) =>
+    /\b(?:[A-Za-z]+Error|error|failed|failure|exception|ELIFECYCLE|ERR_[A-Z0-9_]*|TS\d{4})\b/iu.test(
+      line,
+    ),
+  );
+  const neighborhood =
+    errorIndex === -1
+      ? []
+      : outputLines.slice(
+          Math.max(0, errorIndex - 4),
+          Math.min(outputLines.length, errorIndex + 7),
+        );
+  const tail = outputLines.slice(-lines);
+  const boundedLines =
+    neighborhood.length === 0
+      ? tail
+      : [
+          "[ROOT_CAUSE_NEIGHBORHOOD]",
+          ...neighborhood,
+          "[OUTPUT_TAIL]",
+          ...tail,
+        ];
+  const bounded = [...new Set(boundedLines)].join("\n");
 
-  if (tail.length <= maxChars) {
-    return tail;
+  if (bounded.length <= maxChars) {
+    return bounded;
   }
 
-  return `[OUTPUT_TRUNCATED]\n${tail.slice(-maxChars)}`;
+  if (neighborhood.length === 0) {
+    return `[OUTPUT_TRUNCATED]\n${bounded.slice(-maxChars)}`;
+  }
+
+  const rootCause = neighborhood.join("\n");
+  const outputTail = tail.join("\n");
+  const sectionBudget = Math.max(1, Math.floor((maxChars - 64) / 2));
+  return [
+    "[OUTPUT_TRUNCATED]",
+    "[ROOT_CAUSE_NEIGHBORHOOD]",
+    rootCause.slice(0, sectionBudget),
+    "[OUTPUT_TAIL]",
+    outputTail.slice(-sectionBudget),
+  ].join("\n");
 }
 
 export function commandDisplay(command) {

@@ -163,19 +163,6 @@ taskRules:
         required: true
         reason: Required evidence
 
-  - match: "*"
-    profile: docs
-    sources:
-      - path: AGENTS.md
-        required: true
-        reason: Repository-wide rules
-      - path: tasks/current.md
-        required: true
-        reason: Current task and scope
-      - path: docs/INDEX.md
-        required: true
-        reason: Document status and navigation
-
 topicRules:
   - id: agent-workflow
     patterns:
@@ -184,12 +171,18 @@ topicRules:
       - tooling/agent-*.mjs
       - tooling/check-agent-workflow.mjs
       - tooling/test-agent-workflow.mjs
-      - tooling/lib/agent-workflow.mjs
+      - tooling/lib/**
       - tests/agent-workflow/**
     sources:
-      - docs/agent/workflow.md
-      - docs/technical/repository-structure.md
-      - docs/technical/testing.md
+      - path: docs/agent/workflow.md
+        required: true
+        reason: Accepted behavior for context routing and validation
+      - path: docs/technical/repository-structure.md
+        required: true
+        reason: Tooling ownership and dependency boundaries
+      - path: docs/technical/testing.md
+        required: true
+        reason: Evidence, fixture, and failure-diagnostic requirements
 
   - id: design
     patterns:
@@ -197,9 +190,15 @@ topicRules:
       - packages/design-tokens/**
       - apps/*/src/**/styles/**
     sources:
-      - docs/design/README.md
-      - docs/design/screen-inventory.md
-      - docs/design/interaction-states.md
+      - path: docs/design/README.md
+        required: true
+        reason: Design workflow and original-evidence boundary
+      - path: docs/design/screen-inventory.md
+        required: true
+        reason: Accepted screen and state inventory
+      - path: docs/design/interaction-states.md
+        required: true
+        reason: Accepted interaction behavior
 
   - id: contracts
     patterns:
@@ -208,6 +207,34 @@ topicRules:
       - tooling/*contract*
       - tooling/*codegen*
     sources:
-      - docs/technical/api.md
-      - docs/technical/testing.md
-      - docs/decisions/ADR-0006-monorepo-and-stack.md
+      - path: docs/technical/api.md
+        required: true
+        reason: Accepted API and client contract
+      - path: docs/technical/testing.md
+        required: true
+        reason: Contract drift and negative-fixture evidence
+      - path: docs/decisions/ADR-0006-monorepo-and-stack.md
+        required: true
+        reason: Accepted package and client boundary
+
+  - id: security
+    patterns:
+      - "**/auth/**"
+      - "**/authentication/**"
+      - "**/*-auth.*"
+      - "**/auth.*"
+      - "**/*privacy*"
+      - "**/*safety*"
+      - "**/*secret*"
+      - docs/operations/incident-response.md
+      - packages/server-core/src/**/deletion/**
+    sources:
+      - path: docs/ai/safety.md
+        required: true
+        reason: Accepted content and high-risk safety boundary
+      - path: docs/operations/privacy-data-map.md
+        required: true
+        reason: Accepted privacy and restricted-data boundary
+      - path: docs/technical/testing.md
+        required: true
+        reason: Required security and leak-negative evidence

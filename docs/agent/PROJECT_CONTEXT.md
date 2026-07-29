@@ -40,7 +40,9 @@ ADR、Accepted 规范、Schema、API Contract、测试、任务文件或原始�
 | `security` | 密钥、隐私、权限、依赖与安全边界    | 默认扩大验证；人工威胁审查和生产授权不能自动化替代 |
 
 任务 Profile 由 `docs/agent/authority-index.yaml` 路由，也可通过统一入口显式指定。
-显式指定不能降低策略计算出的安全级别。
+变更路径可能把任务 Profile 提升为 code、hybrid 或 security；显式指定不能降低
+任务与路径共同计算出的安全级别。未知任务没有默认 Profile，必须先补充显式、
+可审核的权威路由。
 
 ## 4. 统一入口
 
@@ -55,11 +57,15 @@ pnpm agent:validate --mode=full --profile=<PROFILE>
 ```
 
 - `agent:prepare` 默认只读、仅使用本地信息、快速且输出有界；
-- `--remote` 才读取 GitHub 状态，`--deep` 才执行环境和依赖深检；
+- `agent:prepare` 合并任务和变更主题来源，并输出触发路径、风险、建议验证模式及
+  Requirement-to-Proof Matrix；
+- `--remote` 才读取 GitHub Issue/PR/main 状态，`--deep` 才执行环境和依赖深检；
 - `changed` 用于快速反馈；P1 中生产代码、测试、配置和 tooling 因尚无完整
   Source-ID dependency map 而保守升级，只有明确的纯状态/导航文档可走轻量 Gate；
 - `task` 覆盖任务 Profile 的必要自动化证据；
 - `full` 是提交审核前的完整代码 Gate；
+- Git 作用域无法可信读取时 fail closed；dry-run 返回 `PLANNED`，可信零变更返回
+  `NO_CHANGES`，均不计作自动化 `PASS`；
 - design/hybrid/research 需要外部或人工证据时必须明确返回未完成状态，不能伪装
   成 `PASS`。
 

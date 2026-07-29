@@ -46,6 +46,14 @@ Gate。
 - 本地分支相对基线的变更范围；
 - `CONTEXT_CONFLICT`、`SOURCE_MISSING` 或 `DEPENDENCY_BLOCKED` 等稳定诊断。
 
+任务规则提供初始来源，变更路径命中的 `topicRules` 必须继续追加来源。合并结果
+按来源路径去重，同时保留 required、理由、命中规则和触发路径；不得只读取任务
+规则后忽略实际变更主题。未命中显式任务规则时返回
+`AGENT_PREPARE_ROUTE_MISSING`，不得以通配的轻量文档 Profile 猜测。
+
+同一任务在 `tasks/current.md`、`tasks/backlog.md` 或同一文件不同位置出现不同状态
+时，必须保留全部来源并返回 `CONTEXT_TASK_STATE_CONFLICT`，不得用后读值覆盖前值。
+
 ### 3.2 Requirement-to-Proof Matrix
 
 每个 Profile 都必须明确：
@@ -79,7 +87,8 @@ Gate。
 
 `--remote` 和 `--deep` 是显式扩展：
 
-- `--remote` 只读核对 GitHub Issue/PR；
+- `--remote` 只读核对 GitHub Issue、main，并在任务为 In Review 时核对 PR
+  状态、分支和 head commit 映射；
 - `--deep` 检查 Node、pnpm、依赖和 GitHub CLI 等环境；
 - 扩展失败必须区分代码阻塞、环境阻塞和外部状态阻塞。
 
@@ -100,6 +109,14 @@ Gate。
   tooling 变更均保守升级到 `full`，不得以文件名规则冒充依赖选择器；
 - 只有明确的纯任务状态和项目导航文档可在 P1 使用轻量文档 Gate；
 - 显式 Profile 不能降低自动推导的风险；
+- 有效 Profile 必须合并任务路由、变更路径影响与显式请求：
+  `design + code → hybrid`、`docs + code → code`、任意组合包含
+  `security → security`；无法安全表达的组合必须阻断，不得只升级 mode 而继续
+  使用较弱 Profile；
+- 基线、branch diff、工作区、暂存区或未跟踪文件的任一 Git 读取失败都必须返回
+  稳定诊断并阻断，不得把读取失败解释成零变更；
+- `--dry-run` 返回 `automatedStatus=NOT_RUN`、`finalStatus=PLANNED`；
+  可信作用域内确实零变更返回 `NO_CHANGES`，两者都不是 `PASS`；
 - design/hybrid/research 的人工或外部证据未满足时返回
   `MANUAL_EVIDENCE_REQUIRED` 或 `EXTERNAL_AUTHORIZATION_REQUIRED`。
 
@@ -113,6 +130,10 @@ Gate。
 | `docs`     | 格式、链接、索引、状态一致性                    | 改变 Accepted 决策的授权                      |
 | `research` | 来源结构和仓库一致性                            | 外部来源真实性、授权与最终选型决定            |
 | `security` | `code` 完整 Gate、安全/架构规则与负向 fixture   | 生产密钥、生产数据、渗透授权与风险接受        |
+
+`agent:prepare` 必须把最终 Profile 对应的自动命令、来源/要求、人工或用户证据和终止
+状态组成可检查的 proof matrix。若 Profile 由多个输入合并，人工证据取并集，不能因
+自动 Gate 提升而丢失设计、研究或安全证据。
 
 ## 6. D 系列约束
 
