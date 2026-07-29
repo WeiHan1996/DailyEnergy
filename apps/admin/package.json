@@ -4,13 +4,34 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "next build && pnpm run bundle:check",
+    "bundle:check": "node ../../tooling/check-admin-bundle.mjs",
+    "dev": "next dev",
+    "format:check": "prettier --check README.md package.json next.config.ts playwright.config.ts tsconfig.json src tests",
+    "lint": "eslint --max-warnings=0 next.config.ts playwright.config.ts src tests",
+    "start": "next start",
+    "test": "vitest run src && pnpm run test:e2e",
+    "test:e2e": "pnpm run build && playwright test",
     "typecheck": "node ../../tooling/typecheck-workspace.mjs"
   },
   "dailyEnergy": {
     "kind": "app",
     "runtime": "client-safe"
   },
+  "dependencies": {
+    "@daily-energy/api-client": "workspace:*",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "server-only": "catalog:"
+  },
   "devDependencies": {
-    "@daily-energy/typescript-config": "workspace:*"
+    "@daily-energy/typescript-config": "workspace:*",
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

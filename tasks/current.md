@@ -4,11 +4,11 @@
 - **最后更新**：2026-07-29
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-005 — 创建 Next.js 管理后台骨架
-- **任务状态**：Ready
-- **当前分支**：`main`
+- **任务状态**：In Progress
+- **当前分支**：`agent/e-005-admin-shell`
 - **当前 Issue**：[E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)
 - **当前 PR**：无
-- **Gate 结论**：`GO_TO_START`
+- **Gate 结论**：`GO_TO_IMPLEMENT`
 
 ## 1. 当前目标
 
@@ -23,7 +23,7 @@ apps/admin
 E-008 已随 [PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)
 squash 合并，merge commit 为
 `29798917392e0e1db3b852083caf525bb756f8ad`，Issue #46 已关闭。
-E-005 的 E-001、E-002、E-008 前置均已完成，现为唯一 Ready 工程任务；
+E-005 的 E-001、E-002、E-008 前置均已完成，现为唯一 In Progress 工程任务；
 E-006 及其他工程任务不得并行开始。
 
 ## 2. 开工检查
@@ -71,8 +71,8 @@ E-006 及其他工程任务不得并行开始。
 - **前置依赖**：E-001、E-002、E-008 已完成；
 - **生产身份**：尚未配置真实 Admin 身份，不阻塞骨架实现，但 production 必须默认关闭；
 - **视觉边界**：本任务使用最小可验证布局，不替代后续 D 系列正式设计；
-- **并行规则**：E-005 是唯一 Ready，完成并进入审核前不得启动 E-006；
-- **下一状态**：创建实现分支和 Draft PR 后，将 E-005 更新为 In Progress / In Review。
+- **并行规则**：E-005 是唯一 In Progress，完成并进入审核前不得启动 E-006；
+- **下一状态**：实现、完整验证与自审通过并创建 Draft PR 后，将 E-005 更新为 In Review。
 
 ## 7. 最近交接
 
@@ -83,5 +83,19 @@ E-006 及其他工程任务不得并行开始。
 - E-008 最终 contract fingerprint：
   `sha256:133257cc7336ea5bc217cf713d14c85bfe6a3661d3ea3168406c53ceb41c092a`；
 - E-008 审核修复的必填输入、AST/递归依赖泄漏 Gate、status/envelope 判别联合均已验收；
-- 当前唯一 Ready：[E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)；
-- 当前动作：从最新 `main` 启动 E-005，不自动启动其他任务。
+- 已确认本地 `main` 与 `origin/main` 均为 `31cd942ad636fcdb66bd3fff8f1450b8637da9a9`，
+  且包含 E-008 merge commit；
+- 已完成 Next.js 16 / React 19 App Router、ADM-001 登录外壳、基础布局和
+  Loading / Empty / Recoverable Error / Disabled 状态；
+- 已固定 server-only Admin API origin、Admin session cookie policy、production
+  trusted-identity fail-closed Gate 与最小 CSP / 安全响应头；
+- 已通过 `@daily-energy/api-client/admin` 建立唯一 Admin HTTP transport，并禁止
+  未认证业务操作；
+- 已建立真实 `.next/static` bundle 扫描和 5 条固定负向 fixture，覆盖
+  server-only、secret identifier/value、restricted field 与用户正文；
+- 已完成 9 条 Vitest 与 5 条 Chromium Playwright 用例；最终
+  `pnpm run validate` 全仓通过；
+- 已完成全 diff 自审并加强压缩产物中的裸 restricted-field 匹配，无未解决代码发现；
+- 当前唯一 In Progress：[E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)；
+- 当前动作：提交并推送 `agent/e-005-admin-shell`，创建 Draft PR 后转为 In Review；
+  不自动启动其他任务。

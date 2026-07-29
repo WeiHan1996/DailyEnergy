@@ -24,6 +24,8 @@
     "codegen:check": "node tooling/generate-contracts.mjs --check",
     "contract:check": "node tooling/check-contracts.mjs",
     "contract:fixtures": "node tooling/test-contracts.mjs",
+    "admin:bundle:check": "node tooling/check-admin-bundle.mjs",
+    "admin:bundle:fixtures": "node tooling/test-admin-bundle.mjs",
     "workspace:graph": "turbo ls",
     "dry-run": "turbo run format:check lint typecheck test build --dry=json",
     "format": "prettier --write package.json pnpm-workspace.yaml turbo.json eslint.config.mjs prettier.config.mjs .dependency-cruiser.cjs apps packages tooling tests",
@@ -34,7 +36,7 @@
     "typecheck": "pnpm run config:check && turbo run typecheck",
     "typecheck:fixtures": "node tooling/test-typecheck.mjs",
     "config:fixtures": "node tooling/test-config.mjs",
-    "test": "pnpm run config:fixtures && pnpm run typecheck:fixtures && pnpm run lint:fixtures && pnpm run architecture:fixtures && pnpm run contract:fixtures && turbo run test",
+    "test": "pnpm run config:fixtures && pnpm run typecheck:fixtures && pnpm run lint:fixtures && pnpm run architecture:fixtures && pnpm run contract:fixtures && pnpm run admin:bundle:fixtures && turbo run test",
     "build": "turbo run build",
     "clean": "node tooling/clean.mjs",
     "validate": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"

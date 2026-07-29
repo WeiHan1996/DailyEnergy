@@ -1,0 +1,83 @@
+{
+  "fixture_version": "e-005-admin-bundle-v1",
+  "source_ids": [
+    "S28-STACK-009",
+    "S30-REPO-020",
+    "S30-REPO-021",
+    "S30-REPO-023",
+    "S30-REPO-024",
+    "S31-TEST-014"
+  ],
+  "known_pass": {
+    "files": [
+      {
+        "path": "apps/admin/.next/static/chunks/known-pass.js",
+        "content": "const shellState = \"empty\";"
+      }
+    ],
+    "secret_values": ["synthetic-secret-not-present"],
+    "user_body_canaries": ["synthetic-user-body-not-present"]
+  },
+  "cases": [
+    {
+      "case_id": "E005-BUNDLE-001",
+      "expected_rule_id": "ADMIN_BUNDLE_SERVER_ONLY_DEPENDENCY",
+      "files": [
+        {
+          "path": "apps/admin/.next/static/chunks/server-leak.js",
+          "content": "import \"@daily-energy/server-core/runtime/api\";"
+        }
+      ],
+      "secret_values": [],
+      "user_body_canaries": []
+    },
+    {
+      "case_id": "E005-BUNDLE-002",
+      "expected_rule_id": "ADMIN_BUNDLE_SECRET_IDENTIFIER",
+      "files": [
+        {
+          "path": "apps/admin/.next/static/chunks/config-leak.js",
+          "content": "const configKey = \"ADMIN_SESSION_SECRET_FILE\";"
+        }
+      ],
+      "secret_values": [],
+      "user_body_canaries": []
+    },
+    {
+      "case_id": "E005-BUNDLE-003",
+      "expected_rule_id": "ADMIN_BUNDLE_SECRET_VALUE",
+      "files": [
+        {
+          "path": "apps/admin/.next/static/chunks/secret-leak.js",
+          "content": "const credential = \"synthetic-secret-value-90210\";"
+        }
+      ],
+      "secret_values": ["synthetic-secret-value-90210"],
+      "user_body_canaries": []
+    },
+    {
+      "case_id": "E005-BUNDLE-004",
+      "expected_rule_id": "ADMIN_BUNDLE_RESTRICTED_FIELD",
+      "files": [
+        {
+          "path": "apps/admin/.next/static/chunks/restricted-leak.js",
+          "content": "const unsafe={provider_payload:\"synthetic\"};"
+        }
+      ],
+      "secret_values": [],
+      "user_body_canaries": []
+    },
+    {
+      "case_id": "E005-BUNDLE-005",
+      "expected_rule_id": "ADMIN_BUNDLE_USER_BODY_FIXTURE",
+      "files": [
+        {
+          "path": "apps/admin/.next/static/chunks/body-leak.js",
+          "content": "const note = \"今天有点累，这是合成测试正文\";"
+        }
+      ],
+      "secret_values": [],
+      "user_body_canaries": ["今天有点累，这是合成测试正文"]
+    }
+  ]
+}

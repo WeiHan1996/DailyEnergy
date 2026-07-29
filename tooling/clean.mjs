@@ -11,7 +11,14 @@ for (const area of ["apps", "packages"]) {
     if (!entry.isDirectory()) {
       continue;
     }
-    for (const artifact of [".turbo", "coverage", "dist"]) {
+    for (const artifact of [
+      ".next",
+      ".turbo",
+      "coverage",
+      "dist",
+      "playwright-report",
+      "test-results",
+    ]) {
       artifactPaths.push(`${area}/${entry.name}/${artifact}`);
     }
     artifactPaths.push(`${area}/${entry.name}/tsconfig.tsbuildinfo`);
