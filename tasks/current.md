@@ -18,7 +18,7 @@ E-005 已随 [PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)
 Issue #43 已关闭。E-006 的前置已满足，现为唯一 Ready 工程任务，但尚未创建
 执行分支或 PR。
 
-D-001～D-004 已作为 Phase 2 正式视觉设计工作流纳入 Backlog，当前全部为
+D-001～D-005 已作为 Phase 2 正式视觉设计工作流纳入 Backlog，当前全部为
 Planned。登记设计任务和依赖关系不代表开始设计，也不改变 E-006 的唯一
 Ready 状态。
 
@@ -44,7 +44,7 @@ Ready 状态。
 
 - 本次项目控制 PR 不实现 E-006 代码、数据库迁移或生产资源；
 - 不提前启动 E-007、E-009、E-010、E-011 或其他下游工程任务；
-- 不开始 D-001～D-004，不创建 Figma 稿、Design Tokens 或业务页面；
+- 不开始 D-001～D-005，不创建 Figma 稿、Design Tokens 或业务页面；
 - 不改变 D 系列以外的产品定位、技术栈或外部 Production Gate；
 - 不降低 Accepted ADR、Schema、API、隐私、安全、删除、幂等、事务或运行 profile 边界。
 
@@ -55,10 +55,11 @@ Ready 状态。
 - 最新 `main` 包含 E-005 merge commit
   `bde64fd60128ab699eac3251bcf2eace88f0a902`；
 - [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)～
-  [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 均属于
+  [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 均属于
   Phase 2 Milestone 且保持 Open / Planned；
-- D-004 是 C-003、C-004、C-009 的直接前置，仓库路线图、Backlog 和文档索引一致；
-- 项目控制 PR 仅包含文档和任务依赖，完整仓库验证通过后才能进入审核。
+- D-004 是 C-003、C-004、C-009 的直接前置；D-005 是 C-012、C-013、C-014
+  的直接前置，仓库路线图、Backlog、Issue 和文档索引保持一致；
+- 项目控制 PR 仅包含文档、任务依赖和 E-005 遗留格式修正，完整仓库验证通过后才能进入审核。
 
 ## 6. 当前阻塞与决策
 
@@ -67,7 +68,7 @@ Ready 状态。
 - **执行授权**：当前仅完成项目控制，等待用户明确要求开始 E-006；
 - **控制审核**：[Draft PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103)
   等待用户审核，不自动标记 Ready for review 或合并；
-- **视觉边界**：D-001～D-004 均为 Planned，不自动插队；
+- **视觉边界**：D-001～D-005 均为 Planned，不自动插队；
 - **并行规则**：E-006 是唯一 Ready；不存在 In Progress 或 In Review 工程任务；
 - **下一状态**：项目控制 PR 审核合并后仍保持 E-006 Ready，直到明确开工。
 
@@ -110,15 +111,16 @@ Ready 状态。
   [Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43) 已关闭；
 - 已创建 [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
   [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
-  [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101) 与
-  [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102)，全部为 Planned；
-- 已把 D-004 写入 C-003、C-004、C-009 的直接前置，并同步路线图、Backlog
-  与设计文档索引；
+  [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
+  [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
+  [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104)，全部为 Planned；
+- 已把 D-004 写入 C-003、C-004、C-009 的直接前置，并把 D-005 写入
+  C-012、C-013、C-014 的直接前置；对应 Issue 均增加设计文档、Frame ID、
+  正常/异常状态截图和 Token/组件复用证据要求；
 - E-005 最后一个 Unicode 修复提交遗留一处 Prettier 漂移；已做一行纯格式
   修正，未改变运行逻辑；
-- 已按 `pnpm run clean`、`pnpm install --frozen-lockfile`、`pnpm run validate`
-  完成干净验证；全仓格式、Lint、边界、契约、类型、单元/fixture/Playwright
-  测试与构建均通过；
+- 原 PR 已按 `pnpm run clean`、`pnpm install --frozen-lockfile`、`pnpm run validate`
+  完成干净验证；补充 D-005 后仍需重新执行适用文档和全仓 Gate；
 - 已创建 [Draft PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103)，
   标题为 `[Project] 将 D 系列视觉设计任务纳入路线图`；不自动合并；
 - **当前唯一 Ready**：E-006 — PostgreSQL 与 Prisma；尚未开工。
