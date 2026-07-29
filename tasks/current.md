@@ -59,7 +59,11 @@ Ready 状态。
   Phase 2 Milestone 且保持 Open / Planned；
 - D-004 是 C-003、C-004、C-009 的直接前置；D-005 是 C-012、C-013、C-014
   的直接前置，仓库路线图、Backlog、Issue 和文档索引保持一致；
-- 项目控制 PR 仅包含文档、任务依赖和 E-005 遗留格式修正，完整仓库验证通过后才能进入审核。
+- README、ROADMAP、docs/INDEX 已同步 D-005 和 53（14 / 22 / 17）项计数；
+- 最新 PR patch 已完成静态回读，未发现缺失结尾换行或依赖/计数漂移；
+- 当前连接器环境无法取得可执行仓库 checkout，且 E-011 尚未提供 CI，因此
+  当前 head 的 `pnpm run validate` 状态为 `INFRA_BLOCKED`；不得复用旧 head 的
+  完整 Gate 结果冒充当前验证。
 
 ## 6. 当前阻塞与决策
 
@@ -68,6 +72,8 @@ Ready 状态。
 - **执行授权**：当前仅完成项目控制，等待用户明确要求开始 E-006；
 - **控制审核**：[Draft PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103)
   等待用户审核，不自动标记 Ready for review 或合并；
+- **项目控制静态检查**：`PASS`；D-005、下游依赖、文档索引和 Issue 计数一致；
+- **全仓 Gate**：`INFRA_BLOCKED`；当前环境没有仓库 checkout，且尚无 CI；
 - **视觉边界**：D-001～D-005 均为 Planned，不自动插队；
 - **并行规则**：E-006 是唯一 Ready；不存在 In Progress 或 In Review 工程任务；
 - **下一状态**：项目控制 PR 审核合并后仍保持 E-006 Ready，直到明确开工。
@@ -117,10 +123,10 @@ Ready 状态。
 - 已把 D-004 写入 C-003、C-004、C-009 的直接前置，并把 D-005 写入
   C-012、C-013、C-014 的直接前置；对应 Issue 均增加设计文档、Frame ID、
   正常/异常状态截图和 Token/组件复用证据要求；
-- E-005 最后一个 Unicode 修复提交遗留一处 Prettier 漂移；已做一行纯格式
-  修正，未改变运行逻辑；
-- 原 PR 已按 `pnpm run clean`、`pnpm install --frozen-lockfile`、`pnpm run validate`
-  完成干净验证；补充 D-005 后仍需重新执行适用文档和全仓 Gate；
+- README、ROADMAP、docs/INDEX、docs/design/README、tasks/current、
+  tasks/backlog 和 PR 描述均已同步 D-005 与最新计数；
+- 最新 patch 静态检查通过；当前 head 的完整 `pnpm run validate` 因执行环境
+  缺少 checkout 且尚无 CI，准确记录为 `INFRA_BLOCKED`；
 - 已创建 [Draft PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103)，
   标题为 `[Project] 将 D 系列视觉设计任务纳入路线图`；不自动合并；
 - **当前唯一 Ready**：E-006 — PostgreSQL 与 Prisma；尚未开工。
