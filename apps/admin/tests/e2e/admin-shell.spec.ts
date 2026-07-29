@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
 
+import {
+  captureBrowserResponses,
+  readBrowserExposureCanaries,
+  scanCapturedBrowserResponses,
+} from "./browser-response-audit";
+
 test.describe("E-005 Admin shell", () => {
   test("[ADM-001] renders the fail-closed login shell", async ({ page }) => {
     await page.goto("/login");
@@ -62,8 +68,36 @@ test.describe("E-005 Admin shell", () => {
       "frame-ancestors 'none'",
     );
     expect(headers["content-security-policy"]).toContain("connect-src 'self'");
+    expect(headers["content-security-policy"]).not.toContain("'unsafe-eval'");
     expect(headers["x-content-type-options"]).toBe("nosniff");
     expect(headers["x-frame-options"]).toBe("DENY");
     expect(headers["referrer-policy"]).toBe("no-referrer");
+  });
+
+  test("[S32-DEPLOY-041] scans initial HTML, RSC, and browser network responses", async ({
+    page,
+  }) => {
+    const initialResponses = await captureBrowserResponses(
+      page,
+      "http://127.0.0.1:3210",
+      async () => {
+        await page.goto("/shell?state=empty");
+      },
+    );
+    const navigationResponses = await captureBrowserResponses(
+      page,
+      "http://127.0.0.1:3210",
+      async () => {
+        await page.getByTestId("admin-brand-link").click();
+        await page.waitForURL("**/login");
+      },
+    );
+    const responses = [...initialResponses, ...navigationResponses];
+
+    expect(responses.some(({ channel }) => channel === "html")).toBe(true);
+    expect(responses.some(({ channel }) => channel === "rsc")).toBe(true);
+    expect(
+      scanCapturedBrowserResponses(responses, readBrowserExposureCanaries()),
+    ).toEqual([]);
   });
 });

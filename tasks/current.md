@@ -43,7 +43,8 @@ E-006 及其他工程任务不得并行开始。
 - 提供 loading、empty、error 与恢复状态；
 - 接入 `@daily-energy/api-client/admin`，固定独立 Admin origin/session 配置边界；
 - 实现 production-disabled Gate、最小 CSP 与安全 headers；
-- 建立 browser bundle 的 server-only、secret、restricted-field 和越界依赖扫描；
+- 建立 browser bundle、初始 HTML、RSC 与 Playwright 网络响应的 server-only、
+  secret、restricted-field、用户正文和越界依赖扫描；
 - 增加 Next build、Playwright shell 冒烟及缺失身份配置负向测试。
 
 ## 4. 不做
@@ -56,10 +57,12 @@ E-006 及其他工程任务不得并行开始。
 
 ## 5. 验收与证据
 
-- `apps/admin` 可独立 typecheck、build 和启动；
+- `apps/admin` 可在无 `.next` 的干净状态先执行 `next typegen`，再完成
+  route-aware typecheck、build 和启动；
 - 登录外壳、基础布局、loading/empty/error/retry 状态有 Playwright 冒烟证据；
 - 未配置可信 Admin 身份时，production profile 必须 fail closed；
-- bundle scan 能拒绝 server-only package、secret 名值、用户正文 fixture、provider 与 restricted field；
+- browser exposure scan 能拒绝 server-only package、secret 名值与 secret
+  文件实际内容、用户正文 fixture、provider 和 restricted field；
 - Admin app 不直接依赖 server-core、adapters、Prisma、Redis 或 provider；
 - 所有生成客户端继续由 E-008 codegen/drift Gate 维护，不得在 E-005 手改；
 - `pnpm run validate` 与 E-003 API、E-004 Mini Program、E-008 contract Gate 保持通过；
@@ -92,11 +95,21 @@ E-006 及其他工程任务不得并行开始。
   trusted-identity fail-closed Gate 与最小 CSP / 安全响应头；
 - 已通过 `@daily-energy/api-client/admin` 建立唯一 Admin HTTP transport，并禁止
   未认证业务操作；
-- 已建立真实 `.next/static` bundle 扫描和 5 条固定负向 fixture，覆盖
-  server-only、secret identifier/value、restricted field 与用户正文；
-- 已完成 9 条 Vitest 与 5 条 Chromium Playwright 用例；最终
-  `pnpm run validate` 全仓通过；
-- 已完成全 diff 自审并加强压缩产物中的裸 restricted-field 匹配，无未解决代码发现；
+- 已建立真实 `.next/static` 扫描、Playwright 初始 HTML/RSC/网络响应扫描，
+  并读取合成 secret 文件实际内容作为 canary；
+- 已增加独立真实 Next known-fail app，由 Server Component 故意输出合成
+  secret 与用户正文，证明 HTML 和 RSC 两条响应路径都会被稳定 rule ID 拒绝；
+- Admin `typecheck` 已固定先执行 `next typegen`，不再依赖本地残留
+  `.next/types`；
+- 开发环境 CSP 仅增加 `'unsafe-eval'`，production 响应明确不包含；
+- 已完成 11 条 Vitest、6 条 production shell Playwright 与 2 条真实 Next
+  known-fail Playwright 用例；最终 `pnpm run validate` 全仓通过；
+- 已按审核要求从 `pnpm clean` 开始，依次完成
+  `pnpm install --frozen-lockfile` 与 `pnpm run validate`；clean run 中
+  `@daily-energy/app-admin:typecheck` 为 cache miss 并明确执行
+  `next typegen` 后再运行 workspace TypeScript 检查；
+- 已完成全 diff 自审；known-fail app 仅位于 tests、临时 secret 与 fixture build
+  均在 `finally` 清理，诊断不输出 canary 内容，无未解决代码发现；
 - 已创建 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)，
   标题为 `[E-005] 创建 Next.js 管理后台骨架`，包含 `Closes #43`；
 - 当前唯一 In Review：[E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)；

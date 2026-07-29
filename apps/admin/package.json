@@ -7,12 +7,12 @@
     "build": "next build && pnpm run bundle:check",
     "bundle:check": "node ../../tooling/check-admin-bundle.mjs",
     "dev": "next dev",
-    "format:check": "prettier --check README.md package.json next.config.ts playwright.config.ts tsconfig.json src tests",
-    "lint": "eslint --max-warnings=0 next.config.ts playwright.config.ts src tests",
+    "format:check": "prettier --check README.md package.json next.config.ts playwright.config.ts response-fixture.playwright.config.ts tsconfig.json src tests",
+    "lint": "eslint --max-warnings=0 next.config.ts playwright.config.ts response-fixture.playwright.config.ts src tests",
     "start": "next start",
     "test": "vitest run src && pnpm run test:e2e",
-    "test:e2e": "pnpm run build && playwright test",
-    "typecheck": "node ../../tooling/typecheck-workspace.mjs"
+    "test:e2e": "node ../../tooling/run-admin-playwright.mjs",
+    "typecheck": "next typegen && node ../../tooling/typecheck-workspace.mjs"
   },
   "dailyEnergy": {
     "kind": "app",

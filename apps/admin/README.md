@@ -3,7 +3,7 @@
 E-005 的 Next.js 16 / React 19 App Router 管理后台骨架。
 
 当前只交付 ADM-001 登录外壳、基础页面框架、Loading / Empty /
-Recoverable Error / Disabled 状态，以及 Admin API、会话和浏览器 bundle
+Recoverable Error / Disabled 状态，以及 Admin API、会话和浏览器可见响应
 的安全边界。真实企业 SSO、业务 Dashboard、用户查询和生产部署不在本任务内。
 
 ## 单向边界
@@ -46,6 +46,9 @@ pnpm --filter @daily-energy/app-admin dev
 
 secret 配置只接受受控文件路径，不接受明文；任何值都不得进入浏览器 bundle。
 
+开发环境 CSP 只为 Next.js / React 调试增加 `'unsafe-eval'`；production header
+不包含该能力。
+
 ## 验证
 
 ```bash
@@ -56,6 +59,11 @@ pnpm run admin:bundle:fixtures
 pnpm run validate
 ```
 
-`build` 会在 Next build 后扫描真实 `.next/static` 浏览器产物。负向 fixture
-分别证明 server-only package、secret identifier、secret value、restricted
-field 和合成用户正文能被稳定 rule ID 拒绝。
+`typecheck` 会先运行 `next typegen`，因此干净检出不依赖本地残留
+`.next/types`。
+
+`build` 会在 Next build 后扫描真实 `.next/static` 浏览器产物。`test:e2e`
+创建权限受限的合成 secret 文件，读取文件实际内容作为 canary，并用 Playwright
+扫描初始 HTML、RSC 与浏览器加载的同源网络响应体。独立的真实 Next known-fail app
+会故意从 Server Component 输出合成 secret 与用户正文，证明 HTML 和 RSC 两条
+响应路径都必须命中稳定 rule ID。测试结束会删除合成 secret 与 fixture build。

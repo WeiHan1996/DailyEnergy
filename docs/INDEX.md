@@ -255,7 +255,8 @@ S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-0
 E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done；E-008 已随
 PR #97 squash 合并并关闭 Issue #46。E-005 已在
 `agent/e-005-admin-shell` 完成 Next.js Admin shell、production fail-closed、
-Admin API/session 边界、bundle Gate 与 Playwright 证据，并以
+Admin API/session 边界、route typegen、静态 bundle + HTML/RSC/网络响应 Gate、
+真实 Next known-fail fixture 与 Playwright 证据，并以
 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98) 进入 In Review。
 正式 Source-ID registry 由 E-010 交付；E-005 已在固定 fixture 中记录对应
 Source IDs，并按 E-010 前的 `NA_WITH_REASON` 规则保留可执行证据。

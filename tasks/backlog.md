@@ -131,7 +131,9 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 
 E-004 已随 PR #96 合并。E-008 已随 PR #97 squash 合并并关闭 Issue #46；
 E-005 已从包含 merge commit `29798917392e0e1db3b852083caf525bb756f8ad`
-的最新 `main` 完成实现、全仓验证与自审，并以 Draft PR #98 等待用户审核。
+的最新 `main` 完成实现、全仓验证与自审；审核修订已补齐 `next typegen`、
+secret 文件实际内容 canary、HTML/RSC/浏览器响应 Gate、真实 Next known-fail
+fixture 和 development-only `'unsafe-eval'`，继续以 Draft PR #98 等待用户审核。
 E-006 仅记录为接受后的下一候选，当前不启动。
 
 ## 5. Phase 2：确定性核心闭环

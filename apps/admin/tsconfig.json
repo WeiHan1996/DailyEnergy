@@ -7,6 +7,7 @@
     "tests/**/*.ts",
     "next.config.ts",
     "playwright.config.ts",
+    "response-fixture.playwright.config.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"],

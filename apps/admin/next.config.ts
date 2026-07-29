@@ -1,17 +1,30 @@
 import type { NextConfig } from "next";
 
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  "base-uri 'self'",
-  "connect-src 'self'",
-  "font-src 'self'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-  "img-src 'self' data:",
-  "object-src 'none'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline'",
-].join("; ");
+export function contentSecurityPolicyForEnvironment(
+  nodeEnvironment: string | undefined,
+): string {
+  const scriptSource =
+    nodeEnvironment === "development"
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+      : "script-src 'self' 'unsafe-inline'";
+
+  return [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "connect-src 'self'",
+    "font-src 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "img-src 'self' data:",
+    "object-src 'none'",
+    scriptSource,
+    "style-src 'self' 'unsafe-inline'",
+  ].join("; ");
+}
+
+const contentSecurityPolicy = contentSecurityPolicyForEnvironment(
+  process.env.NODE_ENV,
+);
 
 const securityHeaders = [
   {

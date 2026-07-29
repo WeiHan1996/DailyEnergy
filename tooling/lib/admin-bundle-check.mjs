@@ -29,11 +29,12 @@ function includesCanary(content, values) {
     (value) =>
       typeof value === "string" &&
       value.length >= 12 &&
-      content.includes(value),
+      (content.includes(value) ||
+        content.includes(JSON.stringify(value).slice(1, -1))),
   );
 }
 
-export function scanAdminBrowserBundle({
+export function scanAdminBrowserExposure({
   files,
   secretValues = [],
   userBodyCanaries = [ADMIN_USER_BODY_FIXTURE_CANARY],
@@ -88,3 +89,5 @@ export function scanAdminBrowserBundle({
   }
   return diagnostics;
 }
+
+export const scanAdminBrowserBundle = scanAdminBrowserExposure;

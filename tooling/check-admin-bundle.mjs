@@ -1,7 +1,8 @@
 import { readdir, readFile } from "node:fs/promises";
 import { relative, resolve, sep } from "node:path";
 
-import { scanAdminBrowserBundle } from "./lib/admin-bundle-check.mjs";
+import { scanAdminBrowserExposure } from "./lib/admin-bundle-check.mjs";
+import { collectAdminSecretCanaries } from "./lib/admin-secret-canaries.mjs";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const browserOutputRoot = resolve(repositoryRoot, "apps/admin/.next/static");
@@ -38,30 +39,28 @@ try {
 }
 
 if (process.exitCode !== 1) {
-  const secretValues = Object.entries(process.env)
-    .filter(([name, value]) => {
-      return (
-        /(?:SECRET|TOKEN|PASSWORD|PRIVATE_KEY|DATABASE_URL|REDIS_URL)/u.test(
-          name,
-        ) && (value?.length ?? 0) >= 12
-      );
-    })
-    .map(([, value]) => value);
-  const diagnostics = scanAdminBrowserBundle({
-    files,
-    secretValues,
-  });
+  try {
+    const diagnostics = scanAdminBrowserExposure({
+      files,
+      secretValues: await collectAdminSecretCanaries(process.env),
+    });
 
-  if (diagnostics.length > 0) {
+    if (diagnostics.length > 0) {
+      console.error(
+        diagnostics
+          .map(({ message, path, ruleId }) => `${ruleId}: ${path}: ${message}`)
+          .join("\n"),
+      );
+      process.exitCode = 1;
+    } else {
+      console.log(
+        `Admin browser bundle Gate passed ${files.length} static files with server-only, secret-file content, restricted-field, and user-body scans.`,
+      );
+    }
+  } catch (error) {
     console.error(
-      diagnostics
-        .map(({ message, path, ruleId }) => `${ruleId}: ${path}: ${message}`)
-        .join("\n"),
+      error instanceof Error ? error.message : "ADMIN_BUNDLE_SCAN_FAILED",
     );
     process.exitCode = 1;
-  } else {
-    console.log(
-      `Admin browser bundle Gate passed ${files.length} static files with server-only, secret, restricted-field, and user-body scans.`,
-    );
   }
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 interface AdminShellProperties {
@@ -11,7 +12,12 @@ export function AdminShell({ children, runtimeLabel }: AdminShellProperties) {
   return (
     <div className="admin-shell" data-testid="admin-shell">
       <aside className="admin-sidebar">
-        <a className="brand" href="/login">
+        <Link
+          className="brand"
+          data-testid="admin-brand-link"
+          href="/login"
+          prefetch={false}
+        >
           <span aria-hidden="true" className="brand__mark">
             DE
           </span>
@@ -19,7 +25,7 @@ export function AdminShell({ children, runtimeLabel }: AdminShellProperties) {
             <strong>DailyEnergy</strong>
             <small>管理后台</small>
           </span>
-        </a>
+        </Link>
         <nav aria-label="后台主导航" className="admin-nav">
           {navigation.map((item, index) => (
             <span
