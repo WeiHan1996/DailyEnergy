@@ -346,10 +346,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-001、E-002、E-003 已完成；E-004 是唯一 Ready
-当前目标：创建微信原生小程序 TypeScript 骨架
-当前任务：E-004 微信小程序骨架（Ready）
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/42
+状态：E-001～E-004、E-008 已完成；E-005 是唯一 In Review
+当前目标：审核 Next.js 管理后台骨架与 fail-closed 安全边界
+当前任务：E-005 创建 Next.js 管理后台骨架（In Review）
+工程入口：https://github.com/WeiHan1996/DailyEnergy/pull/98
 ```
 
 长期工作入口：
@@ -362,12 +362,20 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- 读取 [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)、information-architecture、screen-inventory、repository-structure、testing 和 deployment；
-- 建立微信原生小程序入口、启动路由、平台 port 和 client-only bundle 边界；
-- 不实现正式页面、真实微信登录、订阅消息或分享业务，也不提前实现 E-008 的 api-client/codegen；
-- E-004 尚未创建实现分支或 Draft PR；E-005～E-014 及其他下游工程 Issue 继续保持 Planned。
+- 审核 [E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)
+  与 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)；
+- 验证 Next.js 16 / React 19 App Router、ADM-001 登录外壳、基础布局、
+  状态组件和 Playwright 证据；
+- 重点审核 Admin API origin/session 单向边界、production fail-closed、
+  安全响应头和 browser bundle Gate；
+- 不实现真实 SSO、业务 Dashboard、用户下钻或生产部署，不启动 E-006。
 
-[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并，E-003 已随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 合并并进入 Done；E-004 Issue #42 是唯一 Ready，尚未创建实现分支或 Draft PR。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
+[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。
+E-001～E-004 与 E-008 已合并并进入 Done；E-005 已完成实现、完整
+`pnpm run validate` 和 diff 自审，并以 Draft PR #98 进入 In Review。
+Issue #43 保持打开，PR 未标记 ready、未合并；E-006 与其他下游任务保持
+Planned。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate
+仍未解除。
 
 ---
 

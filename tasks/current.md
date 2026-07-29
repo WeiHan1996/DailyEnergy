@@ -4,11 +4,11 @@
 - **最后更新**：2026-07-29
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-005 — 创建 Next.js 管理后台骨架
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **当前分支**：`agent/e-005-admin-shell`
 - **当前 Issue**：[E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)
-- **当前 PR**：无
-- **Gate 结论**：`GO_TO_IMPLEMENT`
+- **当前 PR**：[Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)
+- **Gate 结论**：`GO_TO_REVIEW`
 
 ## 1. 当前目标
 
@@ -23,7 +23,7 @@ apps/admin
 E-008 已随 [PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)
 squash 合并，merge commit 为
 `29798917392e0e1db3b852083caf525bb756f8ad`，Issue #46 已关闭。
-E-005 的 E-001、E-002、E-008 前置均已完成，现为唯一 In Progress 工程任务；
+E-005 的 E-001、E-002、E-008 前置均已完成，现为唯一 In Review 工程任务；
 E-006 及其他工程任务不得并行开始。
 
 ## 2. 开工检查
@@ -69,10 +69,11 @@ E-006 及其他工程任务不得并行开始。
 
 - **仓库/代码阻塞**：无；
 - **前置依赖**：E-001、E-002、E-008 已完成；
+- **审核阻塞**：等待用户审核 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)；
 - **生产身份**：尚未配置真实 Admin 身份，不阻塞骨架实现，但 production 必须默认关闭；
 - **视觉边界**：本任务使用最小可验证布局，不替代后续 D 系列正式设计；
-- **并行规则**：E-005 是唯一 In Progress，完成并进入审核前不得启动 E-006；
-- **下一状态**：实现、完整验证与自审通过并创建 Draft PR 后，将 E-005 更新为 In Review。
+- **并行规则**：E-005 是唯一 In Review；用户接受并合并前不得启动 E-006；
+- **下一状态**：按审核意见修订，或在用户明确批准后标记 PR ready 并合并。
 
 ## 7. 最近交接
 
@@ -96,6 +97,9 @@ E-006 及其他工程任务不得并行开始。
 - 已完成 9 条 Vitest 与 5 条 Chromium Playwright 用例；最终
   `pnpm run validate` 全仓通过；
 - 已完成全 diff 自审并加强压缩产物中的裸 restricted-field 匹配，无未解决代码发现；
-- 当前唯一 In Progress：[E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)；
-- 当前动作：提交并推送 `agent/e-005-admin-shell`，创建 Draft PR 后转为 In Review；
-  不自动启动其他任务。
+- 已创建 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)，
+  标题为 `[E-005] 创建 Next.js 管理后台骨架`，包含 `Closes #43`；
+- 当前唯一 In Review：[E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)；
+- 当前动作：等待用户审核 Draft PR #98；不标记 ready、不合并、不关闭 Issue，
+  也不自动启动其他任务；
+- **接受后的下一任务**：E-006 — PostgreSQL 与 Prisma；仅记录，不启动。

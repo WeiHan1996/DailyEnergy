@@ -108,7 +108,7 @@
 | S-34 | Phase 1～3 工程 Issues | Done | 3 个 GitHub Milestones、48 个 Issues | S-01～S-33 |
 | S-35 | Phase 0B Gate 评审 | Done | [Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) | S-34 |
 
-S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)、[E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)、[E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)、[E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42) 与 [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46) 已完成并进入 Done。[E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43) 是唯一 In Progress 工程任务；E-006 与其他工程 Issue 保持 Planned。
+S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)、[E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)、[E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)、[E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42) 与 [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46) 已完成并进入 Done。[E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43) 已以 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98) 进入 In Review，是唯一当前工程任务；E-006 与其他工程 Issue 保持 Planned。
 
 ## 4. Phase 1：工程基础
 
@@ -118,7 +118,7 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 | [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41) | 代码质量基线 | Done | TypeScript、ESLint、Prettier、提交规范 |
 | [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40) | NestJS API 骨架 | Done | 配置、错误、健康检查和日志 |
 | [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42) | 微信小程序骨架 | Done | 原生小程序、TypeScript、路由和环境 |
-| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43) | Next.js 管理后台骨架 | In Progress | 登录外壳和基础布局 |
+| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43) | Next.js 管理后台骨架 | In Review | 登录外壳和基础布局 |
 | [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44) | PostgreSQL 与 Prisma | Planned | 初始 Schema、迁移和测试数据 |
 | [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45) | Redis 与 BullMQ | Planned | 缓存、队列和连接管理 |
 | [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46) | 统一 Zod Schema、OpenAPI 与生成 API Client | Done | client-safe Schema、OpenAPI、生成客户端与 drift Gate |
@@ -131,7 +131,8 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 
 E-004 已随 PR #96 合并。E-008 已随 PR #97 squash 合并并关闭 Issue #46；
 E-005 已从包含 merge commit `29798917392e0e1db3b852083caf525bb756f8ad`
-的最新 `main` 开始实施，E-006 及其他任务继续保持 Planned。
+的最新 `main` 完成实现、全仓验证与自审，并以 Draft PR #98 等待用户审核。
+E-006 仅记录为接受后的下一候选，当前不启动。
 
 ## 5. Phase 2：确定性核心闭环
 
