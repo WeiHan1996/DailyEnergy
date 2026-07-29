@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "contextCases": [
+    {
+      "id": "known-pass-single-current",
+      "requestedTaskId": "E-015",
+      "currentTaskId": "E-015",
+      "mainIsCurrent": true,
+      "activeTasks": [{ "taskId": "E-015", "state": "In Progress" }],
+      "expectedRuleIds": []
+    },
+    {
+      "id": "known-fail-stale-main",
+      "requestedTaskId": "E-015",
+      "currentTaskId": "E-015",
+      "mainIsCurrent": false,
+      "activeTasks": [{ "taskId": "E-015", "state": "In Progress" }],
+      "expectedRuleIds": ["CONTEXT_MAIN_STALE"]
+    },
+    {
+      "id": "known-fail-multiple-active",
+      "requestedTaskId": "E-015",
+      "currentTaskId": "E-015",
+      "mainIsCurrent": true,
+      "activeTasks": [
+        { "taskId": "E-006", "state": "Ready" },
+        { "taskId": "E-015", "state": "In Progress" }
+      ],
+      "expectedRuleIds": ["CONTEXT_MULTIPLE_ACTIVE_TASKS"]
+    },
+    {
+      "id": "known-fail-task-mismatch",
+      "requestedTaskId": "E-006",
+      "currentTaskId": "E-015",
+      "mainIsCurrent": true,
+      "activeTasks": [{ "taskId": "E-015", "state": "In Progress" }],
+      "expectedRuleIds": ["CONTEXT_TASK_MISMATCH"]
+    }
+  ],
+  "dependencyCases": [
+    {
+      "id": "known-fail-c003-before-d004",
+      "taskId": "C-003",
+      "states": { "D-004": "Planned" },
+      "expectedRuleIds": ["DEPENDENCY_BLOCKED"]
+    },
+    {
+      "id": "known-pass-c003-after-d004",
+      "taskId": "C-003",
+      "states": { "D-004": "Done" },
+      "expectedRuleIds": []
+    },
+    {
+      "id": "known-fail-c012-before-d005",
+      "taskId": "C-012",
+      "states": { "D-005": "In Review" },
+      "expectedRuleIds": ["DEPENDENCY_BLOCKED"]
+    },
+    {
+      "id": "known-pass-d005-chain",
+      "taskId": "D-005",
+      "states": { "D-004": "Accepted" },
+      "expectedRuleIds": []
+    }
+  ],
+  "routeCases": [
+    { "id": "exact-e015", "taskId": "E-015", "expectedProfile": "code" },
+    { "id": "hybrid-d002", "taskId": "D-002", "expectedProfile": "hybrid" },
+    { "id": "design-d004", "taskId": "D-004", "expectedProfile": "design" },
+    { "id": "research-r001", "taskId": "R-001", "expectedProfile": "research" },
+    { "id": "fallback-docs", "taskId": "S-999", "expectedProfile": "docs" }
+  ],
+  "profileOverrideCases": [
+    {
+      "id": "known-pass-code-to-security",
+      "inferredProfile": "code",
+      "requestedProfile": "security",
+      "expectedProfile": "security"
+    },
+    {
+      "id": "known-fail-code-to-docs",
+      "inferredProfile": "code",
+      "requestedProfile": "docs",
+      "expectedProfile": "code",
+      "expectedRuleId": "AGENT_PROFILE_DOWNGRADE_BLOCKED"
+    },
+    {
+      "id": "known-fail-design-to-code",
+      "inferredProfile": "design",
+      "requestedProfile": "code",
+      "expectedProfile": "design",
+      "expectedRuleId": "AGENT_PROFILE_DOWNGRADE_BLOCKED"
+    },
+    {
+      "id": "known-pass-docs-to-research",
+      "inferredProfile": "docs",
+      "requestedProfile": "research",
+      "expectedProfile": "research"
+    }
+  ],
+  "changedCases": [
+    {
+      "id": "known-full-agent-policy",
+      "paths": ["docs/agent/workflow.md"],
+      "expectedEscalation": "full",
+      "expectedRuleIds": ["AGENT_POLICY_REQUIRES_FULL"]
+    },
+    {
+      "id": "known-full-admin-without-source-map",
+      "paths": ["apps/admin/app/page.tsx"],
+      "expectedEscalation": "full",
+      "expectedRuleIds": ["APPLICATION_OR_TEST_REQUIRES_FULL"]
+    },
+    {
+      "id": "known-targeted-status-document",
+      "paths": ["tasks/current.md"],
+      "expectedCommandPrefix": "pnpm run agent:check",
+      "expectedRuleIds": ["STATUS_DOCS_TARGETED"]
+    },
+    {
+      "id": "known-full-unknown",
+      "paths": ["unexpected/new-input.bin"],
+      "expectedEscalation": "full",
+      "expectedUnknownPaths": ["unexpected/new-input.bin"]
+    }
+  ],
+  "redactionCases": [
+    {
+      "id": "redact-bearer-and-secret",
+      "input": "Authorization: Bearer abc.def\nSESSION_SECRET=real-value",
+      "forbidden": ["abc.def", "real-value"],
+      "required": ["[REDACTED]"]
+    },
+    {
+      "id": "redact-json-credentials",
+      "input": "{\"token\":\"json-token-value\",\"password\":\"json-password-value\"}",
+      "forbidden": ["json-token-value", "json-password-value"],
+      "required": ["[REDACTED]"]
+    }
+  ],
+  "boundedOutputCases": [
+    {
+      "id": "bounded-tail-only",
+      "inputLineCount": 120,
+      "lineLimit": 10,
+      "maxChars": 100,
+      "required": "line-119",
+      "forbidden": "line-000"
+    }
+  ]
+}

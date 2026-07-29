@@ -41,6 +41,28 @@
   用户正文都会被 Gate 拒绝；测试结束删除临时文件和 fixture build；
 - `lib/admin-bundle-check.mjs` 与 `lib/admin-secret-canaries.mjs`：静态 bundle、
   HTML/RSC/网络响应和 fixture 共用的纯扫描规则与 secret-file canary 读取边界。
+- `agent-prepare.mjs`：默认只读、本地且快速地恢复任务 Profile、required sources、
+  依赖与变更范围；只有显式 `--remote` / `--deep` 才扩大外部和环境检查；
+- `agent-validate.mjs`：统一执行 `changed` / `task` / `full` 分级 Gate；未知、高风险
+  或 tooling/config 变化保守升级，成功只输出摘要，失败输出有界脱敏诊断；E-010
+  提供 Source-ID dependency map 前，生产代码、测试和配置也一律升级 full；
+- `check-agent-workflow.mjs`：验证权威路由、Profile、命令、D 系列依赖、统一入口与
+  非权威摘要声明；
+- `test-agent-workflow.mjs` 与 `lib/agent-workflow.mjs`：运行上下文冲突、依赖阻断、
+  路由、变更升级与输出脱敏的版本化 known-pass/known-fail fixtures。
+
+Agent 工作流：
+
+```bash
+pnpm agent:prepare E-015
+pnpm agent:validate --mode=changed
+pnpm agent:validate --mode=task --task=E-015
+pnpm agent:validate --mode=full --profile=code
+```
+
+设计、混合、研究或安全 Profile 中，自动化无法替代的原始证据、授权或用户决定会
+以明确的 pending 状态返回，不会被仓库检查伪装成 `PASS`。validation receipt、
+有效输入集哈希和持久化日志 artifact 仍属于后续 P2。
 
 合同工作流：
 

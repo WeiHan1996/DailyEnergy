@@ -1,0 +1,213 @@
+version: 1
+projectContext: docs/agent/PROJECT_CONTEXT.md
+
+taskRules:
+  - match: E-015
+    profile: code
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Repository-wide execution and safety rules
+      - path: tasks/current.md
+        required: true
+        reason: Current task scope and handoff
+      - path: docs/agent/workflow.md
+        required: true
+        reason: Accepted agent workflow
+      - path: docs/technical/repository-structure.md
+        required: true
+        reason: Tooling and dependency boundaries
+      - path: docs/technical/testing.md
+        required: true
+        reason: Validation and fixture evidence rules
+      - path: docs/technical/deployment.md
+        required: false
+        reason: Secret, artifact, and environment boundaries
+      - path: docs/technical/observability.md
+        required: false
+        reason: Redaction and bounded diagnostic boundaries
+      - path: docs/decisions/ADR-0006-monorepo-and-stack.md
+        required: true
+        reason: Accepted capability boundary decision
+
+  - match: D-002
+    profile: hybrid
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Repository and product guardrails
+      - path: tasks/current.md
+        required: true
+        reason: Current task scope
+      - path: docs/design/README.md
+        required: true
+        reason: Design workflow and evidence boundary
+      - path: docs/design/screen-inventory.md
+        required: true
+        reason: Accepted screen and state inventory
+      - path: docs/technical/repository-structure.md
+        required: true
+        reason: Code ownership for generated design assets
+
+  - match: D-*
+    profile: design
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Product, content, and authorization guardrails
+      - path: tasks/current.md
+        required: true
+        reason: Current task and dependency state
+      - path: docs/design/README.md
+        required: true
+        reason: Design workflow
+      - path: docs/design/screen-inventory.md
+        required: true
+        reason: Accepted screen and state inventory
+      - path: docs/design/interaction-states.md
+        required: true
+        reason: Accepted interaction behavior
+
+  - match: E-006
+    profile: code
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Repository and technical guardrails
+      - path: tasks/current.md
+        required: true
+        reason: Current task scope
+      - path: docs/data/domain-model.md
+        required: true
+        reason: Accepted entities and invariants
+      - path: docs/technical/database.md
+        required: true
+        reason: Accepted PostgreSQL and Prisma specification
+      - path: docs/operations/privacy-data-map.md
+        required: true
+        reason: Data classification and deletion boundary
+      - path: docs/technical/testing.md
+        required: true
+        reason: Database and integration evidence
+      - path: docs/technical/deployment.md
+        required: true
+        reason: Migration, rollback, and environment rules
+
+  - match: AI-*
+    profile: security
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: AI, privacy, and safety guardrails
+      - path: tasks/current.md
+        required: true
+        reason: Current task scope
+      - path: docs/ai/README.md
+        required: true
+        reason: AI document routing
+      - path: docs/ai/safety.md
+        required: true
+        reason: Safety requirements
+      - path: docs/technical/testing.md
+        required: true
+        reason: Safety and AI evidence
+
+  - match: R-*
+    profile: research
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Repository, privacy, and authorization guardrails
+      - path: tasks/current.md
+        required: true
+        reason: Current research question and scope
+      - path: docs/INDEX.md
+        required: true
+        reason: Authoritative repository source navigation
+      - path: docs/technical/testing.md
+        required: true
+        reason: Evidence, fixture, and external-run boundaries
+
+  - match: E-*
+    profile: code
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Repository and technical guardrails
+      - path: tasks/current.md
+        required: true
+        reason: Current task scope
+      - path: docs/technical/repository-structure.md
+        required: true
+        reason: Package and capability boundaries
+      - path: docs/technical/testing.md
+        required: true
+        reason: Required evidence
+
+  - match: C-*
+    profile: code
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Product, content, and technical guardrails
+      - path: tasks/current.md
+        required: true
+        reason: Current task and dependency state
+      - path: docs/design/screen-inventory.md
+        required: true
+        reason: Accepted screen and state inventory
+      - path: docs/design/interaction-states.md
+        required: true
+        reason: Accepted interaction behavior
+      - path: docs/technical/testing.md
+        required: true
+        reason: Required evidence
+
+  - match: "*"
+    profile: docs
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Repository-wide rules
+      - path: tasks/current.md
+        required: true
+        reason: Current task and scope
+      - path: docs/INDEX.md
+        required: true
+        reason: Document status and navigation
+
+topicRules:
+  - id: agent-workflow
+    patterns:
+      - AGENTS.md
+      - docs/agent/**
+      - tooling/agent-*.mjs
+      - tooling/check-agent-workflow.mjs
+      - tooling/test-agent-workflow.mjs
+      - tooling/lib/agent-workflow.mjs
+      - tests/agent-workflow/**
+    sources:
+      - docs/agent/workflow.md
+      - docs/technical/repository-structure.md
+      - docs/technical/testing.md
+
+  - id: design
+    patterns:
+      - docs/design/**
+      - packages/design-tokens/**
+      - apps/*/src/**/styles/**
+    sources:
+      - docs/design/README.md
+      - docs/design/screen-inventory.md
+      - docs/design/interaction-states.md
+
+  - id: contracts
+    patterns:
+      - packages/shared-schemas/**
+      - packages/api-client/**
+      - tooling/*contract*
+      - tooling/*codegen*
+    sources:
+      - docs/technical/api.md
+      - docs/technical/testing.md
+      - docs/decisions/ADR-0006-monorepo-and-stack.md
