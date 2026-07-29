@@ -10,16 +10,17 @@
 
 本文件是 DailyEnergy 的规范目录。
 
-任何 AI Agent 或开发人员开始任务前，按以下顺序读取：
+任何 AI Agent 或开发人员开始任务前：
 
-1. [AGENTS.md](../AGENTS.md)；
-2. [README.md](../README.md)；
-3. [ROADMAP.md](../ROADMAP.md)；
-4. 本文；
-5. [tasks/current.md](../tasks/current.md)；
-6. 当前任务列出的上游规范；
-7. 所有相关 Accepted ADR；
-8. 对应 Schema、接口和测试。
+1. 阅读 [AGENTS.md](../AGENTS.md)；
+2. 阅读 [Agent Project Context](./agent/PROJECT_CONTEXT.md)；
+3. 阅读 [tasks/current.md](../tasks/current.md)；
+4. 运行 `pnpm agent:prepare <TASK_ID>`；
+5. 实际读取命令返回的全部 required sources；
+6. 阅读相关 Accepted ADR、Schema、接口、测试、fixtures 和附近代码。
+
+若统一入口不可用或策略无效，按 AGENTS 中的完整恢复顺序回退。Project Context、
+权威索引和命令摘要只负责导航，不能替代本索引中的权威原文。
 
 不要从聊天记录猜测正式结论。如果聊天内容与仓库冲突，以仓库中的 Accepted 文档为准。
 
@@ -69,14 +70,18 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 ## 4. 项目控制文档
 
-| 文件                                    | 状态     | 作用                       | 更新时机                 |
-| --------------------------------------- | -------- | -------------------------- | ------------------------ |
-| [README.md](../README.md)               | Active   | 项目入口、定位和当前状态   | 阶段或入口变化           |
-| [ROADMAP.md](../ROADMAP.md)             | Accepted | 长期阶段、交付物和退出门槛 | 里程碑或重大计划变化     |
-| [AGENTS.md](../AGENTS.md)               | Active   | AI 与开发协作规则          | 工作方式变化             |
-| [docs/INDEX.md](./INDEX.md)             | Active   | 文档状态和依赖索引         | 文档新增、接受或取代     |
-| [tasks/current.md](../tasks/current.md) | Active   | 唯一当前任务和交接状态     | 每个任务开始、进展和完成 |
-| [tasks/backlog.md](../tasks/backlog.md) | Active   | 有序候选任务               | 计划、优先级和依赖变化   |
+| 文件                                                                | 状态     | 作用                                    | 更新时机                 |
+| ------------------------------------------------------------------- | -------- | --------------------------------------- | ------------------------ |
+| [README.md](../README.md)                                           | Active   | 项目入口、定位和当前状态                | 阶段或入口变化           |
+| [ROADMAP.md](../ROADMAP.md)                                         | Accepted | 长期阶段、交付物和退出门槛              | 里程碑或重大计划变化     |
+| [AGENTS.md](../AGENTS.md)                                           | Active   | AI 与开发协作规则                       | 工作方式变化             |
+| [docs/INDEX.md](./INDEX.md)                                         | Active   | 文档状态和依赖索引                      | 文档新增、接受或取代     |
+| [tasks/current.md](../tasks/current.md)                             | Active   | 唯一当前任务和交接状态                  | 每个任务开始、进展和完成 |
+| [tasks/backlog.md](../tasks/backlog.md)                             | Active   | 有序候选任务                            | 计划、优先级和依赖变化   |
+| [docs/agent/PROJECT_CONTEXT.md](./agent/PROJECT_CONTEXT.md)         | Active   | Agent 稳定上下文导航，不复制权威结论    | 路由或入口变化           |
+| [docs/agent/workflow.md](./agent/workflow.md)                       | Accepted | 上下文路由、Profile、分级验证与证据边界 | Agent 工作方式变化       |
+| [docs/agent/authority-index.yaml](./agent/authority-index.yaml)     | Active   | 任务到 required sources 的版本化路由    | 任务类型或权威来源变化   |
+| [docs/agent/validation-policy.yaml](./agent/validation-policy.yaml) | Active   | Profile、路径升级、命令和依赖策略       | Gate 或依赖变化          |
 
 这些文件负责控制项目，不取代产品和技术规范。
 
@@ -167,14 +172,14 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 ### 7.6 工程架构与交付
 
-| 文件                                                                                                                                                                                                   | 状态     | 目的                                                                                          | 主要依赖                                                      |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                     | Gateway、database、API、ADR-0006                              |
-| [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted | Monorepo 目录、app/package/module、public exports 与依赖 Gate                                 | architecture、ADR-0006                                        |
-| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵                                          | schemas、API、architecture、repository-structure              |
-| [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复                                        | architecture、repository-structure、testing、privacy          |
-| [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                      | metrics、Gateway、privacy、incident、architecture、deployment |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active   | 53 个 Issues 已按 14 / 22 / 17 绑定三个真实 Milestone；其中 D-001～D-005 均为 Planned         | Accepted Phase 0B specs、D 系列项目控制                       |
+| 文件                                                                                                                                                                                                   | 状态     | 目的                                                                                                      | 主要依赖                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                                 | Gateway、database、API、ADR-0006                              |
+| [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted | Monorepo 目录、app/package/module、public exports 与依赖 Gate                                             | architecture、ADR-0006                                        |
+| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵                                                      | schemas、API、architecture、repository-structure              |
+| [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复                                                    | architecture、repository-structure、testing、privacy          |
+| [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                                  | metrics、Gateway、privacy、incident、architecture、deployment |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active   | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；其中 E-015 为 In Review，D-001～D-005 均为 Planned | Accepted Phase 0B specs、D 系列项目控制、E-015                |
 
 ### 7.7 Phase Gate
 
@@ -239,20 +244,20 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-005 与 E-008 已完成，E-006 是 Phase 1 唯一 Ready 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-005 与 E-008 已完成，E-015 是 Phase 1 唯一 In Review 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)；
-7. [领域模型](./data/domain-model.md)、[数据库规格](./technical/database.md)
-   与 [隐私数据地图](./operations/privacy-data-map.md)；
+6. [E-015 Issue #105](https://github.com/WeiHan1996/DailyEnergy/issues/105)；
+7. `docs/agent/PROJECT_CONTEXT.md` 与 Agent 工作流规范；
 8. [仓库结构与模块边界](./technical/repository-structure.md)；
 9. [测试策略](./technical/testing.md)；
-10. [部署、配置和回滚](./technical/deployment.md)；
-11. E-003 API、E-005 Admin、E-008 contract/codegen Gate 和根工具链；
+10. [部署、配置和回滚](./technical/deployment.md)与
+    [可观测性](./technical/observability.md)；
+11. ADR-0006、现有根工具链、fixtures 与 D 系列依赖；
 12. tasks/backlog.md（仅在需要重排优先级时）。
 
 E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done；E-008 已随
@@ -269,4 +274,5 @@ D-005 是 C-012、C-013、C-014 的直接前置。
 正式 Source-ID registry 由 E-010 交付；E-005 已在固定 fixture 中记录对应
 Source IDs，并按 E-010 前的 `NA_WITH_REASON` 规则保留可执行证据。
 CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production
-Gate 未被自动解除；E-006 是唯一 Ready，但尚未开工。
+Gate 未被自动解除；E-015 只实现 P0/P1，不提前交付 E-010、E-011、E-013
+或 D 系列能力。E-006 在 E-015 接受后恢复为唯一 Ready。

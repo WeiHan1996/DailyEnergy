@@ -347,10 +347,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-001～E-005、E-008 已完成；E-006 是唯一 Ready
-当前目标：在明确开工后建立 PostgreSQL 与 Prisma 基线
-当前任务：E-006 PostgreSQL 与 Prisma（Ready，尚未开工）
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/44
+状态：E-015 是唯一 In Review；E-006 暂时保持 Planned
+当前目标：建立 Agent 上下文路由与分级验证 P0/P1
+当前任务：E-015 Agent 上下文路由与分级验证入口
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/105
 ```
 
 长期工作入口：
@@ -363,11 +363,13 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- [E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44) 是唯一
-  Ready，尚无执行分支或 PR；
-- 开工前重新核对数据库、领域模型、隐私删除、测试和部署规范；
+- [E-015 Issue #105](https://github.com/WeiHan1996/DailyEnergy/issues/105)
+  是唯一 In Review；
+- 实施 P0/P1 的权威来源路由、任务 Profile、依赖阻断和安静验证；
+- 不实现 P2 validation receipt、CI workflow、生产日志或完整 Figma 自动化；
+- E-006 暂时保持 Planned，E-015 接受后恢复为唯一 Ready；
 - D-001～D-005 已进入 Phase 2 Backlog，全部保持 Planned；
-- 本次项目控制变更不实现数据库、不开始正式视觉设计，也不改变其他任务状态。
+- 本任务不实现数据库、不开始正式视觉设计。
 
 [Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。
 E-001～E-005 与 E-008 已合并并进入 Done；E-005 随

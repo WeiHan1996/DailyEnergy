@@ -3,130 +3,113 @@
 - **文档状态**：Active
 - **最后更新**：2026-07-29
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：E-006 — PostgreSQL 与 Prisma
-- **任务状态**：Ready（尚未开工）
-- **当前分支**：无
-- **当前 Issue**：[E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)
-- **当前 PR**：无
-- **项目控制 PR**：[Draft PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103)
-- **Gate 结论**：`GO_TO_START`
+- **当前任务**：E-015 — 建立 Agent 上下文路由与分级验证入口
+- **任务状态**：In Review
+- **当前分支**：`agent/e-015-agent-workflow`
+- **当前 Issue**：[E-015 Issue #105](https://github.com/WeiHan1996/DailyEnergy/issues/105)
+- **当前 PR**：[Draft PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106)
+- **基线提交**：`38676cad32ba16d242050570e943b812c0ae6018`
+- **Gate 结论**：`READY_FOR_REVIEW`
 
 ## 1. 当前目标
 
-E-005 已随 [PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)
-合并，merge commit 为 `bde64fd60128ab699eac3251bcf2eace88f0a902`，
-Issue #43 已关闭。E-006 的前置已满足，现为唯一 Ready 工程任务，但尚未创建
-执行分支或 PR。
+实现已获用户确认的 Agent Token 优化 P0/P1：
 
-D-001～D-005 已作为 Phase 2 正式视觉设计工作流纳入 Backlog，当前全部为
-Planned。登记设计任务和依赖关系不代表开始设计，也不改变 E-006 的唯一
-Ready 状态。
+```text
+权威来源路由
+  → 任务类型与影响范围
+  → Requirement-to-Proof Matrix
+  → changed / task / full 分级验证
+  → 有界、脱敏的结果摘要
+```
 
-## 2. 开工检查
+摘要只负责路由，相关权威原文和原始设计证据仍必须实际读取。无法确定影响
+范围时必须扩大读取与验证，不能为了减少 Token 静默降低实现或审核质量。
 
-- 等待用户明确要求开始 E-006；Ready 不等于 In Progress；
-- 开工时从包含 E-005 merge commit 的最新 `main` 创建聚焦分支；
-- 重新读取 [E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)、
-  `docs/data/domain-model.md`、`docs/technical/database.md`、
-  `docs/operations/privacy-data-map.md`、测试、部署与相关 ADR；
-- 先执行 GO/NO-GO 检查，发现 Accepted 规范实质冲突时不得静默选边；
-- 开工后才把本文件和 Backlog 更新为 E-006 In Progress。
+## 2. 状态变更影响
 
-## 3. E-006 预定范围
+- 用户明确要求先实施 E-015，因此 E-006 暂时从唯一 Ready 调整为 Planned；
+- E-015 是唯一 In Review，完成审核与合并后 E-006 恢复为唯一 Ready；
+- [PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103) 已合并，
+  最新 `main` 为 `38676cad32ba16d242050570e943b812c0ae6018`；
+- D-001～D-005 继续保持 Planned，不创建 Figma、Design Tokens 或业务页面。
 
-- 以 Issue #44 和 Accepted 数据规范为准建立 PostgreSQL / Prisma 基线；
-- 固定可验证的 Schema、迁移、约束、权限、测试数据与隔离边界；
-- 证明迁移创建、验证、回滚和关键数据库负向场景；
-- 保持 E-003 API、E-005 Admin、E-008 contract/codegen 及根 Gate 通过；
-- 精确范围、测试矩阵和不做事项在开工 GO/NO-GO 后写入本文件。
+## 3. 范围
+
+- 更新 `AGENTS.md`，允许通过索引路由相关权威原文；
+- 建立 `docs/agent/PROJECT_CONTEXT.md`、正式工作流规范和版本化策略；
+- 实现只读、默认快速的 `pnpm agent:prepare <TASK_ID>`；
+- 实现统一的
+  `pnpm agent:validate --mode=changed|task|full --profile=<PROFILE>`；
+- 支持 `code`、`design`、`hybrid`、`docs`、`research`、`security`；
+- 建立上下文冲突、D 系列依赖阻断、路径升级和输出脱敏 fixtures；
+- 把 E-015 Gate 接入现有全仓 `pnpm run validate`。
 
 ## 4. 不做
 
-- 本次项目控制 PR 不实现 E-006 代码、数据库迁移或生产资源；
-- 不提前启动 E-007、E-009、E-010、E-011 或其他下游工程任务；
-- 不开始 D-001～D-005，不创建 Figma 稿、Design Tokens 或业务页面；
-- 不改变 D 系列以外的产品定位、技术栈或外部 Production Gate；
-- 不降低 Accepted ADR、Schema、API、隐私、安全、删除、幂等、事务或运行 profile 边界。
+- 不实现 P2 validation receipt、有效输入集哈希或日志 artifact 流水线；
+- 不创建 GitHub Actions workflow、required checks、CI lane 或生产监控；
+- 不建立完整 Source-ID registry、Testcontainers、Dev Container 或 remote cache；
+- 不实现完整 Figma 自动化、视觉回归平台或 Design Token 生成；
+- 不启动 E-006、D-001 或其他下游任务；
+- 不修改产品定位、业务 Schema、数据库、API 或运行时 capability。
 
 ## 5. 验收与证据
 
-- [PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98) 显示 Merged；
-- [Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43) 显示 Closed；
-- 最新 `main` 包含 E-005 merge commit
-  `bde64fd60128ab699eac3251bcf2eace88f0a902`；
-- [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)～
-  [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 均属于
-  Phase 2 Milestone 且保持 Open / Planned；
-- D-004 是 C-003、C-004、C-009 的直接前置；D-005 是 C-012、C-013、C-014
-  的直接前置，仓库路线图、Backlog、Issue 和文档索引保持一致；
-- README、ROADMAP、docs/INDEX 已同步 D-005 和 53（14 / 22 / 17）项计数；
-- 最新 PR patch 已完成静态回读，未发现缺失结尾换行或依赖/计数漂移；
-- 当前连接器环境无法取得可执行仓库 checkout，且 E-011 尚未提供 CI，因此
-  当前 head 的 `pnpm run validate` 状态为 `INFRA_BLOCKED`；不得复用旧 head 的
-  完整 Gate 结果冒充当前验证。
+- `agent:prepare` 默认只读、无远端调用、无文件修改且输出有界；
+- `--remote` 和 `--deep` 必须显式启用；
+- Task Packet/PROJECT_CONTEXT 不成为新权威源；
+- `changed` 模式对未知、高风险、tooling/config 变化保守升级 full；
+- D-004/D-005 未完成时，对相应 C 系列页面任务返回
+  `DEPENDENCY_BLOCKED`；
+- design/hybrid Profile 显式报告 Figma、Frame、人工和用户决定证据；
+- 成功验证只输出摘要，失败只输出脱敏的根因附近内容；
+- fixtures、format、lint、typecheck、test、build 和完整 validate 全部通过。
 
 ## 6. 当前阻塞与决策
 
 - **仓库/代码阻塞**：无；
-- **前置依赖**：E-006 的已知工程前置已完成，开工时仍需重新核对 Issue；
-- **执行授权**：当前仅完成项目控制，等待用户明确要求开始 E-006；
-- **控制审核**：[Draft PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103)
-  等待用户审核，不自动标记 Ready for review 或合并；
-- **项目控制静态检查**：`PASS`；D-005、下游依赖、文档索引和 Issue 计数一致；
-- **全仓 Gate**：`INFRA_BLOCKED`；当前环境没有仓库 checkout，且尚无 CI；
-- **视觉边界**：D-001～D-005 均为 Planned，不自动插队；
-- **并行规则**：E-006 是唯一 Ready；不存在 In Progress 或 In Review 工程任务；
-- **下一状态**：项目控制 PR 审核合并后仍保持 E-006 Ready，直到明确开工。
+- **外部依赖**：无，不需要真实账号、密钥、Figma 或生产资源；
+- **范围决定**：本任务只实施 P0/P1，P2～P4 保持后续；
+- **并行规则**：E-015 是唯一 In Review；
+- **下一动作**：等待用户审核 Draft PR #106；不自动标记 Ready 或合并；
+- **接受后的下一任务**：E-006 — PostgreSQL 与 Prisma。
 
 ## 7. 最近交接
 
-- E-004 PR #96 已合并，Issue #42 已关闭；
-- E-008 PR #97 已通过复审并 squash 合并；
-- E-008 merge commit：`29798917392e0e1db3b852083caf525bb756f8ad`；
-- E-008 Issue #46 已按 `completed` 关闭；
-- E-008 最终 contract fingerprint：
-  `sha256:133257cc7336ea5bc217cf713d14c85bfe6a3661d3ea3168406c53ceb41c092a`；
-- E-008 审核修复的必填输入、AST/递归依赖泄漏 Gate、status/envelope 判别联合均已验收；
-- 已确认最新 `main` 与 `origin/main` 均为
-  `bde64fd60128ab699eac3251bcf2eace88f0a902`；
-- 已完成 Next.js 16 / React 19 App Router、ADM-001 登录外壳、基础布局和
-  Loading / Empty / Recoverable Error / Disabled 状态；
-- 已固定 server-only Admin API origin、Admin session cookie policy、production
-  trusted-identity fail-closed Gate 与最小 CSP / 安全响应头；
-- 已通过 `@daily-energy/api-client/admin` 建立唯一 Admin HTTP transport，并禁止
-  未认证业务操作；
-- 已建立真实 `.next/static` 扫描、Playwright 初始 HTML/RSC/网络响应扫描，
-  并读取合成 secret 文件实际内容作为 canary；
-- 已增加独立真实 Next known-fail app，由 Server Component 故意输出合成
-  secret 与用户正文，证明 HTML 和 RSC 两条响应路径都会被稳定 rule ID 拒绝；
-- Admin `typecheck` 已固定先执行 `next typegen`，不再依赖本地残留
-  `.next/types`；
-- 开发环境 CSP 仅增加 `'unsafe-eval'`，production 响应明确不包含；
-- 已完成 11 条 Vitest、6 条 production shell Playwright 与 2 条真实 Next
-  known-fail Playwright 用例；最终 `pnpm run validate` 全仓通过；
-- 已按审核要求从 `pnpm clean` 开始，依次完成
-  `pnpm install --frozen-lockfile` 与 `pnpm run validate`；clean run 中
-  `@daily-energy/app-admin:typecheck` 为 cache miss 并明确执行
-  `next typegen` 后再运行 workspace TypeScript 检查；
-- 已完成全 diff 自审；known-fail app 仅位于 tests、临时 secret 与 fixture build
-  均在 `finally` 清理，诊断不输出 canary 内容，无未解决代码发现；
-- 已创建 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)，
-  标题为 `[E-005] 创建 Next.js 管理后台骨架`，包含 `Closes #43`；
-- [PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98) 已合并，
-  merge commit 为 `bde64fd60128ab699eac3251bcf2eace88f0a902`，
-  [Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43) 已关闭；
-- 已创建 [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
-  [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
-  [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
-  [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
-  [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104)，全部为 Planned；
-- 已把 D-004 写入 C-003、C-004、C-009 的直接前置，并把 D-005 写入
-  C-012、C-013、C-014 的直接前置；对应 Issue 均增加设计文档、Frame ID、
-  正常/异常状态截图和 Token/组件复用证据要求；
-- README、ROADMAP、docs/INDEX、docs/design/README、tasks/current、
-  tasks/backlog 和 PR 描述均已同步 D-005 与最新计数；
-- 最新 patch 静态检查通过；当前 head 的完整 `pnpm run validate` 因执行环境
-  缺少 checkout 且尚无 CI，准确记录为 `INFRA_BLOCKED`；
-- 已创建 [Draft PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103)，
-  标题为 `[Project] 将 D 系列视觉设计任务纳入路线图`；不自动合并；
-- **当前唯一 Ready**：E-006 — PostgreSQL 与 Prisma；尚未开工。
+- E-005 已随 PR #98 合并，Issue #43 已关闭；
+- D-001～D-005 已随 PR #103 纳入 Phase 2，当前全部 Planned；
+- PR #103 已合并，merge commit 为
+  `38676cad32ba16d242050570e943b812c0ae6018`；
+- 已创建 E-015 Issue #105 并绑定 Phase 1 Milestone；
+- 已从最新 `main` 创建 `agent/e-015-agent-workflow`；
+- 已读取 README、ROADMAP、docs/INDEX、current/backlog、ADR-0006、
+  repository-structure、testing 及相关 deployment/observability 边界；
+- GO/NO-GO 结论为 `GO_TO_IMPLEMENT`；
+- 已建立非权威 `PROJECT_CONTEXT`、版本化 authority index、validation policy
+  与 Accepted Agent 工作流规范；
+- 已实现默认只读本地的 `agent:prepare`，显式 `--remote` / `--deep` 可核对
+  GitHub Issue、远端 main、Node、pnpm、依赖与登录状态；
+- 已实现 `agent:validate` 的 changed/task/full 与六类 Profile，禁止显式 Profile
+  降级，并对上下文冲突、D 系列依赖和人工/外部证据 fail closed；
+- Draft PR 首轮审核提出的 4 个阻塞项与 2 个 P1 缺口均已确认并修复：
+  topic source 会按变更路径合并且保留触发元数据，任务/路径/显式 Profile 取安全
+  组合，dry-run 与零变更不再报告 PASS，Git 作用域读取失败会阻断，任务状态冲突
+  保留来源并阻断，未知任务不再落入通配 docs Profile；
+- `--remote` 在 In Review 状态会继续核对 PR 是否 OPEN，以及 PR head
+  branch/commit 是否与本地任务分支一致；失败输出同时保留脱敏的根因邻域和尾部；
+- 为遵循 Accepted testing 规范，在 E-010 Source-ID dependency map 完成前，
+  生产代码、测试、配置、tooling 和 Accepted 规范变化均保守升级 full；
+- 已通过 41 条版本化 Agent workflow cases 与 5 条 CLI cases，覆盖只读准备、
+  stale main、状态来源冲突、D-004/D-005 阻断、topic source、Profile 组合、
+  normal/no-origin/detached/non-Git/读取失败、dry-run/零变更、根因邻域与脱敏；
+- `agent:prepare E-015 --remote --deep` 在可访问系统凭据的环境中全部 PASS；
+- 审核修复后的最终实现已通过完整 `pnpm run validate`：format、lint、typecheck、test、
+  Playwright、bundle/contract/architecture Gate 与 build 全部 PASS；
+- 首次沙箱 run 因禁止监听 `127.0.0.1:3210` 以 `EPERM` 被环境阻断；在受控
+  本地端口环境重跑同一完整 Gate 后 PASS，未放宽任何检查；
+- 已创建 [Draft PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106)，
+  标题为 `[E-015] 建立 Agent 上下文路由与分级验证入口`，包含 `Closes #105`；
+- Draft PR 与状态更新后，`agent:validate --mode=changed` 按策略自动升级 full，
+  在 39.2 秒内 PASS，成功输出仅保留一行摘要和命中规则；
+- 当前等待用户审核；不自动合并、不关闭 Issue、不启动 E-006。

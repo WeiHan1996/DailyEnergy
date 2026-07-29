@@ -29,6 +29,10 @@ E-002 的版本化质量 fixtures 包括：
   源码但 `tsconfig.include` 全部或部分未覆盖时，root typecheck must-fail；
 - `eslint/fixtures/nest-controller.ts`：NestJS 风格 class/method decorators
   必须能由 ESLint 正向解析。
+- `agent-workflow/cases.json`：版本化覆盖单一当前任务、过期 main、状态来源冲突、
+  D-004/D-005 下游阻断、topic source、任务/路径 Profile 合并、Git 作用域失败、
+  dry-run/零变更状态、changed/full 升级与根因邻域脱敏；所有负向场景要求稳定
+  rule ID，正向场景要求零诊断。
 
 正式 Source-ID registry、测试 metadata、runner 分层和完整 E2E/resilience
 骨架仍属于 E-010。

@@ -5,6 +5,7 @@
 !.env.*.example
 .pnpm-store/
 .turbo/
+.artifacts/
 **/coverage/
 **/dist/
 **/dist-fixtures/

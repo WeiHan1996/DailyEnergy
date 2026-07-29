@@ -6,22 +6,34 @@
 
 These instructions apply to the entire repository.
 
-## 1. Start every task by restoring context
+## 1. Start every task by restoring routed context
 
-Before planning, editing, coding, or creating issues, read in order:
+Before planning, editing, coding, or creating issues:
 
-1. README.md
-2. ROADMAP.md
-3. docs/INDEX.md
-4. tasks/current.md
-5. tasks/backlog.md only when prioritization is needed
-6. Every upstream document listed by the current task
-7. All related Accepted ADRs
-8. Existing Schema, API contracts, tests, and nearby code
+1. Read this file.
+2. Read `docs/agent/PROJECT_CONTEXT.md`.
+3. Read `tasks/current.md`.
+4. Run `pnpm agent:prepare <TASK_ID>` when the entrypoint is available.
+5. Read every required source returned by the command.
+6. Read related Accepted ADRs, executable Schema/API contracts, tests, fixtures, and nearby code.
+7. Read `tasks/backlog.md` only when prioritization or dependency state is needed.
+
+`PROJECT_CONTEXT.md`, the authority index, task packets, command summaries, chat history, and
+generated reports are navigation aids, not sources of truth. They never replace the relevant
+Accepted original document, executable contract, original design evidence, or current task file.
+
+Use `--remote` only when GitHub state is needed and `--deep` only when environment or dependency
+checks are needed. The default preparation command must remain read-only, local, fast, and bounded.
+
+If the entrypoint is unavailable or its policy is invalid, fall back to reading, in order:
+README.md, ROADMAP.md, docs/INDEX.md, tasks/current.md, relevant backlog entries, every upstream
+document, all related Accepted ADRs, executable contracts, tests, and nearby code.
 
 Do not rely on chat history as the source of truth.
 
-If a required file is missing, conflicting, or still Draft when the task needs an Accepted decision, stop and report the blocker instead of guessing.
+If a required file is missing, conflicting, or still Draft when the task needs an Accepted
+decision, stop and report the blocker instead of guessing. If impact cannot be classified safely,
+expand the source set and validation scope.
 
 ## 2. Identify the operating mode
 
@@ -50,6 +62,22 @@ When information conflicts, use this order:
 8. Chat messages, temporary notes, and unmerged drafts
 
 Do not resolve conflict only by choosing the newest timestamp.
+
+## 3A. Classify proof before implementation
+
+Assign the task one profile from `docs/agent/PROJECT_CONTEXT.md`: `code`, `design`, `hybrid`,
+`docs`, `research`, or `security`. Use `docs/agent/authority-index.yaml` and
+`docs/agent/validation-policy.yaml` as versioned routing and validation policy.
+
+Before implementation, identify:
+
+- the requirement being changed;
+- the authoritative source for that requirement;
+- the automated proof that can verify it;
+- any original external evidence, authorization, or user decision automation cannot replace.
+
+Design, hybrid, research, and security work must not report `PASS` when required manual evidence
+or authorization is missing. Return the explicit pending status instead.
 
 ## 4. Work on one bounded task
 
@@ -182,6 +210,15 @@ Before requesting review:
 - update tasks/current.md to In Review;
 - include unresolved decisions in the PR body;
 - identify the next task without starting it.
+
+Use `pnpm agent:validate --mode=changed` for fast feedback and
+`pnpm agent:validate --mode=task --task=<TASK_ID>` for the task Gate. Before requesting review for
+code that can affect behavior, run the required full Gate. Unknown paths, tooling/config changes,
+Schema/contracts, security boundaries, or ambiguous impact must expand to full validation.
+
+Successful validation output should be a short summary. Failed output must be bounded and redacted,
+with a stable rule ID and the root-cause neighborhood. Never expose secrets, tokens, cookies,
+private keys, or real user content in command output or persisted artifacts.
 
 After approval and merge:
 

@@ -1,0 +1,200 @@
+version: 1
+
+allowedProfiles:
+  - code
+  - design
+  - hybrid
+  - docs
+  - research
+  - security
+
+profiles:
+  code:
+    taskCommands:
+      - [pnpm, run, format:check]
+      - [pnpm, run, lint]
+      - [pnpm, run, typecheck]
+      - [pnpm, run, test]
+      - [pnpm, run, build]
+    fullCommands:
+      - [pnpm, run, validate]
+    finalStatus: PASS
+
+  design:
+    taskCommands:
+      - [pnpm, run, agent:check]
+    fullCommands:
+      - [pnpm, run, agent:check]
+    finalStatus: MANUAL_EVIDENCE_REQUIRED
+    manualEvidence:
+      - figmaFile
+      - figmaVersion
+      - frameIds
+      - stateScreenshots
+      - tokenAndComponentReuse
+      - userAcceptance
+
+  hybrid:
+    taskCommands:
+      - [pnpm, run, format:check]
+      - [pnpm, run, lint]
+      - [pnpm, run, typecheck]
+      - [pnpm, run, test]
+      - [pnpm, run, build]
+    fullCommands:
+      - [pnpm, run, validate]
+    finalStatus: MANUAL_EVIDENCE_REQUIRED
+    manualEvidence:
+      - designSourceEvidence
+      - visualAndInteractionReview
+      - userAcceptance
+
+  docs:
+    taskCommands:
+      - [pnpm, run, agent:check]
+      - [git, diff, --check]
+    fullCommands:
+      - [pnpm, run, format:check]
+      - [pnpm, run, agent:check]
+      - [git, diff, --check]
+    finalStatus: PASS
+
+  research:
+    taskCommands:
+      - [pnpm, run, agent:check]
+    fullCommands:
+      - [pnpm, run, agent:check]
+    finalStatus: EXTERNAL_AUTHORIZATION_REQUIRED
+    manualEvidence:
+      - sourceUrls
+      - accessedDates
+      - sourceLimitations
+      - authorizationAndDecisionOwner
+
+  security:
+    taskCommands:
+      - [pnpm, run, format:check]
+      - [pnpm, run, lint]
+      - [pnpm, run, typecheck]
+      - [pnpm, run, test]
+      - [pnpm, run, build]
+    fullCommands:
+      - [pnpm, run, validate]
+    finalStatus: MANUAL_EVIDENCE_REQUIRED
+    manualEvidence:
+      - threatBoundaryReview
+      - productionAuthorizationWhenApplicable
+
+pathRules:
+  - id: AGENT_POLICY_REQUIRES_FULL
+    patterns:
+      - AGENTS.md
+      - .gitignore
+      - README.md
+      - ROADMAP.md
+      - docs/INDEX.md
+      - docs/agent/**
+      - tooling/agent-*.mjs
+      - tooling/check-agent-workflow.mjs
+      - tooling/test-agent-workflow.mjs
+      - tooling/lib/**
+      - tests/agent-workflow/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - turbo.json
+      - eslint.config.mjs
+      - tsconfig*.json
+    escalation: full
+    impactProfile: code
+
+  - id: SECURITY_REQUIRES_FULL
+    patterns:
+      - "**/auth/**"
+      - "**/authentication/**"
+      - "**/*-auth.*"
+      - "**/auth.*"
+      - "**/*privacy*"
+      - "**/*safety*"
+      - "**/*secret*"
+      - docs/operations/incident-response.md
+      - packages/server-core/src/**/deletion/**
+    escalation: full
+    impactProfile: security
+
+  - id: CONTRACT_REQUIRES_FULL
+    patterns:
+      - packages/shared-schemas/**
+      - packages/api-client/**
+      - tooling/*contract*
+      - tooling/*codegen*
+    escalation: full
+    impactProfile: code
+
+  - id: DATABASE_REQUIRES_FULL
+    patterns:
+      - packages/server-adapters/src/**/prisma/**
+      - packages/server-core/src/**/database/**
+      - "**/prisma/**"
+    escalation: full
+    impactProfile: security
+
+  - id: DESIGN_REQUIRES_FULL
+    patterns:
+      - docs/design/**
+      - packages/design-tokens/**
+      - apps/*/src/**/styles/**
+    escalation: full
+    impactProfile: design
+
+  - id: APPLICATION_OR_TEST_REQUIRES_FULL
+    patterns:
+      - apps/**
+      - packages/**
+      - tests/**
+      - tooling/**
+    escalation: full
+    impactProfile: code
+
+  - id: ACCEPTED_SPEC_REQUIRES_FULL
+    patterns:
+      - docs/ai/**
+      - docs/analytics/**
+      - docs/data/**
+      - docs/decisions/**
+      - docs/design/**
+      - docs/operations/**
+      - docs/product/**
+      - docs/reports/**
+      - docs/technical/**
+    escalation: full
+    impactProfile: docs
+
+  - id: STATUS_DOCS_TARGETED
+    patterns:
+      - tasks/current.md
+      - tasks/backlog.md
+    commands:
+      - [pnpm, run, agent:check]
+      - [git, diff, --check]
+    impactProfile: docs
+
+fallback:
+  escalation: full
+  impactProfile: security
+
+dependencies:
+  D-002: [D-001]
+  D-003: [D-002]
+  D-004: [D-003]
+  D-005: [D-004]
+  C-003: [D-004]
+  C-004: [D-004]
+  C-009: [D-004]
+  C-012: [D-005]
+  C-013: [D-005]
+  C-014: [D-005]
+
+completedStates:
+  - Done
+  - Accepted

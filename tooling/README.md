@@ -41,6 +41,37 @@
   用户正文都会被 Gate 拒绝；测试结束删除临时文件和 fixture build；
 - `lib/admin-bundle-check.mjs` 与 `lib/admin-secret-canaries.mjs`：静态 bundle、
   HTML/RSC/网络响应和 fixture 共用的纯扫描规则与 secret-file canary 读取边界。
+- `agent-prepare.mjs`：默认只读、本地且快速地合并任务/变更主题来源，报告来源
+  触发路径、有效 Profile、proof matrix、依赖、Git 变更范围和建议验证模式；只有
+  显式 `--remote` / `--deep` 才扩大 Issue/PR/main 与环境检查；
+- `agent-validate-entry.mjs`：`pnpm agent:validate` 的最终输出边界；捕获内部验证
+  入口的 stdout/stderr，并在写入终端前再次遮蔽 API key、access key、连接串、
+  Prompt、用户正文、provider/request/response body、带凭据 URL、Bearer 与私钥；
+- `agent-validate.mjs`：内部执行 `changed` / `task` / `full` 分级 Gate；未知、高风险
+  或 tooling/config 变化同时提升 mode 与有效 Profile，Git 作用域失败时 fail
+  closed，dry-run/零变更不会伪装成 PASS；成功只输出摘要，失败输出初步脱敏的根因
+  邻域和尾部；E-010 提供 Source-ID dependency map 前，生产代码、测试和配置也
+  一律升级 full；
+- `check-agent-workflow.mjs`：验证权威路由、Profile、命令、D 系列依赖、统一入口与
+  非权威摘要声明；
+- `test-agent-workflow.mjs`、`test-sensitive-redaction.mjs`、
+  `lib/agent-workflow.mjs`、`lib/sensitive-redaction.mjs` 与
+  `lib/git-change-scope.mjs`：运行状态来源冲突、依赖阻断、topic source 合并、
+  Profile 组合、Git 作用域、变更升级、根因输出和最终敏感字段脱敏的版本化
+  known-pass/known-fail fixtures。
+
+Agent 工作流：
+
+```bash
+pnpm agent:prepare E-015
+pnpm agent:validate --mode=changed
+pnpm agent:validate --mode=task --task=E-015
+pnpm agent:validate --mode=full --profile=code
+```
+
+设计、混合、研究或安全 Profile 中，自动化无法替代的原始证据、授权或用户决定会
+以明确的 pending 状态返回，不会被仓库检查伪装成 `PASS`。validation receipt、
+有效输入集哈希和持久化日志 artifact 仍属于后续 P2。
 
 合同工作流：
 
