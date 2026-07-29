@@ -1,7 +1,12 @@
 const sensitiveAssignmentRules = [
   {
     expression:
-      /((?:"|')?[A-Za-z0-9_-]*(?:authorization|cookie|password|secret|token|api[-_]?key|access[-_]?key(?:[-_]?id)?|client[-_]?secret|database[-_]?url|connection[-_]?string|prompt|user[-_]?content|provider[-_]?body|request[-_]?body|response[-_]?body)[A-Za-z0-9_-]*(?:"|')?\s*[:=]\s*)(?:"[^"\r\n]*"|'[^'\r\n]*'|[^\r\n,;]+)/giu,
+      /((?:"|')?[A-Za-z0-9_-]*(?:connection[-_]?string|prompt|user[-_]?content|provider[-_]?body|request[-_]?body|response[-_]?body)[A-Za-z0-9_-]*(?:"|')?\s*[:=]\s*)[^\r\n]*/giu,
+    replacement: "$1[REDACTED]",
+  },
+  {
+    expression:
+      /((?:"|')?[A-Za-z0-9_-]*(?:authorization|cookie|password|secret|token|api[-_]?key|access[-_]?key(?:[-_]?id)?|client[-_]?secret|database[-_]?url)[A-Za-z0-9_-]*(?:"|')?\s*[:=]\s*)(?:"[^"\r\n]*"|'[^'\r\n]*'|[^\r\n,;]+)/giu,
     replacement: "$1[REDACTED]",
   },
   {
