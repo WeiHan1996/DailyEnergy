@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-30 — 仓库结构和模块边界
-- **最后更新**：2026-07-26
+- **最后更新**：2026-07-29
 - **适用范围**：Phase 0B / Phase 1～3 的 Monorepo 目录、workspace package、模块 public API、依赖方向、Worker profile 入口和静态边界 Gate
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[系统架构](./architecture.md)、[共享 Schema](../../packages/shared-schemas/README.md)、[数据库规格](./database.md)、[API 契约](./api.md)
 - **可执行合同**：[Prisma 草案](../../prisma/schema.prisma)、[OpenAPI 草案](../../openapi/openapi.yaml)
@@ -261,7 +261,7 @@ apps/worker/
 
 - `.`：完整 Zod runtime Schema 与推断类型；
 - `./json-schema`：稳定 `$id` 的 JSON Schema；
-- `./client`：由同一权威 Schema 生成/筛选的 client-safe runtime 投影，待 E-008 创建。
+- `./client`：由同一权威 Schema 筛选的 client-safe runtime 白名单；E-008 已建立显式 export 和泄漏 Gate。
 
 约束：
 
@@ -462,7 +462,7 @@ database spec
 - OpenAPI 不能引用内部 job/event/DB row；
 - Nest transport mapper 显式把 command/view 与 HTTP envelope 连接；
 - codegen 输出必须带 source fingerprint，可在 clean checkout 重建且 diff 为 0；
-- 生成物是否提交由 E-008/S-31 按微信工具链和可复现性决定；无论是否提交都不能手改。
+- E-008 决定提交 JSON Schema、OpenAPI bundle 和 Public/Admin client 生成物；生成物带稳定 generator/fingerprint/header，由 clean regeneration Gate 管理且不能手改。
 
 ### 11.2 Root 权威源
 
@@ -471,6 +471,14 @@ database spec
 - `openapi/openapi.yaml` 保留在 root，公开/Admin client 分开生成；
 - package 测试 fixture 可引用 root 权威源的只读副本/路径，但不能复制一份可编辑源；
 - root schema/codegen task 必须是 Turbo 不缓存外部副作用的确定性任务。
+
+### 11.3 E-008 可执行落点
+
+- `pnpm codegen` 从 Zod、`openapi/openapi.yaml` 和 `docs/technical/error-codes.md` 单向生成四个已提交产物；
+- OpenAPI 内 `x-source-contract` 是 Zod identity projection 标记；transport 与 domain 形状不同时必须同时声明 `x-source-mapper`；
+- `packages/api-client/src/mappers.ts` 只提供单向、Zod 校验的显式 mapper，不让 generated type 反向成为领域权威；
+- `pnpm codegen:check` 检查逐字节漂移，`pnpm contract:check` 检查语义边界，`pnpm contract:fixtures` 证明每条静态规则可稳定失败；
+- 正式 Source-ID coverage registry 仍由 E-010 交付，E-008 不创建不完整替代品。
 
 ## 12. TypeScript 与配置继承
 

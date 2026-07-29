@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-07-28
+- **最后更新**：2026-07-29
 - **当前阶段**：Phase 1 — 工程基础
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -146,6 +146,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/api.md](./technical/api.md) | Accepted | 小程序、后端和后台接口契约 | domain、schemas、database |
 | [docs/technical/error-codes.md](./technical/error-codes.md) | Accepted | 错误、恢复和降级语义 | API、interaction-states |
 | [openapi/openapi.yaml](../openapi/openapi.yaml) | Accepted | OpenAPI 3 可执行路径草案 | api.md |
+| [packages/api-client](../packages/api-client/README.md) | Draft | E-008 Public/Admin 生成客户端、mapper 与 drift 使用说明 | shared-schemas、OpenAPI、error-codes |
 
 ### 7.5 数据分析、隐私与运营
 
@@ -234,20 +235,20 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001、E-002、E-003 已完成，E-004 是 Phase 1 唯一 In Review 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-004 已完成，E-008 是 Phase 1 唯一 In Progress 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-004 Issue #42](https://github.com/WeiHan1996/DailyEnergy/issues/42)；
-7. [信息架构](./design/information-architecture.md) 与 [页面清单](./design/screen-inventory.md)；
+6. [E-008 Issue #46](https://github.com/WeiHan1996/DailyEnergy/issues/46)；
+7. [共享 Schema](../packages/shared-schemas/README.md)、[API 契约](./technical/api.md)、[错误码](./technical/error-codes.md) 与 [OpenAPI](../openapi/openapi.yaml)；
 8. [仓库结构与模块边界](./technical/repository-structure.md)；
 9. [测试策略](./technical/testing.md)；
 10. [部署、配置和回滚](./technical/deployment.md)；
-11. `apps/miniapp`、root 配置、共享 TypeScript/ESLint 配置与 E-002 Gate；
-12. E-003 API 运行合同和仓库现状；
+11. E-003 API、E-004 Mini Program client-only/bundle Gate 与根工具链；
+12. [API Client](../packages/api-client/README.md)；
 13. tasks/backlog.md（仅在需要重排优先级时）。
 
-E-001 已随 [PR #89](https://github.com/WeiHan1996/DailyEnergy/pull/89) 合并并进入 Done，E-002 已随 [PR #91](https://github.com/WeiHan1996/DailyEnergy/pull/91) 合并并进入 Done，E-003 已随 [PR #93](https://github.com/WeiHan1996/DailyEnergy/pull/93) 合并并进入 Done。E-004 Issue #42 已在 `agent/e-004-miniapp-skeleton` 完成仓库内实现与 Gate，并以 [Draft PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96) 进入 In Review；review 的配置 parity、DevTools 结果分流与 bundle 逐规则 fixture 已修正，真实 DevTools 仍因启动握手超时准确记录为 `INFRA_BLOCKED`，不冒充平台 PASS。E-005～E-014、E-008 及其他下游 Issue 继续保持 Planned，正式视觉设计系统与外部 Production Gate 也未被自动解除。
+E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done。E-008 Issue #46 正在 `agent/e-008-contract-codegen` 实现统一 Zod/OpenAPI/mapper/client 生成和本地 drift Gate；E-005、E-006 及其他工程 Issue 继续保持 Planned。正式 Source-ID registry 由 E-010 交付，CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production Gate 未被自动解除。

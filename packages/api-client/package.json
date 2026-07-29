@@ -3,15 +3,43 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": {},
+  "description": "Generated, audience-separated DailyEnergy HTTP transport clients.",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    "./miniapp": {
+      "types": "./dist/miniapp.d.ts",
+      "import": "./dist/miniapp.js"
+    },
+    "./admin": {
+      "types": "./dist/admin.d.ts",
+      "import": "./dist/admin.js"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.js"
+    }
+  },
   "scripts": {
-    "typecheck": "node ../../tooling/typecheck-workspace.mjs"
+    "build": "tsc -p tsconfig.json",
+    "format:check": "prettier --check README.md package.json tsconfig*.json src test",
+    "lint": "eslint --max-warnings=0 src test",
+    "test": "node ../../tooling/compile-api-client-entrypoints.mjs && vitest run",
+    "typecheck": "node ../../tooling/typecheck-workspace.mjs tsconfig.check.json"
   },
   "dailyEnergy": {
     "kind": "package",
     "runtime": "client-safe"
   },
+  "dependencies": {
+    "@daily-energy/shared-schemas": "workspace:*"
+  },
   "devDependencies": {
-    "@daily-energy/typescript-config": "workspace:*"
+    "@daily-energy/typescript-config": "workspace:*",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

@@ -2148,10 +2148,7 @@ components:
         maximum: 86400
   schemas:
     OpaqueRef:
-      type: string
-      minLength: 1
-      maxLength: 128
-      pattern: ^[^\s\x00-\x1F\x7F]+$
+      x-source-contract: OpaqueIdSchema
     CommandRef:
       type: string
       minLength: 8
@@ -2162,22 +2159,15 @@ components:
       minLength: 8
       maxLength: 128
     ProductDate:
-      type: string
-      format: date
+      x-source-contract: ProductDateSchema
     VersionToken:
-      type: string
-      minLength: 1
-      maxLength: 64
-      pattern: ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$
+      x-source-contract: VersionTokenSchema
     Semver:
-      type: string
-      pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$
+      x-source-contract: SemverSchema
     Revision:
-      type: integer
-      minimum: 0
+      x-source-contract: RevisionSchema
     PositiveRevision:
-      type: integer
-      minimum: 1
+      x-source-contract: PositiveRevisionSchema
     ClientContext:
       type: object
       properties:
@@ -2191,89 +2181,27 @@ components:
           maxLength: 64
       additionalProperties: false
     ExpressionStyle:
-      type: string
-      enum:
-      - BALANCED
-      - GENTLE
-      - LIGHT_HUMOR
-      - CLEAR_DIRECT
+      x-source-contract: ExpressionStyleSchema
     Mood:
-      type: string
-      enum:
-      - VERY_LOW
-      - LOW
-      - STEADY
-      - GOOD
-      - LIGHT
-      - UNSURE
+      x-source-contract: MoodSchema
     Energy:
-      type: string
-      enum:
-      - EMPTY
-      - LOW
-      - STEADY
-      - HIGH
-      - FULL
-      - UNSURE
+      x-source-contract: EnergySchema
     Sleep:
-      type: string
-      enum:
-      - POOR
-      - LOW
-      - OKAY
-      - GOOD
-      - UNSURE
+      x-source-contract: SleepSchema
     OverallFeeling:
-      type: string
-      enum:
-      - VERY_HEAVY
-      - SOMEWHAT_HEAVY
-      - STEADY
-      - PRETTY_GOOD
-      - LIGHT
-      - UNSURE
+      x-source-contract: OverallFeelingSchema
     HelpfulnessRating:
-      type: string
-      enum:
-      - HELPFUL
-      - NEUTRAL
-      - NOT_HELPFUL
-      - NOT_USED
+      x-source-contract: HelpfulnessRatingSchema
     HelpfulnessState:
-      type: string
-      enum:
-      - UNRATED
-      - HELPFUL
-      - NEUTRAL
-      - NOT_HELPFUL
-      - NOT_USED
+      x-source-contract: HelpfulnessStateSchema
     TaskStatus:
-      type: string
-      enum:
-      - UNMARKED
-      - INTERESTED
-      - COMPLETED
-      - SKIPPED
+      x-source-contract: TaskStatusSchema
     WriteWindow:
-      type: string
-      enum:
-      - OPEN
-      - CONTINUATION_ONLY
-      - CLOSED
+      x-source-contract: WriteWindowSchema
+    RelationshipStage:
+      x-source-contract: RelationshipStageSchema
     WechatSessionRequest:
-      type: object
-      properties:
-        code:
-          type: string
-          minLength: 1
-          maxLength: 256
-        channel:
-          type: string
-          minLength: 1
-          maxLength: 64
-      additionalProperties: false
-      required:
-      - code
+      x-source-contract: WechatSessionRequestSchema
     LogoutRequest:
       type: object
       properties:
@@ -2607,6 +2535,7 @@ components:
       - helpfulness_rating
       - client_context
       x-source-contract: EveningReflectionSubmissionSchema
+      x-source-mapper: mapEveningSaveRequestToSubmission
     EveningSkipRequest:
       type: object
       properties:
@@ -3370,250 +3299,15 @@ components:
       - product_date
       - status
       - updated_at
-    ClientDimensionView:
-      type: object
-      properties:
-        id:
-          type: string
-          enum:
-          - pace
-          - action
-          - connection
-          - resources
-          - recovery
-        label:
-          type: string
-        band:
-          type: string
-          enum:
-          - LOW
-          - STEADY
-          - HIGH
-        band_label:
-          type: string
-        explanation:
-          type: string
-        is_focus:
-          type: boolean
-      additionalProperties: false
-      required:
-      - id
-      - label
-      - band
-      - band_label
-      - explanation
-      - is_focus
-    PrimaryActionView:
-      type: object
-      properties:
-        action_id:
-          $ref: '#/components/schemas/OpaqueRef'
-        instruction:
-          type: string
-        rationale:
-          type: string
-        constraint_label:
-          type: string
-      additionalProperties: false
-      required:
-      - action_id
-      - instruction
-    OptionalTaskView:
-      type: object
-      properties:
-        task_id:
-          $ref: '#/components/schemas/OpaqueRef'
-        instruction:
-          type: string
-      additionalProperties: false
-      required:
-      - task_id
-      - instruction
-    ClientRitualView:
-      type: object
-      properties:
-        kind:
-          type: string
-          enum:
-          - COLOR
-          - NUMBER
-        display_value:
-          type: string
-        note:
-          type: string
-      additionalProperties: false
-      required:
-      - kind
-      - display_value
-      - note
     ClientDailyContentView:
-      type: object
-      properties:
-        contract:
-          type: string
-          enum:
-          - daily-content-view
-        schema_version:
-          $ref: '#/components/schemas/Semver'
-        result_id:
-          $ref: '#/components/schemas/OpaqueRef'
-        product_date:
-          $ref: '#/components/schemas/ProductDate'
-        result_version:
-          $ref: '#/components/schemas/VersionToken'
-        generated_at:
-          type: string
-          format: date-time
-        content_label:
-          type: string
-          enum:
-          - 娱乐与行动参考
-        greeting:
-          type: string
-        state_response:
-          type: string
-        overall:
-          type: object
-          properties:
-            band:
-              type: string
-              enum:
-              - LOW
-              - STEADY
-              - HIGH
-            band_label:
-              type: string
-            summary:
-              type: string
-          additionalProperties: false
-          required:
-          - band
-          - band_label
-          - summary
-        focus_dimension_id:
-          type: string
-          enum:
-          - pace
-          - action
-          - connection
-          - resources
-          - recovery
-        dimensions:
-          type: array
-          items:
-            $ref: '#/components/schemas/ClientDimensionView'
-          minItems: 5
-          maxItems: 5
-        core_tip:
-          type: string
-        explanation_paragraphs:
-          type: array
-          items:
-            type: string
-          minItems: 1
-          maxItems: 2
-        primary_action:
-          $ref: '#/components/schemas/PrimaryActionView'
-        optional_task:
-          $ref: '#/components/schemas/OptionalTaskView'
-        rituals:
-          type: array
-          items:
-            $ref: '#/components/schemas/ClientRitualView'
-          maxItems: 2
-        closing:
-          type: string
-        personalization_notice:
-          type: string
-          enum:
-          - NONE
-          - PERSONALIZATION_REDUCED
-      additionalProperties: false
-      required:
-      - contract
-      - schema_version
-      - result_id
-      - product_date
-      - result_version
-      - generated_at
-      - content_label
-      - greeting
-      - state_response
-      - overall
-      - focus_dimension_id
-      - dimensions
-      - core_tip
-      - explanation_paragraphs
-      - primary_action
-      - optional_task
-      - rituals
-      - closing
-      - personalization_notice
       x-source-contract: ClientDailyContentViewSchema
     DailyInteractionView:
-      type: object
-      properties:
-        contract:
-          type: string
-          enum:
-          - daily-interaction-state
-        schema_version:
-          $ref: '#/components/schemas/Semver'
-        result_id:
-          $ref: '#/components/schemas/OpaqueRef'
-        product_date:
-          $ref: '#/components/schemas/ProductDate'
-        is_lit:
-          type: boolean
-        task:
-          type: object
-          properties:
-            task_id:
-              $ref: '#/components/schemas/OpaqueRef'
-            revision:
-              $ref: '#/components/schemas/PositiveRevision'
-            status:
-              $ref: '#/components/schemas/TaskStatus'
-          additionalProperties: false
-          required:
-          - task_id
-          - revision
-          - status
-        helpfulness:
-          type: object
-          properties:
-            revision:
-              $ref: '#/components/schemas/Revision'
-            rating:
-              $ref: '#/components/schemas/HelpfulnessState'
-          additionalProperties: false
-          required:
-          - revision
-          - rating
-        updated_at:
-          type: string
-          format: date-time
-      additionalProperties: false
-      required:
-      - contract
-      - schema_version
-      - result_id
-      - product_date
-      - is_lit
-      - task
-      - helpfulness
-      - updated_at
       x-source-contract: DailyInteractionStateSchema
     RelationshipView:
       type: object
       properties:
         stage:
-          type: string
-          enum:
-          - BEFORE_FIRST_MEETING
-          - NEWLY_MET
-          - BECOMING_FAMILIAR
-          - FIRST_WEEK_RECORDED
+          $ref: '#/components/schemas/RelationshipStage'
         encounter_day_count:
           type: integer
           minimum: 0
@@ -3637,378 +3331,9 @@ components:
       - content
       - interaction
       - relationship
-    EveningFeedbackValue:
-      type: object
-      properties:
-        revision:
-          $ref: '#/components/schemas/PositiveRevision'
-        overall_feeling:
-          $ref: '#/components/schemas/OverallFeeling'
-        note:
-          type: string
-          minLength: 1
-          maxLength: 80
-        first_submitted_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      additionalProperties: false
-      required:
-      - revision
-      - overall_feeling
-      - first_submitted_at
-      - updated_at
     EveningView:
-      type: object
-      properties:
-        contract:
-          type: string
-          enum:
-          - evening-feedback-view
-        schema_version:
-          $ref: '#/components/schemas/Semver'
-        product_date:
-          $ref: '#/components/schemas/ProductDate'
-        availability:
-          type: string
-          enum:
-          - UNAVAILABLE
-          - EDITABLE_EMPTY
-          - EDITABLE_SUBMITTED
-          - READ_ONLY_SUBMITTED
-          - READ_ONLY_EMPTY
-        write_window:
-          $ref: '#/components/schemas/WriteWindow'
-        unavailable_message:
-          type: string
-        feedback:
-          $ref: '#/components/schemas/EveningFeedbackValue'
-        helpfulness:
-          type: object
-          properties:
-            revision:
-              $ref: '#/components/schemas/Revision'
-            rating:
-              $ref: '#/components/schemas/HelpfulnessState'
-          additionalProperties: false
-          required:
-          - revision
-          - rating
-        task:
-          type: object
-          properties:
-            task_id:
-              $ref: '#/components/schemas/OpaqueRef'
-            instruction:
-              type: string
-            revision:
-              $ref: '#/components/schemas/PositiveRevision'
-            status:
-              $ref: '#/components/schemas/TaskStatus'
-          additionalProperties: false
-          required:
-          - task_id
-          - instruction
-          - revision
-          - status
-        options:
-          type: object
-          properties:
-            overall_feeling:
-              type: array
-              items:
-                $ref: '#/components/schemas/OverallFeeling'
-              minItems: 6
-              maxItems: 6
-            helpfulness:
-              type: array
-              items:
-                $ref: '#/components/schemas/HelpfulnessRating'
-              minItems: 4
-              maxItems: 4
-            task_status:
-              type: array
-              items:
-                $ref: '#/components/schemas/TaskStatus'
-              minItems: 4
-              maxItems: 4
-          additionalProperties: false
-          required:
-          - overall_feeling
-          - helpfulness
-          - task_status
-        note_max_characters:
-          type: integer
-          enum:
-          - 80
-        primary_action:
-          type: string
-          enum:
-          - SAVE
-          - SAVE_CHANGES
-          - READ_ONLY
-        completion_message:
-          type: string
-      additionalProperties: false
-      required:
-      - contract
-      - schema_version
-      - product_date
-      - availability
-      - write_window
-      - helpfulness
-      - options
-      - note_max_characters
-      - primary_action
-      - completion_message
       x-source-contract: ClientEveningFeedbackViewSchema
-    WeeklyDayView:
-      type: object
-      properties:
-        product_date:
-          $ref: '#/components/schemas/ProductDate'
-        state:
-          type: string
-          enum:
-          - RECORDED
-          - MISSING
-        morning:
-          type: object
-          properties:
-            mood:
-              $ref: '#/components/schemas/Mood'
-            energy:
-              $ref: '#/components/schemas/Energy'
-            sleep:
-              $ref: '#/components/schemas/Sleep'
-          additionalProperties: false
-          required:
-          - mood
-          - energy
-          - sleep
-        evening:
-          type: object
-          properties:
-            overall_feeling:
-              $ref: '#/components/schemas/OverallFeeling'
-          additionalProperties: false
-          required:
-          - overall_feeling
-        is_lit:
-          type: boolean
-        helpfulness:
-          $ref: '#/components/schemas/HelpfulnessState'
-        task_status:
-          $ref: '#/components/schemas/TaskStatus'
-      additionalProperties: false
-      required:
-      - product_date
-      - state
-      - is_lit
     WeeklyView:
-      type: object
-      properties:
-        contract:
-          type: string
-          enum:
-          - weekly-summary-view
-        schema_version:
-          $ref: '#/components/schemas/Semver'
-        window_id:
-          $ref: '#/components/schemas/OpaqueRef'
-        window_start_date:
-          $ref: '#/components/schemas/ProductDate'
-        window_end_date:
-          $ref: '#/components/schemas/ProductDate'
-        projection_version:
-          $ref: '#/components/schemas/VersionToken'
-        coverage:
-          type: object
-          properties:
-            level:
-              type: string
-              enum:
-              - EMPTY
-              - POINTS_ONLY
-              - PARTIAL
-              - COMPLETE
-            window_day_count:
-              type: integer
-              enum:
-              - 7
-            real_state_day_count:
-              type: integer
-              minimum: 0
-              maximum: 7
-            checkin_day_count:
-              type: integer
-              minimum: 0
-              maximum: 7
-            evening_feedback_day_count:
-              type: integer
-              minimum: 0
-              maximum: 7
-            lit_day_count:
-              type: integer
-              minimum: 0
-              maximum: 7
-            missing_dates:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProductDate'
-              maxItems: 7
-          additionalProperties: false
-          required:
-          - level
-          - window_day_count
-          - real_state_day_count
-          - checkin_day_count
-          - evening_feedback_day_count
-          - lit_day_count
-          - missing_dates
-        days:
-          type: array
-          items:
-            $ref: '#/components/schemas/WeeklyDayView'
-          minItems: 7
-          maxItems: 7
-        metrics:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                $ref: '#/components/schemas/VersionToken'
-              observed_count:
-                type: integer
-                minimum: 0
-                maximum: 7
-              unsure_count:
-                type: integer
-                minimum: 0
-                maximum: 7
-              missing_count:
-                type: integer
-                minimum: 0
-                maximum: 7
-              direction:
-                type: string
-                enum:
-                - RISING
-                - FALLING
-                - STABLE
-                - MIXED
-                - INSUFFICIENT_DATA
-              direction_label:
-                type: string
-            additionalProperties: false
-            required:
-            - id
-            - observed_count
-            - unsure_count
-            - missing_count
-            - direction
-            - direction_label
-          minItems: 4
-          maxItems: 4
-        activity:
-          type: object
-          properties:
-            lit_day_count:
-              type: integer
-              minimum: 0
-              maximum: 7
-            helpfulness:
-              type: object
-              properties:
-                rated_count:
-                  type: integer
-                  minimum: 0
-                  maximum: 7
-                helpful_count:
-                  type: integer
-                  minimum: 0
-                  maximum: 7
-              additionalProperties: false
-              required:
-              - rated_count
-              - helpful_count
-            tasks:
-              type: object
-              properties:
-                marked_count:
-                  type: integer
-                  minimum: 0
-                  maximum: 7
-                completed_count:
-                  type: integer
-                  minimum: 0
-                  maximum: 7
-              additionalProperties: false
-              required:
-              - marked_count
-              - completed_count
-          additionalProperties: false
-          required:
-          - lit_day_count
-          - helpfulness
-          - tasks
-        summary:
-          type: object
-          properties:
-            summary_id:
-              $ref: '#/components/schemas/OpaqueRef'
-            revision:
-              $ref: '#/components/schemas/PositiveRevision'
-            kind:
-              type: string
-              enum:
-              - PARTIAL_REVIEW
-              - COMPLETE_REVIEW
-            title:
-              type: string
-            paragraphs:
-              type: array
-              items:
-                type: string
-              minItems: 2
-              maxItems: 5
-          additionalProperties: false
-          required:
-          - summary_id
-          - revision
-          - kind
-          - title
-          - paragraphs
-        summary_status:
-          type: string
-          enum:
-          - NOT_ELIGIBLE
-          - ELIGIBLE
-          - GENERATING
-          - AVAILABLE
-          - INVALIDATED
-          - FAILED
-        data_disclosure:
-          type: string
-        relationship_display_token:
-          $ref: '#/components/schemas/VersionToken'
-      additionalProperties: false
-      required:
-      - contract
-      - schema_version
-      - window_id
-      - window_start_date
-      - window_end_date
-      - projection_version
-      - coverage
-      - days
-      - metrics
-      - activity
-      - summary_status
-      - data_disclosure
       x-source-contract: ClientWeeklySummaryViewSchema
     HistoryDaySummaryView:
       type: object
@@ -4365,9 +3690,6 @@ components:
           - FAILED
           - CANCELLED
         online_erased_at:
-          type: string
-          format: date-time
-        provider_expiry_at:
           type: string
           format: date-time
         backup_purge_deadline:

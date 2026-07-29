@@ -1,16 +1,12 @@
 import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
-import { z } from "zod";
+import {
+  WechatSessionRequestSchema,
+  type WechatSessionRequest,
+} from "@daily-energy/shared-schemas";
 
 import { ApiException } from "../common/api-exception.js";
 import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
 import { LaunchAudienceGuard } from "./launch-audience.guard.js";
-
-const WechatSessionRequestSchema = z.strictObject({
-  channel: z.string().min(1).max(64).optional(),
-  code: z.string().min(1).max(256),
-});
-
-type WechatSessionRequest = z.infer<typeof WechatSessionRequestSchema>;
 
 function featureDisabled(): never {
   throw new ApiException({

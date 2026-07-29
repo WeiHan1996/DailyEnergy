@@ -37,6 +37,33 @@ jsonSchemas.eveningReflectionSubmission.$id ===
   JSON_SCHEMA_IDS.eveningReflectionSubmission;
 ```
 
+客户端只能从白名单入口获取可公开 Schema：
+
+```ts
+import {
+  ClientDailyContentViewSchema,
+  WechatSessionRequestSchema,
+} from "@daily-energy/shared-schemas/client";
+```
+
+三个显式入口的职责如下：
+
+- `@daily-energy/shared-schemas`：服务端和工具可用的完整 Zod 权威；
+- `@daily-energy/shared-schemas/client`：人工审核的 client-safe 白名单，不含生成输入、
+  内部发布记录、来源快照或 provider/Prompt/DB/event/job 字段；
+- `@daily-energy/shared-schemas/json-schema`：由 Zod 确定性生成的只读 JSON Schema，
+  带 generator、source fingerprint 和 do-not-edit header。
+
+JSON Schema 生成和漂移检查统一从仓库根执行：
+
+```bash
+pnpm codegen
+pnpm codegen:check
+pnpm contract:check
+```
+
+生成文件不得手改；变更 Zod 权威源后运行 `pnpm codegen` 并提交相应生成差异。
+
 ## 文档映射
 
 | 已接受规范                           | 主要运行时 Schema                                                                                                                                                                                                            |
@@ -72,6 +99,6 @@ Zod 运行时 Schema 是完整校验权威。JSON Schema 用于字段发现、�
 ## 包边界
 
 这是 Phase 0B 接受的可执行契约包，版本从 `0.x` 开始。E-001 已将其纳入根
-workspace，并声明 `dailyEnergy.runtime = client-safe`；包仍通过相同的 public
-exports、fixtures、格式化、类型检查、测试和构建行为保持兼容。CI 和发布策略由
-后续独立工程 Issue 实现。
+workspace，并声明 `dailyEnergy.runtime = client-safe`；E-008 增加 `./client`
+白名单入口和确定性 `./json-schema` 生成，同时保持根入口与既有 fixture 兼容。
+CI 和发布策略由后续独立工程 Issue 实现。

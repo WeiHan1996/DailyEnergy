@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-31 — 测试策略
-- **最后更新**：2026-07-26
+- **最后更新**：2026-07-29
 - **适用范围**：Phase 1～3 的静态边界、单元、模块、数据库、契约、集成、端到端、故障恢复、AI 评测与发布证据
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[共享 Schema](../../packages/shared-schemas/README.md)、[AI 质量评价](../ai/evaluation.md)、[数据库规格](./database.md)、[API 契约](./api.md)、[隐私数据地图](../operations/privacy-data-map.md)
 - **可执行合同**：[AI 评测语料](../ai/evaluation-corpus.json)、[Prisma 草案](../../prisma/schema.prisma)、[OpenAPI 草案](../../openapi/openapi.yaml)
@@ -408,6 +408,15 @@ shared-schemas
 - Nest/class-validator 手写第二套 enum/字符预算；
 - public client 导出 Admin path；
 - response 夹带未在 OpenAPI/shared-schemas 的字段。
+
+E-008 已建立当前可执行基线：
+
+- `pnpm codegen:check`：Zod JSON Schema、OpenAPI bundle、Public/Admin client 逐字节漂移；
+- `pnpm contract:check`：OpenAPI parse、operation 唯一、error catalog/status/envelope、audience、projection/mapper、exports 和 client-safe 静态合同；
+- `pnpm contract:fixtures`：正常 corpus、重复生成和 15 个稳定 rule ID 的最小 known-fail mutation；
+- package-local Vitest/typecheck：Schema 正负 corpus、JSON Schema/Zod 代表样例、mapper、独立客户端和 transport stub。
+
+正式 Source-ID coverage registry 在 E-010 前为 `NA_WITH_REASON`：本任务提供可执行命令和稳定 rule ID 机器证据，但不提前建立覆盖不完整的伪 registry。
 
 ### 13.2 HTTP 黑盒
 

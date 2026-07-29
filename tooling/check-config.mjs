@@ -96,10 +96,12 @@ for (const [workspaceDirectory, expectedBase] of expectedExtends) {
   const manifest = await readJson(
     resolve(repositoryRoot, workspaceDirectory, "package.json"),
   );
-  const expectedTypecheckScript =
-    workspaceDirectory === "packages/shared-schemas"
-      ? "node ../../tooling/typecheck-workspace.mjs tsconfig.check.json"
-      : "node ../../tooling/typecheck-workspace.mjs";
+  const expectedTypecheckScript = [
+    "packages/api-client",
+    "packages/shared-schemas",
+  ].includes(workspaceDirectory)
+    ? "node ../../tooling/typecheck-workspace.mjs tsconfig.check.json"
+    : "node ../../tooling/typecheck-workspace.mjs";
   if (manifest.scripts?.typecheck !== expectedTypecheckScript) {
     errors.push(
       `CONFIG_TYPECHECK_SCRIPT: ${manifest.name} must provide deterministic workspace typecheck`,
