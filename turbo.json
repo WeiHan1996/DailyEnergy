@@ -15,7 +15,7 @@
         "!**/*.local",
         "!**/coverage/**"
       ],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
     },
     "format:check": {
       "inputs": [

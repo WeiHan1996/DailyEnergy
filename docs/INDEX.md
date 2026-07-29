@@ -235,20 +235,30 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-004 已完成，E-008 是 Phase 1 唯一 In Review 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-004 与 E-008 已完成，E-005 是 Phase 1 唯一 In Review 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-008 Issue #46](https://github.com/WeiHan1996/DailyEnergy/issues/46)；
-7. [共享 Schema](../packages/shared-schemas/README.md)、[API 契约](./technical/api.md)、[错误码](./technical/error-codes.md) 与 [OpenAPI](../openapi/openapi.yaml)；
+6. [E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)
+   与 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)；
+7. [页面清单](./design/screen-inventory.md)、[API 契约](./technical/api.md)、
+   [错误码](./technical/error-codes.md) 与 [API Client](../packages/api-client/README.md)；
 8. [仓库结构与模块边界](./technical/repository-structure.md)；
 9. [测试策略](./technical/testing.md)；
 10. [部署、配置和回滚](./technical/deployment.md)；
-11. E-003 API、E-004 Mini Program client-only/bundle Gate 与根工具链；
-12. [API Client](../packages/api-client/README.md)；
-13. tasks/backlog.md（仅在需要重排优先级时）。
+11. E-003 API、E-004 Mini Program、E-008 contract/codegen Gate 和根工具链；
+12. tasks/backlog.md（仅在需要重排优先级时）。
 
-E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done。E-008 Issue #46 已在 `agent/e-008-contract-codegen` 完成统一 Zod/OpenAPI/mapper/client 生成和本地 drift Gate，并以 [Draft PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97) 进入 In Review；E-005、E-006 及其他工程 Issue 继续保持 Planned。正式 Source-ID registry 由 E-010 交付，CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production Gate 未被自动解除。
+E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done；E-008 已随
+PR #97 squash 合并并关闭 Issue #46。E-005 已在
+`agent/e-005-admin-shell` 完成 Next.js Admin shell、production fail-closed、
+Admin API/session 边界、route typegen、静态 bundle + HTML/RSC/网络响应 Gate、
+真实 Next known-fail fixture 与 Playwright 证据，并以
+[Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98) 进入 In Review。
+正式 Source-ID registry 由 E-010 交付；E-005 已在固定 fixture 中记录对应
+Source IDs，并按 E-010 前的 `NA_WITH_REASON` 规则保留可执行证据。
+CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production
+Gate 未被自动解除；E-006 及其他工程任务保持 Planned。

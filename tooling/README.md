@@ -33,6 +33,14 @@
   编译 miniapp、Admin 与 testing 三个入口；
 - `lib/contract-codegen.mjs` 与 `lib/contract-gate.mjs`：生成和 Gate 的共享纯逻辑，
   不读取环境密钥，不写时间戳、本机路径、用户名或真实内容。
+- `check-admin-bundle.mjs`：扫描真实 `.next/static`，并对配置为 `*_SECRET_FILE`
+  的项读取文件实际内容作为 canary；只输出稳定诊断，不输出 secret 或用户正文；
+- `run-admin-playwright.mjs`：在临时权限受限文件中创建合成 Admin secret，运行
+  production shell Playwright 响应扫描，并构建/启动独立真实 Next known-fail
+  fixture，验证初始 HTML、RSC 和浏览器网络响应中的 secret/restricted field/
+  用户正文都会被 Gate 拒绝；测试结束删除临时文件和 fixture build；
+- `lib/admin-bundle-check.mjs` 与 `lib/admin-secret-canaries.mjs`：静态 bundle、
+  HTML/RSC/网络响应和 fixture 共用的纯扫描规则与 secret-file canary 读取边界。
 
 合同工作流：
 

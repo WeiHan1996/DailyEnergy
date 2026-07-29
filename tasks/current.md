@@ -4,11 +4,11 @@
 - **最后更新**：2026-07-29
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-005 — 创建 Next.js 管理后台骨架
-- **任务状态**：Ready
-- **当前分支**：`main`
+- **任务状态**：In Review
+- **当前分支**：`agent/e-005-admin-shell`
 - **当前 Issue**：[E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)
-- **当前 PR**：无
-- **Gate 结论**：`GO_TO_START`
+- **当前 PR**：[Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)
+- **Gate 结论**：`GO_TO_REVIEW`
 
 ## 1. 当前目标
 
@@ -23,7 +23,7 @@ apps/admin
 E-008 已随 [PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)
 squash 合并，merge commit 为
 `29798917392e0e1db3b852083caf525bb756f8ad`，Issue #46 已关闭。
-E-005 的 E-001、E-002、E-008 前置均已完成，现为唯一 Ready 工程任务；
+E-005 的 E-001、E-002、E-008 前置均已完成，现为唯一 In Review 工程任务；
 E-006 及其他工程任务不得并行开始。
 
 ## 2. 开工检查
@@ -43,7 +43,8 @@ E-006 及其他工程任务不得并行开始。
 - 提供 loading、empty、error 与恢复状态；
 - 接入 `@daily-energy/api-client/admin`，固定独立 Admin origin/session 配置边界；
 - 实现 production-disabled Gate、最小 CSP 与安全 headers；
-- 建立 browser bundle 的 server-only、secret、restricted-field 和越界依赖扫描；
+- 建立 browser bundle、初始 HTML、RSC 与 Playwright 网络响应的 server-only、
+  secret、restricted-field、用户正文和越界依赖扫描；
 - 增加 Next build、Playwright shell 冒烟及缺失身份配置负向测试。
 
 ## 4. 不做
@@ -56,10 +57,12 @@ E-006 及其他工程任务不得并行开始。
 
 ## 5. 验收与证据
 
-- `apps/admin` 可独立 typecheck、build 和启动；
+- `apps/admin` 可在无 `.next` 的干净状态先执行 `next typegen`，再完成
+  route-aware typecheck、build 和启动；
 - 登录外壳、基础布局、loading/empty/error/retry 状态有 Playwright 冒烟证据；
 - 未配置可信 Admin 身份时，production profile 必须 fail closed；
-- bundle scan 能拒绝 server-only package、secret 名值、用户正文 fixture、provider 与 restricted field；
+- browser exposure scan 能拒绝 server-only package、secret 名值与 secret
+  文件实际内容、用户正文 fixture、provider 和 restricted field；
 - Admin app 不直接依赖 server-core、adapters、Prisma、Redis 或 provider；
 - 所有生成客户端继续由 E-008 codegen/drift Gate 维护，不得在 E-005 手改；
 - `pnpm run validate` 与 E-003 API、E-004 Mini Program、E-008 contract Gate 保持通过；
@@ -69,10 +72,11 @@ E-006 及其他工程任务不得并行开始。
 
 - **仓库/代码阻塞**：无；
 - **前置依赖**：E-001、E-002、E-008 已完成；
+- **审核阻塞**：等待用户审核 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)；
 - **生产身份**：尚未配置真实 Admin 身份，不阻塞骨架实现，但 production 必须默认关闭；
 - **视觉边界**：本任务使用最小可验证布局，不替代后续 D 系列正式设计；
-- **并行规则**：E-005 是唯一 Ready，完成并进入审核前不得启动 E-006；
-- **下一状态**：创建实现分支和 Draft PR 后，将 E-005 更新为 In Progress / In Review。
+- **并行规则**：E-005 是唯一 In Review；用户接受并合并前不得启动 E-006；
+- **下一状态**：按审核意见修订，或在用户明确批准后标记 PR ready 并合并。
 
 ## 7. 最近交接
 
@@ -83,5 +87,32 @@ E-006 及其他工程任务不得并行开始。
 - E-008 最终 contract fingerprint：
   `sha256:133257cc7336ea5bc217cf713d14c85bfe6a3661d3ea3168406c53ceb41c092a`；
 - E-008 审核修复的必填输入、AST/递归依赖泄漏 Gate、status/envelope 判别联合均已验收；
-- 当前唯一 Ready：[E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)；
-- 当前动作：从最新 `main` 启动 E-005，不自动启动其他任务。
+- 已确认本地 `main` 与 `origin/main` 均为 `31cd942ad636fcdb66bd3fff8f1450b8637da9a9`，
+  且包含 E-008 merge commit；
+- 已完成 Next.js 16 / React 19 App Router、ADM-001 登录外壳、基础布局和
+  Loading / Empty / Recoverable Error / Disabled 状态；
+- 已固定 server-only Admin API origin、Admin session cookie policy、production
+  trusted-identity fail-closed Gate 与最小 CSP / 安全响应头；
+- 已通过 `@daily-energy/api-client/admin` 建立唯一 Admin HTTP transport，并禁止
+  未认证业务操作；
+- 已建立真实 `.next/static` 扫描、Playwright 初始 HTML/RSC/网络响应扫描，
+  并读取合成 secret 文件实际内容作为 canary；
+- 已增加独立真实 Next known-fail app，由 Server Component 故意输出合成
+  secret 与用户正文，证明 HTML 和 RSC 两条响应路径都会被稳定 rule ID 拒绝；
+- Admin `typecheck` 已固定先执行 `next typegen`，不再依赖本地残留
+  `.next/types`；
+- 开发环境 CSP 仅增加 `'unsafe-eval'`，production 响应明确不包含；
+- 已完成 11 条 Vitest、6 条 production shell Playwright 与 2 条真实 Next
+  known-fail Playwright 用例；最终 `pnpm run validate` 全仓通过；
+- 已按审核要求从 `pnpm clean` 开始，依次完成
+  `pnpm install --frozen-lockfile` 与 `pnpm run validate`；clean run 中
+  `@daily-energy/app-admin:typecheck` 为 cache miss 并明确执行
+  `next typegen` 后再运行 workspace TypeScript 检查；
+- 已完成全 diff 自审；known-fail app 仅位于 tests、临时 secret 与 fixture build
+  均在 `finally` 清理，诊断不输出 canary 内容，无未解决代码发现；
+- 已创建 [Draft PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98)，
+  标题为 `[E-005] 创建 Next.js 管理后台骨架`，包含 `Closes #43`；
+- 当前唯一 In Review：[E-005 Issue #43](https://github.com/WeiHan1996/DailyEnergy/issues/43)；
+- 当前动作：等待用户审核 Draft PR #98；不标记 ready、不合并、不关闭 Issue，
+  也不自动启动其他任务；
+- **接受后的下一任务**：E-006 — PostgreSQL 与 Prisma；仅记录，不启动。
