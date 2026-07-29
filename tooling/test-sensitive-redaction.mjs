@@ -1,9 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-import {
-  redactSensitiveDiagnosticOutput,
-} from "./lib/sensitive-redaction.mjs";
+import { redactSensitiveDiagnosticOutput } from "./lib/sensitive-redaction.mjs";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const failures = [];
@@ -40,8 +38,7 @@ const cases = [
   },
   {
     id: "credential-bearing-url",
-    input:
-      "database failure at postgres://url-user:url-pass@host.example/db",
+    input: "database failure at postgres://url-user:url-pass@host.example/db",
     forbidden: ["url-user", "url-pass"],
     required: ["postgres://[REDACTED]@host.example/db"],
   },

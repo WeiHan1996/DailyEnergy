@@ -14,8 +14,7 @@ const sensitiveAssignmentRules = [
     replacement: "Bearer [REDACTED]",
   },
   {
-    expression:
-      /\b([A-Za-z][A-Za-z0-9+.-]*:\/\/)([^/\s:@]+):([^@\s/]+)@/gu,
+    expression: /\b([A-Za-z][A-Za-z0-9+.-]*:\/\/)([^/\s:@]+):([^@\s/]+)@/gu,
     replacement: "$1[REDACTED]@",
   },
   {
