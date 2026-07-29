@@ -8,6 +8,7 @@
 - **当前分支**：无
 - **当前 Issue**：[E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)
 - **当前 PR**：无
+- **项目控制 PR**：[Draft PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103)
 - **Gate 结论**：`GO_TO_START`
 
 ## 1. 当前目标
@@ -64,6 +65,8 @@ Ready 状态。
 - **仓库/代码阻塞**：无；
 - **前置依赖**：E-006 的已知工程前置已完成，开工时仍需重新核对 Issue；
 - **执行授权**：当前仅完成项目控制，等待用户明确要求开始 E-006；
+- **控制审核**：[Draft PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103)
+  等待用户审核，不自动标记 Ready for review 或合并；
 - **视觉边界**：D-001～D-004 均为 Planned，不自动插队；
 - **并行规则**：E-006 是唯一 Ready；不存在 In Progress 或 In Review 工程任务；
 - **下一状态**：项目控制 PR 审核合并后仍保持 E-006 Ready，直到明确开工。
@@ -116,4 +119,6 @@ Ready 状态。
 - 已按 `pnpm run clean`、`pnpm install --frozen-lockfile`、`pnpm run validate`
   完成干净验证；全仓格式、Lint、边界、契约、类型、单元/fixture/Playwright
   测试与构建均通过；
+- 已创建 [Draft PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103)，
+  标题为 `[Project] 将 D 系列视觉设计任务纳入路线图`；不自动合并；
 - **当前唯一 Ready**：E-006 — PostgreSQL 与 Prisma；尚未开工。
