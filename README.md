@@ -366,17 +366,21 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 - [E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44) 是唯一
   Ready，尚无执行分支或 PR；
 - 开工前重新核对数据库、领域模型、隐私删除、测试和部署规范；
-- D-001～D-004 已进入 Phase 2 Backlog，全部保持 Planned；
+- D-001～D-005 已进入 Phase 2 Backlog，全部保持 Planned；
 - 本次项目控制变更不实现数据库、不开始正式视觉设计，也不改变其他任务状态。
 
 [Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。
 E-001～E-005 与 E-008 已合并并进入 Done；E-005 随
 [PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98) 合并，merge commit
 为 `bde64fd60128ab699eac3251bcf2eace88f0a902`，Issue #43 已关闭。
-[D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)～
-[D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 已登记为
-Planned，并为 C-003、C-004、C-009 增加正式设计交付前置。云厂商、域名、
-主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
+[D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
+[D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
+[D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
+[D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
+[D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 已登记为
+Planned。D-004 是 C-003、C-004、C-009 的正式设计交付前置；D-005 是
+C-012、C-013、C-014 的正式设计交付前置。云厂商、域名、主体、跨境、
+真实账号/密钥、热线和值班等外部 Gate 仍未解除。
 
 ---
 
