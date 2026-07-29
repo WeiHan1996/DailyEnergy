@@ -4,24 +4,21 @@ export interface ContractEndpoint {
   readonly path: string;
 }
 
-export interface ContractTransportRequest {
+export interface ContractTransportRequest<OperationId extends string = string> {
   readonly body?: unknown;
   readonly method: ContractEndpoint["method"];
-  readonly operationId: string;
+  readonly operationId: OperationId;
   readonly parameters?: unknown;
   readonly path: string;
 }
 
-export interface ContractTransportResponse<Body = unknown> {
+export interface ContractTransportResponse<
+  Body = unknown,
+  Status extends number = number,
+> {
   readonly body: Body;
   readonly headers: Readonly<Record<string, string | undefined>>;
-  readonly status: number;
-}
-
-export interface ContractTransport {
-  request(
-    request: ContractTransportRequest,
-  ): Promise<ContractTransportResponse>;
+  readonly status: Status;
 }
 
 type JsonContent<Value> = Value extends {
@@ -34,69 +31,137 @@ type OperationBody<Operation> = Operation extends {
   requestBody: infer RequestBody;
 }
   ? JsonContent<RequestBody>
-  : never;
+  : Operation extends {
+        requestBody?: infer RequestBody;
+      }
+    ? JsonContent<RequestBody>
+    : never;
+
+type RequiredOperationBody<Operation> = Operation extends {
+  requestBody: infer RequestBody;
+}
+  ? {
+      readonly body: JsonContent<RequestBody>;
+    }
+  : Operation extends {
+        requestBody?: infer RequestBody;
+      }
+    ? {
+        readonly body?: JsonContent<RequestBody>;
+      }
+    : {
+        readonly body?: never;
+      };
 
 type OperationParameters<Operation> = Operation extends {
   parameters: infer Parameters;
 }
   ? Parameters
-  : never;
+  : Operation extends {
+        parameters?: infer Parameters;
+      }
+    ? Parameters
+    : never;
 
-type OperationResponses<Operation> = Operation extends {
-  responses: infer Responses;
+type RequiredOperationParameters<Operation> = Operation extends {
+  parameters: infer Parameters;
 }
   ? {
-      [Status in keyof Responses]: JsonContent<Responses[Status]>;
-    }[keyof Responses]
+      readonly parameters: Parameters;
+    }
+  : Operation extends {
+        parameters?: infer Parameters;
+      }
+    ? {
+        readonly parameters?: Parameters;
+      }
+    : {
+        readonly parameters?: never;
+      };
+
+type OperationResponseMap<Operation> = Operation extends {
+  responses: infer Responses;
+}
+  ? Responses
   : never;
 
-export type ContractOperationInput<Operation> = {
-  readonly body?: OperationBody<Operation>;
-  readonly parameters?: OperationParameters<Operation>;
-};
+type HttpStatusCode<Status> = Status extends number
+  ? Status
+  : Status extends `${infer Code extends number}`
+    ? Code
+    : number;
 
-export type ContractOperationResponse<Operation> = ContractTransportResponse<
-  OperationResponses<Operation>
->;
+export type ContractOperationInput<Operation> =
+  RequiredOperationBody<Operation> & RequiredOperationParameters<Operation>;
+
+export type ContractOperationResponse<Operation> =
+  OperationResponseMap<Operation> extends infer Responses
+    ? {
+        [Status in keyof Responses]: ContractTransportResponse<
+          JsonContent<Responses[Status]>,
+          HttpStatusCode<Status>
+        >;
+      }[keyof Responses]
+    : never;
+
+export type ContractOperationArguments<Operation> =
+  Record<never, never> extends ContractOperationInput<Operation>
+    ? [input?: ContractOperationInput<Operation>]
+    : [input: ContractOperationInput<Operation>];
+
+export interface ContractTransport<Operations extends object> {
+  request<OperationId extends Extract<keyof Operations, string>>(
+    request: ContractTransportRequest<OperationId>,
+  ): Promise<ContractOperationResponse<Operations[OperationId]>>;
+}
 
 export interface ContractClient<
-  Operations,
+  Operations extends object,
   Manifest extends Readonly<
     Record<Extract<keyof Operations, string>, ContractEndpoint>
   >,
 > {
   request<OperationId extends Extract<keyof Operations, string>>(
     operationId: OperationId,
-    input?: ContractOperationInput<Operations[OperationId]>,
+    ...args: ContractOperationArguments<Operations[OperationId]>
   ): Promise<ContractOperationResponse<Operations[OperationId]>>;
   readonly sourceFingerprint: string;
   readonly operations: Manifest;
 }
 
 export function createContractClient<
-  Operations,
+  Operations extends object,
   Manifest extends Readonly<
     Record<Extract<keyof Operations, string>, ContractEndpoint>
   >,
 >(
-  transport: ContractTransport,
+  transport: ContractTransport<Operations>,
   manifest: Manifest,
   sourceFingerprint: string,
 ): ContractClient<Operations, Manifest> {
+  async function request<OperationId extends Extract<keyof Operations, string>>(
+    operationId: OperationId,
+    ...args: ContractOperationArguments<Operations[OperationId]>
+  ): Promise<ContractOperationResponse<Operations[OperationId]>> {
+    const input = (args[0] ?? {}) as {
+      readonly body?: OperationBody<Operations[OperationId]>;
+      readonly parameters?: OperationParameters<Operations[OperationId]>;
+    };
+    const endpoint = manifest[operationId];
+    return transport.request({
+      ...(input.body === undefined ? {} : { body: input.body }),
+      method: endpoint.method,
+      operationId,
+      ...(input.parameters === undefined
+        ? {}
+        : { parameters: input.parameters }),
+      path: endpoint.path,
+    });
+  }
+
   return {
     operations: manifest,
+    request,
     sourceFingerprint,
-    async request(operationId, input = {}) {
-      const endpoint = manifest[operationId];
-      return (await transport.request({
-        ...(input.body === undefined ? {} : { body: input.body }),
-        method: endpoint.method,
-        operationId,
-        ...(input.parameters === undefined
-          ? {}
-          : { parameters: input.parameters }),
-        path: endpoint.path,
-      })) as ContractOperationResponse<Operations[typeof operationId]>;
-    },
   };
 }

@@ -70,8 +70,13 @@ E-008 是唯一 In Review 任务；E-005、E-006 及其他工程任务不得并�
   operation ID、封闭 envelope/status 和 Public/Admin audience；
 - **mapper**：`EveningSaveRequest` → `EveningReflectionSubmission` 为显式单向
   mapper，并在边界重新执行 Zod 校验；
+- **client input/response**：生成 operation 保留 request body、path/header/query
+  的 OpenAPI 必填性；缺少登录 body 或 daily path 参数的 `@ts-expect-error`
+  负向类型用例通过；响应为精确 status/envelope 判别联合并可按 status 缩窄；
 - **静态失败证据**：15 个稳定 contract rule IDs 均有最小 known-fail，正常
-  corpus 与同输入重复生成通过；
+  corpus 与同输入重复生成通过；client field/import Gate 使用 TypeScript AST
+  与从入口递归解析的本地依赖图，真实未加引号属性和
+  `./generated/admin.js` fixture 均被拒绝；
 - **client compile/bundle**：miniapp、Admin、testing 三入口独立编译；E-004
   bundle Gate 与 client dist 禁用依赖/字段/secret 扫描通过；
 - **clean generation**：四个生成文件在再次 `pnpm codegen` 前后 SHA-256
@@ -98,6 +103,9 @@ E-008 是唯一 In Review 任务；E-005、E-006 及其他工程任务不得并�
   本任务已记录命令、测试数量、rule IDs 和 fingerprint 机器证据；
 - **已知限制**：任意 Zod refinement（真实日历、Unicode grapheme、跨对象等式）
   不能由 JSON Schema 完整表达，所有信任边界仍以 Zod runtime parse 为权威；
+- **transport 边界**：本包不实现真实网络 adapter；typed transport 只能返回
+  operation 声明的 status/envelope。未来 raw HTTP adapter 必须先执行运行时
+  status/envelope 校验，再满足该 transport 接口；
 - **下一状态**：等待用户审核
   [Draft PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)；不得自动合并。
 
@@ -109,9 +117,10 @@ E-008 是唯一 In Review 任务；E-005、E-006 及其他工程任务不得并�
 - 当前 PR：[Draft PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)；
 - 已完成：上下文恢复、基线校验、三类显式 exports、client-safe Zod 模块、
   JSON Schema/OpenAPI/client codegen、one-way mapper、drift/static Gate、
-  known-fail fixtures、文档和全量验证；
+  known-fail fixtures、文档和全量验证；审核反馈中的必填输入、AST/递归依赖泄漏
+  Gate、status/envelope 判别联合均已修复；
 - 开工结论：`GO`；
 - 当前 fingerprint：
-  `sha256:e31f3661912e0f42035d9a86736a6db0c6d19ed18e8f2a3a5f31b0234fcd28b6`；
-- 当前动作：等待用户审核 Draft PR #97；不得自动合并；
+  `sha256:133257cc7336ea5bc217cf713d14c85bfe6a3661d3ea3168406c53ceb41c092a`；
+- 当前动作：等待用户复审 Draft PR #97；不得自动合并；
 - 接受后的下一任务：E-005（仍为 Planned，不提前开始）。

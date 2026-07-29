@@ -1,6 +1,7 @@
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { readdir, readFile } from "node:fs/promises";
+import { posix, relative, resolve } from "node:path";
 
+import { parseSync } from "@babel/core";
 import { parse } from "yaml";
 
 import {
@@ -101,11 +102,43 @@ const EXPECTED_EXPORT_TARGETS = {
   },
 };
 
-const CLIENT_FORBIDDEN_FIELD_PATTERN =
-  /["'](?:admin_notes|ciphertext|database_row|db_row|epoch|event_payload|job_payload|model|openid|prisma|prompt|prompt_version|provider|provider_expiry_at|provider_model|provider_payload|provider_response|redis|restricted|seed)["']\s*[?:]/iu;
+const CLIENT_FORBIDDEN_FIELDS = new Set([
+  "admin_notes",
+  "ciphertext",
+  "database_row",
+  "db_row",
+  "epoch",
+  "event_payload",
+  "job_payload",
+  "model",
+  "openid",
+  "prisma",
+  "prompt",
+  "prompt_version",
+  "provider",
+  "provider_expiry_at",
+  "provider_model",
+  "provider_payload",
+  "provider_response",
+  "redis",
+  "restricted",
+  "seed",
+]);
 
-const CLIENT_FORBIDDEN_IMPORT_PATTERN =
-  /(?:from\s+|import\s*)["'](?:node:|@nestjs\/|@prisma\/|bullmq(?:\/|["'])|ioredis(?:\/|["'])|openai(?:\/|["'])|@anthropic-ai\/|@daily-energy\/api-client\/admin|\.\/(?:admin|daily-content|evening-feedback|index|weekly-summary)(?:\.js)?["'])/iu;
+const CLIENT_FORBIDDEN_EXTERNAL_IMPORT_PATTERN =
+  /^(?:node:|@nestjs\/|@prisma\/|bullmq(?:\/|$)|ioredis(?:\/|$)|openai(?:\/|$)|@anthropic-ai\/|@daily-energy\/api-client\/admin$)/u;
+
+const MINIAPP_FORBIDDEN_REACHABLE_PATHS = new Set([
+  "packages/api-client/src/admin.ts",
+  "packages/api-client/src/generated/admin.ts",
+]);
+
+const SHARED_CLIENT_FORBIDDEN_REACHABLE_PATHS = new Set([
+  "packages/shared-schemas/src/daily-content.ts",
+  "packages/shared-schemas/src/evening-feedback.ts",
+  "packages/shared-schemas/src/index.ts",
+  "packages/shared-schemas/src/weekly-summary.ts",
+]);
 
 export const CONTRACT_RULE_IDS = Object.freeze([
   "CONTRACT_API_ERROR_CATALOG_DRIFT",
@@ -411,33 +444,268 @@ function mapperDiagnostics(state) {
   return diagnostics;
 }
 
+function parseTypeScriptSource(path, source) {
+  return parseSync(source, {
+    babelrc: false,
+    configFile: false,
+    filename: path,
+    parserOpts: {
+      plugins: ["typescript"],
+      sourceType: "module",
+    },
+  });
+}
+
+function visitSyntaxTree(value, visitor) {
+  if (!value || typeof value !== "object") {
+    return;
+  }
+  if (typeof value.type === "string") {
+    visitor(value);
+  }
+  for (const [key, child] of Object.entries(value)) {
+    if (
+      !["comments", "errors", "extra", "loc", "tokens"].includes(key) &&
+      child &&
+      typeof child === "object"
+    ) {
+      if (Array.isArray(child)) {
+        for (const item of child) {
+          visitSyntaxTree(item, visitor);
+        }
+      } else {
+        visitSyntaxTree(child, visitor);
+      }
+    }
+  }
+}
+
+function literalPropertyName(name, computed) {
+  if (name?.type === "Identifier" && !computed) {
+    return name.name;
+  }
+  if (name?.type === "StringLiteral" || name?.type === "NumericLiteral") {
+    return String(name.value);
+  }
+  if (
+    computed &&
+    name?.type === "TemplateLiteral" &&
+    name.expressions.length === 0
+  ) {
+    return name.quasis[0]?.value?.cooked;
+  }
+  return undefined;
+}
+
+function sourcePropertyNames(path, source) {
+  const names = new Set();
+  const syntaxTree = parseTypeScriptSource(path, source);
+  visitSyntaxTree(syntaxTree, (node) => {
+    if (
+      [
+        "ClassProperty",
+        "ClassPrivateProperty",
+        "ObjectProperty",
+        "TSPropertySignature",
+      ].includes(node.type)
+    ) {
+      const name = literalPropertyName(node.key, node.computed === true);
+      if (name) {
+        names.add(name);
+      }
+    }
+  });
+  return names;
+}
+
+function sourceModuleSpecifiers(path, source) {
+  const specifiers = new Set();
+  const syntaxTree = parseTypeScriptSource(path, source);
+  function addLiteral(node) {
+    if (node?.type === "StringLiteral") {
+      specifiers.add(node.value);
+    }
+  }
+  visitSyntaxTree(syntaxTree, (node) => {
+    if (
+      [
+        "ExportAllDeclaration",
+        "ExportNamedDeclaration",
+        "ImportDeclaration",
+      ].includes(node.type)
+    ) {
+      addLiteral(node.source);
+    } else if (
+      node.type === "TSImportEqualsDeclaration" &&
+      node.moduleReference?.type === "TSExternalModuleReference"
+    ) {
+      addLiteral(node.moduleReference.expression);
+    } else if (
+      node.type === "CallExpression" &&
+      node.callee?.type === "Identifier" &&
+      node.callee.name === "require"
+    ) {
+      addLiteral(node.arguments?.[0]);
+    } else if (node.type === "ImportExpression") {
+      addLiteral(node.source);
+    } else if (node.type === "TSImportType") {
+      addLiteral(node.argument ?? node.source);
+    }
+  });
+  return specifiers;
+}
+
+function resolveLocalTypeScriptImport(importerPath, specifier, knownPaths) {
+  if (!specifier.startsWith(".")) {
+    return undefined;
+  }
+  const base = posix.normalize(
+    posix.join(posix.dirname(importerPath), specifier),
+  );
+  const withoutJavaScriptExtension = base.replace(/\.(?:c|m)?js$/u, "");
+  const candidates = [
+    base,
+    `${withoutJavaScriptExtension}.ts`,
+    `${withoutJavaScriptExtension}.tsx`,
+    `${withoutJavaScriptExtension}.mts`,
+    `${withoutJavaScriptExtension}.cts`,
+    posix.join(withoutJavaScriptExtension, "index.ts"),
+    posix.join(withoutJavaScriptExtension, "index.tsx"),
+  ];
+  return candidates.find((candidate) => knownPaths.has(candidate));
+}
+
+function reachableTypeScriptSources(entryPath, sources) {
+  const byPath = new Map(sources.map((source) => [source.path, source]));
+  const reachable = [];
+  const pending = [entryPath];
+  const visited = new Set();
+  while (pending.length > 0) {
+    const path = pending.shift();
+    if (visited.has(path)) {
+      continue;
+    }
+    visited.add(path);
+    const source = byPath.get(path);
+    if (!source) {
+      continue;
+    }
+    reachable.push(source);
+    for (const specifier of sourceModuleSpecifiers(path, source.source)) {
+      const target = resolveLocalTypeScriptImport(path, specifier, byPath);
+      if (target && !visited.has(target)) {
+        pending.push(target);
+      }
+    }
+  }
+  return reachable;
+}
+
+function forbiddenSchemaProperties(document, audience) {
+  const findings = [];
+  const visited = new Set();
+  function visit(value, path) {
+    if (!value || typeof value !== "object" || visited.has(value)) {
+      return;
+    }
+    visited.add(value);
+    if (
+      value.properties &&
+      typeof value.properties === "object" &&
+      !Array.isArray(value.properties)
+    ) {
+      for (const [name, schema] of Object.entries(value.properties)) {
+        if (CLIENT_FORBIDDEN_FIELDS.has(name.toLowerCase())) {
+          findings.push({
+            name,
+            path: `${audience}:${path}.properties.${name}`,
+          });
+        }
+        visit(schema, `${path}.properties.${name}`);
+      }
+    }
+    for (const [key, nested] of Object.entries(value)) {
+      if (key !== "properties") {
+        visit(nested, `${path}.${key}`);
+      }
+    }
+  }
+  visit(document?.components?.schemas, "components.schemas");
+  return findings;
+}
+
 function clientBoundaryDiagnostics(state) {
   const diagnostics = [];
-  const sources = [
-    ["packages/api-client/src/generated/miniapp.ts", state.miniappSource],
-    ["packages/api-client/src/miniapp.ts", state.miniappEntrySource],
-    ["packages/api-client/src/mappers.ts", state.mappersSource],
-    ["packages/api-client/src/transport.ts", state.transportSource],
-    ["packages/shared-schemas/src/client.ts", state.sharedClientSource],
-    ...state.sharedClientReachableSources,
+  const seen = new Set();
+  const graphs = [
+    {
+      entryPath: "packages/api-client/src/miniapp.ts",
+      forbiddenReachablePaths: MINIAPP_FORBIDDEN_REACHABLE_PATHS,
+      sources: state.apiClientSources,
+    },
+    {
+      entryPath: "packages/api-client/src/admin.ts",
+      forbiddenReachablePaths: new Set(),
+      sources: state.apiClientSources,
+    },
+    {
+      entryPath: "packages/shared-schemas/src/client.ts",
+      forbiddenReachablePaths: SHARED_CLIENT_FORBIDDEN_REACHABLE_PATHS,
+      sources: state.sharedSchemaSources,
+    },
   ];
-  for (const [path, source] of sources) {
-    if (CLIENT_FORBIDDEN_FIELD_PATTERN.test(source)) {
-      diagnostics.push(
-        diagnostic(
+  function add(ruleId, path, message) {
+    const key = `${ruleId}:${path}:${message}`;
+    if (!seen.has(key)) {
+      diagnostics.push(diagnostic(ruleId, path, message));
+      seen.add(key);
+    }
+  }
+  for (const { entryPath, forbiddenReachablePaths, sources } of graphs) {
+    const reachable = reachableTypeScriptSources(entryPath, sources);
+    for (const { path, source } of reachable) {
+      for (const name of sourcePropertyNames(path, source)) {
+        if (!CLIENT_FORBIDDEN_FIELDS.has(name.toLowerCase())) {
+          continue;
+        }
+        add(
           "CONTRACT_CLIENT_FORBIDDEN_FIELD",
           path,
-          "client-safe source exposes an internal, Admin, DB, event, Prompt, or provider field",
-        ),
-      );
+          `client-safe source exposes forbidden property ${name}`,
+        );
+      }
+      for (const specifier of sourceModuleSpecifiers(path, source)) {
+        if (CLIENT_FORBIDDEN_EXTERNAL_IMPORT_PATTERN.test(specifier)) {
+          add(
+            "CONTRACT_CLIENT_FORBIDDEN_IMPORT",
+            path,
+            `client-safe source imports forbidden module ${specifier}`,
+          );
+        }
+      }
     }
-    if (CLIENT_FORBIDDEN_IMPORT_PATTERN.test(source)) {
-      diagnostics.push(
-        diagnostic(
+    for (const forbiddenPath of forbiddenReachablePaths) {
+      if (reachable.some(({ path }) => path === forbiddenPath)) {
+        add(
           "CONTRACT_CLIENT_FORBIDDEN_IMPORT",
-          path,
-          "client-safe source imports an Admin, Node, server, database, or provider module",
-        ),
+          entryPath,
+          `${entryPath} must not reach ${forbiddenPath}`,
+        );
+      }
+    }
+  }
+  for (const [audience, document] of [
+    ["miniapp", state.miniapp],
+    ["admin", state.admin],
+  ]) {
+    for (const { name, path } of forbiddenSchemaProperties(
+      document,
+      audience,
+    )) {
+      add(
+        "CONTRACT_CLIENT_FORBIDDEN_FIELD",
+        path,
+        `generated components.schemas exposes forbidden property ${name}`,
       );
     }
   }
@@ -602,6 +870,30 @@ async function readJson(path) {
   return JSON.parse(await readFile(path, "utf8"));
 }
 
+async function readTypeScriptSources(repositoryRoot, directory) {
+  const sources = [];
+  async function visit(absoluteDirectory) {
+    const entries = await readdir(absoluteDirectory, {
+      withFileTypes: true,
+    });
+    for (const entry of entries.sort((left, right) =>
+      left.name.localeCompare(right.name),
+    )) {
+      const absolutePath = resolve(absoluteDirectory, entry.name);
+      if (entry.isDirectory()) {
+        await visit(absolutePath);
+      } else if (/\.(?:cts|mts|tsx?)$/u.test(entry.name)) {
+        sources.push({
+          path: relative(repositoryRoot, absolutePath).replaceAll("\\", "/"),
+          source: await readFile(absolutePath, "utf8"),
+        });
+      }
+    }
+  }
+  await visit(resolve(repositoryRoot, directory));
+  return sources;
+}
+
 export async function loadContractGateState(repositoryRoot, providedBuild) {
   const build = providedBuild ?? (await buildContractArtifacts(repositoryRoot));
   const openApiSource = await readFile(
@@ -648,9 +940,9 @@ export async function loadContractGateState(repositoryRoot, providedBuild) {
       "utf8",
     ),
     miniapp: structuredClone(build.miniapp),
-    miniappEntrySource: await readFile(
-      resolve(repositoryRoot, "packages/api-client/src/miniapp.ts"),
-      "utf8",
+    apiClientSources: await readTypeScriptSources(
+      repositoryRoot,
+      "packages/api-client/src",
     ),
     miniappSource: await readFile(
       resolve(repositoryRoot, "packages/api-client/src/generated/miniapp.ts"),
@@ -658,32 +950,12 @@ export async function loadContractGateState(repositoryRoot, providedBuild) {
     ),
     rawDocument,
     schemaSourceFingerprint: build.schemaSourceFingerprint,
-    sharedClientSource: await readFile(
-      resolve(repositoryRoot, "packages/shared-schemas/src/client.ts"),
-      "utf8",
-    ),
-    sharedClientReachableSources: await Promise.all(
-      [
-        "client-daily-content.ts",
-        "client-evening-feedback.ts",
-        "client-weekly-summary.ts",
-        "common.ts",
-        "public-transport.ts",
-        "weekly-contract-common.ts",
-      ].map(async (file) => [
-        `packages/shared-schemas/src/${file}`,
-        await readFile(
-          resolve(repositoryRoot, "packages/shared-schemas/src", file),
-          "utf8",
-        ),
-      ]),
+    sharedSchemaSources: await readTypeScriptSources(
+      repositoryRoot,
+      "packages/shared-schemas/src",
     ),
     sharedPackage: await readJson(
       resolve(repositoryRoot, "packages/shared-schemas/package.json"),
-    ),
-    transportSource: await readFile(
-      resolve(repositoryRoot, "packages/api-client/src/transport.ts"),
-      "utf8",
     ),
   };
 }

@@ -37,27 +37,42 @@ describe("audience-separated API clients", () => {
   });
 
   it("routes typed miniapp and Admin requests through replaceable transports", async () => {
-    const miniappTransport = createContractTransportStub(async (request) => ({
-      body: {
-        ok: false,
-        request_id: "request-synthetic",
-        server_now: "2026-07-29T08:00:00Z",
-        error: {
-          code: "FEATURE_DISABLED",
-          category: "GUARD",
-          message_key: "error.feature_disabled",
-          message: "尚未开放。",
-          retryable: false,
+    const miniappTransport = createContractTransportStub<MiniappOperations>({
+      createWechatSession: () => ({
+        body: {
+          ok: false,
+          request_id: "request-synthetic",
+          server_now: "2026-07-29T08:00:00Z",
+          error: {
+            code: "FEATURE_DISABLED",
+            category: "GUARD",
+            message_key: "error.feature_disabled",
+            message: "尚未开放。",
+            retryable: false,
+          },
         },
-      },
-      headers: {},
-      status: 403,
-    }));
-    const adminTransport = createContractTransportStub(async () => ({
-      body: {},
-      headers: {},
-      status: 403,
-    }));
+        headers: {},
+        status: 400,
+      }),
+    });
+    const adminTransport = createContractTransportStub<AdminOperations>({
+      adminOpsOverview: () => ({
+        body: {
+          ok: false,
+          request_id: "request-admin-synthetic",
+          server_now: "2026-07-29T08:00:00Z",
+          error: {
+            code: "FEATURE_DISABLED",
+            category: "GUARD",
+            message_key: "error.feature_disabled",
+            message: "尚未开放。",
+            retryable: false,
+          },
+        },
+        headers: {},
+        status: 403,
+      }),
+    });
     const miniapp = createMiniappApiClient(miniappTransport);
     const admin = createAdminApiClient(adminTransport);
 

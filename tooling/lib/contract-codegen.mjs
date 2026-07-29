@@ -642,12 +642,18 @@ function renderParameters(document, pathItem, operation) {
     groups.set(group, entries);
   }
   if (groups.size === 0) {
-    return "Record<string, never>";
+    return {
+      required: false,
+      type: "Record<string, never>",
+    };
   }
   const rendered = [];
   for (const [group, entries] of [...groups].sort(([left], [right]) =>
     left.localeCompare(right),
   )) {
+    const groupRequired = entries.some(
+      (parameter) => parameter.required === true,
+    );
     const fields = entries
       .sort((left, right) => left.name.localeCompare(right.name))
       .map(
@@ -655,10 +661,13 @@ function renderParameters(document, pathItem, operation) {
           `${JSON.stringify(parameter.name)}${parameter.required ? "" : "?"}: ${schemaToTypeScript(parameter.schema ?? true, 3)};`,
       );
     rendered.push(
-      `${JSON.stringify(group)}: {\n${indent(fields.join("\n"), 6)}\n    };`,
+      `${JSON.stringify(group)}${groupRequired ? "" : "?"}: {\n${indent(fields.join("\n"), 6)}\n    };`,
     );
   }
-  return `{\n${indent(rendered.join("\n"), 4)}\n  }`;
+  return {
+    required: parameters.some((parameter) => parameter.required === true),
+    type: `{\n${indent(rendered.join("\n"), 4)}\n  }`,
+  };
 }
 
 function renderContent(content, depth) {
@@ -676,6 +685,7 @@ function renderContent(content, depth) {
 }
 
 function renderOperation(document, pathItem, operation) {
+  const parameters = renderParameters(document, pathItem, operation);
   const requestBody =
     operation.requestBody === undefined
       ? undefined
@@ -690,11 +700,11 @@ function renderOperation(document, pathItem, operation) {
     );
   }
   return `{
-    parameters: ${renderParameters(document, pathItem, operation)};
+    parameters${parameters.required ? "" : "?"}: ${parameters.type};
     ${
       requestBody === undefined
         ? ""
-        : `${requestBody.required ? "" : ""}requestBody${requestBody.required ? "" : "?"}: {
+        : `requestBody${requestBody.required ? "" : "?"}: {
       content: ${renderContent(requestBody.content, 3)};
     };`
     }

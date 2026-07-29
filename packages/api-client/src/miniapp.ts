@@ -32,13 +32,14 @@ export type MiniappApiClient = ContractClient<
   operations,
   typeof MINIAPP_OPERATIONS
 >;
+export type MiniappTransport = ContractTransport<operations>;
 
 export const miniappContractSourceFingerprint =
   MINIAPP_CONTRACT_SOURCE_FINGERPRINT;
 export const miniappOperations = MINIAPP_OPERATIONS;
 
 export function createMiniappApiClient(
-  transport: ContractTransport,
+  transport: MiniappTransport,
 ): MiniappApiClient {
   return createContractClient<operations, typeof MINIAPP_OPERATIONS>(
     transport,

@@ -23,6 +23,10 @@ const client = createMiniappApiClient(transport);
 const submission = mapEveningSaveRequestToSubmission(request);
 ```
 
+每个 operation 的调用签名保留 OpenAPI 必填语义：必填 request body、path、
+header 或 query 参数不能省略；只有不存在必填输入时才能省略 `input`。返回值按
+OpenAPI status 生成判别联合，检查 `response.status` 后会同步缩窄对应的 envelope。
+
 生成类型不是领域模型。`mapEveningSaveRequestToSubmission` 明确处理 Accepted
 OpenAPI transport 与 Zod domain submission 的形状差异，并在边界再次执行 Zod
 校验。Prisma row、Nest DTO、provider payload 或数据库对象不能直接成为 response。
@@ -48,4 +52,6 @@ source fingerprint 和 do-not-edit 证明。相同输入必须得到逐字节相
 
 客户端源码和生成结果不得导入 Admin（miniapp 入口）、Node/Nest/Prisma/Redis/
 BullMQ/provider/Prompt 依赖，也不得出现内部 DB/event/job/provider/restricted
-字段。包不实现真实网络 adapter 或业务 handler；调用方注入 transport。
+字段。包不实现真实网络 adapter 或业务 handler；调用方注入 operation-aware
+transport。未来接入原始 HTTP 响应的 adapter 必须先完成运行时 status/envelope
+校验，才能满足该 typed transport 边界。

@@ -25,12 +25,13 @@ export type AdminApiClient = ContractClient<
   operations,
   typeof ADMIN_OPERATIONS
 >;
+export type AdminTransport = ContractTransport<operations>;
 
 export const adminContractSourceFingerprint = ADMIN_CONTRACT_SOURCE_FINGERPRINT;
 export const adminOperations = ADMIN_OPERATIONS;
 
 export function createAdminApiClient(
-  transport: ContractTransport,
+  transport: AdminTransport,
 ): AdminApiClient {
   return createContractClient<operations, typeof ADMIN_OPERATIONS>(
     transport,

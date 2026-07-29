@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:e31f3661912e0f42035d9a86736a6db0c6d19ed18e8f2a3a5f31b0234fcd28b6
+// source-fingerprint: sha256:133257cc7336ea5bc217cf713d14c85bfe6a3661d3ea3168406c53ceb41c092a
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:e31f3661912e0f42035d9a86736a6db0c6d19ed18e8f2a3a5f31b0234fcd28b6";
+  "sha256:133257cc7336ea5bc217cf713d14c85bfe6a3661d3ea3168406c53ceb41c092a";
 
 export interface paths {
   "/auth/reauth/verify": {
@@ -1914,8 +1914,8 @@ export interface operations {
     };
   };
   createWechatSession: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2130,8 +2130,8 @@ export interface operations {
     };
   };
   getCurrentConsent: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2167,7 +2167,7 @@ export interface operations {
   };
   getDailyByDate: {
     parameters: {
-      header: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2210,8 +2210,8 @@ export interface operations {
     };
   };
   getDailyInteraction: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2247,7 +2247,7 @@ export interface operations {
   };
   getDataTask: {
     parameters: {
-      header: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2290,8 +2290,8 @@ export interface operations {
     };
   };
   getEveningToday: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2326,8 +2326,8 @@ export interface operations {
     };
   };
   getFaq: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2363,7 +2363,7 @@ export interface operations {
   };
   getGenerationIntent: {
     parameters: {
-      header: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2407,7 +2407,7 @@ export interface operations {
   };
   getHistoryDay: {
     parameters: {
-      header: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2450,8 +2450,8 @@ export interface operations {
     };
   };
   getLaunchState: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2486,8 +2486,8 @@ export interface operations {
     };
   };
   getMemoryPreferences: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2522,8 +2522,8 @@ export interface operations {
     };
   };
   getNotificationSettings: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2558,8 +2558,8 @@ export interface operations {
     };
   };
   getProfile: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2594,8 +2594,8 @@ export interface operations {
     };
   };
   getSafetyCurrent: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2630,8 +2630,8 @@ export interface operations {
     };
   };
   getTodayCheckin: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2671,8 +2671,8 @@ export interface operations {
     };
   };
   getTodayView: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2707,8 +2707,8 @@ export interface operations {
     };
   };
   getWeeklyCurrent: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2744,7 +2744,7 @@ export interface operations {
   };
   getWeeklyWindow: {
     parameters: {
-      header: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2853,8 +2853,8 @@ export interface operations {
     };
   };
   listDataTasks: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -2889,12 +2889,12 @@ export interface operations {
     };
   };
   listHistoryDays: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
-      query: {
+      query?: {
         cursor?: string;
         limit?: number;
       };
@@ -2929,8 +2929,8 @@ export interface operations {
     };
   };
   listMatters: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };
@@ -3314,8 +3314,8 @@ export interface operations {
     };
   };
   refreshSession: {
-    parameters: {
-      header: {
+    parameters?: {
+      header?: {
         "Accept-Language"?: "zh-CN";
         "X-Request-Id"?: components["schemas"]["RequestId"];
       };

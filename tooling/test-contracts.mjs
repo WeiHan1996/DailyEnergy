@@ -69,6 +69,14 @@ function firstTwoOperations(document) {
   return operations.slice(0, 2);
 }
 
+function appendTypeScriptSource(state, path, addition) {
+  const source = state.apiClientSources.find(
+    (candidate) => candidate.path === path,
+  );
+  assert.ok(source, `fixture source must exist: ${path}`);
+  source.source += addition;
+}
+
 const cases = [
   {
     mutate(state) {
@@ -146,14 +154,40 @@ const cases = [
   },
   {
     mutate(state) {
-      state.miniappSource +=
-        '\ninterface Leak { "provider_payload": string }\n';
+      appendTypeScriptSource(
+        state,
+        "packages/api-client/src/generated/miniapp.ts",
+        "\ninterface Leak {\n  provider_payload?: string;\n}\n",
+      );
     },
     ruleId: "CONTRACT_CLIENT_FORBIDDEN_FIELD",
   },
   {
     mutate(state) {
-      state.miniappEntrySource += '\nimport "node:fs";\n';
+      state.miniapp.components.schemas.ApiSuccessSession.properties.provider_payload =
+        {
+          type: "string",
+        };
+    },
+    ruleId: "CONTRACT_CLIENT_FORBIDDEN_FIELD",
+  },
+  {
+    mutate(state) {
+      appendTypeScriptSource(
+        state,
+        "packages/api-client/src/miniapp.ts",
+        '\nimport "node:fs";\n',
+      );
+    },
+    ruleId: "CONTRACT_CLIENT_FORBIDDEN_IMPORT",
+  },
+  {
+    mutate(state) {
+      appendTypeScriptSource(
+        state,
+        "packages/api-client/src/miniapp.ts",
+        '\nimport type { operations } from "./generated/admin.js";\n',
+      );
     },
     ruleId: "CONTRACT_CLIENT_FORBIDDEN_IMPORT",
   },
