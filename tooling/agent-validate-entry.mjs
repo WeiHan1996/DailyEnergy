@@ -1,12 +1,17 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-import { redactSensitiveDiagnosticOutput } from "./lib/sensitive-redaction.mjs";
+import {
+  redactSensitiveDiagnosticOutput,
+} from "./lib/sensitive-redaction.mjs";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const execution = spawnSync(
   process.execPath,
-  [resolve(repositoryRoot, "tooling/agent-validate.mjs"), ...process.argv.slice(2)],
+  [
+    resolve(repositoryRoot, "tooling/agent-validate.mjs"),
+    ...process.argv.slice(2),
+  ],
   {
     cwd: repositoryRoot,
     encoding: "utf8",
