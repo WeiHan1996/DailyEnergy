@@ -24,14 +24,93 @@ function diagnostic(ruleId, path, message) {
   };
 }
 
+function jsonStringContent(value) {
+  return JSON.stringify(value).slice(1, -1);
+}
+
+function javascriptSafeContent(value, uppercase, hexadecimal) {
+  const prefix = hexadecimal ? "\\x" : "\\u00";
+  const code = (value) => value.toString(16).padStart(2, "0");
+  const escaped = jsonStringContent(value).replace(/[<>&']/gu, (character) => {
+    const digits = code(character.codePointAt(0));
+    return `${prefix}${uppercase ? digits.toUpperCase() : digits}`;
+  });
+
+  return escaped
+    .replaceAll(" ", uppercase ? "\\u2028" : "\\u2028")
+    .replaceAll(" ", uppercase ? "\\u2029" : "\\u2029");
+}
+
+function htmlEntityContent(value, style) {
+  const named = {
+    "&": "&amp;",
+    "'": style === "apostrophe" ? "&apos;" : "&#x27;",
+    '"': "&quot;",
+    "<": "&lt;",
+    ">": "&gt;",
+  };
+
+  return [...value]
+    .map((character) => {
+      if (style === "named" || style === "apostrophe") {
+        return named[character] ?? character;
+      }
+      if (!["&", "'", '"', "<", ">"].includes(character)) {
+        return character;
+      }
+
+      const codePoint = character.codePointAt(0);
+      if (style === "decimal") {
+        return `&#${codePoint};`;
+      }
+      const digits = codePoint.toString(16);
+      return `&#x${style === "hex-upper" ? digits.toUpperCase() : digits};`;
+    })
+    .join("");
+}
+
+function escapedCanaryRepresentations(value) {
+  const representations = new Set([value]);
+  let frontier = [value];
+  const transformations = [
+    jsonStringContent,
+    (candidate) => javascriptSafeContent(candidate, false, false),
+    (candidate) => javascriptSafeContent(candidate, true, false),
+    (candidate) => javascriptSafeContent(candidate, false, true),
+    (candidate) => javascriptSafeContent(candidate, true, true),
+    (candidate) => htmlEntityContent(candidate, "named"),
+    (candidate) => htmlEntityContent(candidate, "apostrophe"),
+    (candidate) => htmlEntityContent(candidate, "decimal"),
+    (candidate) => htmlEntityContent(candidate, "hex-lower"),
+    (candidate) => htmlEntityContent(candidate, "hex-upper"),
+  ];
+
+  for (let depth = 0; depth < 2; depth += 1) {
+    const nextFrontier = [];
+    for (const candidate of frontier) {
+      for (const transform of transformations) {
+        const transformed = transform(candidate);
+        if (!representations.has(transformed)) {
+          representations.add(transformed);
+          nextFrontier.push(transformed);
+        }
+      }
+    }
+    frontier = nextFrontier;
+  }
+
+  return representations;
+}
+
 function includesCanary(content, values) {
-  return values.some(
-    (value) =>
-      typeof value === "string" &&
-      value.length >= 12 &&
-      (content.includes(value) ||
-        content.includes(JSON.stringify(value).slice(1, -1))),
-  );
+  return values.some((value) => {
+    if (typeof value !== "string" || value.length < 12) {
+      return false;
+    }
+    return [...escapedCanaryRepresentations(value)].some((representation) =>
+      content.includes(representation),
+    );
+  });
 }
 
 export function scanAdminBrowserExposure({
