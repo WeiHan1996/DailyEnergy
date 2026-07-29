@@ -235,7 +235,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-004 已完成，E-008 是 Phase 1 唯一 In Progress 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-004 已完成，E-008 是 Phase 1 唯一 In Review 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
@@ -251,4 +251,4 @@ S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-0
 12. [API Client](../packages/api-client/README.md)；
 13. tasks/backlog.md（仅在需要重排优先级时）。
 
-E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done。E-008 Issue #46 正在 `agent/e-008-contract-codegen` 实现统一 Zod/OpenAPI/mapper/client 生成和本地 drift Gate；E-005、E-006 及其他工程 Issue 继续保持 Planned。正式 Source-ID registry 由 E-010 交付，CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production Gate 未被自动解除。
+E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done。E-008 Issue #46 已在 `agent/e-008-contract-codegen` 完成统一 Zod/OpenAPI/mapper/client 生成和本地 drift Gate，并以 [Draft PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97) 进入 In Review；E-005、E-006 及其他工程 Issue 继续保持 Planned。正式 Source-ID registry 由 E-010 交付，CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production Gate 未被自动解除。

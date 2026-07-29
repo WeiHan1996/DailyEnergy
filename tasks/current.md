@@ -4,10 +4,10 @@
 - **最后更新**：2026-07-29
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-008 — 统一 Zod Schema、OpenAPI 与生成 API Client
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **当前分支**：`agent/e-008-contract-codegen`
 - **当前 Issue**：[E-008 Issue #46](https://github.com/WeiHan1996/DailyEnergy/issues/46)
-- **当前 PR**：尚未创建
+- **当前 PR**：[Draft PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)
 - **Gate 结论**：`GO`
 
 ## 1. 当前目标
@@ -25,7 +25,7 @@ Zod Schema
 E-004 已随 [PR #96](https://github.com/WeiHan1996/DailyEnergy/pull/96)
 squash 合并，merge commit 为
 `84f06b14e77a0df7f57bda60870cb8f4f30cfb32`，Issue #42 已关闭。
-E-008 是唯一 In Progress 任务；E-005、E-006 及其他工程任务不得并行开始。
+E-008 是唯一 In Review 任务；E-005、E-006 及其他工程任务不得并行开始。
 
 ## 2. 开工检查
 
@@ -98,18 +98,20 @@ E-008 是唯一 In Progress 任务；E-005、E-006 及其他工程任务不得�
   本任务已记录命令、测试数量、rule IDs 和 fingerprint 机器证据；
 - **已知限制**：任意 Zod refinement（真实日历、Unicode grapheme、跨对象等式）
   不能由 JSON Schema 完整表达，所有信任边界仍以 Zod runtime parse 为权威；
-- **下一状态**：提交、推送并创建 Draft PR 后切换为 In Review；不得自动合并。
+- **下一状态**：等待用户审核
+  [Draft PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)；不得自动合并。
 
 ## 7. 最近交接
 
 - E-004 PR #96 已合并，Issue #42 已关闭；
-- E-008 Issue #46 已进入 In Progress；
+- E-008 Issue #46 已进入 In Review；
 - 当前分支：`agent/e-008-contract-codegen`；
+- 当前 PR：[Draft PR #97](https://github.com/WeiHan1996/DailyEnergy/pull/97)；
 - 已完成：上下文恢复、基线校验、三类显式 exports、client-safe Zod 模块、
   JSON Schema/OpenAPI/client codegen、one-way mapper、drift/static Gate、
   known-fail fixtures、文档和全量验证；
 - 开工结论：`GO`；
 - 当前 fingerprint：
   `sha256:e31f3661912e0f42035d9a86736a6db0c6d19ed18e8f2a3a5f31b0234fcd28b6`；
-- 当前动作：最终 diff 自审后提交、推送并创建 Draft PR；
+- 当前动作：等待用户审核 Draft PR #97；不得自动合并；
 - 接受后的下一任务：E-005（仍为 Planned，不提前开始）。
