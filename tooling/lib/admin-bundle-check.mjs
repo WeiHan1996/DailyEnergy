@@ -30,8 +30,7 @@ function jsonStringContent(value) {
 
 function javascriptSafeContent(value, uppercase, hexadecimal) {
   const prefix = hexadecimal ? "\\x" : "\\u00";
-  const codePointHex = (codePoint) =>
-    codePoint.toString(16).padStart(2, "0");
+  const codePointHex = (codePoint) => codePoint.toString(16).padStart(2, "0");
   const escaped = jsonStringContent(value).replace(/[<>&']/gu, (character) => {
     const digits = codePointHex(character.codePointAt(0));
     return `${prefix}${uppercase ? digits.toUpperCase() : digits}`;
