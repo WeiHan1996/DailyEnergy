@@ -40,9 +40,9 @@ try {
     "admin-identity-client-secret",
   );
   const sessionSecretFile = join(temporaryDirectory, "admin-session-secret");
-  const identitySecret = "ADMIN_SYNTHETIC_IDENTITY_SECRET_FILE_CANARY_5f71c924";
-  const sessionSecret = "ADMIN_SYNTHETIC_SESSION_SECRET_FILE_CANARY_93d82a16";
-  const userBody = "Synthetic user note: feeling tired today; fixture 1d24f58e";
+  const identitySecret = `ADMIN_SYNTHETIC_IDENTITY_SECRET_<&>"'\n_FILE_CANARY_5f71c924`;
+  const sessionSecret = `ADMIN_SYNTHETIC_SESSION_SECRET_<&>"'\n_FILE_CANARY_93d82a16`;
+  const userBody = `Synthetic user note: <tired & "uncertain">\nfixture 1d24f58e`;
 
   await Promise.all([
     writeFile(identitySecretFile, identitySecret, { mode: 0o600 }),
