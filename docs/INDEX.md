@@ -113,6 +113,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | docs/design/design-system.md                                            | Planned  | D-002 Variables、Design Tokens、组件、动效和无障碍                     | D-001、E-004                      |
 | docs/design/core-flow-high-fidelity.md                                  | Planned  | D-003 核心流程八页及关键状态高保真索引                                 | D-002                             |
 | docs/design/developer-handoff.md                                        | Planned  | D-004 可点击原型、验证结果、Frame ID 和视觉 QA 交付                    | D-003、prototype-validation       |
+| docs/design/phase2-remaining-handoff.md                                 | Planned  | D-005 晚间、趋势、数据权利页面高保真、状态矩阵和开发交付               | D-004                             |
 
 ### 7.2 产品状态与 Schema
 
@@ -166,14 +167,14 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 ### 7.6 工程架构与交付
 
-| 文件                                                                                                                                                                                                   | 状态     | 目的                                                                                      | 主要依赖                                                      |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                 | Gateway、database、API、ADR-0006                              |
-| [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted | Monorepo 目录、app/package/module、public exports 与依赖 Gate                             | architecture、ADR-0006                                        |
-| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵                                      | schemas、API、architecture、repository-structure              |
-| [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复                                    | architecture、repository-structure、testing、privacy          |
-| [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                  | metrics、Gateway、privacy、incident、architecture、deployment |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active   | 52 个 Issues 已按 14 / 21 / 17 绑定三个真实 Milestone；其中新增 D-001～D-004 均为 Planned | Accepted Phase 0B specs、D 系列项目控制                       |
+| 文件                                                                                                                                                                                                   | 状态     | 目的                                                                                          | 主要依赖                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                     | Gateway、database、API、ADR-0006                              |
+| [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted | Monorepo 目录、app/package/module、public exports 与依赖 Gate                                 | architecture、ADR-0006                                        |
+| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵                                          | schemas、API、architecture、repository-structure              |
+| [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复                                        | architecture、repository-structure、testing、privacy          |
+| [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                      | metrics、Gateway、privacy、incident、architecture、deployment |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active   | 53 个 Issues 已按 14 / 22 / 17 绑定三个真实 Milestone；其中 D-001～D-005 均为 Planned         | Accepted Phase 0B specs、D 系列项目控制                       |
 
 ### 7.7 Phase Gate
 
@@ -258,9 +259,13 @@ E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done；E-008
 PR #97 squash 合并并关闭 Issue #46。E-005 已随
 [PR #98](https://github.com/WeiHan1996/DailyEnergy/pull/98) 合并，merge commit
 为 `bde64fd60128ab699eac3251bcf2eace88f0a902`，Issue #43 已关闭。
-[D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)～
-[D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 已纳入
-Phase 2，D-004 已成为 C-003、C-004、C-009 的直接前置；四项均保持 Planned。
+[D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
+[D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
+[D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
+[D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
+[D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 已纳入
+Phase 2，全部保持 Planned。D-004 是 C-003、C-004、C-009 的直接前置；
+D-005 是 C-012、C-013、C-014 的直接前置。
 正式 Source-ID registry 由 E-010 交付；E-005 已在固定 fixture 中记录对应
 Source IDs，并按 E-010 前的 `NA_WITH_REASON` 规则保留可执行证据。
 CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production
