@@ -4,12 +4,12 @@
 - **最后更新**：2026-07-29
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-015 — 建立 Agent 上下文路由与分级验证入口
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **当前分支**：`agent/e-015-agent-workflow`
 - **当前 Issue**：[E-015 Issue #105](https://github.com/WeiHan1996/DailyEnergy/issues/105)
-- **当前 PR**：无
+- **当前 PR**：[Draft PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106)
 - **基线提交**：`38676cad32ba16d242050570e943b812c0ae6018`
-- **Gate 结论**：`GO_TO_IMPLEMENT`
+- **Gate 结论**：`READY_FOR_REVIEW`
 
 ## 1. 当前目标
 
@@ -29,7 +29,7 @@
 ## 2. 状态变更影响
 
 - 用户明确要求先实施 E-015，因此 E-006 暂时从唯一 Ready 调整为 Planned；
-- E-015 是唯一 In Progress，完成审核与合并后 E-006 恢复为唯一 Ready；
+- E-015 是唯一 In Review，完成审核与合并后 E-006 恢复为唯一 Ready；
 - [PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103) 已合并，
   最新 `main` 为 `38676cad32ba16d242050570e943b812c0ae6018`；
 - D-001～D-005 继续保持 Planned，不创建 Figma、Design Tokens 或业务页面。
@@ -71,8 +71,8 @@
 - **仓库/代码阻塞**：无；
 - **外部依赖**：无，不需要真实账号、密钥、Figma 或生产资源；
 - **范围决定**：本任务只实施 P0/P1，P2～P4 保持后续；
-- **并行规则**：E-015 是唯一 In Progress；
-- **下一动作**：实现工具、fixtures 和文档，然后运行完整验证并创建 Draft PR；
+- **并行规则**：E-015 是唯一 In Review；
+- **下一动作**：等待用户审核 Draft PR #106；不自动标记 Ready 或合并；
 - **接受后的下一任务**：E-006 — PostgreSQL 与 Prisma。
 
 ## 7. 最近交接
@@ -100,4 +100,9 @@
 - 最终实现已通过完整 `pnpm run validate`：format、lint、typecheck、test、
   Playwright、bundle/contract/architecture Gate 与 build 全部 PASS；
 - 首次沙箱 run 因禁止监听 `127.0.0.1:3210` 以 `EPERM` 被环境阻断；在受控
-  本地端口环境重跑同一完整 Gate 后 PASS，未放宽任何检查。
+  本地端口环境重跑同一完整 Gate 后 PASS，未放宽任何检查；
+- 已创建 [Draft PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106)，
+  标题为 `[E-015] 建立 Agent 上下文路由与分级验证入口`，包含 `Closes #105`；
+- Draft PR 与状态更新后，`agent:validate --mode=changed` 按策略自动升级 full，
+  在 39.2 秒内 PASS，成功输出仅保留一行摘要和命中规则；
+- 当前等待用户审核；不自动合并、不关闭 Issue、不启动 E-006。
