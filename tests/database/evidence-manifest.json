@@ -1,0 +1,1273 @@
+{
+  "manifest_version": "e-006-evidence-v1",
+  "scope": "Pre-E-010 E-006 database evidence only",
+  "authority": "docs/technical/testing.md",
+  "generated_from": {
+    "sql_test": "tests/database/integration.test.mjs",
+    "transaction_test": "tests/database/transactions.test.mjs",
+    "checker_test": "tests/database/evidence.test.mjs"
+  },
+  "status_definitions": {
+    "COVERED": "Exact executable E-006 evidence with named assertions.",
+    "NA_WITH_REASON": "Not covered in this pre-E-010 slice; missing layer and follow-up owner are explicit."
+  },
+  "entries": [
+    {
+      "source_id": "SQL-001",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-001 accepts valid synthetic data",
+            "SQL-001 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-002",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-002 accepts valid synthetic data",
+            "SQL-002 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-003",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-003 accepts valid synthetic data",
+            "SQL-003 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-004",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-004 accepts valid synthetic data",
+            "SQL-004 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-005",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-005 accepts valid synthetic data",
+            "SQL-005 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-006",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-006 accepts valid synthetic data",
+            "SQL-006 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-007",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-007 accepts valid synthetic data",
+            "SQL-007 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-008",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-008 accepts valid synthetic data",
+            "SQL-008 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-009",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-009 accepts valid synthetic data",
+            "SQL-009 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-010",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-010 accepts valid synthetic data",
+            "SQL-010 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-011",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-011 accepts valid synthetic data",
+            "SQL-011 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-012",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-012 accepts valid synthetic data",
+            "SQL-012 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-013",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-013 accepts valid synthetic data",
+            "SQL-013 rejects invalid synthetic data",
+            "SQL-013 rejects deleting the only daily personalized fragment",
+            "SQL-013 accepts daily fragment deletion with BLOCKED visibility in the same transaction",
+            "SQL-013 rejects deleting the only weekly personalized fragment",
+            "SQL-013 accepts weekly fragment deletion when the summary is unpublished in the same transaction"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-014",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-014 accepts valid synthetic data",
+            "SQL-014 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-015",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-015 accepts valid synthetic data",
+            "SQL-015 rejects invalid synthetic data",
+            "SQL-015 rejects terminal-to-scheduled regression"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-016",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-016 accepts valid synthetic data",
+            "SQL-016 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-017",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-017 accepts valid synthetic data",
+            "SQL-017 rejects invalid synthetic data",
+            "SQL-017 rejects a day-erasure guard over 45 days"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-018",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-018 accepts valid synthetic data",
+            "SQL-018 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-019",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-019 accepts valid synthetic data",
+            "SQL-019 rejects invalid synthetic data"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "SQL-020",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "SQL-020 enforces environment login membership, role attributes, ownership, creation, truncation, restricted, and ciphertext matrix"
+          ]
+        },
+        {
+          "test_id": "T-DB-LIFECYCLE-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "real migration login times out on locked DDL and then rolls forward",
+          "level": "DB",
+          "assertions": [
+            "real migration login alters an existing table through daily_energy_owner",
+            "real Prisma DDL connection enforces the five-second lock timeout",
+            "migration failure output redacts the environment credential",
+            "roll-forward applies the second migration after lock release"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "TX-01",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-001",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-001 TX-01 profile/onboarding commits all facts and rolls all back",
+          "level": "DB",
+          "assertions": [
+            "TX-01 profile/onboarding commits all facts and rolls all back"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "TX-02",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-002",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-002 TX-02 checkin/intent snapshot/outbox is unique and atomic",
+          "level": "DB",
+          "assertions": [
+            "TX-02 checkin/intent snapshot/outbox is unique and atomic"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "TX-03",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-003",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-003 TX-03 daily publication has one concurrent winner and no partial result",
+          "level": "DB",
+          "assertions": [
+            "TX-03 daily publication has one concurrent winner and no partial result"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "TX-04",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-004",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-004 TX-04 EVE components commit together and conflict rolls all back",
+          "level": "DB",
+          "assertions": [
+            "TX-04 EVE components commit together and conflict rolls all back"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "TX-05",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-005",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-005 TX-05 HIGH_RISK commits only minimal safety facts and rollback is complete",
+          "level": "DB",
+          "assertions": [
+            "TX-05 HIGH_RISK commits only minimal safety facts and rollback is complete"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "TX-06",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-006",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-006 TX-06 light/outbox and replay-safe inbox/link are atomic",
+          "level": "DB",
+          "assertions": [
+            "TX-06 light/outbox and replay-safe inbox/link are atomic"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "TX-07",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-007",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-007 TX-07 weekly immutable revision and CAS pointer reject stale publisher",
+          "level": "DB",
+          "assertions": [
+            "TX-07 weekly immutable revision and CAS pointer reject stale publisher"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "TX-08",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-008",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-008 TX-08 dispatch claim has one locker/winner and failed claim rolls back",
+          "level": "DB",
+          "assertions": [
+            "TX-08 dispatch claim has one locker/winner and failed claim rolls back"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "TX-09",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-009",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-009 TX-09 active deletion task/guard is concurrent-idempotent and failure keeps prior epoch",
+          "level": "DB",
+          "assertions": [
+            "TX-09 active deletion task/guard is concurrent-idempotent and failure keeps prior epoch"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-001",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "repository/concurrency",
+        "reason": "No E-006 test concurrently resolves identical provider lookup tokens to one account mapping.",
+        "follow_up_owner": "E-010 identity integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-002",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "encryption adapter/logging",
+        "reason": "No adapter test proves randomized ciphertext with stable lookup-token resolution and redacted logs.",
+        "follow_up_owner": "E-010 identity integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-003",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "account lifecycle use case",
+        "reason": "No delete-then-recreate workflow exists to prove new account, subject, consent, and seed identities.",
+        "follow_up_owner": "E-010 account lifecycle E2E suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-004",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "repository CAS",
+        "reason": "No profile repository API executes expected-revision CAS and verifies the newer value remains.",
+        "follow_up_owner": "E-010 profile integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-005",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "SQL-003 rejects invalid synthetic data",
+          "level": "DB",
+          "assertions": [
+            "ciphertext without key version is rejected by SQL-003"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-006",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "command idempotency use case",
+        "reason": "No onboarding command handler returns the original completion without adding a profile revision.",
+        "follow_up_owner": "E-010 command receipt integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-007",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "command conflict use case",
+        "reason": "No handler compares normalized payload fingerprints before domain writes.",
+        "follow_up_owner": "E-010 command receipt integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-008",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "server ProductDate boundary",
+        "reason": "Database tests receive an already parsed date and cannot prove client date rejection or server policy freezing.",
+        "follow_up_owner": "E-010 API/module test suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-009",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-002",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-002 TX-02 checkin/intent snapshot/outbox is unique and atomic",
+          "level": "DB",
+          "assertions": [
+            "two concurrent same owner/date check-ins leave one winner"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-010",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "generation repository concurrency",
+        "reason": "No concurrent test submits different result versions for the same owner/date and reads the existing intent.",
+        "follow_up_owner": "E-010 generation integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-011",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "weekly fingerprint resolver",
+        "reason": "No workflow corrects a check-in revision then proves immutable snapshot plus changed weekly fingerprint.",
+        "follow_up_owner": "E-010 weekly integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-012",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "SQL-005 rejects invalid synthetic data",
+          "level": "DB",
+          "assertions": [
+            "GatewayInvocation without exactly one accepted parent is rejected"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-013",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "gateway attempt repository",
+        "reason": "No retry test proves invocation/role/ordinal uniqueness and single cost accounting.",
+        "follow_up_owner": "E-010 gateway integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-014",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "provider adapter/content scanner",
+        "reason": "No provider failure path proves raw response is discarded and only redacted outcome persists.",
+        "follow_up_owner": "E-010 gateway integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-015",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-003",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-003 TX-03 daily publication has one concurrent winner and no partial result",
+          "level": "DB",
+          "assertions": [
+            "two concurrent qualified publications leave one result"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-016",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "publish guard use case",
+        "reason": "No controlled provider-return hook changes Safety/deletion epochs before publication.",
+        "follow_up_owner": "E-010 generation integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-017",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-004",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-004 TX-04 EVE components commit together and conflict rolls all back",
+          "level": "DB",
+          "assertions": [
+            "feedback, helpfulness, task, and aggregate revision commit together"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-018",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-004",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-004 TX-04 EVE components commit together and conflict rolls all back",
+          "level": "DB",
+          "assertions": [
+            "revision conflict rolls back the attempted component changes"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-019",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-005",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-005 TX-05 HIGH_RISK commits only minimal safety facts and rollback is complete",
+          "level": "DB",
+          "assertions": [
+            "HIGH_RISK transaction writes restricted minimal facts and zero ordinary evening feedback"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-020",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "interaction application semantics",
+        "reason": "No application test proves missing helpfulness is represented by no row and UNRATED at the contract boundary.",
+        "follow_up_owner": "E-010 interaction module/integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-021",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-006",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-006 TX-06 light/outbox and replay-safe inbox/link are atomic",
+          "level": "DB",
+          "assertions": [
+            "light fact and one logical DayLit outbox event commit atomically"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-022",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-006",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-006 TX-06 light/outbox and replay-safe inbox/link are atomic",
+          "level": "DB",
+          "assertions": [
+            "duplicate DayLit inbox receipt is rejected and one relationship link remains"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-023",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "relationship concurrency repository",
+        "reason": "SQL-009 validates state/slot shape, but no concurrent active-cycle creation test proves one winner.",
+        "follow_up_owner": "E-010 relationship integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-024",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "relationship deletion guard",
+        "reason": "No deleted-cycle replay test compares cutoff/guard and prevents old light import into a new cycle.",
+        "follow_up_owner": "E-010 relationship integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-025",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "encryption adapter/content scanner",
+        "reason": "No Matter write test scans audit/outbox while proving only ciphertext and key version persist.",
+        "follow_up_owner": "E-010 matter integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-026",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "authorization resolver",
+        "reason": "No Daily-versus-Weekly grant resolver test exercises purpose-specific denial.",
+        "follow_up_owner": "E-010 memory authorization suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-027",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "publish guard use case",
+        "reason": "No grant-revoke race hook proves revision/PublishGuard rejects the whole candidate.",
+        "follow_up_owner": "E-010 memory integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-028",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "personalized content deletion workflow",
+        "reason": "No Matter deletion workflow hard-deletes a fragment and resolves a safe fallback view.",
+        "follow_up_owner": "E-010 deletion integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-029",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "personalized content deletion workflow",
+        "reason": "No Matter deletion workflow proves BLOCKED visibility when no safe fallback exists.",
+        "follow_up_owner": "E-010 deletion integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-030",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "weekly invalidation workflow",
+        "reason": "No DAY deletion workflow recomputes fingerprint and hides the old current summary.",
+        "follow_up_owner": "E-010 weekly/deletion integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-031",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "weekly fingerprint policy",
+        "reason": "No evening-note-only mutation test proves the weekly fingerprint remains stable.",
+        "follow_up_owner": "E-010 weekly module/integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-032",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-007",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-007 TX-07 weekly immutable revision and CAS pointer reject stale publisher",
+          "level": "DB",
+          "assertions": [
+            "two publishers serialize and stale CAS updates zero rows"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-033",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-005",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-005 TX-05 HIGH_RISK commits only minimal safety facts and rollback is complete",
+          "level": "DB",
+          "assertions": [
+            "Safety state revision/epoch, event, plan, and outbox commit atomically"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-034",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "schema/content scanner",
+        "reason": "No executable fixture attempts forbidden raw Safety text/confidence fields against the public model and scanner.",
+        "follow_up_owner": "E-010 Safety contract suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-035",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "Safety application semantics",
+        "reason": "No resource-click handler test proves state and recovery receipt remain unchanged.",
+        "follow_up_owner": "E-010 Safety module suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-036",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "Safety recovery use case",
+        "reason": "No two-step recovery CAS test exercises stale expected revision and no automatic CLEAR.",
+        "follow_up_owner": "E-010 Safety integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-037",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "notification preference use case",
+        "reason": "No application test proves default disabled preference and platform grant non-mutation.",
+        "follow_up_owner": "E-010 notification module suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-038",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "notification planning concurrency",
+        "reason": "No concurrent semantic notification planner test proves one intent.",
+        "follow_up_owner": "E-010 notification integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-039",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "notification platform adapter",
+        "reason": "No dispatch hook activates Safety immediately before send and proves zero platform calls.",
+        "follow_up_owner": "E-010 notification integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-040",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "notification retry workflow",
+        "reason": "No timeout/retry workflow reuses the original intent, claim, and attempt.",
+        "follow_up_owner": "E-010 notification integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-041",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-009",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-009 TX-09 active deletion task/guard is concurrent-idempotent and failure keeps prior epoch",
+          "level": "DB",
+          "assertions": [
+            "concurrent duplicate deletion task is rejected and one active task remains"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-042",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "deletion worker checkpoints",
+        "reason": "No worker fault hook fails step three while preserving guard and resumable checkpoint.",
+        "follow_up_owner": "E-010 deletion resilience suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-043",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "account access guard",
+        "reason": "No failed ACCOUNT-delete workflow proves DELETING remains and ordinary paths stay blocked.",
+        "follow_up_owner": "E-010 deletion E2E suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-044",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "DAY re-entry workflow",
+        "reason": "No post-deletion same-day re-entry resolves original version and compares the latest epoch.",
+        "follow_up_owner": "E-010 deletion integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-045",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "SQL-017 rejects a day-erasure guard over 45 days",
+          "level": "DB",
+          "assertions": ["46-day guard is rejected"]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-046",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "backup restore harness",
+        "reason": "No 20-day restore exercise replays deny/guard state before exposure and scans for DAY resurrection.",
+        "follow_up_owner": "E-010 restore resilience suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-047",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "backup publication gate",
+        "reason": "SQL-017 rejects an invalid catalog row, but no backup publication gate workflow is executed.",
+        "follow_up_owner": "E-010 restore resilience suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-048",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "SQL-019 rejects invalid synthetic data",
+          "level": "DB",
+          "assertions": [
+            "ACCOUNT receipt containing blinded subject token is rejected"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-049",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-002",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-002 TX-02 checkin/intent snapshot/outbox is unique and atomic",
+          "level": "DB",
+          "assertions": [
+            "injected transaction failure leaves no generation intent; companion writes share rollback boundary"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-050",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "queue relay/consumer",
+        "reason": "No publisher crash-after-send hook and consumer inbox deduplication workflow exists in E-006.",
+        "follow_up_owner": "E-007 queue reliability suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-051",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "queue acknowledgment",
+        "reason": "No consumer commit-before-ACK crash hook proves receipt-based replay no-op.",
+        "follow_up_owner": "E-007 queue reliability suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-052",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "cache/consumer epoch guard",
+        "reason": "No late cache/outbox delivery path synchronously rejects an old epoch.",
+        "follow_up_owner": "E-007 queue and cache resilience suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-053",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "TTL worker concurrency",
+        "reason": "No SKIP LOCKED/claim scanner test runs concurrent TTL workers.",
+        "follow_up_owner": "E-010 retention resilience suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-054",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "legal-hold retention worker",
+        "reason": "No TTL deletion worker moves or keeps held data in restricted frozen storage.",
+        "follow_up_owner": "E-010 retention integration suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-055",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "deletion timeout worker",
+        "reason": "No seven-day timeout workflow persists stable failure scope codes without SQL/raw errors.",
+        "follow_up_owner": "E-010 deletion resilience suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-056",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "command outcome recovery",
+        "reason": "No unknown-outcome handler resumes from receipt/aggregate without changing key/date/intent.",
+        "follow_up_owner": "E-010 command resilience suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-057",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "SQL-020 enforces role attributes, ownership, creation, truncation, restricted, and ciphertext matrix",
+          "level": "DB",
+          "assertions": [
+            "ordinary API role SELECT on restricted Safety table is denied by PostgreSQL"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-058",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "Prisma runtime logging configuration",
+        "reason": "No production Prisma logging configuration or bind-value canary exists in this database-only slice.",
+        "follow_up_owner": "E-010 database adapter conformance suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-059",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "SQL-016 rejects invalid synthetic data",
+          "level": "DB",
+          "assertions": [
+            "ACTIVE provider profile with training/retention violation is rejected"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-060",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "evaluation schema/fixture scanner",
+        "reason": "No EvaluationSample fixture attempts AccountRef and proves SyntheticSubjectRef-only enforcement.",
+        "follow_up_owner": "E-010 evaluation contract suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-061",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "empty PostgreSQL 18 container applies migration, seed, drift, SQL, and grant checks"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S19-DB-062",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "upgrade fixture path",
+        "reason": "The baseline has no older synthetic migration fixture to upgrade while checking data/version/fingerprint compatibility.",
+        "follow_up_owner": "E-010 database upgrade suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-063",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "rollback/restore harness",
+        "reason": "No rollback plus backup restore exercise replays restore-deny state before data exposure.",
+        "follow_up_owner": "E-010 restore resilience suite"
+      }
+    },
+    {
+      "source_id": "S19-DB-064",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "post-migration drift checker fingerprints columns, enums, constraints, indexes, triggers, functions, owners, ACL, and default privileges",
+            "active constraint, index, function, and grant mutations fail before exact restoration"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S31-TEST-017",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
+          "level": "DB",
+          "assertions": [
+            "empty PostgreSQL 18 migration, SQL-001..020, grants, Prisma migration, and drift checks pass"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S31-TEST-018",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-EVIDENCE-001",
+          "file": "tests/database/evidence.test.mjs",
+          "selector": "T-DB-EVIDENCE-001 rejects COVERED entries without assertion evidence",
+          "level": "STATIC",
+          "assertions": [
+            "checker rejects a COVERED SQL entry whose evidence assertions are empty"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S31-TEST-019",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "transaction fault hook",
+        "reason": "TX-02 injects rollback before snapshot creation; it does not inject specifically after snapshot and before outbox or assert every required table/receipt.",
+        "follow_up_owner": "E-010 database transaction fault suite"
+      }
+    },
+    {
+      "source_id": "S31-TEST-020",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-TX-004",
+          "file": "tests/database/transactions.test.mjs",
+          "selector": "T-DB-TX-004 TX-04 EVE components commit together and conflict rolls all back",
+          "level": "DB",
+          "assertions": [
+            "a revision conflict rolls back the attempted task/helpfulness transaction changes"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S31-TEST-021",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "provider/template call spy",
+        "reason": "TX-05 proves minimal restricted facts and zero ordinary DB writes, but no provider/template call layer exists to prove both call counts are zero.",
+        "follow_up_owner": "E-010 Safety integration suite"
+      }
+    },
+    {
+      "source_id": "S31-TEST-022",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "repository loser read path",
+        "reason": "TX-03 uses a two-connection barrier and one result, but the loser rejects on uniqueness rather than reading and returning the existing result.",
+        "follow_up_owner": "E-010 generation repository integration suite"
+      }
+    },
+    {
+      "source_id": "S31-TEST-023",
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "SQL-020 enforces role attributes, ownership, creation, truncation, restricted, and ciphertext matrix",
+          "level": "DB",
+          "assertions": [
+            "daily_energy_api SELECT on restricted_safety_state is rejected by PostgreSQL grant"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "S31-TEST-024",
+      "status": "NA_WITH_REASON",
+      "na": {
+        "missing_layer": "upgrade/restore mutation harness",
+        "reason": "Clean-install drift checks exist, but no upgrade or restore fixture intentionally loses a custom constraint/grant and proves the gate fails.",
+        "follow_up_owner": "E-010 database upgrade/restore suite"
+      }
+    }
+  ]
+}

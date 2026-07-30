@@ -786,7 +786,7 @@ S-12 完成后，再依据实际 Issue 数量制定：
 - Phase 0B 已通过 Accepted Gate，Phase 1 是当前阶段；
 - E-005 已随 PR #98 合并；
 - E-015 已随 PR #106 squash 合并并进入 Done；
-- E-006 是唯一 Ready，尚未开始实现；
+- E-006 是唯一 In Review，等待 Draft PR 人工审核；
 - D-001～D-005 已进入 Phase 2 路线图，当前均为 Planned；
 - 当前唯一执行任务由 tasks/current.md 指定；
 - C-003、C-004、C-009 在 D-004 被接受前不得开始正式页面实现；

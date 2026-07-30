@@ -24,10 +24,30 @@ const sensitiveAssignmentRules = [
   },
 ];
 
+function redactPostgreSqlUrls(value) {
+  return value.replace(/\bpostgres(?:ql)?:\/\/[^\s"'<>]+/giu, (candidate) => {
+    let urlText = candidate;
+    let trailing = "";
+    while (/[),.;\]}]$/u.test(urlText)) {
+      trailing = `${urlText.at(-1)}${trailing}`;
+      urlText = urlText.slice(0, -1);
+    }
+    try {
+      const url = new URL(urlText);
+      if (url.protocol === "postgres:" || url.protocol === "postgresql:") {
+        return `[REDACTED_DATABASE_URL]${trailing}`;
+      }
+    } catch {
+      // A malformed PostgreSQL URL is still sensitive and must fail closed.
+    }
+    return `[REDACTED_DATABASE_URL]${trailing}`;
+  });
+}
+
 export function redactSensitiveDiagnosticOutput(value) {
   return sensitiveAssignmentRules.reduce(
     (redacted, { expression, replacement }) =>
       redacted.replace(expression, replacement),
-    value,
+    redactPostgreSqlUrls(value),
   );
 }

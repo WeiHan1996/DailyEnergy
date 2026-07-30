@@ -34,6 +34,7 @@ const dependencyFields = [
 ];
 const sourceExtensions = /\.(?:c|m)?(?:j|t)sx?$/u;
 const ignoredDirectories = new Set([
+  ".claude",
   ".git",
   ".turbo",
   "coverage",

@@ -25,6 +25,7 @@ export default [
       "**/coverage/**",
       "**/dist/**",
       "**/node_modules/**",
+      "packages/server-adapters/src/db/generated/prisma/**",
       "prototype/**",
     ],
   },

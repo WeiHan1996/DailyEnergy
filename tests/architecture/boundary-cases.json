@@ -433,6 +433,32 @@
       }
     },
     {
+      "case_id": "restricted-api-from-ordinary-api-startup",
+      "gate": "restricted",
+      "expected_rule_id": "BOUNDARY_RESTRICTED_API_LOCATION",
+      "project": {
+        "files": [
+          {
+            "path": "apps/api/src/main.ts",
+            "content": "import \"@daily-energy/server-adapters/api-restricted\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "migration-from-ordinary-worker-startup",
+      "gate": "restricted",
+      "expected_rule_id": "BOUNDARY_MIGRATION_STARTUP",
+      "project": {
+        "files": [
+          {
+            "path": "apps/worker/src/entrypoints/background.ts",
+            "content": "import \"@daily-energy/server-adapters/migration\";\n"
+          }
+        ]
+      }
+    },
+    {
       "case_id": "runtime-imports-root-contract",
       "gate": "contract",
       "expected_rule_id": "BOUNDARY_CONTRACT_ROOT_SOURCE",
@@ -454,6 +480,19 @@
           {
             "path": "packages/server-core/src/modules/daily/domain/model.ts",
             "content": "import { PrismaClient } from \"@prisma/client\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "prisma-generated-model-in-public-adapter-contract",
+      "gate": "prisma",
+      "expected_rule_id": "BOUNDARY_PRISMA_PUBLIC_CONTRACT",
+      "project": {
+        "files": [
+          {
+            "path": "packages/server-adapters/src/api/index.ts",
+            "content": "export type { UserAccount } from \"../db/generated/prisma/models/UserAccount.js\";\n"
           }
         ]
       }

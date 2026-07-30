@@ -1,0 +1,28 @@
+{
+  "version": "synthetic-seed-v1",
+  "product_date_policy": "product-date-v1-asia-shanghai-0400",
+  "retention_policy": "retention-policy-v1",
+  "synthetic_subject_ref": "synthetic:e006:baseline",
+  "records": {
+    "version_catalog": [
+      {
+        "catalog_type": "PRODUCT_DATE_POLICY",
+        "version": "product-date-v1",
+        "compatibility": { "timezone": "Asia/Shanghai", "boundary": "04:00" },
+        "fingerprint_hex": "7b1fc2c3d2cd3cb48016b76625a0da4cf122bb4f33677cff325325f0832bb7ad"
+      }
+    ],
+    "retention_policy": [
+      {
+        "data_type_code": "SYNTHETIC_RUNTIME",
+        "data_class": "T0_TRANSIENT",
+        "purpose_code": "E006_TEST",
+        "anchor_code": "CREATED_AT",
+        "max_duration_iso8601": "P7D",
+        "terminal_action": "DELETE",
+        "backup_duration_iso8601": "P0D",
+        "fingerprint_hex": "e9497949bddfc33ad20b6a4a49e5992515e62a0b56f54c3ee2f29191ea5f1c53"
+      }
+    ]
+  }
+}

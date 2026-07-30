@@ -382,6 +382,9 @@ function checkExports(input) {
     }
   }
   for (const file of project.files) {
+    if (/(^|\/)db\/generated\/prisma\//u.test(file.path)) {
+      continue;
+    }
     if (/\bexport\s*\*\s*from\b/u.test(file.content)) {
       errors.push(
         diagnostic(
@@ -463,6 +466,9 @@ function checkModuleGraph(input) {
   const knownFiles = new Set(project.files.map((file) => file.path));
   const sourceGraph = new Map();
   for (const file of project.files) {
+    if (/(^|\/)db\/generated\/prisma\//u.test(file.path)) {
+      continue;
+    }
     const edges = new Set();
     for (const specifier of importsFor(file)) {
       if (specifier.startsWith(".")) {
@@ -723,14 +729,38 @@ function checkProvider(input) {
   return errors;
 }
 
+function isApplicationStartup(path) {
+  return (
+    /^apps\/[^/]+\/src\/(?:main|bootstrap)(?:\/|\.)/u.test(path) ||
+    /^apps\/worker\/src\/entrypoints\/(?:interactive|background|restricted)\.[^.]+$/u.test(
+      path,
+    )
+  );
+}
+
 function checkRestricted(input) {
   const project = normalizeProject(input);
   const errors = [];
   for (const file of project.files) {
     for (const specifier of importsFor(file)) {
       if (
+        specifier.includes("/api-restricted") &&
+        !file.path.includes("/entrypoints/restricted.") &&
+        !file.path.startsWith("packages/server-adapters/src/db/") &&
+        !file.path.startsWith("tests/")
+      ) {
+        errors.push(
+          diagnostic(
+            "BOUNDARY_RESTRICTED_API_LOCATION",
+            file.path,
+            `restricted API capability cannot be imported by ${file.path}`,
+          ),
+        );
+      }
+      if (
         specifier.includes("/worker-restricted") &&
         !file.path.includes("/entrypoints/restricted.") &&
+        !file.path.startsWith("packages/server-adapters/src/db/") &&
         !file.path.startsWith("tests/")
       ) {
         errors.push(
@@ -744,13 +774,19 @@ function checkRestricted(input) {
       if (
         specifier.includes("/migration") &&
         !file.path.includes("/entrypoints/migration.") &&
+        !file.path.includes("/entrypoints/entrypoints.test.") &&
+        !file.path.startsWith("packages/server-adapters/src/db/") &&
         !file.path.startsWith("tests/database/")
       ) {
         errors.push(
           diagnostic(
-            "BOUNDARY_MIGRATION_LOCATION",
+            isApplicationStartup(file.path)
+              ? "BOUNDARY_MIGRATION_STARTUP"
+              : "BOUNDARY_MIGRATION_LOCATION",
             file.path,
-            `migration capability cannot be imported by ${file.path}`,
+            isApplicationStartup(file.path)
+              ? `application startup cannot import migration capability ${specifier}`
+              : `migration capability cannot be imported by ${file.path}`,
           ),
         );
       }
@@ -789,7 +825,26 @@ function checkPrisma(input) {
   const project = normalizeProject(input);
   const errors = [];
   for (const file of project.files) {
+    const isGeneratedPrisma = file.path.startsWith(
+      "packages/server-adapters/src/db/generated/prisma/",
+    );
+    const isPublicAdapterSurface =
+      /^packages\/server-adapters\/src\/(api(?:-restricted)?|worker-[^/]+|migration|testing)\//u.test(
+        file.path,
+      );
     for (const specifier of importsFor(file)) {
+      const importsGeneratedPrisma =
+        specifier.includes("/db/generated/prisma/") ||
+        (isPublicAdapterSurface && specifier.includes("generated/prisma"));
+      if (importsGeneratedPrisma && !isGeneratedPrisma) {
+        errors.push(
+          diagnostic(
+            "BOUNDARY_PRISMA_PUBLIC_CONTRACT",
+            file.path,
+            `${specifier} would expose generated Prisma types outside the private runtime`,
+          ),
+        );
+      }
       if (!prismaPackages.has(packageNameFromSpecifier(specifier))) {
         continue;
       }
@@ -816,8 +871,10 @@ function checkPrisma(input) {
 function checkGenerated(input) {
   const project = normalizeProject(input);
   const errors = [];
-  for (const file of project.files.filter((candidate) =>
-    /(^|\/)generated\//u.test(candidate.path),
+  for (const file of project.files.filter(
+    (candidate) =>
+      /(^|\/)generated\//u.test(candidate.path) &&
+      !/(^|\/)db\/generated\/prisma\//u.test(candidate.path),
   )) {
     const header = file.content.split(/\r?\n/u).slice(0, 5).join("\n");
     if (!/@generated\b/u.test(header)) {

@@ -347,8 +347,8 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-006 是唯一 Ready
-当前目标：建立 PostgreSQL 18、Prisma 7 与数据库权限基线
+状态：E-006 是唯一 In Review
+当前目标：审核 PostgreSQL 18、Prisma 7 与数据库权限基线
 当前任务：E-006 PostgreSQL 与 Prisma
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/44
 ```
@@ -364,13 +364,13 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 当前任务范围：
 
 - [E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)
-  是唯一 Ready；
-- 任务开工时从最新 `main` 创建独立分支，并先完成权威文档与数据库工具链
-  GO/NO-GO 检查；
+  是唯一 In Review；
+- PostgreSQL 18 / Prisma 7、versioned migration、最小权限角色、closed adapters、
+  合成 seed、drift/checksum 与真实数据库证据已提交审核；
 - 不连接生产数据库、不创建真实备份服务、不实现全部业务 use case；
 - E-015 已完成 P0/P1 权威来源路由、任务 Profile、依赖阻断和安静验证；
 - D-001～D-005 已进入 Phase 2 Backlog，全部保持 Planned；
-- 当前尚未开始 E-006 实现，也不开始正式视觉设计。
+- 不提升下一任务为 Ready，等待 E-006 Draft PR 审核。
 
 [Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。
 E-001～E-005 与 E-008 已合并并进入 Done；E-005 随
@@ -379,7 +379,7 @@ E-001～E-005 与 E-008 已合并并进入 Done；E-005 随
 [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) 已随
 [PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106) squash 合并，
 merge commit 为 `200e27de889a5cc47571e27d783aa570a381f889`，Issue #105
-已关闭，E-006 恢复为唯一 Ready。
+已关闭，E-006 进入 In Review，且未提升下一任务。
 [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
 [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
