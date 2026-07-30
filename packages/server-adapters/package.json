@@ -3,15 +3,57 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": {},
+  "exports": {
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "import": "./dist/api/index.js"
+    },
+    "./api-restricted": {
+      "types": "./dist/api-restricted/index.d.ts",
+      "import": "./dist/api-restricted/index.js"
+    },
+    "./worker-interactive": {
+      "types": "./dist/worker-interactive/index.d.ts",
+      "import": "./dist/worker-interactive/index.js"
+    },
+    "./worker-background": {
+      "types": "./dist/worker-background/index.d.ts",
+      "import": "./dist/worker-background/index.js"
+    },
+    "./worker-restricted": {
+      "types": "./dist/worker-restricted/index.d.ts",
+      "import": "./dist/worker-restricted/index.js"
+    },
+    "./migration": {
+      "types": "./dist/migration/index.d.ts",
+      "import": "./dist/migration/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js"
+    }
+  },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "format:check": "prettier --check README.md package.json tsconfig*.json src",
+    "lint": "eslint --max-warnings=0 src",
+    "prebuild": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist', { force: true, recursive: true }))\"",
+    "pretest": "pnpm run build",
+    "test": "vitest run src",
     "typecheck": "node ../../tooling/typecheck-workspace.mjs"
   },
   "dailyEnergy": {
     "kind": "package",
     "runtime": "server-adapter"
   },
+  "dependencies": {
+    "@prisma/adapter-pg": "catalog:",
+    "@prisma/client": "catalog:",
+    "pg": "catalog:"
+  },
   "devDependencies": {
-    "@daily-energy/typescript-config": "workspace:*"
+    "@daily-energy/typescript-config": "workspace:*",
+    "@types/pg": "catalog:",
+    "vitest": "catalog:"
   }
 }

@@ -104,6 +104,9 @@ pathRules:
       - pnpm-workspace.yaml
       - turbo.json
       - eslint.config.mjs
+      - prettier.config.mjs
+      - .prettierignore
+      - prisma.config.ts
       - tsconfig*.json
     escalation: full
     impactProfile: code

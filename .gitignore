@@ -6,9 +6,11 @@
 .pnpm-store/
 .turbo/
 .artifacts/
+.claude/
 **/coverage/
 **/dist/
 **/dist-fixtures/
+/generated/prisma/
 **/node_modules/
 **/.next/
 **/playwright-report/

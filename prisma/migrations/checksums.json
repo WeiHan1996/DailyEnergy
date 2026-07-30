@@ -1,0 +1,9 @@
+{
+  "algorithm": "sha256",
+  "migrations": [
+    {
+      "name": "20260730000000_initial_application_schema",
+      "sha256": "a6f326cad3b0591dc858156aeb5a40eeb958117aeb63561c4661a44b1334cb9e"
+    }
+  ]
+}
