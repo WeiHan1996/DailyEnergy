@@ -1,115 +1,93 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-07-29
+- **最后更新**：2026-07-30
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：E-015 — 建立 Agent 上下文路由与分级验证入口
-- **任务状态**：In Review
-- **当前分支**：`agent/e-015-agent-workflow`
-- **当前 Issue**：[E-015 Issue #105](https://github.com/WeiHan1996/DailyEnergy/issues/105)
-- **当前 PR**：[Draft PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106)
-- **基线提交**：`38676cad32ba16d242050570e943b812c0ae6018`
-- **Gate 结论**：`READY_FOR_REVIEW`
+- **当前任务**：E-006 — PostgreSQL 与 Prisma
+- **任务状态**：Ready
+- **任务分支**：尚未创建；开工时从最新 `main` 创建
+- **当前 Issue**：[E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)
+- **当前 PR**：无
+- **基线提交**：`200e27de889a5cc47571e27d783aa570a381f889`
+- **Gate 结论**：`READY_TO_START`
 
 ## 1. 当前目标
 
-实现已获用户确认的 Agent Token 优化 P0/P1：
+把已接受的领域模型和数据库草案落成可迁移、可测试且按运行 profile 最小授权的
+PostgreSQL 18 / Prisma 7 基线。
 
 ```text
-权威来源路由
-  → 任务类型与影响范围
-  → Requirement-to-Proof Matrix
-  → changed / task / full 分级验证
-  → 有界、脱敏的结果摘要
+Accepted 领域与数据库合同
+  → versioned migration
+  → PostgreSQL 约束与最小权限角色
+  → server-adapters DB factory
+  → clean / upgrade / drift / transaction 真实数据库证据
 ```
 
-摘要只负责路由，相关权威原文和原始设计证据仍必须实际读取。无法确定影响
-范围时必须扩大读取与验证，不能为了减少 Token 静默降低实现或审核质量。
+E-006 当前只进入 Ready，尚未创建任务分支或开始实现。开工必须先读取 Issue #44
+和 `pnpm agent:prepare E-006` 返回的全部 required sources，并完成 GO/NO-GO。
 
 ## 2. 状态变更影响
 
-- 用户明确要求先实施 E-015，因此 E-006 暂时从唯一 Ready 调整为 Planned；
-- E-015 是唯一 In Review，完成审核与合并后 E-006 恢复为唯一 Ready；
-- [PR #103](https://github.com/WeiHan1996/DailyEnergy/pull/103) 已合并，
-  最新 `main` 为 `38676cad32ba16d242050570e943b812c0ae6018`；
+- [PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106) 已 squash
+  合并，E-015 进入 Done，Issue #105 已关闭；
+- 最新 `main` 为 `200e27de889a5cc47571e27d783aa570a381f889`；
+- E-006 恢复为唯一 Ready；其它 Phase 1 工程任务继续保持 Planned；
 - D-001～D-005 继续保持 Planned，不创建 Figma、Design Tokens 或业务页面。
 
 ## 3. 范围
 
-- 更新 `AGENTS.md`，允许通过索引路由相关权威原文；
-- 建立 `docs/agent/PROJECT_CONTEXT.md`、正式工作流规范和版本化策略；
-- 实现只读、默认快速的 `pnpm agent:prepare <TASK_ID>`；
-- 实现统一的
-  `pnpm agent:validate --mode=changed|task|full --profile=<PROFILE>`；
-- 支持 `code`、`design`、`hybrid`、`docs`、`research`、`security`；
-- 建立上下文冲突、D 系列依赖阻断、路径升级和输出脱敏 fixtures；
-- 把 E-015 Gate 接入现有全仓 `pnpm run validate`。
+- 完成单一 application schema、Prisma Schema 与首个 versioned migration；
+- 实现 S-19 表、枚举、索引、唯一约束、revision/epoch/owner/delete guards
+  和受审 SQL；
+- 创建 api、interactive、background、restricted、migration、test 的最小
+  数据库角色与 grants；
+- 提供 server-adapters DB factory、合成 seed、migration checksum/drift 与
+  Testcontainers harness；
+- 用真实 PostgreSQL 18 验证 SQL-001～020、TX-01～09、权限和迁移路径。
 
 ## 4. 不做
 
-- 不实现 P2 validation receipt、有效输入集哈希或日志 artifact 流水线；
-- 不创建 GitHub Actions workflow、required checks、CI lane 或生产监控；
-- 不建立完整 Source-ID registry、Testcontainers、Dev Container 或 remote cache；
-- 不实现完整 Figma 自动化、视觉回归平台或 Design Token 生成；
-- 不启动 E-006、D-001 或其他下游任务；
-- 不修改产品定位、业务 Schema、数据库、API 或运行时 capability。
+- 不连接或修改生产数据库；
+- 不创建真实备份服务或生产部署；
+- 不实现全部业务 use case；
+- 不启动 E-007、E-009、E-010、D-001 或其它下游任务；
+- 不放宽 Accepted Schema、API、隐私、Safety、删除、幂等、事务或 profile
+  capability 边界。
 
 ## 5. 验收与证据
 
-- `agent:prepare` 默认只读、无远端调用、无文件修改且输出有界；
-- `--remote` 和 `--deep` 必须显式启用；
-- Task Packet/PROJECT_CONTEXT 不成为新权威源；
-- `changed` 模式对未知、高风险、tooling/config 变化保守升级 full；
-- D-004/D-005 未完成时，对相应 C 系列页面任务返回
-  `DEPENDENCY_BLOCKED`；
-- design/hybrid Profile 显式报告 Figma、Frame、人工和用户决定证据；
-- 成功验证只输出摘要，失败只输出脱敏的根因附近内容；
-- fixtures、format、lint、typecheck、test、build 和完整 validate 全部通过。
+- SQL-001～020、TX-01～09 与关键唯一/外键/check/grant 场景在真实
+  PostgreSQL 18 通过；
+- production 禁止 `db push` 和应用启动自动 migration；migration 只有一次性入口；
+- Prisma row 不穿透 public contract，普通 profile 无 restricted/migration 能力；
+- migration 支持 clean install、upgrade、drift 检测与 rollback/roll-forward 证据；
+- 删除、恢复 ledger hook 与 migration checksum 负向测试通过；
+- 完成实现后运行当前策略要求的 full validation，并提交聚焦 Draft PR。
 
 ## 6. 当前阻塞与决策
 
 - **仓库/代码阻塞**：无；
-- **外部依赖**：无，不需要真实账号、密钥、Figma 或生产资源；
-- **范围决定**：本任务只实施 P0/P1，P2～P4 保持后续；
-- **并行规则**：E-015 是唯一 In Review；
-- **下一动作**：等待用户审核 Draft PR #106；不自动标记 Ready 或合并；
-- **接受后的下一任务**：E-006 — PostgreSQL 与 Prisma。
+- **前置依赖**：E-001、E-002、E-008 已完成；
+- **外部依赖**：开工时核对本地容器运行能力；不得使用真实账号、密钥或生产数据；
+- **并行规则**：E-006 是唯一 Ready，尚未 In Progress；
+- **下一动作**：收到开工指令后，从最新 `main` 创建 E-006 分支，运行
+  `pnpm agent:prepare E-006 --remote --deep` 并完成 GO/NO-GO；
+- **下一任务**：E-006 完成前不提升其它任务为 Ready。
 
 ## 7. 最近交接
 
 - E-005 已随 PR #98 合并，Issue #43 已关闭；
 - D-001～D-005 已随 PR #103 纳入 Phase 2，当前全部 Planned；
-- PR #103 已合并，merge commit 为
-  `38676cad32ba16d242050570e943b812c0ae6018`；
-- 已创建 E-015 Issue #105 并绑定 Phase 1 Milestone；
-- 已从最新 `main` 创建 `agent/e-015-agent-workflow`；
-- 已读取 README、ROADMAP、docs/INDEX、current/backlog、ADR-0006、
-  repository-structure、testing 及相关 deployment/observability 边界；
-- GO/NO-GO 结论为 `GO_TO_IMPLEMENT`；
-- 已建立非权威 `PROJECT_CONTEXT`、版本化 authority index、validation policy
-  与 Accepted Agent 工作流规范；
-- 已实现默认只读本地的 `agent:prepare`，显式 `--remote` / `--deep` 可核对
-  GitHub Issue、远端 main、Node、pnpm、依赖与登录状态；
-- 已实现 `agent:validate` 的 changed/task/full 与六类 Profile，禁止显式 Profile
-  降级，并对上下文冲突、D 系列依赖和人工/外部证据 fail closed；
-- Draft PR 首轮审核提出的 4 个阻塞项与 2 个 P1 缺口均已确认并修复：
-  topic source 会按变更路径合并且保留触发元数据，任务/路径/显式 Profile 取安全
-  组合，dry-run 与零变更不再报告 PASS，Git 作用域读取失败会阻断，任务状态冲突
-  保留来源并阻断，未知任务不再落入通配 docs Profile；
-- `--remote` 在 In Review 状态会继续核对 PR 是否 OPEN，以及 PR head
-  branch/commit 是否与本地任务分支一致；失败输出同时保留脱敏的根因邻域和尾部；
-- 为遵循 Accepted testing 规范，在 E-010 Source-ID dependency map 完成前，
-  生产代码、测试、配置、tooling 和 Accepted 规范变化均保守升级 full；
-- 已通过 41 条版本化 Agent workflow cases 与 5 条 CLI cases，覆盖只读准备、
-  stale main、状态来源冲突、D-004/D-005 阻断、topic source、Profile 组合、
-  normal/no-origin/detached/non-Git/读取失败、dry-run/零变更、根因邻域与脱敏；
-- `agent:prepare E-015 --remote --deep` 在可访问系统凭据的环境中全部 PASS；
-- 审核修复后的最终实现已通过完整 `pnpm run validate`：format、lint、typecheck、test、
-  Playwright、bundle/contract/architecture Gate 与 build 全部 PASS；
-- 首次沙箱 run 因禁止监听 `127.0.0.1:3210` 以 `EPERM` 被环境阻断；在受控
-  本地端口环境重跑同一完整 Gate 后 PASS，未放宽任何检查；
-- 已创建 [Draft PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106)，
-  标题为 `[E-015] 建立 Agent 上下文路由与分级验证入口`，包含 `Closes #105`；
-- Draft PR 与状态更新后，`agent:validate --mode=changed` 按策略自动升级 full，
-  在 39.2 秒内 PASS，成功输出仅保留一行摘要和命中规则；
-- 当前等待用户审核；不自动合并、不关闭 Issue、不启动 E-006。
+- E-015 已随 [PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106)
+  squash 合并，merge commit 为
+  `200e27de889a5cc47571e27d783aa570a381f889`，Issue #105 已关闭；
+- E-015 最终 head `8806726e4b981275bd8500f966210e49725be51d` 已通过
+  `pnpm agent:validate --mode=full --task=E-015`；
+- 最终验证覆盖 format、lint、typecheck、41 条 Agent workflow cases、5 条
+  workflow CLI cases、3 条敏感字段直接 canary、1 条最终入口 CLI canary、
+  Playwright、bundle/contract/architecture Gate 与 build；
+- PR #106 已补齐最外层诊断脱敏，覆盖 API/access key、连接串、Prompt、用户正文、
+  provider/request/response body、带凭据 URL、Bearer 与私钥；
+- 当前控制文件将 E-015 设为 Done、E-006 设为唯一 Ready；
+- 尚未创建 E-006 实现分支、运行数据库容器或修改 Prisma/migration。
