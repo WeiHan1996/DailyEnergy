@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-07-30
+- **最后更新**：2026-07-31
 - **当前阶段**：Phase 1 — 工程基础
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -180,7 +180,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted    | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复                                                        | architecture、repository-structure、testing、privacy          |
 | [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                                      | metrics、Gateway、privacy、incident、architecture、deployment |
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                          | database、testing、deployment、ADR-0005、Issue #44            |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；其中 E-006 为唯一 In Review，D-001～D-005 均为 Planned | Accepted Phase 0B specs、D 系列项目控制、E-006                |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；其中 E-007 为唯一 Ready，D-001～D-005 均为 Planned | Accepted Phase 0B specs、D 系列项目控制、E-007                |
 
 ### 7.7 Phase Gate
 
@@ -245,22 +245,22 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-005、E-008 与 E-015 已完成，E-006 是 Phase 1 唯一 In Review 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-006、E-008 与 E-015 已完成，E-007 是 Phase 1 唯一 Ready 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)；
+6. [E-007 Issue #45](https://github.com/WeiHan1996/DailyEnergy/issues/45)；
 7. `docs/agent/PROJECT_CONTEXT.md`、Agent 工作流规范与
-   `pnpm agent:prepare E-006` 返回的全部 required sources；
-8. [领域模型](./data/domain-model.md)、[数据库规格](./technical/database.md)
-   与 [Prisma Schema](../prisma/schema.prisma)；
-9. ADR-0005、[测试策略](./technical/testing.md)与
+   `pnpm agent:prepare E-007 --remote --deep` 返回的全部 required sources；
+8. [系统架构](./technical/architecture.md)与
+   [仓库结构和模块边界](./technical/repository-structure.md)；
+9. [测试策略](./technical/testing.md)与
    [部署、配置和回滚](./technical/deployment.md)；
-10. [仓库结构与模块边界](./technical/repository-structure.md)、ADR-0006、
-    现有根工具链、fixtures 与附近数据库代码；
+10. [可观测性和成本监控](./technical/observability.md)、ADR-0006、现有
+    Worker/queue/database adapters、fixtures 与附近测试；
 11. tasks/backlog.md（仅在需要重排优先级时）。
 
 E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done；E-008 已随
@@ -270,7 +270,10 @@ PR #97 squash 合并并关闭 Issue #46。E-005 已随
 [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) 已随
 [PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106) squash 合并，
 merge commit 为 `200e27de889a5cc47571e27d783aa570a381f889`，Issue #105
-已关闭；E-006 进入 In Review，且未提升下一任务。
+已关闭。[E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44) 已随
+[PR #108](https://github.com/WeiHan1996/DailyEnergy/pull/108) squash 合并，
+merge commit 为 `e9f02436ff36e9acaf1d34acb353c678453d985e`，Issue #44
+已关闭；E-007 成为唯一 Ready。
 [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
 [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
@@ -282,4 +285,4 @@ D-005 是 C-012、C-013、C-014 的直接前置。
 Source IDs，并按 E-010 前的 `NA_WITH_REASON` 规则保留可执行证据。
 CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production
 Gate 未被自动解除；E-015 只实现了 P0/P1，没有提前交付 E-010、E-011、
-E-013 或 D 系列能力。E-006 当前是唯一 In Review，等待 Draft PR 人工审核。
+E-013 或 D 系列能力。E-007 当前是唯一 Ready，但尚未开始实现。
