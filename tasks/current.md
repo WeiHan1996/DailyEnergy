@@ -7,7 +7,7 @@
 - **任务状态**：In Review
 - **任务分支**：`agent/e-006-postgres-prisma`
 - **当前 Issue**：[E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)
-- **当前 PR**：Draft PR（创建后补充链接）
+- **当前 PR**：[Draft PR #108](https://github.com/WeiHan1996/DailyEnergy/pull/108)
 - **基线提交**：`d3a86b1705a8574a58787f96b20518ea9b4fdccf`
 - **Gate 结论**：`READY_FOR_REVIEW`
 
