@@ -2,10 +2,14 @@
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import {
+  assertMigrationLogin,
   assertMigrationChecksumManifest,
+  assumeDatabaseOwner,
+  DATABASE_OWNER_ROLE,
   MIGRATION_CHECKSUM_MANIFEST,
   withClient,
 } from "./lib.mjs";
+import { redactSensitiveDiagnosticOutput } from "../lib/sensitive-redaction.mjs";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -22,6 +26,8 @@ const expectedMigrations = await assertMigrationChecksumManifest({
 });
 
 await withClient(connectionString, async (client) => {
+  await assertMigrationLogin(client);
+  await assumeDatabaseOwner(client);
   const acquired = await client.query(
     "SELECT pg_try_advisory_lock($1) AS acquired",
     [advisoryKey],
@@ -30,23 +36,23 @@ await withClient(connectionString, async (client) => {
     throw new Error("DB_MIGRATION_LOCKED");
   }
   try {
-    await client.query("SET lock_timeout = '5s'");
-    await client.query("SET statement_timeout = '5min'");
-    await client.query("CREATE SCHEMA IF NOT EXISTS daily_energy");
     const prismaUrl = new URL(connectionString);
     prismaUrl.searchParams.set("schema", "daily_energy");
+    prismaUrl.searchParams.set(
+      "options",
+      `-c lock_timeout=5s -c statement_timeout=5min -c role=${DATABASE_OWNER_ROLE}`,
+    );
     const result = spawnSync(prismaBin, ["migrate", "deploy"], {
       cwd: path.resolve("."),
-      env: { ...process.env, DATABASE_URL: prismaUrl.toString() },
+      env: {
+        ...process.env,
+        DATABASE_URL: prismaUrl.toString(),
+        PGOPTIONS: `-c lock_timeout=5s -c statement_timeout=5min -c role=${DATABASE_OWNER_ROLE}`,
+      },
       encoding: "utf8",
     });
     if (result.status !== 0) {
-      process.stderr.write(
-        result.stderr.replace(
-          /postgresql:\/\/[^\s]+/gu,
-          "[REDACTED_DATABASE_URL]",
-        ),
-      );
+      process.stderr.write(redactSensitiveDiagnosticOutput(result.stderr));
       throw new Error("DB_MIGRATION_DEPLOY_FAILED");
     }
     const applied = await client.query(

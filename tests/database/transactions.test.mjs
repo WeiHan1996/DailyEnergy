@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
 import {
+  bootstrapTestDatabase,
   loadPg,
   loadTestcontainers,
   POSTGRES_IMAGE,
@@ -177,8 +178,9 @@ test(
     const container = await new PostgreSqlContainer(POSTGRES_IMAGE).start();
     const adminUrl = container.getConnectionUri();
     try {
+      const loginUrls = await bootstrapTestDatabase(adminUrl);
       await runNode("tooling/database/migrate.mjs", {
-        DATABASE_URL: adminUrl,
+        DATABASE_URL: loginUrls.migration,
         PRISMA_BIN:
           "/Users/chenbin/SelfProject/DailyEnergy/node_modules/.bin/prisma",
       });
@@ -285,16 +287,19 @@ test(
                VALUES ($1,$2,$3,'product-date-v1',1,'GOOD','HIGH','GOOD',$4,$4,$5,'retention-policy-v1',$4)`,
                 [checkinId, accountId, productDate, ts, id()],
               );
-              const loserInsert = loser.query(
-                `INSERT INTO app_morning_checkin
+              const loserRejected = assert.rejects(
+                loser.query(
+                  `INSERT INTO app_morning_checkin
                 (id,"accountId","productDate","productDatePolicyVersion",revision,mood,energy,sleep,"firstSubmittedAt",
                  "updatedAt","sourceCommandRef","retentionPolicyVersion","retentionAnchorAt")
                VALUES ($1,$2,$3,'product-date-v1',1,'LOW','LOW','LOW',$4,$4,$5,'retention-policy-v1',$4)`,
-                [id(), accountId, productDate, ts, id()],
+                  [id(), accountId, productDate, ts, id()],
+                ),
+                /unique constraint/u,
               );
               await waitUntilBlocked(admin, "tx02-loser");
               await winner.query("COMMIT");
-              await assert.rejects(loserInsert, /unique constraint/u);
+              await loserRejected;
               await loser.query("ROLLBACK");
               assert.equal(
                 await count(
@@ -428,21 +433,24 @@ test(
                 `INSERT INTO runtime_outbox_event (id,"aggregateType","aggregateRef","aggregateRevision","eventType","eventVersion","idempotencyKey","allowlistedPayload","guardEpochs","availableAt","retentionPolicyVersion","retentionAnchorAt","expiresAt") VALUES ($1,'DailyResult',$2,1,'DailyResultPublished','v1',$3,'{}','{}',$4,'retention-policy-v1',$4,$5)`,
                 [id(), resultId, hex("28"), ts, later],
               );
-              const loserInsert = loser.query(
-                `INSERT INTO app_published_daily_result (id,"accountId","generationIntentId","inputSnapshotId","productDate","resultVersion","schemaVersion","generatedAt","ruleFactsPayload","expressionCorePayload","provenancePayload","validationReceipt","resultFingerprint","retentionPolicyVersion","retentionAnchorAt") VALUES ($1,$2,$3,$4,$5,'result-v1','schema-v1',$6,'{}','{}','{}','{}',$7,'retention-policy-v1',$6)`,
-                [
-                  id(),
-                  accountId,
-                  base.intentId,
-                  base.snapshotId,
-                  productDate,
-                  ts,
-                  hex("29"),
-                ],
+              const loserRejected = assert.rejects(
+                loser.query(
+                  `INSERT INTO app_published_daily_result (id,"accountId","generationIntentId","inputSnapshotId","productDate","resultVersion","schemaVersion","generatedAt","ruleFactsPayload","expressionCorePayload","provenancePayload","validationReceipt","resultFingerprint","retentionPolicyVersion","retentionAnchorAt") VALUES ($1,$2,$3,$4,$5,'result-v1','schema-v1',$6,'{}','{}','{}','{}',$7,'retention-policy-v1',$6)`,
+                  [
+                    id(),
+                    accountId,
+                    base.intentId,
+                    base.snapshotId,
+                    productDate,
+                    ts,
+                    hex("29"),
+                  ],
+                ),
+                /unique constraint/u,
               );
               await waitUntilBlocked(admin, "tx03-loser");
               await winner.query("COMMIT");
-              await assert.rejects(loserInsert, /unique constraint/u);
+              await loserRejected;
               await loser.query("ROLLBACK");
               assert.equal(
                 await count(
@@ -674,13 +682,16 @@ test(
                 `INSERT INTO app_relationship_encounter_link (id,"cycleId","sourceLightId","productDate","sourceValidityRevision","sourceEventId","retentionPolicyVersion","retentionAnchorAt") VALUES ($1,$2,$3,'2026-08-04',1,$4,'retention-policy-v1',$5)`,
                 [id(), cycleId, lightId, eventId, ts],
               );
-              const replay = worker2.query(
-                `INSERT INTO runtime_inbox_receipt (id,"consumerCode","eventId","eventFingerprint","processedAt","outcomeCode","retentionPolicyVersion","retentionAnchorAt","expiresAt") VALUES ($1,'relationship',$2,$3,$4,'LINKED','retention-policy-v1',$4,$5)`,
-                [id(), eventId, hex("43"), ts, later],
+              const replayRejected = assert.rejects(
+                worker2.query(
+                  `INSERT INTO runtime_inbox_receipt (id,"consumerCode","eventId","eventFingerprint","processedAt","outcomeCode","retentionPolicyVersion","retentionAnchorAt","expiresAt") VALUES ($1,'relationship',$2,$3,$4,'LINKED','retention-policy-v1',$4,$5)`,
+                  [id(), eventId, hex("43"), ts, later],
+                ),
+                /unique constraint/u,
               );
               await waitUntilBlocked(admin, "tx06-worker2");
               await worker1.query("COMMIT");
-              await assert.rejects(replay, /unique constraint/u);
+              await replayRejected;
               await worker2.query("ROLLBACK");
             } finally {
               await worker1.end();
@@ -903,13 +914,16 @@ test(
                 `INSERT INTO runtime_outbox_event (id,"aggregateType","aggregateRef","aggregateRevision","eventType","eventVersion","idempotencyKey","allowlistedPayload","guardEpochs","availableAt","retentionPolicyVersion","retentionAnchorAt","expiresAt") VALUES ($1,'DataTask',$2,1,'DeletionGuarded','v1',$3,'{}','{"deletion":1}',$4,'retention-policy-v1',$4,$5)`,
                 [id(), taskId, hex("71"), ts, later],
               );
-              const duplicate = worker2.query(
-                `INSERT INTO restricted_data_task (id,"accountId",kind,scope,"targetType","targetKey","activeSlot",state,revision,"confirmationVersion","requestedAt","guardedAt","failureScopeCodes","retentionPolicyVersion","retentionAnchorAt") VALUES ($1,$2,'DELETE','DAY','PRODUCT_DATE','2026-08-06',true,'QUEUED',1,'confirm-v1',$3,$3,ARRAY[]::text[],'retention-policy-v1',$3)`,
-                [id(), accountId, ts],
+              const duplicateRejected = assert.rejects(
+                worker2.query(
+                  `INSERT INTO restricted_data_task (id,"accountId",kind,scope,"targetType","targetKey","activeSlot",state,revision,"confirmationVersion","requestedAt","guardedAt","failureScopeCodes","retentionPolicyVersion","retentionAnchorAt") VALUES ($1,$2,'DELETE','DAY','PRODUCT_DATE','2026-08-06',true,'QUEUED',1,'confirm-v1',$3,$3,ARRAY[]::text[],'retention-policy-v1',$3)`,
+                  [id(), accountId, ts],
+                ),
+                /unique constraint/u,
               );
               await waitUntilBlocked(admin, "tx09-worker2");
               await worker1.query("COMMIT");
-              await assert.rejects(duplicate, /unique constraint/u);
+              await duplicateRejected;
               await worker2.query("ROLLBACK");
             } finally {
               await worker1.end();

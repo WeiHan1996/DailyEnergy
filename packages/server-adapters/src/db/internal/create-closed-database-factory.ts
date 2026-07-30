@@ -20,7 +20,13 @@ interface FactoryDefinition<Profile extends DatabaseProfile> {
   readonly defaultConnectionLimit: number;
 }
 
-function databaseUser(connectionString: string): string {
+const ordinaryDatabaseRoles = new Set([
+  "daily_energy_api",
+  "daily_energy_interactive",
+  "daily_energy_background",
+]);
+
+function assertPostgreSqlUrl(connectionString: string): void {
   let url: URL;
   try {
     url = new URL(connectionString);
@@ -30,10 +36,44 @@ function databaseUser(connectionString: string): string {
   if (url.protocol !== "postgres:" && url.protocol !== "postgresql:") {
     throw new Error("DB_CONFIG_INVALID: PostgreSQL connection required");
   }
-  if (!url.username) {
-    throw new Error("DB_CONFIG_INVALID: database role is required");
+}
+
+function roleIdentityMatches(
+  identity: Awaited<
+    ReturnType<PrismaRuntime<PrismaClientLifecycle>["inspectRoleIdentity"]>
+  >,
+  expectedRole: string,
+): boolean {
+  const exactProfile =
+    identity.profileMemberships.length === 1 &&
+    identity.profileMemberships[0] === expectedRole;
+  const unprivilegedLogin =
+    identity.currentUser === identity.sessionUser &&
+    !identity.superuser &&
+    !identity.createDatabase &&
+    !identity.createRole &&
+    !identity.bypassRls;
+  if (!exactProfile || !unprivilegedLogin) {
+    return false;
   }
-  return decodeURIComponent(url.username);
+  if (ordinaryDatabaseRoles.has(expectedRole)) {
+    return (
+      !identity.ownerMember &&
+      !identity.restrictedRead &&
+      !identity.schemaCreate
+    );
+  }
+  if (expectedRole === "daily_energy_migration") {
+    return (
+      identity.ownerMember && !identity.restrictedRead && !identity.schemaCreate
+    );
+  }
+  if (expectedRole === "daily_energy_restricted") {
+    return (
+      !identity.ownerMember && identity.restrictedRead && !identity.schemaCreate
+    );
+  }
+  return !identity.ownerMember && !identity.schemaCreate;
 }
 
 export function createClosedDatabaseFactory<
@@ -48,11 +88,7 @@ export function createClosedDatabaseFactory<
     async connect(
       config: DatabaseFactoryConfig,
     ): Promise<DatabaseConnection<Profile, DatabaseCapability<Profile>>> {
-      if (databaseUser(config.connectionString) !== definition.databaseRole) {
-        throw new Error(
-          `DB_ROLE_MISMATCH: ${definition.profile} requires ${definition.databaseRole}`,
-        );
-      }
+      assertPostgreSqlUrl(config.connectionString);
 
       const adapter = runtime.createAdapter({
         applicationName:
@@ -65,6 +101,18 @@ export function createClosedDatabaseFactory<
       });
       const client = runtime.createClient(adapter);
       await client.$connect();
+
+      try {
+        const identity = await runtime.inspectRoleIdentity(client);
+        if (!roleIdentityMatches(identity, definition.databaseRole)) {
+          throw new Error(
+            `DB_ROLE_MISMATCH: ${definition.profile} requires ${definition.databaseRole}`,
+          );
+        }
+      } catch (error) {
+        await client.$disconnect();
+        throw error;
+      }
 
       let disconnected = false;
       return Object.freeze({

@@ -215,7 +215,11 @@
           "level": "DB",
           "assertions": [
             "SQL-013 accepts valid synthetic data",
-            "SQL-013 rejects invalid synthetic data"
+            "SQL-013 rejects invalid synthetic data",
+            "SQL-013 rejects deleting the only daily personalized fragment",
+            "SQL-013 accepts daily fragment deletion with BLOCKED visibility in the same transaction",
+            "SQL-013 rejects deleting the only weekly personalized fragment",
+            "SQL-013 accepts weekly fragment deletion when the summary is unpublished in the same transaction"
           ]
         }
       ]
@@ -328,7 +332,19 @@
           "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
           "level": "DB",
           "assertions": [
-            "SQL-020 enforces role attributes, ownership, creation, truncation, restricted, and ciphertext matrix"
+            "SQL-020 enforces environment login membership, role attributes, ownership, creation, truncation, restricted, and ciphertext matrix"
+          ]
+        },
+        {
+          "test_id": "T-DB-LIFECYCLE-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "real migration login times out on locked DDL and then rolls forward",
+          "level": "DB",
+          "assertions": [
+            "real migration login alters an existing table through daily_energy_owner",
+            "real Prisma DDL connection enforces the five-second lock timeout",
+            "migration failure output redacts the environment credential",
+            "roll-forward applies the second migration after lock release"
           ]
         }
       ]
@@ -1151,7 +1167,8 @@
           "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
           "level": "DB",
           "assertions": [
-            "post-migration drift checker verifies custom checks, triggers, roles, and no PUBLIC grants"
+            "post-migration drift checker fingerprints columns, enums, constraints, indexes, triggers, functions, owners, ACL, and default privileges",
+            "active constraint, index, function, and grant mutations fail before exact restoration"
           ]
         }
       ]

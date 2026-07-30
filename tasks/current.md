@@ -9,7 +9,7 @@
 - **当前 Issue**：[E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)
 - **当前 PR**：[Draft PR #108](https://github.com/WeiHan1996/DailyEnergy/pull/108)
 - **基线提交**：`d3a86b1705a8574a58787f96b20518ea9b4fdccf`
-- **Gate 结论**：`READY_FOR_REVIEW`
+- **Gate 结论**：`MANUAL_EVIDENCE_REQUIRED`（`automated=PASS`）
 
 ## 1. 当前目标
 
@@ -71,12 +71,15 @@ E-006 已完成文档范围内的实现与自动验证，现进入 Draft PR 人�
 - **外部依赖**：Docker 29.4.0 可用，已固定 PostgreSQL 18.0 bookworm 镜像 digest；
   不得使用真实账号、密钥或生产数据；
 - **并行规则**：E-006 是唯一 In Review；
-- **自动验证**：`pnpm run database:validate`、`pnpm run validate` 已通过；changed、task、
-  full 三种 Agent Gate 均为 `automated=PASS`，security profile 按策略保留
-  `MANUAL_EVIDENCE_REQUIRED`；
+- **自动验证**：审核修订后的 PostgreSQL 18 suite 共 69 tests 全通过；
+  `pnpm agent:validate --mode=full --task=E-006` 已执行内部 `pnpm run validate` 并返回
+  `automated=PASS`；security profile 按策略保留 `MANUAL_EVIDENCE_REQUIRED`；
 - **人工证据**：`threatBoundaryReview` 交由 PR 审核；
   `productionAuthorizationWhenApplicable` 为 N/A（无生产访问、凭据、数据、资源、部署或破坏性操作）；
-- **下一动作**：审核 Draft PR，并决定是否需要修改；
+- **审核修订**：已同意并修复本轮 5 项阻断与 1 项脱敏意见；无不采纳项；PR 继续保持
+  Draft，等待 reviewer 复审 owner/bootstrap、profile login、DDL timeout、catalog drift、
+  SQL-013 与 URL 脱敏证据；
+- **下一动作**：推送审核修订并请求复审 Draft PR #108；
 - **下一任务**：不提升其它任务为 Ready。
 
 ## 7. 最近交接
@@ -96,7 +99,13 @@ E-006 已完成文档范围内的实现与自动验证，现进入 Draft PR 人�
 - 当前控制文件将 E-015 设为 Done、E-006 设为唯一 In Review；
 - E-006 已完成 PostgreSQL 18 / Prisma 7 基线、versioned migration、最小权限角色、
   closed server-adapters、合成 seed、checksum/drift、SQL-001～020、TX-01～09 与恢复顺序证据；
+- PR #108 首轮审核的 5 项阻断与 1 项非阻断意见均确认成立并已修复：新增
+  `daily_energy_owner NOLOGIN` bootstrap/受控 migration 角色链和第二条真实升级 migration；
+  adapter 改为连接后核验环境 login 的唯一 profile 与越权能力；Prisma DDL 连接实际继承
+  `5s` lock timeout / `5min` statement timeout；drift 改为 14 section 语义 catalog
+  fingerprint 并主动篡改 constraint/index/function/grant；daily/weekly fragment 删除增加
+  deferred SQL-013 校验；PostgreSQL 两种 URL scheme 统一全 URL 脱敏；
 - Source-ID manifest 共 101 项：52 项 `COVERED`、49 项 `NA_WITH_REASON`；
-- `pnpm run validate` 与 `pnpm run database:validate` 已通过；Agent changed/task/full
-  自动验证均通过，人工安全审核由 Draft PR 承接；
+- 审核修订后真实 PostgreSQL 18 suite 为 69 passed / 0 failed；full Agent Gate 内部
+  `pnpm run validate` 自动验证通过，人工安全复审继续由 Draft PR 承接；
 - 未连接生产数据库，未使用真实用户数据、真实密钥或生产备份。

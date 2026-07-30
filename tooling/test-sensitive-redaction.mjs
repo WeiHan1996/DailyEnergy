@@ -38,9 +38,23 @@ const cases = [
   },
   {
     id: "credential-bearing-url",
-    input: "database failure at postgres://url-user:url-pass@host.example/db",
-    forbidden: ["url-user", "url-pass"],
-    required: ["postgres://[REDACTED]@host.example/db"],
+    input: [
+      "database failure at postgres://url-user:url-pass@host.example/db?sslmode=require&token=query-secret",
+      "retry postgresql://encoded%40user:encoded%2Fpass@host.example/db?application_name=private",
+    ].join(" "),
+    forbidden: [
+      "url-user",
+      "url-pass",
+      "query-secret",
+      "encoded%40user",
+      "encoded%2Fpass",
+      "application_name=private",
+      "host.example",
+    ],
+    required: [
+      "database failure at [REDACTED_DATABASE_URL]",
+      "retry [REDACTED_DATABASE_URL]",
+    ],
   },
   {
     id: "existing-secret-shapes",

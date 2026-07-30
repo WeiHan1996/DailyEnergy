@@ -12,6 +12,7 @@ const requireFromRoot = createRequire(
 );
 
 export const APPLICATION_SCHEMA = "daily_energy";
+export const DATABASE_OWNER_ROLE = "daily_energy_owner";
 export const MIGRATIONS_DIRECTORY = path.join(
   repositoryRoot,
   "prisma/migrations",
@@ -32,6 +33,10 @@ export const RUNTIME_ROLES = Object.freeze({
   migration: "daily_energy_migration",
   test: "daily_energy_test",
 });
+export const DATABASE_GROUP_ROLES = Object.freeze([
+  DATABASE_OWNER_ROLE,
+  ...Object.values(RUNTIME_ROLES),
+]);
 
 export async function listMigrations(directory = MIGRATIONS_DIRECTORY) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -166,5 +171,53 @@ export async function withClient(connectionString, callback) {
     return await callback(client);
   } finally {
     await client.end();
+  }
+}
+
+export async function assertMigrationLogin(client) {
+  const identity = await client.query(`
+    SELECT
+      session_user AS session_user,
+      current_user AS current_user,
+      pg_has_role(session_user, 'daily_energy_migration', 'MEMBER') AS migration_member,
+      pg_has_role(session_user, 'daily_energy_owner', 'MEMBER') AS owner_member,
+      (
+        SELECT array_agg(role_name ORDER BY role_name)
+        FROM unnest(ARRAY[
+          'daily_energy_api', 'daily_energy_interactive', 'daily_energy_background',
+          'daily_energy_restricted', 'daily_energy_migration', 'daily_energy_test'
+        ]) AS role_name
+        WHERE pg_has_role(session_user, role_name, 'MEMBER')
+      ) AS profile_memberships,
+      role.rolsuper,
+      role.rolcreatedb,
+      role.rolcreaterole,
+      role.rolbypassrls
+    FROM pg_roles role
+    WHERE role.rolname = session_user
+  `);
+  const row = identity.rows[0];
+  if (
+    identity.rowCount !== 1 ||
+    row.current_user !== row.session_user ||
+    !row.migration_member ||
+    !row.owner_member ||
+    JSON.stringify(row.profile_memberships) !==
+      JSON.stringify([RUNTIME_ROLES.migration]) ||
+    row.rolsuper ||
+    row.rolcreatedb ||
+    row.rolcreaterole ||
+    row.rolbypassrls
+  ) {
+    throw new Error("DB_MIGRATION_ROLE_MISMATCH");
+  }
+  return row.session_user;
+}
+
+export async function assumeDatabaseOwner(client) {
+  await client.query(`SET ROLE ${DATABASE_OWNER_ROLE}`);
+  const identity = await client.query("SELECT current_user");
+  if (identity.rows[0]?.current_user !== DATABASE_OWNER_ROLE) {
+    throw new Error("DB_MIGRATION_OWNER_UNAVAILABLE");
   }
 }

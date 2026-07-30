@@ -2,10 +2,16 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import {
+  assertCatalogFingerprint,
+  collectCatalogSnapshot,
+  fingerprintCatalog,
+} from "./catalog-fingerprint.mjs";
+import {
   APPLICATION_SCHEMA,
   assertExactNames,
   expectedSchemaObjects,
   EXPECTED_SQL_IDS,
+  listMigrations,
   RUNTIME_ROLES,
   withClient,
 } from "./lib.mjs";
@@ -14,13 +20,21 @@ const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
   throw new Error("DB_DATABASE_URL_REQUIRED");
 }
-const migrationSql = await readFile(
-  path.resolve(
-    "prisma/migrations/20260730000000_initial_application_schema/migration.sql",
-  ),
-  "utf8",
-);
+const migrationSql = (
+  await Promise.all(
+    (await listMigrations()).map((migration) =>
+      readFile(migration.file, "utf8"),
+    ),
+  )
+).join("\n");
 const expected = expectedSchemaObjects(migrationSql);
+const fingerprintManifestPath = path.resolve(
+  process.env.DB_CATALOG_FINGERPRINT_MANIFEST ??
+    "prisma/migrations/catalog-fingerprint.json",
+);
+const expectedFingerprint = JSON.parse(
+  await readFile(fingerprintManifestPath, "utf8"),
+);
 
 await withClient(connectionString, async (client) => {
   const queries = {
@@ -99,6 +113,11 @@ await withClient(connectionString, async (client) => {
   ) {
     throw new Error("DB_DRIFT_GRANT_MATRIX");
   }
+
+  const actualFingerprint = fingerprintCatalog(
+    await collectCatalogSnapshot(client),
+  );
+  assertCatalogFingerprint(expectedFingerprint, actualFingerprint);
 });
 console.log(
   `DB_DRIFT_OK:tables=${expected.tables.size}:enums=${expected.enums.size}:indexes=${expected.indexes.size}:constraints=${expected.constraints.size}:triggers=${expected.triggers.size}:functions=${expected.functions.size}`,

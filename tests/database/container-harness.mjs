@@ -57,8 +57,16 @@ export async function loadTestcontainers() {
 }
 
 export function runNodeResult(script, environment) {
+  return runCommandResult(
+    process.execPath,
+    [path.resolve(script)],
+    environment,
+  );
+}
+
+export function runCommandResult(command, args, environment) {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [path.resolve(script)], {
+    const child = spawn(command, args, {
       cwd: path.resolve("."),
       env: { ...process.env, ...environment },
       stdio: ["ignore", "pipe", "pipe"],
@@ -83,4 +91,67 @@ export async function runNode(script, environment) {
     throw new Error(`DB_CHILD_FAILED:${script}:${result.code}`);
   }
   process.stdout.write(result.stdout);
+}
+
+export const TEST_DATABASE_PROFILES = Object.freeze({
+  api: {
+    groupRole: "daily_energy_api",
+    loginRole: "daily_energy_api_test_login",
+    password: "synthetic-api",
+  },
+  interactive: {
+    groupRole: "daily_energy_interactive",
+    loginRole: "daily_energy_interactive_test_login",
+    password: "synthetic-interactive",
+  },
+  background: {
+    groupRole: "daily_energy_background",
+    loginRole: "daily_energy_background_test_login",
+    password: "synthetic-background",
+  },
+  restricted: {
+    groupRole: "daily_energy_restricted",
+    loginRole: "daily_energy_restricted_test_login",
+    password: "synthetic-restricted",
+  },
+  migration: {
+    groupRole: "daily_energy_migration",
+    loginRole: "daily_energy_migration_test_login",
+    password: "synthetic-migration",
+  },
+  test: {
+    groupRole: "daily_energy_test",
+    loginRole: "daily_energy_test_login",
+    password: "synthetic-test",
+  },
+});
+
+export async function bootstrapTestDatabase(adminUrl) {
+  await runNode("tooling/database/bootstrap.mjs", {
+    DATABASE_ADMIN_URL: adminUrl,
+  });
+  const { Client } = loadPg();
+  const administrator = new Client({ connectionString: adminUrl });
+  await administrator.connect();
+  try {
+    for (const profile of Object.values(TEST_DATABASE_PROFILES)) {
+      await administrator.query(
+        `CREATE ROLE ${profile.loginRole} LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS PASSWORD '${profile.password}'`,
+      );
+      await administrator.query(
+        `GRANT ${profile.groupRole} TO ${profile.loginRole}`,
+      );
+    }
+  } finally {
+    await administrator.end();
+  }
+
+  return Object.fromEntries(
+    Object.entries(TEST_DATABASE_PROFILES).map(([name, profile]) => {
+      const url = new URL(adminUrl);
+      url.username = profile.loginRole;
+      url.password = profile.password;
+      return [name, url.toString()];
+    }),
+  );
 }

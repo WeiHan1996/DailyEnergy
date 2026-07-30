@@ -24,6 +24,7 @@ const migrationFile = path.join(
   root,
   "prisma/migrations/20260730000000_initial_application_schema/migration.sql",
 );
+const bootstrapFile = path.join(root, "tooling/database/bootstrap.mjs");
 
 test("T-DB-STATIC-001 initial migration covers the accepted structure and SQL IDs", async () => {
   const sql = await readFile(migrationFile, "utf8");
@@ -37,7 +38,12 @@ test("T-DB-STATIC-001 initial migration covers the accepted structure and SQL ID
   assert.ok(objects.constraints.size > 100);
   assert.ok(objects.triggers.size >= 10);
   assert.ok(objects.functions.size >= 5);
-  assert.match(sql, /CREATE SCHEMA IF NOT EXISTS "daily_energy"/u);
+  const bootstrap = await readFile(bootstrapFile, "utf8");
+  assert.match(
+    bootstrap,
+    /CREATE SCHEMA IF NOT EXISTS.*AUTHORIZATION.*DATABASE_OWNER_ROLE/su,
+  );
+  assert.match(bootstrap, /CREATE ROLE.*NOLOGIN.*NOINHERIT/su);
 });
 
 test("T-DB-STATIC-002 db push gate rejects unsafe commands", () => {
@@ -63,8 +69,20 @@ test("T-DB-STATIC-003 migration checksum changes on mutation", async () => {
       "20260730000000_initial_application_schema",
     );
     await mkdir(targetDirectory);
+    const upgradeDirectory = path.join(
+      temporaryRoot,
+      "20260731000000_owner_upgrade_probe",
+    );
+    await mkdir(upgradeDirectory);
     const target = path.join(targetDirectory, "migration.sql");
     await copyFile(migrationFile, target);
+    await copyFile(
+      path.join(
+        root,
+        "prisma/migrations/20260731000000_owner_upgrade_probe/migration.sql",
+      ),
+      path.join(upgradeDirectory, "migration.sql"),
+    );
     const before = await migrationChecksums(temporaryRoot);
     await writeFile(
       target,
@@ -87,8 +105,20 @@ test("T-DB-STATIC-004 checksum manifest gate rejects a changed migration", async
       "20260730000000_initial_application_schema",
     );
     await mkdir(targetDirectory);
+    const upgradeDirectory = path.join(
+      temporaryRoot,
+      "20260731000000_owner_upgrade_probe",
+    );
+    await mkdir(upgradeDirectory);
     const target = path.join(targetDirectory, "migration.sql");
     await copyFile(migrationFile, target);
+    await copyFile(
+      path.join(
+        root,
+        "prisma/migrations/20260731000000_owner_upgrade_probe/migration.sql",
+      ),
+      path.join(upgradeDirectory, "migration.sql"),
+    );
     const manifestPath = path.join(temporaryRoot, "checksums.json");
     await copyFile(
       path.join(root, "prisma/migrations/checksums.json"),

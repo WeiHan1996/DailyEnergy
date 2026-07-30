@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
-import { chmod, copyFile, mkdtemp, writeFile } from "node:fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import {
+  bootstrapTestDatabase,
   loadPg,
   loadTestcontainers,
   POSTGRES_IMAGE,
+  runCommandResult,
   runNode,
   runNodeResult,
+  TEST_DATABASE_PROFILES,
 } from "./container-harness.mjs";
 
 const integrationEnabled = process.env.DATABASE_INTEGRATION === "1";
@@ -19,6 +22,43 @@ const repositoryRoot = path.resolve(
   "../..",
 );
 const prismaBin = path.join(repositoryRoot, "node_modules/.bin/prisma");
+
+async function createInitialMigrationProject(temporaryRoot) {
+  const prismaDirectory = path.join(temporaryRoot, "initial-prisma");
+  const migrationsDirectory = path.join(prismaDirectory, "migrations");
+  const initialDirectory = path.join(
+    migrationsDirectory,
+    "20260730000000_initial_application_schema",
+  );
+  await mkdir(initialDirectory, { recursive: true });
+  await copyFile(
+    path.join(repositoryRoot, "prisma/schema.prisma"),
+    path.join(prismaDirectory, "schema.prisma"),
+  );
+  await copyFile(
+    path.join(repositoryRoot, "prisma/migrations/migration_lock.toml"),
+    path.join(migrationsDirectory, "migration_lock.toml"),
+  );
+  await copyFile(
+    path.join(
+      repositoryRoot,
+      "prisma/migrations/20260730000000_initial_application_schema/migration.sql",
+    ),
+    path.join(initialDirectory, "migration.sql"),
+  );
+  const configPath = path.join(temporaryRoot, "initial-prisma.config.ts");
+  await writeFile(
+    configPath,
+    `import { defineConfig } from ${JSON.stringify(import.meta.resolve("prisma/config"))};
+export default defineConfig({
+  schema: ${JSON.stringify(path.join(prismaDirectory, "schema.prisma"))},
+  migrations: { path: ${JSON.stringify(migrationsDirectory)} },
+  datasource: { url: process.env.DATABASE_URL },
+});
+`,
+  );
+  return configPath;
+}
 
 const metadata = Object.freeze({
   test_id: "T-DB-INTEGRATION-001",
@@ -181,6 +221,60 @@ function weeklyFixture(base) {
          "retentionPolicyVersion", "retentionAnchorAt", "expiresAt")
        VALUES ('${summary}', '${window}', '${intent}', 1, decode('21','hex'), 'schema-v1',
          'summary-v1', '{}', '{}', '{}', now(), 'synthetic-v1', now(), now() + interval '7 days')`,
+    ],
+  };
+}
+
+function dailyFragmentFixture(base) {
+  const publication = dailyPublicationFixture(base);
+  const visibility = id(base + 6);
+  const slot = id(base + 7);
+  const fragment = id(base + 8);
+  return {
+    ...publication,
+    visibility,
+    slot,
+    fragment,
+    statements: [
+      ...publication.statements,
+      resultInsert(
+        publication.result,
+        publication.account,
+        publication.intent,
+        publication.snapshot,
+      ),
+      `INSERT INTO ${schema}.app_published_result_visibility
+        (id,"resultId",state,revision,"sourceFingerprint","updatedAt","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+       VALUES ('${visibility}','${publication.result}','AVAILABLE',1,decode('31','hex'),now(),'synthetic-v1',now(),now()+interval '7 days')`,
+      `INSERT INTO ${schema}.app_result_content_slot
+        (id,"resultId","segmentPath","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+       VALUES ('${slot}','${publication.result}','core','synthetic-v1',now(),now()+interval '7 days')`,
+      `INSERT INTO ${schema}.app_personalized_content_fragment
+        (id,"slotId","payloadCiphertext","payloadKeyVersion","payloadFingerprint","schemaVersion","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+       VALUES ('${fragment}','${slot}',decode('32','hex'),'synthetic-key-v1',decode('33','hex'),'fragment-v1','synthetic-v1',now(),now()+interval '7 days')`,
+    ],
+  };
+}
+
+function weeklyFragmentFixture(base) {
+  const publication = weeklyFixture(base);
+  const slot = id(base + 4);
+  const fragment = id(base + 5);
+  return {
+    ...publication,
+    slot,
+    fragment,
+    statements: [
+      ...publication.statements,
+      `UPDATE ${schema}.app_weekly_window
+          SET "currentSummaryRef"='${publication.summary}', "currentSourceFingerprint"=decode('21','hex')
+        WHERE id='${publication.window}'`,
+      `INSERT INTO ${schema}.app_weekly_content_slot
+        (id,"summaryId","segmentPath","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+       VALUES ('${slot}','${publication.summary}','summary','synthetic-v1',now(),now()+interval '7 days')`,
+      `INSERT INTO ${schema}.app_weekly_personalized_content_fragment
+        (id,"slotId","payloadCiphertext","payloadKeyVersion","payloadFingerprint","schemaVersion","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+       VALUES ('${fragment}','${slot}',decode('34','hex'),'synthetic-key-v1',decode('35','hex'),'fragment-v1','synthetic-v1',now(),now()+interval '7 days')`,
     ],
   };
 }
@@ -390,12 +484,14 @@ const evidence = [
       id: "SQL-013",
       positive: [
         ...good.statements,
+        `UPDATE ${schema}.app_weekly_window SET "currentSummaryRef"='${good.summary}', "currentSourceFingerprint"=decode('21','hex') WHERE id='${good.window}'`,
         `INSERT INTO ${schema}.app_weekly_content_slot
         (id,"summaryId","segmentPath","fallbackPayload","fallbackFingerprint","retentionPolicyVersion","retentionAnchorAt","expiresAt")
         VALUES ('${id(144)}','${good.summary}','summary','{}',decode('01','hex'),'synthetic-v1',now(),now()+interval '7 days')`,
       ],
       negative: [
         ...bad.statements,
+        `UPDATE ${schema}.app_weekly_window SET "currentSummaryRef"='${bad.summary}', "currentSourceFingerprint"=decode('21','hex') WHERE id='${bad.window}'`,
         `INSERT INTO ${schema}.app_weekly_content_slot
         (id,"summaryId","segmentPath","retentionPolicyVersion","retentionAnchorAt","expiresAt")
         VALUES ('${id(154)}','${bad.summary}','summary','synthetic-v1',now(),now()+interval '7 days')`,
@@ -502,17 +598,8 @@ const evidence = [
 ];
 
 async function proveRoleMatrix(admin, adminUrl, Client) {
-  const roles = [
-    "daily_energy_api",
-    "daily_energy_interactive",
-    "daily_energy_background",
-    "daily_energy_restricted",
-    "daily_energy_migration",
-    "daily_energy_test",
-  ];
-  for (const [index, role] of roles.entries()) {
-    await admin.query(`ALTER ROLE ${role} LOGIN PASSWORD 'synthetic-${index}'`);
-  }
+  const profiles = Object.values(TEST_DATABASE_PROFILES);
+  const roles = profiles.map((profile) => profile.groupRole);
 
   const attributes = await admin.query(
     `
@@ -545,88 +632,121 @@ async function proveRoleMatrix(admin, adminUrl, Client) {
            array_agg(DISTINCT c.relowner::regrole::text) AS table_owners
     FROM pg_namespace n JOIN pg_class c ON c.relnamespace=n.oid
     WHERE n.nspname='daily_energy' AND c.relkind IN ('r','p') GROUP BY n.nspowner`);
-  const currentUser = await admin.query("SELECT current_user");
-  const migrationOwner = currentUser.rows[0].current_user;
-  assert.equal(owners.rows[0].schema_owner, migrationOwner);
-  assert.deepEqual(owners.rows[0].table_owners, [migrationOwner]);
+  assert.equal(owners.rows[0].schema_owner, "daily_energy_owner");
+  assert.deepEqual(owners.rows[0].table_owners, ["daily_energy_owner"]);
+
+  for (const profile of profiles) {
+    const url = new URL(adminUrl);
+    url.username = profile.loginRole;
+    url.password = profile.password;
+    const login = new Client({ connectionString: url.toString() });
+    await login.connect();
+    try {
+      const identity = await login.query(`
+        SELECT current_user, session_user,
+               ARRAY(
+                 SELECT role_name
+                 FROM unnest(ARRAY[
+                   'daily_energy_api', 'daily_energy_interactive', 'daily_energy_background',
+                   'daily_energy_restricted', 'daily_energy_migration', 'daily_energy_test'
+                 ]) AS role_name
+                 WHERE pg_has_role(session_user, role_name, 'MEMBER')
+                 ORDER BY role_name
+               ) AS memberships,
+               pg_has_role(session_user, 'daily_energy_owner', 'MEMBER') AS owner_member
+      `);
+      assert.deepEqual(identity.rows[0], {
+        current_user: profile.loginRole,
+        session_user: profile.loginRole,
+        memberships: [profile.groupRole],
+        owner_member: profile.groupRole === "daily_energy_migration",
+      });
+    } finally {
+      await login.end();
+    }
+  }
 
   async function asRole(
-    role,
-    index,
+    profile,
     query,
     rejection = /permission denied|must be owner|42501/u,
   ) {
     const url = new URL(adminUrl);
-    url.username = role;
-    url.password = `synthetic-${index}`;
+    url.username = profile.loginRole;
+    url.password = profile.password;
     const client = new Client({ connectionString: url.toString() });
     await client.connect();
     try {
-      await assert.rejects(client.query(query), rejection, `${role}: ${query}`);
+      await assert.rejects(
+        client.query(query),
+        rejection,
+        `${profile.groupRole}: ${query}`,
+      );
     } finally {
       await client.end();
     }
   }
 
-  for (const [index, role] of roles.entries()) {
-    await asRole(role, index, `CREATE ROLE forbidden_by_${role}`);
-    await asRole(role, index, `CREATE DATABASE forbidden_by_${role}`);
+  for (const profile of profiles) {
+    await asRole(profile, `CREATE ROLE forbidden_by_${profile.groupRole}`);
+    await asRole(profile, `CREATE DATABASE forbidden_by_${profile.groupRole}`);
     await asRole(
-      role,
-      index,
-      `ALTER TABLE ${schema}.app_morning_checkin OWNER TO ${role}`,
+      profile,
+      `ALTER TABLE ${schema}.app_morning_checkin OWNER TO ${profile.groupRole}`,
     );
-    if (role !== "daily_energy_migration") {
+    if (profile.groupRole !== "daily_energy_migration") {
       await asRole(
-        role,
-        index,
-        `CREATE TABLE ${schema}.forbidden_by_${role}(id int)`,
+        profile,
+        `CREATE TABLE ${schema}.forbidden_by_${profile.groupRole}(id int)`,
       );
     }
   }
 
-  for (const [index, role] of roles.entries()) {
-    if (role !== "daily_energy_migration") {
-      await asRole(role, index, `TRUNCATE ${schema}.app_morning_checkin`);
+  for (const profile of profiles) {
+    if (profile.groupRole !== "daily_energy_migration") {
+      await asRole(profile, `TRUNCATE ${schema}.app_morning_checkin`);
     }
   }
 
   const migrationUrl = new URL(adminUrl);
-  migrationUrl.username = "daily_energy_migration";
-  migrationUrl.password = "synthetic-4";
+  migrationUrl.username = TEST_DATABASE_PROFILES.migration.loginRole;
+  migrationUrl.password = TEST_DATABASE_PROFILES.migration.password;
   const migration = new Client({ connectionString: migrationUrl.toString() });
   await migration.connect();
   try {
-    await migration.query(`CREATE TABLE ${schema}.migration_ddl_probe(id int)`);
-    await migration.query(`DROP TABLE ${schema}.migration_ddl_probe`);
+    await migration.query("SET ROLE daily_energy_owner");
+    await migration.query(
+      `ALTER TABLE ${schema}.app_user_account ADD CONSTRAINT migration_owner_probe_ck CHECK (revision >= 1)`,
+    );
+    await migration.query(
+      `ALTER TABLE ${schema}.app_user_account DROP CONSTRAINT migration_owner_probe_ck`,
+    );
   } finally {
     await migration.end();
   }
 
-  for (const [index, role] of roles.entries()) {
+  for (const profile of profiles) {
     if (
       [
         "daily_energy_api",
         "daily_energy_interactive",
         "daily_energy_background",
-      ].includes(role)
+      ].includes(profile.groupRole)
     ) {
       await asRole(
-        role,
-        index,
+        profile,
         `SELECT * FROM ${schema}.restricted_safety_state LIMIT 1`,
       );
     }
   }
   await asRole(
-    "daily_energy_api",
-    0,
+    TEST_DATABASE_PROFILES.api,
     `SELECT * FROM ${schema}.app_user_profile LIMIT 1`,
   );
 
   const apiUrl = new URL(adminUrl);
-  apiUrl.username = "daily_energy_api";
-  apiUrl.password = "synthetic-0";
+  apiUrl.username = TEST_DATABASE_PROFILES.api.loginRole;
+  apiUrl.password = TEST_DATABASE_PROFILES.api.password;
   const api = new Client({ connectionString: apiUrl.toString() });
   await api.connect();
   try {
@@ -636,8 +756,8 @@ async function proveRoleMatrix(admin, adminUrl, Client) {
   }
 
   const restrictedUrl = new URL(adminUrl);
-  restrictedUrl.username = "daily_energy_restricted";
-  restrictedUrl.password = "synthetic-3";
+  restrictedUrl.username = TEST_DATABASE_PROFILES.restricted.loginRole;
+  restrictedUrl.password = TEST_DATABASE_PROFILES.restricted.password;
   const restricted = new Client({ connectionString: restrictedUrl.toString() });
   await restricted.connect();
   try {
@@ -649,8 +769,8 @@ async function proveRoleMatrix(admin, adminUrl, Client) {
   }
 
   const interactiveUrl = new URL(adminUrl);
-  interactiveUrl.username = "daily_energy_interactive";
-  interactiveUrl.password = "synthetic-1";
+  interactiveUrl.username = TEST_DATABASE_PROFILES.interactive.loginRole;
+  interactiveUrl.password = TEST_DATABASE_PROFILES.interactive.password;
   const interactive = new Client({
     connectionString: interactiveUrl.toString(),
   });
@@ -662,8 +782,8 @@ async function proveRoleMatrix(admin, adminUrl, Client) {
   }
 
   const testUrl = new URL(adminUrl);
-  testUrl.username = "daily_energy_test";
-  testUrl.password = "synthetic-5";
+  testUrl.username = TEST_DATABASE_PROFILES.test.loginRole;
+  testUrl.password = TEST_DATABASE_PROFILES.test.password;
   const synthetic = new Client({ connectionString: testUrl.toString() });
   await synthetic.connect();
   try {
@@ -685,10 +805,18 @@ test(
     const container = await new PostgreSqlContainer(POSTGRES_IMAGE).start();
     const adminUrl = container.getConnectionUri();
     try {
-      const environment = { DATABASE_URL: adminUrl, PRISMA_BIN: prismaBin };
-      await runNode("tooling/database/migrate.mjs", environment);
-      await runNode("tooling/database/seed.mjs", environment);
-      await runNode("tooling/database/check-drift.mjs", environment);
+      const loginUrls = await bootstrapTestDatabase(adminUrl);
+      const migrationEnvironment = {
+        DATABASE_URL: loginUrls.migration,
+        PRISMA_BIN: prismaBin,
+      };
+      const adminEnvironment = {
+        DATABASE_URL: adminUrl,
+        PRISMA_BIN: prismaBin,
+      };
+      await runNode("tooling/database/migrate.mjs", migrationEnvironment);
+      await runNode("tooling/database/seed.mjs", adminEnvironment);
+      await runNode("tooling/database/check-drift.mjs", adminEnvironment);
 
       const { Client } = loadPg();
       const admin = new Client({ connectionString: adminUrl });
@@ -708,6 +836,60 @@ test(
             },
           );
         }
+
+        await t.test(
+          "SQL-013 rejects deleting the only daily personalized fragment",
+          async () => {
+            const fixture = dailyFragmentFixture(240);
+            await transaction(
+              admin,
+              [
+                ...fixture.statements,
+                `DELETE FROM ${schema}.app_personalized_content_fragment WHERE id='${fixture.fragment}'`,
+              ],
+              { reject: /SQL-013|23514/u },
+            );
+          },
+        );
+
+        await t.test(
+          "SQL-013 accepts daily fragment deletion with BLOCKED visibility in the same transaction",
+          async () => {
+            const fixture = dailyFragmentFixture(250);
+            await transaction(admin, [
+              ...fixture.statements,
+              `DELETE FROM ${schema}.app_personalized_content_fragment WHERE id='${fixture.fragment}'`,
+              `UPDATE ${schema}.app_published_result_visibility SET state='BLOCKED',revision=2,"blockedReasonCode"='SOURCE_DELETED',"updatedAt"=now() WHERE id='${fixture.visibility}'`,
+            ]);
+          },
+        );
+
+        await t.test(
+          "SQL-013 rejects deleting the only weekly personalized fragment",
+          async () => {
+            const fixture = weeklyFragmentFixture(260);
+            await transaction(
+              admin,
+              [
+                ...fixture.statements,
+                `DELETE FROM ${schema}.app_weekly_personalized_content_fragment WHERE id='${fixture.fragment}'`,
+              ],
+              { reject: /SQL-013|23514/u },
+            );
+          },
+        );
+
+        await t.test(
+          "SQL-013 accepts weekly fragment deletion when the summary is unpublished in the same transaction",
+          async () => {
+            const fixture = weeklyFragmentFixture(270);
+            await transaction(admin, [
+              ...fixture.statements,
+              `DELETE FROM ${schema}.app_weekly_personalized_content_fragment WHERE id='${fixture.fragment}'`,
+              `UPDATE ${schema}.app_weekly_window SET "currentSummaryRef"=NULL,"currentSourceFingerprint"=NULL,revision=2,"updatedAt"=now() WHERE id='${fixture.window}'`,
+            ]);
+          },
+        );
 
         await t.test(
           "SQL-015 rejects terminal-to-scheduled regression",
@@ -742,7 +924,7 @@ test(
         );
 
         await t.test(
-          "SQL-020 enforces role attributes, ownership, creation, truncation, restricted, and ciphertext matrix",
+          "SQL-020 enforces environment login membership, role attributes, ownership, creation, truncation, restricted, and ciphertext matrix",
           async () => {
             await proveRoleMatrix(admin, adminUrl, Client);
           },
@@ -767,7 +949,7 @@ test(
     const { PostgreSqlContainer } = await loadTestcontainers();
     const container = await new PostgreSqlContainer(POSTGRES_IMAGE).start();
     const adminUrl = container.getConnectionUri();
-    const environment = { DATABASE_URL: adminUrl, PRISMA_BIN: prismaBin };
+    const adminEnvironment = { DATABASE_URL: adminUrl, PRISMA_BIN: prismaBin };
     const temporary = await mkdtemp(
       path.join(os.tmpdir(), "daily-energy-e006-"),
     );
@@ -785,7 +967,7 @@ test(
         value.migrations[0].sha256 = "0".repeat(64);
         await writeFile(manifest, `${JSON.stringify(value, null, 2)}\n`);
         const result = await runNodeResult("tooling/database/migrate.mjs", {
-          ...environment,
+          ...adminEnvironment,
           DB_MIGRATION_CHECKSUM_MANIFEST: manifest,
         });
         assert.notEqual(result.code, 0);
@@ -803,13 +985,188 @@ test(
         }
       });
 
-      await runNode("tooling/database/migrate.mjs", environment);
-      await runNode("tooling/database/seed.mjs", environment);
-      await runNode("tooling/database/check-drift.mjs", environment);
+      const loginUrls = await bootstrapTestDatabase(adminUrl);
+      const migrationEnvironment = {
+        DATABASE_URL: loginUrls.migration,
+        PRISMA_BIN: prismaBin,
+      };
+      await t.test(
+        "migration runner rejects administrator and non-migration profile credentials",
+        async () => {
+          for (const databaseUrl of [adminUrl, loginUrls.api]) {
+            const result = await runNodeResult("tooling/database/migrate.mjs", {
+              DATABASE_URL: databaseUrl,
+              PRISMA_BIN: prismaBin,
+            });
+            assert.notEqual(result.code, 0);
+            assert.match(result.stderr, /DB_MIGRATION_ROLE_MISMATCH/u);
+          }
+        },
+      );
+      await t.test(
+        "real migration login times out on locked DDL and then rolls forward",
+        async () => {
+          const initialConfig = await createInitialMigrationProject(temporary);
+          const migrationUrl = new URL(loginUrls.migration);
+          migrationUrl.searchParams.set("schema", schema);
+          migrationUrl.searchParams.set(
+            "options",
+            "-c lock_timeout=5s -c statement_timeout=5min -c role=daily_energy_owner",
+          );
+          const initial = await runCommandResult(
+            prismaBin,
+            ["migrate", "deploy", "--config", initialConfig],
+            {
+              DATABASE_URL: migrationUrl.toString(),
+              PGOPTIONS:
+                "-c lock_timeout=5s -c statement_timeout=5min -c role=daily_energy_owner",
+            },
+          );
+          assert.equal(initial.code, 0, initial.stderr);
+
+          const { Client } = loadPg();
+          const locker = new Client({ connectionString: adminUrl });
+          await locker.connect();
+          let lockedMigration;
+          const startedAt = Date.now();
+          try {
+            await locker.query("BEGIN");
+            await locker.query(
+              `LOCK TABLE ${schema}.app_user_account IN ACCESS EXCLUSIVE MODE`,
+            );
+            lockedMigration = await runNodeResult(
+              "tooling/database/migrate.mjs",
+              migrationEnvironment,
+            );
+          } finally {
+            await locker.query("ROLLBACK");
+            await locker.end();
+          }
+          const elapsedMillis = Date.now() - startedAt;
+          assert.notEqual(lockedMigration.code, 0);
+          assert.match(lockedMigration.stderr, /DB_MIGRATION_DEPLOY_FAILED/u);
+          assert.doesNotMatch(
+            lockedMigration.stderr,
+            /synthetic-migration|daily_energy_migration_test_login/u,
+          );
+          assert.ok(elapsedMillis >= 4_000, `elapsed=${elapsedMillis}`);
+          assert.ok(elapsedMillis < 15_000, `elapsed=${elapsedMillis}`);
+
+          const cleanup = new Client({ connectionString: adminUrl });
+          await cleanup.connect();
+          try {
+            await cleanup.query(
+              `DELETE FROM ${schema}._prisma_migrations
+                WHERE migration_name='20260731000000_owner_upgrade_probe'
+                  AND finished_at IS NULL`,
+            );
+          } finally {
+            await cleanup.end();
+          }
+          await runNode("tooling/database/migrate.mjs", migrationEnvironment);
+
+          const verify = new Client({ connectionString: adminUrl });
+          await verify.connect();
+          try {
+            const upgraded = await verify.query(
+              `SELECT pg_get_constraintdef(oid, true) AS definition,
+                      conrelid::regclass::text AS relation
+                 FROM pg_constraint
+                WHERE conname='app_user_account_revision_positive_ck'`,
+            );
+            assert.equal(upgraded.rowCount, 1);
+            assert.match(upgraded.rows[0].definition, /revision.*>= 1/u);
+            assert.match(upgraded.rows[0].relation, /app_user_account/u);
+          } finally {
+            await verify.end();
+          }
+        },
+      );
+      await runNode("tooling/database/migrate.mjs", migrationEnvironment);
+      await runNode("tooling/database/seed.mjs", adminEnvironment);
+      await runNode("tooling/database/check-drift.mjs", adminEnvironment);
+
+      await t.test(
+        "semantic catalog drift rejects changed constraint, index, function, and grant",
+        async (driftTest) => {
+          const { Client } = loadPg();
+          const client = new Client({ connectionString: adminUrl });
+          await client.connect();
+          await client.query("SET ROLE daily_energy_owner");
+
+          async function expectFingerprintFailure(section, mutate, restore) {
+            try {
+              await client.query(mutate);
+              const result = await runNodeResult(
+                "tooling/database/check-drift.mjs",
+                adminEnvironment,
+              );
+              assert.notEqual(result.code, 0);
+              assert.match(
+                result.stderr,
+                new RegExp(`DB_DRIFT_FINGERPRINT:${section}`, "u"),
+              );
+            } finally {
+              await client.query(restore);
+            }
+            await runNode("tooling/database/check-drift.mjs", adminEnvironment);
+          }
+
+          try {
+            await driftTest.test("constraint definition", async () => {
+              await expectFingerprintFailure(
+                "constraints",
+                `ALTER TABLE ${schema}.app_user_account
+                   DROP CONSTRAINT app_user_account_revision_positive_ck,
+                   ADD CONSTRAINT app_user_account_revision_positive_ck CHECK (revision >= 0)`,
+                `ALTER TABLE ${schema}.app_user_account
+                   DROP CONSTRAINT app_user_account_revision_positive_ck,
+                   ADD CONSTRAINT app_user_account_revision_positive_ck CHECK (revision >= 1)`,
+              );
+            });
+            await driftTest.test("index definition", async () => {
+              await expectFingerprintFailure(
+                "indexes",
+                `DROP INDEX ${schema}."app_morning_checkin_accountId_productDate_idx";
+                 CREATE INDEX "app_morning_checkin_accountId_productDate_idx"
+                   ON ${schema}.app_morning_checkin("accountId", "productDate" ASC)`,
+                `DROP INDEX ${schema}."app_morning_checkin_accountId_productDate_idx";
+                 CREATE INDEX "app_morning_checkin_accountId_productDate_idx"
+                   ON ${schema}.app_morning_checkin("accountId", "productDate" DESC)`,
+              );
+            });
+            await driftTest.test("function definition", async () => {
+              const originalFunction = await client.query(
+                `SELECT pg_get_functiondef('${schema}.raise_integrity(text)'::regprocedure) AS definition`,
+              );
+              await expectFingerprintFailure(
+                "functions",
+                `CREATE OR REPLACE FUNCTION ${schema}.raise_integrity(code text)
+                   RETURNS void LANGUAGE plpgsql AS $$
+                   BEGIN
+                     RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'DRIFTED';
+                   END
+                   $$`,
+                originalFunction.rows[0].definition,
+              );
+            });
+            await driftTest.test("table grant", async () => {
+              await expectFingerprintFailure(
+                "relationAcl",
+                `GRANT REFERENCES ON ${schema}.app_morning_checkin TO daily_energy_api`,
+                `REVOKE REFERENCES ON ${schema}.app_morning_checkin FROM daily_energy_api`,
+              );
+            });
+          } finally {
+            await client.query("RESET ROLE");
+            await client.end();
+          }
+        },
+      );
 
       await t.test("repeated migration and seed are exact no-ops", async () => {
-        await runNode("tooling/database/migrate.mjs", environment);
-        await runNode("tooling/database/seed.mjs", environment);
+        await runNode("tooling/database/migrate.mjs", migrationEnvironment);
+        await runNode("tooling/database/seed.mjs", adminEnvironment);
         const { Client } = loadPg();
         const client = new Client({ connectionString: adminUrl });
         await client.connect();
@@ -823,7 +1180,7 @@ test(
           const retention = await client.query(
             `SELECT count(*)::int AS count FROM ${schema}.system_retention_policy_entry WHERE "policyVersion"='retention-policy-v1' AND "dataTypeCode"='SYNTHETIC_RUNTIME'`,
           );
-          assert.equal(migrations.rows[0].count, 1);
+          assert.equal(migrations.rows[0].count, 2);
           assert.equal(versions.rows[0].count, 1);
           assert.equal(retention.rows[0].count, 1);
         } finally {
@@ -850,7 +1207,7 @@ test(
         seed.records.retention_policy[0].purpose_code = "CONFLICTING_PURPOSE";
         await writeFile(conflictSeed, `${JSON.stringify(seed, null, 2)}\n`);
         const result = await runNodeResult("tooling/database/seed.mjs", {
-          ...environment,
+          ...adminEnvironment,
           DB_SEED_FILE: conflictSeed,
         });
         assert.notEqual(result.code, 0);
@@ -883,8 +1240,8 @@ test(
           } finally {
             await client.end();
           }
-          await runNode("tooling/database/migrate.mjs", environment);
-          await runNode("tooling/database/check-drift.mjs", environment);
+          await runNode("tooling/database/migrate.mjs", migrationEnvironment);
+          await runNode("tooling/database/check-drift.mjs", adminEnvironment);
           const verify = new Client({ connectionString: adminUrl });
           await verify.connect();
           try {
@@ -897,7 +1254,10 @@ test(
             assert.equal(oldCodeFact.rows[0].count, 1);
             assert.deepEqual(
               history.rows.map((row) => row.migration_name),
-              ["20260730000000_initial_application_schema"],
+              [
+                "20260730000000_initial_application_schema",
+                "20260731000000_owner_upgrade_probe",
+              ],
             );
           } finally {
             await verify.end();
@@ -915,7 +1275,7 @@ test(
           await chmod(passHook, 0o700);
           await chmod(failHook, 0o700);
           const recovery = {
-            ...environment,
+            ...adminEnvironment,
             DB_RECOVERY_STAGE: "isolated",
             DB_RESTORE_LEDGER_CHECKPOINT: "synthetic-checkpoint-20260730",
             DB_RESTORE_LEDGER_FINGERPRINT: "synthetic-ledger-fingerprint",

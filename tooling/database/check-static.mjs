@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { assertNoDbPush, assertSqlIdCoverage, listMigrations } from "./lib.mjs";
+import { redactSensitiveDiagnosticOutput } from "../lib/sensitive-redaction.mjs";
 
 const repositoryRoot = path.resolve(".");
 const prismaBin =
@@ -65,10 +66,10 @@ async function assertRepositoryHasNoDbPush(directory = repositoryRoot) {
 if (migrations.length === 0) {
   throw new Error("DB_MIGRATION_HISTORY_EMPTY");
 }
-for (const migration of migrations) {
-  const sql = await readFile(migration.file, "utf8");
-  assertSqlIdCoverage(sql);
-}
+const migrationSql = await Promise.all(
+  migrations.map((migration) => readFile(migration.file, "utf8")),
+);
+assertSqlIdCoverage(migrationSql.join("\n"));
 
 await assertRepositoryHasNoDbPush();
 
@@ -91,12 +92,7 @@ for (const args of [
     encoding: "utf8",
   });
   if (result.status !== 0) {
-    process.stderr.write(
-      result.stderr.replace(
-        /postgresql:\/\/[^\s]+/gu,
-        "[REDACTED_DATABASE_URL]",
-      ),
-    );
+    process.stderr.write(redactSensitiveDiagnosticOutput(result.stderr));
     throw new Error(`DB_PRISMA_${args[0].toUpperCase()}_FAILED`);
   }
 }

@@ -1,5 +1,3 @@
--- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "daily_energy";
 SET search_path TO "daily_energy", pg_catalog;
 
 -- CreateEnum
@@ -2038,6 +2036,7 @@ BEGIN
     WHERE table_schema = 'daily_energy'
       AND (column_name = 'revision' OR column_name LIKE '%Revision' OR column_name LIKE '%revision')
       AND data_type IN ('smallint', 'integer', 'bigint')
+      AND NOT (table_name = 'app_user_account' AND column_name = 'revision')
   LOOP
     constraint_name := left(r.table_name || '_' || r.column_name || '_positive_ck', 63);
     EXECUTE format('ALTER TABLE %I.%I ADD CONSTRAINT %I CHECK (%I >= 1)', 'daily_energy', r.table_name, constraint_name, r.column_name);
@@ -2246,28 +2245,79 @@ CREATE CONSTRAINT TRIGGER "sql_012_weekly_current_summary"
 AFTER INSERT OR UPDATE ON "daily_energy"."app_weekly_window"
 DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION "daily_energy"."check_weekly_current_summary"();
 
--- SQL-013: every published slot has a personalized fragment or a prevalidated fallback unless blocked.
-CREATE OR REPLACE FUNCTION "daily_energy"."check_daily_content_slot"()
-RETURNS trigger LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
-DECLARE visibility_state "ContentDisplayState"; fragment_exists boolean;
+-- SQL-013: every visible published slot has a personalized fragment or a prevalidated fallback.
+CREATE OR REPLACE FUNCTION "daily_energy"."assert_daily_content_slot"(slot_id uuid)
+RETURNS void LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
+DECLARE slot_row record; visibility_state "ContentDisplayState"; fragment_exists boolean;
 BEGIN
+  SELECT * INTO slot_row FROM app_result_content_slot WHERE id = slot_id;
+  IF slot_row.id IS NULL THEN
+    RETURN;
+  END IF;
   SELECT v.state INTO visibility_state
-  FROM app_published_result_visibility v WHERE v."resultId" = NEW."resultId";
-  SELECT EXISTS(SELECT 1 FROM app_personalized_content_fragment f WHERE f."slotId" = NEW.id) INTO fragment_exists;
-  IF NOT fragment_exists AND (NEW."fallbackPayload" IS NULL OR NEW."fallbackFingerprint" IS NULL OR NEW."fallbackSchemaVersion" IS NULL)
+  FROM app_published_result_visibility v WHERE v."resultId" = slot_row."resultId";
+  SELECT EXISTS(SELECT 1 FROM app_personalized_content_fragment f WHERE f."slotId" = slot_id) INTO fragment_exists;
+  IF NOT fragment_exists AND (slot_row."fallbackPayload" IS NULL OR slot_row."fallbackFingerprint" IS NULL OR slot_row."fallbackSchemaVersion" IS NULL)
      AND visibility_state IS DISTINCT FROM 'BLOCKED' THEN
     PERFORM raise_integrity('SQL-013');
+  END IF;
+END
+$$;
+CREATE OR REPLACE FUNCTION "daily_energy"."assert_weekly_content_slot"(slot_id uuid)
+RETURNS void LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
+DECLARE slot_row record; fragment_exists boolean; current_summary_id uuid;
+BEGIN
+  SELECT * INTO slot_row FROM app_weekly_content_slot WHERE id = slot_id;
+  IF slot_row.id IS NULL THEN
+    RETURN;
+  END IF;
+  SELECT weekly_window."currentSummaryRef" INTO current_summary_id
+  FROM app_published_weekly_summary_revision summary
+  JOIN app_weekly_window weekly_window ON weekly_window.id = summary."windowId"
+  WHERE summary.id = slot_row."summaryId";
+  SELECT EXISTS(SELECT 1 FROM app_weekly_personalized_content_fragment f WHERE f."slotId" = slot_id) INTO fragment_exists;
+  IF current_summary_id = slot_row."summaryId" AND NOT fragment_exists AND
+     (slot_row."fallbackPayload" IS NULL OR slot_row."fallbackFingerprint" IS NULL) THEN
+    PERFORM raise_integrity('SQL-013');
+  END IF;
+END
+$$;
+CREATE OR REPLACE FUNCTION "daily_energy"."check_daily_content_slot"()
+RETURNS trigger LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
+BEGIN
+  PERFORM assert_daily_content_slot(NEW.id);
+  RETURN NEW;
+END
+$$;
+CREATE OR REPLACE FUNCTION "daily_energy"."check_daily_content_fragment"()
+RETURNS trigger LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
+BEGIN
+  PERFORM assert_daily_content_slot(OLD."slotId");
+  IF TG_OP = 'UPDATE' AND NEW."slotId" IS DISTINCT FROM OLD."slotId" THEN
+    PERFORM assert_daily_content_slot(NEW."slotId");
+  END IF;
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
   END IF;
   RETURN NEW;
 END
 $$;
 CREATE OR REPLACE FUNCTION "daily_energy"."check_weekly_content_slot"()
 RETURNS trigger LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
-DECLARE fragment_exists boolean;
 BEGIN
-  SELECT EXISTS(SELECT 1 FROM app_weekly_personalized_content_fragment f WHERE f."slotId" = NEW.id) INTO fragment_exists;
-  IF NOT fragment_exists AND (NEW."fallbackPayload" IS NULL OR NEW."fallbackFingerprint" IS NULL) THEN
-    PERFORM raise_integrity('SQL-013');
+  PERFORM assert_weekly_content_slot(NEW.id);
+  RETURN NEW;
+END
+$$;
+CREATE OR REPLACE FUNCTION "daily_energy"."check_weekly_content_fragment"()
+RETURNS trigger LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
+BEGIN
+  PERFORM assert_weekly_content_slot(OLD."slotId");
+  IF TG_OP = 'UPDATE' AND NEW."slotId" IS DISTINCT FROM OLD."slotId" THEN
+    PERFORM assert_weekly_content_slot(NEW."slotId");
+  END IF;
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
   END IF;
   RETURN NEW;
 END
@@ -2275,9 +2325,15 @@ $$;
 CREATE CONSTRAINT TRIGGER "sql_013_daily_content_slot"
 AFTER INSERT OR UPDATE ON "daily_energy"."app_result_content_slot"
 DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION "daily_energy"."check_daily_content_slot"();
+CREATE CONSTRAINT TRIGGER "sql_013_daily_content_fragment"
+AFTER DELETE OR UPDATE OF "slotId" ON "daily_energy"."app_personalized_content_fragment"
+DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION "daily_energy"."check_daily_content_fragment"();
 CREATE CONSTRAINT TRIGGER "sql_013_weekly_content_slot"
 AFTER INSERT OR UPDATE ON "daily_energy"."app_weekly_content_slot"
 DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION "daily_energy"."check_weekly_content_slot"();
+CREATE CONSTRAINT TRIGGER "sql_013_weekly_content_fragment"
+AFTER DELETE OR UPDATE OF "slotId" ON "daily_energy"."app_weekly_personalized_content_fragment"
+DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION "daily_energy"."check_weekly_content_fragment"();
 
 -- SQL-014: Safety state revision/epoch are monotonic and dependent rows cannot cross owner/revision.
 CREATE OR REPLACE FUNCTION "daily_energy"."check_safety_state_monotonic"()
@@ -2365,29 +2421,11 @@ ALTER TABLE "daily_energy"."restricted_deletion_receipt"
     "scope" <> 'ACCOUNT' OR ("blindedSubjectToken" IS NULL AND "targetType" = 'ACCOUNT')
   );
 
--- SQL-020: least-privilege role/grant baseline for runtime profiles.
-DO $roles$
-DECLARE role_name text;
-BEGIN
-  FOREACH role_name IN ARRAY ARRAY[
-    'daily_energy_api', 'daily_energy_interactive', 'daily_energy_background',
-    'daily_energy_restricted', 'daily_energy_migration', 'daily_energy_test'
-  ]
-  LOOP
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = role_name) THEN
-      EXECUTE format('CREATE ROLE %I NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT', role_name);
-    END IF;
-  END LOOP;
-END
-$roles$;
-
+-- SQL-020: bootstrap owns role creation; migrations only grant runtime capabilities.
 REVOKE ALL ON SCHEMA "daily_energy" FROM PUBLIC;
 REVOKE ALL ON ALL TABLES IN SCHEMA "daily_energy" FROM PUBLIC;
 REVOKE ALL ON ALL SEQUENCES IN SCHEMA "daily_energy" FROM PUBLIC;
 GRANT USAGE ON SCHEMA "daily_energy" TO "daily_energy_api", "daily_energy_interactive", "daily_energy_background", "daily_energy_restricted", "daily_energy_test";
-GRANT ALL ON SCHEMA "daily_energy" TO "daily_energy_migration";
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA "daily_energy" TO "daily_energy_migration";
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "daily_energy" TO "daily_energy_migration";
 
 -- API: ordinary application facts and redacted runtime/system metadata; no restricted/evaluation tables.
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "daily_energy" TO "daily_energy_api";
@@ -2443,8 +2481,8 @@ REVOKE UPDATE, DELETE ON TABLE
   "daily_energy"."system_safety_resource_entry", "daily_energy"."system_version_catalog_entry"
 FROM "daily_energy_api", "daily_energy_interactive", "daily_energy_background", "daily_energy_restricted", "daily_energy_test";
 
-ALTER DEFAULT PRIVILEGES FOR ROLE CURRENT_USER IN SCHEMA "daily_energy" REVOKE ALL ON TABLES FROM PUBLIC;
-ALTER DEFAULT PRIVILEGES FOR ROLE CURRENT_USER IN SCHEMA "daily_energy" REVOKE ALL ON SEQUENCES FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES FOR ROLE "daily_energy_owner" IN SCHEMA "daily_energy" REVOKE ALL ON TABLES FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES FOR ROLE "daily_energy_owner" IN SCHEMA "daily_energy" REVOKE ALL ON SEQUENCES FROM PUBLIC;
 
 COMMENT ON SCHEMA "daily_energy" IS 'DailyEnergy single application schema; E-006 PostgreSQL 18 baseline';
 

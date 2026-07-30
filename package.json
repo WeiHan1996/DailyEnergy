@@ -31,6 +31,8 @@
     "agent:prepare": "node tooling/agent-prepare.mjs",
     "agent:validate": "node tooling/agent-validate-entry.mjs",
     "database:generate": "prisma generate",
+    "database:bootstrap": "node tooling/database/bootstrap.mjs",
+    "database:fingerprint:write": "node tooling/database/write-catalog-fingerprint.mjs",
     "database:evidence": "node tooling/database/check-evidence.mjs && node --test tests/database/evidence.test.mjs",
     "database:check": "node tooling/database/check-migrations.mjs && node tooling/database/check-static.mjs && pnpm run database:evidence",
     "database:test": "node --test tests/database/static.test.mjs",
