@@ -14,7 +14,7 @@ export function createWorkerRestrictedDatabaseFactory(): DatabaseFactory<
 > {
   return createClosedDatabaseFactory(
     {
-      databaseRole: "daily_energy_restricted",
+      databaseRole: "daily_energy_deletion",
       defaultConnectionLimit: 4,
       profile: "worker-restricted",
     },

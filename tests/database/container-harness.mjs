@@ -114,6 +114,16 @@ export const TEST_DATABASE_PROFILES = Object.freeze({
     loginRole: "daily_energy_restricted_test_login",
     password: "synthetic-restricted",
   },
+  safety: {
+    groupRole: "daily_energy_safety",
+    loginRole: "daily_energy_safety_test_login",
+    password: "synthetic-safety",
+  },
+  deletion: {
+    groupRole: "daily_energy_deletion",
+    loginRole: "daily_energy_deletion_test_login",
+    password: "synthetic-deletion",
+  },
   migration: {
     groupRole: "daily_energy_migration",
     loginRole: "daily_energy_migration_test_login",

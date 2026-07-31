@@ -30,6 +30,8 @@ export const RUNTIME_ROLES = Object.freeze({
   interactive: "daily_energy_interactive",
   background: "daily_energy_background",
   restricted: "daily_energy_restricted",
+  safety: "daily_energy_safety",
+  deletion: "daily_energy_deletion",
   migration: "daily_energy_migration",
   test: "daily_energy_test",
 });
@@ -185,7 +187,8 @@ export async function assertMigrationLogin(client) {
         SELECT array_agg(role_name ORDER BY role_name)
         FROM unnest(ARRAY[
           'daily_energy_api', 'daily_energy_interactive', 'daily_energy_background',
-          'daily_energy_restricted', 'daily_energy_migration', 'daily_energy_test'
+          'daily_energy_restricted', 'daily_energy_safety', 'daily_energy_deletion',
+          'daily_energy_migration', 'daily_energy_test'
         ]) AS role_name
         WHERE pg_has_role(session_user, role_name, 'MEMBER')
       ) AS profile_memberships,

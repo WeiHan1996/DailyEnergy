@@ -648,7 +648,8 @@ async function proveRoleMatrix(admin, adminUrl, Client) {
                  SELECT role_name
                  FROM unnest(ARRAY[
                    'daily_energy_api', 'daily_energy_interactive', 'daily_energy_background',
-                   'daily_energy_restricted', 'daily_energy_migration', 'daily_energy_test'
+                   'daily_energy_restricted', 'daily_energy_safety', 'daily_energy_deletion',
+                   'daily_energy_migration', 'daily_energy_test'
                  ]) AS role_name
                  WHERE pg_has_role(session_user, role_name, 'MEMBER')
                  ORDER BY role_name
@@ -755,17 +756,96 @@ async function proveRoleMatrix(admin, adminUrl, Client) {
     await api.end();
   }
 
+  // Legacy restricted role: empty shell, should not have access to anything useful
   const restrictedUrl = new URL(adminUrl);
   restrictedUrl.username = TEST_DATABASE_PROFILES.restricted.loginRole;
   restrictedUrl.password = TEST_DATABASE_PROFILES.restricted.password;
   const restricted = new Client({ connectionString: restrictedUrl.toString() });
   await restricted.connect();
   try {
-    await restricted.query(
-      `SELECT * FROM ${schema}.restricted_safety_state LIMIT 1`,
+    await assert.rejects(
+      restricted.query(
+        `SELECT * FROM ${schema}.restricted_safety_state LIMIT 1`,
+      ),
+      /permission denied/u,
+      "legacy restricted role must not have SELECT on safety tables",
     );
   } finally {
     await restricted.end();
+  }
+
+  // Safety role: can write Safety-owned facts, but cannot delete Safety state,
+  // touch ordinary user facts, or access evaluation data.
+  const safetyUrl = new URL(adminUrl);
+  safetyUrl.username = TEST_DATABASE_PROFILES.safety.loginRole;
+  safetyUrl.password = TEST_DATABASE_PROFILES.safety.password;
+  const safety = new Client({ connectionString: safetyUrl.toString() });
+  await safety.connect();
+  try {
+    await safety.query(
+      `SELECT * FROM ${schema}.restricted_safety_state LIMIT 1`,
+    );
+    await safety.query(`SELECT * FROM ${schema}.app_user_account LIMIT 1`);
+    await assert.rejects(
+      safety.query(`DELETE FROM ${schema}.app_morning_checkin`),
+      /permission denied/u,
+      "safety role must not delete ordinary user facts",
+    );
+    await assert.rejects(
+      safety.query(`DELETE FROM ${schema}.restricted_safety_state`),
+      /permission denied/u,
+      "safety role must not delete Safety state",
+    );
+    await assert.rejects(
+      safety.query(`SELECT * FROM ${schema}.evaluation_run LIMIT 1`),
+      /permission denied/u,
+      "safety role must not access evaluation tables",
+    );
+  } finally {
+    await safety.end();
+  }
+
+  // Deletion role: full DML on deletion tables, read-only on safety tables, no eval access
+  const deletionUrl = new URL(adminUrl);
+  deletionUrl.username = TEST_DATABASE_PROFILES.deletion.loginRole;
+  deletionUrl.password = TEST_DATABASE_PROFILES.deletion.password;
+  const deletion = new Client({ connectionString: deletionUrl.toString() });
+  await deletion.connect();
+  try {
+    // Can read safety
+    await deletion.query(
+      `SELECT * FROM ${schema}.restricted_safety_state LIMIT 1`,
+    );
+    // Can SELECT + DELETE app tables
+    await deletion.query(`SELECT * FROM ${schema}.app_morning_checkin LIMIT 1`);
+    // Cannot write safety
+    await assert.rejects(
+      deletion.query(
+        `INSERT INTO ${schema}.restricted_safety_state (id,"accountId",revision,"guardEpoch","updatedAt") VALUES ('10000000-0000-4000-8000-000000000998','10000000-0000-4000-8000-000000000001',1,1,now())`,
+      ),
+      /permission denied/u,
+      "deletion role must not INSERT on safety state",
+    );
+    // Cannot access evaluation
+    await assert.rejects(
+      deletion.query(`SELECT * FROM ${schema}.evaluation_run LIMIT 1`),
+      /permission denied/u,
+      "deletion role must not access evaluation tables",
+    );
+    // Can write deletion tables (need account ref first, created by admin)
+    await admin.query(accountInsert(id(700)));
+    await deletion.query(
+      dataTaskInsert(id(997), id(700), { activeSlot: "true", state: "FAILED" }),
+    );
+    await deletion.query(
+      `DELETE FROM ${schema}.restricted_data_task WHERE id='${id(997)}'`,
+    );
+    // ACCOUNT deletion finishes by removing the now child-free UserAccount.
+    await deletion.query(
+      `DELETE FROM ${schema}.app_user_account WHERE id='${id(700)}'`,
+    );
+  } finally {
+    await deletion.end();
   }
 
   const interactiveUrl = new URL(adminUrl);
@@ -888,6 +968,115 @@ test(
               `DELETE FROM ${schema}.app_weekly_personalized_content_fragment WHERE id='${fixture.fragment}'`,
               `UPDATE ${schema}.app_weekly_window SET "currentSummaryRef"=NULL,"currentSourceFingerprint"=NULL,revision=2,"updatedAt"=now() WHERE id='${fixture.window}'`,
             ]);
+          },
+        );
+
+        await t.test(
+          "SQL-013 rejects activating daily visibility when a slot has no fragment or fallback",
+          async () => {
+            const fixture = dailyFragmentFixture(280);
+            // Start with BLOCKED visibility and an empty slot (no fragment)
+            const statements = [
+              accountInsert(fixture.account),
+              generationIntentInsert(fixture.intent, fixture.account),
+              checkinInsert(fixture.checkin, fixture.account),
+              snapshotInsert(fixture.snapshot, fixture.intent, fixture.checkin),
+              resultInsert(
+                fixture.result,
+                fixture.account,
+                fixture.intent,
+                fixture.snapshot,
+              ),
+              `INSERT INTO ${schema}.app_published_result_visibility
+                (id,"resultId",state,revision,"sourceFingerprint","blockedReasonCode","updatedAt","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+               VALUES ('${fixture.visibility}','${fixture.result}','BLOCKED',1,decode('31','hex'),'SOURCE_DELETED',now(),'synthetic-v1',now(),now()+interval '7 days')`,
+              `INSERT INTO ${schema}.app_result_content_slot
+                (id,"resultId","segmentPath","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+               VALUES ('${fixture.slot}','${fixture.result}','core','synthetic-v1',now(),now()+interval '7 days')`,
+              // Activate visibility — should fail because slot has no fragment or fallback
+              `UPDATE ${schema}.app_published_result_visibility SET state='AVAILABLE',revision=2,"blockedReasonCode"=NULL,"updatedAt"=now() WHERE id='${fixture.visibility}'`,
+            ];
+            await transaction(admin, statements, { reject: /SQL-013|23514/u });
+          },
+        );
+
+        await t.test(
+          "SQL-013 accepts activating daily visibility when every slot has a fragment or fallback",
+          async () => {
+            const fixture = dailyFragmentFixture(290);
+            // Start with BLOCKED visibility, slot has fragment
+            const statements = [
+              ...fixture.statements.filter(
+                (s) => !s.includes("app_published_result_visibility"),
+              ),
+              `INSERT INTO ${schema}.app_published_result_visibility
+                (id,"resultId",state,revision,"sourceFingerprint","blockedReasonCode","updatedAt","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+               VALUES ('${fixture.visibility}','${fixture.result}','BLOCKED',1,decode('31','hex'),'SOURCE_DELETED',now(),'synthetic-v1',now(),now()+interval '7 days')`,
+              `UPDATE ${schema}.app_published_result_visibility SET state='AVAILABLE',revision=2,"blockedReasonCode"=NULL,"updatedAt"=now() WHERE id='${fixture.visibility}'`,
+            ];
+            await transaction(admin, statements);
+          },
+        );
+
+        await t.test(
+          "SQL-013 rejects setting weekly currentSummaryRef when a current slot has no fragment or fallback",
+          async () => {
+            const publication = weeklyFixture(300);
+            const slot = id(304);
+            // Insert empty slot first (summary is not current), then set current — should fail
+            const statements = [
+              ...publication.statements,
+              `INSERT INTO ${schema}.app_weekly_content_slot
+                (id,"summaryId","segmentPath","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+               VALUES ('${slot}','${publication.summary}','summary','synthetic-v1',now(),now()+interval '7 days')`,
+              `UPDATE ${schema}.app_weekly_window SET "currentSummaryRef"='${publication.summary}',"currentSourceFingerprint"=decode('21','hex'),revision=2,"updatedAt"=now() WHERE id='${publication.window}'`,
+            ];
+            await transaction(admin, statements, { reject: /SQL-013|23514/u });
+          },
+        );
+
+        await t.test(
+          "SQL-007 rejects published result referencing snapshot with cross-account checkin",
+          async () => {
+            const accountA = id(310);
+            const accountB = id(311);
+            const intent = id(312);
+            const checkinB = id(313);
+            const snapshot = id(314);
+            const result = id(315);
+            const statements = [
+              accountInsert(accountA),
+              accountInsert(accountB),
+              generationIntentInsert(intent, accountA),
+              checkinInsert(checkinB, accountB),
+              snapshotInsert(snapshot, intent, checkinB),
+              resultInsert(result, accountA, intent, snapshot),
+            ];
+            await transaction(admin, statements, { reject: /SQL-007|23514/u });
+          },
+        );
+
+        await t.test(
+          "SQL-007 rejects published result with snapshot referencing wrong-date checkin",
+          async () => {
+            const account = id(320);
+            const intent = id(321);
+            const checkin = id(322);
+            const snapshot = id(323);
+            const result = id(324);
+            const statements = [
+              accountInsert(account),
+              generationIntentInsert(intent, account),
+              // Checkin on a different date than the intent
+              `INSERT INTO ${schema}.app_morning_checkin
+                (id, "accountId", "productDate", "productDatePolicyVersion", revision, mood, energy, sleep,
+                 "firstSubmittedAt", "updatedAt", "sourceCommandRef", "retentionPolicyVersion", "retentionAnchorAt", "expiresAt")
+               VALUES ('${checkin}', '${account}', DATE '2026-07-29', 'product-date-v1', 1,
+                 'STEADY', 'STEADY', 'OKAY', now(), now(), '${id(900)}', 'synthetic-v1', now(), now() + interval '7 days')`,
+              snapshotInsert(snapshot, intent, checkin),
+              resultInsert(result, account, intent, snapshot),
+            ];
+            await transaction(admin, statements, { reject: /SQL-007|23514/u });
           },
         );
 
@@ -1180,7 +1369,7 @@ test(
           const retention = await client.query(
             `SELECT count(*)::int AS count FROM ${schema}.system_retention_policy_entry WHERE "policyVersion"='retention-policy-v1' AND "dataTypeCode"='SYNTHETIC_RUNTIME'`,
           );
-          assert.equal(migrations.rows[0].count, 2);
+          assert.equal(migrations.rows[0].count, 3);
           assert.equal(versions.rows[0].count, 1);
           assert.equal(retention.rows[0].count, 1);
         } finally {
@@ -1257,6 +1446,7 @@ test(
               [
                 "20260730000000_initial_application_schema",
                 "20260731000000_owner_upgrade_probe",
+                "20260731000001_security_fixes_sql007_sql013_roles",
               ],
             );
           } finally {

@@ -119,7 +119,9 @@
           "level": "DB",
           "assertions": [
             "SQL-007 accepts valid synthetic data",
-            "SQL-007 rejects invalid synthetic data"
+            "SQL-007 rejects invalid synthetic data",
+            "SQL-007 rejects published result referencing snapshot with cross-account checkin",
+            "SQL-007 rejects published result with snapshot referencing wrong-date checkin"
           ]
         }
       ]
@@ -219,7 +221,10 @@
             "SQL-013 rejects deleting the only daily personalized fragment",
             "SQL-013 accepts daily fragment deletion with BLOCKED visibility in the same transaction",
             "SQL-013 rejects deleting the only weekly personalized fragment",
-            "SQL-013 accepts weekly fragment deletion when the summary is unpublished in the same transaction"
+            "SQL-013 accepts weekly fragment deletion when the summary is unpublished in the same transaction",
+            "SQL-013 rejects activating daily visibility when a slot has no fragment or fallback",
+            "SQL-013 accepts activating daily visibility when every slot has a fragment or fallback",
+            "SQL-013 rejects setting weekly currentSummaryRef when a current slot has no fragment or fallback"
           ]
         }
       ]
@@ -332,7 +337,8 @@
           "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
           "level": "DB",
           "assertions": [
-            "SQL-020 enforces environment login membership, role attributes, ownership, creation, truncation, restricted, and ciphertext matrix"
+            "SQL-020 enforces environment login membership, role attributes, ownership, creation, truncation, restricted, and ciphertext matrix",
+            "SQL-020 enforces safety vs deletion role separation and factory capability probe"
           ]
         },
         {

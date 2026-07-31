@@ -1,111 +1,83 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-07-31
+- **最后更新**：2026-07-31（安全缺陷修复中断 E-007）
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：E-006 — PostgreSQL 与 Prisma
+- **当前任务**：E-006 — PostgreSQL 与 Prisma（PR #108 安全返工）
 - **任务状态**：In Review
-- **任务分支**：`agent/e-006-postgres-prisma`
-- **当前 Issue**：[E-006 Issue #44](https://github.com/WeiHan1996/DailyEnergy/issues/44)
-- **当前 PR**：[Draft PR #108](https://github.com/WeiHan1996/DailyEnergy/pull/108)
-- **基线提交**：`d3a86b1705a8574a58787f96b20518ea9b4fdccf`
+- **任务分支**：`agent/pr108-security-fixes`
+- **当前 Issue**：基于 Issue #44 修复
+- **当前 PR**：Draft（待创建）
+- **基线提交**：`e9f02436ff36e9acaf1d34acb353c678453d985e`
 - **Gate 结论**：`MANUAL_EVIDENCE_REQUIRED`（`automated=PASS`）
 
 ## 1. 当前目标
 
-把已接受的领域模型和数据库草案落成可迁移、可测试且按运行 profile 最小授权的
-PostgreSQL 18 / Prisma 7 基线。
+修复 PR #108（E-006 PostgreSQL 基线）复审发现的三个 P1 安全缺陷：
 
-```text
-Accepted 领域与数据库合同
-  → versioned migration
-  → PostgreSQL 约束与最小权限角色
-  → server-adapters DB factory
-  → clean / upgrade / drift / transaction 真实数据库证据
-```
+1. SQL-013 可通过 visibility 状态切换和 weekly current 指向绕过；
+2. SQL-007 允许跨账户的 MorningCheckin 注入发布结果；
+3. Restricted 角色授权过宽，factory 身份校验无法检测直接越权 grant。
 
-E-006 已完成文档范围内的实现与自动验证，现进入 Draft PR 人工审核阶段。
+属于对 E-006 合并后发现的安全缺陷紧急修复，完成后回到 E-007。
+
+修复范围仅限 PostgreSQL migration、DB factory、相关测试和证据清单，不涉及
+业务逻辑或下游任务。
 
 ## 2. 状态变更影响
 
-- [PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106) 已 squash
-  合并，E-015 进入 Done，Issue #105 已关闭；
-- 最新 `main` 为 `d3a86b1705a8574a58787f96b20518ea9b4fdccf`；
-- E-006 是唯一 In Review；其它 Phase 1 工程任务继续保持 Planned；
-- D-001～D-005 继续保持 Planned，不创建 Figma、Design Tokens 或业务页面。
+- PR #108 合并后的安全复审发现三个 P1 缺陷，全部在真实 PostgreSQL 18 上复现；
+- 按 AGENTS.md §2 紧急缺陷规则，E-006 曾在合并后重新进入 In Progress，现已完成修复并进入 In Review；
+- 修复通过后立即回到 E-007，不扩大范围；
+- E-006 相关的测试注册表 COVERED 声明需要校准补充。
 
 ## 3. 范围
 
-- 完成单一 application schema、Prisma Schema 与首个 versioned migration；
-- 实现 S-19 表、枚举、索引、唯一约束、revision/epoch/owner/delete guards
-  和受审 SQL；
-- 创建 api、interactive、background、restricted、migration、test 的最小
-  数据库角色与 grants；
-- 提供 server-adapters DB factory、合成 seed、migration checksum/drift 与
-  Testcontainers harness；
-- 用真实 PostgreSQL 18 验证 SQL-001～020、TX-01～09、权限和迁移路径。
+- 新增一条 versioned migration，修复 SQL-007、SQL-013 触发器覆盖缺口；
+- 拆分 `daily_energy_restricted` 为 `daily_energy_safety` 与 `daily_energy_deletion`
+  两个角色，各自最小授权；
+- 强化 `createClosedDatabaseFactory` 的 capability 探针：不只检查 profile 角色
+  成员，还要断言无额外 DML、无额外角色成员；
+- 补充对应负向 PostgreSQL 集成测试，全部在真实 PG 18 上通过；
+- 更新 evidence-manifest 的 COVERED 登记。
 
 ## 4. 不做
 
-- 不连接或修改生产数据库；
-- 不创建真实备份服务或生产部署；
-- 不实现全部业务 use case；
-- 不启动 E-007、E-009、E-010、D-001 或其它下游任务；
-- 不放宽 Accepted Schema、API、隐私、Safety、删除、幂等、事务或 profile
-  capability 边界。
+- 不改业务逻辑、不引入新功能、不碰 Redis/BullMQ 或 E-007 范围；
+- 不连接或修改生产数据库，不使用真实账号、密钥或用户数据；
+- 不创建新的 Accepted ADR 或修改已有 Accepted 规格；
+- 不放宽 Accepted Schema、API、隐私、Safety、删除、幂等、事务、profile 或
+  可观测性边界。
 
 ## 5. 验收与证据
 
-- SQL-001～020、TX-01～09 与关键唯一/外键/check/grant 场景在真实
-  PostgreSQL 18 通过；
-- production 禁止 `db push` 和应用启动自动 migration；migration 只有一次性入口；
-- Prisma row 不穿透 public contract，普通 profile 无 restricted/migration 能力；
-- migration 支持 clean install、upgrade、drift 检测与 rollback/roll-forward 证据；
-- 删除、恢复 ledger hook 与 migration checksum 负向测试通过；
-- 完成实现后运行当前策略要求的 full validation，并提交聚焦 Draft PR。
+- SQL-013 的 visibility 激活路径与 weekly current 切换路径均被拒绝；
+- SQL-007 的跨主 checkin snapshot 路径被拒绝；
+- safety 与 deletion 角色能力分离，factory 能检测直接越权 grant；
+- 全部数据库集成、生命周期和事务测试共 74 个继续通过；
+- 真实 PostgreSQL 18 上验证通过；
+- evidence-manifest 中 SQL-007、SQL-013 保持/更新为 `COVERED`；
+- 运行安全 Gate。
 
 ## 6. 当前阻塞与决策
 
 - **仓库/代码阻塞**：无；
-- **前置依赖**：E-001、E-002、E-008 已完成；
-- **外部依赖**：Docker 29.4.0 可用，已固定 PostgreSQL 18.0 bookworm 镜像 digest；
-  不得使用真实账号、密钥或生产数据；
-- **并行规则**：E-006 是唯一 In Review；
-- **自动验证**：审核修订后的 PostgreSQL 18 suite 共 69 tests 全通过；
-  `pnpm agent:validate --mode=full --task=E-006` 已执行内部 `pnpm run validate` 并返回
-  `automated=PASS`；security profile 按策略保留 `MANUAL_EVIDENCE_REQUIRED`；
-- **人工证据**：`threatBoundaryReview` 交由 PR 审核；
-  `productionAuthorizationWhenApplicable` 为 N/A（无生产访问、凭据、数据、资源、部署或破坏性操作）；
-- **审核修订**：已同意并修复本轮 5 项阻断与 1 项脱敏意见；无不采纳项；PR 继续保持
-  Draft，等待 reviewer 复审 owner/bootstrap、profile login、DDL timeout、catalog drift、
-  SQL-013 与 URL 脱敏证据；
-- **下一动作**：推送审核修订并请求复审 Draft PR #108；
-- **下一任务**：不提升其它任务为 Ready。
+- **安全 Gate 阻塞**：自动化已通过；按 security profile 仍需人工
+  `threatBoundaryReview`，并确认 `productionAuthorizationWhenApplicable`（本地合成环境、未访问生产，预期为 N/A）；
+- **前置依赖**：PR #108 已合并为基线 `e9f0243`；
+- **外部依赖**：本地 Docker 运行 PostgreSQL 18；
+- **并行规则**：唯一当前审核任务是 E-006 安全返工；E-007 保持 Planned；
+- **验证结果**：`pnpm run validate` 通过；真实 PostgreSQL 18 集成/生命周期/TX-01..09 共 74/74 通过；
+  `pnpm agent:validate --mode=full --task=E-006` 返回
+  `MANUAL_EVIDENCE_REQUIRED`（`automated=PASS`）；
+- **下一动作**：创建并提交聚焦 Draft PR，附上人工 threat-boundary 复核结论；
+- **下一任务**：修复合并后回到 E-007。
 
 ## 7. 最近交接
 
-- E-005 已随 PR #98 合并，Issue #43 已关闭；
-- D-001～D-005 已随 PR #103 纳入 Phase 2，当前全部 Planned；
-- E-015 已随 [PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106)
+- E-006 已随 [PR #108](https://github.com/WeiHan1996/DailyEnergy/pull/108)
   squash 合并，merge commit 为
-  `200e27de889a5cc47571e27d783aa570a381f889`，Issue #105 已关闭；
-- E-015 最终 head `8806726e4b981275bd8500f966210e49725be51d` 已通过
-  `pnpm agent:validate --mode=full --task=E-015`；
-- 最终验证覆盖 format、lint、typecheck、41 条 Agent workflow cases、5 条
-  workflow CLI cases、3 条敏感字段直接 canary、1 条最终入口 CLI canary、
-  Playwright、bundle/contract/architecture Gate 与 build；
-- PR #106 已补齐最外层诊断脱敏，覆盖 API/access key、连接串、Prompt、用户正文、
-  provider/request/response body、带凭据 URL、Bearer 与私钥；
-- 当前控制文件将 E-015 设为 Done、E-006 设为唯一 In Review；
-- E-006 已完成 PostgreSQL 18 / Prisma 7 基线、versioned migration、最小权限角色、
-  closed server-adapters、合成 seed、checksum/drift、SQL-001～020、TX-01～09 与恢复顺序证据；
-- PR #108 首轮审核的 5 项阻断与 1 项非阻断意见均确认成立并已修复：新增
-  `daily_energy_owner NOLOGIN` bootstrap/受控 migration 角色链和第二条真实升级 migration；
-  adapter 改为连接后核验环境 login 的唯一 profile 与越权能力；Prisma DDL 连接实际继承
-  `5s` lock timeout / `5min` statement timeout；drift 改为 14 section 语义 catalog
-  fingerprint 并主动篡改 constraint/index/function/grant；daily/weekly fragment 删除增加
-  deferred SQL-013 校验；PostgreSQL 两种 URL scheme 统一全 URL 脱敏；
-- Source-ID manifest 共 101 项：52 项 `COVERED`、49 项 `NA_WITH_REASON`；
-- 审核修订后真实 PostgreSQL 18 suite 为 69 passed / 0 failed；full Agent Gate 内部
-  `pnpm run validate` 自动验证通过，人工安全复审继续由 Draft PR 承接；
-- 未连接生产数据库，未使用真实用户数据、真实密钥或生产备份。
+  `e9f02436ff36e9acaf1d34acb353c678453d985e`，Issue #44 已关闭；
+- 用户于 2026-07-31 要求对已合并的 PR #108 再次复审，复审发现三条 P1 安全缺陷；
+- 用户要求立即修复；按 AGENTS.md §2 紧急缺陷规则中断 E-007 并创建本任务；
+- 修复分支 `agent/pr108-security-fixes` 基于 `e9f0243`。

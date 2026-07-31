@@ -1,7 +1,10 @@
 export interface PrismaClientLifecycle {
   $connect(): Promise<void>;
   $disconnect(): Promise<void>;
-  $queryRawUnsafe<Result = unknown>(query: string): Promise<Result>;
+  $queryRawUnsafe<Result = unknown>(
+    query: string,
+    ...values: readonly unknown[]
+  ): Promise<Result>;
 }
 
 export interface DatabaseRoleIdentity {
@@ -15,6 +18,13 @@ export interface DatabaseRoleIdentity {
   readonly createDatabase: boolean;
   readonly createRole: boolean;
   readonly bypassRls: boolean;
+  readonly capabilityMismatch: boolean;
+  readonly safetyWrite: boolean;
+  readonly deletionTaskWrite: boolean;
+  readonly subjectDelete: boolean;
+  readonly evaluationAccess: boolean;
+  readonly extraRoleMemberships: readonly string[];
+  readonly immutableTableUpdate: boolean;
 }
 
 export interface PrismaRuntime<Client extends PrismaClientLifecycle> {
@@ -26,5 +36,8 @@ export interface PrismaRuntime<Client extends PrismaClientLifecycle> {
     readonly idleTimeoutMillis?: number | undefined;
   }): unknown;
   createClient(adapter: unknown): Client;
-  inspectRoleIdentity(client: Client): Promise<DatabaseRoleIdentity>;
+  inspectRoleIdentity(
+    client: Client,
+    expectedRole: string,
+  ): Promise<DatabaseRoleIdentity>;
 }

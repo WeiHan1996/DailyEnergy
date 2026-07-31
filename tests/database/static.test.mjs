@@ -74,6 +74,11 @@ test("T-DB-STATIC-003 migration checksum changes on mutation", async () => {
       "20260731000000_owner_upgrade_probe",
     );
     await mkdir(upgradeDirectory);
+    const securityDirectory = path.join(
+      temporaryRoot,
+      "20260731000001_security_fixes_sql007_sql013_roles",
+    );
+    await mkdir(securityDirectory);
     const target = path.join(targetDirectory, "migration.sql");
     await copyFile(migrationFile, target);
     await copyFile(
@@ -82,6 +87,13 @@ test("T-DB-STATIC-003 migration checksum changes on mutation", async () => {
         "prisma/migrations/20260731000000_owner_upgrade_probe/migration.sql",
       ),
       path.join(upgradeDirectory, "migration.sql"),
+    );
+    await copyFile(
+      path.join(
+        root,
+        "prisma/migrations/20260731000001_security_fixes_sql007_sql013_roles/migration.sql",
+      ),
+      path.join(securityDirectory, "migration.sql"),
     );
     const before = await migrationChecksums(temporaryRoot);
     await writeFile(
@@ -110,6 +122,11 @@ test("T-DB-STATIC-004 checksum manifest gate rejects a changed migration", async
       "20260731000000_owner_upgrade_probe",
     );
     await mkdir(upgradeDirectory);
+    const securityDirectory = path.join(
+      temporaryRoot,
+      "20260731000001_security_fixes_sql007_sql013_roles",
+    );
+    await mkdir(securityDirectory);
     const target = path.join(targetDirectory, "migration.sql");
     await copyFile(migrationFile, target);
     await copyFile(
@@ -118,6 +135,13 @@ test("T-DB-STATIC-004 checksum manifest gate rejects a changed migration", async
         "prisma/migrations/20260731000000_owner_upgrade_probe/migration.sql",
       ),
       path.join(upgradeDirectory, "migration.sql"),
+    );
+    await copyFile(
+      path.join(
+        root,
+        "prisma/migrations/20260731000001_security_fixes_sql007_sql013_roles/migration.sql",
+      ),
+      path.join(securityDirectory, "migration.sql"),
     );
     const manifestPath = path.join(temporaryRoot, "checksums.json");
     await copyFile(

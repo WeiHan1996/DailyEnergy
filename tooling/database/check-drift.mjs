@@ -98,18 +98,28 @@ await withClient(connectionString, async (client) => {
     `SELECT
        has_schema_privilege('daily_energy_api', $1, 'USAGE') AS api_schema,
        has_table_privilege('daily_energy_api', $1 || '.app_morning_checkin', 'SELECT') AS api_read,
-       has_table_privilege('daily_energy_restricted', $1 || '.restricted_safety_state', 'SELECT') AS restricted_read,
+       has_table_privilege('daily_energy_safety', $1 || '.restricted_safety_state', 'SELECT') AS safety_read,
+       has_table_privilege('daily_energy_deletion', $1 || '.restricted_safety_state', 'SELECT') AS deletion_read,
+       NOT has_table_privilege('daily_energy_restricted', $1 || '.restricted_safety_state', 'SELECT') AS legacy_restricted_no_read,
        has_table_privilege('daily_energy_api', $1 || '.restricted_safety_state', 'SELECT') AS api_restricted_read,
-       has_table_privilege('daily_energy_api', $1 || '.app_user_profile', 'SELECT') AS api_ciphertext_read`,
+       has_table_privilege('daily_energy_api', $1 || '.app_user_profile', 'SELECT') AS api_ciphertext_read,
+       NOT has_table_privilege('daily_energy_safety', $1 || '.restricted_safety_state', 'DELETE') AS safety_no_delete,
+       NOT has_table_privilege('daily_energy_deletion', $1 || '.evaluation_run', 'SELECT') AS deletion_no_eval,
+       has_table_privilege('daily_energy_deletion', $1 || '.app_morning_checkin', 'DELETE') AS deletion_app_delete`,
     [APPLICATION_SCHEMA],
   );
   const grants = requiredGrants.rows[0];
   if (
     !grants.api_schema ||
     !grants.api_read ||
-    !grants.restricted_read ||
+    !grants.safety_read ||
+    !grants.deletion_read ||
+    !grants.legacy_restricted_no_read ||
     grants.api_restricted_read ||
-    grants.api_ciphertext_read
+    grants.api_ciphertext_read ||
+    !grants.safety_no_delete ||
+    !grants.deletion_no_eval ||
+    !grants.deletion_app_delete
   ) {
     throw new Error("DB_DRIFT_GRANT_MATRIX");
   }

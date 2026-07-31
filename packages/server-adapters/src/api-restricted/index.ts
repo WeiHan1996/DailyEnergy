@@ -14,7 +14,7 @@ export function createApiRestrictedDatabaseFactory(): DatabaseFactory<
 > {
   return createClosedDatabaseFactory(
     {
-      databaseRole: "daily_energy_restricted",
+      databaseRole: "daily_energy_safety",
       defaultConnectionLimit: 2,
       profile: "api-restricted",
     },
