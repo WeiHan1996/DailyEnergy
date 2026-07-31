@@ -7,7 +7,7 @@
 - **任务状态**：In Review
 - **任务分支**：`agent/pr108-security-fixes`
 - **当前 Issue**：基于 Issue #44 修复
-- **当前 PR**：Draft（待创建）
+- **当前 PR**：[Draft PR #110](https://github.com/WeiHan1996/DailyEnergy/pull/110)
 - **基线提交**：`e9f02436ff36e9acaf1d34acb353c678453d985e`
 - **Gate 结论**：`MANUAL_EVIDENCE_REQUIRED`（`automated=PASS`）
 
@@ -70,7 +70,7 @@
 - **验证结果**：`pnpm run validate` 通过；真实 PostgreSQL 18 集成/生命周期/TX-01..09 共 74/74 通过；
   `pnpm agent:validate --mode=full --task=E-006` 返回
   `MANUAL_EVIDENCE_REQUIRED`（`automated=PASS`）；
-- **下一动作**：创建并提交聚焦 Draft PR，附上人工 threat-boundary 复核结论；
+- **下一动作**：在 Draft PR #110 中完成并记录人工 threat-boundary 复核结论；确认后再决定是否转 Ready；
 - **下一任务**：修复合并后回到 E-007。
 
 ## 7. 最近交接
