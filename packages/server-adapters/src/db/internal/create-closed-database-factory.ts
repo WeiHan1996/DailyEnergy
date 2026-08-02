@@ -52,28 +52,75 @@ function roleIdentityMatches(
     !identity.superuser &&
     !identity.createDatabase &&
     !identity.createRole &&
+    !identity.replication &&
     !identity.bypassRls;
-  if (!exactProfile || !unprivilegedLogin) {
+  if (
+    !exactProfile ||
+    !unprivilegedLogin ||
+    identity.membershipMismatch ||
+    identity.extraRoleMemberships.length > 0 ||
+    identity.capabilityMismatch ||
+    identity.schemaCreate ||
+    identity.immutableTableUpdate
+  ) {
     return false;
   }
+
   if (ordinaryDatabaseRoles.has(expectedRole)) {
     return (
       !identity.ownerMember &&
       !identity.restrictedRead &&
-      !identity.schemaCreate
+      !identity.safetyWrite &&
+      !identity.deletionTaskWrite &&
+      !identity.evaluationAccess
     );
   }
+
   if (expectedRole === "daily_energy_migration") {
     return (
-      identity.ownerMember && !identity.restrictedRead && !identity.schemaCreate
+      identity.ownerMember &&
+      !identity.restrictedRead &&
+      !identity.evaluationAccess
     );
   }
+
+  if (expectedRole === "daily_energy_safety") {
+    return (
+      !identity.ownerMember &&
+      identity.restrictedRead &&
+      identity.safetyWrite &&
+      identity.outboxWrite &&
+      !identity.deletionTaskWrite &&
+      !identity.subjectDelete &&
+      !identity.evaluationAccess
+    );
+  }
+
+  if (expectedRole === "daily_energy_deletion") {
+    return (
+      !identity.ownerMember &&
+      identity.restrictedRead &&
+      !identity.safetyWrite &&
+      identity.outboxWrite &&
+      identity.deletionTaskWrite &&
+      identity.subjectDelete &&
+      !identity.evaluationAccess
+    );
+  }
+
   if (expectedRole === "daily_energy_restricted") {
     return (
-      !identity.ownerMember && identity.restrictedRead && !identity.schemaCreate
+      !identity.ownerMember &&
+      !identity.restrictedRead &&
+      !identity.safetyWrite &&
+      !identity.outboxWrite &&
+      !identity.deletionTaskWrite &&
+      !identity.subjectDelete &&
+      !identity.evaluationAccess
     );
   }
-  return !identity.ownerMember && !identity.schemaCreate;
+
+  return !identity.ownerMember;
 }
 
 export function createClosedDatabaseFactory<
@@ -103,7 +150,10 @@ export function createClosedDatabaseFactory<
       await client.$connect();
 
       try {
-        const identity = await runtime.inspectRoleIdentity(client);
+        const identity = await runtime.inspectRoleIdentity(
+          client,
+          definition.databaseRole,
+        );
         if (!roleIdentityMatches(identity, definition.databaseRole)) {
           throw new Error(
             `DB_ROLE_MISMATCH: ${definition.profile} requires ${definition.databaseRole}`,

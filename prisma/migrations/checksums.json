@@ -8,6 +8,10 @@
     {
       "name": "20260731000000_owner_upgrade_probe",
       "sha256": "d49d3f1769c84c125e7ecbf828d76cf9d3138f72470e5026dfd47b400e206df6"
+    },
+    {
+      "name": "20260731000001_security_fixes_sql007_sql013_roles",
+      "sha256": "74b6690c1bcd9d6ef4d2cf954a83a6d4869158f04d67dc9160cfc8ef308bdf61"
     }
   ]
 }

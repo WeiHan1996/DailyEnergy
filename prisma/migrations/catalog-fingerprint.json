@@ -2,7 +2,7 @@
   "version": 1,
   "algorithm": "sha256",
   "schema": "daily_energy",
-  "catalogSha256": "f2db56de15ce93b4cf29fff4ca49018c324cde21f1629f61126821340dfc9196",
+  "catalogSha256": "f0058342750071dbadb7ebe88a8e6d1a96ff48d6895a9db9e105c8095683a7d5",
   "sections": {
     "schemas": {
       "count": 1,
@@ -16,45 +16,49 @@
       "count": 954,
       "sha256": "672cb61266c3ebf644f35fc33cfc80f337d52ef50006ced6fe2b82f4f59406c5"
     },
+    "columnAcl": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
     "enums": {
       "count": 152,
       "sha256": "28462b347c05b78b4b93cf213dad9b769ea525d0085d4c5a879b380dea37b9d7"
     },
     "constraints": {
-      "count": 1065,
-      "sha256": "a0dd82379cd3d7daf3f5a23c4d0d6d73da16a0c6dd8521f4bfd566c8b7539538"
+      "count": 1068,
+      "sha256": "b1d46edcbe8ccc7d9e599ed4b6d53df98c2039bd9f52aa7a0f9fbee2881525e2"
     },
     "indexes": {
       "count": 255,
       "sha256": "3b676d3489d17fe25eb41d60fcdd2d780fcf8074a9edb34366291fdb8642c6e4"
     },
     "triggers": {
-      "count": 17,
-      "sha256": "bb1f8691fbe407c30a5ad98f720445f1ee351f33e151859a39a469447c7c84e3"
+      "count": 20,
+      "sha256": "6eed96ba92f8b6829a3ba3400a569f16239b455ac69c989c98f2065b3fe52fe8"
     },
     "functions": {
-      "count": 13,
-      "sha256": "7d7129aeec75bc63c59915576d61773cab39e61d80252ae410647b6dea87ac2f"
+      "count": 17,
+      "sha256": "548103cbb8468232312b78f2386d46811b2e8c8cf5b9411bddeeda15a0cd825a"
     },
     "schemaAcl": {
-      "count": 7,
-      "sha256": "8a6bc8e7942683c5a04396f0fbe5fd436fc29872cba8a66f8c394c2e3385cd3a"
+      "count": 9,
+      "sha256": "492815ca1e728968e5e46129b8d3bc08803a4a4f7b354755bd42ac1d832e7fa4"
     },
     "relationAcl": {
-      "count": 1726,
-      "sha256": "e8de63315fd6381712428b90cbcea10e8340fd69b606ca22340be2046f8703b0"
+      "count": 1618,
+      "sha256": "8d7cb71ed469b57994ee6006093c80df1d2e95f3f7e25d54d637026ffbddd27f"
     },
     "functionAcl": {
-      "count": 25,
-      "sha256": "991b99c0b28f30a6f72583a32c2e482472d7bfd6e27c37486bef25e69646527d"
+      "count": 42,
+      "sha256": "da253a2617b2d7d12a56bf2c93b4d0844516463a7080df9934cd36b4a3fb61d1"
     },
     "defaultPrivileges": {
       "count": 0,
       "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     "roles": {
-      "count": 7,
-      "sha256": "00f6cfda55e915244dc41e11171e201cbacfa981feb54b44ef041281fef492e9"
+      "count": 9,
+      "sha256": "cfc058c893e4e55135424dbea4f12262a8faac18ec6f54e2e863bff0ed3852e1"
     },
     "memberships": {
       "count": 1,

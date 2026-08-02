@@ -31,16 +31,26 @@ class FakeClient implements PrismaClientLifecycle {
 }
 
 const backgroundIdentity: DatabaseRoleIdentity = {
+  capabilityMismatch: false,
   currentUser: "daily_energy_background_prod",
   sessionUser: "daily_energy_background_prod",
   profileMemberships: ["daily_energy_background"],
+  membershipMismatch: false,
   ownerMember: false,
   restrictedRead: false,
+  safetyWrite: false,
+  outboxWrite: true,
+  deletionTaskWrite: false,
+  subjectDelete: true,
   schemaCreate: false,
   superuser: false,
   createDatabase: false,
   createRole: false,
+  replication: false,
   bypassRls: false,
+  evaluationAccess: false,
+  extraRoleMemberships: [],
+  immutableTableUpdate: false,
 };
 
 function fakeRuntime(
@@ -100,7 +110,7 @@ describe("closed database factory", () => {
     FakeClient.instances = [];
     const setup = factory(
       "worker-restricted",
-      "daily_energy_restricted",
+      "daily_energy_deletion",
       backgroundIdentity,
     );
 
@@ -109,7 +119,7 @@ describe("closed database factory", () => {
         connectionString: "postgresql://environment_login:secret@db.test/app",
       }),
     ).rejects.toThrow(
-      "DB_ROLE_MISMATCH: worker-restricted requires daily_energy_restricted",
+      "DB_ROLE_MISMATCH: worker-restricted requires daily_energy_deletion",
     );
     expect(setup.runtime.createAdapter).toHaveBeenCalledOnce();
     expect(FakeClient.instances[0]?.disconnect).toHaveBeenCalledOnce();
@@ -132,11 +142,15 @@ describe("closed database factory", () => {
         ...backgroundIdentity,
         profileMemberships: [
           "daily_energy_background",
-          "daily_energy_restricted",
+          "daily_energy_deletion",
         ],
       },
       { ...backgroundIdentity, restrictedRead: true },
       { ...backgroundIdentity, ownerMember: true },
+      { ...backgroundIdentity, capabilityMismatch: true },
+      { ...backgroundIdentity, membershipMismatch: true },
+      { ...backgroundIdentity, replication: true },
+      { ...backgroundIdentity, extraRoleMemberships: ["rogue_group"] },
     ]) {
       const setup = factory(
         "worker-background",
@@ -149,6 +163,80 @@ describe("closed database factory", () => {
         }),
       ).rejects.toThrow("DB_ROLE_MISMATCH");
     }
+  });
+
+  it("accepts only the matching safety and deletion capability contracts", async () => {
+    const safety = factory("api-restricted", "daily_energy_safety", {
+      ...backgroundIdentity,
+      currentUser: "daily_energy_safety_prod",
+      sessionUser: "daily_energy_safety_prod",
+      profileMemberships: ["daily_energy_safety"],
+      restrictedRead: true,
+      safetyWrite: true,
+      outboxWrite: true,
+      subjectDelete: false,
+    });
+    await expect(
+      safety.factory.connect({
+        connectionString: "postgres://safety:secret@db.test/app",
+      }),
+    ).resolves.toMatchObject({ profile: "api-restricted" });
+
+    const safetyWithoutOutbox = factory(
+      "api-restricted",
+      "daily_energy_safety",
+      {
+        ...backgroundIdentity,
+        currentUser: "daily_energy_safety_prod",
+        sessionUser: "daily_energy_safety_prod",
+        profileMemberships: ["daily_energy_safety"],
+        restrictedRead: true,
+        safetyWrite: true,
+        outboxWrite: false,
+        subjectDelete: false,
+      },
+    );
+    await expect(
+      safetyWithoutOutbox.factory.connect({
+        connectionString: "postgres://safety:secret@db.test/app",
+      }),
+    ).rejects.toThrow("DB_ROLE_MISMATCH");
+
+    const deletion = factory("worker-restricted", "daily_energy_deletion", {
+      ...backgroundIdentity,
+      currentUser: "daily_energy_deletion_prod",
+      sessionUser: "daily_energy_deletion_prod",
+      profileMemberships: ["daily_energy_deletion"],
+      restrictedRead: true,
+      outboxWrite: true,
+      deletionTaskWrite: true,
+      subjectDelete: true,
+    });
+    await expect(
+      deletion.factory.connect({
+        connectionString: "postgres://deletion:secret@db.test/app",
+      }),
+    ).resolves.toMatchObject({ profile: "worker-restricted" });
+
+    const overprivilegedSafety = factory(
+      "api-restricted",
+      "daily_energy_safety",
+      {
+        ...backgroundIdentity,
+        currentUser: "daily_energy_safety_prod",
+        sessionUser: "daily_energy_safety_prod",
+        profileMemberships: ["daily_energy_safety"],
+        restrictedRead: true,
+        safetyWrite: true,
+        outboxWrite: true,
+        subjectDelete: true,
+      },
+    );
+    await expect(
+      overprivilegedSafety.factory.connect({
+        connectionString: "postgres://safety:secret@db.test/app",
+      }),
+    ).rejects.toThrow("DB_ROLE_MISMATCH");
   });
 
   it("disconnects the private client exactly once", async () => {

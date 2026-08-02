@@ -104,6 +104,12 @@ async function dailyPublication(client, accountId, productDate, suffix) {
     [checkinId, accountId, productDate, ts, id()],
   );
   await client.query(
+    `INSERT INTO app_morning_checkin_revision
+      (id,"checkinId",revision,mood,energy,sleep,"commandRef","retentionPolicyVersion","retentionAnchorAt")
+     VALUES ($1,$2,1,'STEADY','STEADY','OKAY',$3,'retention-policy-v1',$4)`,
+    [id(), checkinId, id(), ts],
+  );
+  await client.query(
     `INSERT INTO app_generation_intent
       (id,"accountId","targetProductDate","productDatePolicyVersion","acceptedAt",revision,state,
        "resultVersion","manifestRef","manifestFingerprint","inputSnapshotFingerprint","rootSeedMaterialRef",
@@ -287,6 +293,12 @@ test(
                VALUES ($1,$2,$3,'product-date-v1',1,'GOOD','HIGH','GOOD',$4,$4,$5,'retention-policy-v1',$4)`,
                 [checkinId, accountId, productDate, ts, id()],
               );
+              await winner.query(
+                `INSERT INTO app_morning_checkin_revision
+                  (id,"checkinId",revision,mood,energy,sleep,"commandRef","retentionPolicyVersion","retentionAnchorAt")
+                 VALUES ($1,$2,1,'GOOD','HIGH','GOOD',$3,'retention-policy-v1',$4)`,
+                [id(), checkinId, id(), ts],
+              );
               const loserRejected = assert.rejects(
                 loser.query(
                   `INSERT INTO app_morning_checkin
@@ -383,6 +395,10 @@ test(
               await client.query(
                 `INSERT INTO app_morning_checkin (id,"accountId","productDate","productDatePolicyVersion",revision,mood,energy,sleep,"firstSubmittedAt","updatedAt","sourceCommandRef","retentionPolicyVersion","retentionAnchorAt") VALUES ($1,$2,$3,'product-date-v1',1,'STEADY','STEADY','OKAY',$4,$4,$5,'retention-policy-v1',$4)`,
                 [checkinId, accountId, productDate, ts, id()],
+              );
+              await client.query(
+                `INSERT INTO app_morning_checkin_revision (id,"checkinId",revision,mood,energy,sleep,"commandRef","retentionPolicyVersion","retentionAnchorAt") VALUES ($1,$2,1,'STEADY','STEADY','OKAY',$3,'retention-policy-v1',$4)`,
+                [id(), checkinId, id(), ts],
               );
               await client.query(
                 `INSERT INTO app_generation_intent (id,"accountId","targetProductDate","productDatePolicyVersion","acceptedAt",revision,state,"resultVersion","manifestRef","manifestFingerprint","inputSnapshotFingerprint","rootSeedMaterialRef","completionGrantVersion","createdAt","updatedAt","retentionPolicyVersion","retentionAnchorAt") VALUES ($1,$2,$3,'product-date-v1',$4,1,'RUNNING','result-v1','manifest',$5,$6,'seed','grant',$4,$4,'retention-policy-v1',$4)`,

@@ -7,7 +7,7 @@ This directory contains the PostgreSQL 18 / Prisma 7 migration and verification 
 - Prisma CLI and Client: `7.9.1` (same exact version; supplied by the root install)
 - PostgreSQL test image: `postgres:18.0-bookworm@sha256:3f55f8895c4ed50603e2fbdfc72fffeeaba3173321fee5cb825bbbeb30d9d854`
 - Application schema: `daily_energy`
-- Migration head: `20260731000000_owner_upgrade_probe`
+- Migration head: `20260731000001_security_fixes_sql007_sql013_roles`
 
 `DATABASE_URL` is required by `prisma.config.ts`; no credential or production default is committed.
 
@@ -32,10 +32,12 @@ DATABASE_URL=... DB_RESTORE_LEDGER_CHECKPOINT=... \
   node tooling/database/check-recovery-ready.mjs
 ```
 
-`bootstrap.mjs` is a separate privileged, one-time boundary. It creates the `NOLOGIN`
-owner/group roles and the owner-controlled application schema, but it never runs an application
-migration. Environment provisioning creates LOGIN roles separately and grants each login exactly
-one group role.
+`bootstrap.mjs` is a separate privileged, idempotent provisioning boundary. It creates the
+`NOLOGIN` owner/group roles and the owner-controlled application schema, but it never runs an
+application migration. Run it during initial provisioning and again before deployment whenever
+the versioned group-role set expands. The migration preflight fails with
+`DB_MIGRATION_ROLE_BOOTSTRAP_REQUIRED` when that provisioning step is missing. Environment
+provisioning creates LOGIN roles separately and grants each login exactly one group role.
 
 `migrate.mjs` is the one-shot migration entrypoint. It requires an environment LOGIN role whose
 only runtime-profile membership is `daily_energy_migration`, verifies its controlled membership in
@@ -56,20 +58,62 @@ compatible schema. Destructive schema rollback is explicitly not claimed.
 
 ## Role mapping
 
-| Workload profile | PostgreSQL role            |
-| ---------------- | -------------------------- |
-| API              | `daily_energy_api`         |
-| Interactive      | `daily_energy_interactive` |
-| Background       | `daily_energy_background`  |
-| Restricted       | `daily_energy_restricted`  |
-| Migration        | `daily_energy_migration`   |
-| Test             | `daily_energy_test`        |
+| Workload profile  | PostgreSQL role                         |
+| ----------------- | --------------------------------------- |
+| API               | `daily_energy_api`                      |
+| Interactive       | `daily_energy_interactive`              |
+| Background        | `daily_energy_background`               |
+| API Safety pool   | `daily_energy_safety`                   |
+| Restricted worker | `daily_energy_deletion`                 |
+| Legacy restricted | `daily_energy_restricted` (empty shell) |
+| Migration         | `daily_energy_migration`                |
+| Test              | `daily_energy_test`                     |
 
 `daily_energy_owner` and every group role are `NOLOGIN`, `NOINHERIT`, and non-superuser. An
 environment-specific LOGIN role inherits exactly one group role. Only the migration group may
-`SET ROLE daily_energy_owner`; runtime profiles are never object owners. Adapter factories query
-`session_user`, `current_user`, profile memberships, role attributes, restricted-table access, and
-schema-create capability after connecting. They do not infer authorization from the URL username.
+`SET ROLE daily_energy_owner`; runtime profiles are never object owners. The API Safety pool and
+Restricted worker use separate group roles. The legacy `daily_energy_restricted` role is retained
+as an empty compatibility shell and receives no application table privileges.
+
+Adapter factories query `session_user`, `current_user`, recursive profile memberships, role
+attributes, profile capability probes, immutable-table protection, and exact effective
+schema/relation/column/sequence/function/database privileges, including `WITH GRANT OPTION`, against
+the expected group role. PostgreSQL 18 relation comparison includes `MAINTAIN` and
+`MAINTAIN WITH GRANT OPTION`. The expected membership edge must have `ADMIN OPTION = false`,
+`INHERIT OPTION = true`, and `SET OPTION = true`; extra inherited roles, LOGIN `REPLICATION`, and
+capability drift all fail startup. The API Safety role can write the allowlisted Safety facts and
+TX-05 outbox event; the deletion role can write deletion-task evidence and the TX-09 outbox event,
+and delete allowlisted user facts, but cannot write Safety state or evaluation data.
+
+Deferred SQL-007/012/013/014 constraint functions remain `SECURITY INVOKER`. Their helper
+functions are closed to `PUBLIC` and grant `EXECUTE` only to the writer/test roles that can reach
+those constraint paths, so runtime failures retain stable SQL IDs without widening data access.
+SQL-007 separately proves immutable snapshot lineage and the TX-02 current-revision boundary:
+publication and upgrade validation require the referenced historical check-in revision to exist,
+while a newly inserted snapshot must additionally equal the current check-in revision. SQL-013
+validates both sides of a visibility rebind and visibility deletion, so a `BLOCKED` row cannot be
+moved or removed while it still protects an incomplete result; full deletion cleanup remains valid
+once the protected slots are gone.
+
+## Coordinated security cutover
+
+Migration `20260731000001_security_fixes_sql007_sql013_roles` has never been applied to a shared or
+production environment, so its SQL and committed checksum are updated in place before first use.
+It is a coordinated security contract cutover rather than an N/N-1-compatible expand migration:
+
+1. provision the new `daily_energy_safety` and `daily_energy_deletion` group/login roles through the
+   privileged bootstrap boundary;
+2. pause ordinary producer/consumer intake while preserving Safety and deletion guards;
+3. apply the migration, which removes all table/sequence privileges from the legacy
+   `daily_energy_restricted` shell;
+4. start only the new runtime build and verify the Safety, deletion, outbox, role-identity, SQL and
+   drift probes before resuming intake.
+
+After this cutover, rollback to code that still depends on the legacy restricted role is unsupported
+because it would reintroduce the reviewed security defect. Recovery uses a roll-forward build with
+the split-role contract; it must not restore the legacy grants. Any future environment that has
+already applied this migration must treat its migration file and checksum as immutable and use a new
+versioned forward migration.
 
 ## Recovery hook boundary
 
@@ -85,25 +129,35 @@ must-fail fixtures for SQL-001 through SQL-020 and the transaction suite:
 
 - clean migration deployment, idempotent re-application, deterministic synthetic seed, and
   70-table / 35-enum / SQL-ID drift checks;
-- normalized catalog fingerprints for columns/type/default/nullability, ordered enum labels,
-  constraint/index/trigger/function definitions, object owners, complete schema/table/function ACL,
-  default privileges, group-role attributes, and owner membership;
-- active constraint/index/function/grant mutations that must fail the drift gate before exact
-  restoration;
+- normalized catalog fingerprints for columns/type/default/nullability, direct column ACLs,
+  ordered enum labels, constraint/index/trigger/function definitions, object owners,
+  schema/relation/function ACLs, default privileges, group-role attributes, and owner membership;
+- active constraint/index/function/table-grant/column-grant mutations that must fail the drift gate
+  before exact restoration;
 - positive and negative database behavior for SQL-001 through SQL-019, including daily/weekly
-  fragment deletion failure and same-transaction BLOCKED/unpublish success;
-- SQL-020 environment-login membership, role attributes, ownership, DDL, truncate,
-  restricted-data, and ciphertext boundaries;
+  fragment deletion failure, visibility activation/rebind/current-summary publication failure,
+  BLOCKED visibility delete/rebind failure, cross-account, wrong-date, and
+  wrong-checkin-revision snapshot rejection at the TX-02 boundary, a valid API-role snapshot commit,
+  frozen snapshot publication after check-in correction, weekly source fingerprint advancement,
+  and same-transaction BLOCKED/unpublish/deletion-cleanup success;
+- SQL-020 environment-login membership, role attributes, ownership, DDL, truncate, split
+  Safety/Deletion grants including TX-05/TX-09 outbox insertion, legacy restricted-shell closure,
+  ciphertext boundaries, real factory startup, and direct column grant, table `MAINTAIN`, table,
+  schema, function, database and sequence `WITH GRANT OPTION`, membership `ADMIN OPTION`,
+  `INHERIT FALSE`, `SET FALSE`, extra membership, and LOGIN `REPLICATION` rejection;
+- an N-1 role-set upgrade that fails with a stable bootstrap-required code, reruns privileged
+  idempotent provisioning, and then migrates successfully;
 - a conflicting table lock that makes the real second Prisma migration fail near five seconds with
   a stable redacted error, followed by successful roll-forward;
 - TX-01 through TX-09 atomic commit, rollback, replay, compare-and-swap, lock-claim, and concurrent-winner behavior using multiple PostgreSQL connections and deterministic barriers;
 - migration checksum mutation and the repository-level rejection of `prisma db push`.
 
 The harness uses only synthetic identities and data. It does not connect to production, use
-production credentials, or exercise a production restore. The second migration is additive and
-compatible; a future destructive or contract migration still requires its own isolated recovery
-rehearsal and authorization.
+production credentials, or exercise a production restore. The initial lock-timeout migration is
+additive and compatible; the security-fix migration is the explicitly coordinated split-role
+cutover described above. A future destructive or contract migration still requires its own
+isolated recovery rehearsal and authorization.
 
-`tests/database/evidence-manifest.json` is the scoped, machine-readable pre-E-010 handoff. Its 101 entries map every SQL and TX contract to exact tests and classify each `S19-DB-001..064` and `S31-TEST-017..024` item individually as either `COVERED` or `NA_WITH_REASON`. Every NA entry names the missing layer and follow-up owner; it is not counted as coverage.
+`tests/database/evidence-manifest.json` is the scoped, machine-readable pre-E-010 handoff. Its 101 entries map every SQL and TX contract to exact tests and classify each `S19-DB-001..064` and `S31-TEST-017..024` item individually as either `COVERED` or `NA_WITH_REASON`. Every NA entry names the missing layer and follow-up owner; it is not counted as coverage. The security-fix migration adds explicit SQL-007, SQL-013 and split-role assertions to the covered evidence.
 
 `pnpm database:check` validates migration checksums, static gates, and this manifest without starting a container. The broader cross-project registry, queue resilience, application/E2E, production backup, and provider-call layers remain owned by the follow-up tasks named in the manifest.

@@ -33,6 +33,19 @@ const catalogQueries = Object.freeze({
     WHERE n.nspname = $1 AND c.relkind IN ('r', 'p', 'S')
       AND a.attnum > 0 AND NOT a.attisdropped
     ORDER BY c.relname, a.attnum`,
+  columnAcl: `
+    SELECT c.relname AS relation, a.attname AS column_name,
+           CASE WHEN acl.grantee = 0 THEN 'PUBLIC' ELSE grantee.rolname END AS grantee,
+           acl.privilege_type AS privilege, acl.is_grantable AS grantable
+    FROM pg_attribute a
+    JOIN pg_class c ON c.oid = a.attrelid
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    CROSS JOIN LATERAL aclexplode(a.attacl) acl
+    LEFT JOIN pg_roles grantee ON grantee.oid = acl.grantee
+    WHERE n.nspname = $1 AND c.relkind IN ('r', 'p', 'v', 'm', 'f')
+      AND a.attnum > 0 AND NOT a.attisdropped
+      AND a.attacl IS NOT NULL
+    ORDER BY relation, column_name, grantee, privilege`,
   enums: `
     SELECT t.typname AS type, owner.rolname AS owner, e.enumsortorder::text AS ordinal,
            e.enumlabel AS label
