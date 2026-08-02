@@ -81,9 +81,12 @@ schema/relation/column/sequence/function/database privileges, including `WITH GR
 the expected group role. PostgreSQL 18 relation comparison includes `MAINTAIN` and
 `MAINTAIN WITH GRANT OPTION`. The expected membership edge must have `ADMIN OPTION = false`,
 `INHERIT OPTION = true`, and `SET OPTION = true`; extra inherited roles, LOGIN `REPLICATION`, and
-capability drift all fail startup. The API Safety role can write the allowlisted Safety facts and
-TX-05 outbox event; the deletion role can write deletion-task evidence and the TX-09 outbox event,
-and delete allowlisted user facts, but cannot write Safety state or evaluation data.
+capability drift all fail startup. Relation capability probes use catalog OIDs rather than
+permission-dependent qualified-name resolution, so losing inherited schema usage still produces a
+stable role mismatch instead of aborting the identity query. The API Safety role can write the
+allowlisted Safety facts and TX-05 outbox event; the deletion role can write deletion-task evidence
+and the TX-09 outbox event, and delete allowlisted user facts, but cannot write Safety state or
+evaluation data.
 
 Deferred SQL-007/012/013/014 constraint functions remain `SECURITY INVOKER`. Their helper
 functions are closed to `PUBLIC` and grant `EXECUTE` only to the writer/test roles that can reach

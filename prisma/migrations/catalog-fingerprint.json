@@ -2,7 +2,7 @@
   "version": 1,
   "algorithm": "sha256",
   "schema": "daily_energy",
-  "catalogSha256": "f0058342750071dbadb7ebe88a8e6d1a96ff48d6895a9db9e105c8095683a7d5",
+  "catalogSha256": "f5d48fb9233573330c229850650de7f50c845cd3b4c4386f4ead551b7506b6ad",
   "sections": {
     "schemas": {
       "count": 1,
@@ -34,11 +34,11 @@
     },
     "triggers": {
       "count": 20,
-      "sha256": "6eed96ba92f8b6829a3ba3400a569f16239b455ac69c989c98f2065b3fe52fe8"
+      "sha256": "e2354cd2c8e747e6f70d55d52b52622b08e366af19ed45316671552941cf15e4"
     },
     "functions": {
       "count": 17,
-      "sha256": "548103cbb8468232312b78f2386d46811b2e8c8cf5b9411bddeeda15a0cd825a"
+      "sha256": "274b7674bb0b752b59dfa9a764805024071401b1a14e38b7105a9842fbc55bde"
     },
     "schemaAcl": {
       "count": 9,
@@ -50,7 +50,7 @@
     },
     "functionAcl": {
       "count": 42,
-      "sha256": "da253a2617b2d7d12a56bf2c93b4d0844516463a7080df9934cd36b4a3fb61d1"
+      "sha256": "ebc3b66b11b3800359d21f5beb2d098e8a5214b5348a98d5475965c516d24a8f"
     },
     "defaultPrivileges": {
       "count": 0,

@@ -47,6 +47,12 @@ export const prismaRuntime: PrismaRuntime<PrismaClientLifecycle> = {
       }>
     >(
       `
+      WITH application_relations AS (
+        SELECT object.oid, object.relname
+        FROM pg_class object
+        JOIN pg_namespace namespace ON namespace.oid = object.relnamespace
+        WHERE namespace.nspname = 'daily_energy'
+      )
       SELECT
         current_user::text AS "currentUser",
         session_user::text AS "sessionUser",
@@ -71,22 +77,22 @@ export const prismaRuntime: PrismaRuntime<PrismaClientLifecycle> = {
             AND membership.set_option
         ) AS "membershipMismatch",
         pg_has_role(session_user, 'daily_energy_owner', 'MEMBER') AS "ownerMember",
-        has_table_privilege(session_user, 'daily_energy.restricted_safety_state', 'SELECT') AS "restrictedRead",
-        has_table_privilege(session_user, 'daily_energy.restricted_safety_state', 'INSERT')
-          AND has_table_privilege(session_user, 'daily_energy.restricted_safety_state', 'UPDATE') AS "safetyWrite",
-        has_table_privilege(session_user, 'daily_energy.runtime_outbox_event', 'INSERT') AS "outboxWrite",
-        has_table_privilege(session_user, 'daily_energy.restricted_data_task', 'INSERT')
-          AND has_table_privilege(session_user, 'daily_energy.restricted_data_task', 'UPDATE')
-          AND has_table_privilege(session_user, 'daily_energy.restricted_data_task', 'DELETE') AS "deletionTaskWrite",
-        has_table_privilege(session_user, 'daily_energy.app_morning_checkin', 'DELETE') AS "subjectDelete",
+        has_table_privilege(session_user, restricted_safety_state.oid, 'SELECT') AS "restrictedRead",
+        has_table_privilege(session_user, restricted_safety_state.oid, 'INSERT')
+          AND has_table_privilege(session_user, restricted_safety_state.oid, 'UPDATE') AS "safetyWrite",
+        has_table_privilege(session_user, runtime_outbox_event.oid, 'INSERT') AS "outboxWrite",
+        has_table_privilege(session_user, restricted_data_task.oid, 'INSERT')
+          AND has_table_privilege(session_user, restricted_data_task.oid, 'UPDATE')
+          AND has_table_privilege(session_user, restricted_data_task.oid, 'DELETE') AS "deletionTaskWrite",
+        has_table_privilege(session_user, app_morning_checkin.oid, 'DELETE') AS "subjectDelete",
         EXISTS(
-          SELECT 1 FROM pg_tables t
-          WHERE t.schemaname = 'daily_energy' AND t.tablename LIKE 'evaluation_%'
+          SELECT 1 FROM application_relations evaluation_table
+          WHERE evaluation_table.relname LIKE 'evaluation_%'
             AND (
-              has_table_privilege(session_user, format('%I.%I', t.schemaname, t.tablename), 'SELECT')
-              OR has_table_privilege(session_user, format('%I.%I', t.schemaname, t.tablename), 'INSERT')
-              OR has_table_privilege(session_user, format('%I.%I', t.schemaname, t.tablename), 'UPDATE')
-              OR has_table_privilege(session_user, format('%I.%I', t.schemaname, t.tablename), 'DELETE')
+              has_table_privilege(session_user, evaluation_table.oid, 'SELECT')
+              OR has_table_privilege(session_user, evaluation_table.oid, 'INSERT')
+              OR has_table_privilege(session_user, evaluation_table.oid, 'UPDATE')
+              OR has_table_privilege(session_user, evaluation_table.oid, 'DELETE')
             )
         ) AS "evaluationAccess",
         COALESCE((
@@ -107,10 +113,10 @@ export const prismaRuntime: PrismaRuntime<PrismaClientLifecycle> = {
         role.rolreplication AS replication,
         role.rolbypassrls AS "bypassRls",
         (
-          has_table_privilege(session_user, 'daily_energy.app_published_daily_result', 'UPDATE')
-          OR has_table_privilege(session_user, 'daily_energy.app_generation_input_snapshot', 'UPDATE')
-          OR has_table_privilege(session_user, 'daily_energy.app_published_weekly_summary_revision', 'UPDATE')
-          OR has_table_privilege(session_user, 'daily_energy.system_version_catalog_entry', 'UPDATE')
+          has_table_privilege(session_user, app_published_daily_result.oid, 'UPDATE')
+          OR has_table_privilege(session_user, app_generation_input_snapshot.oid, 'UPDATE')
+          OR has_table_privilege(session_user, app_published_weekly_summary_revision.oid, 'UPDATE')
+          OR has_table_privilege(session_user, system_version_catalog_entry.oid, 'UPDATE')
         ) AS "immutableTableUpdate",
         (
           has_schema_privilege(session_user, 'daily_energy', 'USAGE')
@@ -194,6 +200,30 @@ export const prismaRuntime: PrismaRuntime<PrismaClientLifecycle> = {
           )
         ) AS "capabilityMismatch"
       FROM pg_roles role
+      CROSS JOIN LATERAL (
+        SELECT oid FROM application_relations WHERE relname = 'restricted_safety_state'
+      ) restricted_safety_state
+      CROSS JOIN LATERAL (
+        SELECT oid FROM application_relations WHERE relname = 'runtime_outbox_event'
+      ) runtime_outbox_event
+      CROSS JOIN LATERAL (
+        SELECT oid FROM application_relations WHERE relname = 'restricted_data_task'
+      ) restricted_data_task
+      CROSS JOIN LATERAL (
+        SELECT oid FROM application_relations WHERE relname = 'app_morning_checkin'
+      ) app_morning_checkin
+      CROSS JOIN LATERAL (
+        SELECT oid FROM application_relations WHERE relname = 'app_published_daily_result'
+      ) app_published_daily_result
+      CROSS JOIN LATERAL (
+        SELECT oid FROM application_relations WHERE relname = 'app_generation_input_snapshot'
+      ) app_generation_input_snapshot
+      CROSS JOIN LATERAL (
+        SELECT oid FROM application_relations WHERE relname = 'app_published_weekly_summary_revision'
+      ) app_published_weekly_summary_revision
+      CROSS JOIN LATERAL (
+        SELECT oid FROM application_relations WHERE relname = 'system_version_catalog_entry'
+      ) system_version_catalog_entry
       WHERE role.rolname = session_user
     `,
       expectedRole,
