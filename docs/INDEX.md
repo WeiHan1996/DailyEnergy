@@ -172,15 +172,15 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 ### 7.6 工程架构与交付
 
-| 文件                                                                                                                                                                                                   | 状态        | 目的                                                                                                     | 主要依赖                                                      |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted    | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                                | Gateway、database、API、ADR-0006                              |
-| [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted    | Monorepo 目录、app/package/module、public exports 与依赖 Gate                                            | architecture、ADR-0006                                        |
-| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted    | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵                                                     | schemas、API、architecture、repository-structure              |
-| [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted    | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复                                                   | architecture、repository-structure、testing、privacy          |
-| [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                                 | metrics、Gateway、privacy、incident、architecture、deployment |
-| [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                     | database、testing、deployment、ADR-0005、Issue #44            |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-007 是唯一 In Review，D-001～D-005 均为 Planned | Accepted Phase 0B specs、D 系列项目控制、E-007                |
+| 文件                                                                                                                                                                                                   | 状态        | 目的                                                                                                 | 主要依赖                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted    | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                            | Gateway、database、API、ADR-0006                              |
+| [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted    | Monorepo 目录、app/package/module、public exports 与依赖 Gate                                        | architecture、ADR-0006                                        |
+| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted    | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵                                                 | schemas、API、architecture、repository-structure              |
+| [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted    | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复                                               | architecture、repository-structure、testing、privacy          |
+| [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                             | metrics、Gateway、privacy、incident、architecture、deployment |
+| [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                 | database、testing、deployment、ADR-0005、Issue #44            |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-009 是唯一 Ready，D-001～D-005 均为 Planned | Accepted Phase 0B specs、D 系列项目控制、E-009                |
 
 ### 7.7 Phase Gate
 
@@ -245,20 +245,20 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-006、E-008 与 E-015 已完成，E-007 是唯一 In Review。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-008 与 E-015 已完成，E-009 是唯一 Ready。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-007 Issue #45](https://github.com/WeiHan1996/DailyEnergy/issues/45)；
+6. [E-009 Issue #47](https://github.com/WeiHan1996/DailyEnergy/issues/47)；
 7. `docs/agent/PROJECT_CONTEXT.md`、Agent 工作流规范与
-   `pnpm agent:prepare E-007` 返回的全部 required sources；
+   `pnpm agent:prepare E-009` 返回的全部 required sources；
 8. [系统架构](./technical/architecture.md)、[仓库结构与模块边界](./technical/repository-structure.md)、
    [测试策略](./technical/testing.md)、[部署、配置和回滚](./technical/deployment.md)与
    [可观测性和成本监控](./technical/observability.md)；
-9. 现有 Worker、server-adapters、PostgreSQL outbox/inbox、fixtures 与附近代码；
+9. 现有 API/Admin/Worker 入口、运行配置、server-adapters、数据库/队列测试与附近代码；
 10. tasks/backlog.md（仅在需要重排优先级时）。
 
 E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done；E-008 已随
@@ -268,8 +268,10 @@ PR #97 squash 合并并关闭 Issue #46。E-005 已随
 [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) 已随
 [PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106) squash 合并，
 merge commit 为 `200e27de889a5cc47571e27d783aa570a381f889`，Issue #105
-已关闭；E-006 的 PR #110 安全返工与 PR #111 post-merge full Gate 修复均已合并，
-最终真实 PostgreSQL 18 suite `82/82`；E-007 自动化 Gate 已通过并进入审核。
+已关闭；E-006 的 PR #110 安全返工与 PR #111 post-merge full Gate 修复均已合并；
+E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squash 合并为
+`9630691a87b184bafe6ca78900a31244a6e6c237`，Issue #45 已关闭，merged `main` 的完整
+验证通过，真实 PostgreSQL 18 suite `82/82`、Queue integration `7/7`。
 [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
 [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
@@ -281,7 +283,7 @@ D-005 是 C-012、C-013、C-014 的直接前置。
 Source IDs，并按 E-010 前的 `NA_WITH_REASON` 规则保留可执行证据。
 CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production
 Gate 未被自动解除；E-015 只实现了 P0/P1，没有提前交付 E-010、E-011、
-E-013 或 D 系列能力。E-007 当前是唯一 In Review，分支为
-`agent/e007-redis-bullmq`；已建立 37 项 scoped Source-ID evidence，并通过真实
-Redis 8 / BullMQ 5 / PostgreSQL 18 的 relay、Inbox、profile、重建和 drain 套件。
-当前 Gate 与交接见 tasks/current.md。
+E-013 或 D 系列能力。E-009 当前是唯一 Ready，尚未创建实现分支；它将复用 E-007
+已建立的 37 项 scoped Source-ID evidence 与真实 Redis 8 / BullMQ 5 / PostgreSQL 18
+队列基线，落地实际 Compose health/network/egress/fault/rebuild 编排。当前 Gate 与交接见
+tasks/current.md。
