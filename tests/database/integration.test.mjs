@@ -1387,11 +1387,11 @@ test(
               const state = await admin.query(
                 `SELECT snapshot."checkinRevision" AS "snapshotRevision",
                         checkin.revision AS "currentRevision",
-                        encode(window."currentSourceFingerprint", 'hex') AS "weeklyFingerprint",
+                        encode(weekly_window."currentSourceFingerprint", 'hex') AS "weeklyFingerprint",
                         (SELECT count(*)::int FROM ${schema}.app_weekly_source_snapshot WHERE "windowId"=$3) AS "weeklySnapshotCount"
                    FROM ${schema}.app_generation_input_snapshot snapshot
                    JOIN ${schema}.app_morning_checkin checkin ON checkin.id=snapshot."checkinId"
-                   JOIN ${schema}.app_weekly_window window ON window."accountId"=$1
+                   JOIN ${schema}.app_weekly_window weekly_window ON weekly_window."accountId"=$1
                   WHERE snapshot.id=$2`,
                 [account, snapshot, window],
               );
