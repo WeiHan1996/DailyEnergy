@@ -16,7 +16,7 @@
 
 E-002 的版本化质量 fixtures 包括：
 
-- `architecture/boundary-cases.json`：20 个最小 known-fail case 覆盖 S-30
+- `architecture/boundary-cases.json`：24 个最小 known-fail case 覆盖 S-30
   的 12 类静态 Gate，包括生产源码通过 `devDependencies` 跨 runtime zone，以及
   client-safe 通过 TS/JS 或 JSON/资源相对路径穿越到 server-core workspace；
 - `architecture/known-pass-project.json`：隔离正向 project，全部 12 类 Gate
@@ -36,3 +36,13 @@ E-002 的版本化质量 fixtures 包括：
 
 正式 Source-ID registry、测试 metadata、runner 分层和完整 E2E/resilience
 骨架仍属于 E-010。
+
+E-007 增加独立的 queue lane：
+
+- `queue/evidence-manifest.json`：E-010 前的 scoped manifest，将 37 个本任务直接覆盖的
+  S28/S29/S30/S31/S32/S33 Source IDs 映射到具体断言；
+- `queue/evidence.test.mjs`：拒绝缺失 Source ID、未知 proof 和虚假 coverage 状态；
+- `queue/integration.test.mjs`：使用固定 digest 的真实 Redis 8.2.1、BullMQ 5.81.3 与
+  PostgreSQL 18，验证 relay/ACK crash、Inbox duplicate、profile/guard/retry、空 Redis
+  重建与 graceful drain；
+- `pnpm queue:validate`：运行 scoped evidence Gate 和真实容器集成套件。

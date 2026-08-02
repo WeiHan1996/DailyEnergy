@@ -347,7 +347,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-007 Redis 与 BullMQ 基线已 Ready
+状态：E-007 Redis 与 BullMQ 基线 In Review
 当前目标：建立 Redis 8、BullMQ 5、事务型 outbox/inbox 与 Redis 丢失重建基线
 当前任务：E-007 Redis 8、BullMQ 5 与事务型 Outbox 基线
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/45
@@ -364,15 +364,16 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 当前任务范围：
 
 - [E-007 Issue #45](https://github.com/WeiHan1996/DailyEnergy/issues/45)
-  是唯一 Ready 任务，尚未开始实现；
-- E-007 将交付 Redis 8 / BullMQ 5、Worker profile、事务型 outbox/inbox、bounded retry、
-  graceful drain 与从 PostgreSQL 权威事实重建 Redis 的真实集成证据；
+  是唯一 In Review 任务，分支为 `agent/e007-redis-bullmq`；
+- E-007 已实现 Redis 8 / BullMQ 5、Worker profile、事务型 outbox/inbox、bounded retry、
+  graceful drain 与从 PostgreSQL 权威事实重建 Redis，并使用真实 Redis 8、BullMQ 5
+  和 PostgreSQL 18 验证关键 crash/duplicate/profile/rebuild 路径；
 - 不连接生产数据库、不创建真实备份服务、不实现全部业务 use case；
 - E-015 已完成 P0/P1 权威来源路由、任务 Profile、依赖阻断和安静验证；
 - D-001～D-005 已进入 Phase 2 Backlog，全部保持 Planned；
 - E-006 已随 PR #110/#111 完成，最终 `pnpm run validate` 与真实 PostgreSQL 18
   数据库测试 `82/82` 通过；
-- 不在收到 E-007 开工指令前创建实现分支或修改 Redis/BullMQ 代码。
+- 不实现具体 Daily、Weekly、通知或删除业务 handler，不连接生产依赖。
 
 [Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。
 E-001～E-005 与 E-008 已合并并进入 Done；E-005 随
@@ -382,7 +383,7 @@ E-001～E-005 与 E-008 已合并并进入 Done；E-005 随
 [PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106) squash 合并，
 merge commit 为 `200e27de889a5cc47571e27d783aa570a381f889`，Issue #105
 已关闭；E-006 的 PR #110 安全返工与 PR #111 post-merge full Gate 修复均已合并，
-E-007 已提升为唯一 Ready。
+E-007 自动化 changed/task/full Gate 已通过，等待 Draft PR 人工安全审核。
 [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
 [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、

@@ -49,7 +49,10 @@
   "dependencies": {
     "@prisma/adapter-pg": "catalog:",
     "@prisma/client": "catalog:",
-    "pg": "catalog:"
+    "bullmq": "catalog:",
+    "ioredis": "catalog:",
+    "pg": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@daily-energy/typescript-config": "workspace:*",

@@ -1,15 +1,31 @@
 import type {
   DatabaseConnection,
   DatabaseFactory,
-  DatabaseFactoryConfig,
+  QueueJobHandler,
+  WorkerInfrastructureConfig,
+  WorkerInfrastructureRuntime,
 } from "@daily-energy/server-adapters/worker-background";
-import { createWorkerBackgroundDatabaseFactory } from "@daily-energy/server-adapters/worker-background";
+import {
+  createWorkerBackgroundDatabaseFactory,
+  startWorkerBackgroundInfrastructure,
+  workerBackgroundManifest,
+} from "@daily-energy/server-adapters/worker-background";
+
+export type WorkerInfrastructureStarter = (
+  config: WorkerInfrastructureConfig,
+  handlers: readonly QueueJobHandler[],
+) => Promise<WorkerInfrastructureRuntime>;
+
+export interface WorkerProcess {
+  readonly profile: "worker-background";
+  readonly runtime: WorkerInfrastructureRuntime;
+  drain(): Promise<void>;
+}
 
 export interface WorkerEntrypoint {
   readonly profile: "worker-background";
-  start(
-    config: DatabaseFactoryConfig,
-  ): Promise<DatabaseConnection<"worker-background", unknown>>;
+  readonly capabilityFingerprintSource: typeof workerBackgroundManifest;
+  start(config: WorkerInfrastructureConfig): Promise<WorkerProcess>;
 }
 
 export function createBackgroundWorkerEntrypoint(
@@ -17,11 +33,44 @@ export function createBackgroundWorkerEntrypoint(
     "worker-background",
     unknown
   > = createWorkerBackgroundDatabaseFactory(),
+  infrastructureStarter: WorkerInfrastructureStarter = startWorkerBackgroundInfrastructure,
+  handlers: readonly QueueJobHandler[] = [],
 ): WorkerEntrypoint {
   return Object.freeze({
+    capabilityFingerprintSource: workerBackgroundManifest,
     profile: "worker-background",
-    start(config: DatabaseFactoryConfig) {
-      return databaseFactory.connect(config);
+    async start(config: WorkerInfrastructureConfig): Promise<WorkerProcess> {
+      const database = await databaseFactory.connect(config.database);
+      let runtime: WorkerInfrastructureRuntime;
+      try {
+        runtime = await infrastructureStarter(config, handlers);
+      } catch (error) {
+        await database.disconnect();
+        throw error;
+      }
+      return createWorkerProcess(database, runtime);
+    },
+  });
+}
+
+function createWorkerProcess(
+  database: DatabaseConnection<"worker-background", unknown>,
+  runtime: WorkerInfrastructureRuntime,
+): WorkerProcess {
+  let drained = false;
+  return Object.freeze({
+    profile: "worker-background",
+    runtime,
+    async drain(): Promise<void> {
+      if (drained) {
+        return;
+      }
+      drained = true;
+      try {
+        await runtime.drain();
+      } finally {
+        await database.disconnect();
+      }
     },
   });
 }

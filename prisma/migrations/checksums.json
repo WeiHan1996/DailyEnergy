@@ -12,6 +12,10 @@
     {
       "name": "20260731000001_security_fixes_sql007_sql013_roles",
       "sha256": "74b6690c1bcd9d6ef4d2cf954a83a6d4869158f04d67dc9160cfc8ef308bdf61"
+    },
+    {
+      "name": "20260802000000_e007_queue_inbox_permissions",
+      "sha256": "14b9666631cb4ef69721a58530df9ce7b27471fedd88315baee0761c3dfc468b"
     }
   ]
 }

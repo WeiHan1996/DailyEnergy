@@ -10,7 +10,7 @@ PostgreSQL 18 / Prisma 7 数据模型与迁移基线。
   `db push` Gate。
 
 bootstrap 先创建 `daily_energy_owner NOLOGIN`、group roles 和单一 `daily_energy`
-application schema。两条 migration 由环境 migration LOGIN 受控切换到 owner 后执行，
+application schema。四条 migration 由环境 migration LOGIN 受控切换到 owner 后执行，
 并以受审 SQL 实现 `SQL-001`～`SQL-020` 的约束、trigger 和最小权限。运行 profile
 不得使用 owner/superuser；应用启动不得迁移；共享或生产环境禁止 `prisma db push`。
 

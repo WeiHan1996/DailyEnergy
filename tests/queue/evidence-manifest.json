@@ -1,0 +1,297 @@
+{
+  "manifest_version": "e-007-evidence-v1",
+  "scope": "Pre-E-010 E-007 Redis, BullMQ, outbox, inbox and worker-profile evidence",
+  "authority": [
+    "docs/decisions/ADR-0006-monorepo-and-stack.md",
+    "docs/technical/architecture.md",
+    "docs/technical/repository-structure.md",
+    "docs/technical/testing.md",
+    "docs/technical/deployment.md",
+    "docs/technical/observability.md"
+  ],
+  "status_definitions": {
+    "COVERED": "Executable E-007 proof at the required static, contract, or real dependency layer."
+  },
+  "proofs": {
+    "T-QUEUE-CONTRACT-001": {
+      "file": "packages/server-adapters/src/queue/contracts.test.ts",
+      "selector": "versioned queue contract",
+      "level": "CONTRACT",
+      "assertions": [
+        "strict minimal opaque envelope accepts only approved fields",
+        "note/title/Prompt/expression/account identifiers and oversized guard maps are rejected"
+      ]
+    },
+    "T-QUEUE-MANIFEST-001": {
+      "file": "packages/server-adapters/src/queue/contracts.test.ts",
+      "selector": "worker capability manifests",
+      "level": "CONTRACT",
+      "assertions": [
+        "every static handler type/version routes to exactly one queue profile",
+        "queue, database role and egress fingerprints are profile-specific"
+      ]
+    },
+    "T-QUEUE-CAPABILITY-001": {
+      "file": "packages/server-adapters/src/queue/config.test.ts",
+      "selector": "queue runtime config attestation",
+      "level": "CONTRACT",
+      "assertions": [
+        "profile, database role, egress and capability fingerprint mismatches fail closed",
+        "unknown config fields and non-Redis endpoints fail closed"
+      ]
+    },
+    "T-QUEUE-ARCH-001": {
+      "file": "tests/architecture/boundary-cases.json",
+      "selector": "api-bullmq-processor and worker profile capability fixtures",
+      "level": "STATIC",
+      "assertions": [
+        "API BullMQ processor imports fail with BOUNDARY_CAPABILITY_API",
+        "interactive/background/restricted/migration cross-profile imports fail with stable boundary codes"
+      ]
+    },
+    "T-QUEUE-INTEGRATION-RELAY-001": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "S29-ARCH-018/S31-TEST-025 relay crash replays one domain effect",
+      "level": "INTEGRATION",
+      "assertions": [
+        "enqueue-before-PUBLISHED crash leaves the PostgreSQL event replayable",
+        "replay retains the event id and produces one transaction-scoped domain effect"
+      ]
+    },
+    "T-QUEUE-INTEGRATION-INBOX-001": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "S29-ARCH-019/S31-TEST-026 commit-before-ACK crash is inbox no-op",
+      "level": "INTEGRATION",
+      "assertions": [
+        "commit-before-ACK crash retries the same BullMQ job",
+        "InboxReceipt suppresses the duplicate handler effect and emits low-cardinality duplicate telemetry"
+      ]
+    },
+    "T-QUEUE-INTEGRATION-PROFILE-001": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "profile, stale guard and Restricted role subtests",
+      "level": "INTEGRATION",
+      "assertions": [
+        "Interactive rejects Restricted jobs without invoking a handler",
+        "Restricted consumes with the deletion DB role and commits its inbox/domain transaction"
+      ]
+    },
+    "T-QUEUE-INTEGRATION-TERMINAL-001": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "S29-ARCH-007/020/024 profile, stale guard and retry fail closed",
+      "level": "INTEGRATION",
+      "assertions": [
+        "stale revision/guard is persisted as a stable terminal receipt and is not blindly retried",
+        "retryable failures roll back inbox and stop at the configured attempt bound"
+      ]
+    },
+    "T-QUEUE-INTEGRATION-REBUILD-001": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "S29-ARCH-022/S31-TEST-027 empty Redis rebuilds eligible PG facts only",
+      "level": "INTEGRATION",
+      "assertions": [
+        "a replacement empty Redis 8 instance rebuilds unconsumed outbox, due intent and active DataTask jobs",
+        "expired, deleted-account and consumed rows are excluded and PostgreSQL fact counts do not change"
+      ]
+    },
+    "T-QUEUE-INTEGRATION-DRAIN-001": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "S32-DEPLOY-027 in-flight work drains before Redis disconnect",
+      "level": "INTEGRATION",
+      "assertions": [
+        "graceful drain waits for an active handler transaction",
+        "the job completes before the consumer Redis connection closes"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S28-STACK-025",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-REBUILD-001"]
+    },
+    {
+      "source_id": "S28-STACK-026",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-INBOX-001"]
+    },
+    {
+      "source_id": "S28-STACK-027",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-CONTRACT-001"]
+    },
+    {
+      "source_id": "S29-ARCH-007",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-MANIFEST-001", "T-QUEUE-INTEGRATION-PROFILE-001"]
+    },
+    {
+      "source_id": "S29-ARCH-018",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-RELAY-001"]
+    },
+    {
+      "source_id": "S29-ARCH-019",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-INBOX-001"]
+    },
+    {
+      "source_id": "S29-ARCH-020",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-TERMINAL-001"]
+    },
+    {
+      "source_id": "S29-ARCH-021",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-INBOX-001"]
+    },
+    {
+      "source_id": "S29-ARCH-022",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-REBUILD-001"]
+    },
+    {
+      "source_id": "S29-ARCH-023",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-CONTRACT-001"]
+    },
+    {
+      "source_id": "S29-ARCH-024",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-TERMINAL-001"]
+    },
+    {
+      "source_id": "S29-ARCH-032",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-REBUILD-001"]
+    },
+    {
+      "source_id": "S30-REPO-026",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-ARCH-001"]
+    },
+    {
+      "source_id": "S30-REPO-027",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-ARCH-001"]
+    },
+    {
+      "source_id": "S30-REPO-028",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-ARCH-001"]
+    },
+    {
+      "source_id": "S30-REPO-029",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-ARCH-001"]
+    },
+    {
+      "source_id": "S30-REPO-030",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-ARCH-001"]
+    },
+    {
+      "source_id": "S30-REPO-031",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-MANIFEST-001"]
+    },
+    {
+      "source_id": "S30-REPO-032",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-CAPABILITY-001", "T-QUEUE-INTEGRATION-PROFILE-001"]
+    },
+    {
+      "source_id": "S30-REPO-040",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-INBOX-001"]
+    },
+    {
+      "source_id": "S31-TEST-025",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-RELAY-001"]
+    },
+    {
+      "source_id": "S31-TEST-026",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-INBOX-001"]
+    },
+    {
+      "source_id": "S31-TEST-027",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-REBUILD-001"]
+    },
+    {
+      "source_id": "S31-TEST-028",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-TERMINAL-001"]
+    },
+    {
+      "source_id": "S31-TEST-029",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-MANIFEST-001", "T-QUEUE-INTEGRATION-PROFILE-001"]
+    },
+    {
+      "source_id": "S31-TEST-030",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-CAPABILITY-001", "T-QUEUE-INTEGRATION-PROFILE-001"]
+    },
+    {
+      "source_id": "S31-TEST-032",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-CONTRACT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-026",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-REBUILD-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-027",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-QUEUE-INTEGRATION-INBOX-001",
+        "T-QUEUE-INTEGRATION-DRAIN-001"
+      ]
+    },
+    {
+      "source_id": "S32-DEPLOY-028",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-TERMINAL-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-038",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-REBUILD-001"]
+    },
+    {
+      "source_id": "S33-OBS-025",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-RELAY-001"]
+    },
+    {
+      "source_id": "S33-OBS-028",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-TERMINAL-001"]
+    },
+    {
+      "source_id": "S33-OBS-029",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-MANIFEST-001", "T-QUEUE-INTEGRATION-PROFILE-001"]
+    },
+    {
+      "source_id": "S33-OBS-030",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-REBUILD-001"]
+    },
+    {
+      "source_id": "S33-OBS-031",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-INTEGRATION-INBOX-001"]
+    },
+    {
+      "source_id": "S33-OBS-032",
+      "status": "COVERED",
+      "proof_ids": ["T-QUEUE-CONTRACT-001"]
+    }
+  ]
+}
