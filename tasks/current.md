@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-02（E-007 自动化 Gate 完成，进入 Draft PR 审核）
+- **最后更新**：2026-08-02（用户接受 E-007 安全边界，批准合并）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-007 — Redis 8、BullMQ 5 与事务型 Outbox 基线
 - **任务状态**：In Review
@@ -10,7 +10,7 @@
 - **当前 PR**：[Draft PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113)
 - **基线提交**：`c14d8a8a8da504f708ecdf3556a1b3a9451fe058`
 - **实现提交**：`1e0aa81643c24a68fb3e5e26454bd11f911353e3`
-- **Gate 结论**：`AUTOMATED_PASS / USER_REVIEW_REQUIRED`（security profile）
+- **Gate 结论**：`AUTOMATED_PASS / USER_ACCEPTED_FOR_MERGE`（security profile）
 
 ## 1. 当前目标
 
@@ -78,8 +78,8 @@ E-007 已从最新 `main` 创建任务分支并进入实现。Issue #45、
   threat-boundary review 已核对最小 DB grant、严格 payload、profile/egress attestation、
   重试/终态、Redis 非权威与 telemetry 低基数边界，未发现未解决代码风险；新增
   `daily_energy_deletion` 权限仅为 `runtime_inbox_receipt` 的 INSERT/UPDATE；
-- **人工证据**：changed/task/full 均为 `automated=PASS`，但策略终态保持
-  `MANUAL_EVIDENCE_REQUIRED`，等待用户在 Draft PR 中复核 threat boundary 并接受残余风险；
+- **人工证据**：changed/task/full 均为 `automated=PASS`；用户已于 2026-08-02
+  明确复核并接受 threat boundary、Restricted inbox 最小权限与残余风险，批准合并；
   `productionAuthorizationWhenApplicable` 为 N/A，因为只运行本地隔离容器与合成数据，
   未访问生产凭据、数据或资源；
 - **残余边界**：本任务只提供 egress manifest/fingerprint 与错误 profile 的静态/运行时
@@ -87,8 +87,8 @@ E-007 已从最新 `main` 创建任务分支并进入实现。Issue #45、
   仍须在后续任务中同步回读 revision/guard；Redis rebuild 每次扫描有界批次，E-009
   恢复编排必须重复执行并以 PostgreSQL eligible backlog 清零为完成条件；
 - **并行规则**：E-007 是唯一 In Review，不提升其它任务；
-- **下一动作**：审核 [Draft PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113)
-  的 E-007 行为、Restricted inbox 最小权限、threat boundary 与残余风险；
+- **下一动作**：将 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113)
+  标记为 Ready 并 squash 合并，随后验证 `main` 并完成 E-007/E-009 项目状态交接；
 - **下一任务**：E-007 获接受并合并后，将 E-009 提升为唯一 Ready；当前不启动 E-009。
 
 ## 7. 最近交接
@@ -124,5 +124,6 @@ E-007 已从最新 `main` 创建任务分支并进入实现。Issue #45、
 - threat-boundary review 修正了 relay telemetry 的实际 queue-family 归属；最小权限、
   payload/log、profile/egress、终态、重建与合成数据边界无未解决代码发现；
 - 实现提交为 `1e0aa81643c24a68fb3e5e26454bd11f911353e3`，已创建
-  [Draft PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113)；当前等待用户审核并明确
-  接受 threat boundary 与残余风险，Issue #45 保持 Open。
+  [Draft PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113)；用户已于
+  2026-08-02 明确接受 threat boundary、Restricted inbox 最小权限与残余风险，并批准
+  squash 合并；Issue #45 在合并完成前保持 Open。
