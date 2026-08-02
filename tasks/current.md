@@ -5,9 +5,9 @@
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-009 — 本地与测试 Docker Compose 环境
 - **任务状态**：Ready
-- **任务分支**：尚未创建；开工时从最新 `main` 创建
+- **任务分支**：实现分支尚未创建；状态交接分支为 `agent/e009-ready`
 - **当前 Issue**：[E-009 Issue #47](https://github.com/WeiHan1996/DailyEnergy/issues/47)
-- **当前 PR**：无
+- **当前 PR**：[状态 Draft PR #114](https://github.com/WeiHan1996/DailyEnergy/pull/114)（仅项目控制）
 - **基线提交**：`9630691a87b184bafe6ca78900a31244a6e6c237`
 - **Gate 结论**：`READY_TO_START`（code profile；开工后按实际路径升级）
 
@@ -85,9 +85,10 @@ Issue #47、`pnpm agent:prepare E-009 --remote --deep` 返回的全部 required 
 - **可观测性交接**：E-009 只提供 health/fault/telemetry stub 与 smoke evidence；正式
   metrics、alerts 和生产 Runbook 仍由 E-013 交付；
 - **并行规则**：E-009 是唯一 Ready，尚未 In Progress；
-- **下一动作**：收到 E-009 开工指令后，从最新 `main` 创建
-  `agent/e009-docker-compose`，运行 `pnpm agent:prepare E-009 --remote --deep` 并完成
-  GO/NO-GO；
+- **下一动作**：审核并合并
+  [状态 Draft PR #114](https://github.com/WeiHan1996/DailyEnergy/pull/114)；合并后等待
+  E-009 开工指令，再从最新 `main` 创建 `agent/e009-docker-compose`，运行
+  `pnpm agent:prepare E-009 --remote --deep` 并完成 GO/NO-GO；
 - **下一任务**：E-009 完成前不提升其它任务；E-009 获接受后再评估 E-010。
 
 ## 7. 最近交接
@@ -130,4 +131,7 @@ Issue #47、`pnpm agent:prepare E-009 --remote --deep` 返回的全部 required 
   `2/2`；首次运行仅被本仓库遗留的 3211 端口监听阻断，终止该测试进程后局部重跑与
   单次完整 Gate 均通过，未发现代码缺陷；
 - E-009 Issue #47 保持 Open，Milestone 为 Phase 1；E-003、E-005、E-006、E-007、
-  E-008 前置均已完成，现提升为唯一 Ready，尚未创建实现分支或修改 Compose 资产。
+  E-008 前置均已完成，现提升为唯一 Ready，尚未创建实现分支或修改 Compose 资产；
+- post-merge 状态切换已提交为 `08cae5c2114d348051b466989ecec99603cb52c9`，并创建
+  [状态 Draft PR #114](https://github.com/WeiHan1996/DailyEnergy/pull/114)；当前等待该状态
+  PR 审核，E-009 保持 Ready。
