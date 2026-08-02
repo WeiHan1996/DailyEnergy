@@ -1,7 +1,7 @@
 # DailyEnergy 项目 Backlog
 
 - **文档状态**：Active
-- **最后更新**：2026-07-31
+- **最后更新**：2026-08-02
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：[E-006 PostgreSQL 与 Prisma](./current.md)（In Review，PR #108 安全返工）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
@@ -108,7 +108,7 @@
 | S-34 | Phase 1～3 工程 Issues | Done | 3 个 GitHub Milestones、48 个 Issues                       | S-01～S-33             |
 | S-35 | Phase 0B Gate 评审     | Done | [Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) | S-34                   |
 
-S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)～[E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)、[E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46) 与 [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) 已完成并进入 Done。E-015 随 [PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106) squash 合并，merge commit 为 `200e27de889a5cc47571e27d783aa570a381f889`，Issue #105 已关闭；E-006 随 PR #108 合并后因安全复审发现三项 P1 缺陷，已完成安全返工并进入 In Review，且未提升下一任务。
+S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)～[E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)、[E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46) 与 [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) 已完成并进入 Done。E-015 随 [PR #106](https://github.com/WeiHan1996/DailyEnergy/pull/106) squash 合并，merge commit 为 `200e27de889a5cc47571e27d783aa570a381f889`，Issue #105 已关闭；E-006 的 PR #110 补充安全修复已进入 In Review，且未提升下一任务。
 
 ## 4. Phase 1：工程基础
 
@@ -131,7 +131,7 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 | [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done        | P0/P1 上下文路由、任务 Profile 与安静验证            |
 
 E-004 已随 PR #96 合并，E-008 已随 PR #97 squash 合并，E-005 已随 PR #98
-合并，E-015 已随 PR #106 squash 合并。E-006 是唯一 In Review；其它任务均保持 Planned。
+合并，E-015 已随 PR #106 squash 合并。E-006 是唯一 In Review 任务；其它任务均保持 Planned。
 
 ## 5. Phase 2：确定性核心闭环
 

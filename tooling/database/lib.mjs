@@ -177,6 +177,15 @@ export async function withClient(connectionString, callback) {
 }
 
 export async function assertMigrationLogin(client) {
+  const requiredRoles = await client.query(
+    `SELECT rolname FROM pg_roles WHERE rolname = ANY($1::text[])`,
+    [DATABASE_GROUP_ROLES],
+  );
+  const presentRoles = new Set(requiredRoles.rows.map((role) => role.rolname));
+  if (DATABASE_GROUP_ROLES.some((role) => !presentRoles.has(role))) {
+    throw new Error("DB_MIGRATION_ROLE_BOOTSTRAP_REQUIRED");
+  }
+
   const identity = await client.query(`
     SELECT
       session_user AS session_user,

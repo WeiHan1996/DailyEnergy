@@ -52,10 +52,12 @@ function roleIdentityMatches(
     !identity.superuser &&
     !identity.createDatabase &&
     !identity.createRole &&
+    !identity.replication &&
     !identity.bypassRls;
   if (
     !exactProfile ||
     !unprivilegedLogin ||
+    identity.membershipMismatch ||
     identity.extraRoleMemberships.length > 0 ||
     identity.capabilityMismatch ||
     identity.schemaCreate ||
@@ -70,7 +72,6 @@ function roleIdentityMatches(
       !identity.restrictedRead &&
       !identity.safetyWrite &&
       !identity.deletionTaskWrite &&
-      !identity.subjectDelete &&
       !identity.evaluationAccess
     );
   }
@@ -88,6 +89,7 @@ function roleIdentityMatches(
       !identity.ownerMember &&
       identity.restrictedRead &&
       identity.safetyWrite &&
+      identity.outboxWrite &&
       !identity.deletionTaskWrite &&
       !identity.subjectDelete &&
       !identity.evaluationAccess
@@ -99,6 +101,7 @@ function roleIdentityMatches(
       !identity.ownerMember &&
       identity.restrictedRead &&
       !identity.safetyWrite &&
+      identity.outboxWrite &&
       identity.deletionTaskWrite &&
       identity.subjectDelete &&
       !identity.evaluationAccess
@@ -110,6 +113,7 @@ function roleIdentityMatches(
       !identity.ownerMember &&
       !identity.restrictedRead &&
       !identity.safetyWrite &&
+      !identity.outboxWrite &&
       !identity.deletionTaskWrite &&
       !identity.subjectDelete &&
       !identity.evaluationAccess

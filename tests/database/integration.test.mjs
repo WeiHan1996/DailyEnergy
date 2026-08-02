@@ -22,6 +22,7 @@ const repositoryRoot = path.resolve(
   "../..",
 );
 const prismaBin = path.join(repositoryRoot, "node_modules/.bin/prisma");
+const tsxBin = path.join(repositoryRoot, "node_modules/.bin/tsx");
 
 async function createInitialMigrationProject(temporaryRoot) {
   const prismaDirectory = path.join(temporaryRoot, "initial-prisma");
@@ -68,6 +69,7 @@ const metadata = Object.freeze({
       (_, index) => `SQL-${String(index + 1).padStart(3, "0")}`,
     ),
     "S19-DB-005",
+    "S19-DB-011",
     "S19-DB-012",
     "S19-DB-045",
     "S19-DB-048",
@@ -110,6 +112,69 @@ async function transaction(client, statements, { reject } = {}) {
   }
 }
 
+async function commitStatements(client, statements) {
+  await client.query("BEGIN");
+  try {
+    for (const statement of statements) {
+      await client.query(statement);
+    }
+    await client.query("SET CONSTRAINTS ALL IMMEDIATE");
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  }
+}
+
+async function runFactoryRoleProbe(
+  loginUrls,
+  { expected = "success", profile = "all" } = {},
+) {
+  const result = await runCommandResult(
+    tsxBin,
+    [path.join(repositoryRoot, "tests/database/factory-role-probe.ts")],
+    {
+      DB_FACTORY_PROBE_API_URL: loginUrls.api,
+      DB_FACTORY_PROBE_BACKGROUND_URL: loginUrls.background,
+      DB_FACTORY_PROBE_DELETION_URL: loginUrls.deletion,
+      DB_FACTORY_PROBE_EXPECT: expected,
+      DB_FACTORY_PROBE_PROFILE: profile,
+      DB_FACTORY_PROBE_SAFETY_URL: loginUrls.safety,
+    },
+  );
+  assert.equal(
+    result.code,
+    0,
+    `factory role probe failed: profile=${profile}:expected=${expected}`,
+  );
+  assert.match(
+    result.stdout,
+    new RegExp(`DB_FACTORY_ROLE_PROBE_OK:${profile}:${expected}`, "u"),
+  );
+}
+
+async function assertFactoryProbeRejectsSqlMutation(
+  admin,
+  loginUrls,
+  profile,
+  setupStatements,
+  cleanupStatements,
+) {
+  try {
+    for (const statement of setupStatements) {
+      await admin.query(statement);
+    }
+    await runFactoryRoleProbe(loginUrls, {
+      expected: "mismatch",
+      profile,
+    });
+  } finally {
+    for (const statement of cleanupStatements) {
+      await admin.query(statement);
+    }
+  }
+}
+
 const accountInsert = (accountId, overrides = "") => `
   INSERT INTO ${schema}.app_user_account
     (id, "ownerScopeToken", "stableSubjectCiphertext", "stableSubjectKeyVersion", state,
@@ -145,11 +210,25 @@ function checkinInsert(checkinId, accountId) {
      'STEADY', 'STEADY', 'OKAY', now(), now(), '${id(900)}', 'synthetic-v1', now(), now() + interval '7 days')`;
 }
 
-function snapshotInsert(snapshotId, intentId, checkinId) {
+function checkinRevisionInsert(
+  checkinId,
+  revision = 1,
+  mood = "STEADY",
+  energy = "STEADY",
+  sleep = "OKAY",
+) {
+  return `INSERT INTO ${schema}.app_morning_checkin_revision
+    (id, "checkinId", revision, mood, energy, sleep, "commandRef", "retentionPolicyVersion",
+     "retentionAnchorAt", "expiresAt")
+   VALUES (gen_random_uuid(), '${checkinId}', ${revision}, '${mood}', '${energy}', '${sleep}',
+     '${id(901)}', 'synthetic-v1', now(), now() + interval '7 days')`;
+}
+
+function snapshotInsert(snapshotId, intentId, checkinId, checkinRevision = 1) {
   return `INSERT INTO ${schema}.app_generation_input_snapshot
     (id, "generationIntentId", "checkinId", "checkinRevision", "schemaVersion", "snapshotPayload",
      "snapshotFingerprint", "retentionPolicyVersion", "retentionAnchorAt", "expiresAt")
-   VALUES ('${snapshotId}', '${intentId}', '${checkinId}', 1, 'schema-v1', '{}',
+   VALUES ('${snapshotId}', '${intentId}', '${checkinId}', ${checkinRevision}, 'schema-v1', '{}',
      decode('12','hex'), 'synthetic-v1', now(), now() + interval '7 days')`;
 }
 
@@ -188,6 +267,7 @@ function dailyPublicationFixture(base, { secondAccount = false } = {}) {
       ...(secondAccount ? [accountInsert(other)] : []),
       generationIntentInsert(intent, account),
       checkinInsert(checkin, account),
+      checkinRevisionInsert(checkin),
       snapshotInsert(snapshot, intent, checkin),
     ],
   };
@@ -252,6 +332,32 @@ function dailyFragmentFixture(base) {
       `INSERT INTO ${schema}.app_personalized_content_fragment
         (id,"slotId","payloadCiphertext","payloadKeyVersion","payloadFingerprint","schemaVersion","retentionPolicyVersion","retentionAnchorAt","expiresAt")
        VALUES ('${fragment}','${slot}',decode('32','hex'),'synthetic-key-v1',decode('33','hex'),'fragment-v1','synthetic-v1',now(),now()+interval '7 days')`,
+    ],
+  };
+}
+
+function blockedDailyVisibilityFixture(base) {
+  const publication = dailyPublicationFixture(base);
+  const visibility = id(base + 6);
+  const slot = id(base + 7);
+  return {
+    ...publication,
+    visibility,
+    slot,
+    statements: [
+      ...publication.statements,
+      resultInsert(
+        publication.result,
+        publication.account,
+        publication.intent,
+        publication.snapshot,
+      ),
+      `INSERT INTO ${schema}.app_published_result_visibility
+        (id,"resultId",state,revision,"sourceFingerprint","blockedReasonCode","updatedAt","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+       VALUES ('${visibility}','${publication.result}','BLOCKED',1,decode('31','hex'),'SOURCE_DELETED',now(),'synthetic-v1',now(),now()+interval '7 days')`,
+      `INSERT INTO ${schema}.app_result_content_slot
+        (id,"resultId","segmentPath","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+       VALUES ('${slot}','${publication.result}','core','synthetic-v1',now(),now()+interval '7 days')`,
     ],
   };
 }
@@ -786,6 +892,19 @@ async function proveRoleMatrix(admin, adminUrl, Client) {
       `SELECT * FROM ${schema}.restricted_safety_state LIMIT 1`,
     );
     await safety.query(`SELECT * FROM ${schema}.app_user_account LIMIT 1`);
+    await safety.query("BEGIN");
+    try {
+      await safety.query(
+        `INSERT INTO ${schema}.runtime_outbox_event
+          (id,"aggregateType","aggregateRef","aggregateRevision","eventType","eventVersion",
+           "idempotencyKey","allowlistedPayload","guardEpochs","availableAt",
+           "retentionPolicyVersion","retentionAnchorAt","expiresAt")
+         VALUES ('${id(710)}','SafetyState','${id(711)}',1,'SafetyActivated','v1',
+           decode('7100','hex'),'{}','{"safety":1}',now(),'synthetic-v1',now(),now()+interval '7 days')`,
+      );
+    } finally {
+      await safety.query("ROLLBACK");
+    }
     await assert.rejects(
       safety.query(`DELETE FROM ${schema}.app_morning_checkin`),
       /permission denied/u,
@@ -832,14 +951,27 @@ async function proveRoleMatrix(admin, adminUrl, Client) {
       /permission denied/u,
       "deletion role must not access evaluation tables",
     );
-    // Can write deletion tables (need account ref first, created by admin)
+    // Can atomically write TX-09 deletion facts and its outbox event.
     await admin.query(accountInsert(id(700)));
-    await deletion.query(
-      dataTaskInsert(id(997), id(700), { activeSlot: "true", state: "FAILED" }),
-    );
-    await deletion.query(
-      `DELETE FROM ${schema}.restricted_data_task WHERE id='${id(997)}'`,
-    );
+    await deletion.query("BEGIN");
+    try {
+      await deletion.query(
+        dataTaskInsert(id(997), id(700), {
+          activeSlot: "true",
+          state: "FAILED",
+        }),
+      );
+      await deletion.query(
+        `INSERT INTO ${schema}.runtime_outbox_event
+          (id,"aggregateType","aggregateRef","aggregateRevision","eventType","eventVersion",
+           "idempotencyKey","allowlistedPayload","guardEpochs","availableAt",
+           "retentionPolicyVersion","retentionAnchorAt","expiresAt")
+         VALUES ('${id(712)}','DataTask','${id(997)}',1,'DeletionGuarded','v1',
+           decode('7120','hex'),'{}','{"deletion":1}',now(),'synthetic-v1',now(),now()+interval '7 days')`,
+      );
+    } finally {
+      await deletion.query("ROLLBACK");
+    }
     // ACCOUNT deletion finishes by removing the now child-free UserAccount.
     await deletion.query(
       `DELETE FROM ${schema}.app_user_account WHERE id='${id(700)}'`,
@@ -980,6 +1112,7 @@ test(
               accountInsert(fixture.account),
               generationIntentInsert(fixture.intent, fixture.account),
               checkinInsert(fixture.checkin, fixture.account),
+              checkinRevisionInsert(fixture.checkin),
               snapshotInsert(fixture.snapshot, fixture.intent, fixture.checkin),
               resultInsert(
                 fixture.result,
@@ -1036,34 +1169,134 @@ test(
         );
 
         await t.test(
-          "SQL-007 rejects published result referencing snapshot with cross-account checkin",
+          "SQL-013 rejects rebinding AVAILABLE visibility to an incomplete result",
+          async () => {
+            const blocked = dailyFragmentFixture(330);
+            const available = dailyFragmentFixture(340);
+            await admin.query("BEGIN");
+            try {
+              for (const statement of [
+                accountInsert(blocked.account),
+                generationIntentInsert(blocked.intent, blocked.account),
+                checkinInsert(blocked.checkin, blocked.account),
+                checkinRevisionInsert(blocked.checkin),
+                snapshotInsert(
+                  blocked.snapshot,
+                  blocked.intent,
+                  blocked.checkin,
+                ),
+                resultInsert(
+                  blocked.result,
+                  blocked.account,
+                  blocked.intent,
+                  blocked.snapshot,
+                ),
+                `INSERT INTO ${schema}.app_published_result_visibility
+                  (id,"resultId",state,revision,"sourceFingerprint","blockedReasonCode","updatedAt","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+                 VALUES ('${blocked.visibility}','${blocked.result}','BLOCKED',1,decode('31','hex'),'SOURCE_DELETED',now(),'synthetic-v1',now(),now()+interval '7 days')`,
+                `INSERT INTO ${schema}.app_result_content_slot
+                  (id,"resultId","segmentPath","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+                 VALUES ('${blocked.slot}','${blocked.result}','core','synthetic-v1',now(),now()+interval '7 days')`,
+                ...available.statements,
+              ]) {
+                await admin.query(statement);
+              }
+              await admin.query("COMMIT");
+            } catch (error) {
+              await admin.query("ROLLBACK");
+              throw error;
+            }
+
+            await transaction(
+              admin,
+              [
+                `DELETE FROM ${schema}.app_published_result_visibility WHERE id='${blocked.visibility}'`,
+                `UPDATE ${schema}.app_published_result_visibility SET "resultId"='${blocked.result}',revision=2,"updatedAt"=now() WHERE id='${available.visibility}'`,
+              ],
+              { reject: /SQL-013|23514/u },
+            );
+          },
+        );
+
+        await t.test(
+          "SQL-013 rejects deleting BLOCKED visibility that protects an incomplete result",
+          async () => {
+            const blocked = blockedDailyVisibilityFixture(400);
+            await commitStatements(admin, blocked.statements);
+            await transaction(
+              admin,
+              [
+                `DELETE FROM ${schema}.app_published_result_visibility WHERE id='${blocked.visibility}'`,
+              ],
+              { reject: /SQL-013|23514/u },
+            );
+          },
+        );
+
+        await t.test(
+          "SQL-013 rejects rebinding BLOCKED visibility away from an incomplete result",
+          async () => {
+            const blocked = blockedDailyVisibilityFixture(420);
+            const replacement = dailyPublicationFixture(430);
+            await commitStatements(admin, [
+              ...blocked.statements,
+              ...replacement.statements,
+              resultInsert(
+                replacement.result,
+                replacement.account,
+                replacement.intent,
+                replacement.snapshot,
+              ),
+            ]);
+            await transaction(
+              admin,
+              [
+                `UPDATE ${schema}.app_published_result_visibility SET "resultId"='${replacement.result}',revision=2,"updatedAt"=now() WHERE id='${blocked.visibility}'`,
+              ],
+              { reject: /SQL-013|23514/u },
+            );
+          },
+        );
+
+        await t.test(
+          "SQL-013 allows deleting BLOCKED visibility after its protected slots are removed",
+          async () => {
+            const blocked = blockedDailyVisibilityFixture(450);
+            await commitStatements(admin, blocked.statements);
+            await transaction(admin, [
+              `DELETE FROM ${schema}.app_result_content_slot WHERE id='${blocked.slot}'`,
+              `DELETE FROM ${schema}.app_published_result_visibility WHERE id='${blocked.visibility}'`,
+            ]);
+          },
+        );
+
+        await t.test(
+          "SQL-007 rejects TX-02 snapshot with cross-account checkin before publication",
           async () => {
             const accountA = id(310);
             const accountB = id(311);
             const intent = id(312);
             const checkinB = id(313);
             const snapshot = id(314);
-            const result = id(315);
             const statements = [
               accountInsert(accountA),
               accountInsert(accountB),
               generationIntentInsert(intent, accountA),
               checkinInsert(checkinB, accountB),
+              checkinRevisionInsert(checkinB),
               snapshotInsert(snapshot, intent, checkinB),
-              resultInsert(result, accountA, intent, snapshot),
             ];
             await transaction(admin, statements, { reject: /SQL-007|23514/u });
           },
         );
 
         await t.test(
-          "SQL-007 rejects published result with snapshot referencing wrong-date checkin",
+          "SQL-007 rejects TX-02 snapshot referencing a wrong-date checkin before publication",
           async () => {
             const account = id(320);
             const intent = id(321);
             const checkin = id(322);
             const snapshot = id(323);
-            const result = id(324);
             const statements = [
               accountInsert(account),
               generationIntentInsert(intent, account),
@@ -1073,10 +1306,104 @@ test(
                  "firstSubmittedAt", "updatedAt", "sourceCommandRef", "retentionPolicyVersion", "retentionAnchorAt", "expiresAt")
                VALUES ('${checkin}', '${account}', DATE '2026-07-29', 'product-date-v1', 1,
                  'STEADY', 'STEADY', 'OKAY', now(), now(), '${id(900)}', 'synthetic-v1', now(), now() + interval '7 days')`,
+              checkinRevisionInsert(checkin),
               snapshotInsert(snapshot, intent, checkin),
-              resultInsert(result, account, intent, snapshot),
             ];
             await transaction(admin, statements, { reject: /SQL-007|23514/u });
+          },
+        );
+
+        await t.test(
+          "SQL-007 runtime API role commits valid snapshot and rejects revision mismatch",
+          async () => {
+            const { Client } = loadPg();
+            const api = new Client({ connectionString: loginUrls.api });
+            await api.connect();
+            try {
+              await transaction(api, [
+                accountInsert(id(360)),
+                generationIntentInsert(id(361), id(360)),
+                checkinInsert(id(362), id(360)),
+                checkinRevisionInsert(id(362)),
+                snapshotInsert(id(363), id(361), id(362)),
+              ]);
+              await transaction(
+                api,
+                [
+                  accountInsert(id(364)),
+                  generationIntentInsert(id(365), id(364)),
+                  checkinInsert(id(366), id(364)),
+                  checkinRevisionInsert(id(366)),
+                  snapshotInsert(id(367), id(365), id(366), 2),
+                ],
+                { reject: /SQL-007|23514/u },
+              );
+            } finally {
+              await api.end();
+            }
+          },
+        );
+
+        await t.test(
+          "S19-DB-011 preserves a frozen snapshot after check-in correction and accepts a new weekly fingerprint",
+          async () => {
+            const account = id(500);
+            const intent = id(501);
+            const checkin = id(502);
+            const snapshot = id(503);
+            const result = id(504);
+            const window = id(505);
+            const sourceRevisionOne = id(506);
+            const sourceRevisionTwo = id(507);
+
+            await commitStatements(admin, [
+              accountInsert(account),
+              generationIntentInsert(intent, account),
+              checkinInsert(checkin, account),
+              checkinRevisionInsert(checkin),
+              snapshotInsert(snapshot, intent, checkin),
+              `INSERT INTO ${schema}.app_weekly_window
+                (id,"accountId","endProductDate","windowRuleVersion","currentSourceFingerprint",revision,"updatedAt","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+               VALUES ('${window}','${account}',DATE '2026-07-30','window-v1',decode('41','hex'),1,now(),'synthetic-v1',now(),now()+interval '7 days')`,
+              `INSERT INTO ${schema}.app_weekly_source_snapshot
+                (id,"windowId","sourceFingerprint","sourceSlotsPayload","aggregateFactsPayload","expressionPlanPayload","aggregateVersion","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+               VALUES ('${sourceRevisionOne}','${window}',decode('41','hex'),'{"checkinRevision":1}','{}','{}','aggregate-v1','synthetic-v1',now(),now()+interval '7 days')`,
+            ]);
+
+            await admin.query("BEGIN");
+            try {
+              for (const statement of [
+                `UPDATE ${schema}.app_morning_checkin SET revision=2,mood='GOOD',energy='HIGH',sleep='GOOD',"updatedAt"=now() WHERE id='${checkin}'`,
+                checkinRevisionInsert(checkin, 2, "GOOD", "HIGH", "GOOD"),
+                resultInsert(result, account, intent, snapshot),
+                `INSERT INTO ${schema}.app_weekly_source_snapshot
+                  (id,"windowId","sourceFingerprint","sourceSlotsPayload","aggregateFactsPayload","expressionPlanPayload","aggregateVersion","retentionPolicyVersion","retentionAnchorAt","expiresAt")
+                 VALUES ('${sourceRevisionTwo}','${window}',decode('42','hex'),'{"checkinRevision":2}','{}','{}','aggregate-v1','synthetic-v1',now(),now()+interval '7 days')`,
+                `UPDATE ${schema}.app_weekly_window SET "currentSourceFingerprint"=decode('42','hex'),revision=2,"updatedAt"=now() WHERE id='${window}'`,
+              ]) {
+                await admin.query(statement);
+              }
+              await admin.query("SET CONSTRAINTS ALL IMMEDIATE");
+              const state = await admin.query(
+                `SELECT snapshot."checkinRevision" AS "snapshotRevision",
+                        checkin.revision AS "currentRevision",
+                        encode(window."currentSourceFingerprint", 'hex') AS "weeklyFingerprint",
+                        (SELECT count(*)::int FROM ${schema}.app_weekly_source_snapshot WHERE "windowId"=$3) AS "weeklySnapshotCount"
+                   FROM ${schema}.app_generation_input_snapshot snapshot
+                   JOIN ${schema}.app_morning_checkin checkin ON checkin.id=snapshot."checkinId"
+                   JOIN ${schema}.app_weekly_window window ON window."accountId"=$1
+                  WHERE snapshot.id=$2`,
+                [account, snapshot, window],
+              );
+              assert.deepEqual(state.rows[0], {
+                currentRevision: 2,
+                snapshotRevision: 1,
+                weeklyFingerprint: "42",
+                weeklySnapshotCount: 2,
+              });
+            } finally {
+              await admin.query("ROLLBACK");
+            }
           },
         );
 
@@ -1113,9 +1440,188 @@ test(
         );
 
         await t.test(
-          "SQL-020 enforces environment login membership, role attributes, ownership, creation, truncation, restricted, and ciphertext matrix",
+          "SQL-020 enforces role matrix and real factory startup rejects direct grants and extra membership",
           async () => {
             await proveRoleMatrix(admin, adminUrl, Client);
+            await runFactoryRoleProbe(loginUrls);
+
+            await admin.query(
+              `GRANT SELECT ("guardEpoch") ON ${schema}.restricted_safety_state TO ${TEST_DATABASE_PROFILES.api.loginRole}`,
+            );
+            try {
+              await runFactoryRoleProbe(loginUrls, {
+                expected: "mismatch",
+                profile: "api",
+              });
+            } finally {
+              await admin.query(
+                `REVOKE SELECT ("guardEpoch") ON ${schema}.restricted_safety_state FROM ${TEST_DATABASE_PROFILES.api.loginRole}`,
+              );
+            }
+
+            await admin.query(
+              `GRANT SELECT ON ${schema}.app_morning_checkin TO ${TEST_DATABASE_PROFILES.api.loginRole} WITH GRANT OPTION`,
+            );
+            try {
+              await runFactoryRoleProbe(loginUrls, {
+                expected: "mismatch",
+                profile: "api",
+              });
+            } finally {
+              await admin.query(
+                `REVOKE SELECT ON ${schema}.app_morning_checkin FROM ${TEST_DATABASE_PROFILES.api.loginRole}`,
+              );
+            }
+
+            await assertFactoryProbeRejectsSqlMutation(
+              admin,
+              loginUrls,
+              "api",
+              [
+                `GRANT MAINTAIN ON ${schema}.app_morning_checkin TO ${TEST_DATABASE_PROFILES.api.loginRole}`,
+              ],
+              [
+                `REVOKE MAINTAIN ON ${schema}.app_morning_checkin FROM ${TEST_DATABASE_PROFILES.api.loginRole}`,
+              ],
+            );
+
+            await assertFactoryProbeRejectsSqlMutation(
+              admin,
+              loginUrls,
+              "api",
+              [
+                `GRANT MAINTAIN ON ${schema}.app_morning_checkin TO ${TEST_DATABASE_PROFILES.api.groupRole}`,
+                `GRANT MAINTAIN ON ${schema}.app_morning_checkin TO ${TEST_DATABASE_PROFILES.api.loginRole} WITH GRANT OPTION`,
+              ],
+              [
+                `REVOKE MAINTAIN ON ${schema}.app_morning_checkin FROM ${TEST_DATABASE_PROFILES.api.loginRole}`,
+                `REVOKE MAINTAIN ON ${schema}.app_morning_checkin FROM ${TEST_DATABASE_PROFILES.api.groupRole}`,
+              ],
+            );
+
+            await assertFactoryProbeRejectsSqlMutation(
+              admin,
+              loginUrls,
+              "api",
+              [
+                `GRANT USAGE ON SCHEMA ${schema} TO ${TEST_DATABASE_PROFILES.api.loginRole} WITH GRANT OPTION`,
+              ],
+              [
+                `REVOKE USAGE ON SCHEMA ${schema} FROM ${TEST_DATABASE_PROFILES.api.loginRole}`,
+              ],
+            );
+
+            await assertFactoryProbeRejectsSqlMutation(
+              admin,
+              loginUrls,
+              "api",
+              [
+                `GRANT EXECUTE ON FUNCTION ${schema}.assert_generation_snapshot_lineage(uuid) TO ${TEST_DATABASE_PROFILES.api.loginRole} WITH GRANT OPTION`,
+              ],
+              [
+                `REVOKE EXECUTE ON FUNCTION ${schema}.assert_generation_snapshot_lineage(uuid) FROM ${TEST_DATABASE_PROFILES.api.loginRole}`,
+              ],
+            );
+
+            const databaseName = (
+              await admin.query("SELECT current_database() AS name")
+            ).rows[0].name;
+            assert.match(databaseName, /^[a-zA-Z0-9_]+$/u);
+            await assertFactoryProbeRejectsSqlMutation(
+              admin,
+              loginUrls,
+              "api",
+              [
+                `GRANT CONNECT ON DATABASE "${databaseName}" TO ${TEST_DATABASE_PROFILES.api.loginRole} WITH GRANT OPTION`,
+              ],
+              [
+                `REVOKE CONNECT ON DATABASE "${databaseName}" FROM ${TEST_DATABASE_PROFILES.api.loginRole}`,
+              ],
+            );
+
+            await assertFactoryProbeRejectsSqlMutation(
+              admin,
+              loginUrls,
+              "api",
+              [
+                `CREATE SEQUENCE ${schema}.factory_role_probe_sequence`,
+                `GRANT USAGE ON SEQUENCE ${schema}.factory_role_probe_sequence TO ${TEST_DATABASE_PROFILES.api.loginRole} WITH GRANT OPTION`,
+              ],
+              [
+                `REVOKE USAGE ON SEQUENCE ${schema}.factory_role_probe_sequence FROM ${TEST_DATABASE_PROFILES.api.loginRole}`,
+                `DROP SEQUENCE ${schema}.factory_role_probe_sequence`,
+              ],
+            );
+
+            await admin.query(
+              `GRANT daily_energy_safety TO ${TEST_DATABASE_PROFILES.safety.loginRole} WITH ADMIN OPTION`,
+            );
+            try {
+              await runFactoryRoleProbe(loginUrls, {
+                expected: "mismatch",
+                profile: "safety",
+              });
+            } finally {
+              await admin.query(
+                `REVOKE ADMIN OPTION FOR daily_energy_safety FROM ${TEST_DATABASE_PROFILES.safety.loginRole}`,
+              );
+            }
+
+            await assertFactoryProbeRejectsSqlMutation(
+              admin,
+              loginUrls,
+              "safety",
+              [
+                `GRANT daily_energy_safety TO ${TEST_DATABASE_PROFILES.safety.loginRole} WITH INHERIT FALSE`,
+              ],
+              [
+                `GRANT daily_energy_safety TO ${TEST_DATABASE_PROFILES.safety.loginRole} WITH INHERIT TRUE`,
+              ],
+            );
+
+            await assertFactoryProbeRejectsSqlMutation(
+              admin,
+              loginUrls,
+              "safety",
+              [
+                `GRANT daily_energy_safety TO ${TEST_DATABASE_PROFILES.safety.loginRole} WITH SET FALSE`,
+              ],
+              [
+                `GRANT daily_energy_safety TO ${TEST_DATABASE_PROFILES.safety.loginRole} WITH SET TRUE`,
+              ],
+            );
+
+            await admin.query(
+              `ALTER ROLE ${TEST_DATABASE_PROFILES.background.loginRole} REPLICATION`,
+            );
+            try {
+              await runFactoryRoleProbe(loginUrls, {
+                expected: "mismatch",
+                profile: "background",
+              });
+            } finally {
+              await admin.query(
+                `ALTER ROLE ${TEST_DATABASE_PROFILES.background.loginRole} NOREPLICATION`,
+              );
+            }
+
+            await admin.query(
+              "CREATE ROLE daily_energy_factory_probe_rogue NOLOGIN",
+            );
+            try {
+              await admin.query(
+                `GRANT daily_energy_factory_probe_rogue TO ${TEST_DATABASE_PROFILES.safety.loginRole}`,
+              );
+              await runFactoryRoleProbe(loginUrls, {
+                expected: "mismatch",
+                profile: "safety",
+              });
+            } finally {
+              await admin.query(
+                `REVOKE daily_energy_factory_probe_rogue FROM ${TEST_DATABASE_PROFILES.safety.loginRole}`,
+              );
+              await admin.query("DROP ROLE daily_energy_factory_probe_rogue");
+            }
           },
         );
       } finally {
@@ -1179,6 +1685,47 @@ test(
         DATABASE_URL: loginUrls.migration,
         PRISMA_BIN: prismaBin,
       };
+      await t.test(
+        "N-1 role set requires privileged bootstrap before the security migration",
+        async () => {
+          const { Client } = loadPg();
+          const administrator = new Client({ connectionString: adminUrl });
+          await administrator.connect();
+          try {
+            await administrator.query(
+              "DROP ROLE daily_energy_safety, daily_energy_deletion",
+            );
+          } finally {
+            await administrator.end();
+          }
+
+          const rejected = await runNodeResult(
+            "tooling/database/migrate.mjs",
+            migrationEnvironment,
+          );
+          assert.notEqual(rejected.code, 0);
+          assert.match(
+            rejected.stderr,
+            /DB_MIGRATION_ROLE_BOOTSTRAP_REQUIRED/u,
+          );
+
+          await runNode("tooling/database/bootstrap.mjs", {
+            DATABASE_ADMIN_URL: adminUrl,
+          });
+          const repair = new Client({ connectionString: adminUrl });
+          await repair.connect();
+          try {
+            await repair.query(
+              `GRANT daily_energy_safety TO ${TEST_DATABASE_PROFILES.safety.loginRole}`,
+            );
+            await repair.query(
+              `GRANT daily_energy_deletion TO ${TEST_DATABASE_PROFILES.deletion.loginRole}`,
+            );
+          } finally {
+            await repair.end();
+          }
+        },
+      );
       await t.test(
         "migration runner rejects administrator and non-migration profile credentials",
         async () => {
@@ -1344,6 +1891,13 @@ test(
                 "relationAcl",
                 `GRANT REFERENCES ON ${schema}.app_morning_checkin TO daily_energy_api`,
                 `REVOKE REFERENCES ON ${schema}.app_morning_checkin FROM daily_energy_api`,
+              );
+            });
+            await driftTest.test("column grant", async () => {
+              await expectFingerprintFailure(
+                "columnAcl",
+                `GRANT SELECT ("guardEpoch") ON ${schema}.restricted_safety_state TO daily_energy_api`,
+                `REVOKE SELECT ("guardEpoch") ON ${schema}.restricted_safety_state FROM daily_energy_api`,
               );
             });
           } finally {

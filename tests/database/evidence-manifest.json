@@ -120,8 +120,11 @@
           "assertions": [
             "SQL-007 accepts valid synthetic data",
             "SQL-007 rejects invalid synthetic data",
-            "SQL-007 rejects published result referencing snapshot with cross-account checkin",
-            "SQL-007 rejects published result with snapshot referencing wrong-date checkin"
+            "SQL-007 rejects TX-02 snapshot with cross-account checkin before publication",
+            "SQL-007 rejects TX-02 snapshot referencing a wrong-date checkin before publication",
+            "SQL-007 allows a valid TX-02 snapshot through the real API role deferred trigger",
+            "SQL-007 returns the stable integrity code for a real API role snapshot that does not match the current checkin revision",
+            "S19-DB-011 preserves a frozen historical snapshot after checkin correction and permits the weekly source fingerprint to advance"
           ]
         }
       ]
@@ -224,7 +227,11 @@
             "SQL-013 accepts weekly fragment deletion when the summary is unpublished in the same transaction",
             "SQL-013 rejects activating daily visibility when a slot has no fragment or fallback",
             "SQL-013 accepts activating daily visibility when every slot has a fragment or fallback",
-            "SQL-013 rejects setting weekly currentSummaryRef when a current slot has no fragment or fallback"
+            "SQL-013 rejects setting weekly currentSummaryRef when a current slot has no fragment or fallback",
+            "SQL-013 rejects rebinding AVAILABLE visibility to an incomplete result",
+            "SQL-013 rejects deleting BLOCKED visibility that protects an incomplete result",
+            "SQL-013 rejects rebinding BLOCKED visibility away from an incomplete result",
+            "SQL-013 allows deletion cleanup after the protected slots are removed"
           ]
         }
       ]
@@ -337,8 +344,14 @@
           "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
           "level": "DB",
           "assertions": [
-            "SQL-020 enforces environment login membership, role attributes, ownership, creation, truncation, restricted, and ciphertext matrix",
-            "SQL-020 enforces safety vs deletion role separation and factory capability probe"
+            "SQL-020 enforces role matrix and real factory startup rejects direct grants and extra membership",
+            "Safety login can insert the TX-05 outbox event but cannot delete ordinary or Safety state",
+            "Deletion login can insert TX-09 task and outbox facts in one transaction",
+            "API, Background, Safety, and Deletion factories connect with exact expected capabilities",
+            "a direct column grant or extra role membership makes the real factory fail closed",
+            "table MAINTAIN and MAINTAIN WITH GRANT OPTION make the real factory fail closed",
+            "schema, function, database, and sequence grant options make the real factory fail closed",
+            "expected-role ADMIN, INHERIT false, SET false, and LOGIN REPLICATION make the real factory fail closed"
           ]
         },
         {
@@ -351,6 +364,16 @@
             "real Prisma DDL connection enforces the five-second lock timeout",
             "migration failure output redacts the environment credential",
             "roll-forward applies the second migration after lock release"
+          ]
+        },
+        {
+          "test_id": "T-DB-LIFECYCLE-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "N-1 role set requires privileged bootstrap before the security migration",
+          "level": "DB",
+          "assertions": [
+            "migration preflight returns DB_MIGRATION_ROLE_BOOTSTRAP_REQUIRED when the new group roles are absent",
+            "rerunning the idempotent privileged bootstrap provisions the expanded role set"
           ]
         }
       ]
@@ -594,12 +617,20 @@
     },
     {
       "source_id": "S19-DB-011",
-      "status": "NA_WITH_REASON",
-      "na": {
-        "missing_layer": "weekly fingerprint resolver",
-        "reason": "No workflow corrects a check-in revision then proves immutable snapshot plus changed weekly fingerprint.",
-        "follow_up_owner": "E-010 weekly integration suite"
-      }
+      "status": "COVERED",
+      "evidence": [
+        {
+          "test_id": "T-DB-INTEGRATION-001",
+          "file": "tests/database/integration.test.mjs",
+          "selector": "S19-DB-011 preserves a frozen snapshot after check-in correction and accepts a new weekly fingerprint",
+          "level": "DB",
+          "assertions": [
+            "the snapshot remains bound to historical checkin revision 1 after the current checkin advances to revision 2",
+            "publication through the frozen snapshot still succeeds because its historical revision exists",
+            "the weekly window advances to a second source fingerprint without mutating the daily snapshot"
+          ]
+        }
+      ]
     },
     {
       "source_id": "S19-DB-012",
@@ -1089,7 +1120,7 @@
         {
           "test_id": "T-DB-INTEGRATION-001",
           "file": "tests/database/integration.test.mjs",
-          "selector": "SQL-020 enforces role attributes, ownership, creation, truncation, restricted, and ciphertext matrix",
+          "selector": "SQL-020 enforces role matrix and real factory startup rejects direct grants and extra membership",
           "level": "DB",
           "assertions": [
             "ordinary API role SELECT on restricted Safety table is denied by PostgreSQL"
@@ -1173,8 +1204,8 @@
           "selector": "T-DB-INTEGRATION-001 PostgreSQL 18 SQL-001..SQL-020 and role/grant evidence",
           "level": "DB",
           "assertions": [
-            "post-migration drift checker fingerprints columns, enums, constraints, indexes, triggers, functions, owners, ACL, and default privileges",
-            "active constraint, index, function, and grant mutations fail before exact restoration"
+            "post-migration drift checker fingerprints columns, column ACLs, enums, constraints, indexes, triggers, functions, owners, relation ACLs, and default privileges",
+            "active constraint, index, function, table-grant, and column-grant mutations fail before exact restoration"
           ]
         }
       ]
@@ -1258,7 +1289,7 @@
         {
           "test_id": "T-DB-INTEGRATION-001",
           "file": "tests/database/integration.test.mjs",
-          "selector": "SQL-020 enforces role attributes, ownership, creation, truncation, restricted, and ciphertext matrix",
+          "selector": "SQL-020 enforces role matrix and real factory startup rejects direct grants and extra membership",
           "level": "DB",
           "assertions": [
             "daily_energy_api SELECT on restricted_safety_state is rejected by PostgreSQL grant"

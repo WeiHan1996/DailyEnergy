@@ -8,15 +8,81 @@ SET search_path TO "daily_energy", pg_catalog;
 -- =========================================================================
 
 -- -------------------------------------------------------------------------
--- SQL-007 修复：check_daily_publication_consistency 增加 snapshot→checkin 校验
+-- SQL-007 修复：在 TX-02 snapshot 提交边界校验 snapshot→intent→checkin
 -- -------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION "daily_energy"."assert_generation_snapshot_lineage"(snapshot_id uuid)
+RETURNS void LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
+DECLARE
+  snapshot_row record;
+  intent_row record;
+  checkin_row record;
+  checkin_revision_exists boolean;
+BEGIN
+  SELECT * INTO snapshot_row
+  FROM app_generation_input_snapshot
+  WHERE id = snapshot_id;
+  IF snapshot_row.id IS NULL THEN
+    PERFORM raise_integrity('SQL-007');
+  END IF;
+
+  SELECT * INTO intent_row
+  FROM app_generation_intent
+  WHERE id = snapshot_row."generationIntentId";
+  SELECT * INTO checkin_row
+  FROM app_morning_checkin
+  WHERE id = snapshot_row."checkinId";
+  SELECT EXISTS (
+    SELECT 1
+    FROM app_morning_checkin_revision revision_row
+    WHERE revision_row."checkinId" = snapshot_row."checkinId"
+      AND revision_row.revision = snapshot_row."checkinRevision"
+  ) INTO checkin_revision_exists;
+  IF intent_row.id IS NULL OR checkin_row.id IS NULL OR
+     checkin_row."accountId" <> intent_row."accountId" OR
+     checkin_row."productDate" <> intent_row."targetProductDate" OR
+     NOT checkin_revision_exists THEN
+    PERFORM raise_integrity('SQL-007');
+  END IF;
+END
+$$;
+REVOKE ALL ON FUNCTION "daily_energy"."assert_generation_snapshot_lineage"(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION "daily_energy"."assert_generation_snapshot_lineage"(uuid) TO
+  "daily_energy_api", "daily_energy_interactive", "daily_energy_background", "daily_energy_test";
+
+-- Deferred runtime constraints use the shared stable-code helper as the invoking role.
+-- Keep it closed to PUBLIC while allowing only active writer/test profiles to surface
+-- SQL-007/012/013/014 instead of a function-permission error.
+GRANT EXECUTE ON FUNCTION "daily_energy"."raise_integrity"(text) TO
+  "daily_energy_api", "daily_energy_interactive", "daily_energy_background",
+  "daily_energy_safety", "daily_energy_deletion", "daily_energy_test";
+
+CREATE OR REPLACE FUNCTION "daily_energy"."check_generation_snapshot_consistency"()
+RETURNS trigger LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
+BEGIN
+  PERFORM assert_generation_snapshot_lineage(NEW.id);
+  IF NOT EXISTS (
+    SELECT 1
+    FROM app_generation_input_snapshot snapshot_row
+    JOIN app_morning_checkin checkin_row ON checkin_row.id = snapshot_row."checkinId"
+    WHERE snapshot_row.id = NEW.id
+      AND checkin_row.revision = snapshot_row."checkinRevision"
+  ) THEN
+    PERFORM raise_integrity('SQL-007');
+  END IF;
+  RETURN NEW;
+END
+$$;
+CREATE CONSTRAINT TRIGGER "sql_007_generation_snapshot_consistency"
+AFTER INSERT OR UPDATE ON "daily_energy"."app_generation_input_snapshot"
+DEFERRABLE INITIALLY DEFERRED FOR EACH ROW
+EXECUTE FUNCTION "daily_energy"."check_generation_snapshot_consistency"();
+
 CREATE OR REPLACE FUNCTION "daily_energy"."check_daily_publication_consistency"()
 RETURNS trigger LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
 DECLARE
   intent_row record;
   snapshot_row record;
   result_row record;
-  checkin_row record;
 BEGIN
   IF TG_TABLE_NAME = 'app_published_daily_result' THEN
     SELECT * INTO intent_row FROM app_generation_intent WHERE id = NEW."generationIntentId";
@@ -26,15 +92,7 @@ BEGIN
        intent_row."resultVersion" <> NEW."resultVersion" OR snapshot_row."generationIntentId" <> intent_row.id THEN
       PERFORM raise_integrity('SQL-007');
     END IF;
-    SELECT * INTO checkin_row
-    FROM app_morning_checkin
-    WHERE id = snapshot_row."checkinId";
-    IF checkin_row.id IS NULL OR
-       checkin_row."accountId" <> intent_row."accountId" OR
-       checkin_row."productDate" <> intent_row."targetProductDate" OR
-       checkin_row.revision <> snapshot_row."checkinRevision" THEN
-      PERFORM raise_integrity('SQL-007');
-    END IF;
+    PERFORM assert_generation_snapshot_lineage(snapshot_row.id);
   ELSE
     SELECT * INTO result_row FROM app_published_daily_result WHERE id = NEW."resultId";
     IF result_row.id IS NULL OR result_row."accountId" <> NEW."accountId" OR result_row."productDate" <> NEW."productDate" THEN
@@ -45,26 +103,47 @@ BEGIN
 END
 $$;
 
+-- Fail the upgrade if an older deployment already committed an invalid snapshot.
+DO $validate_existing_generation_snapshots$
+DECLARE snapshot_id uuid;
+BEGIN
+  FOR snapshot_id IN SELECT id FROM app_generation_input_snapshot LOOP
+    PERFORM assert_generation_snapshot_lineage(snapshot_id);
+  END LOOP;
+END
+$validate_existing_generation_snapshots$;
+
 -- -------------------------------------------------------------------------
 -- SQL-013 修复：visibility 状态切换时校验所有槽；weekly current 切换时校验所有槽
 -- -------------------------------------------------------------------------
 
--- 日级：visibility 状态变更时，对该 result 的所有槽重新执行 SQL-013
+-- 日级：visibility 状态/绑定变更或删除时，同时校验失去保护的旧 result
+-- 与非 BLOCKED 的新 result。删除完整 result graph 时旧 result 已无 slot，因此仍可提交。
 CREATE OR REPLACE FUNCTION "daily_energy"."check_daily_visibility_slots"()
 RETURNS trigger LANGUAGE plpgsql SET search_path = "daily_energy", pg_catalog AS $$
 DECLARE slot_row record;
 BEGIN
-  IF NEW.state = 'BLOCKED' THEN
-    RETURN NEW;
+  IF TG_OP = 'DELETE' OR
+     (TG_OP = 'UPDATE' AND NEW."resultId" IS DISTINCT FROM OLD."resultId") THEN
+    FOR slot_row IN SELECT * FROM app_result_content_slot WHERE "resultId" = OLD."resultId" LOOP
+      PERFORM assert_daily_content_slot(slot_row.id);
+    END LOOP;
   END IF;
-  FOR slot_row IN SELECT * FROM app_result_content_slot WHERE "resultId" = NEW."resultId" LOOP
-    PERFORM assert_daily_content_slot(slot_row.id);
-  END LOOP;
+
+  IF TG_OP <> 'DELETE' AND NEW.state IS DISTINCT FROM 'BLOCKED' THEN
+    FOR slot_row IN SELECT * FROM app_result_content_slot WHERE "resultId" = NEW."resultId" LOOP
+      PERFORM assert_daily_content_slot(slot_row.id);
+    END LOOP;
+  END IF;
+
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
   RETURN NEW;
 END
 $$;
 CREATE CONSTRAINT TRIGGER "sql_013_daily_visibility"
-AFTER INSERT OR UPDATE OF state ON "daily_energy"."app_published_result_visibility"
+AFTER INSERT OR UPDATE OF state, "resultId" OR DELETE ON "daily_energy"."app_published_result_visibility"
 DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION "daily_energy"."check_daily_visibility_slots"();
 
 -- 周级：currentSummaryRef 变更时，对新 summary 的所有槽重新执行 SQL-013
@@ -127,6 +206,9 @@ GRANT INSERT, UPDATE ON
   "daily_energy"."restricted_recovery_command_receipt",
   "daily_energy"."restricted_audit_event"
 TO "daily_energy_safety";
+GRANT INSERT ON
+  "daily_energy"."runtime_outbox_event"
+TO "daily_energy_safety", "daily_energy_deletion";
 GRANT DELETE ON
   "daily_energy"."restricted_safety_decision",
   "daily_energy"."restricted_safety_event",

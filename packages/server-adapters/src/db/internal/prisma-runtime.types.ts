@@ -11,15 +11,18 @@ export interface DatabaseRoleIdentity {
   readonly currentUser: string;
   readonly sessionUser: string;
   readonly profileMemberships: readonly string[];
+  readonly membershipMismatch: boolean;
   readonly ownerMember: boolean;
   readonly restrictedRead: boolean;
   readonly schemaCreate: boolean;
   readonly superuser: boolean;
   readonly createDatabase: boolean;
   readonly createRole: boolean;
+  readonly replication: boolean;
   readonly bypassRls: boolean;
   readonly capabilityMismatch: boolean;
   readonly safetyWrite: boolean;
+  readonly outboxWrite: boolean;
   readonly deletionTaskWrite: boolean;
   readonly subjectDelete: boolean;
   readonly evaluationAccess: boolean;

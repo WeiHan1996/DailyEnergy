@@ -21,7 +21,7 @@ test(`${metadata.test_id} accepts the complete scoped manifest`, async () => {
   const result = await loadAndValidateEvidenceManifest();
   assert.deepEqual(result, {
     total: 101,
-    counts: { COVERED: 52, NA_WITH_REASON: 49 },
+    counts: { COVERED: 53, NA_WITH_REASON: 48 },
   });
 });
 

@@ -35,15 +35,18 @@ const backgroundIdentity: DatabaseRoleIdentity = {
   currentUser: "daily_energy_background_prod",
   sessionUser: "daily_energy_background_prod",
   profileMemberships: ["daily_energy_background"],
+  membershipMismatch: false,
   ownerMember: false,
   restrictedRead: false,
   safetyWrite: false,
+  outboxWrite: true,
   deletionTaskWrite: false,
-  subjectDelete: false,
+  subjectDelete: true,
   schemaCreate: false,
   superuser: false,
   createDatabase: false,
   createRole: false,
+  replication: false,
   bypassRls: false,
   evaluationAccess: false,
   extraRoleMemberships: [],
@@ -145,6 +148,8 @@ describe("closed database factory", () => {
       { ...backgroundIdentity, restrictedRead: true },
       { ...backgroundIdentity, ownerMember: true },
       { ...backgroundIdentity, capabilityMismatch: true },
+      { ...backgroundIdentity, membershipMismatch: true },
+      { ...backgroundIdentity, replication: true },
       { ...backgroundIdentity, extraRoleMemberships: ["rogue_group"] },
     ]) {
       const setup = factory(
@@ -168,6 +173,8 @@ describe("closed database factory", () => {
       profileMemberships: ["daily_energy_safety"],
       restrictedRead: true,
       safetyWrite: true,
+      outboxWrite: true,
+      subjectDelete: false,
     });
     await expect(
       safety.factory.connect({
@@ -175,12 +182,33 @@ describe("closed database factory", () => {
       }),
     ).resolves.toMatchObject({ profile: "api-restricted" });
 
+    const safetyWithoutOutbox = factory(
+      "api-restricted",
+      "daily_energy_safety",
+      {
+        ...backgroundIdentity,
+        currentUser: "daily_energy_safety_prod",
+        sessionUser: "daily_energy_safety_prod",
+        profileMemberships: ["daily_energy_safety"],
+        restrictedRead: true,
+        safetyWrite: true,
+        outboxWrite: false,
+        subjectDelete: false,
+      },
+    );
+    await expect(
+      safetyWithoutOutbox.factory.connect({
+        connectionString: "postgres://safety:secret@db.test/app",
+      }),
+    ).rejects.toThrow("DB_ROLE_MISMATCH");
+
     const deletion = factory("worker-restricted", "daily_energy_deletion", {
       ...backgroundIdentity,
       currentUser: "daily_energy_deletion_prod",
       sessionUser: "daily_energy_deletion_prod",
       profileMemberships: ["daily_energy_deletion"],
       restrictedRead: true,
+      outboxWrite: true,
       deletionTaskWrite: true,
       subjectDelete: true,
     });
@@ -200,6 +228,7 @@ describe("closed database factory", () => {
         profileMemberships: ["daily_energy_safety"],
         restrictedRead: true,
         safetyWrite: true,
+        outboxWrite: true,
         subjectDelete: true,
       },
     );
