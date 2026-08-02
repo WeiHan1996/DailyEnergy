@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-02
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：[E-007 Redis 与 BullMQ](./current.md)（In Review）
+- **当前任务**：[E-009 本地 Docker Compose](./current.md)（Ready）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -108,31 +108,31 @@
 | S-34 | Phase 1～3 工程 Issues | Done | 3 个 GitHub Milestones、48 个 Issues                       | S-01～S-33             |
 | S-35 | Phase 0B Gate 评审     | Done | [Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) | S-34                   |
 
-S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)～[E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)、[E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46) 与 [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) 已完成并进入 Done。E-006 的安全返工 PR #110 与 post-merge full Gate 修复 PR #111 已 squash 合并，最终真实 PostgreSQL 18 suite `82/82`；E-007 是唯一 In Review。
+S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)～[E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46) 与 [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) 已完成并进入 Done。E-007 已随 PR #113 squash 合并为 `9630691a87b184bafe6ca78900a31244a6e6c237`，Issue #45 已关闭，merged `main` 的完整验证通过；E-009 是唯一 Ready。
 
 ## 4. Phase 1：工程基础
 
-| ID                                                            | 任务                                       | 状态      | 主要结果                                             |
-| ------------------------------------------------------------- | ------------------------------------------ | --------- | ---------------------------------------------------- |
-| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)  | 初始化 TypeScript Monorepo                 | Done      | Workspace、包管理和统一脚本                          |
-| [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)  | 代码质量基线                               | Done      | TypeScript、ESLint、Prettier、提交规范               |
-| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)  | NestJS API 骨架                            | Done      | 配置、错误、健康检查和日志                           |
-| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)  | 微信小程序骨架                             | Done      | 原生小程序、TypeScript、路由和环境                   |
-| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)  | Next.js 管理后台骨架                       | Done      | 登录外壳和基础布局                                   |
-| [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)  | PostgreSQL 与 Prisma                       | Done      | 初始 Schema、迁移和测试数据；PR #108 安全返工        |
-| [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45)  | Redis 与 BullMQ                            | In Review | 缓存、队列和连接管理                                 |
-| [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)  | 统一 Zod Schema、OpenAPI 与生成 API Client | Done      | client-safe Schema、OpenAPI、生成客户端与 drift Gate |
-| [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Planned   | 可重复本地环境                                       |
-| [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Planned   | 单元、集成、契约和端到端                             |
-| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Planned   | 格式、类型、测试、构建和安全检查                     |
-| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | Planned   | 固定开发地址和发布流程                               |
-| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Planned   | 脱敏日志、指标和告警                                 |
-| [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Planned   | 环境可重复、CI 通过、服务可访问                      |
-| [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done      | P0/P1 上下文路由、任务 Profile 与安静验证            |
+| ID                                                            | 任务                                       | 状态    | 主要结果                                             |
+| ------------------------------------------------------------- | ------------------------------------------ | ------- | ---------------------------------------------------- |
+| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)  | 初始化 TypeScript Monorepo                 | Done    | Workspace、包管理和统一脚本                          |
+| [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)  | 代码质量基线                               | Done    | TypeScript、ESLint、Prettier、提交规范               |
+| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)  | NestJS API 骨架                            | Done    | 配置、错误、健康检查和日志                           |
+| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)  | 微信小程序骨架                             | Done    | 原生小程序、TypeScript、路由和环境                   |
+| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)  | Next.js 管理后台骨架                       | Done    | 登录外壳和基础布局                                   |
+| [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)  | PostgreSQL 与 Prisma                       | Done    | 初始 Schema、迁移和测试数据；PR #108 安全返工        |
+| [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45)  | Redis 与 BullMQ                            | Done    | 缓存、队列和连接管理                                 |
+| [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)  | 统一 Zod Schema、OpenAPI 与生成 API Client | Done    | client-safe Schema、OpenAPI、生成客户端与 drift Gate |
+| [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Ready   | 可重复本地环境                                       |
+| [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Planned | 单元、集成、契约和端到端                             |
+| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Planned | 格式、类型、测试、构建和安全检查                     |
+| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | Planned | 固定开发地址和发布流程                               |
+| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Planned | 脱敏日志、指标和告警                                 |
+| [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Planned | 环境可重复、CI 通过、服务可访问                      |
+| [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done    | P0/P1 上下文路由、任务 Profile 与安静验证            |
 
 E-004 已随 PR #96 合并，E-008 已随 PR #97 squash 合并，E-005 已随 PR #98
-合并，E-015 已随 PR #106 squash 合并。E-006 已随 PR #110/#111 完成；E-007 是唯一
-In Review，自动化 Gate 已通过并等待 Draft PR 审核；其它任务均保持 Planned。
+合并，E-015 已随 PR #106 squash 合并。E-006 已随 PR #110/#111 完成，E-007 已随
+PR #113 完成；E-009 是唯一 Ready，尚未开始实现，其它任务均保持 Planned。
 
 ## 5. Phase 2：确定性核心闭环
 
