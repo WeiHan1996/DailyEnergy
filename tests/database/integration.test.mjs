@@ -1923,7 +1923,7 @@ test(
           const retention = await client.query(
             `SELECT count(*)::int AS count FROM ${schema}.system_retention_policy_entry WHERE "policyVersion"='retention-policy-v1' AND "dataTypeCode"='SYNTHETIC_RUNTIME'`,
           );
-          assert.equal(migrations.rows[0].count, 3);
+          assert.equal(migrations.rows[0].count, 4);
           assert.equal(versions.rows[0].count, 1);
           assert.equal(retention.rows[0].count, 1);
         } finally {
@@ -1969,7 +1969,7 @@ test(
       });
 
       await t.test(
-        "single initial migration supports code rollback and roll-forward",
+        "additive migration history supports code rollback and roll-forward",
         async () => {
           const { Client } = loadPg();
           const client = new Client({ connectionString: adminUrl });
@@ -2001,6 +2001,7 @@ test(
                 "20260730000000_initial_application_schema",
                 "20260731000000_owner_upgrade_probe",
                 "20260731000001_security_fixes_sql007_sql013_roles",
+                "20260802000000_e007_queue_inbox_permissions",
               ],
             );
           } finally {

@@ -1,15 +1,31 @@
 import type {
   DatabaseConnection,
   DatabaseFactory,
-  DatabaseFactoryConfig,
+  QueueJobHandler,
+  WorkerInfrastructureConfig,
+  WorkerInfrastructureRuntime,
 } from "@daily-energy/server-adapters/worker-interactive";
-import { createWorkerInteractiveDatabaseFactory } from "@daily-energy/server-adapters/worker-interactive";
+import {
+  createWorkerInteractiveDatabaseFactory,
+  startWorkerInteractiveInfrastructure,
+  workerInteractiveManifest,
+} from "@daily-energy/server-adapters/worker-interactive";
+
+export type WorkerInfrastructureStarter = (
+  config: WorkerInfrastructureConfig,
+  handlers: readonly QueueJobHandler[],
+) => Promise<WorkerInfrastructureRuntime>;
+
+export interface WorkerProcess {
+  readonly profile: "worker-interactive";
+  readonly runtime: WorkerInfrastructureRuntime;
+  drain(): Promise<void>;
+}
 
 export interface WorkerEntrypoint {
   readonly profile: "worker-interactive";
-  start(
-    config: DatabaseFactoryConfig,
-  ): Promise<DatabaseConnection<"worker-interactive", unknown>>;
+  readonly capabilityFingerprintSource: typeof workerInteractiveManifest;
+  start(config: WorkerInfrastructureConfig): Promise<WorkerProcess>;
 }
 
 export function createInteractiveWorkerEntrypoint(
@@ -17,11 +33,44 @@ export function createInteractiveWorkerEntrypoint(
     "worker-interactive",
     unknown
   > = createWorkerInteractiveDatabaseFactory(),
+  infrastructureStarter: WorkerInfrastructureStarter = startWorkerInteractiveInfrastructure,
+  handlers: readonly QueueJobHandler[] = [],
 ): WorkerEntrypoint {
   return Object.freeze({
+    capabilityFingerprintSource: workerInteractiveManifest,
     profile: "worker-interactive",
-    start(config: DatabaseFactoryConfig) {
-      return databaseFactory.connect(config);
+    async start(config: WorkerInfrastructureConfig): Promise<WorkerProcess> {
+      const database = await databaseFactory.connect(config.database);
+      let runtime: WorkerInfrastructureRuntime;
+      try {
+        runtime = await infrastructureStarter(config, handlers);
+      } catch (error) {
+        await database.disconnect();
+        throw error;
+      }
+      return createWorkerProcess(database, runtime);
+    },
+  });
+}
+
+function createWorkerProcess(
+  database: DatabaseConnection<"worker-interactive", unknown>,
+  runtime: WorkerInfrastructureRuntime,
+): WorkerProcess {
+  let drained = false;
+  return Object.freeze({
+    profile: "worker-interactive",
+    runtime,
+    async drain(): Promise<void> {
+      if (drained) {
+        return;
+      }
+      drained = true;
+      try {
+        await runtime.drain();
+      } finally {
+        await database.disconnect();
+      }
     },
   });
 }

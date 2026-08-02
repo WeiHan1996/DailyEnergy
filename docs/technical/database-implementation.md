@@ -7,7 +7,7 @@ This directory contains the PostgreSQL 18 / Prisma 7 migration and verification 
 - Prisma CLI and Client: `7.9.1` (same exact version; supplied by the root install)
 - PostgreSQL test image: `postgres:18.0-bookworm@sha256:3f55f8895c4ed50603e2fbdfc72fffeeaba3173321fee5cb825bbbeb30d9d854`
 - Application schema: `daily_energy`
-- Migration head: `20260731000001_security_fixes_sql007_sql013_roles`
+- Migration head: `20260802000000_e007_queue_inbox_permissions`
 
 `DATABASE_URL` is required by `prisma.config.ts`; no credential or production default is committed.
 
@@ -53,6 +53,12 @@ The initial migration has no fabricated down migration. The second migration mov
 `revision >= 1` constraint onto an existing E-006 table so the harness can prove real owner-based
 `ALTER TABLE`, lock timeout, failure cleanup, and roll-forward. Code rollback keeps the same
 compatible schema. Destructive schema rollback is explicitly not claimed.
+
+The E-007 forward migration is additive and grant-only. It gives `daily_energy_deletion` the
+minimum `INSERT`/`UPDATE` access to `runtime_inbox_receipt` required to commit a Restricted domain
+effect and its InboxReceipt in one transaction; it adds no sequence, DDL, Safety, evaluation, or
+ordinary application-table capability. The checksum, normalized ACL fingerprint, drift probe and
+real Restricted consumer test cover this grant.
 
 `prisma db push` is rejected by the static tooling and is not an accepted migration path.
 
@@ -158,8 +164,9 @@ must-fail fixtures for SQL-001 through SQL-020 and the transaction suite:
 The harness uses only synthetic identities and data. It does not connect to production, use
 production credentials, or exercise a production restore. The initial lock-timeout migration is
 additive and compatible; the security-fix migration is the explicitly coordinated split-role
-cutover described above. A future destructive or contract migration still requires its own
-isolated recovery rehearsal and authorization.
+cutover described above; the E-007 inbox grant is an additive forward migration. A future
+destructive or contract migration still requires its own isolated recovery rehearsal and
+authorization.
 
 `tests/database/evidence-manifest.json` is the scoped, machine-readable pre-E-010 handoff. Its 101 entries map every SQL and TX contract to exact tests and classify each `S19-DB-001..064` and `S31-TEST-017..024` item individually as either `COVERED` or `NA_WITH_REASON`. Every NA entry names the missing layer and follow-up owner; it is not counted as coverage. The security-fix migration adds explicit SQL-007, SQL-013 and split-role assertions to the covered evidence.
 

@@ -394,6 +394,19 @@
       }
     },
     {
+      "case_id": "api-bullmq-processor",
+      "gate": "capability",
+      "expected_rule_id": "BOUNDARY_CAPABILITY_API",
+      "project": {
+        "files": [
+          {
+            "path": "apps/api/src/unsafe-processor.ts",
+            "content": "import { Worker } from \"bullmq\";\n"
+          }
+        ]
+      }
+    },
+    {
       "case_id": "server-core-concrete-runtime",
       "gate": "capability",
       "expected_rule_id": "BOUNDARY_CAPABILITY_SERVER_CORE",

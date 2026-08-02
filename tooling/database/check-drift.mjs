@@ -106,6 +106,8 @@ await withClient(connectionString, async (client) => {
        NOT has_table_privilege('daily_energy_safety', $1 || '.restricted_safety_state', 'DELETE') AS safety_no_delete,
        has_table_privilege('daily_energy_safety', $1 || '.runtime_outbox_event', 'INSERT') AS safety_outbox_insert,
        has_table_privilege('daily_energy_deletion', $1 || '.runtime_outbox_event', 'INSERT') AS deletion_outbox_insert,
+       has_table_privilege('daily_energy_deletion', $1 || '.runtime_inbox_receipt', 'INSERT') AS deletion_inbox_insert,
+       has_table_privilege('daily_energy_deletion', $1 || '.runtime_inbox_receipt', 'UPDATE') AS deletion_inbox_update,
        NOT has_table_privilege('daily_energy_deletion', $1 || '.evaluation_run', 'SELECT') AS deletion_no_eval,
        has_table_privilege('daily_energy_deletion', $1 || '.app_morning_checkin', 'DELETE') AS deletion_app_delete`,
     [APPLICATION_SCHEMA],
@@ -122,6 +124,8 @@ await withClient(connectionString, async (client) => {
     !grants.safety_no_delete ||
     !grants.safety_outbox_insert ||
     !grants.deletion_outbox_insert ||
+    !grants.deletion_inbox_insert ||
+    !grants.deletion_inbox_update ||
     !grants.deletion_no_eval ||
     !grants.deletion_app_delete
   ) {

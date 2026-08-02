@@ -4,6 +4,16 @@ import {
   type DatabaseCapability,
 } from "../db/internal/create-closed-database-factory.js";
 import { prismaRuntime } from "../db/internal/prisma-runtime.js";
+import type {
+  QueueJobHandler,
+  QueueTelemetrySink,
+} from "../queue/contracts.js";
+import { INTERACTIVE_WORKER_MANIFEST } from "../queue/manifests.js";
+import {
+  startWorkerInfrastructure,
+  type WorkerInfrastructureConfig,
+  type WorkerInfrastructureRuntime,
+} from "../queue/worker-runtime.js";
 
 export type WorkerInteractiveDatabaseCapability =
   DatabaseCapability<"worker-interactive">;
@@ -22,8 +32,36 @@ export function createWorkerInteractiveDatabaseFactory(): DatabaseFactory<
   );
 }
 
+export const workerInteractiveManifest = INTERACTIVE_WORKER_MANIFEST;
+
+export function startWorkerInteractiveInfrastructure(
+  config: WorkerInfrastructureConfig,
+  handlers: readonly QueueJobHandler[] = [],
+  telemetry?: QueueTelemetrySink,
+): Promise<WorkerInfrastructureRuntime> {
+  return startWorkerInfrastructure({
+    config,
+    handlers,
+    manifest: INTERACTIVE_WORKER_MANIFEST,
+    ...(telemetry ? { telemetry } : {}),
+  });
+}
+
 export type {
   DatabaseConnection,
   DatabaseFactory,
   DatabaseFactoryConfig,
 } from "../db/internal/contracts.js";
+export type {
+  QueueJobHandler,
+  QueueTelemetryEvent,
+  QueueTelemetrySink,
+  QueueTransaction,
+  QueueTransactionResult,
+  VersionedJobEnvelope,
+  WorkerCapabilityManifest,
+} from "../queue/contracts.js";
+export type {
+  WorkerInfrastructureConfig,
+  WorkerInfrastructureRuntime,
+} from "../queue/worker-runtime.js";
