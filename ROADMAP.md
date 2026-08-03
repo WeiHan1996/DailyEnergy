@@ -789,7 +789,8 @@ S-12 完成后，再依据实际 Issue 数量制定：
 - E-006 已随 PR #110/#111 完成，最终 full Gate 与真实 PostgreSQL 18 `82/82` 通过；
 - E-007 已随 PR #113 squash 合并并进入 Done，merged `main` 的完整验证通过；
 - E-009 已随 PR #115 squash 合并并进入 Done，merged `main` 的完整验证通过；
-- E-010 多层测试、Fixture 与 Source-ID Registry 是唯一 Ready，尚未创建实现分支；
+- E-010 已随 PR #117 squash 合并并进入 Done；
+- E-011 GitHub Actions CI 与供应链 Gate 是唯一 Ready，尚未创建实现分支；
 - D-001～D-005 已进入 Phase 2 路线图，当前均为 Planned；
 - 当前唯一执行任务由 tasks/current.md 指定；
 - C-003、C-004、C-009 在 D-004 被接受前不得开始正式页面实现；
