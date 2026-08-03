@@ -1,0 +1,12 @@
+{
+  "catalog_version": "e-010-fixture-catalog-v1",
+  "factory_version": "synthetic-factory-v1",
+  "synthetic_only": true,
+  "default_clock": "2026-08-03T04:00:00.000+08:00",
+  "default_timezone": "Asia/Shanghai",
+  "default_random_seed": 240803,
+  "golden_policy": "accepted-contract-only",
+  "source_fingerprint": "sha256:synthetic-fixture-contract-v1",
+  "content_policy": "tests/artifacts/policy.json",
+  "fault_catalog": "tests/resilience/fault-plans.json"
+}

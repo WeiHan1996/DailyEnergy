@@ -22,6 +22,8 @@ import type {
 import type { SafetyContinuationVerifier } from "./composition/types.js";
 import { HealthService } from "./transport/public/health.service.js";
 
+const apiRoot = resolve(import.meta.dirname, "..");
+
 function syntheticEnvironment(
   maintenanceMode: MaintenanceMode = "OFF",
 ): NodeJS.ProcessEnv {
@@ -394,7 +396,7 @@ async function waitForOutput(
 
 describe("API process lifecycle", () => {
   it("fails before listening when runtime configuration is missing", async () => {
-    const child = spawn(process.execPath, [resolve("dist/main.js")], {
+    const child = spawn(process.execPath, [resolve(apiRoot, "dist/main.js")], {
       env: {
         PATH: process.env.PATH,
       },
@@ -417,7 +419,7 @@ describe("API process lifecycle", () => {
   });
 
   it("drains and completes Nest shutdown hooks on SIGTERM", async () => {
-    const child = spawn(process.execPath, [resolve("dist/main.js")], {
+    const child = spawn(process.execPath, [resolve(apiRoot, "dist/main.js")], {
       env: {
         PATH: process.env.PATH,
         ...syntheticEnvironment(),
@@ -451,7 +453,7 @@ describe("API process lifecycle", () => {
   it("terminates with a fixed result when shutdown drain exceeds the grace deadline", async () => {
     const child = spawn(
       process.execPath,
-      [resolve("dist-fixtures/test-fixtures/slow-shutdown.js")],
+      [resolve(apiRoot, "dist-fixtures/test-fixtures/slow-shutdown.js")],
       {
         env: {
           PATH: process.env.PATH,

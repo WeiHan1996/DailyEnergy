@@ -1,0 +1,15 @@
+{
+  "template_version": "e-010-ai-evaluation-evidence-v1",
+  "execution_status": "EVALUATION_NOT_RUN",
+  "pass_claim": "PROHIBITED",
+  "synthetic_only": true,
+  "provider_calls": 0,
+  "deterministic_evidence": "PENDING",
+  "model_evidence": "PENDING_EXPLICIT_AUTHORIZATION",
+  "load_evidence": "PENDING_EXPLICIT_AUTHORIZATION",
+  "human_evidence": "PENDING_MANUAL_REVIEW",
+  "professional_evidence": "PENDING_MANUAL_REVIEW",
+  "evaluation_run_ref": null,
+  "reviewer": null,
+  "reviewed_at_utc": null
+}

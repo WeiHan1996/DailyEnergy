@@ -1,0 +1,20 @@
+{
+  "template_version": "e-010-manual-rc-evidence-v1",
+  "execution_status": "MANUAL_EVIDENCE_PENDING",
+  "pass_claim": "PROHIBITED",
+  "synthetic_accounts_only": true,
+  "source_ids": ["S31-TEST-016", "S31-TEST-048"],
+  "devtools": {
+    "status": "INFRA_BLOCKED",
+    "reason_code": "MINIAPP_DEVTOOLS_NOT_EXECUTED",
+    "runner_version": null,
+    "base_library_version": null
+  },
+  "real_device": {
+    "ios": "MANUAL_EVIDENCE_PENDING",
+    "android": "MANUAL_EVIDENCE_PENDING",
+    "matrix": []
+  },
+  "reviewer": null,
+  "reviewed_at_utc": null
+}
