@@ -1,5 +1,7 @@
 **/.next/
 **/dist/
+**/dist-fixtures/
 **/node_modules/
 **/test-results/
+tests/artifacts/output/
 packages/server-adapters/src/db/generated/prisma/

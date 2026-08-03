@@ -1,16 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-03（E-009 合并完成并提升 E-010）
+- **最后更新**：2026-08-03（E-010 实现完成并进入审核）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-010 — 建立多层测试、Fixture 与 Source-ID Registry
-- **任务状态**：Ready
-- **任务分支**：实现分支尚未创建；状态交接分支为 `agent/e010-ready`
+- **任务状态**：In Review
+- **任务分支**：`agent/e010-test-registry`
 - **当前 Issue**：[E-010 Issue #49](https://github.com/WeiHan1996/DailyEnergy/issues/49)
-- **当前 PR**：[状态 Draft PR #116](https://github.com/WeiHan1996/DailyEnergy/pull/116)
-- **基线提交**：`4f1d06b498a5db730661cf39dd5ce005932645e2`
-- **Gate 结论**：`READY_TO_START`（code profile；实现涉及测试、tooling、fixture 与
-  registry，按实际路径运行 task/full Gate）
+- **当前 PR**：实现 Draft PR 尚未创建
+- **基线提交**：`69138b7e2188084a92d1cf23efbf021b5bab3722`
+- **Gate 结论**：`IMPLEMENTATION_COMPLETE`（初始 code profile 因 artifact、runner、
+  配置与测试路径提升为 security；完整自动 Gate 已通过，threat boundary review 为 PASS；
+  微信 DevTools、真机和外部 AI/人工证据保持明确 pending）
 
 ## 1. 当前目标
 
@@ -25,11 +26,11 @@ Accepted Source IDs
   -> COVERED / PLANNED / approved NA_WITH_REASON evidence
 ```
 
-E-010 当前只进入 Ready，尚未创建实现分支或修改测试骨架。开工必须读取 Issue #49、
-`pnpm agent:prepare E-010 --remote --deep` 返回的全部 required sources，以及 Accepted
-testing、evaluation、architecture、repository-structure 和相关 Schema/API/数据库/队列
-原文；随后核对现有 runner、fixture、DevTools、Docker 与 Source-ID 集合并给出
-GO/NO-GO。
+E-010 已建立正式 registry：736 个唯一 Source ID 中 138 个为 `COVERED`、598 个为
+`PLANNED`、0 个为 `NA_WITH_REASON`。root Vitest projects、真实 Nest HTTP Playwright、
+真实 PG/queue、Admin Chromium 与微信 DevTools runner 均有机器可读描述；合成 fixture、
+可重放 fault、sticky flaky、quarantine、artifact/corpus scanner 和 pending evidence 模板均
+已接入，不改变既有数据库、队列或 Compose 证据层级。
 
 ## 2. 状态变更影响
 
@@ -38,7 +39,7 @@ GO/NO-GO。
   commit 为 `4f1d06b498a5db730661cf39dd5ce005932645e2`，Issue #47 已关闭；
 - merged `main` 的完整 `pnpm run validate` 已通过，真实 PostgreSQL 18 suite 为
   `82/82`，Redis 8 / BullMQ 5 / PostgreSQL 18 queue integration 为 `7/7`；
-- E-009 进入 Done，E-010 成为唯一 Ready；E-011～E-014 与其它任务继续 Planned；
+- E-009 进入 Done，E-010 成为唯一 In Progress；E-011～E-014 与其它任务继续 Planned；
 - D-001～D-005 继续 Planned，不创建 Figma、Design Tokens 或业务页面。
 
 ## 3. 范围
@@ -71,17 +72,38 @@ GO/NO-GO。
 - fixture、日志和 artifact 仅含合成数据并通过 secret/content scanner；
 - 完成实现后运行 changed、task 与按实际影响扩大的 full Gate，并提交聚焦 Draft PR。
 
+当前实现证据：
+
+- registry completeness/negative tests `5/5`，harness/policy `12/12`；
+- root Vitest projects `28 files / 156 tests`，真实 Nest Playwright HTTP `4/4`；
+- Playwright known-fail 证明 retry 1 通过后仍以 `FLAKY_FAIL` 非零退出；
+- root `pnpm test`、lint、typecheck、build 与 `pnpm validate` 已通过，完整数据库/队列
+  数量以 Gate 输出和 Draft PR 为准；
+- `pnpm agent:validate --mode=changed` 为 `changed→full automated=PASS`，task Gate 为
+  `automated=PASS`，full Gate 为 `automated=PASS`；三者因 security profile 均返回
+  `MANUAL_EVIDENCE_REQUIRED`，对应 threat review 已 PASS、生产授权不适用；
+- `pnpm test:coverage` 已执行并正确拒绝当前 65.58% statements / 63.93% branches /
+  71.35% functions / 65.67% lines 基线；Accepted target 未降低，也未把未实现业务覆盖伪报
+  为 PASS；
+- 微信 runner 实际返回 `INFRA_BLOCKED: MINIAPP_DEVTOOLS_CLI_PATH_MISSING`；真机、模型、
+  load、人评与专业评审继续 pending，不计作 E-010 自动 PASS。
+
 ## 6. 当前阻塞与决策
 
 - **仓库/代码阻塞**：无；
 - **前置依赖**：E-002～E-009 均已完成；
 - **外部依赖**：开工时用 `--deep` 核对 Docker、浏览器、微信 DevTools 与 runner；
-  真机、人工 AI 评价或外部授权缺失时必须保留明确待完成状态，不能伪报 PASS；
+  本机未配置微信 DevTools CLI，结果为 `INFRA_BLOCKED`；真机、人工 AI 评价或外部授权
+  缺失均保留明确 pending，不能伪报 PASS；
 - **证据边界**：E-010 建立正式 registry，但不能把现有低层证据自动升级为更高层
   conformance；每个 Source ID 的强制层级以 Accepted testing/evaluation 原文为准；
-- **并行规则**：E-010 是唯一 Ready，尚未 In Progress；
-- **下一动作**：审核并合并本次纯状态 Draft PR；合并后等待用户指示，再从最新
-  `main` 创建 E-010 实现分支并运行 `pnpm agent:prepare E-010 --remote --deep`；
+- **coverage 边界**：阈值配置保留 Accepted 80/75、90/85、95/95/100 目标；当前继承代码
+  未达 target，coverage 命令保持非零缺口信号，不在 E-010 内补写下游业务测试或降低阈值；
+- **threat boundary**：只使用合成 identity/token/text；测试服务仅环回监听；外部网络与
+  provider 默认封闭；production graph 无 testing import；artifact/trace/output 不提交且受
+  content/secret policy；未使用生产凭据、真实账号、真实内容或生产授权；
+- **并行规则**：E-010 是唯一 In Review；
+- **下一动作**：完成 changed/task/full Gate 记录，提交并推送实现分支，创建聚焦 Draft PR；
 - **下一任务**：E-010 完成前不提升 E-011；E-010 获接受后再评估 E-011。
 
 ## 7. 最近交接
@@ -108,5 +130,22 @@ GO/NO-GO。
   `automated=PASS`；
 - 状态切换已提交为 `b1a6422f8365a73af808d03a04160a0cb958a825` 并推送；
   [状态 Draft PR #116](https://github.com/WeiHan1996/DailyEnergy/pull/116) 已创建；
-- 当前状态分支为 `agent/e010-ready`，只包含项目控制与导航更新；E-010 尚未开工，
-  等待状态 PR 审核与合并。
+- PR #116 已合并为 `69138b7e2188084a92d1cf23efbf021b5bab3722`；本地 `main` 与
+  `origin/main` 对齐且工作树干净；实现分支 `agent/e010-test-registry` 已从该提交创建；
+- `pnpm agent:prepare E-010 --remote --deep` 的本地/deep checks 与 GitHub 读取通过；旧的
+  `tasks/current.md` 仍映射已合并 PR #116，导致 `REMOTE_PR_NOT_OPEN`，本次开工状态更新
+  已移除该过期映射；
+- Issue #49 范围、Accepted testing/evaluation/architecture/repository-structure 及相关
+  Schema、API、数据库、队列和既有 evidence manifest 已开始逐项核对，开工结论为 GO。
+- 正式 Source-ID registry 从 11 个 Accepted/executable source set 生成 736 个唯一 ID；
+  missing、duplicate、unknown state、missing assertion、insufficient layer 与未批准 NA 均
+  有稳定失败规则，现有 DB/queue/Compose evidence 只在满足强制层级时合并；
+- root runner 使用显式 `vitest.projects.ts`，避免 package-local Vitest 自动发现后重复跨包
+  执行；API lifecycle 产物路径锚定 app root，standalone root runner 会先构建所需产物；
+- Playwright APIRequestContext 通过真实 Nest 测试应用验证 health、closed validation
+  envelope、audience 隔离与 detail-free 404；Admin 两个 Playwright 配置使用一次 retry +
+  sticky reporter，首次失败不会被第二次通过擦除；
+- `tests/registry/runners.json` 固定 PG18、Redis 8/BullMQ 5、API、Admin、miniapp 与 Vitest
+  的命令、真实依赖、隔离和 unavailable 状态；RC/AI evidence 模板默认禁止 PASS；
+- 当前无仓库或代码阻塞；coverage target、微信 DevTools、真机与外部 AI/人工证据状态均
+  已显式记录，E-011 与下游业务任务未提前开始。

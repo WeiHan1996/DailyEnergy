@@ -1,0 +1,84 @@
+{
+  "registry_version": "e-010-runner-registry-v1",
+  "runners": [
+    {
+      "runner_id": "vitest-projects",
+      "command": "pnpm test:projects",
+      "levels": ["UNIT", "MODULE", "CONTRACT"],
+      "implementation": "VITEST_PROJECTS",
+      "isolation": "PROJECT_ROOT_AND_PROCESS",
+      "synthetic_only": true,
+      "unavailable_status": "FAIL"
+    },
+    {
+      "runner_id": "postgresql-18",
+      "command": "pnpm database:test:integration",
+      "levels": ["DB"],
+      "implementation": "TESTCONTAINERS",
+      "real_dependencies": {
+        "postgresql": "postgres:18.0-bookworm@sha256:3f55f8895c4ed50603e2fbdfc72fffeeaba3173321fee5cb825bbbeb30d9d854"
+      },
+      "fake_substitution": "PROHIBITED",
+      "isolation": "EPHEMERAL_CONTAINER",
+      "synthetic_only": true,
+      "unavailable_status": "INFRA_BLOCKED"
+    },
+    {
+      "runner_id": "queue-integration",
+      "command": "pnpm queue:test",
+      "levels": ["INTEGRATION", "RESILIENCE"],
+      "implementation": "TESTCONTAINERS",
+      "real_dependencies": {
+        "postgresql": "postgres:18.0-bookworm@sha256:3f55f8895c4ed50603e2fbdfc72fffeeaba3173321fee5cb825bbbeb30d9d854",
+        "redis": "redis:8.2.1-bookworm@sha256:5fa2edb1e408fa8235e6db8fab01d1afaaae96c9403ba67b70feceb8661e8621",
+        "bullmq": "5.81.3"
+      },
+      "fake_substitution": "PROHIBITED",
+      "isolation": "EPHEMERAL_CONTAINER_AND_NAMESPACE",
+      "synthetic_only": true,
+      "unavailable_status": "INFRA_BLOCKED"
+    },
+    {
+      "runner_id": "api-http",
+      "command": "pnpm test:api:e2e",
+      "levels": ["E2E"],
+      "implementation": "PLAYWRIGHT_API_REQUEST_CONTEXT",
+      "application": "REAL_NEST_TEST_APPLICATION",
+      "isolation": "EPHEMERAL_PORT_AND_SYNTHETIC_AUDIENCE",
+      "retry": {
+        "maximum": 1,
+        "sticky_first_failure": true
+      },
+      "synthetic_only": true,
+      "unavailable_status": "INFRA_BLOCKED"
+    },
+    {
+      "runner_id": "admin-e2e",
+      "command": "pnpm --filter @daily-energy/app-admin run test:e2e",
+      "levels": ["E2E"],
+      "implementation": "PLAYWRIGHT_CHROMIUM",
+      "isolation": "BROWSER_CONTEXT_AND_SYNTHETIC_ADMIN_SESSION",
+      "retry": {
+        "maximum": 1,
+        "sticky_first_failure": true
+      },
+      "synthetic_only": true,
+      "unavailable_status": "INFRA_BLOCKED"
+    },
+    {
+      "runner_id": "miniapp-devtools",
+      "command": "pnpm test:miniapp:devtools",
+      "levels": ["E2E", "MANUAL_RC"],
+      "implementation": "WECHAT_DEVTOOLS_AUTOMATOR",
+      "isolation": "DEDICATED_TEST_PROJECT_AND_SYNTHETIC_BACKEND",
+      "browser_substitute": "PROHIBITED",
+      "real_device_status": "MANUAL_EVIDENCE_PENDING",
+      "retry": {
+        "maximum": 1,
+        "sticky_first_failure": true
+      },
+      "synthetic_only": true,
+      "unavailable_status": "INFRA_BLOCKED"
+    }
+  ]
+}

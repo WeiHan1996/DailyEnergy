@@ -1,0 +1,25 @@
+{
+  "policy_version": "e-010-runner-policy-v1",
+  "default_retry": 0,
+  "retry_exceptions": {
+    "playwright": {
+      "maximum_retries": 1,
+      "sticky_first_failure": true
+    },
+    "wechat-devtools": {
+      "maximum_retries": 1,
+      "sticky_first_failure": true
+    }
+  },
+  "property_failure_requires": ["seed", "fixture_version"],
+  "critical_source_patterns": [
+    "^SQL-",
+    "^TX-",
+    "^S15-",
+    "^PDM-D",
+    "^S29-ARCH-0(?:09|10|16|33|34|35|36|37|38|39|40)$",
+    "^S31-TEST-0(?:17|18|19|20|21|22|23|24|34|37|38|39|40|41|42|43|44|46|47)$"
+  ],
+  "quarantine_registry": "tests/registry/quarantine.json",
+  "skip_policy": "forbidden-without-explicit-expiring-quarantine"
+}

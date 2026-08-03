@@ -24,9 +24,11 @@ export default [
       "**/.turbo/**",
       "**/coverage/**",
       "**/dist/**",
+      "**/dist-fixtures/**",
       "**/node_modules/**",
       "packages/server-adapters/src/db/generated/prisma/**",
       "prototype/**",
+      "tests/artifacts/output/**",
     ],
   },
   {

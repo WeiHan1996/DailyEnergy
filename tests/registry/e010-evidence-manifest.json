@@ -1,0 +1,165 @@
+{
+  "manifest_version": "e-010-evidence-v1",
+  "scope": "E-010 registry, fixture, runner, policy, artifact and corpus harness evidence",
+  "proofs": {
+    "T-E010-REGISTRY-001": {
+      "file": "tests/registry/source-registry.test.mjs",
+      "selector": "formal Source-ID registry completeness and negative fixtures",
+      "level": "STATIC",
+      "assertions": [
+        "all 736 unique Accepted and executable contract IDs have one explicit status",
+        "a removed or duplicate coverage entry fails with a stable registry rule ID",
+        "COVERED without a per-source assertion fails",
+        "UNIT evidence cannot satisfy a mandatory PostgreSQL DB layer",
+        "generated registry drift fails until the versioned registry is regenerated"
+      ]
+    },
+    "T-E010-HARNESS-001": {
+      "file": "tests/fixtures/synthetic-harness.test.mjs",
+      "selector": "synthetic fixture, deterministic source and artifact known-fail tests",
+      "level": "UNIT",
+      "assertions": [
+        "golden provenance must name an Accepted contract rather than current implementation output",
+        "fixture identities, time and random sources are synthetic and replayable",
+        "property failures require a replay seed and fixture version"
+      ]
+    },
+    "T-E010-ARTIFACT-001": {
+      "file": "tests/fixtures/synthetic-harness.test.mjs",
+      "selector": "artifact content policy positive and negative fixtures",
+      "level": "STATIC",
+      "assertions": [
+        "synthetic metadata passes the content policy",
+        "forbidden identity, credential, Prompt and raw-content keys or values fail with stable codes"
+      ]
+    },
+    "T-E010-POLICY-001": {
+      "file": "tests/registry/runner-policy.test.mjs",
+      "selector": "retry, sticky flaky and quarantine policy tests",
+      "level": "STATIC",
+      "assertions": [
+        "the real Playwright known-fail runner exits non-zero when retry 1 passes after retry 0 fails",
+        "a retry pass after an initial failure remains FLAKY_FAIL in the shared classifier and reporter",
+        "critical source IDs cannot be quarantined"
+      ]
+    },
+    "T-E010-POLICY-002": {
+      "file": "tests/registry/test-policy.test.mjs",
+      "selector": "test source skip/focus and production helper import known-fail fixtures",
+      "level": "STATIC",
+      "assertions": [
+        "test.only, test.skip and test.todo fail the source policy Gate",
+        "production source imports of tests or testing helper exports fail the source policy Gate"
+      ]
+    },
+    "T-E010-CORPUS-001": {
+      "file": "tests/registry/runner-policy.test.mjs",
+      "selector": "269-case Accepted AI corpus integrity and fingerprint test",
+      "level": "STATIC",
+      "assertions": [
+        "all 269 case IDs are unique and the canonical manifest fingerprint matches",
+        "a case mutation invalidates the corpus without making a model call"
+      ]
+    },
+    "T-E010-HTTP-CONTRACT-001": {
+      "file": "tooling/lib/contract-gate.mjs",
+      "selector": "closed OpenAPI error envelope and forbidden client field contract Gate",
+      "level": "CONTRACT",
+      "assertions": [
+        "the error envelope and nested error object reject unknown fields",
+        "public response contracts cannot expose stack, provider, model, Prompt or restricted fields"
+      ]
+    },
+    "T-E010-HTTP-E2E-001": {
+      "file": "tests/e2e/api/api-http.spec.ts",
+      "selector": "real Nest application through Playwright APIRequestContext",
+      "level": "E2E",
+      "assertions": [
+        "the real Nest readiness endpoint returns the closed JSON health contract over a TCP listener",
+        "unknown request fields produce the stable validation envelope and preserve a safe request ID",
+        "HTTP errors contain no framework, stack, SQL, provider, model, Prompt or restricted details"
+      ]
+    },
+    "T-E010-HTTP-E2E-002": {
+      "file": "tests/e2e/api/api-http.spec.ts",
+      "selector": "public and Admin audience separation over real Nest HTTP",
+      "level": "E2E",
+      "assertions": [
+        "an Admin bearer cannot enter the public launch route",
+        "a public bearer cannot enter the Admin operations route"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S31-TEST-001",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-REGISTRY-001"]
+    },
+    {
+      "source_id": "S31-TEST-002",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-REGISTRY-001"]
+    },
+    {
+      "source_id": "S31-TEST-006",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-REGISTRY-001"]
+    },
+    {
+      "source_id": "S31-TEST-008",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-REGISTRY-001"]
+    },
+    {
+      "source_id": "S31-TEST-003",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-HARNESS-001"]
+    },
+    {
+      "source_id": "S31-TEST-004",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-HARNESS-001", "T-E010-ARTIFACT-001"]
+    },
+    {
+      "source_id": "S31-TEST-005",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-HARNESS-001"]
+    },
+    {
+      "source_id": "S31-TEST-041",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-CORPUS-001"]
+    },
+    {
+      "source_id": "S31-TEST-045",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-POLICY-001"]
+    },
+    {
+      "source_id": "S31-TEST-046",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-POLICY-001"]
+    },
+    {
+      "source_id": "S31-TEST-047",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-ARTIFACT-001"]
+    },
+    {
+      "source_id": "S31-TEST-007",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-POLICY-002"]
+    },
+    {
+      "source_id": "S20-C02",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-HTTP-CONTRACT-001", "T-E010-HTTP-E2E-001"]
+    },
+    {
+      "source_id": "S31-TEST-035",
+      "status": "COVERED",
+      "proof_ids": ["T-E010-HTTP-E2E-002"]
+    }
+  ]
+}

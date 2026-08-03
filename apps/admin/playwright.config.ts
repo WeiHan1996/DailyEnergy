@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const adminBaseUrl = "http://127.0.0.1:3210";
+const stickyReporter = "../../tooling/testing/sticky-playwright-reporter.mjs";
 
 export default defineConfig({
   expect: {
@@ -17,8 +18,8 @@ export default defineConfig({
       },
     },
   ],
-  reporter: [["list"]],
-  retries: 0,
+  reporter: [["list"], [stickyReporter]],
+  retries: 1,
   testDir: "./tests/e2e",
   timeout: 30_000,
   use: {

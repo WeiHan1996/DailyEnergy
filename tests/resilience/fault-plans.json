@@ -1,0 +1,31 @@
+{
+  "catalog_version": "e-010-fault-catalog-v1",
+  "deterministic": true,
+  "faults": [
+    {
+      "fault_id": "CRASH-RELAY-AFTER-ENQUEUE",
+      "trigger": "relay.after_enqueue.before_mark_published",
+      "mode": "THROW_ONCE"
+    },
+    {
+      "fault_id": "CRASH-CONSUMER-AFTER-COMMIT",
+      "trigger": "consumer.after_commit.before_ack",
+      "mode": "THROW_ONCE"
+    },
+    {
+      "fault_id": "PROVIDER-LATE-SUCCESS",
+      "trigger": "provider.after_deadline.before_callback",
+      "mode": "RETURN_SCRIPTED"
+    },
+    {
+      "fault_id": "REDIS-REPLACED-EMPTY",
+      "trigger": "redis.before_rebuild",
+      "mode": "THROW_ONCE"
+    },
+    {
+      "fault_id": "RESTRICTED-STEP-THREE",
+      "trigger": "data_task.before_step_3_commit",
+      "mode": "THROW_ONCE"
+    }
+  ]
+}
