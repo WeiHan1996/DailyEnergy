@@ -7,7 +7,7 @@
 - **任务状态**：Ready
 - **任务分支**：实现分支尚未创建；状态交接分支为 `agent/e010-ready`
 - **当前 Issue**：[E-010 Issue #49](https://github.com/WeiHan1996/DailyEnergy/issues/49)
-- **当前 PR**：状态 Draft PR 待创建
+- **当前 PR**：[状态 Draft PR #116](https://github.com/WeiHan1996/DailyEnergy/pull/116)
 - **基线提交**：`4f1d06b498a5db730661cf39dd5ce005932645e2`
 - **Gate 结论**：`READY_TO_START`（code profile；实现涉及测试、tooling、fixture 与
   registry，按实际路径运行 task/full Gate）
@@ -106,4 +106,7 @@ GO/NO-GO。
 - 状态切换后 `pnpm agent:prepare E-010 --remote --deep` 为 `READY`，remote/deep checks
   全部通过；策略要求的 `pnpm agent:validate --mode=full --task=E-010` 为
   `automated=PASS`；
-- 当前状态分支为 `agent/e010-ready`，只允许项目控制与导航更新；E-010 尚未开工。
+- 状态切换已提交为 `b1a6422f8365a73af808d03a04160a0cb958a825` 并推送；
+  [状态 Draft PR #116](https://github.com/WeiHan1996/DailyEnergy/pull/116) 已创建；
+- 当前状态分支为 `agent/e010-ready`，只包含项目控制与导航更新；E-010 尚未开工，
+  等待状态 PR 审核与合并。
