@@ -7,7 +7,7 @@
 - **任务状态**：In Review
 - **任务分支**：`agent/e009-docker-compose`
 - **当前 Issue**：[E-009 Issue #47](https://github.com/WeiHan1996/DailyEnergy/issues/47)
-- **当前 PR**：待创建聚焦 Draft PR
+- **当前 PR**：[Draft PR #115](https://github.com/WeiHan1996/DailyEnergy/pull/115)
 - **基线提交**：`5378547300111ec917cd9da3c6c65a294c44074c`
 - **Gate 结论**：`MANUAL_EVIDENCE_REQUIRED`（security profile；changed/task/full
   自动化均 `PASS`，等待 threat-boundary review 确认）
@@ -161,3 +161,6 @@ fault、shutdown、镜像内容和清理均已验证。自动化证据完成，�
   但 image scanner 已拒绝仓库 source/docs/tests/Prompt/secret；SBOM/漏洞晋级由 E-011
   承接。staging-like 仅是本地合成环境，不代表生产 TLS、HA、备份或 PITR；
 - 最终 test/test-fault 容器、网络、volume 与 secret artifact 已清理；E-010 继续 Planned。
+- 实现已提交为 `f8c0f426342fd8099b8d158bfa13707c6ffa2c01` 并推送；
+  [Draft PR #115](https://github.com/WeiHan1996/DailyEnergy/pull/115) 已创建，等待用户确认
+  threat boundary 与残余风险，确认前不得 ready/merge。
