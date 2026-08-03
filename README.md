@@ -347,10 +347,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-009 本地与测试 Docker Compose 环境 In Review
-当前目标：建立可重复的 LOCAL/CI/STAGING-like Compose 拓扑与受控 fault/stub profile
-当前任务：E-009 本地与测试 Docker Compose 环境
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/47
+状态：E-010 多层测试、Fixture 与 Source-ID Registry Ready
+当前目标：建立可执行的多层测试骨架与唯一 Source-ID 覆盖注册表
+当前任务：E-010 建立多层测试、Fixture 与 Source-ID Registry
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/49
 ```
 
 长期工作入口：
@@ -363,17 +363,16 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- [E-009 Issue #47](https://github.com/WeiHan1996/DailyEnergy/issues/47)
-  是唯一 In Review 任务，分支为 `agent/e009-docker-compose`；
-- E-009 已实现 common/local/test/staging-like Compose profiles、API/Admin/Worker 与
-  PostgreSQL/Redis/stub/fault 编排，以及 health/network/egress/empty-Redis rebuild
-  证据；操作入口见 [docker/README.md](./docker/README.md)；
-- E-007 已随 PR #113 squash 合并，Issue #45 已关闭；merged `main` 的完整验证通过，
-  PostgreSQL 18 为 `82/82`，Queue integration 为 `7/7`；
+- [E-010 Issue #49](https://github.com/WeiHan1996/DailyEnergy/issues/49)
+  是唯一 Ready 任务，尚未创建实现分支；
+- E-010 将交付多层 runner、合成 fixture factory、Source-ID registry、确定性故障与
+  retry/flaky/artifact 规则；未实现项必须显式保持 `PLANNED`；
+- E-009 已随 PR #115 squash 合并，Issue #47 已关闭；merged `main` 的完整验证通过，
+  PostgreSQL 18 为 `82/82`，Queue integration 为 `7/7`；Compose integration 为 `2/2`；
 - 不连接生产依赖，不创建云资源、域名、证书、真实备份或高可用声明；
 - E-015 已完成 P0/P1 权威来源路由、任务 Profile、依赖阻断和安静验证；
 - D-001～D-005 已进入 Phase 2 Backlog，全部保持 Planned；
-- 不启动 E-010、E-011、E-012、D-001 或业务实现任务。
+- E-010 状态交接合并前不启动实现；不启动 E-011、E-012、D-001 或业务实现任务。
 
 [Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。
 E-001～E-005 与 E-008 已合并并进入 Done；E-005 随
@@ -385,7 +384,8 @@ merge commit 为 `200e27de889a5cc47571e27d783aa570a381f889`，Issue #105
 已关闭；E-006 的 PR #110 安全返工与 PR #111 post-merge full Gate 修复均已合并；
 E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squash 合并为
 `9630691a87b184bafe6ca78900a31244a6e6c237`，Issue #45 已关闭；状态 PR #114 已合并为
-`5378547300111ec917cd9da3c6c65a294c44074c`，E-009 已从该基线开始实现。
+`5378547300111ec917cd9da3c6c65a294c44074c`；E-009 已随 PR #115 squash 合并为
+`4f1d06b498a5db730661cf39dd5ce005932645e2`，Issue #47 已关闭。
 [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
 [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
