@@ -7,7 +7,7 @@
 - **任务状态**：In Review
 - **任务分支**：`agent/e010-test-registry`
 - **当前 Issue**：[E-010 Issue #49](https://github.com/WeiHan1996/DailyEnergy/issues/49)
-- **当前 PR**：[Draft PR #117](https://github.com/WeiHan1996/DailyEnergy/pull/117)
+- **当前 PR**：[PR #117（Ready for review）](https://github.com/WeiHan1996/DailyEnergy/pull/117)
 - **基线提交**：`69138b7e2188084a92d1cf23efbf021b5bab3722`
 - **Gate 结论**：`IMPLEMENTATION_COMPLETE`（初始 code profile 因 artifact、runner、
   配置与测试路径提升为 security；完整自动 Gate 已通过，threat boundary review 为 PASS；
@@ -103,7 +103,8 @@ E-010 已建立正式 registry：736 个唯一 Source ID 中 138 个为 `COVERED
   provider 默认封闭；production graph 无 testing import；artifact/trace/output 不提交且受
   content/secret policy；未使用生产凭据、真实账号、真实内容或生产授权；
 - **并行规则**：E-010 是唯一 In Review；
-- **下一动作**：审核 Draft PR #117，确认自动 Gate、coverage 缺口与外部 pending 证据边界；
+- **下一动作**：审核 PR #117，确认自动 Gate、coverage 缺口与外部 pending 证据边界；
+  获得明确批准后再执行 squash merge；
 - **下一任务**：E-010 完成前不提升 E-011；E-010 获接受后再评估 E-011。
 
 ## 7. 最近交接
@@ -150,5 +151,6 @@ E-010 已建立正式 registry：736 个唯一 Source ID 中 138 个为 `COVERED
 - 当前无仓库或代码阻塞；coverage target、微信 DevTools、真机与外部 AI/人工证据状态均
   已显式记录，E-011 与下游业务任务未提前开始。
 - E-010 实现已提交为 `7a5eddfe3a33771056a31856a203766f3ef4b176` 并推送；
-  [Draft PR #117](https://github.com/WeiHan1996/DailyEnergy/pull/117) 已创建并关联
-  Issue #49；当前等待用户审核，未将 coverage 缺口或外部 pending 证据升级为 PASS。
+  [PR #117](https://github.com/WeiHan1996/DailyEnergy/pull/117) 已创建并关联 Issue #49；
+  用户于 2026-08-03 要求提交 PR，现已标记为 Ready for review；当前等待明确审核批准，
+  未将 coverage 缺口或外部 pending 证据升级为 PASS。
