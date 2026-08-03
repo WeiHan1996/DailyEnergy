@@ -33,6 +33,7 @@ export function createWorkerRestrictedDatabaseFactory(): DatabaseFactory<
 }
 
 export const workerRestrictedManifest = RESTRICTED_WORKER_MANIFEST;
+export { fingerprintCapabilityManifest } from "../queue/contracts.js";
 
 export function startWorkerRestrictedInfrastructure(
   config: WorkerInfrastructureConfig,

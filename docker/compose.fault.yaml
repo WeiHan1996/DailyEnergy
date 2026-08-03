@@ -1,0 +1,21 @@
+services:
+  host-ingress:
+    ports:
+      - 127.0.0.1:${DAILYENERGY_STUB_CONTROL_HOST_PORT:-19090}:13090
+      - 127.0.0.1:${DAILYENERGY_PROXY_CONTROL_HOST_PORT:-19091}:13091
+  api:
+    depends_on:
+      fault-proxy:
+        condition: service_healthy
+  worker-interactive:
+    depends_on:
+      fault-proxy:
+        condition: service_healthy
+  worker-background:
+    depends_on:
+      fault-proxy:
+        condition: service_healthy
+  worker-restricted:
+    depends_on:
+      fault-proxy:
+        condition: service_healthy

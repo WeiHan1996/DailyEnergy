@@ -17,6 +17,7 @@ function validEnvironment(): NodeJS.ProcessEnv {
   return {
     DAILYENERGY_CONFIG_SCHEMA_VERSION: API_RUNTIME_CONFIG_SCHEMA_VERSION,
     DAILYENERGY_CONTRACT_BUNDLE_VERSION: API_CONTRACT_BUNDLE_VERSION,
+    DAILYENERGY_DATABASE_URL_FILE: "/run/secrets/api-database-url",
     DAILYENERGY_ENVIRONMENT: "CI",
     DAILYENERGY_LOG_LEVEL: "DEBUG",
     DAILYENERGY_MAINTENANCE_MODE: "OFF",
@@ -55,6 +56,18 @@ describe("RuntimeConfig", () => {
     expect(config.runtimeProfile).toBe("API");
     expect(config.deployConfigFingerprint).toMatch(/^[a-f0-9]{64}$/u);
     expect(config.capabilityFingerprint).toMatch(/^[a-f0-9]{64}$/u);
+  });
+
+  it("includes only the database secret path in the deploy fingerprint", () => {
+    const first = calculateRuntimeFingerprints(validEnvironment());
+    const second = calculateRuntimeFingerprints({
+      ...validEnvironment(),
+      DAILYENERGY_DATABASE_URL_FILE: "/run/secrets/api-database-url-v2",
+    });
+
+    expect(first.deployConfigFingerprint).not.toBe(
+      second.deployConfigFingerprint,
+    );
   });
 
   it("binds the Safety continuation maintenance allowlist into the API capability manifest", () => {

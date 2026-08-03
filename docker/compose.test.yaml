@@ -1,0 +1,25 @@
+services:
+  postgres:
+    volumes:
+      - type: tmpfs
+        target: /var/lib/postgresql
+        tmpfs:
+          mode: 1023
+  redis:
+    volumes:
+      - type: tmpfs
+        target: /data
+        tmpfs:
+          mode: 1023
+  host-ingress:
+    networks:
+      host_ingress:
+    ports:
+      - 127.0.0.1:${DAILYENERGY_API_HOST_PORT:-13300}:13000
+      - 127.0.0.1:${DAILYENERGY_ADMIN_HOST_PORT:-13301}:13001
+
+networks:
+  host_ingress:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"

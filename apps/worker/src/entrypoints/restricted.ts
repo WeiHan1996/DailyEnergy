@@ -7,6 +7,7 @@ import type {
 } from "@daily-energy/server-adapters/worker-restricted";
 import {
   createWorkerRestrictedDatabaseFactory,
+  fingerprintCapabilityManifest,
   startWorkerRestrictedInfrastructure,
   workerRestrictedManifest,
 } from "@daily-energy/server-adapters/worker-restricted";
@@ -23,6 +24,7 @@ export interface WorkerProcess {
 }
 
 export interface WorkerEntrypoint {
+  readonly capabilityFingerprint: string;
   readonly profile: "worker-restricted";
   readonly capabilityFingerprintSource: typeof workerRestrictedManifest;
   start(config: WorkerInfrastructureConfig): Promise<WorkerProcess>;
@@ -37,6 +39,9 @@ export function createRestrictedWorkerEntrypoint(
   handlers: readonly QueueJobHandler[] = [],
 ): WorkerEntrypoint {
   return Object.freeze({
+    capabilityFingerprint: fingerprintCapabilityManifest(
+      workerRestrictedManifest,
+    ),
     capabilityFingerprintSource: workerRestrictedManifest,
     profile: "worker-restricted",
     async start(config: WorkerInfrastructureConfig): Promise<WorkerProcess> {

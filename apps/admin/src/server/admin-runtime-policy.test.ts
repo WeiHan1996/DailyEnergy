@@ -78,6 +78,42 @@ describe("Admin production availability Gate", () => {
     });
   });
 
+  it("allows the internal Compose API only with the explicit non-production flag", () => {
+    const runtime = evaluateAdminRuntime({
+      ADMIN_API_ORIGIN: "http://api:3000",
+      ADMIN_COMPOSE_INTERNAL_API: "true",
+      ADMIN_RUNTIME_PROFILE: "development",
+      ADMIN_SHELL_PREVIEW: "true",
+    });
+
+    expect(runtime.apiOrigin).toBe("http://api:3000");
+    expect(runtime.availability).toEqual({
+      mode: "shell-preview",
+      status: "ready",
+    });
+  });
+
+  it.each([
+    { ADMIN_RUNTIME_PROFILE: "development" },
+    {
+      ADMIN_COMPOSE_INTERNAL_API: "true",
+      ADMIN_PRODUCTION_ENABLED: "true",
+      ADMIN_RUNTIME_PROFILE: "production",
+    },
+  ])("rejects an unapproved internal Compose API origin", (environment) => {
+    const runtime = evaluateAdminRuntime({
+      ADMIN_API_ORIGIN: "http://api:3000",
+      ADMIN_SHELL_PREVIEW: "true",
+      ...environment,
+    });
+
+    expect(runtime.apiOrigin).toBeUndefined();
+    expect(runtime.availability).toEqual({
+      reason: "ADMIN_API_ORIGIN_INVALID",
+      status: "disabled",
+    });
+  });
+
   it("fixes the production session cookie policy", () => {
     expect(adminSessionCookiePolicy).toEqual({
       httpOnly: true,

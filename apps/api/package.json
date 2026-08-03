@@ -10,6 +10,7 @@
     "lint": "eslint --max-warnings=0 src test-fixtures",
     "prebuild": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist', { force: true, recursive: true }))\"",
     "prebuild:test-fixtures": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist-fixtures', { force: true, recursive: true }))\"",
+    "pretest": "node ../../tooling/ensure-server-adapters-build.mjs",
     "posttest": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist-fixtures', { force: true, recursive: true }))\"",
     "start": "node dist/main.js",
     "test": "pnpm run build && pnpm run build:test-fixtures && vitest run src",
@@ -20,6 +21,7 @@
     "runtime": "server-adapter"
   },
   "dependencies": {
+    "@daily-energy/server-adapters": "workspace:*",
     "@daily-energy/shared-schemas": "workspace:*",
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",

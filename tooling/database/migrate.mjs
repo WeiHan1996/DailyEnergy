@@ -7,14 +7,16 @@ import {
   assumeDatabaseOwner,
   DATABASE_OWNER_ROLE,
   MIGRATION_CHECKSUM_MANIFEST,
+  readConnectionString,
   withClient,
 } from "./lib.mjs";
 import { redactSensitiveDiagnosticOutput } from "../lib/sensitive-redaction.mjs";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("DB_DATABASE_URL_REQUIRED");
-}
+const connectionString = await readConnectionString({
+  fileName: "DATABASE_URL_FILE",
+  requiredCode: "DB_DATABASE_URL_REQUIRED",
+  valueName: "DATABASE_URL",
+});
 const prismaBin =
   process.env.PRISMA_BIN || path.resolve("node_modules/.bin/prisma");
 const advisoryKey = 768_006;

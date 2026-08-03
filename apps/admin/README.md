@@ -36,6 +36,8 @@ pnpm --filter @daily-energy/app-admin dev
 - `ADMIN_RUNTIME_PROFILE`：`development | test | production`；
 - `ADMIN_PRODUCTION_ENABLED`：production 显式开关；
 - `ADMIN_API_ORIGIN`：独立 Admin API origin；
+- `ADMIN_COMPOSE_INTERNAL_API`：仅 development/test 可将 `http://api:*` 作为
+  Compose 内部 API origin；production 不接受该例外；
 - `ADMIN_TRUSTED_IDENTITY_ISSUER`；
 - `ADMIN_TRUSTED_IDENTITY_AUDIENCE`；
 - `ADMIN_IDENTITY_CLIENT_SECRET_FILE`；
@@ -67,3 +69,18 @@ pnpm run validate
 扫描初始 HTML、RSC 与浏览器加载的同源网络响应体。独立的真实 Next known-fail app
 会故意从 Server Component 输出合成 secret 与用户正文，证明 HTML 和 RSC 两条
 响应路径都必须命中稳定 rule ID。测试结束会删除合成 secret 与 fixture build。
+
+## Compose runtime
+
+E-009 使用 Next standalone 产物运行 Admin。Admin 仅连接内部 API 网络，不连接
+PostgreSQL、Redis、provider、stub 或宿主 bridge；外部访问只经无 secret ingress 绑定
+loopback：
+
+```bash
+pnpm run compose:up -- --mode=local
+pnpm run compose:smoke -- --mode=local
+pnpm run compose:clean -- --mode=local
+```
+
+其它环境与 fault 说明见 [`docker/README.md`](../../docker/README.md)。该 Compose
+外壳不启用真实 SSO、用户查询或生产后台。

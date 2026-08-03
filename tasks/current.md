@@ -1,15 +1,16 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-02（E-007 合并完成并提升 E-009）
+- **最后更新**：2026-08-03（E-009 实现与自动化 Gate 完成，进入人工安全审核）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-009 — 本地与测试 Docker Compose 环境
-- **任务状态**：Ready
-- **任务分支**：实现分支尚未创建；状态交接分支为 `agent/e009-ready`
+- **任务状态**：In Review
+- **任务分支**：`agent/e009-docker-compose`
 - **当前 Issue**：[E-009 Issue #47](https://github.com/WeiHan1996/DailyEnergy/issues/47)
-- **当前 PR**：[状态 Draft PR #114](https://github.com/WeiHan1996/DailyEnergy/pull/114)（仅项目控制）
-- **基线提交**：`9630691a87b184bafe6ca78900a31244a6e6c237`
-- **Gate 结论**：`READY_TO_START`（code profile；开工后按实际路径升级）
+- **当前 PR**：待创建聚焦 Draft PR
+- **基线提交**：`5378547300111ec917cd9da3c6c65a294c44074c`
+- **Gate 结论**：`MANUAL_EVIDENCE_REQUIRED`（security profile；changed/task/full
+  自动化均 `PASS`，等待 threat-boundary review 确认）
 
 ## 1. 当前目标
 
@@ -25,10 +26,11 @@ common Compose contract
   → health / network / egress / fault / shutdown evidence
 ```
 
-E-009 当前只进入 Ready，尚未创建实现分支或修改 Compose/Docker 资产。开工必须读取
-Issue #47、`pnpm agent:prepare E-009 --remote --deep` 返回的全部 required sources，
-以及 Accepted deployment、testing、observability、architecture 与 repository-structure
-原文，并重新核对 Docker、镜像、端口、网络和依赖状态后给出 GO/NO-GO。
+E-009 已从合并后的 `main@5378547` 创建 `agent/e009-docker-compose`，并完成 common、
+local、test、staging-like 与 test-only fault 拓扑。Issue #47、prepare 返回的 required
+sources 及 Accepted deployment、testing、observability、architecture、
+repository-structure 与 ADR-0006 原文已读取；本机 Docker cold start、health、egress、
+fault、shutdown、镜像内容和清理均已验证。自动化证据完成，当前只等待人工安全边界确认。
 
 ## 2. 状态变更影响
 
@@ -38,7 +40,7 @@ Issue #47、`pnpm agent:prepare E-009 --remote --deep` 返回的全部 required 
 - 用户已明确接受 E-007 threat boundary、Restricted inbox 最小权限与残余风险；
 - merged `main` 的完整 `pnpm run validate` 已通过，真实 PostgreSQL 18 suite 为
   `82/82`，Redis 8 / BullMQ 5 / PostgreSQL 18 queue integration 为 `7/7`；
-- E-007 进入 Done，E-009 成为唯一 Ready；其它 Phase 1 工程任务继续保持 Planned；
+- E-007 进入 Done，E-009 成为唯一 In Review；其它 Phase 1 工程任务继续保持 Planned；
 - D-001～D-005 继续保持 Planned，不创建 Figma、Design Tokens 或业务页面。
 
 ## 3. 范围
@@ -76,19 +78,18 @@ Issue #47、`pnpm agent:prepare E-009 --remote --deep` 返回的全部 required 
 
 - **仓库/代码阻塞**：无；
 - **前置依赖**：E-003、E-005、E-006、E-007、E-008 已完成；
-- **外部依赖**：开工时用 `--deep` 核对 Docker daemon、Compose、镜像和端口能力；
-  只允许本地隔离容器与合成数据；
+- **外部依赖**：Docker daemon、Compose、镜像、端口与网络已用本地合成环境核验；
+  本任务不创建或变更生产资源，因此 production authorization 不适用；
 - **安全交接**：E-007 只提供 egress manifest/fingerprint 与错误 profile 的静态/运行时
   拒绝；E-009 必须落地实际容器网络/egress 强制，不能把“测试环境无网络”当证据；
 - **恢复交接**：E-007 Redis rebuild 每次扫描有界批次；E-009 恢复编排必须重复执行，
   并以 PostgreSQL eligible backlog 清零为完成条件；
 - **可观测性交接**：E-009 只提供 health/fault/telemetry stub 与 smoke evidence；正式
   metrics、alerts 和生产 Runbook 仍由 E-013 交付；
-- **并行规则**：E-009 是唯一 Ready，尚未 In Progress；
-- **下一动作**：审核并合并
-  [状态 Draft PR #114](https://github.com/WeiHan1996/DailyEnergy/pull/114)；合并后等待
-  E-009 开工指令，再从最新 `main` 创建 `agent/e009-docker-compose`，运行
-  `pnpm agent:prepare E-009 --remote --deep` 并完成 GO/NO-GO；
+- **人工决策**：用户需确认 threat boundary 与残余风险；确认前 PR 不得 ready/merge；
+- **并行规则**：E-009 是唯一 In Review；
+- **下一动作**：创建聚焦 Draft PR，提交 threat-boundary review；用户确认后再将 PR
+  标记 ready 并合并；
 - **下一任务**：E-009 完成前不提升其它任务；E-009 获接受后再评估 E-010。
 
 ## 7. 最近交接
@@ -135,3 +136,28 @@ Issue #47、`pnpm agent:prepare E-009 --remote --deep` 返回的全部 required 
 - post-merge 状态切换已提交为 `08cae5c2114d348051b466989ecec99603cb52c9`，并创建
   [状态 Draft PR #114](https://github.com/WeiHan1996/DailyEnergy/pull/114)；当前等待该状态
   PR 审核，E-009 保持 Ready。
+- 用户于 2026-08-02 批准并 squash 合并 PR #114，merge commit 为
+  `5378547300111ec917cd9da3c6c65a294c44074c`；本地 `main` 已同步且工作区干净；
+- 用户于 2026-08-03 指示继续下一步，已从该 merge commit 创建
+  `agent/e009-docker-compose` 并开始 E-009；首次 remote/deep prepare 仅被已合并 PR
+  #114 的陈旧映射阻断，其余 deep checks 均通过，现已修正项目控制状态待重跑。
+- E-009 已实现 11 个服务与 11 个隔离网络，覆盖 local/test/staging-like 和 test-only
+  fault 变体；API、Admin、三个 Worker、Migration、PostgreSQL 18、Redis 8 与合成
+  stub/fault proxy 均使用 profile-specific capability、secret file 与 network allowlist；
+- Compose evidence `23/23`、静态/负例 `9/9`、真实 cold start/health/egress/shutdown 与
+  fault integration `2/2` 通过；最终 changed/task/full Gate 均为 `automated=PASS`，
+  security 策略终态为 `MANUAL_EVIDENCE_REQUIRED`；
+- 完整 `pnpm run validate` 覆盖架构边界、API `41/41`、Worker `8/8`、server-adapters
+  `29/29`、Admin unit `14/14`、Chromium `6/6`、response leak `2/2`；真实 PostgreSQL
+  18 suite `82/82` 与 queue integration `7/7` 通过；
+- 首次 changed Gate 曾因 Docker 重建后的资源争用使既有 migration lock 测试耗时
+  `16.6s` 超过 15 秒窗口；单独重跑为 `82/82`、锁等待 `7.76s`，随后所有最终 Gate
+  连续通过，未修改或放宽数据库断言；
+- threat review：one-shot `database-init` 为创建 role 挂载全部合成 runtime DB URL，
+  但只连接 `migration_data` 且无外部网络；无 secret 的 `host-ingress` 只发布 loopback，
+  host bridge 禁止 masquerade；tokenized `fault-proxy` 跨 test data networks 但目标固定为
+  PostgreSQL/Redis，且 fault 被强制限制为 test；
+- 残余风险：migration final image 为运行 Prisma CLI 保留较宽的第三方 Node 依赖树，
+  但 image scanner 已拒绝仓库 source/docs/tests/Prompt/secret；SBOM/漏洞晋级由 E-011
+  承接。staging-like 仅是本地合成环境，不代表生产 TLS、HA、备份或 PITR；
+- 最终 test/test-fault 容器、网络、volume 与 secret artifact 已清理；E-010 继续 Planned。

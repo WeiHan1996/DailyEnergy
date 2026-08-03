@@ -1,12 +1,17 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { APPLICATION_SCHEMA, withClient } from "./lib.mjs";
+import {
+  APPLICATION_SCHEMA,
+  readConnectionString,
+  withClient,
+} from "./lib.mjs";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("DB_DATABASE_URL_REQUIRED");
-}
+const connectionString = await readConnectionString({
+  fileName: "DATABASE_URL_FILE",
+  requiredCode: "DB_DATABASE_URL_REQUIRED",
+  valueName: "DATABASE_URL",
+});
 const seedPath = process.env.DB_SEED_FILE
   ? path.resolve(process.env.DB_SEED_FILE)
   : path.resolve("prisma/seed/synthetic-v1.json");

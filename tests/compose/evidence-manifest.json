@@ -1,0 +1,192 @@
+{
+  "manifest_version": "e-009-evidence-v1",
+  "scope": "Pre-E-010 E-009 local, test, staging-like and fault Compose evidence",
+  "authority": [
+    "docs/technical/deployment.md",
+    "docs/technical/testing.md",
+    "docs/technical/observability.md",
+    "docs/technical/repository-structure.md"
+  ],
+  "proofs": {
+    "T-COMPOSE-STATIC-001": {
+      "file": "tests/compose/static.test.mjs",
+      "selector": "bounded topology and known-fail static mutations",
+      "level": "STATIC",
+      "assertions": [
+        "images, profiles, root filesystem, users, ports, networks and mounts are fail-closed",
+        "API, Admin, Worker and Migration secret/network allowlists remain distinct"
+      ]
+    },
+    "T-COMPOSE-RUNTIME-001": {
+      "file": "tests/compose/integration.test.mjs",
+      "selector": "real Docker cold start, health, egress and shutdown",
+      "level": "INTEGRATION",
+      "assertions": [
+        "clean test topology reaches healthy with synthetic secrets and role-scoped database logins",
+        "ordinary services cannot reach arbitrary internet, metadata, Docker socket or another profile network"
+      ]
+    },
+    "T-COMPOSE-FAULT-001": {
+      "file": "tests/compose/integration.test.mjs",
+      "selector": "deterministic PostgreSQL, Redis, provider, network, clock and telemetry faults",
+      "level": "RESILIENCE",
+      "assertions": [
+        "dependency loss removes readiness/heartbeat and recovery restores it",
+        "Redis restore mode repeats bounded rebuild until eligible PostgreSQL backlog is empty"
+      ]
+    },
+    "T-COMPOSE-IMAGE-001": {
+      "file": "tooling/compose/check-image-content.mjs",
+      "selector": "fixed base image, clean final stages and runtime image inventory scan",
+      "level": "INTEGRATION",
+      "assertions": [
+        "Node 24.18.0 base image is fixed by digest",
+        "all four application images reject repository source, docs, tests, Prompt, fixture, secret-file and inline-secret paths"
+      ]
+    },
+    "T-COMPOSE-PROFILE-001": {
+      "file": "apps/worker/src/runtime-common.test.ts",
+      "selector": "worker capability fingerprint, heartbeat and bounded rebuild",
+      "level": "CONTRACT",
+      "assertions": [
+        "profile, database role, egress and fingerprint mismatch fails closed",
+        "heartbeat contains only status metadata and Redis rebuild is capped at twenty bounded passes"
+      ]
+    },
+    "T-COMPOSE-API-001": {
+      "file": "apps/api/src/database-readiness.test.ts",
+      "selector": "API role readiness and detail-free health",
+      "level": "CONTRACT",
+      "assertions": [
+        "API database role mismatch reports only REQUIRED_DEPENDENCY_UNAVAILABLE",
+        "database URL is read from a secret file and disconnected after each readiness probe"
+      ]
+    },
+    "T-COMPOSE-ADMIN-001": {
+      "file": "apps/admin/src/server/admin-runtime-policy.test.ts",
+      "selector": "Compose internal Admin API origin boundary",
+      "level": "CONTRACT",
+      "assertions": [
+        "http://api is allowed only by the explicit non-production Compose flag",
+        "production remains disabled without trusted identity configuration and adapter"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S30-REPO-030",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-STATIC-001"]
+    },
+    {
+      "source_id": "S30-REPO-032",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-PROFILE-001", "T-COMPOSE-RUNTIME-001"]
+    },
+    {
+      "source_id": "S31-TEST-027",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-FAULT-001"]
+    },
+    {
+      "source_id": "S31-TEST-030",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-PROFILE-001"]
+    },
+    {
+      "source_id": "S31-TEST-047",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-IMAGE-001", "T-COMPOSE-RUNTIME-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-003",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-STATIC-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-004",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-STATIC-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-005",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-STATIC-001", "T-COMPOSE-RUNTIME-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-011",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-STATIC-001", "T-COMPOSE-IMAGE-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-012",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-IMAGE-001", "T-COMPOSE-RUNTIME-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-017",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-STATIC-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-021",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-RUNTIME-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-026",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-PROFILE-001", "T-COMPOSE-FAULT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-027",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-RUNTIME-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-029",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-ADMIN-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-038",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-PROFILE-001", "T-COMPOSE-FAULT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-041",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-IMAGE-001", "T-COMPOSE-RUNTIME-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-044",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-STATIC-001", "T-COMPOSE-RUNTIME-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-045",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-STATIC-001", "T-COMPOSE-RUNTIME-001"]
+    },
+    {
+      "source_id": "S33-OBS-021",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-FAULT-001"]
+    },
+    {
+      "source_id": "S33-OBS-023",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-API-001", "T-COMPOSE-PROFILE-001"]
+    },
+    {
+      "source_id": "S33-OBS-024",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-API-001"]
+    },
+    {
+      "source_id": "S33-OBS-030",
+      "status": "COVERED",
+      "proof_ids": ["T-COMPOSE-PROFILE-001", "T-COMPOSE-FAULT-001"]
+    }
+  ]
+}

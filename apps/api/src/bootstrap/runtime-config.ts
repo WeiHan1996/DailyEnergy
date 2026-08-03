@@ -23,6 +23,8 @@ const PositiveMillisecondsSchema = z
   .pipe(z.number().int().min(1_000).max(60_000));
 
 const RELEASE_ENVIRONMENTS = ["STAGING", "PRODUCTION", "RECOVERY"] as const;
+const SECRET_FILE_PATTERN =
+  /^\/run\/secrets\/[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/u;
 const FINGERPRINT_EXPECTATION_KEYS = new Set([
   "DAILYENERGY_CAPABILITY_FINGERPRINT_EXPECTED",
   "DAILYENERGY_DEPLOY_CONFIG_FINGERPRINT_EXPECTED",
@@ -33,6 +35,10 @@ const RuntimeConfigValueShape = {
     API_RUNTIME_CONFIG_SCHEMA_VERSION,
   ),
   DAILYENERGY_CONTRACT_BUNDLE_VERSION: z.literal(API_CONTRACT_BUNDLE_VERSION),
+  DAILYENERGY_DATABASE_URL_FILE: z
+    .string()
+    .regex(SECRET_FILE_PATTERN)
+    .optional(),
   DAILYENERGY_ENVIRONMENT: z.enum([
     "LOCAL",
     "CI",
@@ -136,6 +142,16 @@ const RuntimeConfigInputSchema = z
         path: ["DAILYENERGY_CAPABILITY_FINGERPRINT_EXPECTED"],
       });
     }
+    if (
+      isReleaseEnvironment(value.DAILYENERGY_ENVIRONMENT) &&
+      value.DAILYENERGY_DATABASE_URL_FILE === undefined
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "release environments require a database URL secret file",
+        path: ["DAILYENERGY_DATABASE_URL_FILE"],
+      });
+    }
   });
 
 type RuntimeConfigInput = z.infer<typeof RuntimeConfigInputSchema>;
@@ -149,6 +165,7 @@ export interface RuntimeConfig {
   readonly capabilityFingerprint: string;
   readonly configSchemaVersion: typeof API_RUNTIME_CONFIG_SCHEMA_VERSION;
   readonly contractBundleVersion: typeof API_CONTRACT_BUNDLE_VERSION;
+  readonly databaseUrlFile?: string;
   readonly deployConfigFingerprint: string;
   readonly environment: RuntimeEnvironment;
   readonly host: string;
@@ -222,6 +239,7 @@ export function calculateRuntimeFingerprints(
     deployConfigFingerprint: fingerprint({
       config_schema_version: input.DAILYENERGY_CONFIG_SCHEMA_VERSION,
       contract_bundle_version: input.DAILYENERGY_CONTRACT_BUNDLE_VERSION,
+      database_url_file: input.DAILYENERGY_DATABASE_URL_FILE ?? "ABSENT",
       environment: input.DAILYENERGY_ENVIRONMENT,
       host: input.DAILYENERGY_HOST,
       log_level: input.DAILYENERGY_LOG_LEVEL,
@@ -268,6 +286,9 @@ export function loadRuntimeConfig(
     capabilityFingerprint,
     configSchemaVersion: input.DAILYENERGY_CONFIG_SCHEMA_VERSION,
     contractBundleVersion: input.DAILYENERGY_CONTRACT_BUNDLE_VERSION,
+    ...(input.DAILYENERGY_DATABASE_URL_FILE === undefined
+      ? {}
+      : { databaseUrlFile: input.DAILYENERGY_DATABASE_URL_FILE }),
     deployConfigFingerprint,
     environment: input.DAILYENERGY_ENVIRONMENT,
     host: input.DAILYENERGY_HOST,

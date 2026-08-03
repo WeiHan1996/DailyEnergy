@@ -71,6 +71,7 @@ function parseProfile(
 function parseOrigin(
   value: string | undefined,
   profile: AdminRuntimeProfile,
+  composeInternalApi: boolean,
 ): string | undefined {
   if (value === undefined) {
     return undefined;
@@ -80,9 +81,13 @@ function parseOrigin(
     const url = new URL(value);
     const isLoopback =
       url.hostname === "127.0.0.1" || url.hostname === "localhost";
+    const isComposeApi =
+      composeInternalApi && profile !== "production" && url.hostname === "api";
     const protocolAllowed =
       url.protocol === "https:" ||
-      (profile !== "production" && url.protocol === "http:" && isLoopback);
+      (profile !== "production" &&
+        url.protocol === "http:" &&
+        (isLoopback || isComposeApi));
     if (
       !protocolAllowed ||
       url.username !== "" ||
@@ -177,7 +182,11 @@ export function evaluateAdminRuntime(
     };
   }
 
-  const apiOrigin = parseOrigin(environment.ADMIN_API_ORIGIN, profile);
+  const apiOrigin = parseOrigin(
+    environment.ADMIN_API_ORIGIN,
+    profile,
+    environment.ADMIN_COMPOSE_INTERNAL_API === "true",
+  );
   const config = {
     ...sharedConfig,
     ...(apiOrigin === undefined ? {} : { apiOrigin }),

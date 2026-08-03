@@ -83,6 +83,8 @@ const nextConfig = {
   },
   poweredByHeader: false,
   reactStrictMode: true,
+  output: "standalone",
+  outputFileTracingRoot: new URL("../..", import.meta.url).pathname,
 } satisfies NextConfig;
 
 export default nextConfig;
