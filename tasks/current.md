@@ -7,7 +7,7 @@
 - **任务状态**：Ready
 - **任务分支**：实现分支尚未创建；状态交接分支为 `agent/e011-ready`
 - **当前 Issue**：[E-011 Issue #48](https://github.com/WeiHan1996/DailyEnergy/issues/48)
-- **当前 PR**：状态 Draft PR 尚未创建
+- **当前 PR**：[状态 Draft PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118)
 - **基线提交**：`68bcc2e0bd7002b20e1de39a06a96f32e0ad21c4`
 - **Gate 结论**：`READY_TO_START`（security profile；workflow、权限、secret、artifact、
   provenance 与供应链路径必须运行 full Gate，并保留 GitHub 运行和人工授权证据）
@@ -91,7 +91,7 @@ registry/policy 原文；随后核对 GitHub Actions、runner、权限、cache�
   的完整自动 Gate 已在合并前 PASS，合并 SHA/格式与主要叶子 Gate 已复核；E-011 必须把
   clean Linux CI 设为权威执行环境，并为 Windows 开发者入口记录或修复明确兼容路径；
 - **并行规则**：E-011 是唯一 Ready，尚未 In Progress；
-- **下一动作**：完成状态交接 PR；合并后从最新 `main` 创建 E-011 实现分支，运行
+- **下一动作**：审核并 squash 合并状态 PR #118；合并后从最新 `main` 创建 E-011 实现分支，运行
   `pnpm agent:prepare E-011 --remote --deep`，读取全部 required sources 并给出 GO/NO-GO；
 - **下一任务**：E-011 完成前不提升 E-012；E-011 获接受后再评估 E-012。
 
@@ -111,5 +111,7 @@ registry/policy 原文；随后核对 GitHub Actions、runner、权限、cache�
 - 合并态 LF worktree 的 format、workspace/config/ESLint、architecture dependency/boundary、
   codegen、contract 与 agent workflow Gate 已通过；Windows 聚合 full Gate 的环境限制已在
   本文记录，未把基础设施限制升级为代码 PASS；
-- E-011 Issue #48 为 Open、Milestone 为 Phase 1，前置 E-001～E-010 均已完成；当前仅
-  创建状态交接分支 `agent/e011-ready`，未创建 workflow、required checks 或外部资源。
+- E-011 Issue #48 为 Open、Milestone 为 Phase 1，前置 E-001～E-010 均已完成；状态
+  交接提交 `26ea3c58858f07346e40e1f2a1844d7e28660b3b` 已推送到
+  `agent/e011-ready`，[Draft PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118)
+  已创建且无冲突；当前未创建 workflow、required checks 或外部资源。
