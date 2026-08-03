@@ -788,7 +788,9 @@ S-12 完成后，再依据实际 Issue 数量制定：
 - E-015 已随 PR #106 squash 合并并进入 Done；
 - E-006 已随 PR #110/#111 完成，最终 full Gate 与真实 PostgreSQL 18 `82/82` 通过；
 - E-007 已随 PR #113 squash 合并并进入 Done，merged `main` 的完整验证通过；
-- E-009 本地与测试 Docker Compose 环境是唯一 Ready，尚未开始实现；
+- E-009 本地与测试 Docker Compose 环境是唯一 In Review，已完成 common/local/test/
+  staging-like 拓扑及 health、fault、egress、secret、shutdown 自动化证据；changed、
+  task、full 自动化均 PASS，等待 threat-boundary review 确认；
 - D-001～D-005 已进入 Phase 2 路线图，当前均为 Planned；
 - 当前唯一执行任务由 tasks/current.md 指定；
 - C-003、C-004、C-009 在 D-004 被接受前不得开始正式页面实现；

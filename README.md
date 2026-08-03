@@ -347,7 +347,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-009 本地与测试 Docker Compose 环境 Ready
+状态：E-009 本地与测试 Docker Compose 环境 In Review
 当前目标：建立可重复的 LOCAL/CI/STAGING-like Compose 拓扑与受控 fault/stub profile
 当前任务：E-009 本地与测试 Docker Compose 环境
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/47
@@ -364,9 +364,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 当前任务范围：
 
 - [E-009 Issue #47](https://github.com/WeiHan1996/DailyEnergy/issues/47)
-  是唯一 Ready 任务，尚未创建实现分支；
-- E-009 将交付 common/local/test/staging-like Compose profiles、API/Admin/Worker 与
-  PostgreSQL/Redis/stub/fault 编排、health/network/egress/empty-Redis rebuild 证据；
+  是唯一 In Review 任务，分支为 `agent/e009-docker-compose`；
+- E-009 已实现 common/local/test/staging-like Compose profiles、API/Admin/Worker 与
+  PostgreSQL/Redis/stub/fault 编排，以及 health/network/egress/empty-Redis rebuild
+  证据；操作入口见 [docker/README.md](./docker/README.md)；
 - E-007 已随 PR #113 squash 合并，Issue #45 已关闭；merged `main` 的完整验证通过，
   PostgreSQL 18 为 `82/82`，Queue integration 为 `7/7`；
 - 不连接生产依赖，不创建云资源、域名、证书、真实备份或高可用声明；
@@ -383,7 +384,8 @@ E-001～E-005 与 E-008 已合并并进入 Done；E-005 随
 merge commit 为 `200e27de889a5cc47571e27d783aa570a381f889`，Issue #105
 已关闭；E-006 的 PR #110 安全返工与 PR #111 post-merge full Gate 修复均已合并；
 E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squash 合并为
-`9630691a87b184bafe6ca78900a31244a6e6c237`，Issue #45 已关闭，E-009 已提升为唯一 Ready。
+`9630691a87b184bafe6ca78900a31244a6e6c237`，Issue #45 已关闭；状态 PR #114 已合并为
+`5378547300111ec917cd9da3c6c65a294c44074c`，E-009 已从该基线开始实现。
 [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
 [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、

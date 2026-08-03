@@ -1,0 +1,13 @@
+.artifacts
+.claude
+.git
+.turbo
+Dockerfile
+**/.env*
+**/.next
+**/coverage
+**/dist
+**/node_modules
+**/playwright-report
+**/test-results
+apps/miniapp/project.private.config.json

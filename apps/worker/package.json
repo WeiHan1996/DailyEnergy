@@ -8,7 +8,10 @@
     "format:check": "prettier --check README.md package.json tsconfig*.json src",
     "lint": "eslint --max-warnings=0 src",
     "prebuild": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist', { force: true, recursive: true }))\"",
-    "pretest": "pnpm --filter @daily-energy/server-adapters build && pnpm run build",
+    "pretest": "node ../../tooling/ensure-server-adapters-build.mjs && pnpm run build",
+    "start:background": "node dist/run-background.js",
+    "start:interactive": "node dist/run-interactive.js",
+    "start:restricted": "node dist/run-restricted.js",
     "test": "vitest run src",
     "typecheck": "node ../../tooling/typecheck-workspace.mjs"
   },
@@ -17,7 +20,8 @@
     "runtime": "server-adapter"
   },
   "dependencies": {
-    "@daily-energy/server-adapters": "workspace:*"
+    "@daily-energy/server-adapters": "workspace:*",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@daily-energy/typescript-config": "workspace:*",

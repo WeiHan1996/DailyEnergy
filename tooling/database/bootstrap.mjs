@@ -3,14 +3,16 @@ import {
   APPLICATION_SCHEMA,
   DATABASE_GROUP_ROLES,
   DATABASE_OWNER_ROLE,
+  readConnectionString,
   RUNTIME_ROLES,
   withClient,
 } from "./lib.mjs";
 
-const connectionString = process.env.DATABASE_ADMIN_URL;
-if (!connectionString) {
-  throw new Error("DB_ADMIN_DATABASE_URL_REQUIRED");
-}
+const connectionString = await readConnectionString({
+  fileName: "DATABASE_ADMIN_URL_FILE",
+  requiredCode: "DB_ADMIN_DATABASE_URL_REQUIRED",
+  valueName: "DATABASE_ADMIN_URL",
+});
 
 await withClient(connectionString, async (client) => {
   const administrator = await client.query(`

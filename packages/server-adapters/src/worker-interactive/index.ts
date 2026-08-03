@@ -33,6 +33,7 @@ export function createWorkerInteractiveDatabaseFactory(): DatabaseFactory<
 }
 
 export const workerInteractiveManifest = INTERACTIVE_WORKER_MANIFEST;
+export { fingerprintCapabilityManifest } from "../queue/contracts.js";
 
 export function startWorkerInteractiveInfrastructure(
   config: WorkerInfrastructureConfig,

@@ -33,6 +33,7 @@ export function createWorkerBackgroundDatabaseFactory(): DatabaseFactory<
 }
 
 export const workerBackgroundManifest = BACKGROUND_WORKER_MANIFEST;
+export { fingerprintCapabilityManifest } from "../queue/contracts.js";
 
 export function startWorkerBackgroundInfrastructure(
   config: WorkerInfrastructureConfig,

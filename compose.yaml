@@ -1,0 +1,487 @@
+name: dailyenergy-e009
+
+x-runtime-security: &runtime-security
+  cap_drop:
+    - ALL
+  init: true
+  pids_limit: 256
+  read_only: true
+  restart: "on-failure:3"
+  security_opt:
+    - no-new-privileges:true
+
+x-runtime-profiles: &runtime-profiles
+  - local
+  - test
+  - staging-like
+
+services:
+  postgres:
+    <<: *runtime-security
+    image: postgres:18.0-bookworm@sha256:3f55f8895c4ed50603e2fbdfc72fffeeaba3173321fee5cb825bbbeb30d9d854
+    user: "999:999"
+    environment:
+      POSTGRES_DB: daily_energy
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "daily_energy"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    mem_limit: 640m
+    cpus: 1.0
+    profiles: *runtime-profiles
+    secrets:
+      - postgres_password
+    tmpfs:
+      - /tmp:mode=1777
+      - /var/run/postgresql:uid=999,gid=999,mode=0750
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      api_data:
+      interactive_data:
+      background_data:
+      restricted_data:
+      migration_data:
+
+  redis:
+    <<: *runtime-security
+    image: redis:8.2.1-bookworm@sha256:5fa2edb1e408fa8235e6db8fab01d1afaaae96c9403ba67b70feceb8661e8621
+    user: "999:999"
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+      start_period: 3s
+    mem_limit: 256m
+    cpus: 0.5
+    profiles: *runtime-profiles
+    tmpfs:
+      - /tmp:mode=1777
+    volumes:
+      - redis_data:/data
+    networks:
+      interactive_data:
+      background_data:
+      restricted_data:
+
+  database-init:
+    <<: *runtime-security
+    image: ${DAILYENERGY_MIGRATION_IMAGE:?run pnpm compose:prepare}
+    command: ["node", "tooling/compose/provision-database.mjs"]
+    user: "1000:1000"
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_ADMIN_URL_FILE: /run/secrets/database_admin_url
+      DATABASE_URL_FILE: /run/secrets/database_migration_url
+      DB_SEED_DATABASE_URL_FILE: /run/secrets/database_admin_url
+      PRISMA_BIN: /workspace/node_modules/.bin/prisma
+    mem_limit: 768m
+    cpus: 0.75
+    profiles: *runtime-profiles
+    secrets:
+      - database_admin_url
+      - database_api_url
+      - database_background_url
+      - database_interactive_url
+      - database_migration_url
+      - database_restricted_url
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      migration_data:
+
+  dependency-stub:
+    <<: *runtime-security
+    image: ${DAILYENERGY_STUB_IMAGE:?run pnpm compose:prepare}
+    command: ["node", "stub-server.mjs"]
+    user: "1000:1000"
+    environment:
+      DAILYENERGY_FAULT_CONTROL_TOKEN_FILE: /run/secrets/fault_control_token
+      DAILYENERGY_STUB_PORT: "8080"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:8080/health').then(r=>{if(!r.ok)process.exit(1)})",
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+      start_period: 2s
+    mem_limit: 128m
+    cpus: 0.25
+    profiles: *runtime-profiles
+    secrets:
+      - fault_control_token
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      api_external:
+        aliases: [wechat.identity]
+      interactive_external:
+        aliases: [ai.daily]
+      background_external:
+        aliases: [ai.weekly, wechat.notification]
+      restricted_external:
+        aliases: [object.cleanup, provider.deletion]
+      fault_control:
+
+  fault-proxy:
+    <<: *runtime-security
+    image: ${DAILYENERGY_STUB_IMAGE:?run pnpm compose:prepare}
+    command: ["node", "fault-proxy.mjs"]
+    user: "1000:1000"
+    environment:
+      DAILYENERGY_FAULT_CONTROL_PORT: "19091"
+      DAILYENERGY_FAULT_CONTROL_TOKEN_FILE: /run/secrets/fault_control_token
+      DAILYENERGY_FAULT_POSTGRES_TARGET: postgres:5432
+      DAILYENERGY_FAULT_REDIS_TARGET: redis:6379
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:19091/health').then(r=>{if(!r.ok)process.exit(1)})",
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+      start_period: 2s
+    mem_limit: 128m
+    cpus: 0.25
+    profiles: [fault]
+    secrets:
+      - fault_control_token
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      api_data:
+      interactive_data:
+      background_data:
+      restricted_data:
+      fault_control:
+
+  api:
+    <<: *runtime-security
+    image: ${DAILYENERGY_SERVER_IMAGE:?run pnpm compose:prepare}
+    command: ["node", "/app/api/dist/main.js"]
+    user: "1000:1000"
+    depends_on:
+      database-init:
+        condition: service_completed_successfully
+      dependency-stub:
+        condition: service_healthy
+    environment:
+      DAILYENERGY_CAPABILITY_FINGERPRINT_EXPECTED: ${DAILYENERGY_API_CAPABILITY_FINGERPRINT:?run pnpm compose:prepare}
+      DAILYENERGY_CONFIG_SCHEMA_VERSION: api-runtime-config-v1
+      DAILYENERGY_CONTRACT_BUNDLE_VERSION: api-contract-v1
+      DAILYENERGY_DATABASE_URL_FILE: /run/secrets/database_api_url
+      DAILYENERGY_DEPLOY_CONFIG_FINGERPRINT_EXPECTED: ${DAILYENERGY_API_DEPLOY_FINGERPRINT:?run pnpm compose:prepare}
+      DAILYENERGY_ENVIRONMENT: ${DAILYENERGY_RUNTIME_ENVIRONMENT:?run pnpm compose:prepare}
+      DAILYENERGY_HOST: 0.0.0.0
+      DAILYENERGY_LOG_LEVEL: ${DAILYENERGY_LOG_LEVEL:-INFO}
+      DAILYENERGY_MAINTENANCE_MODE: "OFF"
+      DAILYENERGY_PORT: "3000"
+      DAILYENERGY_PRODUCT_DATE_POLICY_VERSION: product-date-v1
+      DAILYENERGY_RELEASE_ID: ${DAILYENERGY_RELEASE_ID:?run pnpm compose:prepare}
+      DAILYENERGY_RUNTIME_PROFILE: API
+      DAILYENERGY_SHUTDOWN_GRACE_MS: "5000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/health/ready').then(r=>{if(!r.ok)process.exit(1)})",
+        ]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    mem_limit: 512m
+    cpus: 0.75
+    profiles: *runtime-profiles
+    secrets:
+      - database_api_url
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      admin_api:
+      api_data:
+      api_external:
+
+  admin:
+    <<: *runtime-security
+    image: ${DAILYENERGY_ADMIN_IMAGE:?run pnpm compose:prepare}
+    user: "1000:1000"
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      ADMIN_API_ORIGIN: http://api:3000
+      ADMIN_COMPOSE_INTERNAL_API: "true"
+      ADMIN_RUNTIME_PROFILE: development
+      ADMIN_SHELL_PREVIEW: "true"
+      HOSTNAME: 0.0.0.0
+      NODE_ENV: production
+      PORT: "3000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/login',{redirect:'manual'}).then(r=>{if(r.status>=500)process.exit(1)})",
+        ]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    mem_limit: 512m
+    cpus: 0.5
+    profiles: *runtime-profiles
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      admin_api:
+
+  host-ingress:
+    <<: *runtime-security
+    image: ${DAILYENERGY_STUB_IMAGE:?run pnpm compose:prepare}
+    command: ["node", "host-ingress.mjs"]
+    user: "1000:1000"
+    depends_on:
+      api:
+        condition: service_healthy
+      admin:
+        condition: service_healthy
+    environment:
+      DAILYENERGY_HOST_INGRESS_ADMIN_TARGET: http://admin:3000
+      DAILYENERGY_HOST_INGRESS_API_TARGET: http://api:3000
+      DAILYENERGY_HOST_INGRESS_PROXY_TARGET: http://fault-proxy:19091
+      DAILYENERGY_HOST_INGRESS_STUB_TARGET: http://dependency-stub:8080
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "Promise.all([fetch('http://127.0.0.1:13000/health/ready'),fetch('http://127.0.0.1:13001/login',{redirect:'manual'})]).then(([a,b])=>{if(!a.ok||b.status>=500)process.exit(1)})",
+        ]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+      start_period: 2s
+    mem_limit: 128m
+    cpus: 0.25
+    profiles: *runtime-profiles
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      admin_api:
+      fault_control:
+
+  worker-interactive:
+    <<: *runtime-security
+    image: ${DAILYENERGY_SERVER_IMAGE:?run pnpm compose:prepare}
+    command: ["node", "/app/worker/dist/run-interactive.js"]
+    user: "1000:1000"
+    depends_on:
+      database-init:
+        condition: service_completed_successfully
+      dependency-stub:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DAILYENERGY_WORKER_CAPABILITY_FINGERPRINT_EXPECTED: ${DAILYENERGY_WORKER_INTERACTIVE_FINGERPRINT:?run pnpm compose:prepare}
+      DAILYENERGY_WORKER_CONCURRENCY: "2"
+      DAILYENERGY_WORKER_DATABASE_ROLE_EXPECTED: daily_energy_interactive
+      DAILYENERGY_WORKER_DATABASE_URL_FILE: /run/secrets/database_interactive_url
+      DAILYENERGY_WORKER_DRAIN_TIMEOUT_MS: "5000"
+      DAILYENERGY_WORKER_EGRESS_ALLOWLIST: ai.daily,postgresql,redis
+      DAILYENERGY_WORKER_HEARTBEAT_FILE: /run/dailyenergy/worker-interactive.json
+      DAILYENERGY_WORKER_KEY_PREFIX: ${DAILYENERGY_REDIS_KEY_PREFIX:?run pnpm compose:prepare}
+      DAILYENERGY_WORKER_POLL_INTERVAL_MS: "2000"
+      DAILYENERGY_WORKER_PROFILE: worker-interactive
+      DAILYENERGY_WORKER_REDIS_URL: ${DAILYENERGY_WORKER_REDIS_URL:-redis://redis:6379}
+      DAILYENERGY_WORKER_RESTORE_READINESS: ${DAILYENERGY_WORKER_RESTORE_READINESS:-NORMAL}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('node:fs').statSync('/run/dailyenergy/worker-interactive.json')",
+        ]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    mem_limit: 384m
+    cpus: 0.75
+    profiles: *runtime-profiles
+    secrets:
+      - database_interactive_url
+    tmpfs:
+      - /run/dailyenergy:uid=1000,gid=1000,mode=0700
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      interactive_data:
+      interactive_external:
+
+  worker-background:
+    <<: *runtime-security
+    image: ${DAILYENERGY_SERVER_IMAGE:?run pnpm compose:prepare}
+    command: ["node", "/app/worker/dist/run-background.js"]
+    user: "1000:1000"
+    depends_on:
+      database-init:
+        condition: service_completed_successfully
+      dependency-stub:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DAILYENERGY_WORKER_CAPABILITY_FINGERPRINT_EXPECTED: ${DAILYENERGY_WORKER_BACKGROUND_FINGERPRINT:?run pnpm compose:prepare}
+      DAILYENERGY_WORKER_CONCURRENCY: "1"
+      DAILYENERGY_WORKER_DATABASE_ROLE_EXPECTED: daily_energy_background
+      DAILYENERGY_WORKER_DATABASE_URL_FILE: /run/secrets/database_background_url
+      DAILYENERGY_WORKER_DRAIN_TIMEOUT_MS: "5000"
+      DAILYENERGY_WORKER_EGRESS_ALLOWLIST: ai.weekly,postgresql,redis,wechat.notification
+      DAILYENERGY_WORKER_HEARTBEAT_FILE: /run/dailyenergy/worker-background.json
+      DAILYENERGY_WORKER_KEY_PREFIX: ${DAILYENERGY_REDIS_KEY_PREFIX:?run pnpm compose:prepare}
+      DAILYENERGY_WORKER_POLL_INTERVAL_MS: "2000"
+      DAILYENERGY_WORKER_PROFILE: worker-background
+      DAILYENERGY_WORKER_REDIS_URL: ${DAILYENERGY_WORKER_REDIS_URL:-redis://redis:6379}
+      DAILYENERGY_WORKER_RESTORE_READINESS: ${DAILYENERGY_WORKER_RESTORE_READINESS:-NORMAL}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('node:fs').statSync('/run/dailyenergy/worker-background.json')",
+        ]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    mem_limit: 384m
+    cpus: 0.5
+    profiles: *runtime-profiles
+    secrets:
+      - database_background_url
+    tmpfs:
+      - /run/dailyenergy:uid=1000,gid=1000,mode=0700
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      background_data:
+      background_external:
+
+  worker-restricted:
+    <<: *runtime-security
+    image: ${DAILYENERGY_SERVER_IMAGE:?run pnpm compose:prepare}
+    command: ["node", "/app/worker/dist/run-restricted.js"]
+    user: "1000:1000"
+    depends_on:
+      database-init:
+        condition: service_completed_successfully
+      dependency-stub:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DAILYENERGY_WORKER_CAPABILITY_FINGERPRINT_EXPECTED: ${DAILYENERGY_WORKER_RESTRICTED_FINGERPRINT:?run pnpm compose:prepare}
+      DAILYENERGY_WORKER_CONCURRENCY: "1"
+      DAILYENERGY_WORKER_DATABASE_ROLE_EXPECTED: daily_energy_deletion
+      DAILYENERGY_WORKER_DATABASE_URL_FILE: /run/secrets/database_restricted_url
+      DAILYENERGY_WORKER_DRAIN_TIMEOUT_MS: "5000"
+      DAILYENERGY_WORKER_EGRESS_ALLOWLIST: object.cleanup,postgresql,provider.deletion,redis
+      DAILYENERGY_WORKER_HEARTBEAT_FILE: /run/dailyenergy/worker-restricted.json
+      DAILYENERGY_WORKER_KEY_PREFIX: ${DAILYENERGY_REDIS_KEY_PREFIX:?run pnpm compose:prepare}
+      DAILYENERGY_WORKER_POLL_INTERVAL_MS: "2000"
+      DAILYENERGY_WORKER_PROFILE: worker-restricted
+      DAILYENERGY_WORKER_REDIS_URL: ${DAILYENERGY_WORKER_REDIS_URL:-redis://redis:6379}
+      DAILYENERGY_WORKER_RESTORE_READINESS: ${DAILYENERGY_WORKER_RESTORE_READINESS:-NORMAL}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('node:fs').statSync('/run/dailyenergy/worker-restricted.json')",
+        ]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    mem_limit: 384m
+    cpus: 0.5
+    profiles: *runtime-profiles
+    secrets:
+      - database_restricted_url
+    tmpfs:
+      - /run/dailyenergy:uid=1000,gid=1000,mode=0700
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      restricted_data:
+      restricted_external:
+
+secrets:
+  postgres_password:
+    file: ${DAILYENERGY_SECRET_DIR:?run pnpm compose:prepare}/postgres-password
+  database_admin_url:
+    file: ${DAILYENERGY_SECRET_DIR:?run pnpm compose:prepare}/database-admin-url
+  database_api_url:
+    file: ${DAILYENERGY_SECRET_DIR:?run pnpm compose:prepare}/database-api-url
+  database_background_url:
+    file: ${DAILYENERGY_SECRET_DIR:?run pnpm compose:prepare}/database-background-url
+  database_interactive_url:
+    file: ${DAILYENERGY_SECRET_DIR:?run pnpm compose:prepare}/database-interactive-url
+  database_migration_url:
+    file: ${DAILYENERGY_SECRET_DIR:?run pnpm compose:prepare}/database-migration-url
+  database_restricted_url:
+    file: ${DAILYENERGY_SECRET_DIR:?run pnpm compose:prepare}/database-restricted-url
+  fault_control_token:
+    file: ${DAILYENERGY_SECRET_DIR:?run pnpm compose:prepare}/fault-control-token
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  admin_api:
+    internal: true
+  api_data:
+    internal: true
+  api_external:
+    internal: true
+  interactive_data:
+    internal: true
+  interactive_external:
+    internal: true
+  background_data:
+    internal: true
+  background_external:
+    internal: true
+  restricted_data:
+    internal: true
+  restricted_external:
+    internal: true
+  migration_data:
+    internal: true
+  fault_control:
+    internal: true

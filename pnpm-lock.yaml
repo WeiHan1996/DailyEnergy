@@ -234,6 +234,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@daily-energy/server-adapters':
+        specifier: workspace:*
+        version: link:../../packages/server-adapters
       '@daily-energy/shared-schemas':
         specifier: workspace:*
         version: link:../../packages/shared-schemas
@@ -295,6 +298,9 @@ importers:
       '@daily-energy/server-adapters':
         specifier: workspace:*
         version: link:../../packages/server-adapters
+      zod:
+        specifier: 'catalog:'
+        version: 4.4.3
     devDependencies:
       '@daily-energy/typescript-config':
         specifier: workspace:*

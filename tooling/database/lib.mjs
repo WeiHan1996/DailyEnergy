@@ -40,6 +40,41 @@ export const DATABASE_GROUP_ROLES = Object.freeze([
   ...Object.values(RUNTIME_ROLES),
 ]);
 
+export async function readConnectionString({
+  environment = process.env,
+  fileName,
+  requiredCode,
+  valueName,
+}) {
+  const direct = environment[valueName];
+  const file = environment[fileName];
+  if ((direct === undefined) === (file === undefined)) {
+    throw new Error(requiredCode);
+  }
+  if (
+    file !== undefined &&
+    (!path.isAbsolute(file) || file.split(path.sep).includes(".."))
+  ) {
+    throw new Error(requiredCode);
+  }
+  const value = (
+    file === undefined ? direct : await readFile(file, "utf8")
+  )?.trim();
+  if (value === undefined || value.length === 0) {
+    throw new Error(requiredCode);
+  }
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error(requiredCode);
+  }
+  if (parsed.protocol !== "postgresql:" && parsed.protocol !== "postgres:") {
+    throw new Error(requiredCode);
+  }
+  return value;
+}
+
 export async function listMigrations(directory = MIGRATIONS_DIRECTORY) {
   const entries = await readdir(directory, { withFileTypes: true });
   return entries

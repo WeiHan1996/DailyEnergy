@@ -22,12 +22,19 @@ variables are accepted:
 - `DAILYENERGY_CONFIG_SCHEMA_VERSION` (`api-runtime-config-v1`)
 - `DAILYENERGY_CONTRACT_BUNDLE_VERSION` (`api-contract-v1`)
 - `DAILYENERGY_PRODUCT_DATE_POLICY_VERSION` (`product-date-v1`)
+- `DAILYENERGY_DATABASE_URL_FILE`（可选且只能位于 `/run/secrets/`；release
+  environment 必填）
 - expected deploy/capability fingerprints (required in `STAGING`,
   `PRODUCTION`, and `RECOVERY`)
 
 Unknown project variables, invalid values, and fingerprint mismatches fail
 before the HTTP listener starts. The application never prints configuration
 values or secrets.
+
+When `DAILYENERGY_DATABASE_URL_FILE` is present, startup reads the credential
+only from that file and verifies PostgreSQL connectivity and the expected API
+database role before listening. The same probe participates in readiness; a
+database outage makes readiness fail without exposing the connection string.
 
 Release tooling must use the exported `calculateRuntimeFingerprints` function
 so expected deploy and capability fingerprints come from the same validation
@@ -64,3 +71,19 @@ Shutdown is bounded by `DAILYENERGY_SHUTDOWN_GRACE_MS`: readiness changes to
 not-ready before intake closes, registered drain hooks run within the same
 deadline, and expiry terminates with the fixed
 `SHUTDOWN_DEADLINE_EXCEEDED` reason code.
+
+## Compose runtime
+
+E-009 runs this API through the common Compose topology. Use the repository
+commands instead of assembling environment variables by hand:
+
+```bash
+pnpm run compose:up -- --mode=local
+pnpm run compose:smoke -- --mode=local
+pnpm run compose:clean -- --mode=local
+```
+
+The API is not attached to a host bridge and does not publish a port directly;
+the secret-free ingress binds the documented loopback port. See
+[`docker/README.md`](../../docker/README.md) for test, staging-like, and fault
+variants.
