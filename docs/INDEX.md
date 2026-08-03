@@ -180,7 +180,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted    | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复                                                     | architecture、repository-structure、testing、privacy          |
 | [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                                   | metrics、Gateway、privacy、incident、architecture、deployment |
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                       | database、testing、deployment、ADR-0005、Issue #44            |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-009 是唯一 In Review，D-001～D-005 均为 Planned | Accepted Phase 0B specs、D 系列项目控制、E-009                |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-010 是唯一 Ready，D-001～D-005 均为 Planned | Accepted Phase 0B specs、D 系列项目控制、E-010                |
 
 ### 7.7 Phase Gate
 
@@ -245,20 +245,20 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-008 与 E-015 已完成，E-009 是唯一 In Review。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-009 与 E-015 已完成，E-010 是唯一 Ready。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-009 Issue #47](https://github.com/WeiHan1996/DailyEnergy/issues/47)；
+6. [E-010 Issue #49](https://github.com/WeiHan1996/DailyEnergy/issues/49)；
 7. `docs/agent/PROJECT_CONTEXT.md`、Agent 工作流规范与
-   `pnpm agent:prepare E-009` 返回的全部 required sources；
+   `pnpm agent:prepare E-010` 返回的全部 required sources；
 8. [系统架构](./technical/architecture.md)、[仓库结构与模块边界](./technical/repository-structure.md)、
    [测试策略](./technical/testing.md)、[部署、配置和回滚](./technical/deployment.md)与
    [可观测性和成本监控](./technical/observability.md)；
-9. 现有 API/Admin/Worker 入口、运行配置、server-adapters、数据库/队列测试与附近代码；
+9. 现有 runner、fixture、Source-ID evidence、API/Admin/miniapp、数据库/队列测试与附近代码；
 10. tasks/backlog.md（仅在需要重排优先级时）。
 
 E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done；E-008 已随
@@ -283,8 +283,7 @@ D-005 是 C-012、C-013、C-014 的直接前置。
 Source IDs，并按 E-010 前的 `NA_WITH_REASON` 规则保留可执行证据。
 CI workflow/required checks/artifacts 由 E-011 交付，视觉设计与外部 Production
 Gate 未被自动解除；E-015 只实现了 P0/P1，没有提前交付 E-010、E-011、
-E-013 或 D 系列能力。E-009 当前是唯一 In Review，分支为
-`agent/e009-docker-compose`；它复用 E-007 已建立的真实 Redis 8 / BullMQ 5 /
-PostgreSQL 18 队列基线，已落地 Compose health/network/egress/fault/rebuild 编排与
-23 项 scoped Source-ID evidence。当前 Gate 与交接见 tasks/current.md，运行说明见
-[docker/README.md](../docker/README.md)。
+E-013 或 D 系列能力。E-009 已随 PR #115 squash 合并并进入 Done，Issue #47 已关闭；
+E-010 当前是唯一 Ready，尚未创建实现分支。它必须把现有 scoped evidence 与 Accepted
+Source IDs 纳入正式 registry，同时保留强制证据层级和所有未实现的 `PLANNED` 状态。
+当前 Gate 与交接见 tasks/current.md。
