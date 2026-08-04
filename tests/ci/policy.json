@@ -1,5 +1,5 @@
 {
-  "policy_version": "e-011-ci-policy-v1",
+  "policy_version": "e-011-ci-policy-v2",
   "runner": "ubuntu-24.04",
   "node_version": "24.18.0",
   "pnpm_version": "11.17.0",
@@ -10,6 +10,40 @@
   "remote_cache": "DISABLED",
   "production_secrets": "PROHIBITED",
   "oidc_deployment_permission": "PROHIBITED",
+  "merge_gate": {
+    "control_type": "TEMPORARY_MANUAL_COMPENSATING_CONTROL",
+    "reason": "PRIVATE_FREE_BRANCH_PROTECTION_UNAVAILABLE",
+    "repository": "WeiHan1996/DailyEnergy",
+    "target_branch": "main",
+    "required_checks": [
+      "automated (docs)",
+      "automated (static)",
+      "automated (unit-contract)",
+      "automated (db-integration)",
+      "automated (queue-integration)",
+      "automated (api-e2e)",
+      "automated (admin-e2e)",
+      "automated (resilience)",
+      "automated (ai-deterministic)",
+      "supply-chain",
+      "E-011 automated full Gate"
+    ],
+    "same_workflow_run_required": true,
+    "head_change_guard": "GH_MATCH_HEAD_COMMIT",
+    "merge_method": "SQUASH",
+    "direct_push": "PROHIBITED",
+    "auto_merge": "PROHIBITED",
+    "receipt": "PR_COMMENT_AND_POST_MERGE_HANDOFF",
+    "risk_owner": "REPOSITORY_OWNER",
+    "accepted_on": "2026-08-04",
+    "expires_on": "2026-11-02",
+    "restore_platform_enforcement_on": [
+      "CAPABILITY_AVAILABLE",
+      "SECOND_MERGE_CAPABLE_ACTOR",
+      "E-014_START",
+      "RELEASE_CANDIDATE"
+    ]
+  },
   "actions": {
     "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
     "actions/setup-node": "49933ea5288caeca8642d1e84afbd3f7d6820020",

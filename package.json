@@ -37,6 +37,7 @@
     "testing:playwright-policy": "node tooling/testing/test-sticky-playwright.mjs",
     "ci:check": "node tooling/ci/check-policy.mjs",
     "ci:test": "node --test tests/ci/ci-policy.test.mjs",
+    "ci:verify-pr-merge-gate": "node tooling/ci/verify-pr-merge-gate.mjs",
     "ci:lane": "node tooling/ci/run-lane.mjs",
     "ci:audit": "node tooling/ci/run-audit.mjs",
     "ci:supply-chain:evidence": "node tooling/ci/generate-supply-chain.mjs && node tooling/ci/scan-artifacts.mjs .artifacts/ci/supply-chain",

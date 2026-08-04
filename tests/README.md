@@ -29,12 +29,16 @@ PostgreSQL/Redis/BullMQ。
 | ------------------------------- | ------------------------------------------------------------------ |
 | `pnpm ci:check`                 | 12 个 lane、最小权限、immutable action、TTL 与外部 pending 边界    |
 | `pnpm ci:test`                  | action/权限/fork secret/cache/artifact/cardinality/digest 负例     |
+| `pnpm ci:verify-pr-merge-gate -- <PR> <HEAD_SHA>` | 私有 Free 临时控制：最新 head 的 11 个 checks 来自同一 run 且全部成功 |
 | `pnpm ci:audit`                 | production dependency high/critical vulnerability fail-closed Gate |
 | `pnpm ci:supply-chain:evidence` | SPDX SBOM、license、build digest 与 unsigned provenance 生成和扫描 |
 
 普通 PR 自动执行 9 个可用 lane；`miniapp-conformance`、
 `ai-model-load-human` 与 `manual-rc` 保持显式 pending/blocked，不能由普通 GitHub
 job 冒充 PASS。普通合成报告保留 14 天，SBOM/provenance 等供应链证据保留 365 天。
+当前私有 GitHub Free 仓库无法启用 branch protection；到 2026-11-02、E-014/RC 开始、
+出现第二位可合并协作者或平台能力可用前，合并必须先执行上述只读 Gate，再使用
+`gh pr merge --squash --match-head-commit <HEAD_SHA>`。该控制不豁免任何失败或缺失 lane。
 
 ## Registry 与证据
 

@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-08-03
+- **最后更新**：2026-08-04
 - **当前阶段**：Phase 1 — 工程基础
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -176,8 +176,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted    | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                                  | Gateway、database、API、ADR-0006                              |
 | [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted    | Monorepo 目录、app/package/module、public exports 与依赖 Gate                                              | architecture、ADR-0006                                        |
-| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted    | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵                                                       | schemas、API、architecture、repository-structure              |
-| [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted    | 环境、Compose、配置/密钥、发布、迁移、回滚、备份和恢复                                                     | architecture、repository-structure、testing、privacy          |
+| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted    | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵；私有 Free 临时合并控制                               | schemas、API、architecture、repository-structure              |
+| [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted    | 环境、Compose、配置/密钥、发布、迁移、回滚、备份、恢复与 required Gate                                     | architecture、repository-structure、testing、privacy          |
 | [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                                   | metrics、Gateway、privacy、incident、architecture、deployment |
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                       | database、testing、deployment、ADR-0005、Issue #44            |
 | [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness 与 E-011 CI、artifact、SBOM/provenance 证据入口                                     | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
@@ -282,9 +282,10 @@ Phase 2，全部保持 Planned。D-004 是 C-003、C-004、C-009 的直接前置
 D-005 是 C-012、C-013、C-014 的直接前置。
 正式 Source-ID registry 已由 E-010 实现；E-011 已接入 CI、artifact、cache、
 telemetry 与供应链 evidence 且不改变原有证据层级，未实现项继续为 `PLANNED`。
-CI workflow/required checks/artifacts 正由 E-011 交付，视觉设计与外部 Production
-Gate 未被自动解除；E-015 只实现了 P0/P1，没有提前交付 E-010、E-011、
+CI workflow/artifacts 正由 E-011 交付；私有 GitHub Free 的 platform required checks
+暂由 testing 22.2 于 2026-08-04 获用户接受的有期限补偿控制替代，最迟在 E-014/RC 前恢复。
+视觉设计与外部 Production Gate 未被自动解除；E-015 只实现了 P0/P1，没有提前交付 E-010、E-011、
 E-013 或 D 系列能力。E-009 已随 PR #115 squash 合并并进入 Done，Issue #47 已关闭；
-E-010 已随 PR #117 squash 合并并进入 Done；E-011 当前是唯一 In Progress，实现分支为
-`agent/e011-ci-supply-chain`，外部/人工 lane 与 GitHub clean-run 证据在实际执行前保持 pending。
+E-010 已随 PR #117 squash 合并并进入 Done；E-011 当前是唯一 In Review，实现分支为
+`agent/e011-ci-supply-chain`，外部/人工 lane 保持 pending，临时合并控制等待最终 head CI。
 当前 Gate 与交接见 tasks/current.md。

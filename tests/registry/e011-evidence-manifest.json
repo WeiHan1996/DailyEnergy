@@ -12,7 +12,8 @@
         "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
         "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
         "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
-        "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention"
+        "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
+        "the accepted temporary private-Free merge control verifies one current PR head, all 11 checks from one workflow run, and requires a match-head squash merge"
       ]
     },
     "T-E011-CI-CACHE-001": {

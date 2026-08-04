@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-31 — 测试策略
-- **最后更新**：2026-07-29
+- **最后更新**：2026-08-04（私有 GitHub Free required-check 临时补偿控制获接受）
 - **适用范围**：Phase 1～3 的静态边界、单元、模块、数据库、契约、集成、端到端、故障恢复、AI 评测与发布证据
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[共享 Schema](../../packages/shared-schemas/README.md)、[AI 质量评价](../ai/evaluation.md)、[数据库规格](./database.md)、[API 契约](./api.md)、[隐私数据地图](../operations/privacy-data-map.md)
 - **可执行合同**：[AI 评测语料](../ai/evaluation-corpus.json)、[Prisma 草案](../../prisma/schema.prisma)、[OpenAPI 草案](../../openapi/openapi.yaml)
@@ -700,7 +700,33 @@ Safety、删除、身份、owner、SQL-ID、TX-ID、profile capability 和 secre
 - migration、guard、Safety、删除、Gateway route、profile/capability 变化不得只跑 changed package；
 - 无法确定影响范围时全量；
 - docs-only 可以只跑 docs，但语义规范改变时必须更新 registry 并触发相关 contract lint；
-- branch protection 的精确 required checks 由 E-011 落地，不能少于本文强制 lane。
+- branch protection 的精确 required checks 由 E-011 落地，不能少于本文强制 lane；仅在
+  22.2 的私有 GitHub Free 临时补偿控制有效时，允许替代平台强制机制，不允许减少或跳过 lane。
+
+### 22.2 私有 GitHub Free 临时补偿控制
+
+当且仅当私有仓库的当前 GitHub 计划明确不提供 branch protection required checks，并且
+branch protection/rulesets API 返回能力不可用时，允许使用以下人工批准、机器核验的临时控制：
+
+1. 只能通过 PR 合并到 `main`；禁止 direct push、force push、auto-merge 和在 GitHub UI
+   中绕过本流程合并；
+2. 合并前对一次读取返回的最新 `headRefOid`、`mergeable=MERGEABLE`、
+   `mergeStateStatus=CLEAN` 与 `statusCheckRollup` 执行 fail-closed 核验；
+3. `docs`、`static`、`unit-contract`、`db-integration`、`queue-integration`、`api-e2e`、
+   `admin-e2e`、`resilience`、`ai-deterministic`、`supply-chain` 和聚合
+   `E-011 automated full Gate` 共 11 个固定 check 必须来自同一 CI run，且全部为
+   `COMPLETED/SUCCESS`；缺失、重复、pending、cancelled、skipped、failure 或 run 不一致均拒绝；
+4. 必须有用户的明确合并批准，并使用
+   `gh pr merge --squash --match-head-commit <HEAD_SHA>`；核验后 head 变化时命令必须拒绝；
+5. PR comment 记录 PR、head SHA、run ID、11/11 结果、批准和核验时间；合并后项目交接记录
+   merge SHA。该 receipt 是审计证据，不把人工控制冒充为 GitHub 平台保护；
+6. `tests/ci/policy.json` 和 `pnpm ci:verify-pr-merge-gate -- <PR> <HEAD_SHA>` 固定上述
+   规则并提供可执行核验；任何规则漂移或临时控制到期都使 CI policy fail closed。
+
+该控制由仓库 owner 承担“有权限者仍可绕过”的残余风险，不豁免任何 Safety、删除、owner、
+SQL/TX、capability、secret、contract drift 或其它强制 Gate。它于 2026-08-04 获用户明确接受，
+最迟 2026-11-02 到期；GitHub 计划能力可用、出现第二位 merge-capable actor、E-014 开始或进入
+RC 任一事件先发生时，必须在下一次合并前停止本控制并恢复 platform-enforced required checks。
 
 ## 23. Retry、flaky 与 quarantine
 
@@ -903,7 +929,8 @@ E-010 不需要一次实现全部业务场景，但必须建立 registry，使�
 
 - 每个工程 Issue 列出 source IDs、强制层级、正负 fixture 与 CI lane；
 - E-010 建立 registry/harness/fixture/fault hook，未实现业务场景保持 PLANNED；
-- E-011 将 lane 变为 branch protection required checks，并固定 exact tool/image；
+- E-011 将 lane 变为 branch protection required checks，并固定 exact tool/image；私有
+  GitHub Free 能力不可用期间只能使用 22.2 已接受的有期限补偿控制；
 - Phase 1～3 每个功能 PR 必须更新 coverage registry，不能在最后集中补测试。
 
 ## 30. 明确禁止
@@ -926,6 +953,8 @@ E-010 不需要一次实现全部业务场景，但必须建立 registry，使�
 
 - 状态：Accepted；
 - 接受日期：2026-07-26；
+- 2026-08-04 修订：用户明确接受 22.2 的私有 GitHub Free 临时补偿控制；它只替代平台
+  enforcement，不降低 11 个自动 checks、人工批准、head 绑定或其它 hard Gate；
 - 内容 PR：[PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/36)；
 - 基线：`main`（S-30 仓库结构与模块边界已随 PR #35 合并并获用户确认）；
 - 已确认范围：测试层级/工具、真实依赖与替身边界、source-ID registry、DB/TX/queue/profile/客户端/AI/恢复矩阵、CI/flaky/artifact 和 48 个场景；

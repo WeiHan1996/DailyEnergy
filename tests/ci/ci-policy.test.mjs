@@ -19,6 +19,7 @@ import {
   sha256,
   validateCiPolicy,
   validateLicenseInventory,
+  validateManualMergeGate,
   validateSupplyChainDocuments,
   validateTelemetryPolicy,
   validateTurboPolicy,
@@ -120,6 +121,64 @@ test("T-E011-CI-POLICY-001 accepts the minimum-permission pinned workflow", () =
   assert.deepEqual(
     findWorkflowDiagnostics(workflow, ciPolicy, { complete: true }),
     [],
+  );
+});
+
+test("T-E011-CI-POLICY-001 enforces the temporary manual merge gate", () => {
+  const headSha = "a".repeat(40);
+  const pullRequest = {
+    baseRefName: "main",
+    headRefOid: headSha,
+    isDraft: false,
+    mergeable: "MERGEABLE",
+    mergeStateStatus: "CLEAN",
+    number: 119,
+    state: "OPEN",
+    statusCheckRollup: ciPolicy.merge_gate.required_checks.map(
+      (name, index) => ({
+        conclusion: "SUCCESS",
+        detailsUrl: `https://github.com/WeiHan1996/DailyEnergy/actions/runs/123456/job/${index + 1}`,
+        name,
+        status: "COMPLETED",
+        workflowName: "CI",
+      }),
+    ),
+  };
+
+  assert.deepEqual(validateManualMergeGate(pullRequest, ciPolicy, headSha), {
+    checks: 11,
+    headSha,
+    pullRequest: 119,
+    runId: "123456",
+  });
+
+  const failedCheck = structuredClone(pullRequest);
+  failedCheck.statusCheckRollup[0].conclusion = "FAILURE";
+  assert.throws(
+    () => validateManualMergeGate(failedCheck, ciPolicy, headSha),
+    /CI_MANUAL_MERGE_GATE_CHECK_NOT_SUCCESSFUL/u,
+  );
+
+  const changedHead = structuredClone(pullRequest);
+  changedHead.headRefOid = "b".repeat(40);
+  assert.throws(
+    () => validateManualMergeGate(changedHead, ciPolicy, headSha),
+    /CI_MANUAL_MERGE_GATE_HEAD_CHANGED/u,
+  );
+
+  const mixedRun = structuredClone(pullRequest);
+  mixedRun.statusCheckRollup[0].detailsUrl =
+    "https://github.com/WeiHan1996/DailyEnergy/actions/runs/654321/job/1";
+  assert.throws(
+    () => validateManualMergeGate(mixedRun, ciPolicy, headSha),
+    /CI_MANUAL_MERGE_GATE_RUN_MISMATCH/u,
+  );
+
+  const driftedPolicy = structuredClone(ciPolicy);
+  driftedPolicy.merge_gate.required_checks.pop();
+  assert.throws(
+    () => validateManualMergeGate(pullRequest, driftedPolicy, headSha),
+    /CI_POLICY_MERGE_GATE_INVALID/u,
   );
 });
 

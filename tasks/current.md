@@ -1,19 +1,19 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-04（365 天供应链 artifact retention 已通过真实 run 复验）
+- **最后更新**：2026-08-04（私有 Free 临时合并控制已获接受并进入最终验证）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-011 — 建立 GitHub Actions CI 与供应链 Gate
-- **任务状态**：Blocked
+- **任务状态**：In Review
 - **任务分支**：`agent/e011-ci-supply-chain`
 - **当前 Issue**：[E-011 Issue #48](https://github.com/WeiHan1996/DailyEnergy/issues/48)
 - **当前 PR**：[Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119)；[状态 PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已合并
 - **基线提交**：`604db047938444898c222f7136cc9ac1ec333dd4`
-- **Gate 结论**：`LOCAL_TARGETED_PASS / GITHUB_AUTOMATED_PASS / RETENTION_PASS / REQUIRED_CHECKS_CAPABILITY_BLOCKED / MANUAL_EVIDENCE_PENDING`
+- **Gate 结论**：`LOCAL_TARGETED_PASS / GITHUB_AUTOMATED_PASS / RETENTION_PASS / TEMPORARY_MANUAL_MERGE_CONTROL_ACCEPTED / FINAL_HEAD_CI_PENDING`
   （security profile；PR 复核修复的定向 Gate 与 GitHub 11/11 automated checks 已通过；
   Actions artifact retention 已确认配置为 365 天，新供应链 artifact 的实际到期时间已复验；
-  私有仓库当前计划不提供 branch protection required checks；外部/人工 lane 保持明确 pending，
-  不能报告任务 PASS）
+  私有仓库当前计划不提供 branch protection required checks；用户已接受 testing 22.2 的
+  有期限补偿控制，等待本修订的最终 head 11/11 CI 与 merge receipt）
 
 ## 1. 当前目标
 
@@ -25,7 +25,7 @@ clean checkout + pinned Node/pnpm/actions/images
   -> install / format / lint / type / arch / schema / db / test / build / security
   -> Source-ID / coverage / secret / raw-content / cardinality evidence
   -> bounded, redacted artifacts + SBOM / provenance
-  -> required checks and branch protection evidence
+  -> platform required checks，或 Accepted、有期限且绑定 head 的人工合并控制证据
 ```
 
 E-011 已从状态 PR #118 的 squash merge `604db047938444898c222f7136cc9ac1ec333dd4`
@@ -38,7 +38,7 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
 - [PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已于 2026-08-03 squash
   合并为 `604db047938444898c222f7136cc9ac1ec333dd4`，E-010 已完成交接；
 - 本地 `main` 与 `origin/main` 已对齐到该提交，E-011 分支基于同一提交；
-- E-010 进入 Done，E-011 成为唯一 In Progress；E-012～E-014 与其它任务继续 Planned；
+- E-010 进入 Done，E-011 成为唯一 In Review；E-012～E-014 与其它任务继续 Planned；
 - E-010 已建立的 registry 仍有 736 个唯一 Source ID；E-011 新增可执行 proof 后为
   155 个 `COVERED`、581 个 `PLANNED`、0 个 `NA_WITH_REASON`；
 - D-001～D-005 继续 Planned，不创建 Figma、Design Tokens 或业务页面。
@@ -66,7 +66,8 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
 
 ## 5. 验收与证据
 
-- required checks 覆盖 clean checkout 与全部 12 类边界/供应链 Gate；
+- 11 个自动 checks 覆盖 clean checkout 与可自动化边界/供应链 Gate，并由 platform required
+  checks 或 testing 22.2 的临时补偿控制阻断失败、缺失或旧 head；
 - workflow/action 权限最小，PR workflow 不获得生产 secret，cache/artifact 不含敏感内容；
 - Schema/codegen/drift、跳过测试、未知 Source ID、泄密/正文/高基数命中均 fail closed；
 - workflow lint、最小权限检查与 known-fail fixture 通过；
@@ -91,11 +92,11 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   `30888004544` 生成的 `ci-supply-chain-evidence` artifact `8883871771` 创建于
   `2026-08-04T07:30:28Z`、到期于 `2027-08-04T07:29:16Z`，上传日志使用
   `retention-days: 365` 且无 retention clamp，结论为 `RETENTION_PASS`；
-- **required checks / branch protection**：Accepted testing 规范要求 E-011 把强制 lane 安装为
-  branch protection required checks；GitHub branch protection 与 rulesets API 均对当前私有仓库
-  返回 403，并明确要求 GitHub Pro 或 public visibility。升级计划或改变可见性不在当前授权内，
-  即使能力可用，实际修改 required checks 前仍需核对目标并取得显式授权；这是与 artifact
-  retention 分离的外部阻塞；
+- **required checks / branch protection**：GitHub branch protection 与 rulesets API 对当前私有
+  Free 仓库返回 403。用户于 2026-08-04 明确选择并接受 testing 22.2 的临时补偿控制：机器核验
+  最新 head 的 11 个固定 checks 来自同一 run 且全部成功，用户明确批准，再以
+  `--match-head-commit` squash merge；该控制最迟 2026-11-02 到期，并在能力可用、出现第二位
+  merge-capable actor、E-014 开始或 RC 前提前失效；
 - **授权边界**：提交 workflow 与 Draft PR 属于本任务；启用或修改 required checks、
   branch protection、repository secret/environment 前必须核对目标并保留用户授权证据；
 - **security profile**：人工边界复核已完成；checkout credential、secret/fork、第三方 action、
@@ -107,14 +108,18 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   `D:\D:\...` URL pathname、CRLF shebang fixture 与 SIGTERM 语义均受 Windows 环境影响。
   这些结果保持 FAIL/infra 证据，不改写为 PASS；权威 clean run 由固定
   `ubuntu-24.04` 的 GitHub Actions 补齐；
-- **并行规则**：E-011 是唯一当前任务并处于 Blocked；不提升其它任务；
-- **下一动作**：保持 PR #119 为 Draft；将账户升级为 GitHub Pro 以提供私有仓库 branch
-  protection required checks 能力，并在能力可用后取得对 `main` 精确 required checks 配置的
-  显式授权。配置与验证通过后才能把本文件更新为 In Review；
+- **并行规则**：E-011 是唯一当前任务并处于 In Review；不提升其它任务；
+- **下一动作**：提交并推送临时控制修订；等待最新 head 的 11/11 CI，通过
+  `pnpm ci:verify-pr-merge-gate -- 119 <HEAD_SHA>` 生成 receipt，按既有用户合并批准将 PR #119
+  转为 Ready 并使用 `--match-head-commit` squash merge；
 - **下一任务**：E-011 完成前不提升 E-012；E-011 获接受后再评估 E-012。
 
 ## 7. 最近交接
 
+- 用户于 2026-08-04 明确选择私有 Free 仓库方案 2；Accepted testing/deployment 合同现允许
+  在 platform required checks 不可用期间使用有期限的补偿控制。机器可读 policy v2 固定 11 个
+  check、同一 run、最新 head、squash 与 match-head 要求，并新增只读 PR Gate 命令；该控制不
+  减少 lane，不适用于 E-014/RC，最迟 2026-11-02 到期；
 - 用户已明确授权将 DailyEnergy 仓库 Actions artifact retention 设置为 365 天；GitHub API
   已确认 `days=365`、`maximum_allowed_days=400`。提交 `aa6ddce20053f08ad1b697fa678e0a1a72838109`
   的 GitHub run [#30888004544](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30888004544)

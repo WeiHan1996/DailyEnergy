@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-04
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：[E-011 GitHub Actions CI 与供应链 Gate](./current.md)（Blocked：required-check capability/授权）
+- **当前任务**：[E-011 GitHub Actions CI 与供应链 Gate](./current.md)（In Review：最终 head CI/merge receipt）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -124,7 +124,7 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 | [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)  | 统一 Zod Schema、OpenAPI 与生成 API Client | Done    | client-safe Schema、OpenAPI、生成客户端与 drift Gate  |
 | [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done    | 可重复本地环境                                        |
 | [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done    | 单元、集成、契约和端到端                              |
-| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Blocked | 自动 Gate/365 天 retention 通过；required checks 阻塞 |
+| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | In Review | 自动 Gate/365 天 retention 通过；临时合并控制待最终验证 |
 | [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | Planned | 固定开发地址和发布流程                                |
 | [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Planned | 脱敏日志、指标和告警                                  |
 | [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Planned | 环境可重复、CI 通过、服务可访问                       |
@@ -136,8 +136,9 @@ PR #113 完成，状态 PR #114 已 squash 合并；E-009 已随 PR #115 squash 
 merged-main 验证。E-010 已随 PR #117 squash 合并并进入 Done；E-011 自动 Gate 与 security
 人工边界复核已在 Draft PR #119 通过；GitHub run `30888004544` 的 11/11 checks 已验证提交
 `aa6ddce`，供应链 artifact `8883871771` 的实际到期时间为创建后约 365 天，因此 retention 已
-通过。私有仓库当前计划仍不支持 branch protection required checks，因此 E-011 保持 Blocked；
-实现分支为 `agent/e011-ci-supply-chain`，E-012 与其它任务保持 Planned。
+通过。私有仓库当前计划仍不支持 branch protection required checks；用户于 2026-08-04 已接受
+testing 22.2 的有期限补偿控制，E-011 进入 In Review，等待最终 head 11/11 CI 与 match-head
+squash merge receipt；实现分支为 `agent/e011-ci-supply-chain`，E-012 与其它任务保持 Planned。
 
 ## 5. Phase 2：确定性核心闭环
 

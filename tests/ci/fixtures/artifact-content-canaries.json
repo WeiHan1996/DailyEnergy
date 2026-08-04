@@ -4,7 +4,7 @@
     "payload": {
       "tool_versions": {
         "artifact_scanner": "e-011-artifact-scanner-v2",
-        "ci_policy": "e-011-ci-policy-v1",
+        "ci_policy": "e-011-ci-policy-v2",
         "ci_runner": "e-011-ci-runner-v2",
         "diagnostic": { "message": "I feel under pressure today" },
         "node": "24.18.0",

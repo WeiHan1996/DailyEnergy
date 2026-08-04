@@ -27,6 +27,43 @@ const expectedExternalLanes = new Map([
   ["manual-rc", "MANUAL_EVIDENCE_PENDING"],
 ]);
 
+const expectedRequiredMergeChecks = [
+  "automated (docs)",
+  "automated (static)",
+  "automated (unit-contract)",
+  "automated (db-integration)",
+  "automated (queue-integration)",
+  "automated (api-e2e)",
+  "automated (admin-e2e)",
+  "automated (resilience)",
+  "automated (ai-deterministic)",
+  "supply-chain",
+  "E-011 automated full Gate",
+];
+
+const expectedMergeGate = {
+  control_type: "TEMPORARY_MANUAL_COMPENSATING_CONTROL",
+  reason: "PRIVATE_FREE_BRANCH_PROTECTION_UNAVAILABLE",
+  repository: "WeiHan1996/DailyEnergy",
+  target_branch: "main",
+  required_checks: expectedRequiredMergeChecks,
+  same_workflow_run_required: true,
+  head_change_guard: "GH_MATCH_HEAD_COMMIT",
+  merge_method: "SQUASH",
+  direct_push: "PROHIBITED",
+  auto_merge: "PROHIBITED",
+  receipt: "PR_COMMENT_AND_POST_MERGE_HANDOFF",
+  risk_owner: "REPOSITORY_OWNER",
+  accepted_on: "2026-08-04",
+  expires_on: "2026-11-02",
+  restore_platform_enforcement_on: [
+    "CAPABILITY_AVAILABLE",
+    "SECOND_MERGE_CAPABLE_ACTOR",
+    "E-014_START",
+    "RELEASE_CANDIDATE",
+  ],
+};
+
 const expectedMinimumLaneCommands = new Map([
   [
     "docs",
@@ -160,7 +197,7 @@ function isSha(value) {
 
 export function validateCiPolicy(policy) {
   if (
-    policy?.policy_version !== "e-011-ci-policy-v1" ||
+    policy?.policy_version !== "e-011-ci-policy-v2" ||
     policy.runner !== "ubuntu-24.04" ||
     policy.node_version !== "24.18.0" ||
     policy.pnpm_version !== "11.17.0" ||
@@ -170,6 +207,13 @@ export function validateCiPolicy(policy) {
     !sameJson(policy.default_permissions, { contents: "read" })
   ) {
     fail("CI_POLICY_BASELINE_INVALID", policy?.policy_version ?? "missing");
+  }
+
+  if (!sameJson(policy.merge_gate, expectedMergeGate)) {
+    fail("CI_POLICY_MERGE_GATE_INVALID", "temporary-control");
+  }
+  if (Date.now() >= Date.parse(`${policy.merge_gate.expires_on}T00:00:00Z`)) {
+    fail("CI_POLICY_MERGE_GATE_EXPIRED", policy.merge_gate.expires_on);
   }
 
   for (const [action, sha] of Object.entries(policy.actions ?? {})) {
@@ -256,6 +300,61 @@ export function validateCiPolicy(policy) {
     automated: lanes.length - expectedExternalLanes.size,
     external: expectedExternalLanes.size,
     lanes: lanes.length,
+  });
+}
+
+export function validateManualMergeGate(pullRequest, policy, expectedHeadSha) {
+  validateCiPolicy(policy);
+  if (!isSha(expectedHeadSha)) {
+    fail("CI_MANUAL_MERGE_GATE_HEAD_INVALID", expectedHeadSha ?? "missing");
+  }
+  if (
+    pullRequest?.state !== "OPEN" ||
+    pullRequest.isDraft !== false ||
+    pullRequest.mergeable !== "MERGEABLE" ||
+    pullRequest.mergeStateStatus !== "CLEAN" ||
+    pullRequest.baseRefName !== policy.merge_gate.target_branch
+  ) {
+    fail("CI_MANUAL_MERGE_GATE_PR_NOT_READY", pullRequest?.number ?? "missing");
+  }
+  if (pullRequest.headRefOid !== expectedHeadSha) {
+    fail(
+      "CI_MANUAL_MERGE_GATE_HEAD_CHANGED",
+      pullRequest.headRefOid ?? "missing",
+    );
+  }
+
+  const checks = pullRequest.statusCheckRollup ?? [];
+  const runIds = new Set();
+  for (const requiredCheck of policy.merge_gate.required_checks) {
+    const matches = checks.filter(({ name }) => name === requiredCheck);
+    if (matches.length !== 1) {
+      fail("CI_MANUAL_MERGE_GATE_CHECK_COUNT_INVALID", requiredCheck);
+    }
+    const [check] = matches;
+    if (check.status !== "COMPLETED" || check.conclusion !== "SUCCESS") {
+      fail("CI_MANUAL_MERGE_GATE_CHECK_NOT_SUCCESSFUL", requiredCheck);
+    }
+    if (check.workflowName !== "CI") {
+      fail("CI_MANUAL_MERGE_GATE_WORKFLOW_INVALID", requiredCheck);
+    }
+    const runId = /\/actions\/runs\/(\d+)(?:\/|$)/u.exec(
+      check.detailsUrl ?? "",
+    )?.[1];
+    if (!runId) {
+      fail("CI_MANUAL_MERGE_GATE_RUN_ID_MISSING", requiredCheck);
+    }
+    runIds.add(runId);
+  }
+  if (policy.merge_gate.same_workflow_run_required && runIds.size !== 1) {
+    fail("CI_MANUAL_MERGE_GATE_RUN_MISMATCH", [...runIds].join(","));
+  }
+
+  return Object.freeze({
+    checks: policy.merge_gate.required_checks.length,
+    headSha: expectedHeadSha,
+    pullRequest: pullRequest.number,
+    runId: [...runIds][0],
   });
 }
 
