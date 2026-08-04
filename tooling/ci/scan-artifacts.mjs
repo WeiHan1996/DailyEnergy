@@ -3,6 +3,7 @@ import { lstat, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 import {
+  collectLockfilePackageCoordinates,
   findArtifactDiagnostics,
   validateSupplyChainDocuments,
   verifyDigestManifest,
@@ -30,6 +31,25 @@ const policy = JSON.parse(
     "utf8",
   ),
 );
+const [ciPolicy, registry, lockfile] = await Promise.all([
+  readFile(path.resolve(repositoryRoot, "tests/ci/policy.json"), "utf8").then(
+    JSON.parse,
+  ),
+  readFile(
+    path.resolve(repositoryRoot, "tests/registry/coverage-registry.json"),
+    "utf8",
+  ).then(JSON.parse),
+  readFile(path.resolve(repositoryRoot, "pnpm-lock.yaml"), "utf8"),
+]);
+const lockfilePackageCoordinates = collectLockfilePackageCoordinates(lockfile);
+const targetLaneId = relativeTarget.replaceAll("\\", "/");
+const lane = ciPolicy.lanes.find(({ id }) => id === targetLaneId);
+if (
+  targetLaneId !== "supply-chain" &&
+  (!lane || lane.execution !== "AUTOMATED_REQUIRED")
+) {
+  throw new Error(`CI_ARTIFACT_SCHEMA_TARGET_UNKNOWN:${targetLaneId}`);
+}
 const files = [];
 async function walk(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -58,6 +78,11 @@ for (const filePath of files) {
     );
   }
   const contents = await readFile(filePath, "utf8");
+  if (path.dirname(filePath) !== target) {
+    throw new Error(
+      `CI_ARTIFACT_NESTING_PROHIBITED:${path.relative(target, filePath)}`,
+    );
+  }
   totalBytes += Buffer.byteLength(contents);
   if (totalBytes > 20 * 1024 * 1024) {
     throw new Error("CI_ARTIFACT_TOTAL_SIZE_EXCEEDED:20MiB");
@@ -70,11 +95,36 @@ for (const filePath of files) {
       `CI_ARTIFACT_JSON_INVALID:${path.relative(target, filePath)}`,
     );
   }
-  const diagnostics = findArtifactDiagnostics(document, policy);
+  const artifactName = path.basename(filePath);
+  const diagnostics = findArtifactDiagnostics(document, policy, {
+    artifactName,
+    ciPolicy,
+    lane,
+    lockfilePackageCoordinates,
+    registryVersion: registry.registry_version,
+  });
   if (diagnostics.length > 0) {
     throw new Error(diagnostics.join("\n"));
   }
-  documents.set(path.basename(filePath), document);
+  documents.set(artifactName, document);
+}
+
+const expectedNames =
+  targetLaneId === "supply-chain"
+    ? new Set([
+        "build-output-digests.json",
+        "provenance.intoto.json",
+        "sbom.spdx.json",
+        "vulnerability-summary.json",
+      ])
+    : new Set(["evidence.json"]);
+for (const name of documents.keys()) {
+  if (!expectedNames.has(name)) {
+    throw new Error(`CI_ARTIFACT_BUNDLE_FILE_PROHIBITED:${name}`);
+  }
+}
+if (targetLaneId !== "supply-chain" && documents.size !== 1) {
+  throw new Error(`CI_ARTIFACT_BUNDLE_INCOMPLETE:${targetLaneId}`);
 }
 
 const digestManifest = documents.get("build-output-digests.json");

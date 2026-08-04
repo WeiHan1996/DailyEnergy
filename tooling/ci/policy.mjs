@@ -27,6 +27,121 @@ const expectedExternalLanes = new Map([
   ["manual-rc", "MANUAL_EVIDENCE_PENDING"],
 ]);
 
+const expectedMinimumLaneCommands = new Map([
+  [
+    "docs",
+    [
+      ["pnpm", "run", "agent:check"],
+      ["pnpm", "run", "registry:check"],
+    ],
+  ],
+  [
+    "static",
+    [
+      ["pnpm", "run", "format:check"],
+      ["pnpm", "run", "lint"],
+      ["pnpm", "run", "typecheck"],
+      ["pnpm", "run", "ci:test"],
+    ],
+  ],
+  [
+    "unit-contract",
+    [
+      ["pnpm", "run", "config:fixtures"],
+      ["pnpm", "run", "typecheck:fixtures"],
+      ["pnpm", "run", "lint:fixtures"],
+      ["pnpm", "run", "architecture:fixtures"],
+      ["pnpm", "run", "contract:fixtures"],
+      ["pnpm", "run", "admin:bundle:fixtures"],
+      ["pnpm", "run", "agent:fixtures"],
+      ["pnpm", "run", "registry:test"],
+      ["pnpm", "run", "testing:playwright-policy"],
+      ["pnpm", "run", "test:projects"],
+      ["pnpm", "--filter", "@daily-energy/app-miniapp", "run", "test"],
+    ],
+  ],
+  ["db-integration", [["pnpm", "run", "database:validate"]]],
+  ["queue-integration", [["pnpm", "run", "queue:validate"]]],
+  ["api-e2e", [["pnpm", "run", "test:api:e2e"]]],
+  [
+    "admin-e2e",
+    [["pnpm", "--filter", "@daily-energy/app-admin", "run", "test:e2e"]],
+  ],
+  [
+    "resilience",
+    [
+      ["pnpm", "run", "queue:test"],
+      ["pnpm", "run", "compose:evidence"],
+    ],
+  ],
+  [
+    "ai-deterministic",
+    [
+      ["pnpm", "run", "testing:policy"],
+      ["pnpm", "run", "test:harness"],
+    ],
+  ],
+]);
+
+const expectedLaneSourceIds = new Map([
+  ["docs", ["S31-TEST-008"]],
+  [
+    "static",
+    ["S31-TEST-047", "S32-DEPLOY-041", "S32-DEPLOY-042", "S32-DEPLOY-043"],
+  ],
+  [
+    "unit-contract",
+    [
+      "S31-TEST-001",
+      "S31-TEST-002",
+      "S31-TEST-003",
+      "S31-TEST-004",
+      "S31-TEST-005",
+      "S31-TEST-006",
+      "S31-TEST-007",
+      "S31-TEST-008",
+      "S31-TEST-041",
+      "S31-TEST-045",
+      "S31-TEST-046",
+      "S31-TEST-047",
+    ],
+  ],
+  [
+    "db-integration",
+    ["S31-TEST-017", "S31-TEST-018", "S31-TEST-020", "S31-TEST-023"],
+  ],
+  [
+    "queue-integration",
+    [
+      "S31-TEST-025",
+      "S31-TEST-026",
+      "S31-TEST-027",
+      "S31-TEST-028",
+      "S31-TEST-029",
+      "S31-TEST-030",
+      "S31-TEST-032",
+    ],
+  ],
+  ["api-e2e", ["S20-C02", "S31-TEST-035"]],
+  ["admin-e2e", ["S32-DEPLOY-041"]],
+  [
+    "resilience",
+    ["S31-TEST-027", "S31-TEST-047", "S32-DEPLOY-044", "S32-DEPLOY-045"],
+  ],
+  [
+    "ai-deterministic",
+    [
+      "S31-TEST-003",
+      "S31-TEST-004",
+      "S31-TEST-005",
+      "S31-TEST-041",
+      "S31-TEST-045",
+      "S31-TEST-046",
+      "S31-TEST-047",
+    ],
+  ],
+]);
+
 function fail(ruleId, detail) {
   throw new Error(`${ruleId}:${detail}`);
 }
@@ -121,6 +236,21 @@ export function validateCiPolicy(policy) {
     ) {
       fail("CI_POLICY_AUTOMATED_LANE_INVALID", lane.id);
     }
+    const commandKeys = new Set(
+      lane.commands.map((command) => JSON.stringify(command)),
+    );
+    const missingCommand = expectedMinimumLaneCommands
+      .get(lane.id)
+      ?.find((command) => !commandKeys.has(JSON.stringify(command)));
+    if (missingCommand) {
+      fail(
+        "CI_POLICY_REQUIRED_COMMAND_MISSING",
+        `${lane.id}:${missingCommand.join(" ")}`,
+      );
+    }
+    if (!sameJson(lane.source_ids, expectedLaneSourceIds.get(lane.id))) {
+      fail("CI_POLICY_LANE_SOURCE_IDS_DRIFT", lane.id);
+    }
   }
   return Object.freeze({
     automated: lanes.length - expectedExternalLanes.size,
@@ -170,6 +300,22 @@ function actionDiagnostic(uses, policy, location) {
   return [];
 }
 
+function containsSecretsExpression(value) {
+  if (typeof value === "string") {
+    return /\$\{\{[\s\S]*?\bsecrets\b[\s\S]*?\}\}/iu.test(value);
+  }
+  if (Array.isArray(value)) {
+    return value.some(containsSecretsExpression);
+  }
+  if (value && typeof value === "object") {
+    return Object.entries(value).some(
+      ([key, entry]) =>
+        containsSecretsExpression(key) || containsSecretsExpression(entry),
+    );
+  }
+  return false;
+}
+
 export function findWorkflowDiagnostics(source, policy, options = {}) {
   const diagnostics = [];
   let workflow;
@@ -185,7 +331,7 @@ export function findWorkflowDiagnostics(source, policy, options = {}) {
   if (/\bpull_request_target\b/u.test(source)) {
     diagnostics.push("CI_WORKFLOW_UNTRUSTED_TRIGGER:pull_request_target");
   }
-  if (/\$\{\{\s*secrets\./u.test(source)) {
+  if (containsSecretsExpression(workflow)) {
     diagnostics.push("CI_WORKFLOW_SECRET_REFERENCE:untrusted-workflow");
   }
   if (/\bTURBO_(?:TOKEN|TEAM|REMOTE_ONLY)\b/u.test(source)) {
@@ -276,6 +422,22 @@ export function findWorkflowDiagnostics(source, policy, options = {}) {
     if (workflow.env?.NEXT_TELEMETRY_DISABLED !== "1") {
       diagnostics.push("CI_WORKFLOW_UNBOUNDED_TELEMETRY:next");
     }
+    const requiredEvidenceEnvironment = {
+      CI_BASE_SHA:
+        "${{ github.event.pull_request.base.sha || github.event.before || github.sha }}",
+      CI_BRANCH: "${{ github.head_ref || github.ref_name }}",
+      CI_EVENT_NAME: "${{ github.event_name }}",
+      CI_HEAD_SHA: "${{ github.event.pull_request.head.sha || github.sha }}",
+      CI_PULL_REQUEST_NUMBER: "${{ github.event.pull_request.number || '' }}",
+      CI_TESTED_SHA: "${{ github.sha }}",
+    };
+    for (const [name, expression] of Object.entries(
+      requiredEvidenceEnvironment,
+    )) {
+      if (workflow.env?.[name] !== expression) {
+        diagnostics.push(`CI_WORKFLOW_EVIDENCE_BINDING_INVALID:${name}`);
+      }
+    }
     const automated = policy.lanes
       .filter(({ execution }) => execution === "AUTOMATED_REQUIRED")
       .map(({ id }) => id);
@@ -305,6 +467,19 @@ export function findWorkflowDiagnostics(source, policy, options = {}) {
       )
     ) {
       diagnostics.push("CI_WORKFLOW_LANE_RUNNER_MISSING:automated");
+    }
+    const fullGate = jobs["e011-full-gate"];
+    if (
+      !sameJson(fullGate?.needs, ["automated", "supply-chain"]) ||
+      fullGate?.if !== "always()" ||
+      !(fullGate?.steps ?? []).some(
+        ({ run }) =>
+          isNonEmpty(run) &&
+          run.includes("needs.automated.result") &&
+          run.includes("needs.supply-chain.result"),
+      )
+    ) {
+      diagnostics.push("CI_WORKFLOW_FULL_GATE_INVALID:e011-full-gate");
     }
     const supplyRuns = (jobs["supply-chain"]?.steps ?? [])
       .map(({ run }) => run)
@@ -489,7 +664,543 @@ export function validateLicenseInventory(inventory, policy) {
   );
 }
 
-export function findArtifactDiagnostics(value, policy) {
+function artifactObjectDiagnostics(
+  value,
+  { allowed, location, required = allowed },
+) {
+  const diagnostics = [];
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return [`CI_ARTIFACT_SCHEMA_TYPE_INVALID:${location}`];
+  }
+  const allowedKeys = new Set(allowed);
+  for (const key of Object.keys(value)) {
+    if (!allowedKeys.has(key)) {
+      diagnostics.push(`CI_ARTIFACT_METADATA_NOT_ALLOWED:${location}.${key}`);
+    }
+  }
+  for (const key of required) {
+    if (!Object.hasOwn(value, key)) {
+      diagnostics.push(
+        `CI_ARTIFACT_REQUIRED_METADATA_MISSING:${location}.${key}`,
+      );
+    }
+  }
+  return diagnostics;
+}
+
+function isIsoUtc(value) {
+  if (typeof value !== "string") {
+    return false;
+  }
+  const timestamp = Date.parse(value);
+  return (
+    Number.isFinite(timestamp) && new Date(timestamp).toISOString() === value
+  );
+}
+
+function isNonNegativeInteger(value) {
+  return Number.isSafeInteger(value) && value >= 0;
+}
+
+export function collectLockfilePackageCoordinates(source) {
+  let lockfile;
+  try {
+    lockfile = parse(source);
+  } catch {
+    fail("CI_LOCKFILE_INVALID", "parse");
+  }
+  if (
+    lockfile?.lockfileVersion !== "9.0" ||
+    !lockfile.packages ||
+    typeof lockfile.packages !== "object" ||
+    Array.isArray(lockfile.packages)
+  ) {
+    fail("CI_LOCKFILE_INVALID", "packages");
+  }
+  const coordinates = new Set();
+  for (const key of Object.keys(lockfile.packages)) {
+    const separator = key.lastIndexOf("@");
+    const name = key.slice(0, separator);
+    const version = key.slice(separator + 1);
+    if (
+      separator <= 0 ||
+      !/^@?[a-z0-9][a-z0-9._/@-]{0,214}$/u.test(name) ||
+      !/^[A-Za-z0-9.+_-]{1,128}$/u.test(version)
+    ) {
+      fail("CI_LOCKFILE_PACKAGE_INVALID", key);
+    }
+    coordinates.add(`${name}@${version}`);
+  }
+  if (coordinates.size === 0) {
+    fail("CI_LOCKFILE_INVALID", "empty-packages");
+  }
+  return coordinates;
+}
+
+function validateLaneEvidence(value, policy, options) {
+  const diagnostics = artifactObjectDiagnostics(value, {
+    allowed: policy.allowed_metadata ?? [],
+    location: "$",
+  });
+  const lane = options.lane;
+  const ciPolicy = options.ciPolicy;
+  const toolVersions = value?.tool_versions;
+  diagnostics.push(
+    ...artifactObjectDiagnostics(toolVersions, {
+      allowed: [
+        "artifact_scanner",
+        "ci_policy",
+        "ci_runner",
+        "node",
+        "pnpm",
+        "source_registry",
+      ],
+      location: "$.tool_versions",
+    }),
+  );
+  if (
+    value?.artifact_version !== "e-011-ci-lane-evidence-v2" ||
+    value.repository !== "WeiHan1996/DailyEnergy" ||
+    !["local", "pull_request", "push", "workflow_dispatch"].includes(
+      value.event_name,
+    ) ||
+    !/^[A-Za-z0-9._/-]{1,255}$/u.test(value.branch ?? "") ||
+    (value.pull_request !== null &&
+      (!Number.isSafeInteger(value.pull_request) || value.pull_request <= 0)) ||
+    !isSha(value.head_sha) ||
+    !isSha(value.base_sha) ||
+    !isSha(value.tested_sha) ||
+    !isIsoUtc(value.started_at_utc) ||
+    !isIsoUtc(value.ended_at_utc) ||
+    !isNonNegativeInteger(value.duration_ms) ||
+    !["PASS", "FAIL"].includes(value.result) ||
+    !["NONE", "COMMAND_FAILED"].includes(value.failure_code) ||
+    !["NONE", "INSPECT_REDACTED_FAILURE_AND_RERUN"].includes(
+      value.next_action,
+    ) ||
+    value.runner_version !== ciPolicy?.runner ||
+    value.fixture_version !== "synthetic-factory-v1" ||
+    value.registry_version !== options.registryVersion ||
+    value.lane_id !== lane?.id ||
+    !sameJson(value.source_ids, lane?.source_ids) ||
+    !/^[a-f0-9]{64}$/u.test(value.lockfile_sha256 ?? "") ||
+    !/^[a-f0-9]{64}$/u.test(value.toolchain_fingerprint ?? "") ||
+    !isNonNegativeInteger(value.command_count) ||
+    !isNonNegativeInteger(value.completed_command_count) ||
+    value.command_count !== lane?.commands?.length ||
+    value.completed_command_count > value.command_count ||
+    (value.failed_command_ordinal !== null &&
+      (!Number.isSafeInteger(value.failed_command_ordinal) ||
+        value.failed_command_ordinal <= 0 ||
+        value.failed_command_ordinal > value.command_count)) ||
+    toolVersions?.node !== ciPolicy?.node_version ||
+    toolVersions?.pnpm !== ciPolicy?.pnpm_version ||
+    toolVersions?.ci_policy !== ciPolicy?.policy_version ||
+    toolVersions?.ci_runner !== "e-011-ci-runner-v2" ||
+    toolVersions?.artifact_scanner !== "e-011-artifact-scanner-v2" ||
+    toolVersions?.source_registry !== options.registryVersion
+  ) {
+    diagnostics.push("CI_ARTIFACT_LANE_EVIDENCE_INVALID:$");
+  }
+  if (
+    (value?.result === "PASS" &&
+      (value.failure_code !== "NONE" ||
+        value.next_action !== "NONE" ||
+        value.failed_command_ordinal !== null ||
+        value.completed_command_count !== value.command_count)) ||
+    (value?.result === "FAIL" &&
+      (value.failure_code !== "COMMAND_FAILED" ||
+        value.next_action !== "INSPECT_REDACTED_FAILURE_AND_RERUN" ||
+        value.failed_command_ordinal === null))
+  ) {
+    diagnostics.push("CI_ARTIFACT_LANE_OUTCOME_INCONSISTENT:$");
+  }
+  return diagnostics;
+}
+
+function validateVulnerabilitySummary(value) {
+  const diagnostics = artifactObjectDiagnostics(value, {
+    allowed: [
+      "advisories",
+      "artifact_version",
+      "counts",
+      "policy_version",
+      "result",
+      "scope",
+    ],
+    location: "$",
+  });
+  diagnostics.push(
+    ...artifactObjectDiagnostics(value?.counts, {
+      allowed: ["critical", "high"],
+      location: "$.counts",
+    }),
+  );
+  if (
+    value?.artifact_version !== "e-011-vulnerability-summary-v1" ||
+    value.policy_version !== "e-011-vulnerability-policy-v1" ||
+    value.scope !== "production" ||
+    !["PASS", "FAIL"].includes(value.result) ||
+    !isNonNegativeInteger(value.counts?.critical) ||
+    !isNonNegativeInteger(value.counts?.high) ||
+    !Array.isArray(value.advisories)
+  ) {
+    diagnostics.push("CI_ARTIFACT_VULNERABILITY_SUMMARY_INVALID:$");
+    return diagnostics;
+  }
+  for (const [index, advisory] of value.advisories.entries()) {
+    const location = `$.advisories[${index}]`;
+    diagnostics.push(
+      ...artifactObjectDiagnostics(advisory, {
+        allowed: ["advisory_id", "module_name", "severity"],
+        location,
+      }),
+    );
+    if (
+      !/^GHSA-[a-z0-9-]+$/u.test(advisory.advisory_id ?? "") ||
+      !/^@?[A-Za-z0-9][A-Za-z0-9._/@-]{0,214}$/u.test(
+        advisory.module_name ?? "",
+      ) ||
+      !["critical", "high"].includes(advisory.severity)
+    ) {
+      diagnostics.push(`CI_ARTIFACT_VULNERABILITY_ENTRY_INVALID:${location}`);
+    }
+  }
+  return diagnostics;
+}
+
+function validateDigestDocument(value) {
+  const diagnostics = artifactObjectDiagnostics(value, {
+    allowed: [
+      "base_sha",
+      "entries",
+      "head_sha",
+      "lockfile_sha256",
+      "manifest_version",
+      "tested_sha",
+    ],
+    location: "$",
+  });
+  if (
+    value?.manifest_version !== "e-011-build-digest-v2" ||
+    !isSha(value.head_sha) ||
+    !isSha(value.base_sha) ||
+    !isSha(value.tested_sha) ||
+    !/^[a-f0-9]{64}$/u.test(value.lockfile_sha256 ?? "") ||
+    !Array.isArray(value.entries) ||
+    value.entries.length === 0
+  ) {
+    diagnostics.push("CI_ARTIFACT_DIGEST_DOCUMENT_INVALID:$");
+    return diagnostics;
+  }
+  for (const [index, entry] of value.entries.entries()) {
+    const location = `$.entries[${index}]`;
+    diagnostics.push(
+      ...artifactObjectDiagnostics(entry, {
+        allowed: ["path", "sha256"],
+        location,
+      }),
+    );
+    if (
+      !/^[!-~]+$/u.test(entry.path ?? "") ||
+      entry.path.includes("\\") ||
+      !/^[a-f0-9]{64}$/u.test(entry.sha256 ?? "")
+    ) {
+      diagnostics.push(`CI_ARTIFACT_DIGEST_ENTRY_INVALID:${location}`);
+    }
+  }
+  return diagnostics;
+}
+
+function validateSpdxDocument(value, options) {
+  const diagnostics = artifactObjectDiagnostics(value, {
+    allowed: [
+      "SPDXID",
+      "creationInfo",
+      "dataLicense",
+      "documentNamespace",
+      "name",
+      "packages",
+      "relationships",
+      "spdxVersion",
+    ],
+    location: "$",
+  });
+  diagnostics.push(
+    ...artifactObjectDiagnostics(value?.creationInfo, {
+      allowed: ["created", "creators"],
+      location: "$.creationInfo",
+    }),
+  );
+  if (
+    value?.spdxVersion !== "SPDX-2.3" ||
+    value.dataLicense !== "CC0-1.0" ||
+    value.SPDXID !== "SPDXRef-DOCUMENT" ||
+    !/^dailyenergy-[a-f0-9]{12}$/u.test(value.name ?? "") ||
+    !/^https:\/\/dailyenergy\.invalid\/spdx\/[a-f0-9]{40}\/[a-f0-9]{40}\/[a-f0-9]{64}$/u.test(
+      value.documentNamespace ?? "",
+    ) ||
+    !isIsoUtc(value.creationInfo?.created) ||
+    !sameJson(value.creationInfo?.creators, [
+      "Tool: DailyEnergy-E011-SBOM-v1",
+    ]) ||
+    !Array.isArray(value.packages) ||
+    value.packages.length === 0 ||
+    !Array.isArray(value.relationships)
+  ) {
+    diagnostics.push("CI_ARTIFACT_SPDX_DOCUMENT_INVALID:$");
+    return diagnostics;
+  }
+  if (!(options.lockfilePackageCoordinates instanceof Set)) {
+    diagnostics.push("CI_ARTIFACT_SPDX_LOCKFILE_CONTEXT_MISSING:$");
+  }
+  for (const [index, packageEntry] of value.packages.entries()) {
+    const location = `$.packages[${index}]`;
+    diagnostics.push(
+      ...artifactObjectDiagnostics(packageEntry, {
+        allowed: [
+          "SPDXID",
+          "copyrightText",
+          "downloadLocation",
+          "externalRefs",
+          "filesAnalyzed",
+          "licenseConcluded",
+          "licenseDeclared",
+          "name",
+          "versionInfo",
+        ],
+        location,
+        required: [
+          "SPDXID",
+          "copyrightText",
+          "downloadLocation",
+          "filesAnalyzed",
+          "licenseConcluded",
+          "licenseDeclared",
+          "name",
+          "versionInfo",
+        ],
+      }),
+    );
+    if (
+      !/^SPDXRef-[A-Za-z0-9.-]+$/u.test(packageEntry.SPDXID ?? "") ||
+      !/^@?[A-Za-z0-9][A-Za-z0-9._/@-]{0,214}$/u.test(
+        packageEntry.name ?? "",
+      ) ||
+      !/^[A-Za-z0-9.+_-]{1,128}$/u.test(packageEntry.versionInfo ?? "") ||
+      packageEntry.downloadLocation !== "NOASSERTION" ||
+      packageEntry.filesAnalyzed !== false ||
+      !/^[A-Za-z0-9 .()+-]{1,128}$/u.test(
+        packageEntry.licenseConcluded ?? "",
+      ) ||
+      packageEntry.licenseDeclared !== packageEntry.licenseConcluded ||
+      packageEntry.copyrightText !== "NOASSERTION"
+    ) {
+      diagnostics.push(`CI_ARTIFACT_SPDX_PACKAGE_INVALID:${location}`);
+    }
+    const isRootPackage = packageEntry.SPDXID === "SPDXRef-DailyEnergy";
+    const coordinate = `${packageEntry.name}@${packageEntry.versionInfo}`;
+    if (
+      (isRootPackage && coordinate !== "daily-energy@0.1.0") ||
+      (!isRootPackage && !options.lockfilePackageCoordinates?.has(coordinate))
+    ) {
+      diagnostics.push(`CI_ARTIFACT_SPDX_PACKAGE_NOT_IN_LOCKFILE:${location}`);
+    }
+    if (
+      packageEntry.externalRefs !== undefined &&
+      !Array.isArray(packageEntry.externalRefs)
+    ) {
+      diagnostics.push(`CI_ARTIFACT_SPDX_REFERENCE_INVALID:${location}`);
+    }
+    const externalReferences = Array.isArray(packageEntry.externalRefs)
+      ? packageEntry.externalRefs
+      : [];
+    for (const [referenceIndex, reference] of externalReferences.entries()) {
+      const referenceLocation = `${location}.externalRefs[${referenceIndex}]`;
+      diagnostics.push(
+        ...artifactObjectDiagnostics(reference, {
+          allowed: ["referenceCategory", "referenceLocator", "referenceType"],
+          location: referenceLocation,
+        }),
+      );
+      if (
+        reference.referenceCategory !== "OTHER" ||
+        reference.referenceType !== "pnpm-lock-sha256" ||
+        !/^[a-f0-9]{64}$/u.test(reference.referenceLocator ?? "")
+      ) {
+        diagnostics.push(
+          `CI_ARTIFACT_SPDX_REFERENCE_INVALID:${referenceLocation}`,
+        );
+      }
+    }
+  }
+  for (const [index, relationship] of value.relationships.entries()) {
+    const location = `$.relationships[${index}]`;
+    diagnostics.push(
+      ...artifactObjectDiagnostics(relationship, {
+        allowed: ["relatedSpdxElement", "relationshipType", "spdxElementId"],
+        location,
+      }),
+    );
+    if (
+      relationship.spdxElementId !== "SPDXRef-DailyEnergy" ||
+      relationship.relationshipType !== "DEPENDS_ON" ||
+      !/^SPDXRef-[A-Za-z0-9.-]+$/u.test(relationship.relatedSpdxElement ?? "")
+    ) {
+      diagnostics.push(`CI_ARTIFACT_SPDX_RELATIONSHIP_INVALID:${location}`);
+    }
+  }
+  return diagnostics;
+}
+
+function validateProvenanceDocument(value, options) {
+  const diagnostics = [];
+  const objects = [
+    [
+      value,
+      [
+        "_type",
+        "attestation_status",
+        "predicate",
+        "predicateType",
+        "promotion_status",
+        "signature_status",
+        "subject",
+      ],
+      "$",
+    ],
+    [value?.subject?.[0], ["digest", "name"], "$.subject[0]"],
+    [value?.subject?.[0]?.digest, ["sha256"], "$.subject[0].digest"],
+    [value?.predicate, ["buildDefinition", "runDetails"], "$.predicate"],
+    [
+      value?.predicate?.buildDefinition,
+      [
+        "buildType",
+        "externalParameters",
+        "internalParameters",
+        "resolvedDependencies",
+      ],
+      "$.predicate.buildDefinition",
+    ],
+    [
+      value?.predicate?.buildDefinition?.externalParameters,
+      [
+        "base_sha",
+        "branch",
+        "event_name",
+        "head_sha",
+        "lockfile_sha256",
+        "pull_request",
+        "tested_sha",
+        "workflow",
+      ],
+      "$.predicate.buildDefinition.externalParameters",
+    ],
+    [
+      value?.predicate?.buildDefinition?.internalParameters,
+      ["node_version", "pnpm_version", "runner"],
+      "$.predicate.buildDefinition.internalParameters",
+    ],
+    [
+      value?.predicate?.runDetails,
+      ["builder", "byproducts", "metadata"],
+      "$.predicate.runDetails",
+    ],
+    [
+      value?.predicate?.runDetails?.builder,
+      ["id"],
+      "$.predicate.runDetails.builder",
+    ],
+    [
+      value?.predicate?.runDetails?.metadata,
+      ["finishedOn", "invocationId", "startedOn"],
+      "$.predicate.runDetails.metadata",
+    ],
+  ];
+  for (const [object, allowed, location] of objects) {
+    diagnostics.push(
+      ...artifactObjectDiagnostics(object, { allowed, location }),
+    );
+  }
+  const dependencies =
+    value?.predicate?.buildDefinition?.resolvedDependencies ?? [];
+  if (Array.isArray(dependencies)) {
+    for (const [index, dependency] of dependencies.entries()) {
+      diagnostics.push(
+        ...artifactObjectDiagnostics(dependency, {
+          allowed: ["digest", "uri"],
+          location: `$.predicate.buildDefinition.resolvedDependencies[${index}]`,
+        }),
+        ...artifactObjectDiagnostics(dependency?.digest, {
+          allowed:
+            dependency?.uri === "file:pnpm-lock.yaml"
+              ? ["sha256"]
+              : ["gitCommit"],
+          location: `$.predicate.buildDefinition.resolvedDependencies[${index}].digest`,
+        }),
+      );
+    }
+  }
+  if (
+    value?._type !== "https://in-toto.io/Statement/v1" ||
+    !Array.isArray(value.subject) ||
+    value.subject.length !== 1 ||
+    value.subject[0]?.name !== "build-output-digests.json" ||
+    !/^[a-f0-9]{64}$/u.test(value.subject[0]?.digest?.sha256 ?? "") ||
+    value.predicateType !== "https://slsa.dev/provenance/v1" ||
+    value.predicate?.buildDefinition?.buildType !==
+      "https://dailyenergy.invalid/build-types/pnpm-turbo/v1" ||
+    !isSha(value.predicate?.buildDefinition?.externalParameters?.head_sha) ||
+    !isSha(value.predicate?.buildDefinition?.externalParameters?.base_sha) ||
+    !isSha(value.predicate?.buildDefinition?.externalParameters?.tested_sha) ||
+    !/^[A-Za-z0-9._/-]{1,255}$/u.test(
+      value.predicate?.buildDefinition?.externalParameters?.branch ?? "",
+    ) ||
+    !["local", "pull_request", "push", "workflow_dispatch"].includes(
+      value.predicate?.buildDefinition?.externalParameters?.event_name,
+    ) ||
+    (value.predicate?.buildDefinition?.externalParameters?.pull_request !==
+      null &&
+      (!Number.isSafeInteger(
+        value.predicate?.buildDefinition?.externalParameters?.pull_request,
+      ) ||
+        value.predicate?.buildDefinition?.externalParameters?.pull_request <=
+          0)) ||
+    !/^[a-f0-9]{64}$/u.test(
+      value.predicate?.buildDefinition?.externalParameters?.lockfile_sha256 ??
+        "",
+    ) ||
+    value.predicate?.buildDefinition?.externalParameters?.workflow !==
+      ".github/workflows/ci.yml" ||
+    value.predicate?.buildDefinition?.internalParameters?.node_version !==
+      options.ciPolicy?.node_version ||
+    value.predicate?.buildDefinition?.internalParameters?.pnpm_version !==
+      options.ciPolicy?.pnpm_version ||
+    !["local-untrusted", "ubuntu-24.04"].includes(
+      value.predicate?.buildDefinition?.internalParameters?.runner,
+    ) ||
+    !Array.isArray(dependencies) ||
+    dependencies.length !== 2 ||
+    value.predicate?.runDetails?.builder?.id !==
+      "https://github.com/WeiHan1996/DailyEnergy/actions" ||
+    !/^(?:local-untrusted|[0-9]+)$/u.test(
+      value.predicate?.runDetails?.metadata?.invocationId ?? "",
+    ) ||
+    !isIsoUtc(value.predicate?.runDetails?.metadata?.startedOn) ||
+    !isIsoUtc(value.predicate?.runDetails?.metadata?.finishedOn) ||
+    !sameJson(value.predicate?.runDetails?.byproducts, []) ||
+    value.attestation_status !==
+      "PENDING_REPOSITORY_CAPABILITY_AND_EXPLICIT_RELEASE_AUTHORIZATION" ||
+    value.signature_status !== "UNSIGNED" ||
+    value.promotion_status !==
+      "PROHIBITED_UNTIL_ATTESTED_AND_RELEASE_GATES_PASS"
+  ) {
+    diagnostics.push("CI_ARTIFACT_PROVENANCE_DOCUMENT_INVALID:$");
+  }
+  return diagnostics;
+}
+
+export function findArtifactDiagnostics(value, policy, options = {}) {
   const diagnostics = [];
   const forbiddenKeys = new Set(policy.forbidden_keys ?? []);
   const patterns = (policy.forbidden_value_patterns ?? []).map(
@@ -521,7 +1232,29 @@ export function findArtifactDiagnostics(value, policy) {
     }
   }
   visit(value, "$");
-  return diagnostics;
+
+  const schemaDiagnostics =
+    options.artifactName === "evidence.json"
+      ? validateLaneEvidence(value, policy, options)
+      : options.artifactName === "vulnerability-summary.json"
+        ? validateVulnerabilitySummary(value)
+        : options.artifactName === "build-output-digests.json"
+          ? validateDigestDocument(value)
+          : options.artifactName === "sbom.spdx.json"
+            ? validateSpdxDocument(value, options)
+            : options.artifactName === "provenance.intoto.json"
+              ? validateProvenanceDocument(value, options)
+              : options.artifactName
+                ? [`CI_ARTIFACT_SCHEMA_UNKNOWN:${options.artifactName}`]
+                : artifactObjectDiagnostics(value, {
+                    allowed: policy.allowed_metadata ?? [],
+                    location: "$",
+                    required: [],
+                  });
+  diagnostics.push(...schemaDiagnostics);
+  return [...new Set(diagnostics)].sort((left, right) =>
+    left.localeCompare(right),
+  );
 }
 
 export function sha256(contents) {
@@ -530,7 +1263,7 @@ export function sha256(contents) {
 
 export async function verifyDigestManifest(root, manifest) {
   if (
-    manifest?.manifest_version !== "e-011-build-digest-v1" ||
+    manifest?.manifest_version !== "e-011-build-digest-v2" ||
     !Array.isArray(manifest.entries) ||
     manifest.entries.length === 0
   ) {
@@ -585,14 +1318,18 @@ export function validateSupplyChainDocuments({
   provenance,
   sbom,
 }) {
-  const commitSha = digestManifest?.commit_sha;
+  const headSha = digestManifest?.head_sha;
+  const baseSha = digestManifest?.base_sha;
+  const testedSha = digestManifest?.tested_sha;
   const lockfileSha256 = digestManifest?.lockfile_sha256;
   const digestManifestSha256 = sha256(
     `${JSON.stringify(digestManifest, null, 2)}\n`,
   );
   if (
-    digestManifest?.manifest_version !== "e-011-build-digest-v1" ||
-    !/^[a-f0-9]{40}$/u.test(commitSha ?? "") ||
+    digestManifest?.manifest_version !== "e-011-build-digest-v2" ||
+    !/^[a-f0-9]{40}$/u.test(headSha ?? "") ||
+    !/^[a-f0-9]{40}$/u.test(baseSha ?? "") ||
+    !/^[a-f0-9]{40}$/u.test(testedSha ?? "") ||
     !/^[a-f0-9]{64}$/u.test(lockfileSha256 ?? "") ||
     sbom?.spdxVersion !== "SPDX-2.3" ||
     !Array.isArray(sbom.packages) ||
@@ -609,8 +1346,12 @@ export function validateSupplyChainDocuments({
     provenance.subject?.length !== 1 ||
     provenance.subject[0]?.name !== "build-output-digests.json" ||
     provenance.subject[0]?.digest?.sha256 !== digestManifestSha256 ||
-    provenance.predicate?.buildDefinition?.externalParameters?.commit_sha !==
-      commitSha ||
+    provenance.predicate?.buildDefinition?.externalParameters?.head_sha !==
+      headSha ||
+    provenance.predicate?.buildDefinition?.externalParameters?.base_sha !==
+      baseSha ||
+    provenance.predicate?.buildDefinition?.externalParameters?.tested_sha !==
+      testedSha ||
     provenance.predicate?.buildDefinition?.externalParameters
       ?.lockfile_sha256 !== lockfileSha256
   ) {
@@ -631,11 +1372,14 @@ export function validateSupplyChainDocuments({
     ({ referenceType }) => referenceType === "pnpm-lock-sha256",
   );
   if (
-    gitDependency?.digest?.gitCommit !== commitSha ||
+    gitDependency?.digest?.gitCommit !== testedSha ||
     lockfileDependency?.digest?.sha256 !== lockfileSha256 ||
-    lockfileReference?.referenceLocator !== lockfileSha256
+    lockfileReference?.referenceLocator !== lockfileSha256 ||
+    sbom.name !== `dailyenergy-${headSha.slice(0, 12)}` ||
+    sbom.documentNamespace !==
+      `https://dailyenergy.invalid/spdx/${headSha}/${testedSha}/${lockfileSha256}`
   ) {
-    fail("CI_SUPPLY_CHAIN_BINDING_MISMATCH", "commit-or-lockfile");
+    fail("CI_SUPPLY_CHAIN_BINDING_MISMATCH", "source-or-lockfile");
   }
   return Object.freeze({ packages: sbom.packages.length });
 }

@@ -51,19 +51,28 @@ function normalizeLicense(expression) {
 }
 
 await mkdir(outputDirectory, { recursive: true, mode: 0o700 });
-const [lockfile, buildFiles, licensePolicy, licenseExecution, gitExecution] =
-  await Promise.all([
-    readFile(path.resolve(repositoryRoot, "pnpm-lock.yaml")),
-    collectBuildFiles(),
-    readFile(
-      path.resolve(repositoryRoot, "tests/ci/license-policy.json"),
-      "utf8",
-    ).then(JSON.parse),
-    runBounded("pnpm", ["licenses", "list", "--json"], {
-      maximumBytes: 16 * 1024 * 1024,
-    }),
-    runBounded("git", ["rev-parse", "HEAD"]),
-  ]);
+const [
+  lockfile,
+  buildFiles,
+  licensePolicy,
+  licenseExecution,
+  gitExecution,
+  baseExecution,
+  branchExecution,
+] = await Promise.all([
+  readFile(path.resolve(repositoryRoot, "pnpm-lock.yaml")),
+  collectBuildFiles(),
+  readFile(
+    path.resolve(repositoryRoot, "tests/ci/license-policy.json"),
+    "utf8",
+  ).then(JSON.parse),
+  runBounded("pnpm", ["licenses", "list", "--json"], {
+    maximumBytes: 16 * 1024 * 1024,
+  }),
+  runBounded("git", ["rev-parse", "HEAD"]),
+  runBounded("git", ["merge-base", "HEAD", "origin/main"]),
+  runBounded("git", ["branch", "--show-current"]),
+]);
 if (licenseExecution.code !== 0) {
   throw new Error("CI_LICENSE_INVENTORY_COMMAND_FAILED:pnpm");
 }
@@ -75,11 +84,28 @@ try {
 }
 const packages = validateLicenseInventory(licenseInventory, licensePolicy);
 const lockfileSha256 = sha256(lockfile);
-const commitSha = /^[a-f0-9]{40}$/u.test(process.env.GITHUB_SHA ?? "")
-  ? process.env.GITHUB_SHA
-  : gitExecution.stdout.trim();
-if (!/^[a-f0-9]{40}$/u.test(commitSha)) {
-  throw new Error("CI_PROVENANCE_COMMIT_INVALID:git");
+const localSha = gitExecution.stdout.trim();
+const testedSha =
+  process.env.CI_TESTED_SHA || process.env.GITHUB_SHA || localSha;
+const headSha = process.env.CI_HEAD_SHA || testedSha;
+const baseSha = process.env.CI_BASE_SHA || baseExecution.stdout.trim();
+const branch =
+  process.env.CI_BRANCH ||
+  process.env.GITHUB_HEAD_REF ||
+  process.env.GITHUB_REF_NAME ||
+  branchExecution.stdout.trim() ||
+  "detached";
+const eventName =
+  process.env.CI_EVENT_NAME ?? process.env.GITHUB_EVENT_NAME ?? "local";
+const pullRequestText = process.env.CI_PULL_REQUEST_NUMBER ?? "";
+const pullRequest = pullRequestText === "" ? null : Number(pullRequestText);
+if (
+  ![localSha, testedSha, headSha, baseSha].every((value) =>
+    /^[a-f0-9]{40}$/u.test(value),
+  ) ||
+  testedSha !== localSha
+) {
+  throw new Error("CI_PROVENANCE_GIT_BINDING_INVALID:git");
 }
 
 const entries = [];
@@ -92,8 +118,10 @@ for (const filePath of buildFiles) {
   });
 }
 const digestManifest = {
-  manifest_version: "e-011-build-digest-v1",
-  commit_sha: commitSha,
+  manifest_version: "e-011-build-digest-v2",
+  head_sha: headSha,
+  base_sha: baseSha,
+  tested_sha: testedSha,
   lockfile_sha256: lockfileSha256,
   entries,
 };
@@ -115,8 +143,8 @@ const sbom = {
   spdxVersion: "SPDX-2.3",
   dataLicense: "CC0-1.0",
   SPDXID: "SPDXRef-DOCUMENT",
-  name: `dailyenergy-${commitSha.slice(0, 12)}`,
-  documentNamespace: `https://dailyenergy.invalid/spdx/${commitSha}/${lockfileSha256}`,
+  name: `dailyenergy-${headSha.slice(0, 12)}`,
+  documentNamespace: `https://dailyenergy.invalid/spdx/${headSha}/${testedSha}/${lockfileSha256}`,
   creationInfo: {
     created: createdAt,
     creators: ["Tool: DailyEnergy-E011-SBOM-v1"],
@@ -161,7 +189,12 @@ const provenance = {
     buildDefinition: {
       buildType: "https://dailyenergy.invalid/build-types/pnpm-turbo/v1",
       externalParameters: {
-        commit_sha: commitSha,
+        head_sha: headSha,
+        base_sha: baseSha,
+        tested_sha: testedSha,
+        branch,
+        event_name: eventName,
+        pull_request: pullRequest,
         lockfile_sha256: lockfileSha256,
         workflow: ".github/workflows/ci.yml",
       },
@@ -173,7 +206,7 @@ const provenance = {
       resolvedDependencies: [
         {
           uri: "git+https://github.com/WeiHan1996/DailyEnergy",
-          digest: { gitCommit: commitSha },
+          digest: { gitCommit: testedSha },
         },
         {
           uri: "file:pnpm-lock.yaml",

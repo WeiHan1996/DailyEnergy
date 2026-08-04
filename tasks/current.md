@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-04（E-011 security 复核与 Linux Gate 10/10 通过，365 天 retention 待授权）
+- **最后更新**：2026-08-04（E-011 PR 复核修复完成，等待新的 Linux clean run）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-011 — 建立 GitHub Actions CI 与供应链 Gate
 - **任务状态**：Blocked
@@ -9,9 +9,11 @@
 - **当前 Issue**：[E-011 Issue #48](https://github.com/WeiHan1996/DailyEnergy/issues/48)
 - **当前 PR**：[Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119)；[状态 PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已合并
 - **基线提交**：`604db047938444898c222f7136cc9ac1ec333dd4`
-- **Gate 结论**：`GITHUB_AUTOMATED_PASS / RETENTION_AUTHORIZATION_BLOCKED / MANUAL_EVIDENCE_PENDING`
-  （security profile；GitHub clean run 10/10 automated job 通过；Accepted supply-chain evidence
-  要求 365 天，但仓库上限将其降为 90 天；外部/人工 lane 保持明确 pending，不能报告任务 PASS）
+- **Gate 结论**：`LOCAL_TARGETED_PASS / GITHUB_REVALIDATION_PENDING / RETENTION_AUTHORIZATION_BLOCKED / REQUIRED_CHECKS_CAPABILITY_BLOCKED / MANUAL_EVIDENCE_PENDING`
+  （security profile；PR 复核修复的定向 policy/registry/miniapp Gate 已通过，新的 GitHub
+  clean run 尚待完成；Accepted supply-chain evidence 要求 365 天，但仓库上限将其降为
+  90 天；私有仓库当前计划不提供 branch protection required checks；外部/人工 lane 保持
+  明确 pending，不能报告任务 PASS）
 
 ## 1. 当前目标
 
@@ -87,6 +89,11 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
 - **artifact retention**：Accepted supply-chain evidence 要求 365 天，但仓库当前最大值为
   90 天，GitHub 首轮已明确把 workflow 的 365 天请求降为 90 天；修改仓库 retention 或选择
   其它获批准的 365 天存储前需要显式授权，当前不能报告 retention PASS；
+- **required checks / branch protection**：Accepted testing 规范要求 E-011 把强制 lane 安装为
+  branch protection required checks；GitHub branch protection 与 rulesets API 均对当前私有仓库
+  返回 403，并明确要求 GitHub Pro 或 public visibility。升级计划或改变可见性不在当前授权内，
+  即使能力可用，实际修改 required checks 前仍需核对目标并取得显式授权；这是与 artifact
+  retention 分离的外部阻塞；
 - **授权边界**：提交 workflow 与 Draft PR 属于本任务；启用或修改 required checks、
   branch protection、repository secret/environment 前必须核对目标并保留用户授权证据；
 - **security profile**：人工边界复核已完成；checkout credential、secret/fork、第三方 action、
@@ -99,9 +106,9 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   这些结果保持 FAIL/infra 证据，不改写为 PASS；权威 clean run 由固定
   `ubuntu-24.04` 的 GitHub Actions 补齐；
 - **并行规则**：E-011 是唯一当前任务并处于 Blocked；不提升其它任务；
-- **下一动作**：取得用户对以下二选一的明确授权：把 DailyEnergy 仓库 Actions artifact
-  retention 上限提高到 365 天，或批准等价的受控 365 天 supply-chain evidence 存储；落实并
-  验证后把本文件更新为 In Review；
+- **下一动作**：先推送本轮 PR 复核修复并取得新的 GitHub Linux clean run；随后需要分别解除
+  两个外部阻塞：授权 365 天 Actions retention 或等价受控存储，以及提供支持 branch protection
+  required checks 的仓库能力并显式授权配置。两项均验证后才能把本文件更新为 In Review；
 - **下一任务**：E-011 完成前不提升 E-012；E-011 获接受后再评估 E-012。
 
 ## 7. 最近交接
@@ -129,6 +136,19 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
 - E-011 实现提交 `a407201957c7c2a94166756e09daf6c1eb4b1d86` 已推送并创建
   [Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119)；PR 保持 Draft，不启用自动
   合并或仓库权限变更；
+- PR 复核确认 artifact scanner 未使用 `allowed_metadata`、GitHub `secrets` context 可由 bracket/
+  wrapped 表达式绕过、自动 lane 命令可被掏空、lane/supply evidence 未区分 head/base/tested SHA，
+  且 required checks 因仓库计划能力不可配置；本轮已用闭合 per-artifact schema、lockfile-bound
+  SPDX、递归 expression 检测、不可删减最低命令集、aggregate Linux Gate 与 v2 traceability
+  修复代码问题，新的 clean run 尚待推送后验证；
+- 本轮定向验证已通过 CI policy `22/22`、registry `5/5`、miniapp Vitest `3 files / 10 tests`、
+  public-config `14` cases、DevTools result `10` cases、bundle `9` known-fail + `1` known-pass，
+  目标 ESLint/Prettier 与既有最终 artifact 的 v2 schema replay（4,795 build entries / 717
+  packages）亦通过；Playwright sticky policy 的直接 executable equivalent 正确返回
+  `PLAYWRIGHT_FLAKY_FAIL`；
+- 本机 changed/task/full Agent Gate 均在首条 pnpm 命令正式 `FAIL`：Node 为 `24.6.0` 而非固定
+  `24.18.0`，本地 pnpm store 又缺少 package index 并尝试不可用的 registry/依赖清理；这些
+  结果不改写为 PASS，新的固定 Linux clean run 负责补齐权威 full evidence；
 - 首轮修复提交 `8cd0b36ed0830ede6a068533a8952e4be5ff96a2` 已推送；GitHub clean run
   [#30874806384](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30874806384) 的 10/10
   automated job 全部成功，包括真实 PostgreSQL、Redis/BullMQ、API/Admin E2E 与 supply-chain；
@@ -148,7 +168,7 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   telemetry 基数、license、production vulnerability、SPDX 2.3 SBOM、build digest 与明确
   `UNSIGNED/PENDING` provenance Gate；CI policy 测试 `19/19` 通过；
 - production audit 当前 `critical=0`、`high=0`；root build `7/7` 通过；supply-chain evidence
-  已覆盖 12,956 个 build files 与 715 个 dependency packages，4 个 JSON artifact 约 3.3 MB，
+  最终已核实覆盖 4,795 个 build files 与 717 个 dependency packages，4 个 JSON artifact，
   内容扫描、digest、SBOM/provenance 校验均通过；
 - Next 已从 `16.2.12` 升级到 `16.3.0`，并对 `brace-expansion` 与 `fast-uri` 采用精确安全
   override；`apps/admin/next-env.d.ts` 是 Next 16.3 生成的合法变化；Admin 使用官方
@@ -170,4 +190,5 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
 - registry 当前为 `736 total / 155 COVERED / 581 PLANNED`，净新增 17 个覆盖；
   `S33-OBS-041` 因 PAGE/IR 行为尚未实现继续为 `PLANNED`；
 - 尚未创建 required checks、branch protection、repository secret/environment、OIDC、生产
-  资源或自动合并；这些能力必须在核对目标并取得明确授权后另行处理。
+  资源或自动合并；required checks/branch protection 还受当前私有仓库计划能力阻塞，这些能力
+  必须在能力可用、核对目标并取得明确授权后另行处理。

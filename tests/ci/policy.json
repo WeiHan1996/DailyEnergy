@@ -32,7 +32,8 @@
       "commands": [
         ["pnpm", "run", "agent:check"],
         ["pnpm", "run", "registry:check"]
-      ]
+      ],
+      "source_ids": ["S31-TEST-008"]
     },
     {
       "id": "static",
@@ -42,6 +43,12 @@
         ["pnpm", "run", "lint"],
         ["pnpm", "run", "typecheck"],
         ["pnpm", "run", "ci:test"]
+      ],
+      "source_ids": [
+        "S31-TEST-047",
+        "S32-DEPLOY-041",
+        "S32-DEPLOY-042",
+        "S32-DEPLOY-043"
       ]
     },
     {
@@ -56,30 +63,63 @@
         ["pnpm", "run", "admin:bundle:fixtures"],
         ["pnpm", "run", "agent:fixtures"],
         ["pnpm", "run", "registry:test"],
-        ["pnpm", "run", "test:projects"]
+        ["pnpm", "run", "testing:playwright-policy"],
+        ["pnpm", "run", "test:projects"],
+        ["pnpm", "--filter", "@daily-energy/app-miniapp", "run", "test"]
+      ],
+      "source_ids": [
+        "S31-TEST-001",
+        "S31-TEST-002",
+        "S31-TEST-003",
+        "S31-TEST-004",
+        "S31-TEST-005",
+        "S31-TEST-006",
+        "S31-TEST-007",
+        "S31-TEST-008",
+        "S31-TEST-041",
+        "S31-TEST-045",
+        "S31-TEST-046",
+        "S31-TEST-047"
       ]
     },
     {
       "id": "db-integration",
       "execution": "AUTOMATED_REQUIRED",
-      "commands": [["pnpm", "run", "database:validate"]]
+      "commands": [["pnpm", "run", "database:validate"]],
+      "source_ids": [
+        "S31-TEST-017",
+        "S31-TEST-018",
+        "S31-TEST-020",
+        "S31-TEST-023"
+      ]
     },
     {
       "id": "queue-integration",
       "execution": "AUTOMATED_REQUIRED",
-      "commands": [["pnpm", "run", "queue:validate"]]
+      "commands": [["pnpm", "run", "queue:validate"]],
+      "source_ids": [
+        "S31-TEST-025",
+        "S31-TEST-026",
+        "S31-TEST-027",
+        "S31-TEST-028",
+        "S31-TEST-029",
+        "S31-TEST-030",
+        "S31-TEST-032"
+      ]
     },
     {
       "id": "api-e2e",
       "execution": "AUTOMATED_REQUIRED",
-      "commands": [["pnpm", "run", "test:api:e2e"]]
+      "commands": [["pnpm", "run", "test:api:e2e"]],
+      "source_ids": ["S20-C02", "S31-TEST-035"]
     },
     {
       "id": "admin-e2e",
       "execution": "AUTOMATED_REQUIRED",
       "commands": [
         ["pnpm", "--filter", "@daily-energy/app-admin", "run", "test:e2e"]
-      ]
+      ],
+      "source_ids": ["S32-DEPLOY-041"]
     },
     {
       "id": "miniapp-conformance",
@@ -93,6 +133,12 @@
       "commands": [
         ["pnpm", "run", "queue:test"],
         ["pnpm", "run", "compose:evidence"]
+      ],
+      "source_ids": [
+        "S31-TEST-027",
+        "S31-TEST-047",
+        "S32-DEPLOY-044",
+        "S32-DEPLOY-045"
       ]
     },
     {
@@ -101,6 +147,15 @@
       "commands": [
         ["pnpm", "run", "testing:policy"],
         ["pnpm", "run", "test:harness"]
+      ],
+      "source_ids": [
+        "S31-TEST-003",
+        "S31-TEST-004",
+        "S31-TEST-005",
+        "S31-TEST-041",
+        "S31-TEST-045",
+        "S31-TEST-046",
+        "S31-TEST-047"
       ]
     },
     {

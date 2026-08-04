@@ -12,6 +12,12 @@ permissions:
 
 env:
   NEXT_TELEMETRY_DISABLED: "1"
+  CI_EVENT_NAME: ${{ github.event_name }}
+  CI_BRANCH: ${{ github.head_ref || github.ref_name }}
+  CI_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number || '' }}
+  CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
+  CI_TESTED_SHA: ${{ github.sha }}
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -124,3 +130,17 @@ jobs:
           path: .artifacts/ci/supply-chain
           if-no-files-found: error
           retention-days: 365
+
+  e011-full-gate:
+    name: E-011 automated full Gate
+    if: always()
+    needs:
+      - automated
+      - supply-chain
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every automated lane and supply-chain Gate
+        run: |
+          test "${{ needs.automated.result }}" = "success"
+          test "${{ needs.supply-chain.result }}" = "success"

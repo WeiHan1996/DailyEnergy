@@ -5201,10 +5201,11 @@
       "evidence": [
         {
           "assertions": [
-            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
           "file": "tests/ci/ci-policy.test.mjs",
@@ -5226,10 +5227,11 @@
       "evidence": [
         {
           "assertions": [
-            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
           "file": "tests/ci/ci-policy.test.mjs",
@@ -7655,10 +7657,11 @@
         },
         {
           "assertions": [
-            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
           "file": "tests/ci/ci-policy.test.mjs",
@@ -8322,7 +8325,8 @@
         },
         {
           "assertions": [
-            "Prompt, credential, database URL, external identity and raw-content canaries stop artifact upload",
+            "closed per-artifact schemas reject nested user text, preferred name, check-in, matter/note, Prompt, Safety/provider content, credentials and external identity before upload",
+            "lane evidence binds branch/PR, head/base/tested SHA, start/end UTC, lockfile, registry, exact tool versions, Source IDs, result and next action",
             "strict cryptographic digests remain allowed opaque evidence rather than false-positive user content"
           ],
           "file": "tests/ci/ci-policy.test.mjs",
@@ -8538,10 +8542,11 @@
       "evidence": [
         {
           "assertions": [
-            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
           "file": "tests/ci/ci-policy.test.mjs",
@@ -8698,7 +8703,7 @@
             "downloaded or promoted artifact content whose SHA-256 differs from the manifest fails closed",
             "repository attestation and signature remain explicitly pending instead of being reported as complete",
             "repository-contained build links contribute target bytes under logical output paths while escaping or cyclic links fail closed",
-            "SBOM and provenance must both exist and bind to the root lockfile SHA-256"
+            "SBOM and provenance must both exist and bind to the PR head, base, tested checkout SHA and root lockfile SHA-256"
           ],
           "file": "tests/ci/ci-policy.test.mjs",
           "level": "STATIC",
@@ -8748,10 +8753,11 @@
       "evidence": [
         {
           "assertions": [
-            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
           "file": "tests/ci/ci-policy.test.mjs",
@@ -8784,7 +8790,7 @@
             "downloaded or promoted artifact content whose SHA-256 differs from the manifest fails closed",
             "repository attestation and signature remain explicitly pending instead of being reported as complete",
             "repository-contained build links contribute target bytes under logical output paths while escaping or cyclic links fail closed",
-            "SBOM and provenance must both exist and bind to the root lockfile SHA-256"
+            "SBOM and provenance must both exist and bind to the PR head, base, tested checkout SHA and root lockfile SHA-256"
           ],
           "file": "tests/ci/ci-policy.test.mjs",
           "level": "STATIC",
@@ -9468,7 +9474,8 @@
         },
         {
           "assertions": [
-            "Prompt, credential, database URL, external identity and raw-content canaries stop artifact upload",
+            "closed per-artifact schemas reject nested user text, preferred name, check-in, matter/note, Prompt, Safety/provider content, credentials and external identity before upload",
+            "lane evidence binds branch/PR, head/base/tested SHA, start/end UTC, lockfile, registry, exact tool versions, Source IDs, result and next action",
             "strict cryptographic digests remain allowed opaque evidence rather than false-positive user content"
           ],
           "file": "tests/ci/ci-policy.test.mjs",
@@ -9498,10 +9505,11 @@
       "evidence": [
         {
           "assertions": [
-            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
           "file": "tests/ci/ci-policy.test.mjs",

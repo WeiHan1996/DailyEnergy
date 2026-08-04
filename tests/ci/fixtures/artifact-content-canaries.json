@@ -1,0 +1,35 @@
+[
+  {
+    "name": "nested user text",
+    "payload": {
+      "tool_versions": {
+        "artifact_scanner": "e-011-artifact-scanner-v2",
+        "ci_policy": "e-011-ci-policy-v1",
+        "ci_runner": "e-011-ci-runner-v2",
+        "diagnostic": { "message": "I feel under pressure today" },
+        "node": "24.18.0",
+        "pnpm": "11.17.0",
+        "source_registry": "e-010-source-registry-v1"
+      }
+    }
+  },
+  {
+    "name": "preferred name",
+    "payload": { "preferred_name": "Alice" }
+  },
+  {
+    "name": "check-in value",
+    "payload": { "checkin": { "mood": "anxious" } }
+  },
+  {
+    "name": "matter and note",
+    "payload": { "matter": "private plan", "note": "remember this" }
+  },
+  {
+    "name": "Safety and provider content",
+    "payload": {
+      "provider_response": "synthetic raw completion",
+      "safety_content": "synthetic high-risk source text"
+    }
+  }
+]
