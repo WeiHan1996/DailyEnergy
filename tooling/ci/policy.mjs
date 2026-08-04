@@ -212,7 +212,8 @@ export function findWorkflowDiagnostics(source, policy, options = {}) {
       diagnostics.push(`CI_WORKFLOW_ENVIRONMENT_PROHIBITED:${jobId}`);
     }
 
-    for (const [index, step] of (job.steps ?? []).entries()) {
+    const steps = job.steps ?? [];
+    for (const [index, step] of steps.entries()) {
       const location = `${jobId}:${index + 1}`;
       if (step.uses) {
         diagnostics.push(...actionDiagnostic(step.uses, policy, location));
@@ -223,19 +224,38 @@ export function findWorkflowDiagnostics(source, policy, options = {}) {
       ) {
         diagnostics.push(`CI_WORKFLOW_CHECKOUT_DEPTH_INVALID:${location}`);
       }
+      if (
+        step.uses?.startsWith("actions/checkout@") &&
+        step.with?.["persist-credentials"] !== false
+      ) {
+        diagnostics.push(
+          `CI_WORKFLOW_CHECKOUT_CREDENTIALS_PERSISTED:${location}`,
+        );
+      }
       if (step.uses?.startsWith("actions/upload-artifact@")) {
         const expectedRetention =
           jobId === "supply-chain"
             ? policy.artifacts.supply_chain_evidence.retention_days
             : policy.artifacts.synthetic_reports.retention_days;
+        const expectedScanRun =
+          jobId === "supply-chain"
+            ? "node tooling/ci/scan-artifacts.mjs .artifacts/ci/supply-chain"
+            : "node tooling/ci/scan-artifacts.mjs .artifacts/ci/${{ matrix.lane }}";
+        const scanStep = steps
+          .slice(0, index)
+          .find(({ id }) => id === "artifact_scan");
         if (step.with?.["retention-days"] !== expectedRetention) {
           diagnostics.push(`CI_WORKFLOW_ARTIFACT_TTL_INVALID:${location}`);
         }
         if (
-          step.if !== "always()" ||
-          step.with?.["if-no-files-found"] !== "error"
+          step.if !== "always() && steps.artifact_scan.outcome == 'success'" ||
+          step.with?.["if-no-files-found"] !== "error" ||
+          scanStep?.if !== "always()" ||
+          scanStep?.run !== expectedScanRun
         ) {
-          diagnostics.push(`CI_WORKFLOW_ARTIFACT_UPLOAD_UNBOUNDED:${location}`);
+          diagnostics.push(
+            `CI_WORKFLOW_ARTIFACT_UPLOAD_WITHOUT_SCAN_PASS:${location}`,
+          );
         }
       }
     }
@@ -565,7 +585,15 @@ export function validateSupplyChainDocuments({
   provenance,
   sbom,
 }) {
+  const commitSha = digestManifest?.commit_sha;
+  const lockfileSha256 = digestManifest?.lockfile_sha256;
+  const digestManifestSha256 = sha256(
+    `${JSON.stringify(digestManifest, null, 2)}\n`,
+  );
   if (
+    digestManifest?.manifest_version !== "e-011-build-digest-v1" ||
+    !/^[a-f0-9]{40}$/u.test(commitSha ?? "") ||
+    !/^[a-f0-9]{64}$/u.test(lockfileSha256 ?? "") ||
     sbom?.spdxVersion !== "SPDX-2.3" ||
     !Array.isArray(sbom.packages) ||
     sbom.packages.length === 0
@@ -578,10 +606,36 @@ export function validateSupplyChainDocuments({
     provenance.attestation_status !==
       "PENDING_REPOSITORY_CAPABILITY_AND_EXPLICIT_RELEASE_AUTHORIZATION" ||
     provenance.signature_status !== "UNSIGNED" ||
+    provenance.subject?.length !== 1 ||
+    provenance.subject[0]?.name !== "build-output-digests.json" ||
+    provenance.subject[0]?.digest?.sha256 !== digestManifestSha256 ||
+    provenance.predicate?.buildDefinition?.externalParameters?.commit_sha !==
+      commitSha ||
     provenance.predicate?.buildDefinition?.externalParameters
-      ?.lockfile_sha256 !== digestManifest.lockfile_sha256
+      ?.lockfile_sha256 !== lockfileSha256
   ) {
     fail("CI_PROVENANCE_INVALID", provenance?.predicateType ?? "missing");
+  }
+  const resolvedDependencies =
+    provenance.predicate?.buildDefinition?.resolvedDependencies ?? [];
+  const gitDependency = resolvedDependencies.find(
+    ({ uri }) => uri === "git+https://github.com/WeiHan1996/DailyEnergy",
+  );
+  const lockfileDependency = resolvedDependencies.find(
+    ({ uri }) => uri === "file:pnpm-lock.yaml",
+  );
+  const rootPackage = sbom.packages.find(
+    ({ SPDXID }) => SPDXID === "SPDXRef-DailyEnergy",
+  );
+  const lockfileReference = rootPackage?.externalRefs?.find(
+    ({ referenceType }) => referenceType === "pnpm-lock-sha256",
+  );
+  if (
+    gitDependency?.digest?.gitCommit !== commitSha ||
+    lockfileDependency?.digest?.sha256 !== lockfileSha256 ||
+    lockfileReference?.referenceLocator !== lockfileSha256
+  ) {
+    fail("CI_SUPPLY_CHAIN_BINDING_MISMATCH", "commit-or-lockfile");
   }
   return Object.freeze({ packages: sbom.packages.length });
 }

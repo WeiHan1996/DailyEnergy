@@ -152,7 +152,7 @@ const provenance = {
   _type: "https://in-toto.io/Statement/v1",
   subject: [
     {
-      name: "dailyenergy-build-output-manifest.json",
+      name: "build-output-digests.json",
       digest: { sha256: sha256(digestManifestContents) },
     },
   ],

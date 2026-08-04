@@ -75,6 +75,14 @@ const workflowFixtures = [
   ["artifact-ttl.yml", "CI_WORKFLOW_ARTIFACT_TTL_INVALID"],
   ["remote-cache.yml", "CI_WORKFLOW_REMOTE_CACHE_ENABLED"],
   ["shallow-checkout.yml", "CI_WORKFLOW_CHECKOUT_DEPTH_INVALID"],
+  [
+    "persisted-checkout-credentials.yml",
+    "CI_WORKFLOW_CHECKOUT_CREDENTIALS_PERSISTED",
+  ],
+  [
+    "unsafe-artifact-upload.yml",
+    "CI_WORKFLOW_ARTIFACT_UPLOAD_WITHOUT_SCAN_PASS",
+  ],
 ];
 for (const [fixture, expectedRule] of workflowFixtures) {
   test(`T-E011-CI-POLICY-001 rejects ${fixture}`, async () => {
@@ -333,14 +341,54 @@ test("T-E011-CI-SUPPLY-001 rejects build link cycles", async () => {
 });
 
 test("T-E011-CI-SUPPLY-001 requires honest unsigned provenance metadata", () => {
-  const digestManifest = { lockfile_sha256: "a".repeat(64) };
-  const sbom = { spdxVersion: "SPDX-2.3", packages: [{ name: "synthetic" }] };
+  const digestManifest = {
+    manifest_version: "e-011-build-digest-v1",
+    commit_sha: "b".repeat(40),
+    lockfile_sha256: "a".repeat(64),
+    entries: [{ path: "artifact.txt", sha256: "c".repeat(64) }],
+  };
+  const sbom = {
+    spdxVersion: "SPDX-2.3",
+    packages: [
+      {
+        SPDXID: "SPDXRef-DailyEnergy",
+        name: "synthetic",
+        externalRefs: [
+          {
+            referenceType: "pnpm-lock-sha256",
+            referenceLocator: digestManifest.lockfile_sha256,
+          },
+        ],
+      },
+    ],
+  };
   const provenance = {
     _type: "https://in-toto.io/Statement/v1",
     predicateType: "https://slsa.dev/provenance/v1",
+    subject: [
+      {
+        name: "build-output-digests.json",
+        digest: {
+          sha256: sha256(`${JSON.stringify(digestManifest, null, 2)}\n`),
+        },
+      },
+    ],
     predicate: {
       buildDefinition: {
-        externalParameters: { lockfile_sha256: "a".repeat(64) },
+        externalParameters: {
+          commit_sha: digestManifest.commit_sha,
+          lockfile_sha256: digestManifest.lockfile_sha256,
+        },
+        resolvedDependencies: [
+          {
+            uri: "git+https://github.com/WeiHan1996/DailyEnergy",
+            digest: { gitCommit: digestManifest.commit_sha },
+          },
+          {
+            uri: "file:pnpm-lock.yaml",
+            digest: { sha256: digestManifest.lockfile_sha256 },
+          },
+        ],
       },
     },
     attestation_status:
@@ -355,5 +403,27 @@ test("T-E011-CI-SUPPLY-001 requires honest unsigned provenance metadata", () => 
   assert.throws(
     () => validateSupplyChainDocuments({ digestManifest, provenance, sbom }),
     /CI_PROVENANCE_INVALID/u,
+  );
+  provenance.signature_status = "UNSIGNED";
+  provenance.subject[0].digest.sha256 = "d".repeat(64);
+  assert.throws(
+    () => validateSupplyChainDocuments({ digestManifest, provenance, sbom }),
+    /CI_PROVENANCE_INVALID/u,
+  );
+  provenance.subject[0].digest.sha256 = sha256(
+    `${JSON.stringify(digestManifest, null, 2)}\n`,
+  );
+  provenance.predicate.buildDefinition.externalParameters.commit_sha =
+    "f".repeat(40);
+  assert.throws(
+    () => validateSupplyChainDocuments({ digestManifest, provenance, sbom }),
+    /CI_PROVENANCE_INVALID/u,
+  );
+  provenance.predicate.buildDefinition.externalParameters.commit_sha =
+    digestManifest.commit_sha;
+  sbom.packages[0].externalRefs[0].referenceLocator = "e".repeat(64);
+  assert.throws(
+    () => validateSupplyChainDocuments({ digestManifest, provenance, sbom }),
+    /CI_SUPPLY_CHAIN_BINDING_MISMATCH/u,
   );
 });

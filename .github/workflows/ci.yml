@@ -40,6 +40,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up exact Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -63,11 +64,12 @@ jobs:
         run: node tooling/ci/run-lane.mjs ${{ matrix.lane }}
 
       - name: Scan bounded synthetic evidence
+        id: artifact_scan
         if: always()
         run: node tooling/ci/scan-artifacts.mjs .artifacts/ci/${{ matrix.lane }}
 
       - name: Upload bounded synthetic evidence
-        if: always()
+        if: always() && steps.artifact_scan.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ci-${{ matrix.lane }}-evidence
@@ -84,6 +86,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up exact Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -109,11 +112,12 @@ jobs:
         run: node tooling/ci/generate-supply-chain.mjs
 
       - name: Scan and verify supply-chain evidence
+        id: artifact_scan
         if: always()
         run: node tooling/ci/scan-artifacts.mjs .artifacts/ci/supply-chain
 
       - name: Upload supply-chain evidence
-        if: always()
+        if: always() && steps.artifact_scan.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ci-supply-chain-evidence

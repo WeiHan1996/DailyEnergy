@@ -1,0 +1,16 @@
+name: known-fail-unsafe-artifact-upload
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: unsafe-evidence
+          path: .artifacts/ci/static
+          if-no-files-found: error
+          retention-days: 14
