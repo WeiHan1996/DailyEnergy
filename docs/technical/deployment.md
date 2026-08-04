@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-07-26
+- **最后更新**：2026-08-04（私有 GitHub Free required-check 临时补偿控制获接受）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
@@ -740,7 +740,7 @@ PostgreSQL 官方文档说明 PITR 需要连续 WAL 序列；`pg_verifybackup` �
 | E-007 | Redis empty rebuild、queue version、drain、graceful shutdown、profile allowlist |
 | E-009 | common/local/staging-like Compose、production overlay contract、stub/fault/recovery profile |
 | E-010 | migration/release/rollback/backup/restore 场景注册与 fault hook |
-| E-011 | build-once、digest、SBOM/provenance、OIDC/environments、artifact TTL、required Gate |
+| E-011 | build-once、digest、SBOM/provenance、OIDC/environments、artifact TTL、platform required Gate；能力不可用时仅允许 testing 22.2 的有期限补偿控制 |
 | E-012 | 单 host Compose、reverse proxy/TLS、external PG/Redis/object、release/rollback runbook |
 | E-013 | S-33 稳定 metrics/alerts、backup/WAL/secret/cert/deploy signals |
 | E-014 | clean environment、CI、staging deploy、rollback、PITR/restore、secret/content Gate 证明 |
@@ -874,6 +874,8 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 - 状态：Accepted；
 - 接受日期：2026-07-26；
+- 2026-08-04 修订：用户明确接受测试策略 22.2 的私有 GitHub Free 临时补偿控制；
+  E-014/RC 前必须恢复 platform-enforced required checks；
 - 内容 PR：[PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)；
 - 基线：`main`（S-31 测试策略已随 PR #36 合并并获用户确认）；
 - 已确认范围：环境、单 host Compose、profile 能力、Release Manifest、配置/secret、migration、发布/回滚、backup/PITR、隔离恢复、artifact/供应链与 48 个场景；

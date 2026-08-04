@@ -1,0 +1,74 @@
+{
+  "policy_version": "e-011-ci-telemetry-policy-v1",
+  "maximum_total_series": 256,
+  "labels": {
+    "lane": {
+      "owner": "E-011",
+      "purpose": "Bounded CI lane outcome",
+      "allowed_values": [
+        "docs",
+        "static",
+        "unit-contract",
+        "db-integration",
+        "queue-integration",
+        "api-e2e",
+        "admin-e2e",
+        "resilience",
+        "ai-deterministic",
+        "supply-chain"
+      ],
+      "maximum_cardinality": 10,
+      "expires_on": "2027-08-03",
+      "query_owner": "engineering"
+    },
+    "outcome": {
+      "owner": "E-011",
+      "purpose": "Stable terminal result",
+      "allowed_values": ["PASS", "FAIL", "BLOCKED", "PARTIAL"],
+      "maximum_cardinality": 4,
+      "expires_on": "2027-08-03",
+      "query_owner": "engineering"
+    },
+    "failure_code": {
+      "owner": "E-011",
+      "purpose": "Stable bounded failure reason",
+      "allowed_values": [
+        "NONE",
+        "COMMAND_FAILED",
+        "INFRA_BLOCKED",
+        "POLICY_FAILED"
+      ],
+      "maximum_cardinality": 4,
+      "expires_on": "2027-08-03",
+      "query_owner": "engineering"
+    }
+  },
+  "metrics": [
+    {
+      "name": "ci_lane_outcome_total",
+      "labels": ["lane", "outcome", "failure_code"],
+      "maximum_series": 160
+    }
+  ],
+  "forbidden_labels": [
+    "account_ref",
+    "openid",
+    "unionid",
+    "trace_id",
+    "request_id",
+    "raw_url",
+    "query",
+    "exception_message",
+    "prompt",
+    "safety_raw_text"
+  ],
+  "allowed_event_fields": [
+    "timestamp",
+    "lane",
+    "outcome",
+    "failure_code",
+    "duration_ms_bucket",
+    "commit_sha",
+    "toolchain_fingerprint"
+  ]
+}

@@ -79,6 +79,10 @@ export function miniappPublicConfigFingerprint(config) {
   return createHash("sha256").update(canonical).digest("hex");
 }
 
+export function normalizeGeneratedSourceLineEndings(value) {
+  return value.replaceAll("\r\n", "\n");
+}
+
 export function renderMiniappPublicConfigSource(config) {
   const fingerprint = miniappPublicConfigFingerprint(config);
   return [

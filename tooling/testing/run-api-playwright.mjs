@@ -25,6 +25,7 @@ function run(command, arguments_) {
   });
 }
 
+await run("pnpm", ["--filter", "@daily-energy/shared-schemas", "run", "build"]);
 await run("node", ["tooling/ensure-server-adapters-build.mjs"]);
 await run("pnpm", ["--filter", "@daily-energy/app-api", "run", "build"]);
 await run("pnpm", [

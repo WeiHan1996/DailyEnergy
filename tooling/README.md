@@ -41,6 +41,10 @@
   用户正文都会被 Gate 拒绝；测试结束删除临时文件和 fixture build；
 - `lib/admin-bundle-check.mjs` 与 `lib/admin-secret-canaries.mjs`：静态 bundle、
   HTML/RSC/网络响应和 fixture 共用的纯扫描规则与 secret-file canary 读取边界。
+- `ci/`：验证 GitHub Actions lane、immutable action、最小权限、fork secret、
+  artifact TTL、Turbo cache 和 telemetry cardinality；以 bounded/redacted runner 生成
+  lane evidence，并生成/扫描 production dependency audit、SPDX SBOM、license inventory、
+  build-output digest 与明确 `UNSIGNED` 的 SLSA provenance statement；
 - `agent-prepare.mjs`：默认只读、本地且快速地合并任务/变更主题来源，报告来源
   触发路径、有效 Profile、proof matrix、依赖、Git 变更范围和建议验证模式；只有
   显式 `--remote` / `--deep` 才扩大 Issue/PR/main 与环境检查；

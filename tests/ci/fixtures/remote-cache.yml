@@ -1,0 +1,13 @@
+name: known-fail-remote-cache
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  static:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      TURBO_TOKEN: forbidden-token-reference
+      TURBO_TEAM: third-party
+    steps:
+      - run: corepack pnpm turbo run build

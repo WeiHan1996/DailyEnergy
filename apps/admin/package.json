@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build && pnpm run bundle:check",
+    "build": "next build --webpack && pnpm run bundle:check",
     "bundle:check": "node ../../tooling/check-admin-bundle.mjs",
     "dev": "next dev",
     "format:check": "prettier --check README.md package.json next.config.ts playwright.config.ts response-fixture.playwright.config.ts tsconfig.json src tests",

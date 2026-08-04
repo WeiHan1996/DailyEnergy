@@ -63,6 +63,16 @@ try {
     ADMIN_TEST_USER_BODY_CANARIES: JSON.stringify([userBody]),
   };
 
+  await run(
+    "pnpm",
+    ["--filter", "@daily-energy/shared-schemas", "run", "build"],
+    environment,
+  );
+  await run(
+    "pnpm",
+    ["--filter", "@daily-energy/api-client", "run", "build"],
+    environment,
+  );
   await run("pnpm", ["run", "build"], environment);
   await run(
     "pnpm",
@@ -71,7 +81,7 @@ try {
   );
   await run(
     "pnpm",
-    ["exec", "next", "build", "tests/fixtures/response-leak"],
+    ["exec", "next", "build", "tests/fixtures/response-leak", "--webpack"],
     environment,
   );
   await run(

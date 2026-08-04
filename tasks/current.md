@@ -1,16 +1,19 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-03（E-010 合并完成并提升 E-011）
+- **最后更新**：2026-08-04（私有 Free 临时合并控制已获接受并进入最终验证）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-011 — 建立 GitHub Actions CI 与供应链 Gate
-- **任务状态**：Ready
-- **任务分支**：实现分支尚未创建；状态交接分支为 `agent/e011-ready`
+- **任务状态**：In Review
+- **任务分支**：`agent/e011-ci-supply-chain`
 - **当前 Issue**：[E-011 Issue #48](https://github.com/WeiHan1996/DailyEnergy/issues/48)
-- **当前 PR**：[状态 Draft PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118)
-- **基线提交**：`68bcc2e0bd7002b20e1de39a06a96f32e0ad21c4`
-- **Gate 结论**：`READY_TO_START`（security profile；workflow、权限、secret、artifact、
-  provenance 与供应链路径必须运行 full Gate，并保留 GitHub 运行和人工授权证据）
+- **当前 PR**：[Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119)；[状态 PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已合并
+- **基线提交**：`604db047938444898c222f7136cc9ac1ec333dd4`
+- **Gate 结论**：`LOCAL_TARGETED_PASS / GITHUB_AUTOMATED_PASS / RETENTION_PASS / TEMPORARY_MANUAL_MERGE_CONTROL_ACCEPTED / FINAL_HEAD_CI_PENDING`
+  （security profile；PR 复核修复的定向 Gate 与 GitHub 11/11 automated checks 已通过；
+  Actions artifact retention 已确认配置为 365 天，新供应链 artifact 的实际到期时间已复验；
+  私有仓库当前计划不提供 branch protection required checks；用户已接受 testing 22.2 的
+  有期限补偿控制，等待本修订的最终 head 11/11 CI 与 merge receipt）
 
 ## 1. 当前目标
 
@@ -22,23 +25,22 @@ clean checkout + pinned Node/pnpm/actions/images
   -> install / format / lint / type / arch / schema / db / test / build / security
   -> Source-ID / coverage / secret / raw-content / cardinality evidence
   -> bounded, redacted artifacts + SBOM / provenance
-  -> required checks and branch protection evidence
+  -> platform required checks，或 Accepted、有期限且绑定 head 的人工合并控制证据
 ```
 
-E-011 当前只进入 Ready，尚未创建实现分支或 CI workflow。开工必须读取 Issue #48、
-`pnpm agent:prepare E-011 --remote --deep` 返回的全部 required sources，以及 Accepted
-testing、deployment、observability、architecture、repository-structure、ADR-0006 和 E-010
-registry/policy 原文；随后核对 GitHub Actions、runner、权限、cache、artifact 与分支保护
-现状并给出 GO/NO-GO。
+E-011 已从状态 PR #118 的 squash merge `604db047938444898c222f7136cc9ac1ec333dd4`
+创建实现分支。Issue #48、`pnpm agent:prepare E-011 --remote --deep` 返回的 required
+sources，以及 Accepted testing、deployment、observability、architecture、
+repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；开工结论为 GO。
 
 ## 2. 状态变更影响
 
-- [PR #117](https://github.com/WeiHan1996/DailyEnergy/pull/117) 已于 2026-08-03 squash
-  合并为 `68bcc2e0bd7002b20e1de39a06a96f32e0ad21c4`，E-010 Issue #49 已关闭；
-- 本地 `main` 与 `origin/main` 已对齐到该提交，合并态工作树干净；
-- E-010 进入 Done，E-011 成为唯一 Ready；E-012～E-014 与其它任务继续 Planned；
-- E-010 已建立 736 个唯一 Source ID：138 个 `COVERED`、598 个 `PLANNED`、
-  0 个 `NA_WITH_REASON`，E-011 必须更新自己覆盖的 ID，不得静默跳过；
+- [PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已于 2026-08-03 squash
+  合并为 `604db047938444898c222f7136cc9ac1ec333dd4`，E-010 已完成交接；
+- 本地 `main` 与 `origin/main` 已对齐到该提交，E-011 分支基于同一提交；
+- E-010 进入 Done，E-011 成为唯一 In Review；E-012～E-014 与其它任务继续 Planned；
+- E-010 已建立的 registry 仍有 736 个唯一 Source ID；E-011 新增可执行 proof 后为
+  155 个 `COVERED`、581 个 `PLANNED`、0 个 `NA_WITH_REASON`；
 - D-001～D-005 继续 Planned，不创建 Figma、Design Tokens 或业务页面。
 
 ## 3. 范围
@@ -64,7 +66,8 @@ registry/policy 原文；随后核对 GitHub Actions、runner、权限、cache�
 
 ## 5. 验收与证据
 
-- required checks 覆盖 clean checkout 与全部 12 类边界/供应链 Gate；
+- 11 个自动 checks 覆盖 clean checkout 与可自动化边界/供应链 Gate，并由 platform required
+  checks 或 testing 22.2 的临时补偿控制阻断失败、缺失或旧 head；
 - workflow/action 权限最小，PR workflow 不获得生产 secret，cache/artifact 不含敏感内容；
 - Schema/codegen/drift、跳过测试、未知 Source ID、泄密/正文/高基数命中均 fail closed；
 - workflow lint、最小权限检查与 known-fail fixture 通过；
@@ -81,22 +84,48 @@ registry/policy 原文；随后核对 GitHub Actions、runner、权限、cache�
 - **外部依赖**：开工时用 `--remote --deep` 核对 GitHub Actions、Docker、浏览器、
   微信 DevTools、runner 与 branch protection；缺失外部能力时返回明确 pending/blocked，
   不能伪报 PASS；
+- **外部 lane**：`miniapp-conformance=INFRA_BLOCKED`、
+  `ai-model-load-human=PENDING_EXPLICIT_AUTHORIZATION`、
+  `manual-rc=MANUAL_EVIDENCE_PENDING`；普通 PR workflow 不创建替代 PASS；
+- **artifact retention**：用户已明确授权将 Actions artifact retention 设置为 365 天，GitHub API
+  已确认仓库当前为 `days=365`、私有仓库上限为 `maximum_allowed_days=400`；GitHub run
+  `30888004544` 生成的 `ci-supply-chain-evidence` artifact `8883871771` 创建于
+  `2026-08-04T07:30:28Z`、到期于 `2027-08-04T07:29:16Z`，上传日志使用
+  `retention-days: 365` 且无 retention clamp，结论为 `RETENTION_PASS`；
+- **required checks / branch protection**：GitHub branch protection 与 rulesets API 对当前私有
+  Free 仓库返回 403。用户于 2026-08-04 明确选择并接受 testing 22.2 的临时补偿控制：机器核验
+  最新 head 的 11 个固定 checks 来自同一 run 且全部成功，用户明确批准，再以
+  `--match-head-commit` squash merge；该控制最迟 2026-11-02 到期，并在能力可用、出现第二位
+  merge-capable actor、E-014 开始或 RC 前提前失效；
 - **授权边界**：提交 workflow 与 Draft PR 属于本任务；启用或修改 required checks、
   branch protection、repository secret/environment 前必须核对目标并保留用户授权证据；
-- **security profile**：需要人工复核 workflow 权限、secret/fork 边界、第三方 action、
-  artifact/caching、SBOM/provenance 与供应链残余风险；
-- **Windows Gate 风险**：合并后本地复核确认系统 `core.autocrlf=true` 会把 LF checkout
-  转为 CRLF；Node `execFile("pnpm")` 需要可执行 shim；部分 package script 使用 POSIX
-  quoting；database tooling 用 URL pathname 组装 Windows 盘符会得到重复盘符。E-010 PR
-  的完整自动 Gate 已在合并前 PASS，合并 SHA/格式与主要叶子 Gate 已复核；E-011 必须把
-  clean Linux CI 设为权威执行环境，并为 Windows 开发者入口记录或修复明确兼容路径；
-- **并行规则**：E-011 是唯一 Ready，尚未 In Progress；
-- **下一动作**：审核并 squash 合并状态 PR #118；合并后从最新 `main` 创建 E-011 实现分支，运行
-  `pnpm agent:prepare E-011 --remote --deep`，读取全部 required sources 并给出 GO/NO-GO；
+- **security profile**：人工边界复核已完成；checkout credential、secret/fork、第三方 action、
+  artifact scan-before-upload、cache、SBOM/provenance 绑定和供应链残余风险均已核对，发现的
+  credential 持久化、扫描失败仍上传与 provenance 绑定缺口已修复并由 Linux clean run 验证；
+- **Windows Gate 结果**：changed/task/full Agent Gate 均在全仓 `format:check` 首步正式
+  `FAIL`，原因是系统 `core.autocrlf=true` 使 333 个未修改基线文件以 CRLF 检出；后续直接
+  诊断还确认 contract/codegen 字节指纹、POSIX 单引号 architecture script、数据库
+  `D:\D:\...` URL pathname、CRLF shebang fixture 与 SIGTERM 语义均受 Windows 环境影响。
+  这些结果保持 FAIL/infra 证据，不改写为 PASS；权威 clean run 由固定
+  `ubuntu-24.04` 的 GitHub Actions 补齐；
+- **并行规则**：E-011 是唯一当前任务并处于 In Review；不提升其它任务；
+- **下一动作**：提交并推送临时控制修订；等待最新 head 的 11/11 CI，通过
+  `pnpm ci:verify-pr-merge-gate -- 119 <HEAD_SHA>` 生成 receipt，按既有用户合并批准将 PR #119
+  转为 Ready 并使用 `--match-head-commit` squash merge；
 - **下一任务**：E-011 完成前不提升 E-012；E-011 获接受后再评估 E-012。
 
 ## 7. 最近交接
 
+- 用户于 2026-08-04 明确选择私有 Free 仓库方案 2；Accepted testing/deployment 合同现允许
+  在 platform required checks 不可用期间使用有期限的补偿控制。机器可读 policy v2 固定 11 个
+  check、同一 run、最新 head、squash 与 match-head 要求，并新增只读 PR Gate 命令；该控制不
+  减少 lane，不适用于 E-014/RC，最迟 2026-11-02 到期；
+- 用户已明确授权将 DailyEnergy 仓库 Actions artifact retention 设置为 365 天；GitHub API
+  已确认 `days=365`、`maximum_allowed_days=400`。提交 `aa6ddce20053f08ad1b697fa678e0a1a72838109`
+  的 GitHub run [#30888004544](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30888004544)
+  已 11/11 checks 全部通过；供应链 artifact `8883871771` 从
+  `2026-08-04T07:30:28Z` 保留至 `2027-08-04T07:29:16Z`，上传日志无 retention clamp，
+  因此 365 天 retention 结论为 `PASS`；
 - E-010 配置 root Vitest projects、真实 Nest HTTP Playwright、PG/queue、Admin Chromium
   与微信 DevTools runner，并建立合成 fixture、fault plan、sticky flaky、quarantine、
   artifact/corpus scanner 和 pending evidence 模板；
@@ -114,4 +143,77 @@ registry/policy 原文；随后核对 GitHub Actions、runner、权限、cache�
 - E-011 Issue #48 为 Open、Milestone 为 Phase 1，前置 E-001～E-010 均已完成；状态
   交接提交 `26ea3c58858f07346e40e1f2a1844d7e28660b3b` 已推送到
   `agent/e011-ready`，[Draft PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118)
-  已创建且无冲突；当前未创建 workflow、required checks 或外部资源。
+  已 squash 合并为 `604db047938444898c222f7136cc9ac1ec333dd4`；
+- 本地 `main`、`origin/main` 与 GitHub `main` 已验证指向同一签名提交，E-011 实现分支
+  `agent/e011-ci-supply-chain` 已从该提交创建；
+- E-011 实现提交 `a407201957c7c2a94166756e09daf6c1eb4b1d86` 已推送并创建
+  [Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119)；PR 保持 Draft，不启用自动
+  合并或仓库权限变更；
+- PR 复核确认 artifact scanner 未使用 `allowed_metadata`、GitHub `secrets` context 可由 bracket/
+  wrapped 表达式绕过、自动 lane 命令可被掏空、lane/supply evidence 未区分 head/base/tested SHA，
+  且 required checks 因仓库计划能力不可配置；本轮已用闭合 per-artifact schema、lockfile-bound
+  SPDX、递归 expression 检测、不可删减最低命令集、aggregate Linux Gate 与 v2 traceability
+  修复代码问题；最终修复提交 `f169ce6b258d941071544c761736e57f1cc6debd` 已推送；
+- 本轮定向验证已通过 CI policy `22/22`、registry `5/5`、miniapp Vitest `3 files / 10 tests`、
+  public-config `14` cases、DevTools result `10` cases、bundle `9` known-fail + `1` known-pass，
+  目标 ESLint/Prettier 与既有最终 artifact 的 v2 schema replay（4,795 build entries / 717
+  packages）亦通过；Playwright sticky policy 的直接 executable equivalent 正确返回
+  `PLAYWRIGHT_FLAKY_FAIL`；
+- 本机 changed/task/full Agent Gate 均在首条 pnpm 命令正式 `FAIL`：Node 为 `24.6.0` 而非固定
+  `24.18.0`，本地 pnpm store 又缺少 package index 并尝试不可用的 registry/依赖清理；这些
+  结果不改写为 PASS，固定 Linux clean run 已补齐权威 full evidence；
+- 最终 GitHub clean run
+  [#30881658367](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30881658367) 对应提交
+  `f169ce6b258d941071544c761736e57f1cc6debd`，9 个自动 lane、`supply-chain` 与聚合
+  `E-011 automated full Gate` 共 11/11 checks 全部成功；真实 PostgreSQL、Redis/BullMQ、
+  API/Admin E2E、resilience、deterministic AI 与 supply-chain 路径均由 clean runner 验证；
+- 该 run 的供应链证据覆盖 4,795 个 build files、716 个 dependency packages，并加入 root
+  package 形成 717 个 SPDX packages；4 个 JSON 共 1,586,062 bytes，内容扫描、digest、
+  SBOM/provenance 校验均通过，attestation 仍为 `PENDING`、signature 仍为 `UNSIGNED`；
+- workflow 请求供应链 artifact 保留 365 天，但 GitHub 再次降为 90 天；artifact 元数据到期
+  时间亦确认只有 90 天，因此 retention 继续为独立授权阻塞，不能因 automated Gate 成功而
+  报告 E-011 PASS；
+- 首轮修复提交 `8cd0b36ed0830ede6a068533a8952e4be5ff96a2` 已推送；GitHub clean run
+  [#30874806384](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30874806384) 的 10/10
+  automated job 全部成功，包括真实 PostgreSQL、Redis/BullMQ、API/Admin E2E 与 supply-chain；
+- security 人工边界复核发现 checkout 默认持久化 credential、artifact scan 失败后仍会执行上传、
+  provenance subject 文件名及 digest/commit/lockfile/SBOM 绑定不完整；修复提交
+  `7a516e6823d1b6337ebc9d51ab4bd3604c2450d7` 已推送，GitHub clean run
+  [#30875863656](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30875863656) 再次 10/10
+  通过，PR #119 保持 Draft、mergeable/clean；
+- `agent:prepare --remote --deep` 的自动结果因缺少 `gh` 与裸 `pnpm.exe` 为
+  `INFRA_BLOCKED`；Issue/main/commit 由 GitHub API/页面复核，Node、Corepack pnpm
+  `11.17.0` 与 12 个 workspace 依赖均通过等价检查，开工结论为 GO；
+- 已创建 `.github/workflows/ci.yml`：固定 `ubuntu-24.04`、Node `24.18.0`、pnpm
+  `11.17.0` 和三个 immutable action SHA，使用只读 contents 权限、concurrency、45 分钟
+  timeout、9 个自动 lane、14 天合成证据与 365 天供应链证据；checkout 不持久化 credential，
+  artifact 只有在前置扫描成功后才上传；不使用 secret、OIDC、environment 或第三方 Turbo remote cache；
+- `tests/ci` 与 `tooling/ci` 已建立 workflow/policy、fork secret、artifact TTL、cache、
+  telemetry 基数、license、production vulnerability、SPDX 2.3 SBOM、build digest 与明确
+  `UNSIGNED/PENDING` provenance Gate；CI policy 测试 `19/19` 通过；
+- production audit 当前 `critical=0`、`high=0`；root build `7/7` 通过；supply-chain evidence
+  最终已核实覆盖 4,795 个 build files、716 个 dependency packages 与包含 root package 的
+  717 个 SPDX packages，4 个 JSON artifact 共 1,586,062 bytes，内容扫描、digest、
+  SBOM/provenance 校验均通过；
+- Next 已从 `16.2.12` 升级到 `16.3.0`，并对 `brace-expansion` 与 `fast-uri` 采用精确安全
+  override；`apps/admin/next-env.d.ts` 是 Next 16.3 生成的合法变化；Admin 使用官方
+  `--webpack` 构建路径，并以 `fileURLToPath` 规范化 `outputFileTracingRoot`，Windows 完整
+  build 已验证 standalone 只写入 `.next/standalone`，不再生成仓库根 `Projects/` 副本；
+- build digest 允许解析后仍位于仓库内的 Linux symlink/Windows junction，并以构建逻辑路径
+  记录目标文件字节；外部链接、断链、特殊文件和祖先循环均 fail closed，正向、逃逸与循环
+  测试均已通过；artifact 不记录机器绝对链接目标；
+- changed/task/full security Gate 已在 Windows 执行并按上文保持正式 FAIL；目标 E-011 文件
+  Prettier、workspace/config、ESLint、架构边界与 dependency-cruiser 直接入口、14/14
+  typecheck、7/7 build、registry `5/5`、CI policy `19/19`、agent/admin/Playwright/queue
+  evidence、production audit 与 supply-chain evidence 均已分别通过；
+- GitHub 首轮 clean run [#30873436444](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30873436444)
+  为 3/10 job 通过：失败根因为 shallow checkout 缺少 `origin/main`、clean checkout 未先构建
+  Admin/API workspace 依赖、Next build config 被误分为 client bundle、TX fixture 硬编码 macOS
+  Prisma 路径、BullMQ failed-job 对象读取竞争和 Linux sharp/libvips license 表达式差异；以上均已
+  以完整 checkout policy/负向 fixture、显式依赖构建、边界 fixture、跨平台路径、settled-job
+  重取和精确 license policy 修复；本机无容器 runtime，PG/Redis 真实回归等待 GitHub runner；
+- registry 当前为 `736 total / 155 COVERED / 581 PLANNED`，净新增 17 个覆盖；
+  `S33-OBS-041` 因 PAGE/IR 行为尚未实现继续为 `PLANNED`；
+- 尚未创建 required checks、branch protection、repository secret/environment、OIDC、生产
+  资源或自动合并；required checks/branch protection 还受当前私有仓库计划能力阻塞，这些能力
+  必须在能力可用、核对目标并取得明确授权后另行处理。

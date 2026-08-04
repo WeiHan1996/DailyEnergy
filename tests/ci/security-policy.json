@@ -1,0 +1,10 @@
+{
+  "policy_version": "e-011-vulnerability-policy-v1",
+  "scope": "production",
+  "audit_source": "pnpm-registry-advisories",
+  "maximum_vulnerabilities": {
+    "critical": 0,
+    "high": 0
+  },
+  "exceptions": []
+}

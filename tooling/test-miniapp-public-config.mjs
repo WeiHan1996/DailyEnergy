@@ -3,7 +3,11 @@ import {
   parsePublicBuildConfig,
 } from "../apps/miniapp/src/app/public-build-config.ts";
 
-import { parseMiniappPublicConfig } from "./lib/miniapp-public-config.mjs";
+import {
+  normalizeGeneratedSourceLineEndings,
+  parseMiniappPublicConfig,
+  renderMiniappPublicConfigSource,
+} from "./lib/miniapp-public-config.mjs";
 
 const schemaVersion = MINIAPP_PUBLIC_BUILD_CONFIG_SCHEMA_VERSION;
 const baseConfig = {
@@ -97,6 +101,17 @@ const cases = [
   },
 ];
 const errors = [];
+
+const generatedSource = renderMiniappPublicConfigSource(baseConfig);
+if (
+  normalizeGeneratedSourceLineEndings(
+    generatedSource.replaceAll("\n", "\r\n"),
+  ) !== generatedSource
+) {
+  errors.push(
+    "MINIAPP_GENERATED_SOURCE_LINE_ENDINGS: CRLF checkout must compare as canonical LF",
+  );
+}
 
 function accepts(parser, value) {
   try {
