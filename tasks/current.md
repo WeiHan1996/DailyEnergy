@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-04（E-011 PR 复核修复完成，等待新的 Linux clean run）
+- **最后更新**：2026-08-04（E-011 PR 复核修复与 Linux clean run 已通过，保持外部阻塞）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-011 — 建立 GitHub Actions CI 与供应链 Gate
 - **任务状态**：Blocked
@@ -9,9 +9,9 @@
 - **当前 Issue**：[E-011 Issue #48](https://github.com/WeiHan1996/DailyEnergy/issues/48)
 - **当前 PR**：[Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119)；[状态 PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已合并
 - **基线提交**：`604db047938444898c222f7136cc9ac1ec333dd4`
-- **Gate 结论**：`LOCAL_TARGETED_PASS / GITHUB_REVALIDATION_PENDING / RETENTION_AUTHORIZATION_BLOCKED / REQUIRED_CHECKS_CAPABILITY_BLOCKED / MANUAL_EVIDENCE_PENDING`
-  （security profile；PR 复核修复的定向 policy/registry/miniapp Gate 已通过，新的 GitHub
-  clean run 尚待完成；Accepted supply-chain evidence 要求 365 天，但仓库上限将其降为
+- **Gate 结论**：`LOCAL_TARGETED_PASS / GITHUB_AUTOMATED_PASS / RETENTION_AUTHORIZATION_BLOCKED / REQUIRED_CHECKS_CAPABILITY_BLOCKED / MANUAL_EVIDENCE_PENDING`
+  （security profile；PR 复核修复的定向 Gate 与 GitHub 11/11 automated checks 已通过；
+  Accepted supply-chain evidence 要求 365 天，但仓库上限将其降为
   90 天；私有仓库当前计划不提供 branch protection required checks；外部/人工 lane 保持
   明确 pending，不能报告任务 PASS）
 
@@ -106,9 +106,9 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   这些结果保持 FAIL/infra 证据，不改写为 PASS；权威 clean run 由固定
   `ubuntu-24.04` 的 GitHub Actions 补齐；
 - **并行规则**：E-011 是唯一当前任务并处于 Blocked；不提升其它任务；
-- **下一动作**：先推送本轮 PR 复核修复并取得新的 GitHub Linux clean run；随后需要分别解除
-  两个外部阻塞：授权 365 天 Actions retention 或等价受控存储，以及提供支持 branch protection
-  required checks 的仓库能力并显式授权配置。两项均验证后才能把本文件更新为 In Review；
+- **下一动作**：保持 PR #119 为 Draft；分别解除两个外部阻塞：授权 365 天 Actions retention
+  或等价受控存储，以及提供支持 branch protection required checks 的仓库能力并显式授权配置。
+  两项均验证后才能把本文件更新为 In Review；
 - **下一任务**：E-011 完成前不提升 E-012；E-011 获接受后再评估 E-012。
 
 ## 7. 最近交接
@@ -140,7 +140,7 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   wrapped 表达式绕过、自动 lane 命令可被掏空、lane/supply evidence 未区分 head/base/tested SHA，
   且 required checks 因仓库计划能力不可配置；本轮已用闭合 per-artifact schema、lockfile-bound
   SPDX、递归 expression 检测、不可删减最低命令集、aggregate Linux Gate 与 v2 traceability
-  修复代码问题，新的 clean run 尚待推送后验证；
+  修复代码问题；最终修复提交 `f169ce6b258d941071544c761736e57f1cc6debd` 已推送；
 - 本轮定向验证已通过 CI policy `22/22`、registry `5/5`、miniapp Vitest `3 files / 10 tests`、
   public-config `14` cases、DevTools result `10` cases、bundle `9` known-fail + `1` known-pass，
   目标 ESLint/Prettier 与既有最终 artifact 的 v2 schema replay（4,795 build entries / 717
@@ -148,7 +148,18 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   `PLAYWRIGHT_FLAKY_FAIL`；
 - 本机 changed/task/full Agent Gate 均在首条 pnpm 命令正式 `FAIL`：Node 为 `24.6.0` 而非固定
   `24.18.0`，本地 pnpm store 又缺少 package index 并尝试不可用的 registry/依赖清理；这些
-  结果不改写为 PASS，新的固定 Linux clean run 负责补齐权威 full evidence；
+  结果不改写为 PASS，固定 Linux clean run 已补齐权威 full evidence；
+- 最终 GitHub clean run
+  [#30881658367](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30881658367) 对应提交
+  `f169ce6b258d941071544c761736e57f1cc6debd`，9 个自动 lane、`supply-chain` 与聚合
+  `E-011 automated full Gate` 共 11/11 checks 全部成功；真实 PostgreSQL、Redis/BullMQ、
+  API/Admin E2E、resilience、deterministic AI 与 supply-chain 路径均由 clean runner 验证；
+- 该 run 的供应链证据覆盖 4,795 个 build files、716 个 dependency packages，并加入 root
+  package 形成 717 个 SPDX packages；4 个 JSON 共 1,586,062 bytes，内容扫描、digest、
+  SBOM/provenance 校验均通过，attestation 仍为 `PENDING`、signature 仍为 `UNSIGNED`；
+- workflow 请求供应链 artifact 保留 365 天，但 GitHub 再次降为 90 天；artifact 元数据到期
+  时间亦确认只有 90 天，因此 retention 继续为独立授权阻塞，不能因 automated Gate 成功而
+  报告 E-011 PASS；
 - 首轮修复提交 `8cd0b36ed0830ede6a068533a8952e4be5ff96a2` 已推送；GitHub clean run
   [#30874806384](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30874806384) 的 10/10
   automated job 全部成功，包括真实 PostgreSQL、Redis/BullMQ、API/Admin E2E 与 supply-chain；
@@ -168,8 +179,9 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   telemetry 基数、license、production vulnerability、SPDX 2.3 SBOM、build digest 与明确
   `UNSIGNED/PENDING` provenance Gate；CI policy 测试 `19/19` 通过；
 - production audit 当前 `critical=0`、`high=0`；root build `7/7` 通过；supply-chain evidence
-  最终已核实覆盖 4,795 个 build files 与 717 个 dependency packages，4 个 JSON artifact，
-  内容扫描、digest、SBOM/provenance 校验均通过；
+  最终已核实覆盖 4,795 个 build files、716 个 dependency packages 与包含 root package 的
+  717 个 SPDX packages，4 个 JSON artifact 共 1,586,062 bytes，内容扫描、digest、
+  SBOM/provenance 校验均通过；
 - Next 已从 `16.2.12` 升级到 `16.3.0`，并对 `brace-expansion` 与 `fast-uri` 采用精确安全
   override；`apps/admin/next-env.d.ts` 是 Next 16.3 生成的合法变化；Admin 使用官方
   `--webpack` 构建路径，并以 `fileURLToPath` 规范化 `outputFileTracingRoot`，Windows 完整
