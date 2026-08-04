@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 138, "NA_WITH_REASON": 0, "PLANNED": 598 },
+  "counts": { "COVERED": 155, "NA_WITH_REASON": 0, "PLANNED": 581 },
   "entries": [
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
@@ -5198,11 +5198,22 @@
     },
     {
       "authority_paths": ["docs/decisions/ADR-0006-monorepo-and-stack.md"],
-      "planned": {
-        "owner": "E-010 and the owning Phase 1 implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
+            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "minimum-permission pinned workflow and known-fail fixtures",
+          "test_id": "T-E011-CI-POLICY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "INTEGRATION", "STATIC"] }
       ],
@@ -5211,11 +5222,22 @@
     },
     {
       "authority_paths": ["docs/decisions/ADR-0006-monorepo-and-stack.md"],
-      "planned": {
-        "owner": "E-010 and the owning Phase 1 implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
+            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "minimum-permission pinned workflow and known-fail fixtures",
+          "test_id": "T-E011-CI-POLICY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "INTEGRATION", "STATIC"] }
       ],
@@ -5276,11 +5298,21 @@
     },
     {
       "authority_paths": ["docs/decisions/ADR-0006-monorepo-and-stack.md"],
-      "planned": {
-        "owner": "E-010 and the owning Phase 1 implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "build cache outputs exclude environment, secret and credential paths",
+            "test, migration, restore, release and deploy results cannot be cached as successful evidence",
+            "third-party Turbo remote-cache configuration is rejected"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "Turbo cache content and remote-cache known-fail tests",
+          "test_id": "T-E011-CI-CACHE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "INTEGRATION", "STATIC"] }
       ],
@@ -5289,11 +5321,21 @@
     },
     {
       "authority_paths": ["docs/decisions/ADR-0006-monorepo-and-stack.md"],
-      "planned": {
-        "owner": "E-010 and the owning Phase 1 implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "build cache outputs exclude environment, secret and credential paths",
+            "test, migration, restore, release and deploy results cannot be cached as successful evidence",
+            "third-party Turbo remote-cache configuration is rejected"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "Turbo cache content and remote-cache known-fail tests",
+          "test_id": "T-E011-CI-CACHE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "INTEGRATION", "STATIC"] }
       ],
@@ -5302,11 +5344,21 @@
     },
     {
       "authority_paths": ["docs/decisions/ADR-0006-monorepo-and-stack.md"],
-      "planned": {
-        "owner": "E-010 and the owning Phase 1 implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "build cache outputs exclude environment, secret and credential paths",
+            "test, migration, restore, release and deploy results cannot be cached as successful evidence",
+            "third-party Turbo remote-cache configuration is rejected"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "Turbo cache content and remote-cache known-fail tests",
+          "test_id": "T-E011-CI-CACHE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "INTEGRATION", "STATIC"] }
       ],
@@ -7598,6 +7650,19 @@
           "origin": "tests/registry/e010-evidence-manifest.json",
           "selector": "formal Source-ID registry completeness and negative fixtures",
           "test_id": "T-E010-REGISTRY-001"
+        },
+        {
+          "assertions": [
+            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
+            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "minimum-permission pinned workflow and known-fail fixtures",
+          "test_id": "T-E011-CI-POLICY-001"
         }
       ],
       "status": "COVERED",
@@ -8251,6 +8316,17 @@
           "origin": "tests/registry/e010-evidence-manifest.json",
           "selector": "artifact content policy positive and negative fixtures",
           "test_id": "T-E010-ARTIFACT-001"
+        },
+        {
+          "assertions": [
+            "Prompt, credential, database URL, external identity and raw-content canaries stop artifact upload",
+            "strict cryptographic digests remain allowed opaque evidence rather than false-positive user content"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "artifact raw-content and credential canary tests",
+          "test_id": "T-E011-CI-ARTIFACT-001"
         }
       ],
       "status": "COVERED",
@@ -8456,11 +8532,22 @@
     },
     {
       "authority_paths": ["docs/technical/deployment.md"],
-      "planned": {
-        "owner": "E-011 or the owning deployment and release issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
+            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "minimum-permission pinned workflow and known-fail fixtures",
+          "test_id": "T-E011-CI-POLICY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -8601,11 +8688,22 @@
     },
     {
       "authority_paths": ["docs/technical/deployment.md"],
-      "planned": {
-        "owner": "E-011 or the owning deployment and release issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "downloaded or promoted artifact content whose SHA-256 differs from the manifest fails closed",
+            "repository attestation and signature remain explicitly pending instead of being reported as complete",
+            "repository-contained build links contribute target bytes under logical output paths while escaping or cyclic links fail closed",
+            "SBOM and provenance must both exist and bind to the root lockfile SHA-256"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "SBOM, unsigned provenance, build-output digest and contained-link tests",
+          "test_id": "T-E011-CI-SUPPLY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -8643,11 +8741,22 @@
     },
     {
       "authority_paths": ["docs/technical/deployment.md"],
-      "planned": {
-        "owner": "E-011 or the owning deployment and release issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
+            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "minimum-permission pinned workflow and known-fail fixtures",
+          "test_id": "T-E011-CI-POLICY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -8664,11 +8773,22 @@
     },
     {
       "authority_paths": ["docs/technical/deployment.md"],
-      "planned": {
-        "owner": "E-011 or the owning deployment and release issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "downloaded or promoted artifact content whose SHA-256 differs from the manifest fails closed",
+            "repository attestation and signature remain explicitly pending instead of being reported as complete",
+            "repository-contained build links contribute target bytes under logical output paths while escaping or cyclic links fail closed",
+            "SBOM and provenance must both exist and bind to the root lockfile SHA-256"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "SBOM, unsigned provenance, build-output digest and contained-link tests",
+          "test_id": "T-E011-CI-SUPPLY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -9340,6 +9460,17 @@
           "origin": "tests/compose/evidence-manifest.json",
           "selector": "real Docker cold start, health, egress and shutdown",
           "test_id": "T-COMPOSE-RUNTIME-001"
+        },
+        {
+          "assertions": [
+            "Prompt, credential, database URL, external identity and raw-content canaries stop artifact upload",
+            "strict cryptographic digests remain allowed opaque evidence rather than false-positive user content"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "artifact raw-content and credential canary tests",
+          "test_id": "T-E011-CI-ARTIFACT-001"
         }
       ],
       "status": "COVERED",
@@ -9359,11 +9490,22 @@
     },
     {
       "authority_paths": ["docs/technical/deployment.md"],
-      "planned": {
-        "owner": "E-011 or the owning deployment and release issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
+            "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+            "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "minimum-permission pinned workflow and known-fail fixtures",
+          "test_id": "T-E011-CI-POLICY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -9380,11 +9522,21 @@
     },
     {
       "authority_paths": ["docs/technical/deployment.md"],
-      "planned": {
-        "owner": "E-011 or the owning deployment and release issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "build cache outputs exclude environment, secret and credential paths",
+            "test, migration, restore, release and deploy results cannot be cached as successful evidence",
+            "third-party Turbo remote-cache configuration is rejected"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "Turbo cache content and remote-cache known-fail tests",
+          "test_id": "T-E011-CI-CACHE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -9572,11 +9724,21 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "AccountRef, trace ID, raw URL, query, exception message, Prompt and Safety raw text cannot become CI telemetry labels",
+            "each label declares owner, purpose, allowed values, maximum cardinality, expiry and query owner",
+            "undeclared labels and series-budget overflow fail closed"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "low-cardinality telemetry contract and forbidden-field tests",
+          "test_id": "T-E011-CI-TELEMETRY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -9585,11 +9747,21 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "AccountRef, trace ID, raw URL, query, exception message, Prompt and Safety raw text cannot become CI telemetry labels",
+            "each label declares owner, purpose, allowed values, maximum cardinality, expiry and query owner",
+            "undeclared labels and series-budget overflow fail closed"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "low-cardinality telemetry contract and forbidden-field tests",
+          "test_id": "T-E011-CI-TELEMETRY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -9598,11 +9770,21 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "AccountRef, trace ID, raw URL, query, exception message, Prompt and Safety raw text cannot become CI telemetry labels",
+            "each label declares owner, purpose, allowed values, maximum cardinality, expiry and query owner",
+            "undeclared labels and series-budget overflow fail closed"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "low-cardinality telemetry contract and forbidden-field tests",
+          "test_id": "T-E011-CI-TELEMETRY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -9611,11 +9793,21 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "AccountRef, trace ID, raw URL, query, exception message, Prompt and Safety raw text cannot become CI telemetry labels",
+            "each label declares owner, purpose, allowed values, maximum cardinality, expiry and query owner",
+            "undeclared labels and series-budget overflow fail closed"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "low-cardinality telemetry contract and forbidden-field tests",
+          "test_id": "T-E011-CI-TELEMETRY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -9624,11 +9816,21 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "AccountRef, trace ID, raw URL, query, exception message, Prompt and Safety raw text cannot become CI telemetry labels",
+            "each label declares owner, purpose, allowed values, maximum cardinality, expiry and query owner",
+            "undeclared labels and series-budget overflow fail closed"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "low-cardinality telemetry contract and forbidden-field tests",
+          "test_id": "T-E011-CI-TELEMETRY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -9637,11 +9839,21 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "AccountRef, trace ID, raw URL, query, exception message, Prompt and Safety raw text cannot become CI telemetry labels",
+            "each label declares owner, purpose, allowed values, maximum cardinality, expiry and query owner",
+            "undeclared labels and series-budget overflow fail closed"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "low-cardinality telemetry contract and forbidden-field tests",
+          "test_id": "T-E011-CI-TELEMETRY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],

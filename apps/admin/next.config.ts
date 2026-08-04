@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+
 import type { NextConfig } from "next";
 
 export function contentSecurityPolicyForEnvironment(
@@ -84,7 +86,7 @@ const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   output: "standalone",
-  outputFileTracingRoot: new URL("../..", import.meta.url).pathname,
+  outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
 } satisfies NextConfig;
 
 export default nextConfig;

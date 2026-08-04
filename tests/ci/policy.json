@@ -1,0 +1,119 @@
+{
+  "policy_version": "e-011-ci-policy-v1",
+  "runner": "ubuntu-24.04",
+  "node_version": "24.18.0",
+  "pnpm_version": "11.17.0",
+  "default_permissions": {
+    "contents": "read"
+  },
+  "default_timeout_minutes": 45,
+  "remote_cache": "DISABLED",
+  "production_secrets": "PROHIBITED",
+  "oidc_deployment_permission": "PROHIBITED",
+  "actions": {
+    "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
+    "actions/setup-node": "49933ea5288caeca8642d1e84afbd3f7d6820020",
+    "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02"
+  },
+  "artifacts": {
+    "synthetic_reports": {
+      "retention_days": 14,
+      "synthetic_only": true
+    },
+    "supply_chain_evidence": {
+      "retention_days": 365,
+      "synthetic_only": true
+    }
+  },
+  "lanes": [
+    {
+      "id": "docs",
+      "execution": "AUTOMATED_REQUIRED",
+      "commands": [
+        ["pnpm", "run", "agent:check"],
+        ["pnpm", "run", "registry:check"]
+      ]
+    },
+    {
+      "id": "static",
+      "execution": "AUTOMATED_REQUIRED",
+      "commands": [
+        ["pnpm", "run", "format:check"],
+        ["pnpm", "run", "lint"],
+        ["pnpm", "run", "typecheck"],
+        ["pnpm", "run", "ci:test"]
+      ]
+    },
+    {
+      "id": "unit-contract",
+      "execution": "AUTOMATED_REQUIRED",
+      "commands": [
+        ["pnpm", "run", "config:fixtures"],
+        ["pnpm", "run", "typecheck:fixtures"],
+        ["pnpm", "run", "lint:fixtures"],
+        ["pnpm", "run", "architecture:fixtures"],
+        ["pnpm", "run", "contract:fixtures"],
+        ["pnpm", "run", "admin:bundle:fixtures"],
+        ["pnpm", "run", "agent:fixtures"],
+        ["pnpm", "run", "registry:test"],
+        ["pnpm", "run", "test:projects"]
+      ]
+    },
+    {
+      "id": "db-integration",
+      "execution": "AUTOMATED_REQUIRED",
+      "commands": [["pnpm", "run", "database:validate"]]
+    },
+    {
+      "id": "queue-integration",
+      "execution": "AUTOMATED_REQUIRED",
+      "commands": [["pnpm", "run", "queue:validate"]]
+    },
+    {
+      "id": "api-e2e",
+      "execution": "AUTOMATED_REQUIRED",
+      "commands": [["pnpm", "run", "test:api:e2e"]]
+    },
+    {
+      "id": "admin-e2e",
+      "execution": "AUTOMATED_REQUIRED",
+      "commands": [
+        ["pnpm", "--filter", "@daily-energy/app-admin", "run", "test:e2e"]
+      ]
+    },
+    {
+      "id": "miniapp-conformance",
+      "execution": "INFRA_BLOCKED",
+      "pass_claim": "PROHIBITED",
+      "unlock": "Dedicated WeChat DevTools runner and approved synthetic test project"
+    },
+    {
+      "id": "resilience",
+      "execution": "AUTOMATED_REQUIRED",
+      "commands": [
+        ["pnpm", "run", "queue:test"],
+        ["pnpm", "run", "compose:evidence"]
+      ]
+    },
+    {
+      "id": "ai-deterministic",
+      "execution": "AUTOMATED_REQUIRED",
+      "commands": [
+        ["pnpm", "run", "testing:policy"],
+        ["pnpm", "run", "test:harness"]
+      ]
+    },
+    {
+      "id": "ai-model-load-human",
+      "execution": "PENDING_EXPLICIT_AUTHORIZATION",
+      "pass_claim": "PROHIBITED",
+      "unlock": "Approved provider budget, isolated evaluation run, and human review"
+    },
+    {
+      "id": "manual-rc",
+      "execution": "MANUAL_EVIDENCE_PENDING",
+      "pass_claim": "PROHIBITED",
+      "unlock": "Accepted release candidate and named manual reviewers"
+    }
+  ]
+}

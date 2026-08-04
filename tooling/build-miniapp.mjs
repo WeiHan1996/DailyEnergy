@@ -5,6 +5,7 @@ import { extname, resolve } from "node:path";
 import { scanMiniappBundle } from "./lib/miniapp-bundle-check.mjs";
 import {
   miniappPublicConfigFingerprint,
+  normalizeGeneratedSourceLineEndings,
   parseMiniappPublicConfig,
   renderMiniappPublicConfigRuntime,
   renderMiniappPublicConfigSource,
@@ -100,7 +101,7 @@ function compileTypeScript() {
 async function assertGeneratedSource(defaultConfig) {
   const expected = renderMiniappPublicConfigSource(defaultConfig);
   const actual = await readFile(generatedSourcePath, "utf8");
-  if (actual !== expected) {
+  if (normalizeGeneratedSourceLineEndings(actual) !== expected) {
     throw new Error(
       "MINIAPP_GENERATED_SOURCE_DRIFT: run build-miniapp.mjs --write-source",
     );

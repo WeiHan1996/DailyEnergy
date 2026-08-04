@@ -1,0 +1,118 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  automated:
+    name: automated (${{ matrix.lane }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        lane:
+          - docs
+          - static
+          - unit-contract
+          - db-integration
+          - queue-integration
+          - api-e2e
+          - admin-e2e
+          - resilience
+          - ai-deterministic
+    steps:
+      - name: Checkout immutable source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up exact Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.18.0
+
+      - name: Activate exact pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.17.0 --activate
+          corepack pnpm --version
+
+      - name: Frozen install
+        run: corepack pnpm install --frozen-lockfile
+
+      - name: Install Chromium for the Admin lane
+        if: matrix.lane == 'admin-e2e'
+        run: corepack pnpm exec playwright install --with-deps chromium
+
+      - name: Run bounded lane
+        run: node tooling/ci/run-lane.mjs ${{ matrix.lane }}
+
+      - name: Scan bounded synthetic evidence
+        if: always()
+        run: node tooling/ci/scan-artifacts.mjs .artifacts/ci/${{ matrix.lane }}
+
+      - name: Upload bounded synthetic evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ci-${{ matrix.lane }}-evidence
+          path: .artifacts/ci/${{ matrix.lane }}
+          if-no-files-found: error
+          retention-days: 14
+
+  supply-chain:
+    name: supply-chain
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout immutable source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up exact Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.18.0
+
+      - name: Activate exact pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@11.17.0 --activate
+          corepack pnpm --version
+
+      - name: Frozen install
+        run: corepack pnpm install --frozen-lockfile
+
+      - name: Audit production dependencies
+        run: node tooling/ci/run-audit.mjs
+
+      - name: Build once
+        run: corepack pnpm run build
+
+      - name: Generate SBOM, digest manifest, and unsigned provenance
+        run: node tooling/ci/generate-supply-chain.mjs
+
+      - name: Scan and verify supply-chain evidence
+        if: always()
+        run: node tooling/ci/scan-artifacts.mjs .artifacts/ci/supply-chain
+
+      - name: Upload supply-chain evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ci-supply-chain-evidence
+          path: .artifacts/ci/supply-chain
+          if-no-files-found: error
+          retention-days: 365

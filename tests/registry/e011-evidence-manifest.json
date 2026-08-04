@@ -1,0 +1,159 @@
+{
+  "manifest_version": "e-011-evidence-v1",
+  "scope": "E-011 GitHub Actions, cache, artifact, telemetry, SBOM, provenance, license, vulnerability, and digest policy evidence",
+  "proofs": {
+    "T-E011-CI-POLICY-001": {
+      "file": "tests/ci/ci-policy.test.mjs",
+      "selector": "minimum-permission pinned workflow and known-fail fixtures",
+      "level": "STATIC",
+      "assertions": [
+        "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission",
+        "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
+        "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+        "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention"
+      ]
+    },
+    "T-E011-CI-CACHE-001": {
+      "file": "tests/ci/ci-policy.test.mjs",
+      "selector": "Turbo cache content and remote-cache known-fail tests",
+      "level": "STATIC",
+      "assertions": [
+        "build cache outputs exclude environment, secret and credential paths",
+        "test, migration, restore, release and deploy results cannot be cached as successful evidence",
+        "third-party Turbo remote-cache configuration is rejected"
+      ]
+    },
+    "T-E011-CI-ARTIFACT-001": {
+      "file": "tests/ci/ci-policy.test.mjs",
+      "selector": "artifact raw-content and credential canary tests",
+      "level": "STATIC",
+      "assertions": [
+        "Prompt, credential, database URL, external identity and raw-content canaries stop artifact upload",
+        "strict cryptographic digests remain allowed opaque evidence rather than false-positive user content"
+      ]
+    },
+    "T-E011-CI-SUPPLY-001": {
+      "file": "tests/ci/ci-policy.test.mjs",
+      "selector": "SBOM, unsigned provenance, build-output digest and contained-link tests",
+      "level": "STATIC",
+      "assertions": [
+        "SBOM and provenance must both exist and bind to the root lockfile SHA-256",
+        "downloaded or promoted artifact content whose SHA-256 differs from the manifest fails closed",
+        "repository-contained build links contribute target bytes under logical output paths while escaping or cyclic links fail closed",
+        "repository attestation and signature remain explicitly pending instead of being reported as complete"
+      ]
+    },
+    "T-E011-CI-TELEMETRY-001": {
+      "file": "tests/ci/ci-policy.test.mjs",
+      "selector": "low-cardinality telemetry contract and forbidden-field tests",
+      "level": "STATIC",
+      "assertions": [
+        "AccountRef, trace ID, raw URL, query, exception message, Prompt and Safety raw text cannot become CI telemetry labels",
+        "each label declares owner, purpose, allowed values, maximum cardinality, expiry and query owner",
+        "undeclared labels and series-budget overflow fail closed"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S28-STACK-013",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-POLICY-001"]
+    },
+    {
+      "source_id": "S28-STACK-014",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-POLICY-001"]
+    },
+    {
+      "source_id": "S28-STACK-019",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-CACHE-001"]
+    },
+    {
+      "source_id": "S28-STACK-020",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-CACHE-001"]
+    },
+    {
+      "source_id": "S28-STACK-021",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-CACHE-001"]
+    },
+    {
+      "source_id": "S31-TEST-008",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-POLICY-001"]
+    },
+    {
+      "source_id": "S31-TEST-047",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-ARTIFACT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-008",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-POLICY-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-013",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-SUPPLY-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-015",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-POLICY-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-016",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-SUPPLY-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-041",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-ARTIFACT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-042",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-POLICY-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-043",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-CACHE-001"]
+    },
+    {
+      "source_id": "S33-OBS-003",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-TELEMETRY-001"]
+    },
+    {
+      "source_id": "S33-OBS-004",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-TELEMETRY-001"]
+    },
+    {
+      "source_id": "S33-OBS-005",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-TELEMETRY-001"]
+    },
+    {
+      "source_id": "S33-OBS-006",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-TELEMETRY-001"]
+    },
+    {
+      "source_id": "S33-OBS-007",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-TELEMETRY-001"]
+    },
+    {
+      "source_id": "S33-OBS-008",
+      "status": "COVERED",
+      "proof_ids": ["T-E011-CI-TELEMETRY-001"]
+    }
+  ]
+}

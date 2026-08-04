@@ -1,0 +1,22 @@
+{
+  "policy_version": "e-011-license-policy-v1",
+  "allowed_expressions": [
+    "(MIT AND Zlib)",
+    "0BSD",
+    "Apache 2.0",
+    "Apache-2.0",
+    "Apache-2.0 AND LGPL-3.0-or-later",
+    "BlueOak-1.0.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "CC-BY-4.0",
+    "EPL-2.0",
+    "ISC",
+    "MIT",
+    "MIT and ISC",
+    "MPL-2.0",
+    "Unlicense"
+  ],
+  "denied_patterns": ["^AGPL", "^GPL", "^SSPL", "^BUSL", "^UNLICENSED$"],
+  "unknown_license": "FAIL_CLOSED"
+}

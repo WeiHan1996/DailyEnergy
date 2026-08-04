@@ -1,0 +1,14 @@
+name: known-fail-artifact-ttl
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  static:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ci-static-evidence
+          path: .artifacts/ci/static
+          retention-days: 30

@@ -71,7 +71,7 @@ try {
   );
   await run(
     "pnpm",
-    ["exec", "next", "build", "tests/fixtures/response-leak"],
+    ["exec", "next", "build", "tests/fixtures/response-leak", "--webpack"],
     environment,
   );
   await run(

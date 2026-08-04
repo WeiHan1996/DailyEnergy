@@ -1,16 +1,18 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-03（E-010 合并完成并提升 E-011）
+- **最后更新**：2026-08-04（E-011 本地实现与叶子验证完成，准备 Draft PR 和 Linux Gate）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-011 — 建立 GitHub Actions CI 与供应链 Gate
-- **任务状态**：Ready
-- **任务分支**：实现分支尚未创建；状态交接分支为 `agent/e011-ready`
+- **任务状态**：In Progress
+- **任务分支**：`agent/e011-ci-supply-chain`
 - **当前 Issue**：[E-011 Issue #48](https://github.com/WeiHan1996/DailyEnergy/issues/48)
-- **当前 PR**：[状态 Draft PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118)
-- **基线提交**：`68bcc2e0bd7002b20e1de39a06a96f32e0ad21c4`
-- **Gate 结论**：`READY_TO_START`（security profile；workflow、权限、secret、artifact、
-  provenance 与供应链路径必须运行 full Gate，并保留 GitHub 运行和人工授权证据）
+- **当前 PR**：实现 Draft PR 尚未创建；[状态 PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已合并
+- **基线提交**：`604db047938444898c222f7136cc9ac1ec333dd4`
+- **Gate 结论**：`LOCAL_LEAF_PASS / WINDOWS_AGGREGATE_FAIL / GITHUB_CLEAN_RUN_PENDING`
+  （security profile；本地 CI policy、16 项 policy 测试、production dependency audit、root
+  build、registry 与 supply-chain evidence 已通过；changed/task/full Gate 已执行但均在
+  Windows CRLF 全仓 format 首步正式失败，不能记为 PASS；外部/人工 lane 保持明确 pending）
 
 ## 1. 当前目标
 
@@ -25,20 +27,19 @@ clean checkout + pinned Node/pnpm/actions/images
   -> required checks and branch protection evidence
 ```
 
-E-011 当前只进入 Ready，尚未创建实现分支或 CI workflow。开工必须读取 Issue #48、
-`pnpm agent:prepare E-011 --remote --deep` 返回的全部 required sources，以及 Accepted
-testing、deployment、observability、architecture、repository-structure、ADR-0006 和 E-010
-registry/policy 原文；随后核对 GitHub Actions、runner、权限、cache、artifact 与分支保护
-现状并给出 GO/NO-GO。
+E-011 已从状态 PR #118 的 squash merge `604db047938444898c222f7136cc9ac1ec333dd4`
+创建实现分支。Issue #48、`pnpm agent:prepare E-011 --remote --deep` 返回的 required
+sources，以及 Accepted testing、deployment、observability、architecture、
+repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；开工结论为 GO。
 
 ## 2. 状态变更影响
 
-- [PR #117](https://github.com/WeiHan1996/DailyEnergy/pull/117) 已于 2026-08-03 squash
-  合并为 `68bcc2e0bd7002b20e1de39a06a96f32e0ad21c4`，E-010 Issue #49 已关闭；
-- 本地 `main` 与 `origin/main` 已对齐到该提交，合并态工作树干净；
-- E-010 进入 Done，E-011 成为唯一 Ready；E-012～E-014 与其它任务继续 Planned；
-- E-010 已建立 736 个唯一 Source ID：138 个 `COVERED`、598 个 `PLANNED`、
-  0 个 `NA_WITH_REASON`，E-011 必须更新自己覆盖的 ID，不得静默跳过；
+- [PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已于 2026-08-03 squash
+  合并为 `604db047938444898c222f7136cc9ac1ec333dd4`，E-010 已完成交接；
+- 本地 `main` 与 `origin/main` 已对齐到该提交，E-011 分支基于同一提交；
+- E-010 进入 Done，E-011 成为唯一 In Progress；E-012～E-014 与其它任务继续 Planned；
+- E-010 已建立的 registry 仍有 736 个唯一 Source ID；E-011 新增可执行 proof 后为
+  155 个 `COVERED`、581 个 `PLANNED`、0 个 `NA_WITH_REASON`；
 - D-001～D-005 继续 Planned，不创建 Figma、Design Tokens 或业务页面。
 
 ## 3. 范围
@@ -81,18 +82,22 @@ registry/policy 原文；随后核对 GitHub Actions、runner、权限、cache�
 - **外部依赖**：开工时用 `--remote --deep` 核对 GitHub Actions、Docker、浏览器、
   微信 DevTools、runner 与 branch protection；缺失外部能力时返回明确 pending/blocked，
   不能伪报 PASS；
+- **外部 lane**：`miniapp-conformance=INFRA_BLOCKED`、
+  `ai-model-load-human=PENDING_EXPLICIT_AUTHORIZATION`、
+  `manual-rc=MANUAL_EVIDENCE_PENDING`；普通 PR workflow 不创建替代 PASS；
 - **授权边界**：提交 workflow 与 Draft PR 属于本任务；启用或修改 required checks、
   branch protection、repository secret/environment 前必须核对目标并保留用户授权证据；
 - **security profile**：需要人工复核 workflow 权限、secret/fork 边界、第三方 action、
   artifact/caching、SBOM/provenance 与供应链残余风险；
-- **Windows Gate 风险**：合并后本地复核确认系统 `core.autocrlf=true` 会把 LF checkout
-  转为 CRLF；Node `execFile("pnpm")` 需要可执行 shim；部分 package script 使用 POSIX
-  quoting；database tooling 用 URL pathname 组装 Windows 盘符会得到重复盘符。E-010 PR
-  的完整自动 Gate 已在合并前 PASS，合并 SHA/格式与主要叶子 Gate 已复核；E-011 必须把
-  clean Linux CI 设为权威执行环境，并为 Windows 开发者入口记录或修复明确兼容路径；
-- **并行规则**：E-011 是唯一 Ready，尚未 In Progress；
-- **下一动作**：审核并 squash 合并状态 PR #118；合并后从最新 `main` 创建 E-011 实现分支，运行
-  `pnpm agent:prepare E-011 --remote --deep`，读取全部 required sources 并给出 GO/NO-GO；
+- **Windows Gate 结果**：changed/task/full Agent Gate 均在全仓 `format:check` 首步正式
+  `FAIL`，原因是系统 `core.autocrlf=true` 使 334 个未修改基线文件以 CRLF 检出；后续直接
+  诊断还确认 contract/codegen 字节指纹、POSIX 单引号 architecture script、数据库
+  `D:\D:\...` URL pathname、CRLF shebang fixture 与 SIGTERM 语义均受 Windows 环境影响。
+  这些结果保持 FAIL/infra 证据，不改写为 PASS；权威 clean run 由固定
+  `ubuntu-24.04` 的 GitHub Actions 补齐；
+- **并行规则**：E-011 是唯一 In Progress；
+- **下一动作**：完成最终 diff/文件清单复核后提交、推送并创建 Draft PR，再以真实 GitHub
+  clean run 补齐托管 CI 证据；CI 全绿后更新本文件为 In Review；
 - **下一任务**：E-011 完成前不提升 E-012；E-011 获接受后再评估 E-012。
 
 ## 7. 最近交接
@@ -114,4 +119,34 @@ registry/policy 原文；随后核对 GitHub Actions、runner、权限、cache�
 - E-011 Issue #48 为 Open、Milestone 为 Phase 1，前置 E-001～E-010 均已完成；状态
   交接提交 `26ea3c58858f07346e40e1f2a1844d7e28660b3b` 已推送到
   `agent/e011-ready`，[Draft PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118)
-  已创建且无冲突；当前未创建 workflow、required checks 或外部资源。
+  已 squash 合并为 `604db047938444898c222f7136cc9ac1ec333dd4`；
+- 本地 `main`、`origin/main` 与 GitHub `main` 已验证指向同一签名提交，E-011 实现分支
+  `agent/e011-ci-supply-chain` 已从该提交创建；
+- `agent:prepare --remote --deep` 的自动结果因缺少 `gh` 与裸 `pnpm.exe` 为
+  `INFRA_BLOCKED`；Issue/main/commit 由 GitHub API/页面复核，Node、Corepack pnpm
+  `11.17.0` 与 12 个 workspace 依赖均通过等价检查，开工结论为 GO；
+- 已创建 `.github/workflows/ci.yml`：固定 `ubuntu-24.04`、Node `24.18.0`、pnpm
+  `11.17.0` 和三个 immutable action SHA，使用只读 contents 权限、concurrency、45 分钟
+  timeout、9 个自动 lane、14 天合成证据与 365 天供应链证据；不使用 secret、OIDC、
+  environment 或第三方 Turbo remote cache；
+- `tests/ci` 与 `tooling/ci` 已建立 workflow/policy、fork secret、artifact TTL、cache、
+  telemetry 基数、license、production vulnerability、SPDX 2.3 SBOM、build digest 与明确
+  `UNSIGNED/PENDING` provenance Gate；CI policy 测试 `16/16` 通过；
+- production audit 当前 `critical=0`、`high=0`；root build `7/7` 通过；supply-chain evidence
+  已覆盖 12,956 个 build files 与 715 个 dependency packages，4 个 JSON artifact 约 3.3 MB，
+  内容扫描、digest、SBOM/provenance 校验均通过；
+- Next 已从 `16.2.12` 升级到 `16.3.0`，并对 `brace-expansion` 与 `fast-uri` 采用精确安全
+  override；`apps/admin/next-env.d.ts` 是 Next 16.3 生成的合法变化；Admin 使用官方
+  `--webpack` 构建路径，并以 `fileURLToPath` 规范化 `outputFileTracingRoot`，Windows 完整
+  build 已验证 standalone 只写入 `.next/standalone`，不再生成仓库根 `Projects/` 副本；
+- build digest 允许解析后仍位于仓库内的 Linux symlink/Windows junction，并以构建逻辑路径
+  记录目标文件字节；外部链接、断链、特殊文件和祖先循环均 fail closed，正向、逃逸与循环
+  测试均已通过；artifact 不记录机器绝对链接目标；
+- changed/task/full security Gate 已在 Windows 执行并按上文保持正式 FAIL；目标 E-011 文件
+  Prettier、workspace/config、ESLint、架构边界与 dependency-cruiser 直接入口、14/14
+  typecheck、7/7 build、registry `5/5`、CI policy `16/16`、agent/admin/Playwright/queue
+  evidence、production audit 与 supply-chain evidence 均已分别通过；
+- registry 当前为 `736 total / 155 COVERED / 581 PLANNED`，净新增 17 个覆盖；
+  `S33-OBS-041` 因 PAGE/IR 行为尚未实现继续为 `PLANNED`；
+- 尚未创建 required checks、branch protection、repository secret/environment、OIDC、生产
+  资源或自动合并；这些能力必须在核对目标并取得明确授权后另行处理。

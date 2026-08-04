@@ -23,12 +23,26 @@
 `registry/runners.json`。浏览器/jsdom 不能代替微信运行时，内存替身不能代替
 PostgreSQL/Redis/BullMQ。
 
+## E-011 CI 与供应链入口
+
+| 命令                            | 证据                                                               |
+| ------------------------------- | ------------------------------------------------------------------ |
+| `pnpm ci:check`                 | 12 个 lane、最小权限、immutable action、TTL 与外部 pending 边界    |
+| `pnpm ci:test`                  | action/权限/fork secret/cache/artifact/cardinality/digest 负例     |
+| `pnpm ci:audit`                 | production dependency high/critical vulnerability fail-closed Gate |
+| `pnpm ci:supply-chain:evidence` | SPDX SBOM、license、build digest 与 unsigned provenance 生成和扫描 |
+
+普通 PR 自动执行 9 个可用 lane；`miniapp-conformance`、
+`ai-model-load-human` 与 `manual-rc` 保持显式 pending/blocked，不能由普通 GitHub
+job 冒充 PASS。普通合成报告保留 14 天，SBOM/provenance 等供应链证据保留 365 天。
+
 ## Registry 与证据
 
 - `registry/source-sets.json` 从 Accepted 原文和 executable Schema 提取 ID；
 - `registry/coverage-registry.json` 是确定性生成物，只允许 `COVERED`、`PLANNED`、
   `NA_WITH_REASON`；
-- `registry/e010-evidence-manifest.json` 与已有 database/queue/Compose manifest 提供逐项
+- `registry/e010-evidence-manifest.json`、`registry/e011-evidence-manifest.json` 与已有
+  database/queue/Compose manifest 提供逐项
   assertion，不把低层证据升级为高层 conformance；
 - 尚未实现的业务、恢复、模型、真机或人工场景保持 `PLANNED` 或明确 pending，不能因
   runner/模板存在而变为 PASS；
