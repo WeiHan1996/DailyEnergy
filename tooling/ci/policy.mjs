@@ -217,6 +217,12 @@ export function findWorkflowDiagnostics(source, policy, options = {}) {
       if (step.uses) {
         diagnostics.push(...actionDiagnostic(step.uses, policy, location));
       }
+      if (
+        step.uses?.startsWith("actions/checkout@") &&
+        step.with?.["fetch-depth"] !== 0
+      ) {
+        diagnostics.push(`CI_WORKFLOW_CHECKOUT_DEPTH_INVALID:${location}`);
+      }
       if (step.uses?.startsWith("actions/upload-artifact@")) {
         const expectedRetention =
           jobId === "supply-chain"
@@ -406,14 +412,18 @@ export function validateTurboPolicy(configuration) {
 export function validateLicenseInventory(inventory, policy) {
   if (
     policy?.policy_version !== "e-011-license-policy-v1" ||
-    policy.unknown_license !== "FAIL_CLOSED"
+    policy.unknown_license !== "FAIL_CLOSED" ||
+    !Array.isArray(policy.allowed_expressions) ||
+    !Array.isArray(policy.denied_patterns)
   ) {
     fail("CI_LICENSE_POLICY_INVALID", policy?.policy_version ?? "missing");
   }
   const packages = [];
   for (const [expression, entries] of Object.entries(inventory ?? {})) {
+    const conditionalPackages = policy.conditional_packages?.[expression];
     if (
-      !policy.allowed_expressions.includes(expression) ||
+      (!policy.allowed_expressions.includes(expression) &&
+        !Array.isArray(conditionalPackages)) ||
       policy.denied_patterns.some((pattern) =>
         new RegExp(pattern, "iu").test(expression),
       )
@@ -424,6 +434,19 @@ export function validateLicenseInventory(inventory, policy) {
       for (const version of entry.versions ?? []) {
         if (!isNonEmpty(entry.name) || !isNonEmpty(version)) {
           fail("CI_LICENSE_PACKAGE_INVALID", expression);
+        }
+        const conditionallyAllowed = (conditionalPackages ?? []).some(
+          (candidate) =>
+            candidate?.name === entry.name && candidate.version === version,
+        );
+        if (
+          !policy.allowed_expressions.includes(expression) &&
+          !conditionallyAllowed
+        ) {
+          fail(
+            "CI_LICENSE_PACKAGE_DENIED",
+            `${expression}:${entry.name}@${version}`,
+          );
         }
         packages.push({
           license: expression,

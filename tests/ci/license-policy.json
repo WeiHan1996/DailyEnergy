@@ -17,6 +17,14 @@
     "MPL-2.0",
     "Unlicense"
   ],
+  "conditional_packages": {
+    "LGPL-3.0-or-later": [
+      {
+        "name": "@img/sharp-libvips-linux-x64",
+        "version": "1.3.2"
+      }
+    ]
+  },
   "denied_patterns": ["^AGPL", "^GPL", "^SSPL", "^BUSL", "^UNLICENSED$"],
   "unknown_license": "FAIL_CLOSED"
 }

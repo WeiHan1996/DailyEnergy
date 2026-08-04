@@ -40,14 +40,21 @@ async function readJson(relativePath) {
   );
 }
 
-const [ciPolicy, telemetryPolicy, artifactPolicy, turboPolicy, workflow] =
-  await Promise.all([
-    readJson("tests/ci/policy.json"),
-    readJson("tests/ci/telemetry-policy.json"),
-    readJson("tests/artifacts/policy.json"),
-    readJson("turbo.json"),
-    readFile(path.resolve(repositoryRoot, ".github/workflows/ci.yml"), "utf8"),
-  ]);
+const [
+  ciPolicy,
+  telemetryPolicy,
+  artifactPolicy,
+  licensePolicy,
+  turboPolicy,
+  workflow,
+] = await Promise.all([
+  readJson("tests/ci/policy.json"),
+  readJson("tests/ci/telemetry-policy.json"),
+  readJson("tests/artifacts/policy.json"),
+  readJson("tests/ci/license-policy.json"),
+  readJson("turbo.json"),
+  readFile(path.resolve(repositoryRoot, ".github/workflows/ci.yml"), "utf8"),
+]);
 
 test("T-E011-CI-POLICY-001 accepts the minimum-permission pinned workflow", () => {
   assert.deepEqual(validateCiPolicy(ciPolicy), {
@@ -67,6 +74,7 @@ const workflowFixtures = [
   ["fork-secret.yml", "CI_WORKFLOW_SECRET_REFERENCE"],
   ["artifact-ttl.yml", "CI_WORKFLOW_ARTIFACT_TTL_INVALID"],
   ["remote-cache.yml", "CI_WORKFLOW_REMOTE_CACHE_ENABLED"],
+  ["shallow-checkout.yml", "CI_WORKFLOW_CHECKOUT_DEPTH_INVALID"],
 ];
 for (const [fixture, expectedRule] of workflowFixtures) {
   test(`T-E011-CI-POLICY-001 rejects ${fixture}`, async () => {
@@ -177,6 +185,38 @@ test("T-E011-CI-LICENSE-001 fails closed on unknown license expressions", () => 
         policy,
       ),
     /CI_LICENSE_EXPRESSION_DENIED/u,
+  );
+  assert.deepEqual(
+    validateLicenseInventory(
+      {
+        "LGPL-3.0-or-later": [
+          {
+            name: "@img/sharp-libvips-linux-x64",
+            versions: ["1.3.2"],
+          },
+        ],
+      },
+      licensePolicy,
+    ),
+    [
+      {
+        license: "LGPL-3.0-or-later",
+        name: "@img/sharp-libvips-linux-x64",
+        version: "1.3.2",
+      },
+    ],
+  );
+  assert.throws(
+    () =>
+      validateLicenseInventory(
+        {
+          "LGPL-3.0-or-later": [
+            { name: "unexpected-package", versions: ["1.3.2"] },
+          ],
+        },
+        licensePolicy,
+      ),
+    /CI_LICENSE_PACKAGE_DENIED/u,
   );
 });
 

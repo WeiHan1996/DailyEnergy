@@ -257,7 +257,10 @@ async function waitForJob(producer, queueFamily, eventId, expectedState) {
   while (Date.now() < deadline) {
     const job = await producer.getJob(queueFamily, eventId);
     if (job && (await job.getState()) === expectedState) {
-      return job;
+      const settledJob = await producer.getJob(queueFamily, eventId);
+      if (settledJob && (await settledJob.getState()) === expectedState) {
+        return settledJob;
+      }
     }
     await new Promise((resolve) => setTimeout(resolve, 20));
   }

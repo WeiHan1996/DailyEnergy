@@ -11,6 +11,17 @@
     },
     "workspaces": [
       {
+        "directory": "apps/admin",
+        "manifest": {
+          "name": "@daily-energy/app-admin",
+          "private": true,
+          "dailyEnergy": {
+            "kind": "app",
+            "runtime": "client-safe"
+          }
+        }
+      },
+      {
         "directory": "packages/shared",
         "manifest": {
           "name": "@daily-energy/shared",
@@ -43,6 +54,10 @@
       }
     ],
     "files": [
+      {
+        "path": "apps/admin/next.config.ts",
+        "content": "import { fileURLToPath } from \"node:url\";\nexport default { outputFileTracingRoot: fileURLToPath(new URL(\"../..\", import.meta.url)) };\n"
+      },
       {
         "path": "packages/shared/src/index.ts",
         "content": "export const sharedValue = \"safe\";\n"

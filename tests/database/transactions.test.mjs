@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import path from "node:path";
 import test from "node:test";
 import {
   bootstrapTestDatabase,
@@ -11,6 +12,10 @@ import {
 } from "./container-harness.mjs";
 
 const integrationEnabled = process.env.DATABASE_INTEGRATION === "1";
+const prismaBin = path.resolve(
+  "node_modules/.bin",
+  process.platform === "win32" ? "prisma.CMD" : "prisma",
+);
 const transactionMetadata = Object.freeze(
   Array.from({ length: 9 }, (_, index) => ({
     test_id: `T-DB-TX-${String(index + 1).padStart(3, "0")}`,
@@ -187,8 +192,7 @@ test(
       const loginUrls = await bootstrapTestDatabase(adminUrl);
       await runNode("tooling/database/migrate.mjs", {
         DATABASE_URL: loginUrls.migration,
-        PRISMA_BIN:
-          "/Users/chenbin/SelfProject/DailyEnergy/node_modules/.bin/prisma",
+        PRISMA_BIN: prismaBin,
       });
       const { Client } = loadPg();
       const admin = await connect(Client, adminUrl, "tx-admin");

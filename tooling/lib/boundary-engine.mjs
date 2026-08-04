@@ -50,6 +50,7 @@ const clientWorkspaceAllowlist = new Map([
     ]),
   ],
 ]);
+const clientBuildConfigurationPaths = new Set(["apps/admin/next.config.ts"]);
 const allowedRuntimeDependencies = new Map([
   ["client-safe", new Set(["client-safe"])],
   ["server-core", new Set(["client-safe", "server-core"])],
@@ -558,7 +559,9 @@ function checkClient(input) {
     const [area, appName] = file.path.split("/");
     const workspace = workspaceForFile(project, file.path);
     const isClientApp =
-      area === "apps" && clientWorkspaceAllowlist.has(appName);
+      area === "apps" &&
+      clientWorkspaceAllowlist.has(appName) &&
+      !clientBuildConfigurationPaths.has(file.path);
     const isClientPackage =
       area === "packages" &&
       workspace?.manifest.dailyEnergy?.runtime === "client-safe";

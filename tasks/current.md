@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-04（E-011 Draft PR #119 已创建，等待 Linux clean Gate）
+- **最后更新**：2026-08-04（E-011 首轮 Linux Gate 失败已完成本地修复，准备重跑）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-011 — 建立 GitHub Actions CI 与供应链 Gate
 - **任务状态**：In Progress
@@ -9,10 +9,10 @@
 - **当前 Issue**：[E-011 Issue #48](https://github.com/WeiHan1996/DailyEnergy/issues/48)
 - **当前 PR**：[Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119)；[状态 PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已合并
 - **基线提交**：`604db047938444898c222f7136cc9ac1ec333dd4`
-- **Gate 结论**：`LOCAL_LEAF_PASS / WINDOWS_AGGREGATE_FAIL / GITHUB_CLEAN_RUN_PENDING`
-  （security profile；本地 CI policy、16 项 policy 测试、production dependency audit、root
-  build、registry 与 supply-chain evidence 已通过；changed/task/full Gate 已执行但均在
-  Windows CRLF 全仓 format 首步正式失败，不能记为 PASS；外部/人工 lane 保持明确 pending）
+- **Gate 结论**：`LOCAL_FIX_PASS / WINDOWS_AGGREGATE_FAIL / GITHUB_RERUN_PENDING`
+  （security profile；本地 CI policy、17 项 policy 测试、production dependency audit、root
+  build、registry 与 supply-chain evidence 已通过；GitHub 首轮 3/10 job 通过，7 项失败均已
+  定位并完成本地修复，等待新 head 重跑；外部/人工 lane 保持明确 pending）
 
 ## 1. 当前目标
 
@@ -85,6 +85,9 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
 - **外部 lane**：`miniapp-conformance=INFRA_BLOCKED`、
   `ai-model-load-human=PENDING_EXPLICIT_AUTHORIZATION`、
   `manual-rc=MANUAL_EVIDENCE_PENDING`；普通 PR workflow 不创建替代 PASS；
+- **artifact retention**：Accepted supply-chain evidence 要求 365 天，但仓库当前最大值为
+  90 天，GitHub 首轮已明确把 workflow 的 365 天请求降为 90 天；修改仓库 retention 或选择
+  其它获批准的 365 天存储前需要显式授权，当前不能报告 retention PASS；
 - **授权边界**：提交 workflow 与 Draft PR 属于本任务；启用或修改 required checks、
   branch protection、repository secret/environment 前必须核对目标并保留用户授权证据；
 - **security profile**：需要人工复核 workflow 权限、secret/fork 边界、第三方 action、
@@ -96,8 +99,9 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   这些结果保持 FAIL/infra 证据，不改写为 PASS；权威 clean run 由固定
   `ubuntu-24.04` 的 GitHub Actions 补齐；
 - **并行规则**：E-011 是唯一 In Progress；
-- **下一动作**：跟踪 [Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119) 的真实
-  GitHub clean run，修复任何代码失败并补齐托管 CI 证据；CI 全绿后更新本文件为 In Review；
+- **下一动作**：提交并推送首轮 Linux 修复，跟踪
+  [Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119) 的新 clean run；自动 job
+  全绿且 365 天 retention 获授权落实后，再补齐托管证据并更新本文件为 In Review；
 - **下一任务**：E-011 完成前不提升 E-012；E-011 获接受后再评估 E-012。
 
 ## 7. 最近交接
@@ -134,7 +138,7 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   environment 或第三方 Turbo remote cache；
 - `tests/ci` 与 `tooling/ci` 已建立 workflow/policy、fork secret、artifact TTL、cache、
   telemetry 基数、license、production vulnerability、SPDX 2.3 SBOM、build digest 与明确
-  `UNSIGNED/PENDING` provenance Gate；CI policy 测试 `16/16` 通过；
+  `UNSIGNED/PENDING` provenance Gate；CI policy 测试 `17/17` 通过；
 - production audit 当前 `critical=0`、`high=0`；root build `7/7` 通过；supply-chain evidence
   已覆盖 12,956 个 build files 与 715 个 dependency packages，4 个 JSON artifact 约 3.3 MB，
   内容扫描、digest、SBOM/provenance 校验均通过；
@@ -147,8 +151,14 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   测试均已通过；artifact 不记录机器绝对链接目标；
 - changed/task/full security Gate 已在 Windows 执行并按上文保持正式 FAIL；目标 E-011 文件
   Prettier、workspace/config、ESLint、架构边界与 dependency-cruiser 直接入口、14/14
-  typecheck、7/7 build、registry `5/5`、CI policy `16/16`、agent/admin/Playwright/queue
+  typecheck、7/7 build、registry `5/5`、CI policy `17/17`、agent/admin/Playwright/queue
   evidence、production audit 与 supply-chain evidence 均已分别通过；
+- GitHub 首轮 clean run [#30873436444](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30873436444)
+  为 3/10 job 通过：失败根因为 shallow checkout 缺少 `origin/main`、clean checkout 未先构建
+  Admin/API workspace 依赖、Next build config 被误分为 client bundle、TX fixture 硬编码 macOS
+  Prisma 路径、BullMQ failed-job 对象读取竞争和 Linux sharp/libvips license 表达式差异；以上均已
+  以完整 checkout policy/负向 fixture、显式依赖构建、边界 fixture、跨平台路径、settled-job
+  重取和精确 license policy 修复；本机无容器 runtime，PG/Redis 真实回归等待 GitHub runner；
 - registry 当前为 `736 total / 155 COVERED / 581 PLANNED`，净新增 17 个覆盖；
   `S33-OBS-041` 因 PAGE/IR 行为尚未实现继续为 `PLANNED`；
 - 尚未创建 required checks、branch protection、repository secret/environment、OIDC、生产

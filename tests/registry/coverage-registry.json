@@ -5202,6 +5202,7 @@
         {
           "assertions": [
             "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
             "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
@@ -5226,6 +5227,7 @@
         {
           "assertions": [
             "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
             "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
@@ -7654,6 +7656,7 @@
         {
           "assertions": [
             "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
             "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
@@ -8536,6 +8539,7 @@
         {
           "assertions": [
             "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
             "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
@@ -8745,6 +8749,7 @@
         {
           "assertions": [
             "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
             "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
@@ -9494,6 +9499,7 @@
         {
           "assertions": [
             "all 12 Accepted lanes are present while external lanes prohibit a synthetic PASS",
+            "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
             "untrusted PR workflows reject production secret, OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
