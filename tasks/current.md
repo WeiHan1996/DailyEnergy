@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-04（E-011 Linux Gate 10/10 通过，365 天 retention 待授权）
+- **最后更新**：2026-08-04（E-011 security 复核与 Linux Gate 10/10 通过，365 天 retention 待授权）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-011 — 建立 GitHub Actions CI 与供应链 Gate
 - **任务状态**：Blocked
@@ -89,8 +89,9 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   其它获批准的 365 天存储前需要显式授权，当前不能报告 retention PASS；
 - **授权边界**：提交 workflow 与 Draft PR 属于本任务；启用或修改 required checks、
   branch protection、repository secret/environment 前必须核对目标并保留用户授权证据；
-- **security profile**：需要人工复核 workflow 权限、secret/fork 边界、第三方 action、
-  artifact/caching、SBOM/provenance 与供应链残余风险；
+- **security profile**：人工边界复核已完成；checkout credential、secret/fork、第三方 action、
+  artifact scan-before-upload、cache、SBOM/provenance 绑定和供应链残余风险均已核对，发现的
+  credential 持久化、扫描失败仍上传与 provenance 绑定缺口已修复并由 Linux clean run 验证；
 - **Windows Gate 结果**：changed/task/full Agent Gate 均在全仓 `format:check` 首步正式
   `FAIL`，原因是系统 `core.autocrlf=true` 使 333 个未修改基线文件以 CRLF 检出；后续直接
   诊断还确认 contract/codegen 字节指纹、POSIX 单引号 architecture script、数据库
@@ -100,7 +101,7 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
 - **并行规则**：E-011 是唯一当前任务并处于 Blocked；不提升其它任务；
 - **下一动作**：取得用户对以下二选一的明确授权：把 DailyEnergy 仓库 Actions artifact
   retention 上限提高到 365 天，或批准等价的受控 365 天 supply-chain evidence 存储；落实并
-  验证后完成 security 人工边界复核，再把本文件更新为 In Review；
+  验证后把本文件更新为 In Review；
 - **下一任务**：E-011 完成前不提升 E-012；E-011 获接受后再评估 E-012。
 
 ## 7. 最近交接
@@ -131,16 +132,21 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
 - 首轮修复提交 `8cd0b36ed0830ede6a068533a8952e4be5ff96a2` 已推送；GitHub clean run
   [#30874806384](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30874806384) 的 10/10
   automated job 全部成功，包括真实 PostgreSQL、Redis/BullMQ、API/Admin E2E 与 supply-chain；
+- security 人工边界复核发现 checkout 默认持久化 credential、artifact scan 失败后仍会执行上传、
+  provenance subject 文件名及 digest/commit/lockfile/SBOM 绑定不完整；修复提交
+  `7a516e6823d1b6337ebc9d51ab4bd3604c2450d7` 已推送，GitHub clean run
+  [#30875863656](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30875863656) 再次 10/10
+  通过，PR #119 保持 Draft、mergeable/clean；
 - `agent:prepare --remote --deep` 的自动结果因缺少 `gh` 与裸 `pnpm.exe` 为
   `INFRA_BLOCKED`；Issue/main/commit 由 GitHub API/页面复核，Node、Corepack pnpm
   `11.17.0` 与 12 个 workspace 依赖均通过等价检查，开工结论为 GO；
 - 已创建 `.github/workflows/ci.yml`：固定 `ubuntu-24.04`、Node `24.18.0`、pnpm
   `11.17.0` 和三个 immutable action SHA，使用只读 contents 权限、concurrency、45 分钟
-  timeout、9 个自动 lane、14 天合成证据与 365 天供应链证据；不使用 secret、OIDC、
-  environment 或第三方 Turbo remote cache；
+  timeout、9 个自动 lane、14 天合成证据与 365 天供应链证据；checkout 不持久化 credential，
+  artifact 只有在前置扫描成功后才上传；不使用 secret、OIDC、environment 或第三方 Turbo remote cache；
 - `tests/ci` 与 `tooling/ci` 已建立 workflow/policy、fork secret、artifact TTL、cache、
   telemetry 基数、license、production vulnerability、SPDX 2.3 SBOM、build digest 与明确
-  `UNSIGNED/PENDING` provenance Gate；CI policy 测试 `17/17` 通过；
+  `UNSIGNED/PENDING` provenance Gate；CI policy 测试 `19/19` 通过；
 - production audit 当前 `critical=0`、`high=0`；root build `7/7` 通过；supply-chain evidence
   已覆盖 12,956 个 build files 与 715 个 dependency packages，4 个 JSON artifact 约 3.3 MB，
   内容扫描、digest、SBOM/provenance 校验均通过；
@@ -153,7 +159,7 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   测试均已通过；artifact 不记录机器绝对链接目标；
 - changed/task/full security Gate 已在 Windows 执行并按上文保持正式 FAIL；目标 E-011 文件
   Prettier、workspace/config、ESLint、架构边界与 dependency-cruiser 直接入口、14/14
-  typecheck、7/7 build、registry `5/5`、CI policy `17/17`、agent/admin/Playwright/queue
+  typecheck、7/7 build、registry `5/5`、CI policy `19/19`、agent/admin/Playwright/queue
   evidence、production audit 与 supply-chain evidence 均已分别通过；
 - GitHub 首轮 clean run [#30873436444](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30873436444)
   为 3/10 job 通过：失败根因为 shallow checkout 缺少 `origin/main`、clean checkout 未先构建

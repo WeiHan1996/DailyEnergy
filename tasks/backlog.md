@@ -133,8 +133,8 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 E-004 已随 PR #96 合并，E-008 已随 PR #97 squash 合并，E-005 已随 PR #98
 合并，E-015 已随 PR #106 squash 合并。E-006 已随 PR #110/#111 完成，E-007 已随
 PR #113 完成，状态 PR #114 已 squash 合并；E-009 已随 PR #115 squash 合并并完成
-merged-main 验证。E-010 已随 PR #117 squash 合并并进入 Done；E-011 自动 Gate 已在
-Draft PR #119 全绿，当前因 365 天 artifact retention 需要外部授权而 Blocked；实现分支为
+merged-main 验证。E-010 已随 PR #117 squash 合并并进入 Done；E-011 自动 Gate 与 security
+人工边界复核已在 Draft PR #119 通过，当前因 365 天 artifact retention 需要外部授权而 Blocked；实现分支为
 `agent/e011-ci-supply-chain`，E-012 与其它任务保持 Planned。
 
 ## 5. Phase 2：确定性核心闭环
