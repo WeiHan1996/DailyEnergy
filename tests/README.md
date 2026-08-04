@@ -25,13 +25,13 @@ PostgreSQL/Redis/BullMQ。
 
 ## E-011 CI 与供应链入口
 
-| 命令                            | 证据                                                               |
-| ------------------------------- | ------------------------------------------------------------------ |
-| `pnpm ci:check`                 | 12 个 lane、最小权限、immutable action、TTL 与外部 pending 边界    |
-| `pnpm ci:test`                  | action/权限/fork secret/cache/artifact/cardinality/digest 负例     |
+| 命令                                              | 证据                                                                  |
+| ------------------------------------------------- | --------------------------------------------------------------------- |
+| `pnpm ci:check`                                   | 12 个 lane、最小权限、immutable action、TTL 与外部 pending 边界       |
+| `pnpm ci:test`                                    | action/权限/fork secret/cache/artifact/cardinality/digest 负例        |
 | `pnpm ci:verify-pr-merge-gate -- <PR> <HEAD_SHA>` | 私有 Free 临时控制：最新 head 的 11 个 checks 来自同一 run 且全部成功 |
-| `pnpm ci:audit`                 | production dependency high/critical vulnerability fail-closed Gate |
-| `pnpm ci:supply-chain:evidence` | SPDX SBOM、license、build digest 与 unsigned provenance 生成和扫描 |
+| `pnpm ci:audit`                                   | production dependency high/critical vulnerability fail-closed Gate    |
+| `pnpm ci:supply-chain:evidence`                   | SPDX SBOM、license、build digest 与 unsigned provenance 生成和扫描    |
 
 普通 PR 自动执行 9 个可用 lane；`miniapp-conformance`、
 `ai-model-load-human` 与 `manual-rc` 保持显式 pending/blocked，不能由普通 GitHub
