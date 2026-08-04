@@ -1,13 +1,13 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-04（E-011 本地实现与叶子验证完成，准备 Draft PR 和 Linux Gate）
+- **最后更新**：2026-08-04（E-011 Draft PR #119 已创建，等待 Linux clean Gate）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-011 — 建立 GitHub Actions CI 与供应链 Gate
 - **任务状态**：In Progress
 - **任务分支**：`agent/e011-ci-supply-chain`
 - **当前 Issue**：[E-011 Issue #48](https://github.com/WeiHan1996/DailyEnergy/issues/48)
-- **当前 PR**：实现 Draft PR 尚未创建；[状态 PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已合并
+- **当前 PR**：[Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119)；[状态 PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已合并
 - **基线提交**：`604db047938444898c222f7136cc9ac1ec333dd4`
 - **Gate 结论**：`LOCAL_LEAF_PASS / WINDOWS_AGGREGATE_FAIL / GITHUB_CLEAN_RUN_PENDING`
   （security profile；本地 CI policy、16 项 policy 测试、production dependency audit、root
@@ -90,14 +90,14 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
 - **security profile**：需要人工复核 workflow 权限、secret/fork 边界、第三方 action、
   artifact/caching、SBOM/provenance 与供应链残余风险；
 - **Windows Gate 结果**：changed/task/full Agent Gate 均在全仓 `format:check` 首步正式
-  `FAIL`，原因是系统 `core.autocrlf=true` 使 334 个未修改基线文件以 CRLF 检出；后续直接
+  `FAIL`，原因是系统 `core.autocrlf=true` 使 333 个未修改基线文件以 CRLF 检出；后续直接
   诊断还确认 contract/codegen 字节指纹、POSIX 单引号 architecture script、数据库
   `D:\D:\...` URL pathname、CRLF shebang fixture 与 SIGTERM 语义均受 Windows 环境影响。
   这些结果保持 FAIL/infra 证据，不改写为 PASS；权威 clean run 由固定
   `ubuntu-24.04` 的 GitHub Actions 补齐；
 - **并行规则**：E-011 是唯一 In Progress；
-- **下一动作**：完成最终 diff/文件清单复核后提交、推送并创建 Draft PR，再以真实 GitHub
-  clean run 补齐托管 CI 证据；CI 全绿后更新本文件为 In Review；
+- **下一动作**：跟踪 [Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119) 的真实
+  GitHub clean run，修复任何代码失败并补齐托管 CI 证据；CI 全绿后更新本文件为 In Review；
 - **下一任务**：E-011 完成前不提升 E-012；E-011 获接受后再评估 E-012。
 
 ## 7. 最近交接
@@ -122,6 +122,9 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   已 squash 合并为 `604db047938444898c222f7136cc9ac1ec333dd4`；
 - 本地 `main`、`origin/main` 与 GitHub `main` 已验证指向同一签名提交，E-011 实现分支
   `agent/e011-ci-supply-chain` 已从该提交创建；
+- E-011 实现提交 `a407201957c7c2a94166756e09daf6c1eb4b1d86` 已推送并创建
+  [Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119)；PR 保持 Draft，等待固定
+  `ubuntu-24.04` clean Gate，不启用自动合并或仓库权限变更；
 - `agent:prepare --remote --deep` 的自动结果因缺少 `gh` 与裸 `pnpm.exe` 为
   `INFRA_BLOCKED`；Issue/main/commit 由 GitHub API/页面复核，Node、Corepack pnpm
   `11.17.0` 与 12 个 workspace 依赖均通过等价检查，开工结论为 GO；
