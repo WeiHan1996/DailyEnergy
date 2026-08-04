@@ -347,10 +347,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-010 多层测试、Fixture 与 Source-ID Registry Ready
-当前目标：建立可执行的多层测试骨架与唯一 Source-ID 覆盖注册表
-当前任务：E-010 建立多层测试、Fixture 与 Source-ID Registry
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/49
+状态：E-012 开发环境部署 Blocked
+当前目标：在已批准的开发基础设施上建立 digest 晋级、Release Manifest、TLS 与可验证回滚
+当前任务：E-012 部署固定开发环境与可回滚发布流程
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/50
 ```
 
 长期工作入口：
@@ -363,16 +363,15 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- [E-010 Issue #49](https://github.com/WeiHan1996/DailyEnergy/issues/49)
-  是唯一 Ready 任务，尚未创建实现分支；
-- E-010 将交付多层 runner、合成 fixture factory、Source-ID registry、确定性故障与
-  retry/flaky/artifact 规则；未实现项必须显式保持 `PLANNED`；
-- E-009 已随 PR #115 squash 合并，Issue #47 已关闭；merged `main` 的完整验证通过，
-  PostgreSQL 18 为 `82/82`，Queue integration 为 `7/7`；Compose integration 为 `2/2`；
-- 不连接生产依赖，不创建云资源、域名、证书、真实备份或高可用声明；
-- E-015 已完成 P0/P1 权威来源路由、任务 Profile、依赖阻断和安静验证；
+- [E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
+  是唯一当前任务；代码前置已满足，但开发基础设施未授权，因此保持 Blocked；
+- E-011 已随 PR #119 squash 合并，11/11 CI Gate、365 天供应链 artifact retention 和
+  Accepted 私有 Free 临时合并控制均已验证；
+- 解锁 E-012 需要明确选择并授权云厂商/账户、region、主机/预算、域名/DNS/TLS、独立
+  PostgreSQL/Redis/object 服务、部署身份/secret store、责任人与退出方案；
+- 未获授权前不购买或创建云资源、域名、证书、数据库或真实 secret，不开放公网；
 - D-001～D-005 已进入 Phase 2 Backlog，全部保持 Planned；
-- E-010 状态交接合并前不启动实现；不启动 E-011、E-012、D-001 或业务实现任务。
+- E-012 解锁前不创建实现分支；不启动 E-013、E-014、D-001 或业务实现任务。
 
 [Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。
 E-001～E-005 与 E-008 已合并并进入 Done；E-005 随
