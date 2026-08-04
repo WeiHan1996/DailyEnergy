@@ -1,7 +1,7 @@
 # DailyEnergy 项目路线图
 
 - **文档状态**：Accepted
-- **最后更新**：2026-08-02
+- **最后更新**：2026-08-04
 - **当前阶段**：Phase 1 — 工程基础
 - **维护方式**：每个里程碑结束或重大决策变更时更新
 - **当前任务入口**：[tasks/current.md](./tasks/current.md)
@@ -790,7 +790,8 @@ S-12 完成后，再依据实际 Issue 数量制定：
 - E-007 已随 PR #113 squash 合并并进入 Done，merged `main` 的完整验证通过；
 - E-009 已随 PR #115 squash 合并并进入 Done，merged `main` 的完整验证通过；
 - E-010 已随 PR #117 squash 合并并进入 Done；
-- E-011 GitHub Actions CI 与供应链 Gate 是唯一 Ready，尚未创建实现分支；
+- E-011 已随 PR #119 squash 合并并进入 Done，11/11 CI Gate 与 365 天供应链证据通过；
+- E-012 是唯一当前任务；代码前置已满足，但在开发基础设施获得明确选择与授权前保持 Blocked；
 - D-001～D-005 已进入 Phase 2 路线图，当前均为 Planned；
 - 当前唯一执行任务由 tasks/current.md 指定；
 - C-003、C-004、C-009 在 D-004 被接受前不得开始正式页面实现；
