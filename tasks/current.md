@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-04（E-011 PR 复核修复与 Linux clean run 已通过，保持外部阻塞）
+- **最后更新**：2026-08-04（365 天仓库 retention 已获授权并配置，等待新 artifact 复验）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-011 — 建立 GitHub Actions CI 与供应链 Gate
 - **任务状态**：Blocked
@@ -9,11 +9,11 @@
 - **当前 Issue**：[E-011 Issue #48](https://github.com/WeiHan1996/DailyEnergy/issues/48)
 - **当前 PR**：[Draft PR #119](https://github.com/WeiHan1996/DailyEnergy/pull/119)；[状态 PR #118](https://github.com/WeiHan1996/DailyEnergy/pull/118) 已合并
 - **基线提交**：`604db047938444898c222f7136cc9ac1ec333dd4`
-- **Gate 结论**：`LOCAL_TARGETED_PASS / GITHUB_AUTOMATED_PASS / RETENTION_AUTHORIZATION_BLOCKED / REQUIRED_CHECKS_CAPABILITY_BLOCKED / MANUAL_EVIDENCE_PENDING`
+- **Gate 结论**：`LOCAL_TARGETED_PASS / GITHUB_AUTOMATED_PASS / RETENTION_REVALIDATION_PENDING / REQUIRED_CHECKS_CAPABILITY_BLOCKED / MANUAL_EVIDENCE_PENDING`
   （security profile；PR 复核修复的定向 Gate 与 GitHub 11/11 automated checks 已通过；
-  Accepted supply-chain evidence 要求 365 天，但仓库上限将其降为
-  90 天；私有仓库当前计划不提供 branch protection required checks；外部/人工 lane 保持
-  明确 pending，不能报告任务 PASS）
+  Actions artifact retention 已获授权并确认配置为 365 天，但该设置不追溯已有 artifact，须以
+  新 run 的实际 `expires_at` 复验；私有仓库当前计划不提供 branch protection required checks；
+  外部/人工 lane 保持明确 pending，不能报告任务 PASS）
 
 ## 1. 当前目标
 
@@ -86,9 +86,9 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
 - **外部 lane**：`miniapp-conformance=INFRA_BLOCKED`、
   `ai-model-load-human=PENDING_EXPLICIT_AUTHORIZATION`、
   `manual-rc=MANUAL_EVIDENCE_PENDING`；普通 PR workflow 不创建替代 PASS；
-- **artifact retention**：Accepted supply-chain evidence 要求 365 天，但仓库当前最大值为
-  90 天，GitHub 首轮已明确把 workflow 的 365 天请求降为 90 天；修改仓库 retention 或选择
-  其它获批准的 365 天存储前需要显式授权，当前不能报告 retention PASS；
+- **artifact retention**：用户已明确授权将 Actions artifact retention 设置为 365 天，GitHub API
+  已确认仓库当前为 `days=365`、私有仓库上限为 `maximum_allowed_days=400`；设置不追溯已有
+  artifact，必须由新 run 生成供应链证据并核对实际 `expires_at` 后才能报告 retention PASS；
 - **required checks / branch protection**：Accepted testing 规范要求 E-011 把强制 lane 安装为
   branch protection required checks；GitHub branch protection 与 rulesets API 均对当前私有仓库
   返回 403，并明确要求 GitHub Pro 或 public visibility。升级计划或改变可见性不在当前授权内，
@@ -106,13 +106,20 @@ repository-structure、ADR-0006 和 E-010 registry/policy 原文均已读取；�
   这些结果保持 FAIL/infra 证据，不改写为 PASS；权威 clean run 由固定
   `ubuntu-24.04` 的 GitHub Actions 补齐；
 - **并行规则**：E-011 是唯一当前任务并处于 Blocked；不提升其它任务；
-- **下一动作**：保持 PR #119 为 Draft；分别解除两个外部阻塞：授权 365 天 Actions retention
-  或等价受控存储，以及提供支持 branch protection required checks 的仓库能力并显式授权配置。
-  两项均验证后才能把本文件更新为 In Review；
+- **下一动作**：提交并推送本次状态更新，触发新 GitHub run；核对新供应链 artifact 的
+  `expires_at` 约为创建后 365 天。retention 验证通过后，仍需提供支持 branch protection
+  required checks 的仓库能力并显式授权配置；两项均验证后才能把本文件更新为 In Review；
 - **下一任务**：E-011 完成前不提升 E-012；E-011 获接受后再评估 E-012。
 
 ## 7. 最近交接
 
+- 用户已明确授权将 DailyEnergy 仓库 Actions artifact retention 设置为 365 天；GitHub API
+  已确认 `days=365`、`maximum_allowed_days=400`。该设置不追溯旧 artifact，当前须由新 run
+  生成 `ci-supply-chain-evidence` 并以其实际 `created_at/expires_at` 完成 retention 复验；
+- 当前 PR head `007a4fd3baca63476be48c93d43c1acb0b4dd5f3` 的 GitHub run
+  [#30882464490](https://github.com/WeiHan1996/DailyEnergy/actions/runs/30882464490) 已 11/11
+  checks 全部通过，PR #119 仍为 Draft、mergeable/clean；该 run 早于本次仓库设置确认，
+  不能替代新 artifact 留存证据；
 - E-010 配置 root Vitest projects、真实 Nest HTTP Playwright、PG/queue、Admin Chromium
   与微信 DevTools runner，并建立合成 fixture、fault plan、sticky flaky、quarantine、
   artifact/corpus scanner 和 pending evidence 模板；
