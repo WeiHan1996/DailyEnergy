@@ -7,7 +7,7 @@
 - **任务状态**：Blocked
 - **任务分支**：尚未创建实现分支；当前仅有状态交接分支 `agent/e012-handoff`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
-- **当前 PR**：无
+- **当前 PR**：[状态交接 Draft PR #120](https://github.com/WeiHan1996/DailyEnergy/pull/120)
 - **基线提交**：`266a7dc39b87aec23740d64656bf33081a3aa34b`
 - **Gate 结论**：`E011_DONE / E012_DEPENDENCIES_PASS / DEVELOPMENT_INFRASTRUCTURE_AUTHORIZATION_BLOCKED`
 
