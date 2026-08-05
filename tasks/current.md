@@ -1,15 +1,15 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-05（E-012 source-free deployment bundle、安装与顺序发布控制器已实现并通过定向验证）
+- **最后更新**：2026-08-05（E-012 草稿 PR #121 已创建，等待固定 Linux Gate 与评审）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **任务分支**：`agent/e012-development-deployment`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
-- **当前 PR**：无 E-012 实现 PR；项目状态交接见 [PR #120](https://github.com/WeiHan1996/DailyEnergy/pull/120)
+- **当前 PR**：[E-012 草稿 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **基线提交**：最新 `main` 状态交接基线 `6bc3fae`（包含 E-011 合并提交 `266a7dc39b87aec23740d64656bf33081a3aa34b`）
-- **Gate 结论**：`E012_IMPLEMENTATION_IN_PROGRESS / DEV_COLOCATION_ACCEPTED / DEV_COS_SMOKE_PASS / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / DEV_COLOCATION_ACCEPTED / DEV_COS_SMOKE_PASS / PR_CI_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -98,7 +98,7 @@ approved development infrastructure
   smoke、Accepted state、唯一 N-1 rollback 与幂等 replay 已进入代码和定向测试；外部 secret/config
   保持宿主机 `root:root 0600`，部署控制器只在内存中将值交给 Compose，容器按服务以 `0400`
   secret mount 获取最小集合，值不进入命令参数、release env、Compose 解析结果或日志；
-- **下一动作**：完成变更审阅和 E-012 草稿 PR；合并并取得同 commit 完整 CI PASS 后，手动发布
+- **下一动作**：完成 PR #121 固定 Linux Gate 与用户评审；获得明确合并批准并取得同 commit 完整 CI PASS 后，手动发布
   deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、
   执行首次真实 Compose 发布并通过 SSH tunnel 验收。合并前不发布 image，不在服务器现场 build；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
