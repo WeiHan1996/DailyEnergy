@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -15,42 +16,91 @@ import {
   validateReleaseTransition,
 } from "./release-contract.mjs";
 
-const DATABASE_SECRET_VERSION = "dev-secret-v1";
-const COS_SECRET_VERSION = "dev-cos-credential-v1";
+const VERSION_REF = /^[a-z0-9][a-z0-9-]{2,63}$/u;
 
 function fail(code, detail) {
   throw new Error(`${code}:${detail}`);
 }
 
+export function validateDevelopmentReleaseSelection(value) {
+  const keys = Object.keys(value ?? {}).sort();
+  if (
+    JSON.stringify(keys) !==
+      JSON.stringify([
+        "cos_secret_version",
+        "database_secret_version",
+        "object_config_ref",
+      ]) ||
+    Object.entries(value).some(([, ref]) => !VERSION_REF.test(ref))
+  ) {
+    fail("DEV_RELEASE_SELECTION_INVALID", "version-refs");
+  }
+  return Object.freeze({
+    cos_secret_version: value.cos_secret_version,
+    database_secret_version: value.database_secret_version,
+    object_config_ref: value.object_config_ref,
+  });
+}
+
+export function developmentReleaseId({
+  imageSet,
+  objectConfigSha256,
+  selection,
+}) {
+  const selected = validateDevelopmentReleaseSelection(selection);
+  if (!/^[a-f0-9]{64}$/u.test(objectConfigSha256)) {
+    fail("DEV_RELEASE_OBJECT_CONFIG_FINGERPRINT_INVALID", "sha256");
+  }
+  const binding = JSON.stringify({
+    image_set_id: imageSet.image_set_id,
+    object_config_sha256: objectConfigSha256,
+    ...selected,
+  });
+  const digest = createHash("sha256").update(binding).digest("hex");
+  return `devr-${imageSet.source.commit_sha.slice(0, 12)}-${digest.slice(0, 24)}`;
+}
+
 export function materializeDevelopmentRelease({
   currentManifest = null,
+  catalogManifest = currentManifest,
   imageSet,
   objectConfigSource,
   runtimeEvidence,
+  selection,
   supplyEvidence,
 }) {
   validateDevPublicationEvidence(imageSet, supplyEvidence, runtimeEvidence);
+  const selected = validateDevelopmentReleaseSelection(selection);
   if (currentManifest !== null) {
     validateReleaseManifest(currentManifest);
-    if (currentManifest.release_id === imageSet.image_set_id) {
-      fail("DEV_RELEASE_ALREADY_MATERIALIZED", imageSet.image_set_id);
-    }
+  }
+  if (catalogManifest !== null) {
+    validateReleaseManifest(catalogManifest);
   }
   const objectConfig = createCosConfigEvidence(objectConfigSource);
+  const materializedReleaseId = developmentReleaseId({
+    imageSet,
+    objectConfigSha256: objectConfig.config_sha256,
+    selection: selected,
+  });
   const catalogChanged =
-    currentManifest !== null &&
-    currentManifest.migrations.catalog_fingerprint !==
+    catalogManifest !== null &&
+    catalogManifest.migrations.catalog_fingerprint !==
       supplyEvidence.catalog_fingerprint;
   const catalogGeneration =
-    currentManifest === null
+    catalogManifest === null
       ? 1
-      : currentManifest.migrations.catalog_generation +
+      : catalogManifest.migrations.catalog_generation +
         (catalogChanged ? 1 : 0);
+  const currentApplicationGeneration =
+    currentManifest?.compatibility.generation ?? catalogGeneration;
   const acceptedGenerations = [
     ...new Set(
-      catalogChanged
-        ? [currentManifest.migrations.catalog_generation, catalogGeneration]
-        : [catalogGeneration, catalogGeneration + 1],
+      currentApplicationGeneration !== catalogGeneration
+        ? [currentApplicationGeneration, catalogGeneration]
+        : catalogChanged
+          ? [catalogManifest.migrations.catalog_generation, catalogGeneration]
+          : [catalogGeneration, catalogGeneration + 1],
     ),
   ].sort((left, right) => left - right);
   const manifest = {
@@ -70,16 +120,16 @@ export function materializeDevelopmentRelease({
         object_config: objectConfig.config_sha256,
       },
       secret_ref_versions: {
-        cos_secret_id: COS_SECRET_VERSION,
-        cos_secret_key: COS_SECRET_VERSION,
-        database_admin_url: DATABASE_SECRET_VERSION,
-        database_api_url: DATABASE_SECRET_VERSION,
-        database_background_url: DATABASE_SECRET_VERSION,
-        database_interactive_url: DATABASE_SECRET_VERSION,
-        database_migration_url: DATABASE_SECRET_VERSION,
-        database_restricted_url: DATABASE_SECRET_VERSION,
-        fault_control_token: DATABASE_SECRET_VERSION,
-        postgres_password: DATABASE_SECRET_VERSION,
+        cos_secret_id: selected.cos_secret_version,
+        cos_secret_key: selected.cos_secret_version,
+        database_admin_url: selected.database_secret_version,
+        database_api_url: selected.database_secret_version,
+        database_background_url: selected.database_secret_version,
+        database_interactive_url: selected.database_secret_version,
+        database_migration_url: selected.database_secret_version,
+        database_restricted_url: selected.database_secret_version,
+        fault_control_token: selected.database_secret_version,
+        postgres_password: selected.database_secret_version,
       },
     },
     evidence: {
@@ -109,7 +159,7 @@ export function materializeDevelopmentRelease({
       rollback_compatible_release_ids:
         currentManifest === null ? [] : [currentManifest.release_id],
     },
-    release_id: imageSet.image_set_id,
+    release_id: materializedReleaseId,
     source: {
       ci_run_attempt: imageSet.source.ci_run_attempt,
       ci_run_id: imageSet.source.ci_run_id,
@@ -124,7 +174,7 @@ export function materializeDevelopmentRelease({
       sbom_sha256: supplyEvidence.ci_sbom_sha256,
     },
     topology: {
-      object_config_ref: "dev-cos-config-v1",
+      object_config_ref: selected.object_config_ref,
       object_endpoint: "TENCENT_COS_PRIVATE_INTERNAL",
       object_prefix: "dev/objects/",
       object_region: "ap-shanghai",
@@ -148,17 +198,24 @@ async function main() {
     objectConfigFile,
     outputFile,
     currentFile,
+    catalogFile,
+    databaseSecretVersion,
+    cosSecretVersion,
+    objectConfigRef,
   ] = process.argv.slice(2);
   if (
     !imageSetFile ||
     !supplyFile ||
     !runtimeFile ||
     !objectConfigFile ||
-    !outputFile
+    !outputFile ||
+    !databaseSecretVersion ||
+    !cosSecretVersion ||
+    !objectConfigRef
   ) {
     fail(
       "DEV_RELEASE_MATERIALIZE_USAGE",
-      "image-set supply runtime object-config output [current-manifest]",
+      "image-set supply runtime object-config output [current-manifest|-] [catalog-manifest|-] database-secret-version cos-secret-version object-config-ref",
     );
   }
   const [
@@ -167,20 +224,30 @@ async function main() {
     runtimeEvidence,
     objectConfigSource,
     currentManifest,
+    catalogManifest,
   ] = await Promise.all([
     readFile(path.resolve(imageSetFile), "utf8").then(JSON.parse),
     readFile(path.resolve(supplyFile), "utf8").then(JSON.parse),
     readFile(path.resolve(runtimeFile), "utf8").then(JSON.parse),
     readFile(path.resolve(objectConfigFile), "utf8"),
-    currentFile
+    currentFile && currentFile !== "-"
       ? readFile(path.resolve(currentFile), "utf8").then(JSON.parse)
+      : null,
+    catalogFile && catalogFile !== "-"
+      ? readFile(path.resolve(catalogFile), "utf8").then(JSON.parse)
       : null,
   ]);
   const manifest = materializeDevelopmentRelease({
+    catalogManifest,
     currentManifest,
     imageSet,
     objectConfigSource,
     runtimeEvidence,
+    selection: {
+      cos_secret_version: cosSecretVersion,
+      database_secret_version: databaseSecretVersion,
+      object_config_ref: objectConfigRef,
+    },
     supplyEvidence,
   });
   await writeFile(

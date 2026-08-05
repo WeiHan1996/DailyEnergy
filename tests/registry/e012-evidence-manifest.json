@@ -8,7 +8,7 @@
       "level": "STATIC",
       "assertions": [
         "the DEV overlay starts only the authorized co-located PostgreSQL 18, Redis 8 and application profiles without server-side source mounts or builds",
-        "Caddy exposes API and Admin TLS only on loopback while PostgreSQL and Redis publish no host ports",
+        "Caddy exposes API and Admin TLS only on loopback while PostgreSQL and Redis publish no host ports; host probes force loopback transport while preserving the exact Caddy localhost Host/SNI",
         "the one-shot COS smoke is the only application service that receives the COS config and credential mounts and object egress network"
       ]
     },
@@ -34,14 +34,14 @@
     },
     "T-E012-IMAGE-001": {
       "file": "tests/deployment/image-publish.test.mjs",
-      "selector": "manual main-bound GHCR image publication, CI binding and digest-only image set cases",
+      "selector": "manual main-bound GHCR image publication, CI binding, digest-only image set and version-reference materialization cases",
       "level": "CONTRACT",
       "assertions": [
         "publication is a manual development-environment workflow that accepts one exact main commit only after all eleven required checks from one successful CI run",
         "the server is not contacted and all application roles are built on the GitHub runner, pushed to GHCR and recorded only by sha256 digest",
         "the closed image set separately binds five expected Docker targets, commit, successful CI run and publication run and rejects missing metadata, mutable references or digest drift against ReleaseManifestV1",
         "the minimal source-free deployment bundle binds exact Compose, controller, installer, manifest-contract and three publication-evidence files by SHA-256 and rejects path, file-set or content drift",
-        "the root-only installer atomically materializes the external COS config fingerprint and N/N-1 ReleaseManifestV1 under an owner-only versioned directory while exact replay is idempotent",
+        "the root-only installer atomically materializes the external COS config fingerprint plus strictly validated database/COS secret and object-config version refs into a distinct N/N-1 ReleaseManifestV1 while exact replay is idempotent",
         "BuildKit maximum provenance and attached SBOM are required while the private GitHub Free limitation remains explicit as unsigned DEV-only and production_eligible=false"
       ]
     },
@@ -61,7 +61,7 @@
       "selector": "versioned DEV database and fault-control secret creation cases",
       "level": "INTEGRATION",
       "assertions": [
-        "one fresh version creates exactly eight role-scoped random values as owner-only files and binds the PostgreSQL administrator URL to the container password",
+        "one fresh version creates exactly eight role-scoped random values as owner-only files and binds the PostgreSQL administrator URL to the container password; a successor version can retain the active DEV administrator credential while rotating all application login credentials",
         "an existing complete version is revalidated without rotation while partial, extra or permission-unsafe state fails closed",
         "the provision result reports only version, status and file count and never returns credential values"
       ]
@@ -108,11 +108,12 @@
     },
     "T-E012-DEPLOY-001": {
       "file": "tests/deployment/release.test.mjs",
-      "selector": "closed DEV deployment, failure, exact replay and rollback execution cases",
+      "selector": "closed DEV deployment, failure recovery, exact replay and rollback execution cases",
       "level": "INTEGRATION",
       "assertions": [
         "preflight, digest pull, co-located state readiness, ingress closure, worker drain, migration/drift proof, consumer-before-producer startup, loopback TLS and object/Safety/owner/deletion smoke execute in one closed order",
-        "a failed phase does not write Accepted state and exact replay revalidates preflight without reexecuting Docker",
+        "a failed phase does not replace Accepted state, persists a root-only pending/dirty operation and blocks ordinary deploy or rollback until explicit recover-current completes",
+        "Accepted N followed by N+1 failure after migration converges N application/config/secret against the compatible effective catalog, records application and catalog state separately and then restores idempotent replay",
         "rollback accepts only the recorded manifest digest, reruns the complete proof sequence and consumes the single rollback target",
         "the generated release environment contains only immutable references, fingerprints and external secret paths while root-only values are passed only to the Compose process for service-specific secrets and no credential, database URL, bucket identity or public binding is persisted"
       ]

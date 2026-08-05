@@ -13,11 +13,15 @@ import {
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { validateDevPublicationEvidence } from "./image-set.mjs";
+import {
+  validateDevPublicationEvidence,
+  validateManifestImageSet,
+  validateManifestRuntimeEvidence,
+} from "./image-set.mjs";
 import { validateReleaseManifest } from "./release-contract.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "../..");
-const BUNDLE_VERSION = "DevDeploymentBundleV1";
+const BUNDLE_VERSION = "DevDeploymentBundleV2";
 const staticFiles = Object.freeze([
   "compose.yaml",
   "docker/compose.dev.yaml",
@@ -27,6 +31,7 @@ const staticFiles = Object.freeze([
   "tooling/deployment/install-dev-bundle.mjs",
   "tooling/deployment/materialize-dev-release.mjs",
   "tooling/deployment/preflight.mjs",
+  "tooling/deployment/provision-dev-secrets.mjs",
   "tooling/deployment/release-contract.mjs",
   "tooling/deployment/release-state.mjs",
   "tooling/deployment/runtime-evidence.mjs",
@@ -99,7 +104,7 @@ export async function verifyDevelopmentBundle(
   if (
     manifest.bundle_version !== BUNDLE_VERSION ||
     manifest.production_eligible !== false ||
-    !/^dev-[a-f0-9]{12}-\d{1,20}-\d{1,6}$/u.test(manifest.release_id) ||
+    !/^dev-[a-f0-9]{12}-\d{1,20}-\d{1,6}$/u.test(manifest.image_set_id) ||
     !Array.isArray(manifest.files)
   ) {
     fail("DEV_BUNDLE_MANIFEST_INVALID", "document");
@@ -141,9 +146,10 @@ export async function verifyDevelopmentBundle(
     ),
   );
   validateDevPublicationEvidence(imageSet, supplyEvidence, runtimeEvidence);
-  if (manifest.release_id !== imageSet.image_set_id) {
-    fail("DEV_BUNDLE_RELEASE_BINDING", manifest.release_id);
+  if (manifest.image_set_id !== imageSet.image_set_id) {
+    fail("DEV_BUNDLE_IMAGE_SET_BINDING", manifest.image_set_id);
   }
+  let releaseId = null;
   if (materialized) {
     let releaseManifest;
     try {
@@ -154,14 +160,15 @@ export async function verifyDevelopmentBundle(
       fail("DEV_BUNDLE_RELEASE_MANIFEST_INVALID", "json");
     }
     validateReleaseManifest(releaseManifest);
-    if (releaseManifest.release_id !== manifest.release_id) {
-      fail("DEV_BUNDLE_RELEASE_MANIFEST_BINDING", manifest.release_id);
-    }
+    validateManifestImageSet(releaseManifest, imageSet);
+    validateManifestRuntimeEvidence(releaseManifest, imageSet, runtimeEvidence);
+    releaseId = releaseManifest.release_id;
   }
   return Object.freeze({
     files: manifest.files.length,
+    image_set_id: manifest.image_set_id,
     materialized,
-    release_id: manifest.release_id,
+    release_id: releaseId,
   });
 }
 
@@ -211,7 +218,7 @@ export async function buildDevelopmentBundle(destination, evidenceDirectory) {
         bundle_version: BUNDLE_VERSION,
         files: entries,
         production_eligible: false,
-        release_id: imageSet.image_set_id,
+        image_set_id: imageSet.image_set_id,
       },
       null,
       2,
@@ -226,7 +233,7 @@ async function main() {
   if (mode === "--verify" && directory && evidenceDirectory === undefined) {
     const result = await verifyDevelopmentBundle(path.resolve(directory));
     process.stdout.write(
-      `DEV_DEPLOYMENT_BUNDLE_OK:id=${result.release_id}:files=${result.files}:production_eligible=false\n`,
+      `DEV_DEPLOYMENT_BUNDLE_OK:image_set=${result.image_set_id}:files=${result.files}:production_eligible=false\n`,
     );
     return;
   }
@@ -236,7 +243,7 @@ async function main() {
       path.resolve(evidenceDirectory),
     );
     process.stdout.write(
-      `DEV_DEPLOYMENT_BUNDLE_OK:id=${result.release_id}:files=${result.files}:production_eligible=false\n`,
+      `DEV_DEPLOYMENT_BUNDLE_OK:image_set=${result.image_set_id}:files=${result.files}:production_eligible=false\n`,
     );
     return;
   }

@@ -7,6 +7,7 @@ import { parse } from "yaml";
 
 import { cosSmokeTesting } from "../../tooling/deployment/cos-smoke.mjs";
 import { validateDevComposePolicy } from "../../tooling/deployment/dev-compose-policy.mjs";
+import { developmentDeploymentCommands } from "../../tooling/deployment/deploy-dev.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "../..");
 const sources = await Promise.all([
@@ -41,6 +42,31 @@ test("T-E012-COMPOSE-001 accepts loopback-only TLS and DEV co-location", () => {
     public_ports: 0,
     tls_endpoints: 2,
   });
+});
+
+test("T-E012-COMPOSE-001 keeps host health probes aligned with Caddy Host and SNI", () => {
+  const caddyOrigins = new Set(
+    [...sources[3].matchAll(/^https:\/\/(localhost:\d+) \{/gmu)].map(
+      ([, origin]) => origin,
+    ),
+  );
+  const commands = developmentDeploymentCommands(
+    "/srv/dailyenergy/bundles/synthetic",
+    "/srv/dailyenergy/bundles/synthetic/release.env",
+  );
+  const healthOrigins = new Set(
+    [...commands.health, ...commands["maintenance-off"]].map(
+      (command) => new URL(command.arguments.at(-1)).host,
+    ),
+  );
+  assert.deepEqual(healthOrigins, caddyOrigins);
+  for (const command of [...commands.health, ...commands["maintenance-off"]]) {
+    const url = new URL(command.arguments.at(-1));
+    assert.ok(
+      command.arguments.includes(`${url.host}:127.0.0.1`),
+      `${url.host} must resolve to loopback without changing Host/SNI`,
+    );
+  }
 });
 
 test("T-E012-COMPOSE-001 rejects public ingress and server-side builds", () => {

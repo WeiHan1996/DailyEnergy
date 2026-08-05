@@ -24,6 +24,7 @@ import {
 import {
   commitSuccessfulDeployment,
   commitSuccessfulRollback,
+  readReleaseOperation,
   readReleaseState,
   withReleaseLock,
 } from "../../tooling/deployment/release-state.mjs";
@@ -208,10 +209,12 @@ test("T-E012-STATE-001 records one rollback target and makes replay idempotent",
     acceptedAtUtc: "2026-08-05T01:00:00.000Z",
   });
   assert.equal(first.state.rollback_target, null);
+  assert.equal(first.state.catalog.release_id, previous.release_id);
   const second = await commitSuccessfulDeployment(root, current, {
     acceptedAtUtc: "2026-08-05T01:01:00.000Z",
   });
   assert.equal(second.state.rollback_target.release_id, previous.release_id);
+  assert.equal(second.state.catalog.release_id, current.release_id);
   const replay = await commitSuccessfulDeployment(root, current, {
     acceptedAtUtc: "2026-08-05T01:02:00.000Z",
   });
@@ -446,6 +449,131 @@ test("T-E012-DEPLOY-001 does not accept release state when any ordered phase fai
     /E012_DEPLOY_PHASE_FAILED:smoke-object/u,
   );
   assert.equal(await readReleaseState(stateRoot), null);
+  const pending = await readReleaseOperation(stateRoot);
+  assert.equal(pending.status, "FAILED");
+  assert.equal(pending.target.release_id, "e012-deploy-fail");
+  const retried = await executeDevelopmentDeployment({
+    bundleRoot,
+    imageSet: {},
+    manifest: manifest("e012-deploy-fail"),
+    preflight: async () => undefined,
+    runner: async () => ({ code: 0 }),
+    runtimeEvidence: {},
+    secretEnvironmentLoader: noSecretEnvironment,
+    stateRoot,
+  });
+  assert.equal(retried.receipts.length, deploymentPhases.length);
+  assert.equal(
+    (await readReleaseState(stateRoot)).current.release_id,
+    "e012-deploy-fail",
+  );
+  assert.equal(await readReleaseOperation(stateRoot), null);
+});
+
+test("T-E012-DEPLOY-001 converges Accepted N after N+1 fails after migration", async (t) => {
+  const root = await temporaryRoot(t);
+  const firstBundle = path.join(root, "first");
+  const secondBundle = path.join(root, "second");
+  const stateRoot = path.join(root, "state");
+  await Promise.all([mkdir(firstBundle), mkdir(secondBundle)]);
+  const current = manifest("e012-recover-n", {
+    acceptedGenerations: [1, 2],
+  });
+  const candidate = manifest("e012-recover-n-plus-one", {
+    acceptedGenerations: [1, 2],
+    catalogGeneration: 2,
+    generation: 2,
+    rollbackCompatibleReleaseIds: [current.release_id],
+    mutate: (value) => {
+      value.images.migration = `ghcr.io/weihan1996/dailyenergy-migration@sha256:${"9".repeat(64)}`;
+      value.migrations.catalog_fingerprint = "f".repeat(64);
+    },
+  });
+  const common = {
+    imageSet: {},
+    preflight: async () => undefined,
+    runtimeEvidence: {},
+    secretEnvironmentLoader: noSecretEnvironment,
+    stateRoot,
+  };
+  await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: firstBundle,
+    manifest: current,
+    runner: async () => ({ code: 0 }),
+  });
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      bundleRoot: secondBundle,
+      manifest: candidate,
+      runner: async (command) => ({
+        code: command.arguments.includes("object-smoke") ? 1 : 0,
+      }),
+    }),
+    /E012_DEPLOY_PHASE_FAILED:smoke-object/u,
+  );
+  const dirty = await readReleaseOperation(stateRoot);
+  assert.equal(dirty.status, "FAILED");
+  assert.equal(dirty.migration_started, true);
+  assert.equal(dirty.target.release_id, candidate.release_id);
+  assert.equal(
+    (await readReleaseState(stateRoot)).current.release_id,
+    current.release_id,
+  );
+
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      bundleRoot: firstBundle,
+      manifest: current,
+      runner: async () => ({ code: 0 }),
+    }),
+    /RELEASE_RECOVERY_REQUIRED:e012-recover-n-plus-one/u,
+  );
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      bundleRoot: firstBundle,
+      manifest: current,
+      operation: "rollback",
+      runner: async () => ({ code: 0 }),
+    }),
+    /RELEASE_RECOVERY_REQUIRED:e012-recover-n-plus-one/u,
+  );
+
+  const recovered = await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: firstBundle,
+    manifest: current,
+    operation: "recover-current",
+    runner: async () => ({ code: 0 }),
+  });
+  assert.equal(recovered.receipts.length, deploymentPhases.length);
+  const recoveredState = await readReleaseState(stateRoot);
+  assert.equal(recoveredState.current.release_id, current.release_id);
+  assert.equal(recoveredState.catalog.release_id, candidate.release_id);
+  assert.equal(recoveredState.catalog.catalog_generation, 2);
+  assert.equal(await readReleaseOperation(stateRoot), null);
+  const recoveryEnvironment = await readFile(
+    path.join(
+      stateRoot,
+      `recover-${current.release_id}-${candidate.release_id}.env`,
+    ),
+    "utf8",
+  );
+  assert.ok(recoveryEnvironment.includes(current.images.server));
+  assert.ok(recoveryEnvironment.includes(candidate.images.migration));
+
+  const replay = await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: firstBundle,
+    manifest: current,
+    runner: async () => {
+      throw new Error("recovered Accepted replay must be idempotent");
+    },
+  });
+  assert.deepEqual(replay, { idempotent: true, receipts: [] });
 });
 
 test("T-E012-DEPLOY-001 rolls back only to the recorded compatible manifest and consumes the target", async (t) => {
@@ -513,6 +641,25 @@ test("T-E012-DEPLOY-001 keeps Docker builds, public bindings and raw secrets out
   assert.equal(serialized.includes(" build"), false);
   assert.equal(serialized.includes("docker.sock"), false);
   assert.equal(serialized.includes("0.0.0.0:443"), false);
+  for (const command of [...commands.health, ...commands["maintenance-off"]]) {
+    assert.ok(command.arguments.includes("--resolve"));
+    assert.ok(
+      command.arguments.some((argument) =>
+        /^localhost:844[34]:127\.0\.0\.1$/u.test(argument),
+      ),
+    );
+    assert.ok(
+      command.arguments.some((argument) =>
+        /^https:\/\/localhost:844[34]\//u.test(argument),
+      ),
+    );
+    assert.equal(
+      command.arguments.some((argument) =>
+        /^https:\/\/127\.0\.0\.1:844[34]\//u.test(argument),
+      ),
+      false,
+    );
+  }
   for (const phase of [
     "worker-interactive",
     "worker-background",

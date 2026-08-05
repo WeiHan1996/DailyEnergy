@@ -51,6 +51,29 @@ test("T-E012-SECRET-001 creates and revalidates one closed root-equivalent DEV s
   assert.equal(adminUrl.password, postgresPassword);
   assert.equal(adminUrl.hostname, "postgres");
   assert.equal(adminUrl.pathname, "/daily_energy");
+
+  const rotatedOptions = {
+    ...options,
+    inheritAdminFromVersion: "dev-secret-v1",
+    version: "dev-secret-v2",
+  };
+  assert.deepEqual(await provisionDevelopmentSecrets(rotatedOptions), {
+    files: 8,
+    status: "CREATED",
+  });
+  const rotatedDirectory = path.join(root, "secrets", "dev-secret-v2");
+  assert.equal(
+    await readFile(path.join(rotatedDirectory, "postgres-password"), "utf8"),
+    await readFile(path.join(directory, "postgres-password"), "utf8"),
+  );
+  assert.equal(
+    await readFile(path.join(rotatedDirectory, "database-admin-url"), "utf8"),
+    await readFile(path.join(directory, "database-admin-url"), "utf8"),
+  );
+  assert.notEqual(
+    await readFile(path.join(rotatedDirectory, "database-api-url"), "utf8"),
+    await readFile(path.join(directory, "database-api-url"), "utf8"),
+  );
 });
 
 test("T-E012-SECRET-001 fails closed on partial or unsafe existing state", async (t) => {

@@ -138,11 +138,13 @@ async function validateCompleteSet(directory, expectedUid, expectedGid) {
   if (!VALUE.test(values.get("fault-control-token"))) {
     fail("E012_DEV_SECRET_VALUE_INVALID");
   }
+  return values;
 }
 
 export async function provisionDevelopmentSecrets({
   expectedGid = process.getgid?.(),
   expectedUid = process.getuid?.(),
+  inheritAdminFromVersion = null,
   root = DEVELOPMENT_ROOT,
   version = DEVELOPMENT_SECRET_VERSION,
 } = {}) {
@@ -151,6 +153,13 @@ export async function provisionDevelopmentSecrets({
   }
   if (!/^[a-z0-9][a-z0-9-]{2,63}$/u.test(version)) {
     fail("E012_DEV_SECRET_VERSION_INVALID");
+  }
+  if (
+    inheritAdminFromVersion !== null &&
+    (!/^[a-z0-9][a-z0-9-]{2,63}$/u.test(inheritAdminFromVersion) ||
+      inheritAdminFromVersion === version)
+  ) {
+    fail("E012_DEV_SECRET_INHERIT_VERSION_INVALID");
   }
   const secretsRoot = path.join(root, "secrets");
   await validateProtectedParent(root, expectedUid, expectedGid);
@@ -173,10 +182,22 @@ export async function provisionDevelopmentSecrets({
     });
   }
 
-  const postgresPassword = secretValue();
+  const inherited =
+    inheritAdminFromVersion === null
+      ? null
+      : await validateCompleteSet(
+          path.join(secretsRoot, inheritAdminFromVersion),
+          expectedUid,
+          expectedGid,
+        );
+  const postgresPassword = inherited?.get("postgres-password") ?? secretValue();
   const values = new Map([
     ["postgres-password", postgresPassword],
-    ["database-admin-url", databaseUrl("postgres", postgresPassword)],
+    [
+      "database-admin-url",
+      inherited?.get("database-admin-url") ??
+        databaseUrl("postgres", postgresPassword),
+    ],
     ["database-api-url", databaseUrl("daily_energy_api_login", secretValue())],
     [
       "database-background-url",
@@ -212,12 +233,20 @@ export async function provisionDevelopmentSecrets({
 }
 
 async function main() {
-  if (process.getuid?.() !== 0 || process.argv.length !== 2) {
+  const [version, inheritAdminFromVersion] = process.argv.slice(2);
+  if (
+    process.getuid?.() !== 0 ||
+    !version ||
+    ![3, 4].includes(process.argv.length)
+  ) {
     fail("E012_DEV_SECRET_PROVISION_USAGE");
   }
-  const result = await provisionDevelopmentSecrets();
+  const result = await provisionDevelopmentSecrets({
+    inheritAdminFromVersion: inheritAdminFromVersion ?? null,
+    version,
+  });
   process.stdout.write(
-    `E012_DEV_SECRETS_OK:status=${result.status}:files=${result.files}:version=${DEVELOPMENT_SECRET_VERSION}\n`,
+    `E012_DEV_SECRETS_OK:status=${result.status}:files=${result.files}:version=${version}\n`,
   );
 }
 

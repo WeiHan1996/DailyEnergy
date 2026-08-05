@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-08-05（ADR-0007 DEV 同机 PG/Redis 与私有 COS 边界已接受）
+- **最后更新**：2026-08-05（E-012 发布失败恢复与可执行版本轮换合同已补充）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0007 临时 DEV 同机例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
@@ -315,6 +315,10 @@ ReleaseManifestV1 {
 
 - manifest 只保存 ref、version、digest、时间和角色，不保存 secret、环境变量值、数据库 URL、用户内容或 provider payload；
 - `release_id` 不可变；任何 image/config/migration/capability 变化创建新 release；
+- CI 发布的 `image_set_id` 只标识一组不可变镜像与供应链证据；materializer 以
+  `image_set_id + database secret version + COS secret version + object config ref + object config fingerprint`
+  派生不同的 `release_id`。因此 secret/config-only 轮换可以复用同一组已验证 image digest，但不能复用旧 release ID；
+- 安装入口只接受受 closed pattern 校验的非敏感 version/ref 参数，禁止通过参数传 secret value、路径、URL 或任意 env；
 - production 实际 fingerprint 与 manifest 不同则 startup/deployment Gate 失败；
 - 当前生产与上一份可回滚 Accepted manifest 必须可查询；
 - additive migration 前，当前 application generation 必须声明接受下一 catalog generation；materializer 在无 catalog 变化时使用 `[N, N+1]`，发生 catalog 变化时使用 `[N-1, N]`，同 schema 的后续 release 再向 `[N, N+1]` 滑动，窗口始终最多两代；
@@ -355,6 +359,10 @@ ReleaseManifestV1 {
 - config dump/health 只返回字段名、是否存在、fingerprint 和稳定状态，不返回值。
 
 Deploy config 变化创建受审 commit/manifest；secret rotation 创建新 secret version 并更新 manifest ref；runtime catalog 通过受控 Admin/operation publish。三者不能用一个“万能热更新”接口。
+
+E-012 DEV materializer 必须允许操作者为每次安装选择 database secret version、COS secret version 与 object config ref；
+这三个参数只包含版本引用，不含值，并与 object config fingerprint 一同进入不可变 release 身份。轮换不得要求修改常量、重跑 CI
+或重新构建相同 image，且不得覆盖已有 version directory/config file。
 
 ## 12. Secret 与凭据
 
@@ -634,6 +642,18 @@ remote Turbo cache 在 v1 继续禁用。job-local cache 只含可重建依赖/�
 6. 重建 readiness、owner/Safety/delete、command/publish、queue smoke；
 7. 恢复流量并进入 S-23 规定观察窗口；
 8. 任何数据完整性未知保持隔离，不以页面恢复视为完成。
+
+发布控制器必须在第一次可能改变运行态的阶段前持久化 pending operation，并在每个阶段开始/通过时原子更新。任一阶段失败或进程中断后：
+
+- Accepted application release 与唯一 rollback target 不被候选覆盖；
+- 普通 deploy/rollback 必须以 `RELEASE_RECOVERY_REQUIRED` fail closed，不能把同一 Accepted release 当作无操作 replay；
+- `recover-current` 必须重新执行完整阶段，把当前 Accepted application/config/secret 收敛回来；
+- migration 尚未开始时使用已记录 effective catalog；migration 已开始时用失败候选中已通过 preflight 的 immutable migration image
+  完成 additive migration，并验证当前 application 接受该 generation；
+- state 分别记录 Accepted application ref 与 effective catalog ref。代码回滚不声称执行 down migration，也不能把应用切到不接受当前
+  effective catalog 的目标；
+- recovery 完成完整 health、COS、Safety、owner、deletion smoke 后才清除 dirty operation。首次发布尚无 Accepted release 时，只有同一
+  manifest 可完整重试，不能用其它候选跳过 dirty state。
 
 ## 21. PostgreSQL 备份
 

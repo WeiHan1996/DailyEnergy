@@ -73,13 +73,17 @@ scp -i <SSH_IDENTITY_FILE> -r \
 ```bash
 sudo /usr/local/bin/dailyenergy-node \
   /tmp/dailyenergy-dev-bundle/tooling/deployment/install-dev-bundle.mjs \
-  /tmp/dailyenergy-dev-bundle
+  /tmp/dailyenergy-dev-bundle \
+  dev-secret-v1 \
+  dev-cos-credential-v1 \
+  dev-cos-config-v1
 ```
 
 成功输出只包含 `release_id`、catalog generation 和本次是否首次安装。安装入口会在 release lock 内：
 
 - 校验 source bundle；
-- 读取 COS 无值配置计算 fingerprint，但不读取 COS credential；
+- 严格校验命令中的 database secret version、COS secret version 与 object config ref；这些参数不得包含路径或 secret value；
+- 读取所选 COS 无值配置计算 fingerprint，但不读取 COS credential；
 - 结合当前 Accepted release 生成 N/N-1 兼容的 `ReleaseManifestV1`；
 - 以 `root:root`、目录 `0700`、文件 `0600` 原子安装到 `/srv/dailyenergy/bundles/<release_id>`；
 - 对同一 bundle 重放时验证已安装内容并返回 `installed=false`。
@@ -116,7 +120,10 @@ exit
 
 控制器固定执行 18 个阶段：preflight、digest pull、stateful readiness、关闭 loopback TLS 进入 DEV 维护、drain workers、migration 与 drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、COS object smoke、Safety smoke、owner smoke、deletion smoke、退出维护。任一阶段失败都不写 Accepted release state。
 
-首次全通过后才会更新 `/srv/dailyenergy/deployment/release-state.json`，保存当前 release 和唯一 N-1 rollback target，并写无用户内容的 PASS receipt。同一 release 重放只重新核验 manifest/preflight，不重复迁移或写状态。
+首次全通过后才会更新 `/srv/dailyenergy/deployment/release-state.json`，分别保存当前 Accepted application、实际 effective catalog 和唯一
+N-1 rollback target，并写无用户内容的 PASS receipt。同一 release 在没有 dirty operation 时重放只重新核验 manifest/preflight，
+不重复迁移或写状态。控制器在第一次运行态变更前写 `/srv/dailyenergy/deployment/release-operation.json`；失败后保留该文件并拒绝普通
+deploy/rollback，不能把 Accepted release 的幂等返回误当作恢复。
 
 ## 5. Loopback TLS 验收
 
@@ -138,7 +145,38 @@ curl --fail --insecure https://localhost:8444/login
 
 DEV 使用 Caddy internal certificate，因此浏览器会显示本地不受信任证书；这不是公网证书验收。不要为了消除警告而开放 80/443、修改 DNS 或导入未授权证书。
 
-## 6. 回滚
+## 6. 发布失败后的恢复
+
+如果已有 Accepted release 的候选发布失败，先查看无 secret 的 state/operation，确认 `current`、`target`、`active_phase` 和
+`migration_started`：
+
+```bash
+sudo sed -n '1,220p' /srv/dailyenergy/deployment/release-state.json
+sudo sed -n '1,220p' /srv/dailyenergy/deployment/release-operation.json
+```
+
+不得删除或编辑 operation/state。进入 state 中 `current.release_id` 对应的已安装 bundle，显式恢复当前 Accepted release：
+
+```bash
+sudo -i
+CURRENT_RELEASE_ID='<STATE_CURRENT_RELEASE_ID>'
+cd "/srv/dailyenergy/bundles/${CURRENT_RELEASE_ID}"
+/usr/local/bin/dailyenergy-node tooling/deployment/deploy-dev.mjs \
+  recover-current \
+  release-manifest.json \
+  evidence/dev-image-set.json \
+  evidence/dev-runtime-evidence.json
+exit
+```
+
+控制器会重新执行完整 18 阶段。失败操作若尚未进入 migration，恢复使用 state 已记录的 effective catalog；若已经进入 migration，
+恢复使用失败候选中已在 preflight 验证过的 immutable migration image 完成 additive migration，再启动当前 Accepted 的 application、
+config 和 secret。只有完整 smoke 通过后才更新 effective catalog 记录并清除 operation。恢复自身失败时继续保留 dirty operation，修复外部
+原因后重复同一 `recover-current`，不得改用 deploy/rollback 绕过。
+
+首次发布尚无 Accepted state 时不能执行 `recover-current`；修复失败原因后，只能对同一 manifest 重试 `deploy`。其它候选会被拒绝。
+
+## 7. 回滚
 
 只有 `release-state.json` 中记录的唯一 `rollback_target` 可以回滚。先查看无 secret 状态文件并抄录精确 target release ID：
 
@@ -162,7 +200,7 @@ exit
 
 控制器会重新校验 manifest digest、双向 catalog generation 兼容和完整 18 阶段 smoke。成功后消费旧 rollback target；禁止手改 state、指定任意历史 tag、恢复旧数据库 volume 或跳过 migration/Smoke。
 
-## 7. Secret/配置轮换
+## 8. Secret/配置轮换
 
 - secret value 变化必须创建新 version directory，并以新 release manifest 引用；不得覆盖 `dev-secret-v1` 或 `dev-cos-credential-v1` 的现有文件；
 - COS bucket、region、prefix 或 endpoint 变化属于 deploy config 变化，必须生成新 fingerprint 和 release；
@@ -170,7 +208,35 @@ exit
 - GHCR token 轮换不改变 application release，但必须验证 digest pull 并记录操作时间和操作者；
 - STAGING/PRODUCTION 不复用任何 DEV secret version 或身份。
 
-## 8. 临时主机迁移或丢失
+应用数据库 role 轮换示例：创建 `dev-secret-v2`，保留当前 DEV PostgreSQL administrator/container credential，只轮换各 application login
+credential；这使 `database-init` 可先用仍有效的 admin 连接，再原子更新最小角色密码。参数只含 version ref，命令不输出值：
+
+```bash
+sudo /usr/local/bin/dailyenergy-node \
+  /tmp/dailyenergy-dev-bundle/tooling/deployment/provision-dev-secrets.mjs \
+  dev-secret-v2 \
+  dev-secret-v1
+```
+
+若 PostgreSQL administrator/container credential 泄露，停止普通轮换并按 DEV 可丢弃边界重建 PostgreSQL volume/主机；不得把新 admin
+password 只写入文件后假装现有 PostgreSQL 已完成轮换。
+
+COS credential 由 CAM 创建 `dev-cos-credential-v2`，以相同文件名写入新的 root-only version directory；COS deploy config 变化则创建
+新的 `/srv/dailyenergy/config/dev-cos-config-v2.env`。完成文件权限和最小权限验证后，用同一 CI bundle 重新运行安装入口：
+
+```bash
+sudo /usr/local/bin/dailyenergy-node \
+  /tmp/dailyenergy-dev-bundle/tooling/deployment/install-dev-bundle.mjs \
+  /tmp/dailyenergy-dev-bundle \
+  dev-secret-v2 \
+  dev-cos-credential-v2 \
+  dev-cos-config-v2
+```
+
+安装器会因 version refs/config fingerprint 变化生成新的 `release_id`，manifest 明确绑定 v2；无需修改代码、重跑 CI 或重建相同镜像。
+先发布并通过完整 smoke，再吊销旧 application/COS credential。疑似泄露时先 containment/吊销的事件流程优先，不能为了无缝轮换继续使用泄露值。
+
+## 9. 临时主机迁移或丢失
 
 DEV 的恢复单位是“同一 GitHub artifact + immutable image digest + migration catalog + 外部无值配置 + 重新创建的版本化 secret”，不是容器文件系统或旧 volume：
 
@@ -183,7 +249,7 @@ DEV 的恢复单位是“同一 GitHub artifact + immutable image digest + migra
 
 PostgreSQL/Redis DEV volume 不承诺备份、PITR、RPO、RTO 或 HA；COS application objects 会按 7 天生命周期删除。需要保留的测试事实必须来自可重复 seed/fixture，而不是迁移可变 DEV 数据。
 
-## 9. 必须停止的情况
+## 10. 必须停止的情况
 
 出现以下任一情况，停止发布且不得写 PASS：
 
@@ -193,6 +259,7 @@ PostgreSQL/Redis DEV volume 不承诺备份、PITR、RPO、RTO 或 HA；COS appl
 - COS 配置 fingerprint、secret version、host baseline 或非 loopback 端口漂移；
 - migration/drift、health、COS、Safety、owner 或 deletion 任一 smoke 失败；
 - rollback target 不存在、不兼容或与 state digest 不一致；
+- 存在 dirty operation 却尝试普通 deploy/rollback，或恢复目标不是 state 中的 current Accepted release；
 - 发现真实用户数据、生产身份、生产 secret 或 DEV 状态正在向生产迁移。
 
 凭据暴露、越权、真实数据进入 DEV 或 Safety/删除控制失效时，按[故障和安全事件响应](./incident-response.md)处理。

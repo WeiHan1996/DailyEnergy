@@ -20,7 +20,10 @@ import {
   verifyDevelopmentBundle,
 } from "../../tooling/deployment/deployment-bundle.mjs";
 import { installDevelopmentBundle } from "../../tooling/deployment/install-dev-bundle.mjs";
-import { materializeDevelopmentRelease } from "../../tooling/deployment/materialize-dev-release.mjs";
+import {
+  developmentReleaseId,
+  materializeDevelopmentRelease,
+} from "../../tooling/deployment/materialize-dev-release.mjs";
 import {
   collectDevRuntimeEvidence,
   devRuntimeEvidenceDigest,
@@ -38,6 +41,11 @@ import { releaseManifestFixture } from "./release-fixture.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "../..");
 const COMMIT_SHA = "a".repeat(40);
+const RELEASE_SELECTION_V1 = Object.freeze({
+  cos_secret_version: "dev-cos-credential-v1",
+  database_secret_version: "dev-secret-v1",
+  object_config_ref: "dev-cos-config-v1",
+});
 
 function runtimeEvidence(releaseId) {
   return {
@@ -160,9 +168,23 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
     imageSet: value,
     objectConfigSource,
     runtimeEvidence: runtimeEvidence(releaseId),
+    selection: RELEASE_SELECTION_V1,
     supplyEvidence: supplyEvidence(releaseId),
   });
-  assert.equal(materialized.release_id, value.image_set_id);
+  assert.match(materialized.release_id, /^devr-a{12}-[a-f0-9]{24}$/u);
+  assert.equal(
+    developmentReleaseId({
+      imageSet: value,
+      objectConfigSha256:
+        materialized.config.runtime_fingerprints.object_config,
+      selection: {
+        object_config_ref: "dev-cos-config-v1",
+        database_secret_version: "dev-secret-v1",
+        cos_secret_version: "dev-cos-credential-v1",
+      },
+    }),
+    materialized.release_id,
+  );
   assert.deepEqual(materialized.compatibility.accepted_generations, [1, 2]);
   assert.deepEqual(
     validateManifestRuntimeEvidence(
@@ -170,7 +192,11 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
       value,
       runtimeEvidence(releaseId),
     ),
-    { fingerprints: 5, release_id: value.image_set_id },
+    {
+      fingerprints: 5,
+      image_set_id: value.image_set_id,
+      release_id: materialized.release_id,
+    },
   );
   assert.equal(JSON.stringify(materialized).includes("1250000000"), false);
 
@@ -192,6 +218,7 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
     imageSet: migratedImageSet,
     objectConfigSource,
     runtimeEvidence: runtimeEvidence(migratedReleaseId),
+    selection: RELEASE_SELECTION_V1,
     supplyEvidence: migratedSupply,
   });
   assert.equal(migratedManifest.migrations.catalog_generation, 2);
@@ -219,6 +246,7 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
     imageSet: forwardImageSet,
     objectConfigSource,
     runtimeEvidence: runtimeEvidence(forwardReleaseId),
+    selection: RELEASE_SELECTION_V1,
     supplyEvidence: forwardSupply,
   });
   assert.equal(forwardManifest.migrations.catalog_generation, 2);
@@ -240,8 +268,9 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
   ]);
   const bundle = path.join(directory, "bundle");
   const built = await buildDevelopmentBundle(bundle, directory);
-  assert.equal(built.release_id, value.image_set_id);
-  assert.equal(built.files, 15);
+  assert.equal(built.image_set_id, value.image_set_id);
+  assert.equal(built.release_id, null);
+  assert.equal(built.files, 16);
   assert.equal(built.materialized, false);
   assert.deepEqual(await verifyDevelopmentBundle(bundle), built);
 
@@ -259,22 +288,54 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
     developmentRoot,
     expectedGid: process.getgid(),
     expectedUid: process.getuid(),
+    selection: RELEASE_SELECTION_V1,
   };
   const installed = await installDevelopmentBundle(bundle, protection);
   assert.equal(installed.installed, true);
-  assert.equal(installed.release_id, value.image_set_id);
-  assert.equal(path.basename(installed.path), value.image_set_id);
+  assert.equal(installed.release_id, materialized.release_id);
+  assert.equal(path.basename(installed.path), materialized.release_id);
   assert.deepEqual(
     await verifyDevelopmentBundle(installed.path, { materialized: true }),
     {
-      files: 15,
+      files: 16,
+      image_set_id: value.image_set_id,
       materialized: true,
-      release_id: value.image_set_id,
+      release_id: materialized.release_id,
     },
   );
   const replayed = await installDevelopmentBundle(bundle, protection);
   assert.equal(replayed.installed, false);
   assert.equal(replayed.manifest_sha256, installed.manifest_sha256);
+
+  const selectionV2 = {
+    cos_secret_version: "dev-cos-credential-v2",
+    database_secret_version: "dev-secret-v2",
+    object_config_ref: "dev-cos-config-v2",
+  };
+  await writeFile(
+    path.join(developmentRoot, "config", "dev-cos-config-v2.env"),
+    objectConfigSource,
+    { mode: 0o600 },
+  );
+  const rotated = await installDevelopmentBundle(bundle, {
+    ...protection,
+    selection: selectionV2,
+  });
+  assert.equal(rotated.installed, true);
+  assert.notEqual(rotated.release_id, installed.release_id);
+  const rotatedManifest = JSON.parse(
+    await readFile(path.join(rotated.path, "release-manifest.json"), "utf8"),
+  );
+  assert.equal(
+    rotatedManifest.config.secret_ref_versions.database_api_url,
+    "dev-secret-v2",
+  );
+  assert.equal(
+    rotatedManifest.config.secret_ref_versions.cos_secret_key,
+    "dev-cos-credential-v2",
+  );
+  assert.equal(rotatedManifest.topology.object_config_ref, "dev-cos-config-v2");
+  assert.deepEqual(rotatedManifest.images, materialized.images);
 
   await writeFile(path.join(bundle, "compose.yaml"), "drift\n");
   await assert.rejects(

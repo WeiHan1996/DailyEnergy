@@ -28,8 +28,17 @@ import {
 import {
   commitSuccessfulDeployment,
   commitSuccessfulRollback,
+  beginReleaseOperation,
+  clearReleaseOperation,
+  commitRecoveredCurrent,
+  loadOperationManifest,
   loadReleaseManifest,
+  markReleaseOperationFailed,
+  markReleaseOperationRecovering,
+  readReleaseOperation,
   readReleaseState,
+  restartInitialReleaseOperation,
+  updateReleaseOperationPhase,
   withReleaseLock,
 } from "./release-state.mjs";
 
@@ -236,7 +245,9 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
           "--silent",
           "--show-error",
           "--insecure",
-          "https://127.0.0.1:8443/health/ready",
+          "--resolve",
+          "localhost:8443:127.0.0.1",
+          "https://localhost:8443/health/ready",
         ],
         executable: "curl",
       },
@@ -246,7 +257,9 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
           "--silent",
           "--show-error",
           "--insecure",
-          "https://127.0.0.1:8444/login",
+          "--resolve",
+          "localhost:8444:127.0.0.1",
+          "https://localhost:8444/login",
         ],
         executable: "curl",
       },
@@ -258,7 +271,9 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
           "--silent",
           "--show-error",
           "--insecure",
-          "https://127.0.0.1:8443/health/ready",
+          "--resolve",
+          "localhost:8443:127.0.0.1",
+          "https://localhost:8443/health/ready",
         ],
         executable: "curl",
       },
@@ -422,12 +437,15 @@ async function persistReceipt(stateRoot, receipt) {
 async function runPhases({
   bundleRoot,
   environmentFile,
+  onPhasePass = async () => undefined,
+  onPhaseStart = async () => undefined,
   runner,
   secretEnvironment,
 }) {
   const commands = developmentDeploymentCommands(bundleRoot, environmentFile);
   const receipts = [];
   for (const phase of deploymentPhases) {
+    await onPhaseStart(phase);
     for (const command of commands[phase]) {
       const result = await runner(command, {
         cwd: bundleRoot,
@@ -438,6 +456,7 @@ async function runPhases({
       }
     }
     receipts.push({ phase, result: "PASS" });
+    await onPhasePass(phase);
   }
   validateDeploymentReceipts(receipts);
   return receipts;
@@ -454,7 +473,7 @@ export async function executeDevelopmentDeployment({
   secretEnvironmentLoader = loadDevelopmentComposeSecretEnvironment,
   stateRoot = STATE_ROOT,
 }) {
-  if (!["deploy", "rollback"].includes(operation)) {
+  if (!["deploy", "recover-current", "rollback"].includes(operation)) {
     fail("E012_DEPLOY_OPERATION_INVALID", operation);
   }
   return withReleaseLock(
@@ -462,6 +481,114 @@ export async function executeDevelopmentDeployment({
     `${operation}:${manifest.release_id}`,
     async () => {
       const state = await readReleaseState(stateRoot);
+      const pending = await readReleaseOperation(stateRoot);
+      let retryInitialRelease = false;
+      if (operation !== "recover-current" && pending !== null) {
+        if (
+          state?.current.release_id === pending.target.release_id &&
+          state.current.manifest_sha256 === pending.target.manifest_sha256
+        ) {
+          await clearReleaseOperation(stateRoot);
+        } else if (
+          operation === "deploy" &&
+          state === null &&
+          pending.from_current === null &&
+          pending.target.release_id === manifest.release_id &&
+          pending.target.manifest_sha256 === releaseManifestDigest(manifest)
+        ) {
+          retryInitialRelease = true;
+        } else {
+          fail("RELEASE_RECOVERY_REQUIRED", pending.target.release_id);
+        }
+      }
+      if (operation === "recover-current") {
+        if (pending === null || state === null) {
+          fail("RECOVER_CURRENT_MISSING", "pending-operation");
+        }
+        if (
+          state.current.release_id === pending.target.release_id &&
+          state.current.manifest_sha256 === pending.target.manifest_sha256
+        ) {
+          await clearReleaseOperation(stateRoot);
+          return Object.freeze({ idempotent: true, receipts: [] });
+        }
+        if (
+          state.current.release_id !== manifest.release_id ||
+          state.current.manifest_sha256 !== releaseManifestDigest(manifest) ||
+          pending.from_current?.release_id !== manifest.release_id ||
+          pending.from_current.manifest_sha256 !==
+            releaseManifestDigest(manifest)
+        ) {
+          fail("RECOVER_CURRENT_MANIFEST_MISMATCH", manifest.release_id);
+        }
+        await preflight(manifest, imageSet, runtimeEvidence);
+        const secretEnvironment = await secretEnvironmentLoader(manifest);
+        const recoveryCatalogReference =
+          pending.recovery_catalog ??
+          (pending.migration_started
+            ? pending.target
+            : {
+                manifest_sha256: state.catalog.manifest_sha256,
+                release_id: state.catalog.release_id,
+              });
+        const catalogManifest = await loadOperationManifest(
+          stateRoot,
+          recoveryCatalogReference,
+        );
+        if (
+          !manifest.compatibility.accepted_generations.includes(
+            catalogManifest.migrations.catalog_generation,
+          )
+        ) {
+          fail(
+            "RECOVER_CURRENT_CATALOG_INCOMPATIBLE",
+            catalogManifest.release_id,
+          );
+        }
+        await markReleaseOperationRecovering(
+          stateRoot,
+          recoveryCatalogReference,
+        );
+        const convergenceManifest = structuredClone(manifest);
+        convergenceManifest.images.migration = catalogManifest.images.migration;
+        convergenceManifest.migrations = structuredClone(
+          catalogManifest.migrations,
+        );
+        const environmentFile = path.join(
+          stateRoot,
+          `recover-${manifest.release_id}-${catalogManifest.release_id}.env`,
+        );
+        await writeExact(
+          environmentFile,
+          renderComposeEnvironment(convergenceManifest),
+        );
+        try {
+          const receipts = await runPhases({
+            bundleRoot,
+            environmentFile,
+            onPhasePass: (phase) =>
+              updateReleaseOperationPhase(stateRoot, phase, true),
+            onPhaseStart: (phase) =>
+              updateReleaseOperationPhase(stateRoot, phase, false),
+            runner,
+            secretEnvironment,
+          });
+          await commitRecoveredCurrent(stateRoot, catalogManifest);
+          await persistReceipt(stateRoot, {
+            completed_at_utc: new Date().toISOString(),
+            manifest_sha256: releaseManifestDigest(manifest),
+            operation,
+            release_id: manifest.release_id,
+            receipts,
+            status: "PASS",
+          });
+          await clearReleaseOperation(stateRoot);
+          return Object.freeze({ idempotent: false, receipts });
+        } catch (error) {
+          await markReleaseOperationFailed(stateRoot, error);
+          throw error;
+        }
+      }
       if (operation === "deploy" && state !== null) {
         const current = await loadReleaseManifest(stateRoot, state.current);
         if (current.release_id === manifest.release_id) {
@@ -491,28 +618,48 @@ export async function executeDevelopmentDeployment({
       await writeExact(environmentFile, renderComposeEnvironment(manifest));
       await preflight(manifest, imageSet, runtimeEvidence);
       const secretEnvironment = await secretEnvironmentLoader(manifest);
-      const receipts = await runPhases({
-        bundleRoot,
-        environmentFile,
-        runner,
-        secretEnvironment,
-      });
-      const committed =
-        operation === "deploy"
-          ? await commitSuccessfulDeployment(stateRoot, manifest)
-          : await commitSuccessfulRollback(stateRoot);
-      await persistReceipt(stateRoot, {
-        completed_at_utc: new Date().toISOString(),
-        manifest_sha256: releaseManifestDigest(manifest),
-        operation,
-        release_id: manifest.release_id,
-        receipts,
-        status: "PASS",
-      });
-      return Object.freeze({
-        idempotent: committed.idempotent ?? false,
-        receipts,
-      });
+      if (retryInitialRelease) {
+        await restartInitialReleaseOperation(stateRoot, manifest);
+      } else {
+        await beginReleaseOperation(
+          stateRoot,
+          operation.toUpperCase(),
+          manifest,
+          state?.current ?? null,
+        );
+      }
+      try {
+        const receipts = await runPhases({
+          bundleRoot,
+          environmentFile,
+          onPhasePass: (phase) =>
+            updateReleaseOperationPhase(stateRoot, phase, true),
+          onPhaseStart: (phase) =>
+            updateReleaseOperationPhase(stateRoot, phase, false),
+          runner,
+          secretEnvironment,
+        });
+        const committed =
+          operation === "deploy"
+            ? await commitSuccessfulDeployment(stateRoot, manifest)
+            : await commitSuccessfulRollback(stateRoot);
+        await persistReceipt(stateRoot, {
+          completed_at_utc: new Date().toISOString(),
+          manifest_sha256: releaseManifestDigest(manifest),
+          operation,
+          release_id: manifest.release_id,
+          receipts,
+          status: "PASS",
+        });
+        await clearReleaseOperation(stateRoot);
+        return Object.freeze({
+          idempotent: committed.idempotent ?? false,
+          receipts,
+        });
+      } catch (error) {
+        await markReleaseOperationFailed(stateRoot, error);
+        throw error;
+      }
     },
   );
 }
@@ -523,7 +670,7 @@ async function main() {
   if (!operation || !manifestFile || !imageSetFile || !runtimeFile) {
     fail(
       "E012_DEPLOY_USAGE",
-      "deploy|rollback manifest image-set runtime-evidence",
+      "deploy|rollback|recover-current manifest image-set runtime-evidence",
     );
   }
   const bundleRoot = path.resolve(".");

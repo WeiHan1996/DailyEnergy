@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-05（E-012 草稿 PR #121 已创建，等待固定 Linux Gate 与评审）
+- **最后更新**：2026-08-05（E-012 草稿 PR #121 三项审核修复已完成本地验证，等待同 commit CI）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Review
@@ -9,7 +9,7 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **当前 PR**：[E-012 草稿 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **基线提交**：最新 `main` 状态交接基线 `6bc3fae`（包含 E-011 合并提交 `266a7dc39b87aec23740d64656bf33081a3aa34b`）
-- **Gate 结论**：`E012_IN_REVIEW / DEV_COLOCATION_ACCEPTED / DEV_COS_SMOKE_PASS / PR_CI_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / REVIEW_FIXES_LOCAL_PASS / FULL_GATE_LOCAL_ENV_BLOCKED / PR_CI_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -98,24 +98,29 @@ approved development infrastructure
   smoke、Accepted state、唯一 N-1 rollback 与幂等 replay 已进入代码和定向测试；外部 secret/config
   保持宿主机 `root:root 0600`，部署控制器只在内存中将值交给 Compose，容器按服务以 `0400`
   secret mount 获取最小集合，值不进入命令参数、release env、Compose 解析结果或日志；
-- **下一动作**：完成 PR #121 固定 Linux Gate 与用户评审；获得明确合并批准并取得同 commit 完整 CI PASS 后，手动发布
+- **审核修复**：PR #121 的三项审核意见已修复：主机健康探针与 Caddy `localhost` Host/SNI 一致；部分发布失败会留下
+  pending/dirty operation，并可显式 `recover-current` 收敛回当前 Accepted application/config/secret 与已验证兼容的
+  catalog；安装入口必须接收受严格校验且不含值的 database/COS secret version 与 object config ref，使轮换生成并绑定
+  新 release，而不是依赖代码常量；本地部署 suite、registry、test policy、CI policy、ESLint、目标格式与 diff Gate 已通过；
+- **下一动作**：提交并推送审核修复，等待 PR #121 固定 Linux Gate；获得明确合并批准并取得同 commit 完整 CI PASS 后，手动发布
   deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、
   执行首次真实 Compose 发布并通过 SSH tunnel 验收。合并前不发布 image，不在服务器现场 build；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
-- 本轮私有 COS 决策已进入 ADR-0007、部署规范、任务状态和 `ReleaseManifestV1` 合同；当前定向
-  deployment suite `29/29`、与 registry/CI policy/database static 合并检查 `61/61` 通过，覆盖 source-free bundle
+- 本轮私有 COS 决策与审核修复已进入 ADR-0007、部署规范、Runbook、任务状态和 `ReleaseManifestV1` 合同；当前定向
+  deployment suite `31/31` 通过，覆盖 Caddy Host/SNI 一致性、source-free bundle
   build/verify、root-only 原子安装、首次 materialize、幂等 replay、篡改拒绝、顺序发布失败不落状态和
-  唯一 rollback，以及 root-only 外部值仅通过 service-specific Compose environment secret 进入容器；source registry 为
+  dirty operation、`Accepted N → N+1 中途失败 → recover-current N`、唯一 rollback、v1→v2 配置/secret 引用轮换，以及
+  root-only 外部值仅通过 service-specific Compose environment secret 进入容器；source registry 为
   `736 total / 170 COVERED / 566 PLANNED / 0 NA_WITH_REASON`，`git diff --check` 通过；真实 DEV
   主机的 root-only credential/config 权限、内网 DNS/TLS、最小 CAM 策略和 signed
   write/read/delete/delete-verification smoke 均通过，输出不含 secret 或对象内容；
 - `pnpm agent:prepare E-012` 仍因本机 pnpm store/registry 与非固定 Node 版本失败；直接运行同一
   仓库只读入口 `node tooling/agent-prepare.mjs E-012` 返回 `READY / profile=code / risk=full`；
-- 本次 post-merge handoff 的正式 `agent:validate --mode=full --task=E-012` 在首个
-  `pnpm run validate` 前置依赖状态检查返回 `FAIL`：本机 Node `24.6.0` 与固定 `24.18.0`
+- 本次审核修复后的正式 `pnpm agent:validate --mode=task --task=E-012` 在前置依赖状态检查返回
+  `FAIL`：本机 Node `24.6.0` 与固定 `24.18.0`
   不一致，本地 pnpm store 又缺 package index，并尝试不可用的 registry/依赖清理；该结果不
   改写为 PASS，Agent workflow、registry、目标格式与 diff 已分别通过，固定 Linux 状态 PR
   run 将补齐权威自动证据；

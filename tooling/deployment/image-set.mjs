@@ -200,7 +200,6 @@ export function validateManifestImageSet(manifest, imageSet) {
   validateReleaseManifest(manifest);
   validateDevImageSet(imageSet);
   if (
-    manifest.release_id !== imageSet.image_set_id ||
     manifest.source.commit_sha !== imageSet.source.commit_sha ||
     manifest.source.ci_run_id !== imageSet.source.ci_run_id ||
     manifest.source.ci_run_attempt !== imageSet.source.ci_run_attempt ||
@@ -234,7 +233,7 @@ export function validateManifestRuntimeEvidence(
   validateManifestImageSet(manifest, imageSet);
   validateDevRuntimeEvidence(runtimeEvidence);
   if (
-    runtimeEvidence.release_id !== manifest.release_id ||
+    runtimeEvidence.release_id !== imageSet.image_set_id ||
     runtimeEvidence.server_image !== manifest.images.server ||
     devRuntimeEvidenceDigest(runtimeEvidence) !==
       imageSet.evidence.runtime_evidence_sha256 ||
@@ -245,7 +244,11 @@ export function validateManifestRuntimeEvidence(
   ) {
     fail("DEV_RUNTIME_EVIDENCE_MANIFEST_DRIFT", manifest.release_id);
   }
-  return Object.freeze({ fingerprints: 5, release_id: manifest.release_id });
+  return Object.freeze({
+    fingerprints: 5,
+    image_set_id: imageSet.image_set_id,
+    release_id: manifest.release_id,
+  });
 }
 
 function imageDigest(metadata, role) {
