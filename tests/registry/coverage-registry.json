@@ -8666,7 +8666,7 @@
             "a failed phase does not write Accepted state and exact replay revalidates preflight without reexecuting Docker",
             "preflight, digest pull, co-located state readiness, ingress closure, worker drain, migration/drift proof, consumer-before-producer startup, loopback TLS and object/Safety/owner/deletion smoke execute in one closed order",
             "rollback accepts only the recorded manifest digest, reruns the complete proof sequence and consumes the single rollback target",
-            "the generated Compose environment contains only immutable references, fingerprints and external secret paths and contains no credential, database URL, bucket identity or public binding"
+            "the generated release environment contains only immutable references, fingerprints and external secret paths while root-only values are passed only to the Compose process for service-specific secrets and no credential, database URL, bucket identity or public binding is persisted"
           ],
           "file": "tests/deployment/release.test.mjs",
           "level": "INTEGRATION",
@@ -9260,7 +9260,7 @@
             "a failed phase does not write Accepted state and exact replay revalidates preflight without reexecuting Docker",
             "preflight, digest pull, co-located state readiness, ingress closure, worker drain, migration/drift proof, consumer-before-producer startup, loopback TLS and object/Safety/owner/deletion smoke execute in one closed order",
             "rollback accepts only the recorded manifest digest, reruns the complete proof sequence and consumes the single rollback target",
-            "the generated Compose environment contains only immutable references, fingerprints and external secret paths and contains no credential, database URL, bucket identity or public binding"
+            "the generated release environment contains only immutable references, fingerprints and external secret paths while root-only values are passed only to the Compose process for service-specific secrets and no credential, database URL, bucket identity or public binding is persisted"
           ],
           "file": "tests/deployment/release.test.mjs",
           "level": "INTEGRATION",
@@ -9468,7 +9468,7 @@
             "a failed phase does not write Accepted state and exact replay revalidates preflight without reexecuting Docker",
             "preflight, digest pull, co-located state readiness, ingress closure, worker drain, migration/drift proof, consumer-before-producer startup, loopback TLS and object/Safety/owner/deletion smoke execute in one closed order",
             "rollback accepts only the recorded manifest digest, reruns the complete proof sequence and consumes the single rollback target",
-            "the generated Compose environment contains only immutable references, fingerprints and external secret paths and contains no credential, database URL, bucket identity or public binding"
+            "the generated release environment contains only immutable references, fingerprints and external secret paths while root-only values are passed only to the Compose process for service-specific secrets and no credential, database URL, bucket identity or public binding is persisted"
           ],
           "file": "tests/deployment/release.test.mjs",
           "level": "INTEGRATION",
@@ -9524,7 +9524,7 @@
             "a failed phase does not write Accepted state and exact replay revalidates preflight without reexecuting Docker",
             "preflight, digest pull, co-located state readiness, ingress closure, worker drain, migration/drift proof, consumer-before-producer startup, loopback TLS and object/Safety/owner/deletion smoke execute in one closed order",
             "rollback accepts only the recorded manifest digest, reruns the complete proof sequence and consumes the single rollback target",
-            "the generated Compose environment contains only immutable references, fingerprints and external secret paths and contains no credential, database URL, bucket identity or public binding"
+            "the generated release environment contains only immutable references, fingerprints and external secret paths while root-only values are passed only to the Compose process for service-specific secrets and no credential, database URL, bucket identity or public binding is persisted"
           ],
           "file": "tests/deployment/release.test.mjs",
           "level": "INTEGRATION",
@@ -9580,7 +9580,7 @@
             "a failed phase does not write Accepted state and exact replay revalidates preflight without reexecuting Docker",
             "preflight, digest pull, co-located state readiness, ingress closure, worker drain, migration/drift proof, consumer-before-producer startup, loopback TLS and object/Safety/owner/deletion smoke execute in one closed order",
             "rollback accepts only the recorded manifest digest, reruns the complete proof sequence and consumes the single rollback target",
-            "the generated Compose environment contains only immutable references, fingerprints and external secret paths and contains no credential, database URL, bucket identity or public binding"
+            "the generated release environment contains only immutable references, fingerprints and external secret paths while root-only values are passed only to the Compose process for service-specific secrets and no credential, database URL, bucket identity or public binding is persisted"
           ],
           "file": "tests/deployment/release.test.mjs",
           "level": "INTEGRATION",
