@@ -12,14 +12,16 @@ import {
   expectedSchemaObjects,
   EXPECTED_SQL_IDS,
   listMigrations,
+  readConnectionString,
   RUNTIME_ROLES,
   withClient,
 } from "./lib.mjs";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("DB_DATABASE_URL_REQUIRED");
-}
+const connectionString = await readConnectionString({
+  fileName: "DATABASE_URL_FILE",
+  requiredCode: "DB_DATABASE_URL_REQUIRED",
+  valueName: "DATABASE_URL",
+});
 const migrationSql = (
   await Promise.all(
     (await listMigrations()).map((migration) =>

@@ -1,0 +1,265 @@
+name: dailyenergy-dev
+
+x-dev-profile: &dev-profile
+  - dev
+
+x-runtime-security: &runtime-security
+  cap_drop:
+    - ALL
+  init: true
+  pids_limit: 128
+  read_only: true
+  restart: "on-failure:3"
+  security_opt:
+    - no-new-privileges:true
+
+services:
+  postgres:
+    profiles: *dev-profile
+    secrets:
+      - source: dev_postgres_password
+        target: /run/secrets/postgres_password
+        uid: "999"
+        gid: "999"
+        mode: 0400
+
+  redis:
+    profiles: *dev-profile
+
+  database-init:
+    profiles: *dev-profile
+    secrets:
+      - source: dev_database_admin_url
+        target: /run/secrets/database_admin_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: dev_database_api_url
+        target: /run/secrets/database_api_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: dev_database_background_url
+        target: /run/secrets/database_background_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: dev_database_interactive_url
+        target: /run/secrets/database_interactive_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: dev_database_migration_url
+        target: /run/secrets/database_migration_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: dev_database_restricted_url
+        target: /run/secrets/database_restricted_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  database-verify:
+    <<: *runtime-security
+    image: ${DAILYENERGY_MIGRATION_IMAGE:?ReleaseManifestV1 migration digest required}
+    command: ["node", "tooling/database/check-drift.mjs"]
+    user: "1000:1000"
+    restart: "no"
+    depends_on:
+      database-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_admin_url
+    mem_limit: 512m
+    cpus: 0.5
+    profiles: *dev-profile
+    secrets:
+      - source: dev_database_admin_url
+        target: /run/secrets/database_admin_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      migration_data:
+
+  dependency-stub:
+    profiles: *dev-profile
+    secrets:
+      - source: dev_fault_control_token
+        target: /run/secrets/fault_control_token
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  api:
+    profiles: *dev-profile
+    secrets:
+      - source: dev_database_api_url
+        target: /run/secrets/database_api_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  admin:
+    profiles: *dev-profile
+
+  worker-interactive:
+    profiles: *dev-profile
+    secrets:
+      - source: dev_database_interactive_url
+        target: /run/secrets/database_interactive_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  worker-background:
+    profiles: *dev-profile
+    secrets:
+      - source: dev_database_background_url
+        target: /run/secrets/database_background_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  worker-restricted:
+    profiles: *dev-profile
+    secrets:
+      - source: dev_database_restricted_url
+        target: /run/secrets/database_restricted_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  database-smoke:
+    <<: *runtime-security
+    image: ${DAILYENERGY_MIGRATION_IMAGE:?ReleaseManifestV1 migration digest required}
+    command: ["node", "tooling/deployment/database-smoke.mjs"]
+    user: "1000:1000"
+    restart: "no"
+    depends_on:
+      database-verify:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_admin_url
+    mem_limit: 256m
+    cpus: 0.25
+    profiles:
+      - dev-smoke
+    secrets:
+      - source: dev_database_admin_url
+        target: /run/secrets/database_admin_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      migration_data:
+
+  tls-proxy:
+    <<: *runtime-security
+    image: ${DAILYENERGY_PROXY_IMAGE:?ReleaseManifestV1 proxy digest required}
+    user: "1000:1000"
+    depends_on:
+      api:
+        condition: service_healthy
+      admin:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-check-certificate",
+          "--spider",
+          "https://localhost:8443/health/ready",
+        ]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    mem_limit: 128m
+    cpus: 0.25
+    profiles: *dev-profile
+    ports:
+      - 127.0.0.1:${DAILYENERGY_DEV_API_TLS_PORT:-8443}:8443
+      - 127.0.0.1:${DAILYENERGY_DEV_ADMIN_TLS_PORT:-8444}:8444
+    tmpfs:
+      - /config:uid=1000,gid=1000,mode=0700
+      - /data:uid=1000,gid=1000,mode=0700
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      admin_api:
+      dev_ingress:
+
+  object-smoke:
+    <<: *runtime-security
+    image: ${DAILYENERGY_STUB_IMAGE:?ReleaseManifestV1 stub digest required}
+    command: ["node", "/app/cos-smoke.mjs"]
+    user: "1000:1000"
+    restart: "no"
+    environment:
+      DAILYENERGY_COS_CONFIG_FILE: /run/dailyenergy/cos.env
+      DAILYENERGY_COS_SECRET_ID_FILE: /run/secrets/cos_secret_id
+      DAILYENERGY_COS_SECRET_KEY_FILE: /run/secrets/cos_secret_key
+    mem_limit: 128m
+    cpus: 0.25
+    profiles:
+      - dev-smoke
+    secrets:
+      - source: dev_cos_config
+        target: /run/dailyenergy/cos.env
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: dev_cos_secret_id
+        target: /run/secrets/cos_secret_id
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: dev_cos_secret_key
+        target: /run/secrets/cos_secret_key
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      object_external:
+
+secrets:
+  dev_cos_config:
+    environment: DAILYENERGY_DEV_COS_CONFIG
+  dev_cos_secret_id:
+    environment: DAILYENERGY_DEV_COS_SECRET_ID
+  dev_cos_secret_key:
+    environment: DAILYENERGY_DEV_COS_SECRET_KEY
+  dev_database_admin_url:
+    environment: DAILYENERGY_DEV_DATABASE_ADMIN_URL
+  dev_database_api_url:
+    environment: DAILYENERGY_DEV_DATABASE_API_URL
+  dev_database_background_url:
+    environment: DAILYENERGY_DEV_DATABASE_BACKGROUND_URL
+  dev_database_interactive_url:
+    environment: DAILYENERGY_DEV_DATABASE_INTERACTIVE_URL
+  dev_database_migration_url:
+    environment: DAILYENERGY_DEV_DATABASE_MIGRATION_URL
+  dev_database_restricted_url:
+    environment: DAILYENERGY_DEV_DATABASE_RESTRICTED_URL
+  dev_fault_control_token:
+    environment: DAILYENERGY_DEV_FAULT_CONTROL_TOKEN
+  dev_postgres_password:
+    environment: DAILYENERGY_DEV_POSTGRES_PASSWORD
+
+networks:
+  dev_ingress:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+  object_external:
+    driver: bridge

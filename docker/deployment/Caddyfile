@@ -1,0 +1,25 @@
+{
+	admin off
+	auto_https disable_redirects
+}
+
+(dailyenergy_security_headers) {
+	header {
+		-Server
+		Referrer-Policy "no-referrer"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+	}
+}
+
+https://localhost:8443 {
+	tls internal
+	import dailyenergy_security_headers
+	reverse_proxy api:3000
+}
+
+https://localhost:8444 {
+	tls internal
+	import dailyenergy_security_headers
+	reverse_proxy admin:3000
+}

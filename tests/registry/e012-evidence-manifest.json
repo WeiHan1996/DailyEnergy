@@ -1,0 +1,229 @@
+{
+  "manifest_version": "e-012-evidence-v1",
+  "scope": "E-012 ReleaseManifestV1, immutable image, DEV topology, root-only preflight, release lock, compatibility, ordered deployment and rollback state evidence",
+  "proofs": {
+    "T-E012-COMPOSE-001": {
+      "file": "tests/deployment/dev-compose.test.mjs",
+      "selector": "loopback TLS, DEV co-location and one-shot COS service topology cases",
+      "level": "STATIC",
+      "assertions": [
+        "the DEV overlay starts only the authorized co-located PostgreSQL 18, Redis 8 and application profiles without server-side source mounts or builds",
+        "Caddy exposes API and Admin TLS only on loopback while PostgreSQL and Redis publish no host ports",
+        "the one-shot COS smoke is the only application service that receives the COS config and credential mounts and object egress network"
+      ]
+    },
+    "T-E012-COS-001": {
+      "file": "tests/deployment/dev-compose.test.mjs",
+      "selector": "closed COS config, signed request and redacted diagnostic cases",
+      "level": "CONTRACT",
+      "assertions": [
+        "the smoke client accepts only the private internal bucket endpoint, ap-shanghai region and dev/objects/ prefix",
+        "signed PUT, GET, DELETE and post-delete HEAD use one ephemeral prefixed object and always attempt cleanup",
+        "stable diagnostics disclose neither credential values, bucket identity, endpoint value nor object content"
+      ]
+    },
+    "T-E012-HOST-001": {
+      "file": "tests/deployment/dev-compose.test.mjs",
+      "selector": "isolated checksum-verified host deployment runtime case",
+      "level": "STATIC",
+      "assertions": [
+        "the host bootstrap installs only the exact Node 24.18.0 linux-x64 archive after matching its official SHA-256",
+        "the deployment runtime is isolated under /opt/dailyenergy/runtime and exposed as dailyenergy-node without replacing system Node or installing pnpm",
+        "unsupported OS, architecture, privilege or an inconsistent existing installation fails closed"
+      ]
+    },
+    "T-E012-IMAGE-001": {
+      "file": "tests/deployment/image-publish.test.mjs",
+      "selector": "manual main-bound GHCR image publication, CI binding and digest-only image set cases",
+      "level": "CONTRACT",
+      "assertions": [
+        "publication is a manual development-environment workflow that accepts one exact main commit only after all eleven required checks from one successful CI run",
+        "the server is not contacted and all application roles are built on the GitHub runner, pushed to GHCR and recorded only by sha256 digest",
+        "the closed image set separately binds five expected Docker targets, commit, successful CI run and publication run and rejects missing metadata, mutable references or digest drift against ReleaseManifestV1",
+        "the minimal source-free deployment bundle binds exact Compose, controller, installer, manifest-contract and three publication-evidence files by SHA-256 and rejects path, file-set or content drift",
+        "the root-only installer atomically materializes the external COS config fingerprint and N/N-1 ReleaseManifestV1 under an owner-only versioned directory while exact replay is idempotent",
+        "BuildKit maximum provenance and attached SBOM are required while the private GitHub Free limitation remains explicit as unsigned DEV-only and production_eligible=false"
+      ]
+    },
+    "T-E012-PREFLIGHT-001": {
+      "file": "tests/deployment/preflight.test.mjs",
+      "selector": "closed DEV host, COS config, secret-file and network preflight cases",
+      "level": "INTEGRATION",
+      "assertions": [
+        "preflight accepts only Ubuntu 24.04+ x86_64 with synchronized Asia/Shanghai time, Docker 29+, Compose 2.40+, four CPUs, seven GiB memory and twenty GiB free disk",
+        "COS config is a closed four-key document whose private internal endpoint, ap-shanghai region, dev/objects/ prefix and raw file fingerprint match the manifest without returning bucket or endpoint values",
+        "all external config and secret files remain root-owned 0600 regular single-link files under protected root-owned directories, values reach non-root containers only through service-specific Compose environment secrets mounted 0400, and revoked or split credential versions fail closed",
+        "public listeners on HTTP, TLS, PostgreSQL or Redis ports and path-capable config or secret version references fail closed"
+      ]
+    },
+    "T-E012-SECRET-001": {
+      "file": "tests/deployment/dev-secrets.test.mjs",
+      "selector": "versioned DEV database and fault-control secret creation cases",
+      "level": "INTEGRATION",
+      "assertions": [
+        "one fresh version creates exactly eight role-scoped random values as owner-only files and binds the PostgreSQL administrator URL to the container password",
+        "an existing complete version is revalidated without rotation while partial, extra or permission-unsafe state fails closed",
+        "the provision result reports only version, status and file count and never returns credential values"
+      ]
+    },
+    "T-E012-MANIFEST-001": {
+      "file": "tests/deployment/release.test.mjs",
+      "selector": "strict ReleaseManifestV1 positive and known-fail cases",
+      "level": "CONTRACT",
+      "assertions": [
+        "manifest accepts only the authorized DEV co-location topology, private internal COS endpoint, ap-shanghai region, dev/objects/ prefix, INFO logging and production_enabled=false",
+        "all five application and proxy image references require the expected GHCR repository role and immutable sha256 digest",
+        "unknown config, mutable tags, synthetic or wrong-region object endpoints, wrong object prefix, revoked secret versions, missing Safety/owner/deletion gates, non-synthetic evidence and production enablement fail closed",
+        "source commit, lockfile, CI run, SBOM, provenance, migration catalog and runtime fingerprints are closed required fields"
+      ]
+    },
+    "T-E012-COMPAT-001": {
+      "file": "tests/deployment/release.test.mjs",
+      "selector": "mutual N/N-1 and rollback catalog compatibility cases",
+      "level": "CONTRACT",
+      "assertions": [
+        "candidate and current release must mutually accept each other within a one-generation window",
+        "candidate catalog can advance at most one compatible generation and must explicitly name the previous release as rollback-compatible",
+        "destructive migration or an undeclared and incompatible rollback target fails closed"
+      ]
+    },
+    "T-E012-LOCK-001": {
+      "file": "tests/deployment/release.test.mjs",
+      "selector": "exclusive filesystem release lock concurrency test",
+      "level": "RESILIENCE",
+      "assertions": [
+        "a second deploy cannot enter while the first release owner holds the lock",
+        "lock ownership is token-bound and released only by the holder"
+      ]
+    },
+    "T-E012-STATE-001": {
+      "file": "tests/deployment/release.test.mjs",
+      "selector": "atomic release state, idempotent replay and single-use rollback target test",
+      "level": "INTEGRATION",
+      "assertions": [
+        "a successful new deployment records exactly the prior Accepted manifest as the only rollback target",
+        "replaying identical release ID and content is idempotent while content drift under one release ID is rejected",
+        "successful rollback consumes the target and prevents unrecorded ping-pong rollback"
+      ]
+    },
+    "T-E012-DEPLOY-001": {
+      "file": "tests/deployment/release.test.mjs",
+      "selector": "closed DEV deployment, failure, exact replay and rollback execution cases",
+      "level": "INTEGRATION",
+      "assertions": [
+        "preflight, digest pull, co-located state readiness, ingress closure, worker drain, migration/drift proof, consumer-before-producer startup, loopback TLS and object/Safety/owner/deletion smoke execute in one closed order",
+        "a failed phase does not write Accepted state and exact replay revalidates preflight without reexecuting Docker",
+        "rollback accepts only the recorded manifest digest, reruns the complete proof sequence and consumes the single rollback target",
+        "the generated release environment contains only immutable references, fingerprints and external secret paths while root-only values are passed only to the Compose process for service-specific secrets and no credential, database URL, bucket identity or public binding is persisted"
+      ]
+    },
+    "T-E012-ORDER-001": {
+      "file": "tests/deployment/release.test.mjs",
+      "selector": "closed deployment phase and receipt order test",
+      "level": "STATIC",
+      "assertions": [
+        "migration and ordinary consumer workers precede the API producer",
+        "Admin and Restricted capability start only after the API producer",
+        "health plus separate object, Safety, owner and deletion smoke phases must pass before maintenance is disabled and a release can be recorded"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S32-DEPLOY-001",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-MANIFEST-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-002",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-MANIFEST-001", "T-E012-PREFLIGHT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-005",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-SECRET-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-007",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-MANIFEST-001", "T-E012-PREFLIGHT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-009",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-E012-COMPOSE-001",
+        "T-E012-HOST-001",
+        "T-E012-IMAGE-001",
+        "T-E012-MANIFEST-001",
+        "T-E012-ORDER-001",
+        "T-E012-DEPLOY-001"
+      ]
+    },
+    {
+      "source_id": "S32-DEPLOY-010",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-IMAGE-001", "T-E012-MANIFEST-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-014",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-MANIFEST-001", "T-E012-STATE-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-018",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-COMPAT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-019",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-COMPAT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-023",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-COMPAT-001", "T-E012-STATE-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-024",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-COMPAT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-025",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-DEPLOY-001", "T-E012-ORDER-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-030",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-DEPLOY-001", "T-E012-ORDER-001", "T-E012-STATE-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-031",
+      "status": "COVERED",
+      "proof_ids": ["T-E012-DEPLOY-001", "T-E012-ORDER-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-032",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-E012-COMPAT-001",
+        "T-E012-DEPLOY-001",
+        "T-E012-STATE-001"
+      ]
+    },
+    {
+      "source_id": "S32-DEPLOY-047",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-E012-COMPOSE-001",
+        "T-E012-COS-001",
+        "T-E012-MANIFEST-001",
+        "T-E012-PREFLIGHT-001"
+      ]
+    }
+  ]
+}

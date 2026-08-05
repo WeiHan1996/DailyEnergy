@@ -68,6 +68,8 @@
     "compose:evidence": "node tooling/compose/check-static.mjs && node tooling/compose/check-evidence.mjs && node --test tests/compose/static.test.mjs tests/compose/evidence.test.mjs",
     "compose:test": "COMPOSE_INTEGRATION=1 node --test tests/compose/integration.test.mjs",
     "compose:validate": "pnpm run compose:evidence && pnpm run compose:test",
+    "deployment:preflight": "node tooling/deployment/preflight.mjs",
+    "deployment:test": "node tooling/deployment/dev-compose-policy.mjs && node --test tests/deployment/*.test.mjs",
     "workspace:graph": "turbo ls",
     "dry-run": "turbo run format:check lint typecheck test build --dry=json",
     "format": "prettier --write AGENTS.md package.json pnpm-workspace.yaml turbo.json eslint.config.mjs prettier.config.mjs vitest.projects.ts .dependency-cruiser.cjs prisma.config.ts prisma/README.md prisma/migrations/README.md .github docs/agent docs/technical/database-implementation.md tasks/current.md apps packages tooling tests --ignore-path .prettierignore",
@@ -78,7 +80,7 @@
     "typecheck": "pnpm run config:check && turbo run typecheck",
     "typecheck:fixtures": "node tooling/test-typecheck.mjs",
     "config:fixtures": "node tooling/test-config.mjs",
-    "test": "pnpm run config:fixtures && pnpm run typecheck:fixtures && pnpm run lint:fixtures && pnpm run architecture:fixtures && pnpm run contract:fixtures && pnpm run admin:bundle:fixtures && pnpm run agent:fixtures && pnpm run registry:check && pnpm run registry:test && pnpm run testing:policy && pnpm run testing:playwright-policy && pnpm run ci:test && pnpm run test:harness && pnpm run database:test && pnpm run queue:evidence && turbo run test",
+    "test": "pnpm run config:fixtures && pnpm run typecheck:fixtures && pnpm run lint:fixtures && pnpm run architecture:fixtures && pnpm run contract:fixtures && pnpm run admin:bundle:fixtures && pnpm run agent:fixtures && pnpm run registry:check && pnpm run registry:test && pnpm run testing:policy && pnpm run testing:playwright-policy && pnpm run ci:test && pnpm run deployment:test && pnpm run test:harness && pnpm run database:test && pnpm run queue:evidence && turbo run test",
     "build": "turbo run build",
     "clean": "node tooling/clean.mjs",
     "validate": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run ci:audit && pnpm run ci:supply-chain:evidence && pnpm run database:validate && pnpm run queue:test"
