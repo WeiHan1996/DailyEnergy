@@ -41,7 +41,7 @@
         "the server is not contacted and all application roles are built on the GitHub runner, pushed to GHCR and recorded only by sha256 digest",
         "the closed image set separately binds five expected Docker targets, commit, successful CI run and publication run and rejects missing metadata, mutable references or digest drift against ReleaseManifestV1",
         "the minimal source-free deployment bundle binds exact Compose, controller, installer, manifest-contract and three publication-evidence files by SHA-256 and rejects path, file-set or content drift",
-        "the root-only installer atomically materializes the external COS config fingerprint plus strictly validated database/COS secret and object-config version refs into a distinct N/N-1 ReleaseManifestV1 while exact replay is idempotent",
+        "the root-only installer atomically materializes the external COS config fingerprint plus strictly validated database/COS secret and object-config version refs into a distinct N/N-1 ReleaseManifestV1; v1 to v2 rotation remains explicitly rollback-compatible while exact replay is idempotent",
         "BuildKit maximum provenance and attached SBOM are required while the private GitHub Free limitation remains explicit as unsigned DEV-only and production_eligible=false"
       ]
     },

@@ -25,6 +25,15 @@ import {
   materializeDevelopmentRelease,
 } from "../../tooling/deployment/materialize-dev-release.mjs";
 import {
+  validateReleaseTransition,
+  validateRollbackTransition,
+} from "../../tooling/deployment/release-contract.mjs";
+import {
+  commitSuccessfulDeployment,
+  commitSuccessfulRollback,
+  readReleaseState,
+} from "../../tooling/deployment/release-state.mjs";
+import {
   collectDevRuntimeEvidence,
   devRuntimeEvidenceDigest,
   validateDevRuntimeEvidence,
@@ -306,6 +315,13 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
   const replayed = await installDevelopmentBundle(bundle, protection);
   assert.equal(replayed.installed, false);
   assert.equal(replayed.manifest_sha256, installed.manifest_sha256);
+  const installedManifest = JSON.parse(
+    await readFile(path.join(installed.path, "release-manifest.json"), "utf8"),
+  );
+  const stateRoot = path.join(developmentRoot, "deployment");
+  await commitSuccessfulDeployment(stateRoot, installedManifest, {
+    acceptedAtUtc: "2026-08-05T04:10:00.000Z",
+  });
 
   const selectionV2 = {
     cos_secret_version: "dev-cos-credential-v2",
@@ -336,6 +352,30 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
   );
   assert.equal(rotatedManifest.topology.object_config_ref, "dev-cos-config-v2");
   assert.deepEqual(rotatedManifest.images, materialized.images);
+  assert.deepEqual(rotatedManifest.migrations.rollback_compatible_release_ids, [
+    installedManifest.release_id,
+  ]);
+  assert.deepEqual(
+    validateReleaseTransition(installedManifest, rotatedManifest),
+    {
+      idempotent: false,
+    },
+  );
+  assert.deepEqual(
+    validateRollbackTransition(rotatedManifest, installedManifest),
+    {
+      compatible: true,
+    },
+  );
+  await commitSuccessfulDeployment(stateRoot, rotatedManifest, {
+    acceptedAtUtc: "2026-08-05T04:11:00.000Z",
+  });
+  await commitSuccessfulRollback(stateRoot, {
+    acceptedAtUtc: "2026-08-05T04:12:00.000Z",
+  });
+  const rotatedBack = await readReleaseState(stateRoot);
+  assert.equal(rotatedBack.current.release_id, installedManifest.release_id);
+  assert.equal(rotatedBack.rollback_target, null);
 
   await writeFile(path.join(bundle, "compose.yaml"), "drift\n");
   await assert.rejects(
