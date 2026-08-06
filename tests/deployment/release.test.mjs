@@ -22,10 +22,12 @@ import {
   validateRollbackTransition,
 } from "../../tooling/deployment/release-contract.mjs";
 import {
+  beginReleaseOperation,
   commitSuccessfulDeployment,
   commitSuccessfulRollback,
   readReleaseOperation,
   readReleaseState,
+  updateReleaseOperationPhase,
   withReleaseLock,
 } from "../../tooling/deployment/release-state.mjs";
 import {
@@ -171,7 +173,7 @@ test("T-E012-COMPAT-001 enforces mutual N/N-1 and explicit rollback compatibilit
   );
 });
 
-test("T-E012-LOCK-001 rejects concurrent release ownership", async (t) => {
+test("T-E012-LOCK-001 rejects concurrency and releases ownership with the process", async (t) => {
   const root = await temporaryRoot(t);
   let releaseFirst;
   const held = new Promise((resolve) => {
@@ -192,6 +194,11 @@ test("T-E012-LOCK-001 rejects concurrent release ownership", async (t) => {
   );
   releaseFirst();
   await first;
+  await withReleaseLock(
+    root,
+    "deploy:after-owner-exit",
+    async () => undefined,
+  );
 });
 
 test("T-E012-STATE-001 records one rollback target and makes replay idempotent", async (t) => {
@@ -515,7 +522,7 @@ test("T-E012-DEPLOY-001 converges Accepted N after N+1 fails after migration", a
   );
   const dirty = await readReleaseOperation(stateRoot);
   assert.equal(dirty.status, "FAILED");
-  assert.equal(dirty.migration_started, true);
+  assert.equal(dirty.migration_verified, true);
   assert.equal(dirty.target.release_id, candidate.release_id);
   assert.equal(
     (await readReleaseState(stateRoot)).current.release_id,
@@ -574,6 +581,115 @@ test("T-E012-DEPLOY-001 converges Accepted N after N+1 fails after migration", a
     },
   });
   assert.deepEqual(replay, { idempotent: true, receipts: [] });
+});
+
+test("T-E012-DEPLOY-001 recovers with the effective catalog when candidate migration fails", async (t) => {
+  const root = await temporaryRoot(t);
+  const firstBundle = path.join(root, "first");
+  const secondBundle = path.join(root, "second");
+  const stateRoot = path.join(root, "state");
+  await Promise.all([mkdir(firstBundle), mkdir(secondBundle)]);
+  const current = manifest("e012-migration-failure-n", {
+    acceptedGenerations: [1, 2],
+  });
+  const candidate = manifest("e012-migration-failure-n-plus-one", {
+    acceptedGenerations: [1, 2],
+    catalogGeneration: 2,
+    generation: 2,
+    rollbackCompatibleReleaseIds: [current.release_id],
+    mutate: (value) => {
+      value.images.migration = `ghcr.io/weihan1996/dailyenergy-migration@sha256:${"9".repeat(64)}`;
+      value.migrations.catalog_fingerprint = "f".repeat(64);
+    },
+  });
+  const common = {
+    imageSet: {},
+    preflight: async () => undefined,
+    runtimeEvidence: {},
+    secretEnvironmentLoader: noSecretEnvironment,
+    stateRoot,
+  };
+  await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: firstBundle,
+    manifest: current,
+    runner: async () => ({ code: 0 }),
+  });
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      bundleRoot: secondBundle,
+      manifest: candidate,
+      runner: async (command) => ({
+        code: command.arguments.includes("database-init") ? 1 : 0,
+      }),
+    }),
+    /E012_DEPLOY_PHASE_FAILED:migration/u,
+  );
+  assert.equal(
+    (await readReleaseOperation(stateRoot)).migration_verified,
+    false,
+  );
+
+  await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: firstBundle,
+    manifest: current,
+    operation: "recover-current",
+    runner: async () => ({ code: 0 }),
+  });
+  const recoveredState = await readReleaseState(stateRoot);
+  assert.equal(recoveredState.catalog.release_id, current.release_id);
+  const recoveryEnvironment = await readFile(
+    path.join(
+      stateRoot,
+      `recover-${current.release_id}-${current.release_id}.env`,
+    ),
+    "utf8",
+  );
+  assert.ok(recoveryEnvironment.includes(current.images.migration));
+  assert.equal(recoveryEnvironment.includes(candidate.images.migration), false);
+});
+
+test("T-E012-DEPLOY-001 rebuilds a PASS receipt after state commit", async (t) => {
+  const root = await temporaryRoot(t);
+  const bundleRoot = path.join(root, "bundle");
+  const stateRoot = path.join(root, "state");
+  const value = manifest("e012-receipt-recovery");
+  await mkdir(bundleRoot);
+  await beginReleaseOperation(stateRoot, "DEPLOY", value, null);
+  for (const phase of deploymentPhases) {
+    await updateReleaseOperationPhase(stateRoot, phase, false);
+    await updateReleaseOperationPhase(stateRoot, phase, true);
+  }
+  await commitSuccessfulDeployment(stateRoot, value);
+
+  const replay = await executeDevelopmentDeployment({
+    bundleRoot,
+    imageSet: {},
+    manifest: value,
+    preflight: async () => undefined,
+    runner: async () => {
+      throw new Error("receipt recovery must not rerun deployment phases");
+    },
+    runtimeEvidence: {},
+    secretEnvironmentLoader: noSecretEnvironment,
+    stateRoot,
+  });
+  assert.deepEqual(replay, { idempotent: true, receipts: [] });
+  assert.equal(await readReleaseOperation(stateRoot), null);
+  const receipt = JSON.parse(
+    await readFile(
+      path.join(
+        stateRoot,
+        "receipts",
+        `deploy-${value.release_id}.json`,
+      ),
+      "utf8",
+    ),
+  );
+  assert.equal(receipt.status, "PASS");
+  assert.equal(receipt.receipts.length, deploymentPhases.length);
 });
 
 test("T-E012-DEPLOY-001 rolls back only to the recorded compatible manifest and consumes the target", async (t) => {

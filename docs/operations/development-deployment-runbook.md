@@ -20,7 +20,7 @@
 以下前置只能由获授权的主机管理员执行：
 
 1. Ubuntu 24.04 LTS、x86_64、4 vCPU、至少 7 GiB RAM、至少 20 GiB 可用磁盘；时区 `Asia/Shanghai` 且 NTP 已同步；
-2. Docker `>=29.0.0`、Compose `>=2.40.0`，防火墙只允许 SSH，80/443/5432/6379 不得在非 loopback 地址监听；
+2. Docker `>=29.0.0`、Compose `>=2.40.0`，且系统提供 util-linux `flock`；防火墙只允许 SSH，80/443/5432/6379 不得在非 loopback 地址监听；
 3. 运行 `tooling/deployment/bootstrap-host.sh`，安装 checksum 固定的隔离 Node `24.18.0` 到 `/opt/dailyenergy/runtime/node-v24.18.0`，部署命令只使用 `/usr/local/bin/dailyenergy-node`；
 4. PostgreSQL/故障控制 secret 使用 `dev-secret-v1`，COS credential 使用 `dev-cos-credential-v1`；version directory 为 `root:root 0700`，父目录由 root 拥有且不可被 group/other 写入，文件为 `root:root 0600`；
 5. COS 无值配置位于 `/srv/dailyenergy/config/dev-cos-config-v1.env`，也是 `root:root 0600`。Linux Compose 对 `file` secret/config 使用 bind mount，不能安全重映射非 root UID/GID；部署控制器因此在 preflight 后由 root 读取已验证文件，只在 Docker Compose 根进程的环境中提供 `environment` secret source，并在容器内挂载为目标 UID/GID 的 `0400` 文件。值不进入命令参数、`release.env`、Compose 输出或仓库。
@@ -81,6 +81,7 @@ sudo /usr/local/bin/dailyenergy-node \
 
 成功输出只包含 `release_id`、catalog generation 和本次是否首次安装。安装入口会在 release lock 内：
 
+- 通过 Linux 内核 advisory `flock` 获取互斥所有权；`release.lock` 只保存无 secret 的当前 owner 元数据，不是文件存在即占用的哨兵，持锁进程异常退出或主机重启后内核会释放实际锁；
 - 校验 source bundle；
 - 严格校验命令中的 database secret version、COS secret version 与 object config ref；这些参数不得包含路径或 secret value；
 - 读取所选 COS 无值配置计算 fingerprint，但不读取 COS credential；
@@ -123,7 +124,8 @@ exit
 首次全通过后才会更新 `/srv/dailyenergy/deployment/release-state.json`，分别保存当前 Accepted application、实际 effective catalog 和唯一
 N-1 rollback target，并写无用户内容的 PASS receipt。同一 release 在没有 dirty operation 时重放只重新核验 manifest/preflight，
 不重复迁移或写状态。控制器在第一次运行态变更前写 `/srv/dailyenergy/deployment/release-operation.json`；失败后保留该文件并拒绝普通
-deploy/rollback，不能把 Accepted release 的幂等返回误当作恢复。
+deploy/rollback，不能把 Accepted release 的幂等返回误当作恢复。若进程在 Accepted state 写入后、PASS receipt 写入前退出，下次入口会先用
+完整 operation phases 确定性补建同一 receipt，再清除 operation；不得手工删除 `release-operation.json` 或伪造 receipt。
 
 ## 5. Loopback TLS 验收
 
@@ -148,7 +150,7 @@ DEV 使用 Caddy internal certificate，因此浏览器会显示本地不受信�
 ## 6. 发布失败后的恢复
 
 如果已有 Accepted release 的候选发布失败，先查看无 secret 的 state/operation，确认 `current`、`target`、`active_phase` 和
-`migration_started`：
+`migration_verified`：
 
 ```bash
 sudo sed -n '1,220p' /srv/dailyenergy/deployment/release-state.json
@@ -169,10 +171,11 @@ cd "/srv/dailyenergy/bundles/${CURRENT_RELEASE_ID}"
 exit
 ```
 
-控制器会重新执行完整 18 阶段。失败操作若尚未进入 migration，恢复使用 state 已记录的 effective catalog；若已经进入 migration，
-恢复使用失败候选中已在 preflight 验证过的 immutable migration image 完成 additive migration，再启动当前 Accepted 的 application、
-config 和 secret。只有完整 smoke 通过后才更新 effective catalog 记录并清除 operation。恢复自身失败时继续保留 dirty operation，修复外部
-原因后重复同一 `recover-current`，不得改用 deploy/rollback 绕过。
+控制器会重新执行完整 18 阶段。只有失败候选的 migration 与 drift verify 整个阶段已经通过、operation 明确记录
+`migration_verified=true` 时，恢复才使用该候选的 immutable migration image 和 catalog；如果 migration 尚未执行或在阶段内部失败，恢复使用
+state 已记录的 effective catalog，避免被未验证或确定性失败的候选 migration image 卡死。随后启动当前 Accepted 的 application、config 和
+secret。只有完整 smoke 通过后才更新 effective catalog、写入 PASS receipt 并清除 operation。恢复自身失败时继续保留 dirty operation，修复
+外部原因后重复同一 `recover-current`，不得改用 deploy/rollback 绕过。
 
 首次发布尚无 Accepted state 时不能执行 `recover-current`；修复失败原因后，只能对同一 manifest 重试 `deploy`。其它候选会被拒绝。
 

@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-05（E-012 草稿 PR #121 三项审核修复已完成本地验证，等待同 commit CI）
+- **最后更新**：2026-08-06（E-012 草稿 PR #121 第二轮三项审核修复已提交，按用户要求未运行本地验证，等待新 head CI）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Review
@@ -9,7 +9,7 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **当前 PR**：[E-012 草稿 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **基线提交**：最新 `main` 状态交接基线 `6bc3fae`（包含 E-011 合并提交 `266a7dc39b87aec23740d64656bf33081a3aa34b`）
-- **Gate 结论**：`E012_IN_REVIEW / REVIEW_FIXES_LOCAL_PASS / FULL_GATE_LOCAL_ENV_BLOCKED / PR_CI_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / REVIEW_ROUND2_FIXES_UNVALIDATED / FULL_GATE_LOCAL_ENV_BLOCKED / PR_CI_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -101,14 +101,21 @@ approved development infrastructure
 - **审核修复**：PR #121 的三项审核意见已修复：主机健康探针与 Caddy `localhost` Host/SNI 一致；部分发布失败会留下
   pending/dirty operation，并可显式 `recover-current` 收敛回当前 Accepted application/config/secret 与已验证兼容的
   catalog；安装入口必须接收受严格校验且不含值的 database/COS secret version 与 object config ref，使轮换生成并绑定
-  新 release，而不是依赖代码常量；本地部署 suite、registry、test policy、CI policy、ESLint、目标格式与 diff Gate 已通过；
-- **下一动作**：提交并推送审核修复，等待 PR #121 固定 Linux Gate；获得明确合并批准并取得同 commit 完整 CI PASS 后，手动发布
+  新 release，而不是依赖代码常量；第一轮修复的本地部署 suite、registry、test policy、CI policy、ESLint、目标格式与 diff Gate 已通过；
+- **第二轮审核修复**：release/install/deploy/rollback/recover-current 改用 Linux 内核 advisory `flock`，持锁进程退出或主机重启后不会被残留
+  元数据文件永久阻塞；operation 只在 migration 与 drift verify 整阶段通过后记录 `migration_verified=true`，migration 阶段内部失败时
+  `recover-current` 使用 state 中已验证 effective catalog；完整 operation phases 可在 Accepted state 写入后确定性补建 PASS receipt，receipt
+  已存在但内容不一致时 fail closed，写入一致后才清 operation。对应最小故障场景代码和 Runbook/Accepted 部署合同已同步；按用户明确要求，
+  本轮未运行测试、lint、format 或 Gate；
+- **下一动作**：等待 PR #121 新 head 的固定 Linux Gate；获得明确合并批准并取得同 commit 完整 CI PASS 后，手动发布
   deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、
   执行首次真实 Compose 发布并通过 SSH tunnel 验收。合并前不发布 image，不在服务器现场 build；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- PR #121 第二轮审核修复按用户指示只完成最小代码、场景和文档修改；本轮没有运行测试、lint、format、`git diff --check` 或任何
+  `agent:validate`，不得将未运行状态报告为 PASS；
 - 本轮私有 COS 决策与审核修复已进入 ADR-0007、部署规范、Runbook、任务状态和 `ReleaseManifestV1` 合同；当前定向
   deployment suite `31/31` 通过，覆盖 Caddy Host/SNI 一致性、source-free bundle
   build/verify、root-only 原子安装、首次 materialize、幂等 replay、篡改拒绝、顺序发布失败不落状态和

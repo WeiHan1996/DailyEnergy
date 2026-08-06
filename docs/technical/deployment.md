@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-08-05（E-012 发布失败恢复与可执行版本轮换合同已补充）
+- **最后更新**：2026-08-05（E-012 崩溃安全发布锁、迁移恢复与 receipt 收尾合同已补充）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0007 临时 DEV 同机例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
@@ -645,13 +645,14 @@ remote Turbo cache 在 v1 继续禁用。job-local cache 只含可重建依赖/�
 
 发布控制器必须在第一次可能改变运行态的阶段前持久化 pending operation，并在每个阶段开始/通过时原子更新。任一阶段失败或进程中断后：
 
+- release/install/deploy/rollback/recover-current 共享 Linux 内核 advisory lock；锁元数据文件可以持久存在，但不得作为占用哨兵，进程异常退出或主机重启后必须由内核释放实际所有权；
 - Accepted application release 与唯一 rollback target 不被候选覆盖；
 - 普通 deploy/rollback 必须以 `RELEASE_RECOVERY_REQUIRED` fail closed，不能把同一 Accepted release 当作无操作 replay；
 - `recover-current` 必须重新执行完整阶段，把当前 Accepted application/config/secret 收敛回来；
-- migration 尚未开始时使用已记录 effective catalog；migration 已开始时用失败候选中已通过 preflight 的 immutable migration image
-  完成 additive migration，并验证当前 application 接受该 generation；
+- 只有候选 migration 与 drift verify 整个阶段通过后，operation 才记录 `migration_verified=true` 并允许恢复采用候选 catalog；阶段开始或阶段内部失败仍使用 state 已记录的 effective catalog，不能把恢复绑定到未验证的 migration image；
 - state 分别记录 Accepted application ref 与 effective catalog ref。代码回滚不声称执行 down migration，也不能把应用切到不接受当前
   effective catalog 的目标；
+- Accepted state/effective catalog 写入后，完整 operation phase 记录必须能够确定性重建同一 PASS receipt；只有 receipt 已写入且内容一致后才能清除 dirty operation，state→receipt 间进程退出不得永久丢失证据；
 - recovery 完成完整 health、COS、Safety、owner、deletion smoke 后才清除 dirty operation。首次发布尚无 Accepted release 时，只有同一
   manifest 可完整重试，不能用其它候选跳过 dirty state。
 

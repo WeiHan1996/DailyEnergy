@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import {
   lstat,
   mkdir,
@@ -429,9 +430,80 @@ async function persistReceipt(stateRoot, receipt) {
     `${receipt.operation}-${receipt.release_id}.json`,
   );
   const contents = `${JSON.stringify(receipt, null, 2)}\n`;
-  const temporary = `${file}.tmp-${process.pid}`;
+  try {
+    const existing = await readFile(file, "utf8");
+    if (existing !== contents) {
+      fail("RELEASE_RECEIPT_CONTENT_DRIFT", path.basename(file));
+    }
+    return;
+  } catch (error) {
+    if (error?.code !== "ENOENT") {
+      throw error;
+    }
+  }
+  const temporary = `${file}.tmp-${process.pid}-${randomUUID()}`;
   await writeFile(temporary, contents, { flag: "wx", mode: 0o600 });
   await rename(temporary, file);
+}
+
+function operationReferenceMatches(left, right) {
+  return (
+    left?.release_id === right?.release_id &&
+    left?.manifest_sha256 === right?.manifest_sha256
+  );
+}
+
+function completedOperationReceipt(pending, completedAtUtc) {
+  const receipts = pending.completed_phases.map((phase) => ({
+    phase,
+    result: "PASS",
+  }));
+  validateDeploymentReceipts(receipts);
+  if (pending.active_phase !== null) {
+    fail("RELEASE_RECEIPT_OPERATION_INCOMPLETE", pending.target.release_id);
+  }
+  const reference =
+    pending.kind === "RECOVER_CURRENT" ? pending.from_current : pending.target;
+  if (reference === null) {
+    fail("RELEASE_RECEIPT_REFERENCE_MISSING", pending.kind);
+  }
+  return {
+    completed_at_utc: completedAtUtc,
+    manifest_sha256: reference.manifest_sha256,
+    operation: pending.kind.toLowerCase().replaceAll("_", "-"),
+    release_id: reference.release_id,
+    receipts,
+    status: "PASS",
+  };
+}
+
+async function persistCompletedOperationReceipt(stateRoot) {
+  const [pending, state] = await Promise.all([
+    readReleaseOperation(stateRoot),
+    readReleaseState(stateRoot),
+  ]);
+  if (pending === null || state === null) {
+    fail("RELEASE_RECEIPT_OPERATION_MISSING", "pending-operation-or-state");
+  }
+  const receipt = completedOperationReceipt(pending, state.updated_at_utc);
+  await persistReceipt(stateRoot, receipt);
+  return receipt;
+}
+
+async function finalizeCommittedOperation(stateRoot, state, pending) {
+  const applicationCommitted =
+    pending.kind !== "RECOVER_CURRENT" &&
+    operationReferenceMatches(state?.current, pending.target);
+  const recoveryCommitted =
+    pending.kind === "RECOVER_CURRENT" &&
+    operationReferenceMatches(state?.current, pending.from_current) &&
+    operationReferenceMatches(state?.catalog, pending.recovery_catalog);
+  if (!applicationCommitted && !recoveryCommitted) {
+    return false;
+  }
+  await persistCompletedOperationReceipt(stateRoot);
+  await clearReleaseOperation(stateRoot);
+  return true;
 }
 
 async function runPhases({
@@ -481,15 +553,32 @@ export async function executeDevelopmentDeployment({
     `${operation}:${manifest.release_id}`,
     async () => {
       const state = await readReleaseState(stateRoot);
-      const pending = await readReleaseOperation(stateRoot);
+      let pending = await readReleaseOperation(stateRoot);
+      const committedPendingOperation =
+        pending?.kind.toLowerCase().replaceAll("_", "-");
+      const committedPendingReference =
+        pending?.kind === "RECOVER_CURRENT"
+          ? pending.from_current
+          : pending?.target;
+      if (
+        pending !== null &&
+        (await finalizeCommittedOperation(stateRoot, state, pending))
+      ) {
+        pending = null;
+        if (
+          operation === committedPendingOperation &&
+          operationReferenceMatches(committedPendingReference, {
+            manifest_sha256: releaseManifestDigest(manifest),
+            release_id: manifest.release_id,
+          })
+        ) {
+          await preflight(manifest, imageSet, runtimeEvidence);
+          return Object.freeze({ idempotent: true, receipts: [] });
+        }
+      }
       let retryInitialRelease = false;
       if (operation !== "recover-current" && pending !== null) {
         if (
-          state?.current.release_id === pending.target.release_id &&
-          state.current.manifest_sha256 === pending.target.manifest_sha256
-        ) {
-          await clearReleaseOperation(stateRoot);
-        } else if (
           operation === "deploy" &&
           state === null &&
           pending.from_current === null &&
@@ -506,13 +595,6 @@ export async function executeDevelopmentDeployment({
           fail("RECOVER_CURRENT_MISSING", "pending-operation");
         }
         if (
-          state.current.release_id === pending.target.release_id &&
-          state.current.manifest_sha256 === pending.target.manifest_sha256
-        ) {
-          await clearReleaseOperation(stateRoot);
-          return Object.freeze({ idempotent: true, receipts: [] });
-        }
-        if (
           state.current.release_id !== manifest.release_id ||
           state.current.manifest_sha256 !== releaseManifestDigest(manifest) ||
           pending.from_current?.release_id !== manifest.release_id ||
@@ -525,7 +607,7 @@ export async function executeDevelopmentDeployment({
         const secretEnvironment = await secretEnvironmentLoader(manifest);
         const recoveryCatalogReference =
           pending.recovery_catalog ??
-          (pending.migration_started
+          (pending.migration_verified
             ? pending.target
             : {
                 manifest_sha256: state.catalog.manifest_sha256,
@@ -574,14 +656,7 @@ export async function executeDevelopmentDeployment({
             secretEnvironment,
           });
           await commitRecoveredCurrent(stateRoot, catalogManifest);
-          await persistReceipt(stateRoot, {
-            completed_at_utc: new Date().toISOString(),
-            manifest_sha256: releaseManifestDigest(manifest),
-            operation,
-            release_id: manifest.release_id,
-            receipts,
-            status: "PASS",
-          });
+          await persistCompletedOperationReceipt(stateRoot);
           await clearReleaseOperation(stateRoot);
           return Object.freeze({ idempotent: false, receipts });
         } catch (error) {
@@ -643,14 +718,7 @@ export async function executeDevelopmentDeployment({
           operation === "deploy"
             ? await commitSuccessfulDeployment(stateRoot, manifest)
             : await commitSuccessfulRollback(stateRoot);
-        await persistReceipt(stateRoot, {
-          completed_at_utc: new Date().toISOString(),
-          manifest_sha256: releaseManifestDigest(manifest),
-          operation,
-          release_id: manifest.release_id,
-          receipts,
-          status: "PASS",
-        });
+        await persistCompletedOperationReceipt(stateRoot);
         await clearReleaseOperation(stateRoot);
         return Object.freeze({
           idempotent: committed.idempotent ?? false,

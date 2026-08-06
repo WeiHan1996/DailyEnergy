@@ -1,5 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, open, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import {
+  chmod,
+  mkdir,
+  readFile,
+  rename,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 
 import {
@@ -12,7 +20,9 @@ import {
 } from "./release-contract.mjs";
 
 const STATE_VERSION = "e012-release-state-v2";
-const OPERATION_VERSION = "e012-release-operation-v1";
+const OPERATION_VERSION = "e012-release-operation-v2";
+const LOCK_CONFLICT_EXIT_CODE = 75;
+const LOCK_ACQUIRED_MARKER = "E012_RELEASE_LOCK_ACQUIRED\n";
 
 function fail(ruleId, detail) {
   throw new Error(`${ruleId}:${detail}`);
@@ -146,7 +156,7 @@ function validateOperation(value) {
         "failure_code",
         "from_current",
         "kind",
-        "migration_started",
+        "migration_verified",
         "operation_version",
         "recovery_catalog",
         "started_at_utc",
@@ -163,7 +173,7 @@ function validateOperation(value) {
     !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u.test(
       value.updated_at_utc,
     ) ||
-    typeof value.migration_started !== "boolean" ||
+    typeof value.migration_verified !== "boolean" ||
     (value.failure_code !== null &&
       !/^[A-Z][A-Z0-9_]{2,127}$/u.test(value.failure_code)) ||
     (value.active_phase !== null &&
@@ -185,39 +195,115 @@ function validateOperation(value) {
   return value;
 }
 
+async function acquireAdvisoryLock(file) {
+  const holder = spawn(
+    "flock",
+    [
+      "--exclusive",
+      "--nonblock",
+      "--conflict-exit-code",
+      String(LOCK_CONFLICT_EXIT_CODE),
+      file,
+      process.execPath,
+      "-e",
+      `process.stdout.write(${JSON.stringify(LOCK_ACQUIRED_MARKER)}); process.stdin.resume();`,
+    ],
+    { stdio: ["pipe", "pipe", "ignore"] },
+  );
+  holder.stdin.on("error", () => undefined);
+  holder.stdout.setEncoding("utf8");
+
+  const exited = new Promise((resolve) => {
+    holder.once("exit", (code, signal) => resolve({ code, signal }));
+  });
+  const spawnError = new Promise((resolve) => {
+    holder.once("error", (error) => resolve(error));
+  });
+  const acquired = new Promise((resolve) => {
+    let output = "";
+    holder.stdout.on("data", (chunk) => {
+      output += chunk;
+      if (output === LOCK_ACQUIRED_MARKER) {
+        resolve(true);
+      } else if (
+        output.length >= LOCK_ACQUIRED_MARKER.length &&
+        output !== LOCK_ACQUIRED_MARKER
+      ) {
+        resolve(false);
+      }
+    });
+  });
+  let timeout;
+  const timedOut = new Promise((resolve) => {
+    timeout = setTimeout(() => resolve(true), 5_000);
+    timeout.unref();
+  });
+  const outcome = await Promise.race([
+    acquired.then((valid) => ({ type: "acquired", valid })),
+    exited.then((status) => ({ status, type: "exit" })),
+    spawnError.then((error) => ({ error, type: "error" })),
+    timedOut.then(() => ({ type: "timeout" })),
+  ]);
+  clearTimeout(timeout);
+
+  if (outcome.type === "acquired" && outcome.valid) {
+    return { exited, holder };
+  }
+  if (holder.exitCode === null) {
+    holder.kill("SIGTERM");
+  }
+  if (
+    outcome.type === "exit" &&
+    outcome.status.code === LOCK_CONFLICT_EXIT_CODE
+  ) {
+    fail("RELEASE_LOCK_HELD", path.basename(file));
+  }
+  if (outcome.type === "error" && outcome.error?.code === "ENOENT") {
+    fail("RELEASE_LOCK_RUNTIME_MISSING", "flock");
+  }
+  fail("RELEASE_LOCK_ACQUIRE_FAILED", outcome.type);
+}
+
 export async function withReleaseLock(root, owner, operation) {
   if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$/u.test(owner)) {
     fail("RELEASE_LOCK_OWNER_INVALID", "owner");
   }
   const selected = paths(root);
   await mkdir(selected.root, { recursive: true, mode: 0o700 });
-  let handle;
   const token = randomUUID();
+  const { exited, holder } = await acquireAdvisoryLock(selected.lock);
+  let failure;
+  let result;
   try {
-    handle = await open(selected.lock, "wx", 0o600);
+    await chmod(selected.lock, 0o600);
+    await writeFile(
+      selected.lock,
+      `${JSON.stringify({
+        acquired_at_utc: new Date().toISOString(),
+        owner,
+        token,
+      })}\n`,
+    );
+    result = await operation();
   } catch (error) {
-    if (error?.code === "EEXIST") {
-      fail("RELEASE_LOCK_HELD", path.basename(selected.lock));
-    }
-    throw error;
-  }
-  await handle.writeFile(
-    `${JSON.stringify({
-      acquired_at_utc: new Date().toISOString(),
-      owner,
-      token,
-    })}\n`,
-  );
-  try {
-    return await operation();
+    failure = error;
   } finally {
-    await handle.close();
-    const lock = JSON.parse(await readFile(selected.lock, "utf8"));
-    if (lock.token !== token) {
-      fail("RELEASE_LOCK_OWNERSHIP_LOST", owner);
+    const ownershipLost = holder.exitCode !== null;
+    if (!ownershipLost) {
+      holder.stdin.end();
     }
-    await rm(selected.lock);
+    const status = await exited;
+    if (
+      failure === undefined &&
+      (ownershipLost || status.code !== 0 || status.signal !== null)
+    ) {
+      failure = new Error(`RELEASE_LOCK_OWNERSHIP_LOST:${owner}`);
+    }
   }
+  if (failure !== undefined) {
+    throw failure;
+  }
+  return result;
 }
 
 export async function readReleaseState(root) {
@@ -321,7 +407,7 @@ export async function beginReleaseOperation(
     failure_code: null,
     from_current: fromCurrent,
     kind,
-    migration_started: false,
+    migration_verified: false,
     operation_version: OPERATION_VERSION,
     recovery_catalog: null,
     started_at_utc: startedAtUtc,
@@ -351,7 +437,8 @@ export async function updateReleaseOperationPhase(root, phase, passed) {
     completed_phases: passed
       ? [...operation.completed_phases, phase]
       : operation.completed_phases,
-    migration_started: operation.migration_started || phase === "migration",
+    migration_verified:
+      operation.migration_verified || (passed && phase === "migration"),
     updated_at_utc: new Date().toISOString(),
   };
   validateOperation(next);
@@ -424,7 +511,7 @@ export async function restartInitialReleaseOperation(root, manifest) {
     completed_phases: [],
     failure_code: null,
     kind: "DEPLOY",
-    migration_started: false,
+    migration_verified: false,
     recovery_catalog: null,
     status: "PENDING",
     updated_at_utc: new Date().toISOString(),
