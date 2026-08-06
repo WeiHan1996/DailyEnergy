@@ -194,11 +194,7 @@ test("T-E012-LOCK-001 rejects concurrency and releases ownership with the proces
   );
   releaseFirst();
   await first;
-  await withReleaseLock(
-    root,
-    "deploy:after-owner-exit",
-    async () => undefined,
-  );
+  await withReleaseLock(root, "deploy:after-owner-exit", async () => undefined);
 });
 
 test("T-E012-STATE-001 records one rollback target and makes replay idempotent", async (t) => {
@@ -680,11 +676,7 @@ test("T-E012-DEPLOY-001 rebuilds a PASS receipt after state commit", async (t) =
   assert.equal(await readReleaseOperation(stateRoot), null);
   const receipt = JSON.parse(
     await readFile(
-      path.join(
-        stateRoot,
-        "receipts",
-        `deploy-${value.release_id}.json`,
-      ),
+      path.join(stateRoot, "receipts", `deploy-${value.release_id}.json`),
       "utf8",
     ),
   );

@@ -554,8 +554,9 @@ export async function executeDevelopmentDeployment({
     async () => {
       const state = await readReleaseState(stateRoot);
       let pending = await readReleaseOperation(stateRoot);
-      const committedPendingOperation =
-        pending?.kind.toLowerCase().replaceAll("_", "-");
+      const committedPendingOperation = pending?.kind
+        .toLowerCase()
+        .replaceAll("_", "-");
       const committedPendingReference =
         pending?.kind === "RECOVER_CURRENT"
           ? pending.from_current
