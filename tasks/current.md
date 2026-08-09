@@ -7,8 +7,8 @@
 - **任务状态**：In Review
 - **任务分支**：`agent/e012-development-deployment`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
-- **当前 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **基线提交**：最新 `main` 为 E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
+- **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
+- **实现合并提交**：E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
 - **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_PUBLICATION_DEPLOYMENT_PENDING_AUTHORIZATION / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
@@ -113,8 +113,8 @@ approved development infrastructure
 - **合并交接**：PR #121 最终 head `79b2e8dbfeda68da5ef08a185756e606edaac135` 的固定 Ubuntu CI
   [run #31295404849](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31295404849) 为 11/11 checks 全部成功；人工 merge
   receipt 为 `CI_MANUAL_MERGE_GATE_OK:pr=121:head=79b2e8dbfeda68da5ef08a185756e606edaac135:run=31295404849:checks=11`；
-  PR 已于 `2026-08-09T04:55:02Z` squash 合并为 `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`，本地 `main`、
-  `origin/main` 与 GitHub `main` 已核对一致；Issue #50 保持 Open；
+  PR 已于 `2026-08-09T04:55:02Z` squash 合并为 `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`；该实现合并时本地
+  `main`、`origin/main` 与 GitHub `main` 已核对一致；Issue #50 保持 Open；
 - **下一动作**：取得 DEV image publication 与首次部署这两项外部状态变更的明确操作授权后，从已合并的固定 CI run 手动发布
   digest-only images 与 deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、
   执行首次真实 Compose 发布并通过 SSH tunnel 验收；不在服务器现场 build；
