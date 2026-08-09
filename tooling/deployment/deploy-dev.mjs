@@ -35,6 +35,7 @@ import {
   loadOperationManifest,
   loadReleaseManifest,
   markReleaseOperationFailed,
+  markReleaseOperationMigrationApplied,
   markReleaseOperationRecovering,
   readReleaseOperation,
   readReleaseState,
@@ -224,6 +225,18 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
     arguments: [...compose, ...arguments_],
     executable: "docker",
   });
+  const databaseCommand = (mode, operationCheckpoint) => ({
+    ...command(
+      "run",
+      "--rm",
+      "--no-deps",
+      "database-init",
+      "node",
+      "tooling/compose/provision-database.mjs",
+      mode,
+    ),
+    ...(operationCheckpoint === undefined ? {} : { operationCheckpoint }),
+  });
   return Object.freeze({
     admin: [
       command(
@@ -281,7 +294,9 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
     ],
     "maintenance-on": [command("stop", "--timeout", "10", "tls-proxy")],
     migration: [
-      command("run", "--rm", "--no-deps", "database-init"),
+      databaseCommand("prepare"),
+      databaseCommand("migrate", "MIGRATION_APPLIED"),
+      databaseCommand("seed"),
       command("run", "--rm", "--no-deps", "database-verify"),
     ],
     preflight: [],
@@ -427,7 +442,7 @@ async function persistReceipt(stateRoot, receipt) {
   await mkdir(directory, { recursive: true, mode: 0o700 });
   const file = path.join(
     directory,
-    `${receipt.operation}-${receipt.release_id}.json`,
+    `${receipt.operation}-${receipt.release_id}-${receipt.operation_id}.json`,
   );
   const contents = `${JSON.stringify(receipt, null, 2)}\n`;
   try {
@@ -471,6 +486,7 @@ function completedOperationReceipt(pending, completedAtUtc) {
     completed_at_utc: completedAtUtc,
     manifest_sha256: reference.manifest_sha256,
     operation: pending.kind.toLowerCase().replaceAll("_", "-"),
+    operation_id: pending.operation_id,
     release_id: reference.release_id,
     receipts,
     status: "PASS",
@@ -506,9 +522,71 @@ async function finalizeCommittedOperation(stateRoot, state, pending) {
   return true;
 }
 
+async function probeRecoveryCatalog({
+  bundleRoot,
+  manifest,
+  runner,
+  secretEnvironment,
+  stateRoot,
+}) {
+  const environmentFile = path.join(
+    stateRoot,
+    `catalog-probe-${manifest.release_id}-${releaseManifestDigest(manifest).slice(0, 12)}.env`,
+  );
+  await writeExact(environmentFile, renderComposeEnvironment(manifest));
+  const command = developmentDeploymentCommands(
+    bundleRoot,
+    environmentFile,
+  ).migration.at(-1);
+  const result = await runner(command, {
+    cwd: bundleRoot,
+    environment: secretEnvironment,
+  });
+  return !result.error && result.code === 0;
+}
+
+async function resolveRecoveryCatalogReference({
+  bundleRoot,
+  pending,
+  runner,
+  secretEnvironment,
+  state,
+  stateRoot,
+}) {
+  if (pending.recovery_catalog !== null) {
+    return pending.recovery_catalog;
+  }
+  if (pending.migration_verified) {
+    return pending.target;
+  }
+  const stateCatalog = {
+    manifest_sha256: state.catalog.manifest_sha256,
+    release_id: state.catalog.release_id,
+  };
+  const candidates = pending.migration_applied
+    ? [pending.target]
+    : [stateCatalog, pending.target];
+  for (const reference of candidates) {
+    const candidate = await loadOperationManifest(stateRoot, reference);
+    if (
+      await probeRecoveryCatalog({
+        bundleRoot,
+        manifest: candidate,
+        runner,
+        secretEnvironment,
+        stateRoot,
+      })
+    ) {
+      return reference;
+    }
+  }
+  fail("RECOVER_CURRENT_CATALOG_UNRESOLVED", pending.target.release_id);
+}
+
 async function runPhases({
   bundleRoot,
   environmentFile,
+  onCommandPass = async () => undefined,
   onPhasePass = async () => undefined,
   onPhaseStart = async () => undefined,
   runner,
@@ -526,6 +604,7 @@ async function runPhases({
       if (result.error || result.code !== 0) {
         fail("E012_DEPLOY_PHASE_FAILED", phase);
       }
+      await onCommandPass(phase, command);
     }
     receipts.push({ phase, result: "PASS" });
     await onPhasePass(phase);
@@ -540,6 +619,7 @@ export async function executeDevelopmentDeployment({
   manifest,
   operation = "deploy",
   preflight = runDevelopmentPreflight,
+  releaseLock = withReleaseLock,
   runner = runCommand,
   runtimeEvidence,
   secretEnvironmentLoader = loadDevelopmentComposeSecretEnvironment,
@@ -548,7 +628,7 @@ export async function executeDevelopmentDeployment({
   if (!["deploy", "recover-current", "rollback"].includes(operation)) {
     fail("E012_DEPLOY_OPERATION_INVALID", operation);
   }
-  return withReleaseLock(
+  return releaseLock(
     stateRoot,
     `${operation}:${manifest.release_id}`,
     async () => {
@@ -606,14 +686,14 @@ export async function executeDevelopmentDeployment({
         }
         await preflight(manifest, imageSet, runtimeEvidence);
         const secretEnvironment = await secretEnvironmentLoader(manifest);
-        const recoveryCatalogReference =
-          pending.recovery_catalog ??
-          (pending.migration_verified
-            ? pending.target
-            : {
-                manifest_sha256: state.catalog.manifest_sha256,
-                release_id: state.catalog.release_id,
-              });
+        const recoveryCatalogReference = await resolveRecoveryCatalogReference({
+          bundleRoot,
+          pending,
+          runner,
+          secretEnvironment,
+          state,
+          stateRoot,
+        });
         const catalogManifest = await loadOperationManifest(
           stateRoot,
           recoveryCatalogReference,
@@ -649,6 +729,10 @@ export async function executeDevelopmentDeployment({
           const receipts = await runPhases({
             bundleRoot,
             environmentFile,
+            onCommandPass: (_phase, command) =>
+              command.operationCheckpoint === "MIGRATION_APPLIED"
+                ? markReleaseOperationMigrationApplied(stateRoot)
+                : undefined,
             onPhasePass: (phase) =>
               updateReleaseOperationPhase(stateRoot, phase, true),
             onPhaseStart: (phase) =>
@@ -708,6 +792,10 @@ export async function executeDevelopmentDeployment({
         const receipts = await runPhases({
           bundleRoot,
           environmentFile,
+          onCommandPass: (_phase, command) =>
+            command.operationCheckpoint === "MIGRATION_APPLIED"
+              ? markReleaseOperationMigrationApplied(stateRoot)
+              : undefined,
           onPhasePass: (phase) =>
             updateReleaseOperationPhase(stateRoot, phase, true),
           onPhaseStart: (phase) =>

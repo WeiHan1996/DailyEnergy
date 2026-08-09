@@ -20,7 +20,7 @@ import {
 } from "./release-contract.mjs";
 
 const STATE_VERSION = "e012-release-state-v2";
-const OPERATION_VERSION = "e012-release-operation-v2";
+const OPERATION_VERSION = "e012-release-operation-v3";
 const LOCK_CONFLICT_EXIT_CODE = 75;
 const LOCK_ACQUIRED_MARKER = "E012_RELEASE_LOCK_ACQUIRED\n";
 
@@ -156,7 +156,9 @@ function validateOperation(value) {
         "failure_code",
         "from_current",
         "kind",
+        "migration_applied",
         "migration_verified",
+        "operation_id",
         "operation_version",
         "recovery_catalog",
         "started_at_utc",
@@ -165,6 +167,9 @@ function validateOperation(value) {
         "updated_at_utc",
       ]) ||
     value.operation_version !== OPERATION_VERSION ||
+    !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/u.test(
+      value.operation_id,
+    ) ||
     !["DEPLOY", "RECOVER_CURRENT", "ROLLBACK"].includes(value.kind) ||
     !["FAILED", "PENDING", "RECOVERING"].includes(value.status) ||
     !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u.test(
@@ -173,6 +178,7 @@ function validateOperation(value) {
     !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u.test(
       value.updated_at_utc,
     ) ||
+    typeof value.migration_applied !== "boolean" ||
     typeof value.migration_verified !== "boolean" ||
     (value.failure_code !== null &&
       !/^[A-Z][A-Z0-9_]{2,127}$/u.test(value.failure_code)) ||
@@ -394,7 +400,7 @@ export async function beginReleaseOperation(
   kind,
   manifest,
   fromCurrent,
-  { startedAtUtc = new Date().toISOString() } = {},
+  { operationId = randomUUID(), startedAtUtc = new Date().toISOString() } = {},
 ) {
   const existing = await readReleaseOperation(root);
   if (existing !== null) {
@@ -407,7 +413,9 @@ export async function beginReleaseOperation(
     failure_code: null,
     from_current: fromCurrent,
     kind,
+    migration_applied: false,
     migration_verified: false,
+    operation_id: operationId,
     operation_version: OPERATION_VERSION,
     recovery_catalog: null,
     started_at_utc: startedAtUtc,
@@ -437,8 +445,28 @@ export async function updateReleaseOperationPhase(root, phase, passed) {
     completed_phases: passed
       ? [...operation.completed_phases, phase]
       : operation.completed_phases,
+    migration_applied:
+      operation.migration_applied || (passed && phase === "migration"),
     migration_verified:
       operation.migration_verified || (passed && phase === "migration"),
+    updated_at_utc: new Date().toISOString(),
+  };
+  validateOperation(next);
+  await atomicWrite(
+    paths(root).operation,
+    `${JSON.stringify(next, null, 2)}\n`,
+  );
+  return next;
+}
+
+export async function markReleaseOperationMigrationApplied(root) {
+  const operation = await readReleaseOperation(root);
+  if (operation === null || operation.active_phase !== "migration") {
+    fail("RELEASE_OPERATION_MIGRATION_CHECKPOINT_INVALID", "migration");
+  }
+  const next = {
+    ...operation,
+    migration_applied: true,
     updated_at_utc: new Date().toISOString(),
   };
   validateOperation(next);
@@ -511,6 +539,7 @@ export async function restartInitialReleaseOperation(root, manifest) {
     completed_phases: [],
     failure_code: null,
     kind: "DEPLOY",
+    migration_applied: false,
     migration_verified: false,
     recovery_catalog: null,
     status: "PENDING",

@@ -2,7 +2,7 @@
 
 - **文档状态**：Draft
 - **所属任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **最后更新**：2026-08-05
+- **最后更新**：2026-08-09
 - **适用范围**：腾讯云上海临时 DEV 主机；loopback TLS；PostgreSQL 18、Redis 8 与应用同机；私有 COS application object
 - **上游权威**：[ADR-0007](../decisions/ADR-0007-development-colocation-exception.md)、[部署、配置与回滚规范](../technical/deployment.md)、[测试策略](../technical/testing.md)、[故障和安全事件响应](./incident-response.md)
 - **生产资格**：无；本流程和产物都固定为 `production_eligible=false`
@@ -123,9 +123,11 @@ exit
 
 首次全通过后才会更新 `/srv/dailyenergy/deployment/release-state.json`，分别保存当前 Accepted application、实际 effective catalog 和唯一
 N-1 rollback target，并写无用户内容的 PASS receipt。同一 release 在没有 dirty operation 时重放只重新核验 manifest/preflight，
-不重复迁移或写状态。控制器在第一次运行态变更前写 `/srv/dailyenergy/deployment/release-operation.json`；失败后保留该文件并拒绝普通
-deploy/rollback，不能把 Accepted release 的幂等返回误当作恢复。若进程在 Accepted state 写入后、PASS receipt 写入前退出，下次入口会先用
-完整 operation phases 确定性补建同一 receipt，再清除 operation；不得手工删除 `release-operation.json` 或伪造 receipt。
+不重复迁移或写状态。控制器在第一次运行态变更前生成唯一 `operation_id` 并写
+`/srv/dailyenergy/deployment/release-operation.json`；失败后保留该文件并拒绝普通 deploy/rollback，不能把 Accepted release 的幂等返回误当作恢复。
+若进程在 Accepted state 写入后、PASS receipt 写入前退出，下次入口会先用完整 operation phases 与原 `operation_id` 确定性补建同一 receipt，
+再清除 operation。receipt 文件名绑定 operation ID，因此同一 release 的多次合法 deploy/rollback/recover 不覆盖旧证据；不得手工删除
+`release-operation.json` 或伪造 receipt。
 
 ## 5. Loopback TLS 验收
 
@@ -149,8 +151,8 @@ DEV 使用 Caddy internal certificate，因此浏览器会显示本地不受信�
 
 ## 6. 发布失败后的恢复
 
-如果已有 Accepted release 的候选发布失败，先查看无 secret 的 state/operation，确认 `current`、`target`、`active_phase` 和
-`migration_verified`：
+如果已有 Accepted release 的候选发布失败，先查看无 secret 的 state/operation，确认 `current`、`target`、`active_phase`、
+`migration_applied` 和 `migration_verified`：
 
 ```bash
 sudo sed -n '1,220p' /srv/dailyenergy/deployment/release-state.json
@@ -171,11 +173,15 @@ cd "/srv/dailyenergy/bundles/${CURRENT_RELEASE_ID}"
 exit
 ```
 
-控制器会重新执行完整 18 阶段。只有失败候选的 migration 与 drift verify 整个阶段已经通过、operation 明确记录
-`migration_verified=true` 时，恢复才使用该候选的 immutable migration image 和 catalog；如果 migration 尚未执行或在阶段内部失败，恢复使用
-state 已记录的 effective catalog，避免被未验证或确定性失败的候选 migration image 卡死。随后启动当前 Accepted 的 application、config 和
-secret。只有完整 smoke 通过后才更新 effective catalog、写入 PASS receipt 并清除 operation。恢复自身失败时继续保留 dirty operation，修复
-外部原因后重复同一 `recover-current`，不得改用 deploy/rollback 绕过。
+控制器会重新执行完整 18 阶段。migration 阶段内部依次执行 role/credential prepare、Prisma migrate、synthetic seed 与 drift verify。Prisma
+migrate 自身完成并核验 migration history 后立即记录 `migration_applied=true`；seed 与 drift verify 也通过后才记录
+`migration_verified=true`。prepare 或 Prisma migrate 自身失败时，恢复先用只读 drift probe 核验 state 已记录的 effective catalog；如果 host
+checkpoint 恰好在 migration 生效后、`migration_applied` 落盘前丢失，旧 catalog probe 会失败，只有候选 probe 通过才能选择候选。migration
+已核验生效但 seed、drift 或后续阶段失败时，恢复使用候选 immutable migration image/catalog；两个 probe 都失败时保持 dirty operation 并
+以 `RECOVER_CURRENT_CATALOG_UNRESOLVED` 停止，不能猜测 catalog 或启动应用。
+随后启动当前 Accepted 的 application、config 和 secret。只有完整 smoke 通过后才更新 effective catalog、写入 PASS receipt 并清除
+operation。恢复自身失败时继续保留同一 `operation_id` 的 dirty operation，修复外部原因后重复同一 `recover-current`，不得改用
+deploy/rollback 绕过。
 
 首次发布尚无 Accepted state 时不能执行 `recover-current`；修复失败原因后，只能对同一 manifest 重试 `deploy`。其它候选会被拒绝。
 

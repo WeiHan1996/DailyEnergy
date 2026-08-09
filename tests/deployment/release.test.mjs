@@ -4,6 +4,7 @@ import {
   mkdir,
   mkdtemp,
   readFile,
+  readdir,
   realpath as resolveRealpath,
   rm,
   writeFile,
@@ -32,7 +33,7 @@ import {
 } from "../../tooling/deployment/release-state.mjs";
 import {
   developmentDeploymentCommands,
-  executeDevelopmentDeployment,
+  executeDevelopmentDeployment as executeWithReleaseLock,
   loadDevelopmentComposeSecretEnvironment,
   renderComposeEnvironment,
 } from "../../tooling/deployment/deploy-dev.mjs";
@@ -45,6 +46,14 @@ async function temporaryRoot(t) {
 }
 
 const noSecretEnvironment = async () => Object.freeze({});
+const inProcessReleaseLock = async (_root, _owner, operation) => operation();
+
+function executeDevelopmentDeployment(options) {
+  return executeWithReleaseLock({
+    ...options,
+    releaseLock: inProcessReleaseLock,
+  });
+}
 
 test("T-E012-MANIFEST-001 accepts strict DEV ReleaseManifestV1", () => {
   const value = manifest("e012-release-a");
@@ -518,6 +527,7 @@ test("T-E012-DEPLOY-001 converges Accepted N after N+1 fails after migration", a
   );
   const dirty = await readReleaseOperation(stateRoot);
   assert.equal(dirty.status, "FAILED");
+  assert.equal(dirty.migration_applied, true);
   assert.equal(dirty.migration_verified, true);
   assert.equal(dirty.target.release_id, candidate.release_id);
   assert.equal(
@@ -579,7 +589,7 @@ test("T-E012-DEPLOY-001 converges Accepted N after N+1 fails after migration", a
   assert.deepEqual(replay, { idempotent: true, receipts: [] });
 });
 
-test("T-E012-DEPLOY-001 recovers with the effective catalog when candidate migration fails", async (t) => {
+test("T-E012-DEPLOY-001 keeps the effective catalog when candidate migration does not apply", async (t) => {
   const root = await temporaryRoot(t);
   const firstBundle = path.join(root, "first");
   const secondBundle = path.join(root, "second");
@@ -617,10 +627,14 @@ test("T-E012-DEPLOY-001 recovers with the effective catalog when candidate migra
       bundleRoot: secondBundle,
       manifest: candidate,
       runner: async (command) => ({
-        code: command.arguments.includes("database-init") ? 1 : 0,
+        code: command.arguments.at(-1) === "prepare" ? 1 : 0,
       }),
     }),
     /E012_DEPLOY_PHASE_FAILED:migration/u,
+  );
+  assert.equal(
+    (await readReleaseOperation(stateRoot)).migration_applied,
+    false,
   );
   assert.equal(
     (await readReleaseOperation(stateRoot)).migration_verified,
@@ -647,13 +661,161 @@ test("T-E012-DEPLOY-001 recovers with the effective catalog when candidate migra
   assert.equal(recoveryEnvironment.includes(candidate.images.migration), false);
 });
 
+test("T-E012-DEPLOY-001 recovers candidate catalog after migration applies and seed fails", async (t) => {
+  const root = await temporaryRoot(t);
+  const firstBundle = path.join(root, "first");
+  const secondBundle = path.join(root, "second");
+  const stateRoot = path.join(root, "state");
+  await Promise.all([mkdir(firstBundle), mkdir(secondBundle)]);
+  const current = manifest("e012-seed-failure-n", {
+    acceptedGenerations: [1, 2],
+  });
+  const candidate = manifest("e012-seed-failure-n-plus-one", {
+    acceptedGenerations: [1, 2],
+    catalogGeneration: 2,
+    generation: 2,
+    rollbackCompatibleReleaseIds: [current.release_id],
+    mutate: (value) => {
+      value.images.migration = `ghcr.io/weihan1996/dailyenergy-migration@sha256:${"9".repeat(64)}`;
+      value.migrations.catalog_fingerprint = "f".repeat(64);
+    },
+  });
+  const common = {
+    imageSet: {},
+    preflight: async () => undefined,
+    runtimeEvidence: {},
+    secretEnvironmentLoader: noSecretEnvironment,
+    stateRoot,
+  };
+  await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: firstBundle,
+    manifest: current,
+    runner: async () => ({ code: 0 }),
+  });
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      bundleRoot: secondBundle,
+      manifest: candidate,
+      runner: async (command) => ({
+        code: command.arguments.at(-1) === "seed" ? 1 : 0,
+      }),
+    }),
+    /E012_DEPLOY_PHASE_FAILED:migration/u,
+  );
+  const pending = await readReleaseOperation(stateRoot);
+  assert.equal(pending.migration_applied, true);
+  assert.equal(pending.migration_verified, false);
+
+  await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: firstBundle,
+    manifest: current,
+    operation: "recover-current",
+    runner: async () => ({ code: 0 }),
+  });
+  const recoveredState = await readReleaseState(stateRoot);
+  assert.equal(recoveredState.catalog.release_id, candidate.release_id);
+  const recoveryEnvironment = await readFile(
+    path.join(
+      stateRoot,
+      `recover-${current.release_id}-${candidate.release_id}.env`,
+    ),
+    "utf8",
+  );
+  assert.ok(recoveryEnvironment.includes(current.images.server));
+  assert.ok(recoveryEnvironment.includes(candidate.images.migration));
+});
+
+test("T-E012-DEPLOY-001 probes candidate catalog when the host checkpoint is lost", async (t) => {
+  const root = await temporaryRoot(t);
+  const firstBundle = path.join(root, "first");
+  const secondBundle = path.join(root, "second");
+  const stateRoot = path.join(root, "state");
+  await Promise.all([mkdir(firstBundle), mkdir(secondBundle)]);
+  const current = manifest("e012-checkpoint-loss-n", {
+    acceptedGenerations: [1, 2],
+  });
+  const candidate = manifest("e012-checkpoint-loss-n-plus-one", {
+    acceptedGenerations: [1, 2],
+    catalogGeneration: 2,
+    generation: 2,
+    rollbackCompatibleReleaseIds: [current.release_id],
+    mutate: (value) => {
+      value.images.migration = `ghcr.io/weihan1996/dailyenergy-migration@sha256:${"9".repeat(64)}`;
+      value.migrations.catalog_fingerprint = "f".repeat(64);
+    },
+  });
+  const common = {
+    imageSet: {},
+    preflight: async () => undefined,
+    runtimeEvidence: {},
+    secretEnvironmentLoader: noSecretEnvironment,
+    stateRoot,
+  };
+  await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: firstBundle,
+    manifest: current,
+    runner: async () => ({ code: 0 }),
+  });
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      bundleRoot: secondBundle,
+      manifest: candidate,
+      runner: async (command) => ({
+        code: command.arguments.at(-1) === "prepare" ? 1 : 0,
+      }),
+    }),
+    /E012_DEPLOY_PHASE_FAILED:migration/u,
+  );
+  const pending = await readReleaseOperation(stateRoot);
+  assert.equal(pending.migration_applied, false);
+  const currentProbe = `catalog-probe-${current.release_id}-${releaseManifestDigest(current).slice(0, 12)}.env`;
+
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      bundleRoot: firstBundle,
+      manifest: current,
+      operation: "recover-current",
+      runner: async () => ({ code: 1 }),
+    }),
+    /RECOVER_CURRENT_CATALOG_UNRESOLVED:e012-checkpoint-loss-n-plus-one/u,
+  );
+  const unresolved = await readReleaseOperation(stateRoot);
+  assert.equal(unresolved.status, "FAILED");
+  assert.equal(unresolved.recovery_catalog, null);
+
+  await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: firstBundle,
+    manifest: current,
+    operation: "recover-current",
+    runner: async (command) => ({
+      code: command.arguments.some(
+        (argument) => path.basename(argument) === currentProbe,
+      )
+        ? 1
+        : 0,
+    }),
+  });
+  const recoveredState = await readReleaseState(stateRoot);
+  assert.equal(recoveredState.catalog.release_id, candidate.release_id);
+});
+
 test("T-E012-DEPLOY-001 rebuilds a PASS receipt after state commit", async (t) => {
   const root = await temporaryRoot(t);
   const bundleRoot = path.join(root, "bundle");
   const stateRoot = path.join(root, "state");
   const value = manifest("e012-receipt-recovery");
+  const operationId = "00000000-0000-4000-8000-000000000001";
   await mkdir(bundleRoot);
-  await beginReleaseOperation(stateRoot, "DEPLOY", value, null);
+  await beginReleaseOperation(stateRoot, "DEPLOY", value, null, {
+    operationId,
+  });
   for (const phase of deploymentPhases) {
     await updateReleaseOperationPhase(stateRoot, phase, false);
     await updateReleaseOperationPhase(stateRoot, phase, true);
@@ -676,10 +838,15 @@ test("T-E012-DEPLOY-001 rebuilds a PASS receipt after state commit", async (t) =
   assert.equal(await readReleaseOperation(stateRoot), null);
   const receipt = JSON.parse(
     await readFile(
-      path.join(stateRoot, "receipts", `deploy-${value.release_id}.json`),
+      path.join(
+        stateRoot,
+        "receipts",
+        `deploy-${value.release_id}-${operationId}.json`,
+      ),
       "utf8",
     ),
   );
+  assert.equal(receipt.operation_id, operationId);
   assert.equal(receipt.status, "PASS");
   assert.equal(receipt.receipts.length, deploymentPhases.length);
 });
@@ -736,6 +903,23 @@ test("T-E012-DEPLOY-001 rolls back only to the recorded compatible manifest and 
     }),
     /ROLLBACK_TARGET_MISSING/u,
   );
+
+  await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: secondBundle,
+    manifest: current,
+  });
+  const receiptFiles = await readdir(path.join(stateRoot, "receipts"));
+  assert.equal(receiptFiles.length, 4);
+  const operationIds = await Promise.all(
+    receiptFiles.map(async (file) => {
+      const receipt = JSON.parse(
+        await readFile(path.join(stateRoot, "receipts", file), "utf8"),
+      );
+      return receipt.operation_id;
+    }),
+  );
+  assert.equal(new Set(operationIds).size, operationIds.length);
 });
 
 test("T-E012-DEPLOY-001 keeps Docker builds, public bindings and raw secrets out of the deployment plan", () => {
@@ -749,6 +933,11 @@ test("T-E012-DEPLOY-001 keeps Docker builds, public bindings and raw secrets out
   assert.equal(serialized.includes(" build"), false);
   assert.equal(serialized.includes("docker.sock"), false);
   assert.equal(serialized.includes("0.0.0.0:443"), false);
+  assert.deepEqual(
+    commands.migration.slice(0, 3).map((command) => command.arguments.at(-1)),
+    ["prepare", "migrate", "seed"],
+  );
+  assert.equal(commands.migration[1].operationCheckpoint, "MIGRATION_APPLIED");
   for (const command of [...commands.health, ...commands["maintenance-off"]]) {
     assert.ok(command.arguments.includes("--resolve"));
     assert.ok(

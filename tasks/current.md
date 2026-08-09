@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-06（E-012 草稿 PR #121 第二轮三项审核修复已提交，按用户要求未运行本地验证，等待新 head CI）
+- **最后更新**：2026-08-09（E-012 草稿 PR #121 第三轮两项 P1 修复完成本地定向验证，等待提交与新 head CI）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Review
@@ -9,7 +9,7 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **当前 PR**：[E-012 草稿 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **基线提交**：最新 `main` 状态交接基线 `6bc3fae`（包含 E-011 合并提交 `266a7dc39b87aec23740d64656bf33081a3aa34b`）
-- **Gate 结论**：`E012_IN_REVIEW / REVIEW_ROUND2_FIXES_UNVALIDATED / FULL_GATE_LOCAL_ENV_BLOCKED / PR_CI_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / REVIEW_ROUND3_TARGETED_PASS / FULL_GATE_WINDOWS_PATH_BLOCKED / PR_CI_NEW_HEAD_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -88,8 +88,8 @@ approved development infrastructure
   GET 200、SHA-256 match、DELETE 204 与删除后 HEAD 404，测试对象和临时脚本均已清理；
 - **数据边界**：DEV 只用 synthetic seed/专用测试身份；主机丢失后重建，不把 DEV volume、dump、
   COS object 或 secret 迁入 STAGING/PRODUCTION；
-- **context prepare**：`node tooling/agent-prepare.mjs E-012 --remote` 已确认 route=`READY`、
-  profile=`code`、remote check PASS、Issue/Milestone 正确；这只证明仓库路由和代码前置满足，
+- **context prepare**：`pnpm agent:prepare E-012 --remote --deep` 已确认 route=`READY`、
+  profile=`security`、remote/dependency/Node/pnpm check PASS、Issue/Milestone 正确；这只证明仓库路由和代码前置满足，
   不能替代 Issue #50 要求的开发基础设施授权；
 - **已完成实现**：手动 `Publish DEV images` workflow 将一个成功的 `main` CI run 与独立 publication
   run 绑定，构建五类 digest-only image、SBOM/provenance、migration/runtime evidence 和 source-free
@@ -103,20 +103,21 @@ approved development infrastructure
   catalog；安装入口必须接收受严格校验且不含值的 database/COS secret version 与 object config ref，使轮换生成并绑定
   新 release，而不是依赖代码常量；第一轮修复的本地部署 suite、registry、test policy、CI policy、ESLint、目标格式与 diff Gate 已通过；
 - **第二轮审核修复**：release/install/deploy/rollback/recover-current 改用 Linux 内核 advisory `flock`，持锁进程退出或主机重启后不会被残留
-  元数据文件永久阻塞；operation 只在 migration 与 drift verify 整阶段通过后记录 `migration_verified=true`，migration 阶段内部失败时
-  `recover-current` 使用 state 中已验证 effective catalog；完整 operation phases 可在 Accepted state 写入后确定性补建 PASS receipt，receipt
-  已存在但内容不一致时 fail closed，写入一致后才清 operation。对应最小故障场景代码和 Runbook/Accepted 部署合同已同步；按用户明确要求，
-  本轮未运行测试、lint、format 或 Gate；
-- **下一动作**：等待 PR #121 新 head 的固定 Linux Gate；获得明确合并批准并取得同 commit 完整 CI PASS 后，手动发布
+  元数据文件永久阻塞；dirty operation 与 state→receipt 可恢复提交已进入代码，但复审又发现 migration 阶段内部副作用和 receipt 路径复用缺口；
+- **第三轮审核修复**：migration 阶段拆为 prepare/migrate/seed/drift 子步骤，Prisma migrate 核验成功后原子记录 `migration_applied`，完整阶段通过后才记录
+  `migration_verified`；checkpoint 落盘窗口丢失时用只读 state/candidate drift probe 判定实际 catalog，两个都不通过则保持 dirty 并 fail closed；每次
+  operation 生成持久 UUID，receipt 内容和路径均绑定该 ID，同一 release 合法重复 deploy/rollback 不再碰撞。新增 seed failure、checkpoint loss、
+  state→receipt 重建与 deploy N+1 → rollback N → 再 deploy N+1 场景；secret 仍只通过 root Compose 环境进入最小 mount，probe 不输出值；
+- **下一动作**：提交并推送第三轮修复，等待 PR #121 新 head 的固定 Linux Gate；使用用户本次明确合并授权并取得同 commit 完整 CI PASS 后，手动发布
   deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、
   执行首次真实 Compose 发布并通过 SSH tunnel 验收。合并前不发布 image，不在服务器现场 build；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
-- PR #121 第二轮审核修复按用户指示只完成最小代码、场景和文档修改；本轮没有运行测试、lint、format、`git diff --check` 或任何
-  `agent:validate`，不得将未运行状态报告为 PASS；
-- 本轮私有 COS 决策与审核修复已进入 ADR-0007、部署规范、Runbook、任务状态和 `ReleaseManifestV1` 合同；当前定向
+- 第三轮新增的 seed failure、checkpoint loss、state→receipt 重建和重复 release receipt 场景 `4/4` 通过；目标 ESLint、Prettier 与
+  `git diff --check` 通过；DEV Compose/image/preflight 的 Windows 可执行子集 `15` 项通过，另 `1` 项只因 Windows 无 `process.getgid()` 未进入逻辑；
+- 本轮私有 COS 决策与审核修复已进入 ADR-0007、部署规范、Runbook、任务状态和 `ReleaseManifestV1` 合同；PR 前一 head 定向
   deployment suite `31/31` 通过，覆盖 Caddy Host/SNI 一致性、source-free bundle
   build/verify、root-only 原子安装、首次 materialize、幂等 replay、篡改拒绝、顺序发布失败不落状态和
   dirty operation、`Accepted N → N+1 中途失败 → recover-current N`、唯一 rollback、v1→v2 配置/secret 引用轮换，以及
@@ -124,18 +125,15 @@ approved development infrastructure
   `736 total / 170 COVERED / 566 PLANNED / 0 NA_WITH_REASON`，`git diff --check` 通过；真实 DEV
   主机的 root-only credential/config 权限、内网 DNS/TLS、最小 CAM 策略和 signed
   write/read/delete/delete-verification smoke 均通过，输出不含 secret 或对象内容；
-- `pnpm agent:prepare E-012` 仍因本机 pnpm store/registry 与非固定 Node 版本失败；直接运行同一
-  仓库只读入口 `node tooling/agent-prepare.mjs E-012` 返回 `READY / profile=code / risk=full`；
-- 本次审核修复后的正式 `pnpm agent:validate --mode=task --task=E-012` 在前置依赖状态检查返回
-  `FAIL`：本机 Node `24.6.0` 与固定 `24.18.0`
-  不一致，本地 pnpm store 又缺 package index，并尝试不可用的 registry/依赖清理；该结果不
-  改写为 PASS，Agent workflow、registry、目标格式与 diff 已分别通过，固定 Linux 状态 PR
-  run 将补齐权威自动证据；
+- `pnpm agent:prepare E-012 --remote --deep` 在固定 Node `24.18.0`、pnpm `11.17.0` 与当前依赖上 PASS；Docker Linux 定向复核因 Docker Hub
+  manifest 请求 EOF 未取得容器，未伪装为 PASS；
+- 正式 `pnpm agent:validate --mode=full --task=E-012` 返回 `FAIL`：在 format、workspace、config、ESLint、architecture、codegen、contracts 与 agent
+  workflow 通过后，既有 Windows 路径处理把 migration 目录解析为 `D:\D:\Projects\...`，database static Gate 以 `ENOENT` 停止。该结果保持 FAIL；
+  PR 前一 head `39b30e0` 的固定 Ubuntu run `31066001189` 为 11/11 SUCCESS，第三轮新 head 尚待 GitHub CI；
 - E-011 本地定向 CI policy `23/23`、registry
   `736 total / 155 COVERED / 581 PLANNED / 0 NA_WITH_REASON`、Agent workflow、目标 ESLint、
   format 与 diff Gate 均通过；
-- 本机 Node 为 `24.6.0`，低于项目固定 `24.18.0`，且本地 pnpm store 不完整；本机聚合
-  changed/task/full Gate 不改写为 PASS，固定 `ubuntu-24.04` GitHub run 是 E-011 权威证据；
+- 本机 Node 已为项目固定 `24.18.0`；Windows-only path/UID/flock 差异不改写为 PASS，固定 `ubuntu-24.04` GitHub run 是本 PR 的权威自动证据；
 - 外部 lane 继续保持 `miniapp-conformance=INFRA_BLOCKED`、
   `ai-model-load-human=PENDING_EXPLICIT_AUTHORIZATION`、
   `manual-rc=MANUAL_EVIDENCE_PENDING`，没有被 E-011 自动化冒充为 PASS。
