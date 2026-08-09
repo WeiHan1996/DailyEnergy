@@ -1,0 +1,152 @@
+name: Publish DEV images
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Exact 40-character main commit that already passed the complete CI workflow
+        required: true
+        type: string
+
+concurrency:
+  group: publish-dev-images
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish immutable DEV image set
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    environment: development
+    permissions:
+      actions: read
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout the exact release commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ inputs.release_sha }}
+
+      - name: Set up the deployment control runtime
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.18.0
+
+      - name: Require an immutable main commit and one complete CI run
+        id: ci_gate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          set -euo pipefail
+          test "$RELEASE_SHA" = "$(git rev-parse HEAD)"
+          git merge-base --is-ancestor "$RELEASE_SHA" origin/main
+          node tooling/deployment/verify-ci-release.mjs "$RELEASE_SHA" --github-output "$GITHUB_OUTPUT"
+
+      - name: Download the exact CI supply-chain evidence
+        env:
+          CI_RUN_ID: ${{ steps.ci_gate.outputs.ci_run_id }}
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh run download "$CI_RUN_ID"
+          --repo "$GITHUB_REPOSITORY"
+          --name ci-supply-chain-evidence
+          --dir .artifacts/deployment/ci-supply-chain
+
+      - name: Authenticate to GHCR with the job-scoped token
+        env:
+          GHCR_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+
+      - name: Build once and push five commit-bound image roles
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 .artifacts/deployment/image-metadata
+          for specification in \
+            "admin:e009-admin" \
+            "migration:e009-migration" \
+            "proxy:e012-proxy" \
+            "server:e009-server" \
+            "stub:e009-stub"
+          do
+            role="${specification%%:*}"
+            target="${specification#*:}"
+            image_name="ghcr.io/weihan1996/dailyenergy-${role}"
+            docker buildx build \
+              --file Dockerfile \
+              --label "org.opencontainers.image.revision=${RELEASE_SHA}" \
+              --label "org.opencontainers.image.source=https://github.com/WeiHan1996/DailyEnergy" \
+              --metadata-file ".artifacts/deployment/image-metadata/${role}.json" \
+              --platform linux/amd64 \
+              --provenance=mode=max \
+              --push \
+              --sbom=true \
+              --tag "${image_name}:${RELEASE_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+              --target "$target" \
+              .
+          done
+
+      - name: Collect immutable image runtime evidence
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: >-
+          node tooling/deployment/runtime-evidence.mjs --collect
+          .artifacts/deployment/image-metadata/server.json
+          .artifacts/deployment/dev-runtime-evidence.json
+
+      - name: Bind CI supply chain, migration catalog and runtime evidence
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: >-
+          node tooling/deployment/supply-evidence.mjs --collect
+          .artifacts/deployment/ci-supply-chain
+          .artifacts/deployment/dev-runtime-evidence.json
+          .artifacts/deployment/dev-supply-evidence.json
+
+      - name: Generate closed digest-only image set evidence
+        env:
+          CI_RUN_ATTEMPT: ${{ steps.ci_gate.outputs.ci_run_attempt }}
+          CI_RUN_ID: ${{ steps.ci_gate.outputs.ci_run_id }}
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: >-
+          node tooling/deployment/image-set.mjs --generate
+          .artifacts/deployment/image-metadata
+          .artifacts/deployment/dev-supply-evidence.json
+          .artifacts/deployment/dev-image-set.json
+
+      - name: Build the minimal source-free deployment bundle
+        run: >-
+          node tooling/deployment/deployment-bundle.mjs --build
+          .artifacts/deployment/dev-bundle
+          .artifacts/deployment
+
+      - name: Validate bounded image set evidence
+        id: image_set_scan
+        if: always()
+        run: |
+          set -euo pipefail
+          node tooling/deployment/image-set.mjs --validate-bundle \
+            .artifacts/deployment/dev-bundle/evidence/dev-image-set.json \
+            .artifacts/deployment/dev-bundle/evidence/dev-supply-evidence.json \
+            .artifacts/deployment/dev-bundle/evidence/dev-runtime-evidence.json
+          node tooling/deployment/deployment-bundle.mjs --verify \
+            .artifacts/deployment/dev-bundle
+
+      - name: Upload DEV image set evidence
+        if: always() && steps.image_set_scan.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dev-deployment-bundle-${{ inputs.release_sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .artifacts/deployment/dev-bundle
+          if-no-files-found: error
+          retention-days: 365

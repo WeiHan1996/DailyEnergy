@@ -77,68 +77,79 @@ function validateCredential(value, profile) {
   return url.password;
 }
 
-const adminUrl = await readConnectionString({
-  fileName: "DATABASE_ADMIN_URL_FILE",
-  requiredCode: "DB_ADMIN_DATABASE_URL_REQUIRED",
-  valueName: "DATABASE_ADMIN_URL",
-});
+const mode = process.argv[2] ?? "all";
+if (!["all", "migrate", "prepare", "seed"].includes(mode)) {
+  throw new Error("COMPOSE_DATABASE_MODE_INVALID");
+}
 
-run("tooling/database/bootstrap.mjs", {
-  DATABASE_ADMIN_URL: undefined,
-  DATABASE_ADMIN_URL_FILE: process.env.DATABASE_ADMIN_URL_FILE,
-});
+if (mode === "all" || mode === "prepare") {
+  const adminUrl = await readConnectionString({
+    fileName: "DATABASE_ADMIN_URL_FILE",
+    requiredCode: "DB_ADMIN_DATABASE_URL_REQUIRED",
+    valueName: "DATABASE_ADMIN_URL",
+  });
 
-await withClient(adminUrl, async (client) => {
-  for (const profile of profiles) {
-    const credential = (await readFile(profile.secretFile, "utf8")).trim();
-    const password = validateCredential(credential, profile);
-    const existing = await client.query(
-      "SELECT 1 FROM pg_roles WHERE rolname = $1",
-      [profile.loginRole],
-    );
-    if (existing.rowCount === 0) {
+  run("tooling/database/bootstrap.mjs", {
+    DATABASE_ADMIN_URL: undefined,
+    DATABASE_ADMIN_URL_FILE: process.env.DATABASE_ADMIN_URL_FILE,
+  });
+
+  await withClient(adminUrl, async (client) => {
+    for (const profile of profiles) {
+      const credential = (await readFile(profile.secretFile, "utf8")).trim();
+      const password = validateCredential(credential, profile);
+      const existing = await client.query(
+        "SELECT 1 FROM pg_roles WHERE rolname = $1",
+        [profile.loginRole],
+      );
+      if (existing.rowCount === 0) {
+        await client.query(
+          `CREATE ROLE ${profile.loginRole} LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS`,
+        );
+      }
       await client.query(
-        `CREATE ROLE ${profile.loginRole} LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS`,
+        `ALTER ROLE ${profile.loginRole} PASSWORD '${password}'`,
+      );
+      await client.query(
+        `GRANT ${profile.groupRole} TO ${profile.loginRole} WITH INHERIT TRUE, SET TRUE`,
       );
     }
-    await client.query(
-      `ALTER ROLE ${profile.loginRole} PASSWORD '${password}'`,
+
+    const identities = await client.query(
+      `SELECT rolname, rolcanlogin, rolsuper, rolcreatedb, rolcreaterole, rolinherit, rolbypassrls
+         FROM pg_roles
+        WHERE rolname = ANY($1::text[])
+        ORDER BY rolname`,
+      [profiles.map((profile) => profile.loginRole)],
     );
-    await client.query(
-      `GRANT ${profile.groupRole} TO ${profile.loginRole} WITH INHERIT TRUE, SET TRUE`,
-    );
-  }
+    if (
+      identities.rowCount !== profiles.length ||
+      identities.rows.some(
+        (role) =>
+          !role.rolcanlogin ||
+          role.rolsuper ||
+          role.rolcreatedb ||
+          role.rolcreaterole ||
+          !role.rolinherit ||
+          role.rolbypassrls,
+      )
+    ) {
+      throw new Error("COMPOSE_DATABASE_LOGIN_ROLE_MISMATCH");
+    }
+  });
+}
 
-  const identities = await client.query(
-    `SELECT rolname, rolcanlogin, rolsuper, rolcreatedb, rolcreaterole, rolinherit, rolbypassrls
-       FROM pg_roles
-      WHERE rolname = ANY($1::text[])
-      ORDER BY rolname`,
-    [profiles.map((profile) => profile.loginRole)],
-  );
-  if (
-    identities.rowCount !== profiles.length ||
-    identities.rows.some(
-      (role) =>
-        !role.rolcanlogin ||
-        role.rolsuper ||
-        role.rolcreatedb ||
-        role.rolcreaterole ||
-        !role.rolinherit ||
-        role.rolbypassrls,
-    )
-  ) {
-    throw new Error("COMPOSE_DATABASE_LOGIN_ROLE_MISMATCH");
-  }
-});
+if (mode === "all" || mode === "migrate") {
+  run("tooling/database/migrate.mjs", {
+    DATABASE_URL: undefined,
+    DATABASE_URL_FILE: process.env.DATABASE_URL_FILE,
+  });
+}
+if (mode === "all" || mode === "seed") {
+  run("tooling/database/seed.mjs", {
+    DATABASE_URL: undefined,
+    DATABASE_URL_FILE: process.env.DB_SEED_DATABASE_URL_FILE,
+  });
+}
 
-run("tooling/database/migrate.mjs", {
-  DATABASE_URL: undefined,
-  DATABASE_URL_FILE: process.env.DATABASE_URL_FILE,
-});
-run("tooling/database/seed.mjs", {
-  DATABASE_URL: undefined,
-  DATABASE_URL_FILE: process.env.DB_SEED_DATABASE_URL_FILE,
-});
-
-console.log("COMPOSE_DATABASE_READY");
+console.log(`COMPOSE_DATABASE_READY:${mode}`);

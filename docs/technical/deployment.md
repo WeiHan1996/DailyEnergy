@@ -2,9 +2,9 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-08-04（私有 GitHub Free required-check 临时补偿控制获接受）
+- **最后更新**：2026-08-09（E-012 迁移子步骤 checkpoint 与唯一 operation receipt 合同已补充）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
-- **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
+- **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0007 临时 DEV 同机例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
 
 ## 1. 目的
@@ -122,6 +122,20 @@ RPO/RTO 是 Phase 1/Beta 的工程准备目标，不是对用户的公开承诺�
 - production secret 不下发到 CI、LOCAL、DEV、STAGING、EVALUATION 或 MINIAPP_RUNNER；
 - 环境标识必须写入 Release Manifest、runtime startup fingerprint、数据库连接期望值和 artifact evidence；错连立即 fail closed。
 
+### 5.3 E-012 临时 DEV 例外
+
+[ADR-0007](../decisions/ADR-0007-development-colocation-exception.md) 仅为当前 E-012 `DEV` 接受一个有期限的数据库/队列拓扑例外：PostgreSQL 18 与 Redis 8 可在同一台临时 application host 上以独立容器、网络和 volume 运行。object endpoint 不再使用 synthetic stub，而是使用腾讯云上海 `ap-shanghai` 的独立私有 COS；application 只能通过同地域 private/internal endpoint 访问 `dev/objects/`。家庭 NAS、生产身份、真实用户对象和生产数据均不进入该环境。
+
+COS 保持私有、版本控制关闭；`dev/objects/` 的当前对象 7 天后删除，未完成分块 1 天后清理，只用于 synthetic、可重新生成的 application object，不承担 PostgreSQL backup 或长期保留。专用 CAM 编程身份只能拥有该 bucket/prefix 的必要 object read/write/delete、受限 list 与 multipart actions，不得控制 bucket 配置、账户其它 bucket/prefix 或控制台登录。真实 bucket/APPID/endpoint 与 credential value 保存在外部 DEV 配置和 root-only secret 中；仓库、镜像、manifest 与日志只保存 endpoint class、region、prefix、配置 fingerprint 和 secret version reference。
+
+PostgreSQL/Redis 与 COS application object 都按 disposable DEV state 管理：不声称 backup、PITR、RPO、RTO、HA 或长期数据耐久性，主机丢失时用同一 release manifest、image digest、migration、无值 COS 配置与 seed 重建。域名完成 ICP 备案并取得 DNS/TLS 授权前，只允许 loopback/SSH tunnel 验证，不开放公网 80/443。
+
+E-012 的 DEV 控制面使用隔离、checksum 固定的 Node 24.18.0，不替换主机系统 Node。手动 publication workflow 只接受已经进入 `main` 且一个 CI run 内 11 个 required checks 全部成功的精确 commit；它分别记录 CI run 与 publication run，发布 `admin/migration/proxy/server/stub` 五个 `linux/amd64` digest，并生成 source-free deployment bundle。服务器安装入口验证 allowlist、SHA-256、publication evidence、外部 COS 配置 fingerprint 与 root-only 权限后，原子安装到版本化 bundle 目录；服务器不 checkout、不 build，也不接收 CI 远程 SSH。
+
+DEV 发布控制器固定执行 preflight、digest pull、stateful readiness、关闭 loopback TLS、worker drain、migration/drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、COS object、Safety、owner、deletion 与退出维护共 18 个有序阶段；全通过后才写 Accepted state 和唯一 N-1 rollback target。该短维护窗口只适用于尚无公网和真实用户的 DEV，不构成 Production 零停机设计。具体操作者步骤见 [DEV 发布、回滚与换机 Runbook](../operations/development-deployment-runbook.md)。
+
+此例外不改变 5.2 与第 6、18、19 节的生产合同。`STAGING`、`PRODUCTION` 和处理真实备份的 `RECOVERY` 必须使用独立受控 PostgreSQL、Redis 与对象服务，并使用不同 bucket/prefix、credential、retention 与审计边界；其 preflight 遇到 `DEV_COLOCATED_EXCEPTION` 必须 fail closed。DEV volume、dump、COS object 或 secret 不得迁入 STAGING/PRODUCTION。
+
 ## 6. MVP 生产拓扑
 
 ### 6.1 单区域、单活边界
@@ -227,43 +241,73 @@ Critical/high vulnerability 的处置时限与例外由安全策略和 S-33/E-01
 
 ## 9. Release Manifest
 
-目标 `ReleaseManifestV1`：
+`ReleaseManifestV1` 的当前可执行闭包为：
 
 ```text
 ReleaseManifestV1 {
   release_id
-  source_commit_sha
-  created_at
-  created_by_role
-
-  node_version
-  pnpm_version
-  lockfile_sha256
-  contract_versions
-
-  image_digests {
-    api
-    admin
-    server_worker
+  source {
+    repository
+    commit_sha
+    lockfile_sha256
+    ci_run_id
+    ci_run_attempt
   }
-  sbom_refs[]
-  provenance_refs[]
-
-  migration_head
-  migration_checksums[]
-  min_compatible_schema
-  max_compatible_schema
-
-  config_schema_version
-  deploy_config_fingerprint
-  runtime_catalog_fingerprint
-  capability_fingerprints[]
-  secret_ref_versions[]
-
-  required_gate_run_refs[]
-  backup_readiness_ref
-  rollback_release_id
-  deployment_environment
+  images {
+    admin
+    migration
+    proxy
+    server
+    stub
+  }
+  supply_chain {
+    gate_ref
+    image_set_sha256
+    provenance_sha256
+    sbom_sha256
+  }
+  migrations {
+    catalog_fingerprint
+    catalog_generation
+    migration_head
+    destructive=false
+    rollback_compatible_release_ids[]
+  }
+  config {
+    config_schema_version
+    contract_bundle_version
+    environment
+    log_level
+    product_date_policy_version
+    runtime_fingerprints {
+      api_capability
+      api_deploy_config
+      object_config
+      worker_background
+      worker_interactive
+      worker_restricted
+    }
+    secret_ref_versions[]
+  }
+  topology {
+    stateful_topology
+    public_ingress
+    object_endpoint
+    object_region
+    object_prefix
+    object_config_ref
+    production_enabled=false
+  }
+  compatibility {
+    generation
+    accepted_generations[]
+    manifest_versions[]
+  }
+  evidence {
+    required_gates[]
+    source_ids[]
+    synthetic_only
+  }
 }
 ```
 
@@ -271,8 +315,13 @@ ReleaseManifestV1 {
 
 - manifest 只保存 ref、version、digest、时间和角色，不保存 secret、环境变量值、数据库 URL、用户内容或 provider payload；
 - `release_id` 不可变；任何 image/config/migration/capability 变化创建新 release；
+- CI 发布的 `image_set_id` 只标识一组不可变镜像与供应链证据；materializer 以
+  `image_set_id + database secret version + COS secret version + object config ref + object config fingerprint`
+  派生不同的 `release_id`。因此 secret/config-only 轮换可以复用同一组已验证 image digest，但不能复用旧 release ID；
+- 安装入口只接受受 closed pattern 校验的非敏感 version/ref 参数，禁止通过参数传 secret value、路径、URL 或任意 env；
 - production 实际 fingerprint 与 manifest 不同则 startup/deployment Gate 失败；
 - 当前生产与上一份可回滚 Accepted manifest 必须可查询；
+- additive migration 前，当前 application generation 必须声明接受下一 catalog generation；materializer 在无 catalog 变化时使用 `[N, N+1]`，发生 catalog 变化时使用 `[N-1, N]`，同 schema 的后续 release 再向 `[N, N+1]` 滑动，窗口始终最多两代；
 - manifest 与 artifact digest 在部署前后均校验，不能在服务器手改后补记；
 - runtime catalog 的后续独立发布使用自己的 immutable catalog release，并记录与 application release 的 compatibility；
 - emergency switch 不改写历史 manifest，使用单独有期限的操作记录。
@@ -311,6 +360,10 @@ ReleaseManifestV1 {
 
 Deploy config 变化创建受审 commit/manifest；secret rotation 创建新 secret version 并更新 manifest ref；runtime catalog 通过受控 Admin/operation publish。三者不能用一个“万能热更新”接口。
 
+E-012 DEV materializer 必须允许操作者为每次安装选择 database secret version、COS secret version 与 object config ref；
+这三个参数只包含版本引用，不含值，并与 object config fingerprint 一同进入不可变 release 身份。轮换不得要求修改常量、重跑 CI
+或重新构建相同 image，且不得覆盖已有 version directory/config file。
+
 ## 12. Secret 与凭据
 
 ### 12.1 注入
@@ -318,10 +371,13 @@ Deploy config 变化创建受审 commit/manifest；secret rotation 创建新 sec
 - 优先使用 GitHub Actions OIDC/云工作负载身份获取短期部署 credential，不在仓库保存长期云密钥；
 - 若目标平台暂不支持 OIDC，使用 environment-protected、最小权限、短期且可轮换的部署凭据；该路径必须单独记录风险与 expiry；
 - Compose service 通过显式 `secrets` 挂载只读文件；应用只从批准路径读取；
+- Docker Compose 对 `file` 来源使用 bind mount，`uid/gid/mode` 重映射会被忽略；E-012 Linux DEV 保持外部文件 `root:root 0600`，由 root 部署控制器在 preflight 后读取，并只通过 Compose 根进程内存中的 `environment` secret source 映射为 service-specific、目标 UID/GID `0400` 文件。值不得进入命令参数、`release.env`、Compose 输出或仓库；该 DEV 适配不替代 Production secret store；
 - 环境变量只携带 secret file path/ref，不携带 secret 明文；
 - 每个 environment/profile/用途独立 secret，不跨环境或跨 profile 复用；
 - CI fork/untrusted PR 不获得 environment secret 或 OIDC deployment permission；
 - shell trace、process list、Compose config、crash dump、diagnostic endpoint 和 artifact 均不得显示 secret。
+
+Docker file secret 的 bind-mount 限制以 [Compose services 官方说明](https://docs.docker.com/reference/compose-file/services/#secrets) 为准。
 
 GitHub 官方文档说明 OIDC 可用短期 token 代替长期云 secret，deployment environment 可在访问 secret 前应用审批与分支保护；实际云厂商确认后由 E-011/E-012 按其官方 action 实现：
 
@@ -586,6 +642,20 @@ remote Turbo cache 在 v1 继续禁用。job-local cache 只含可重建依赖/�
 6. 重建 readiness、owner/Safety/delete、command/publish、queue smoke；
 7. 恢复流量并进入 S-23 规定观察窗口；
 8. 任何数据完整性未知保持隔离，不以页面恢复视为完成。
+
+发布控制器必须在第一次可能改变运行态的阶段前生成唯一 `operation_id`、持久化 pending operation，并在每个阶段开始/通过时原子更新。任一阶段失败或进程中断后：
+
+- release/install/deploy/rollback/recover-current 共享 Linux 内核 advisory lock；锁元数据文件可以持久存在，但不得作为占用哨兵，进程异常退出或主机重启后必须由内核释放实际所有权；
+- Accepted application release 与唯一 rollback target 不被候选覆盖；
+- 普通 deploy/rollback 必须以 `RELEASE_RECOVERY_REQUIRED` fail closed，不能把同一 Accepted release 当作无操作 replay；
+- `recover-current` 必须重新执行完整阶段，把当前 Accepted application/config/secret 收敛回来；
+- migration 阶段把 role/credential prepare、Prisma migrate、synthetic seed 与 drift verify 作为同一阶段内的独立受控命令；只有 Prisma migrate 自身完成并核验 migration history 后才记录 `migration_applied=true`，只有 seed 与 drift verify 也通过后才记录 `migration_verified=true`；
+- prepare 或 Prisma migrate 自身失败且 `migration_applied=false` 时，恢复先用只读 drift probe 核验 state 已记录的 effective catalog；若 host checkpoint 恰好在 migration 生效后、`migration_applied` 落盘前丢失，旧 catalog probe 会失败且候选 probe 必须通过，恢复才能选择候选。Prisma migrate 已核验生效但 seed/drift 等后续命令失败时，恢复必须使用候选 immutable migration image/catalog 收敛；两个 probe 都失败时保持 dirty operation 并 fail closed；
+- state 分别记录 Accepted application ref 与 effective catalog ref。代码回滚不声称执行 down migration，也不能把应用切到不接受当前
+  effective catalog 的目标；
+- Accepted state/effective catalog 写入后，完整 operation phase 记录必须能够按原 `operation_id` 确定性重建同一 PASS receipt；receipt 路径必须绑定该 ID，使 deploy N+1 → rollback N → 再 deploy N+1 等合法重复 release 不复用旧文件。只有 receipt 已写入且内容一致后才能清除 dirty operation，state→receipt 间进程退出不得永久丢失证据；
+- recovery 完成完整 health、COS、Safety、owner、deletion smoke 后才清除 dirty operation。首次发布尚无 Accepted release 时，只有同一
+  manifest 可完整重试，不能用其它候选跳过 dirty state。
 
 ## 21. PostgreSQL 备份
 

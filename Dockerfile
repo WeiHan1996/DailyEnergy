@@ -70,10 +70,13 @@ COPY --from=build --chown=node:node /workspace/prisma ./prisma
 COPY --from=build --chown=node:node /workspace/tooling/compose/provision-database.mjs ./tooling/compose/
 COPY --from=build --chown=node:node \
   /workspace/tooling/database/bootstrap.mjs \
+  /workspace/tooling/database/catalog-fingerprint.mjs \
+  /workspace/tooling/database/check-drift.mjs \
   /workspace/tooling/database/lib.mjs \
   /workspace/tooling/database/migrate.mjs \
   /workspace/tooling/database/seed.mjs \
   ./tooling/database/
+COPY --from=build --chown=node:node /workspace/tooling/deployment/database-smoke.mjs ./tooling/deployment/
 COPY --from=build --chown=node:node /workspace/tooling/lib/sensitive-redaction.mjs ./tooling/lib/
 USER 1000:1000
 CMD ["node", "tooling/compose/provision-database.mjs"]
@@ -81,6 +84,11 @@ CMD ["node", "tooling/compose/provision-database.mjs"]
 FROM node:24.18.0-bookworm-slim@sha256:6f7b03f7c2c8e2e784dcf9295400527b9b1270fd37b7e9a7285cf83b6951452d AS e009-stub
 
 WORKDIR /app
-COPY --chown=node:node tooling/compose/stub-server.mjs tooling/compose/fault-proxy.mjs tooling/compose/host-ingress.mjs ./
+COPY --chown=node:node tooling/compose/stub-server.mjs tooling/compose/fault-proxy.mjs tooling/compose/host-ingress.mjs tooling/deployment/cos-smoke.mjs ./
 USER 1000:1000
 CMD ["node", "stub-server.mjs"]
+
+FROM caddy:2.11.4-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648 AS e012-proxy
+
+COPY --chown=1000:1000 docker/deployment/Caddyfile /etc/caddy/Caddyfile
+USER 1000:1000

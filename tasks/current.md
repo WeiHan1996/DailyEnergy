@@ -1,15 +1,15 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-04（E-011 已合并，E-012 等待开发基础设施授权）
+- **最后更新**：2026-08-09（E-012 草稿 PR #121 第三轮 P1 与新披露 nanoid high advisory 已修复，等待新 head CI）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **任务状态**：Blocked
-- **任务分支**：尚未创建 E-012 实现分支；项目状态交接见 PR #120
+- **任务状态**：In Review
+- **任务分支**：`agent/e012-development-deployment`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
-- **当前 PR**：无 E-012 实现 PR；项目状态交接见 [PR #120](https://github.com/WeiHan1996/DailyEnergy/pull/120)
-- **基线提交**：E-011 合并基线 `266a7dc39b87aec23740d64656bf33081a3aa34b`；E-012 实现须从最新 `main` 创建
-- **Gate 结论**：`E011_DONE / E012_DEPENDENCIES_PASS / DEVELOPMENT_INFRASTRUCTURE_AUTHORIZATION_BLOCKED`
+- **当前 PR**：[E-012 草稿 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
+- **基线提交**：最新 `main` 状态交接基线 `6bc3fae`（包含 E-011 合并提交 `266a7dc39b87aec23740d64656bf33081a3aa34b`）
+- **Gate 结论**：`E012_IN_REVIEW / REVIEW_ROUND3_TARGETED_PASS / NANOID_HIGH_ADVISORY_FIXED_LOCAL / FULL_GATE_WINDOWS_PATH_BLOCKED / PR_CI_RETRY_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -19,7 +19,7 @@
 ```text
 approved development infrastructure
   -> immutable CI digest + ReleaseManifestV1 + release lock/preflight
-  -> reverse proxy/TLS + independent PG/Redis/object endpoints
+  -> reverse proxy/TLS + DEV-only co-located PG/Redis + private COS object endpoint
   -> ordered deploy + health/readiness + synthetic observability
   -> recorded rollback target + config/secret compatibility proof
 ```
@@ -47,7 +47,8 @@ approved development infrastructure
 ## 3. E-012 范围
 
 - 实现幂等部署入口、发布锁、preflight、`ReleaseManifestV1` 与唯一 rollback target；
-- 部署单 host Compose application，连接独立受控 PostgreSQL、Redis 和 object endpoint；
+- 部署单 host Compose application；按 ADR-0007 仅 DEV 同机运行 PostgreSQL/Redis，并连接
+  上海 `ap-shanghai` 私有 COS 的 `dev/objects/` application object endpoint；
 - 配置 reverse proxy/TLS、health/readiness、maintenance、Worker 发布顺序与证据保存；
 - 编写开发环境发布、回滚、配置轮换、恢复 runbook 与审批点；
 - 证明同一 CI image digest 晋级，服务器不现场 build，不使用 mutable tag；
@@ -62,36 +63,81 @@ approved development infrastructure
 - 不降低 Accepted ADR、Schema、API、隐私、Safety、删除、幂等、事务、profile、测试或
   可观测性边界。
 
-## 5. 当前阻塞与授权边界
+## 5. 当前授权、待决证据与边界
 
 - **前置依赖**：E-009 与 E-011 已完成，代码依赖满足；E-012 Issue #50 为 Open，Milestone
   为 Phase 1；
-- **权威阻塞**：Issue #50 明确要求云厂商、主机、域名/TLS、区域、身份和真实 secret 未批准时
-  保持 Blocked；deployment 26 的外部 Production Gates 也不能由仓库文档或本地模拟解除；
-- **需要的用户决定/授权**：开发环境的云厂商与账户主体、region、主机规格/预算、固定域名与
-  DNS/TLS 控制权、独立 PostgreSQL/Redis/object 方案、部署身份/secret store、责任人及退出方案；
-- **禁止推定**：不得把“继续下一步”解释为购买服务、创建账号/主机/域名、写入 DNS、签发证书、
-  创建数据库、保存真实 secret 或开放公网的授权；
-- **context prepare**：`node tooling/agent-prepare.mjs E-012 --remote` 已确认 route=`READY`、
-  profile=`code`、remote check PASS、Issue/Milestone 正确；这只证明仓库路由和代码前置满足，
+- **已获授权**：腾讯云上海临时 Ubuntu 24.04 LTS 主机作为 DEV；4 vCPU、8 GiB RAM、约
+  180 GB 系统盘；PostgreSQL 18 与 Redis 8 同机；不用 NAS；使用上海私有 COS 和专用
+  `dailyenergy-dev-cos` CAM 编程身份访问 `dev/objects/`；允许 SSH 部署与更新 E-012 规范/任务记录；
+  该决定由 Accepted ADR-0007 固化；
+- **已完成主机基线**：DailyEnergy 专用 ED25519 公钥登录通过，旧未知公钥已移除并留有受限备份；
+  系统安全更新完成；Docker 29.1.3、Compose 2.40.3 已安装；UFW 仅允许 SSH 入站；COS
+  credential/config 已以 `root:root`、`0600` 存入版本化外部路径；checksum 固定的隔离 Node
+  24.18.0 已安装到 `/opt/dailyenergy/runtime/node-v24.18.0`，部署入口为
+  `/usr/local/bin/dailyenergy-node`；`dev-secret-v1` 的 PostgreSQL 六类角色 URL、admin password 与
+  fault-control token 已生成并通过 `root:root 0600` 完整性复核，过程未输出值；
+- **待决外部证据**：域名已实名但未备案；ICP备案、DNS/TLS 控制权和公网 80/443 开放尚未授权，
+  因此先用 loopback/SSH tunnel 验证 TLS，固定公网地址验收保持 `ICP_FILING_PENDING`；
+- **生产仍阻塞**：STAGING/PRODUCTION 必须迁移到独立 PostgreSQL、Redis 和对象服务，并另行批准
+  生产身份、secret store、备份/PITR、区域与审计；ADR-0007 不豁免这些 Gate；
+- **对象边界**：COS 仅存 synthetic、可重新生成的 application object，不存 PostgreSQL backup；
+  bucket 私有、版本控制关闭，`dev/objects/` 当前对象 7 天后删除、未完成分块 1 天后清理；真实
+  bucket/APPID/endpoint 与 credential value 不入仓库/镜像/manifest/log，只记录无值配置和 secret
+  version；专用 CAM 最小权限策略已绑定，private/internal endpoint 的签名 smoke 已完成 PUT 200、
+  GET 200、SHA-256 match、DELETE 204 与删除后 HEAD 404，测试对象和临时脚本均已清理；
+- **数据边界**：DEV 只用 synthetic seed/专用测试身份；主机丢失后重建，不把 DEV volume、dump、
+  COS object 或 secret 迁入 STAGING/PRODUCTION；
+- **context prepare**：`pnpm agent:prepare E-012 --remote --deep` 已确认 route=`READY`、
+  profile=`security`、remote/dependency/Node/pnpm check PASS、Issue/Milestone 正确；这只证明仓库路由和代码前置满足，
   不能替代 Issue #50 要求的开发基础设施授权；
-- **下一动作**：先取得上述开发基础设施的明确选择与授权；随后从最新 `main` 创建
-  `agent/e012-development-deployment`，重新运行 `pnpm agent:prepare E-012 --remote --deep`，
-  阅读全部 required sources 后再给出 GO/BLOCKED 开工结论；
+- **已完成实现**：手动 `Publish DEV images` workflow 将一个成功的 `main` CI run 与独立 publication
+  run 绑定，构建五类 digest-only image、SBOM/provenance、migration/runtime evidence 和 source-free
+  deployment bundle；root-only 安装入口验证文件集、digest、权限、COS config fingerprint 后原子生成
+  `ReleaseManifestV1`；preflight、release lock、18 阶段 Compose 顺序发布、COS/Safety/owner/deletion
+  smoke、Accepted state、唯一 N-1 rollback 与幂等 replay 已进入代码和定向测试；外部 secret/config
+  保持宿主机 `root:root 0600`，部署控制器只在内存中将值交给 Compose，容器按服务以 `0400`
+  secret mount 获取最小集合，值不进入命令参数、release env、Compose 解析结果或日志；
+- **审核修复**：PR #121 的三项审核意见已修复：主机健康探针与 Caddy `localhost` Host/SNI 一致；部分发布失败会留下
+  pending/dirty operation，并可显式 `recover-current` 收敛回当前 Accepted application/config/secret 与已验证兼容的
+  catalog；安装入口必须接收受严格校验且不含值的 database/COS secret version 与 object config ref，使轮换生成并绑定
+  新 release，而不是依赖代码常量；第一轮修复的本地部署 suite、registry、test policy、CI policy、ESLint、目标格式与 diff Gate 已通过；
+- **第二轮审核修复**：release/install/deploy/rollback/recover-current 改用 Linux 内核 advisory `flock`，持锁进程退出或主机重启后不会被残留
+  元数据文件永久阻塞；dirty operation 与 state→receipt 可恢复提交已进入代码，但复审又发现 migration 阶段内部副作用和 receipt 路径复用缺口；
+- **第三轮审核修复**：migration 阶段拆为 prepare/migrate/seed/drift 子步骤，Prisma migrate 核验成功后原子记录 `migration_applied`，完整阶段通过后才记录
+  `migration_verified`；checkpoint 落盘窗口丢失时用只读 state/candidate drift probe 判定实际 catalog，两个都不通过则保持 dirty 并 fail closed；每次
+  operation 生成持久 UUID，receipt 内容和路径均绑定该 ID，同一 release 合法重复 deploy/rollback 不再碰撞。新增 seed failure、checkpoint loss、
+  state→receipt 重建与 deploy N+1 → rollback N → 再 deploy N+1 场景；secret 仍只通过 root Compose 环境进入最小 mount，probe 不输出值；
+- **供应链修复**：head `87af40e` 的 run `31294911129` 中 9 个 automated lane 全部成功，但 supply-chain 因 2026-08-07 完成 GitHub review 的
+  `GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.16`，聚合 Gate 随之失败；已用精确 pnpm override 升到 patched `3.3.17`，未豁免 high Gate；
+- **下一动作**：提交并推送 nanoid override，等待 PR #121 新 head 的固定 Linux Gate；使用用户本次明确合并授权并取得同 commit 完整 CI PASS 后，手动发布
+  deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、
+  执行首次真实 Compose 发布并通过 SSH tunnel 验收。合并前不发布 image，不在服务器现场 build；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
-- 本次 post-merge handoff 的正式 `agent:validate --mode=full --task=E-012` 在首个
-  `pnpm run validate` 前置依赖状态检查返回 `FAIL`：本机 Node `24.6.0` 与固定 `24.18.0`
-  不一致，本地 pnpm store 又缺 package index，并尝试不可用的 registry/依赖清理；该结果不
-  改写为 PASS，Agent workflow、registry、目标格式与 diff 已分别通过，固定 Linux 状态 PR
-  run 将补齐权威自动证据；
+- 第三轮新增的 seed failure、checkpoint loss、state→receipt 重建和重复 release receipt 场景 `4/4` 通过；目标 ESLint、Prettier 与
+  `git diff --check` 通过；DEV Compose/image/preflight 的 Windows 可执行子集 `15` 项通过，另 `1` 项只因 Windows 无 `process.getgid()` 未进入逻辑；
+- 本轮私有 COS 决策与审核修复已进入 ADR-0007、部署规范、Runbook、任务状态和 `ReleaseManifestV1` 合同；PR 前一 head 定向
+  deployment suite `31/31` 通过，覆盖 Caddy Host/SNI 一致性、source-free bundle
+  build/verify、root-only 原子安装、首次 materialize、幂等 replay、篡改拒绝、顺序发布失败不落状态和
+  dirty operation、`Accepted N → N+1 中途失败 → recover-current N`、唯一 rollback、v1→v2 配置/secret 引用轮换，以及
+  root-only 外部值仅通过 service-specific Compose environment secret 进入容器；source registry 为
+  `736 total / 170 COVERED / 566 PLANNED / 0 NA_WITH_REASON`，`git diff --check` 通过；真实 DEV
+  主机的 root-only credential/config 权限、内网 DNS/TLS、最小 CAM 策略和 signed
+  write/read/delete/delete-verification smoke 均通过，输出不含 secret 或对象内容；
+- `pnpm agent:prepare E-012 --remote --deep` 在固定 Node `24.18.0`、pnpm `11.17.0` 与当前依赖上 PASS；Docker Linux 定向复核因 Docker Hub
+  manifest 请求 EOF 未取得容器，未伪装为 PASS；
+- `pnpm audit --prod` 返回无已知漏洞，`pnpm run ci:audit` 返回 `CI_AUDIT_OK:critical=0:high=0`；override 只把 `postcss` 的 nanoid 3.x
+  解析从 `3.3.16` 提升到 GitHub advisory 指定的首个补丁版本 `3.3.17`；完整 workspace build `7/7` 成功，Admin bundle Gate 扫描 28 个静态文件通过；
+- 正式 `pnpm agent:validate --mode=full --task=E-012` 返回 `FAIL`：在 format、workspace、config、ESLint、architecture、codegen、contracts 与 agent
+  workflow 通过后，既有 Windows 路径处理把 migration 目录解析为 `D:\D:\Projects\...`，database static Gate 以 `ENOENT` 停止。该结果保持 FAIL；
+  PR 前一 head `39b30e0` 的固定 Ubuntu run `31066001189` 为 11/11 SUCCESS，包含 nanoid override 的下一 head 尚待 GitHub CI；
 - E-011 本地定向 CI policy `23/23`、registry
   `736 total / 155 COVERED / 581 PLANNED / 0 NA_WITH_REASON`、Agent workflow、目标 ESLint、
   format 与 diff Gate 均通过；
-- 本机 Node 为 `24.6.0`，低于项目固定 `24.18.0`，且本地 pnpm store 不完整；本机聚合
-  changed/task/full Gate 不改写为 PASS，固定 `ubuntu-24.04` GitHub run 是 E-011 权威证据；
+- 本机 Node 已为项目固定 `24.18.0`；Windows-only path/UID/flock 差异不改写为 PASS，固定 `ubuntu-24.04` GitHub run 是本 PR 的权威自动证据；
 - 外部 lane 继续保持 `miniapp-conformance=INFRA_BLOCKED`、
   `ai-model-load-human=PENDING_EXPLICIT_AUTHORIZATION`、
   `manual-rc=MANUAL_EVIDENCE_PENDING`，没有被 E-011 自动化冒充为 PASS。
