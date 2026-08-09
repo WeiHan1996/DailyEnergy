@@ -1,15 +1,15 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-09（E-012 草稿 PR #121 第三轮 P1 与新披露 nanoid high advisory 已修复，等待新 head CI）
+- **最后更新**：2026-08-09（E-012 PR #121 已合并，等待获授权后的 DEV image publication 与首次真实部署证据）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Review
 - **任务分支**：`agent/e012-development-deployment`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
-- **当前 PR**：[E-012 草稿 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **基线提交**：最新 `main` 状态交接基线 `6bc3fae`（包含 E-011 合并提交 `266a7dc39b87aec23740d64656bf33081a3aa34b`）
-- **Gate 结论**：`E012_IN_REVIEW / REVIEW_ROUND3_TARGETED_PASS / NANOID_HIGH_ADVISORY_FIXED_LOCAL / FULL_GATE_WINDOWS_PATH_BLOCKED / PR_CI_RETRY_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **当前 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
+- **基线提交**：最新 `main` 为 E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
+- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_PUBLICATION_DEPLOYMENT_PENDING_AUTHORIZATION / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -110,9 +110,14 @@ approved development infrastructure
   state→receipt 重建与 deploy N+1 → rollback N → 再 deploy N+1 场景；secret 仍只通过 root Compose 环境进入最小 mount，probe 不输出值；
 - **供应链修复**：head `87af40e` 的 run `31294911129` 中 9 个 automated lane 全部成功，但 supply-chain 因 2026-08-07 完成 GitHub review 的
   `GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.16`，聚合 Gate 随之失败；已用精确 pnpm override 升到 patched `3.3.17`，未豁免 high Gate；
-- **下一动作**：提交并推送 nanoid override，等待 PR #121 新 head 的固定 Linux Gate；使用用户本次明确合并授权并取得同 commit 完整 CI PASS 后，手动发布
-  deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、
-  执行首次真实 Compose 发布并通过 SSH tunnel 验收。合并前不发布 image，不在服务器现场 build；
+- **合并交接**：PR #121 最终 head `79b2e8dbfeda68da5ef08a185756e606edaac135` 的固定 Ubuntu CI
+  [run #31295404849](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31295404849) 为 11/11 checks 全部成功；人工 merge
+  receipt 为 `CI_MANUAL_MERGE_GATE_OK:pr=121:head=79b2e8dbfeda68da5ef08a185756e606edaac135:run=31295404849:checks=11`；
+  PR 已于 `2026-08-09T04:55:02Z` squash 合并为 `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`，本地 `main`、
+  `origin/main` 与 GitHub `main` 已核对一致；Issue #50 保持 Open；
+- **下一动作**：取得 DEV image publication 与首次部署这两项外部状态变更的明确操作授权后，从已合并的固定 CI run 手动发布
+  digest-only images 与 deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、
+  执行首次真实 Compose 发布并通过 SSH tunnel 验收；不在服务器现场 build；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
@@ -133,7 +138,8 @@ approved development infrastructure
   解析从 `3.3.16` 提升到 GitHub advisory 指定的首个补丁版本 `3.3.17`；完整 workspace build `7/7` 成功，Admin bundle Gate 扫描 28 个静态文件通过；
 - 正式 `pnpm agent:validate --mode=full --task=E-012` 返回 `FAIL`：在 format、workspace、config、ESLint、architecture、codegen、contracts 与 agent
   workflow 通过后，既有 Windows 路径处理把 migration 目录解析为 `D:\D:\Projects\...`，database static Gate 以 `ENOENT` 停止。该结果保持 FAIL；
-  PR 前一 head `39b30e0` 的固定 Ubuntu run `31066001189` 为 11/11 SUCCESS，包含 nanoid override 的下一 head 尚待 GitHub CI；
+  最终 head `79b2e8d` 的固定 Ubuntu run `31295404849` 为 11/11 SUCCESS，包含 nanoid override、数据库集成、队列集成、API/Admin E2E、
+  resilience、deterministic AI、静态/合同/docs 与 supply-chain Gate；
 - E-011 本地定向 CI policy `23/23`、registry
   `736 total / 155 COVERED / 581 PLANNED / 0 NA_WITH_REASON`、Agent workflow、目标 ESLint、
   format 与 diff Gate 均通过；
