@@ -131,6 +131,33 @@ function successfulWorkflowRun(runId = "40000000001") {
   };
 }
 
+test("T-E012-IMAGE-001 normalizes installed bundle ownership before its mode", async () => {
+  const installerSource = await readFile(
+    path.join(repositoryRoot, "tooling/deployment/install-dev-bundle.mjs"),
+    "utf8",
+  );
+  const helperStart = installerSource.indexOf(
+    "async function copyProtectedFile(",
+  );
+  const helperEnd = installerSource.indexOf(
+    "\n}\n\nasync function protectDirectories",
+    helperStart,
+  );
+  assert.notEqual(helperStart, -1);
+  assert.notEqual(helperEnd, -1);
+  const helperSource = installerSource.slice(helperStart, helperEnd);
+  const copyIndex = helperSource.indexOf(
+    "await copyFile(source, destination, constants.COPYFILE_EXCL);",
+  );
+  const ownerIndex = helperSource.indexOf(
+    "await chown(destination, expectedUid, expectedGid);",
+  );
+  const modeIndex = helperSource.indexOf("await chmod(destination, 0o600);");
+  assert.ok(copyIndex >= 0);
+  assert.ok(ownerIndex > copyIndex);
+  assert.ok(modeIndex > ownerIndex);
+});
+
 test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", async (t) => {
   const directory = await metadataDirectory(t);
   const releaseId = `dev-${COMMIT_SHA.slice(0, 12)}-50000000001-1`;

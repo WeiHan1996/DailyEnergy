@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-10（Checks 权限修复已合并；第二次 DEV publication 在 attestation-capable Buildx 初始化处阻断）
+- **最后更新**：2026-08-10（DEV publication 已成功；首次真实安装在传输文件 owner 规范化处 fail closed）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Review
-- **任务分支**：`agent/e012-buildx-attestations`
+- **任务分支**：`agent/e012-install-owner-normalization`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **最近合并 PR**：[E-012 PR #124](https://github.com/WeiHan1996/DailyEnergy/pull/124)
-- **当前 PR**：[E-012 草稿 PR #125](https://github.com/WeiHan1996/DailyEnergy/pull/125)
+- **最近合并 PR**：[E-012 PR #125](https://github.com/WeiHan1996/DailyEnergy/pull/125)
+- **当前 PR**：[E-012 草稿 PR #126](https://github.com/WeiHan1996/DailyEnergy/pull/126)
 - **实现合并提交**：E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
-- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_PUBLICATION_BUILDX_ATTESTATION_REPAIR / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_INSTALL_OWNER_NORMALIZATION_REPAIR / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -130,13 +130,32 @@ approved development infrastructure
   evidence 下载和 job-scoped GHCR 登录，但 runner 默认 Docker driver 不支持 `--provenance=mode=max` 与 `--sbom=true` attestation，
   首个 buildx 调用以 `Attestation is not supported for the docker driver` 失败；没有镜像 push、deployment artifact 或 DEV 主机变更；
   修复限定为固定官方 Buildx action 并显式使用 `docker-container` driver，以及对应工作流合同测试；
-- **下一动作**：合并 Buildx 初始化修复后，重新从合并提交 `3c00d952be6fa7e44aba683fc79fee4e1a1687fe` 发布 digest-only
-  images 与 deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、执行首次真实
-  Compose 发布并通过 SSH tunnel 验收；不在服务器现场 build；
+- **Buildx 修复合并**：PR #125 最终 head `f44be717255420b52225b1d341cc05826e267324` 的固定 Ubuntu CI
+  [run #31348801769](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31348801769) 为 11/11 checks 全部成功；人工 merge
+  receipt 为 `CI_MANUAL_MERGE_GATE_OK:pr=125:head=f44be717255420b52225b1d341cc05826e267324:run=31348801769:checks=11`；
+  用户明确批准后，PR 于 `2026-08-10T02:17:51Z` squash 合并为 `d56ff92781d4d7d8f9052404681c71ade8ea2299`；
+- **DEV publication 成功**：手动 publication
+  [run #31349439531](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31349439531) 已成功发布五类 digest-only DEV image 和
+  source-free deployment bundle `dev-3c00d952be6f-31349439531-1`；artifact `9048495961` 保留至
+  `2027-08-10T02:18:31Z`，下载、离线 bundle 校验与传输后校验均通过，服务器没有现场 checkout/build；
+- **COS config v2**：为满足 private endpoint preflight，在保留 v1 的前提下创建 root-only
+  `/srv/dailyenergy/config/dev-cos-config-v2.env`，仅将 endpoint 从带 `https://` 的 URL 规范化为私有内网 hostname；文件继续为
+  `root:root 0600`，过程未输出 bucket、APPID、endpoint 或 credential value；
+- **首次真实安装阻断**：root installer 从 `/tmp/dailyenergy-dev-bundle` 复制传输用户持有的 artifact 后，以
+  `DEV_BUNDLE_INSTALL_FILE_PROTECTION:bundle-manifest.json` fail closed；只读诊断确认副本为 regular file、非 symlink、`uid=1000`、
+  `gid=1001`、`mode=600`、`nlink=1`，证明 Node `copyFile` 保留源 owner，而 root-only 安装 Gate 正确拒绝。失败后 stage 已清理，
+  `/srv/dailyenergy/bundles` 为空且没有 Accepted release state；修复限定为复制后显式 `chown(expectedUid, expectedGid)`、再设 `0600`，
+  并增加顺序合同测试；
+- **下一动作**：完成 owner 规范化修复 PR 并取得固定 Ubuntu CI；合并后用 `dev-cos-config-v2` 重新安装 artifact，服务器管理员再交互式
+  配置有 `read:packages` 的 GHCR 只读身份，执行首次真实 Compose 发布并通过 SSH tunnel 验收；不在服务器现场 build；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- owner 规范化顺序合同 `1/1`、目标 ESLint、Prettier、CI policy 与 `git diff --check` 通过；本机完整 E-012 code Gate 已运行并保持
+  `FAIL`，deployment suite 为 `34/36`，两个失败均限定为 macOS 缺少 Linux `flock`，新增 owner 合同通过；合并前以固定
+  `ubuntu-24.04` PR CI 为权威自动证据。真实主机证据已证明 transfer owner 与 root-only 安装目标不同，失败未留下 candidate bundle
+  或 Accepted release state；
 - Buildx attestation 修复的精确工作流合同用例、Prettier、CI policy 与 `git diff --check` 通过；本机完整 E-012
   security Gate 已运行并保持 `FAIL`，失败仍限定为 macOS 缺少 Linux `flock` 导致 deployment suite `33/35`，
   Buildx action/driver 合同断言本身通过；合并前以固定 `ubuntu-24.04` PR CI 为权威自动证据；
