@@ -88,7 +88,16 @@ test("T-E012-COMPOSE-001 rejects public ingress and server-side builds", () => {
   worldReadableSecret.overlay.services.api.secrets[0].mode = 444;
   assert.throws(
     () => validateDevComposePolicy(worldReadableSecret),
-    /DEV_COMPOSE_ENVIRONMENT_SECRET_GRANT:api/u,
+    /DEV_COMPOSE_FILE_SECRET_GRANT:api/u,
+  );
+
+  const environmentSecret = policyInput();
+  environmentSecret.overlay.secrets.dev_database_api_url = {
+    environment: "DAILYENERGY_DEV_DATABASE_API_URL",
+  };
+  assert.throws(
+    () => validateDevComposePolicy(environmentSecret),
+    /DEV_COMPOSE_FILE_SECRET_SET:top-level/u,
   );
 });
 
@@ -105,7 +114,7 @@ test("T-E012-COMPOSE-001 keeps COS credential and egress on one-shot smoke only"
   ];
   assert.throws(
     () => validateDevComposePolicy(leakedCredential),
-    /DEV_COMPOSE_ENVIRONMENT_SECRET_GRANT:api/u,
+    /DEV_COMPOSE_FILE_SECRET_GRANT:api/u,
   );
 
   const broadEgress = policyInput();

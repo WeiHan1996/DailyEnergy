@@ -234,27 +234,27 @@ services:
 
 secrets:
   dev_cos_config:
-    environment: DAILYENERGY_DEV_COS_CONFIG
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/cos-config.env
   dev_cos_secret_id:
-    environment: DAILYENERGY_DEV_COS_SECRET_ID
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/cos-secret-id
   dev_cos_secret_key:
-    environment: DAILYENERGY_DEV_COS_SECRET_KEY
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/cos-secret-key
   dev_database_admin_url:
-    environment: DAILYENERGY_DEV_DATABASE_ADMIN_URL
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/database-admin-url
   dev_database_api_url:
-    environment: DAILYENERGY_DEV_DATABASE_API_URL
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/database-api-url
   dev_database_background_url:
-    environment: DAILYENERGY_DEV_DATABASE_BACKGROUND_URL
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/database-background-url
   dev_database_interactive_url:
-    environment: DAILYENERGY_DEV_DATABASE_INTERACTIVE_URL
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/database-interactive-url
   dev_database_migration_url:
-    environment: DAILYENERGY_DEV_DATABASE_MIGRATION_URL
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/database-migration-url
   dev_database_restricted_url:
-    environment: DAILYENERGY_DEV_DATABASE_RESTRICTED_URL
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/database-restricted-url
   dev_fault_control_token:
-    environment: DAILYENERGY_DEV_FAULT_CONTROL_TOKEN
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/fault-control-token
   dev_postgres_password:
-    environment: DAILYENERGY_DEV_POSTGRES_PASSWORD
+    file: ${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}/postgres-password
 
 networks:
   dev_ingress:

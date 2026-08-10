@@ -2,11 +2,15 @@
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import {
+  chmod,
+  chown,
   lstat,
   mkdir,
   readFile,
+  readdir,
   realpath,
   rename,
+  rm,
   writeFile,
 } from "node:fs/promises";
 import path from "node:path";
@@ -47,19 +51,10 @@ import {
 const DEVELOPMENT_ROOT = "/srv/dailyenergy";
 const STATE_ROOT = `${DEVELOPMENT_ROOT}/deployment`;
 const BUNDLE_ROOT = `${DEVELOPMENT_ROOT}/bundles`;
-const COMPOSE_SECRET_ENVIRONMENT_NAMES = Object.freeze({
-  cos_secret_id: "DAILYENERGY_DEV_COS_SECRET_ID",
-  cos_secret_key: "DAILYENERGY_DEV_COS_SECRET_KEY",
-  database_admin_url: "DAILYENERGY_DEV_DATABASE_ADMIN_URL",
-  database_api_url: "DAILYENERGY_DEV_DATABASE_API_URL",
-  database_background_url: "DAILYENERGY_DEV_DATABASE_BACKGROUND_URL",
-  database_interactive_url: "DAILYENERGY_DEV_DATABASE_INTERACTIVE_URL",
-  database_migration_url: "DAILYENERGY_DEV_DATABASE_MIGRATION_URL",
-  database_restricted_url: "DAILYENERGY_DEV_DATABASE_RESTRICTED_URL",
-  fault_control_token: "DAILYENERGY_DEV_FAULT_CONTROL_TOKEN",
-  postgres_password: "DAILYENERGY_DEV_POSTGRES_PASSWORD",
+const COMPOSE_SECRET_FILE_NAMES = Object.freeze({
+  cos_config: "cos-config.env",
+  ...SECRET_FILE_NAMES,
 });
-const COMPOSE_COS_CONFIG_ENVIRONMENT = "DAILYENERGY_DEV_COS_CONFIG";
 
 function fail(code, detail) {
   throw new Error(`${code}:${detail}`);
@@ -123,46 +118,222 @@ async function readProtectedRuntimeFile(
   return value;
 }
 
-export async function loadDevelopmentComposeSecretEnvironment(
+async function validateProtectedDirectory(
+  directory,
+  { expectedGid, expectedUid, mode, ruleId },
+) {
+  let metadata;
+  try {
+    metadata = await lstat(directory);
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      fail(ruleId, "missing");
+    }
+    throw error;
+  }
+  if (
+    !metadata.isDirectory() ||
+    metadata.isSymbolicLink() ||
+    metadata.uid !== expectedUid ||
+    metadata.gid !== expectedGid ||
+    (metadata.mode & 0o777) !== mode ||
+    (await realpath(directory)) !== directory
+  ) {
+    fail(ruleId, "protection");
+  }
+}
+
+function composeSecretIdentity(
+  role,
+  { postgresGid, postgresUid, serviceGid, serviceUid },
+) {
+  return role === "postgres_password"
+    ? { gid: postgresGid, uid: postgresUid }
+    : { gid: serviceGid, uid: serviceUid };
+}
+
+async function readDevelopmentComposeSecretMaterials(
   manifest,
-  { expectedGid = 0, expectedUid = 0, root = DEVELOPMENT_ROOT } = {},
+  {
+    expectedSourceGid,
+    expectedSourceUid,
+    postgresGid,
+    postgresUid,
+    root,
+    serviceGid,
+    serviceUid,
+  },
+) {
+  const configFile = path.join(
+    root,
+    "config",
+    `${manifest.topology.object_config_ref}.env`,
+  );
+  const entries = await Promise.all(
+    Object.entries(SECRET_FILE_NAMES).map(async ([role, sourceFileName]) => ({
+      ...composeSecretIdentity(role, {
+        postgresGid,
+        postgresUid,
+        serviceGid,
+        serviceUid,
+      }),
+      contents: await readProtectedRuntimeFile(
+        path.join(
+          root,
+          "secrets",
+          manifest.config.secret_ref_versions[role],
+          sourceFileName,
+        ),
+        {
+          expectedGid: expectedSourceGid,
+          expectedUid: expectedSourceUid,
+          kind: "secret",
+        },
+      ),
+      fileName: COMPOSE_SECRET_FILE_NAMES[role],
+      role,
+    })),
+  );
+  entries.push({
+    ...composeSecretIdentity("cos_config", {
+      postgresGid,
+      postgresUid,
+      serviceGid,
+      serviceUid,
+    }),
+    contents: await readProtectedRuntimeFile(configFile, {
+      expectedGid: expectedSourceGid,
+      expectedUid: expectedSourceUid,
+      kind: "config",
+    }),
+    fileName: COMPOSE_SECRET_FILE_NAMES.cos_config,
+    role: "cos_config",
+  });
+  return entries;
+}
+
+async function validateMaterializedSecretDirectory(
+  directory,
+  materials,
+  { expectedGid, expectedUid },
+) {
+  await validateProtectedDirectory(directory, {
+    expectedGid,
+    expectedUid,
+    mode: 0o700,
+    ruleId: "E012_DEPLOY_MATERIALIZED_SECRET_DIRECTORY",
+  });
+  const actualFiles = (await readdir(directory)).sort();
+  const expectedFiles = materials.map(({ fileName }) => fileName).sort();
+  if (JSON.stringify(actualFiles) !== JSON.stringify(expectedFiles)) {
+    fail("E012_DEPLOY_MATERIALIZED_SECRET_DRIFT", "file-set");
+  }
+  for (const material of materials) {
+    const file = path.join(directory, material.fileName);
+    const metadata = await lstat(file);
+    if (
+      !metadata.isFile() ||
+      metadata.isSymbolicLink() ||
+      metadata.nlink !== 1 ||
+      metadata.uid !== material.uid ||
+      metadata.gid !== material.gid ||
+      (metadata.mode & 0o777) !== 0o400 ||
+      (await realpath(file)) !== file ||
+      (await readFile(file, "utf8")) !== material.contents
+    ) {
+      fail("E012_DEPLOY_MATERIALIZED_SECRET_DRIFT", material.role);
+    }
+  }
+}
+
+export function developmentComposeSecretDirectory(
+  manifest,
+  { root = DEVELOPMENT_ROOT } = {},
 ) {
   validateReleaseManifest(manifest);
   const selectedRoot = path.resolve(root);
   if (selectedRoot === path.parse(selectedRoot).root) {
     fail("E012_DEPLOY_SECRET_ROOT_INVALID", "filesystem-root");
   }
-  const configFile = path.join(
-    selectedRoot,
-    "config",
-    `${manifest.topology.object_config_ref}.env`,
-  );
-  const entries = await Promise.all(
-    Object.entries(SECRET_FILE_NAMES).map(async ([role, fileName]) => [
-      COMPOSE_SECRET_ENVIRONMENT_NAMES[role],
-      await readProtectedRuntimeFile(
-        path.join(
-          selectedRoot,
-          "secrets",
-          manifest.config.secret_ref_versions[role],
-          fileName,
-        ),
-        { expectedGid, expectedUid, kind: "secret" },
-      ),
-    ]),
-  );
-  entries.push([
-    COMPOSE_COS_CONFIG_ENVIRONMENT,
-    await readProtectedRuntimeFile(configFile, {
-      expectedGid,
-      expectedUid,
-      kind: "config",
-    }),
-  ]);
-  return Object.freeze(Object.fromEntries(entries));
+  return path.join(selectedRoot, "runtime-secrets", manifest.release_id);
 }
 
-export function developmentComposeEnvironment(manifest) {
+export async function materializeDevelopmentComposeSecrets(
+  manifest,
+  {
+    expectedSourceGid = 0,
+    expectedSourceUid = 0,
+    postgresGid = 999,
+    postgresUid = 999,
+    root = DEVELOPMENT_ROOT,
+    serviceGid = 1000,
+    serviceUid = 1000,
+  } = {},
+) {
+  const selectedRoot = path.resolve(root);
+  const finalDirectory = developmentComposeSecretDirectory(manifest, {
+    root: selectedRoot,
+  });
+  const runtimeRoot = path.dirname(finalDirectory);
+  const materials = await readDevelopmentComposeSecretMaterials(manifest, {
+    expectedSourceGid,
+    expectedSourceUid,
+    postgresGid,
+    postgresUid,
+    root: selectedRoot,
+    serviceGid,
+    serviceUid,
+  });
+  await mkdir(runtimeRoot, { mode: 0o700, recursive: true });
+  await validateProtectedDirectory(runtimeRoot, {
+    expectedGid: expectedSourceGid,
+    expectedUid: expectedSourceUid,
+    mode: 0o700,
+    ruleId: "E012_DEPLOY_MATERIALIZED_SECRET_ROOT",
+  });
+  try {
+    await validateMaterializedSecretDirectory(finalDirectory, materials, {
+      expectedGid: expectedSourceGid,
+      expectedUid: expectedSourceUid,
+    });
+    return finalDirectory;
+  } catch (error) {
+    if (
+      !String(error?.message).startsWith(
+        "E012_DEPLOY_MATERIALIZED_SECRET_DIRECTORY:missing",
+      )
+    ) {
+      throw error;
+    }
+  }
+  const stagingDirectory = path.join(
+    runtimeRoot,
+    `.${manifest.release_id}.${randomUUID()}`,
+  );
+  await mkdir(stagingDirectory, { mode: 0o700 });
+  try {
+    for (const material of materials) {
+      const file = path.join(stagingDirectory, material.fileName);
+      await writeFile(file, material.contents, { flag: "wx", mode: 0o400 });
+      await chown(file, material.uid, material.gid);
+      await chmod(file, 0o400);
+    }
+    await rename(stagingDirectory, finalDirectory);
+  } catch (error) {
+    await rm(stagingDirectory, { force: true, recursive: true });
+    throw error;
+  }
+  await validateMaterializedSecretDirectory(finalDirectory, materials, {
+    expectedGid: expectedSourceGid,
+    expectedUid: expectedSourceUid,
+  });
+  return finalDirectory;
+}
+
+export function developmentComposeEnvironment(
+  manifest,
+  { composeSecretDirectory = developmentComposeSecretDirectory(manifest) } = {},
+) {
   const fingerprints = manifest.config.runtime_fingerprints;
   return Object.freeze({
     DAILYENERGY_ADMIN_IMAGE: manifest.images.admin,
@@ -171,6 +342,7 @@ export function developmentComposeEnvironment(manifest) {
     DAILYENERGY_CONFIG_DIR: `${DEVELOPMENT_ROOT}/config`,
     DAILYENERGY_COS_CONFIG_REF: manifest.topology.object_config_ref,
     DAILYENERGY_COS_SECRET_DIR: `${DEVELOPMENT_ROOT}/secrets/${manifest.config.secret_ref_versions.cos_secret_id}`,
+    DAILYENERGY_DEV_COMPOSE_SECRET_DIR: composeSecretDirectory,
     DAILYENERGY_LOG_LEVEL: manifest.config.log_level,
     DAILYENERGY_MIGRATION_IMAGE: manifest.images.migration,
     DAILYENERGY_PROXY_IMAGE: manifest.images.proxy,
@@ -188,8 +360,8 @@ export function developmentComposeEnvironment(manifest) {
   });
 }
 
-export function renderComposeEnvironment(manifest) {
-  return `${Object.entries(developmentComposeEnvironment(manifest))
+export function renderComposeEnvironment(manifest, options) {
+  return `${Object.entries(developmentComposeEnvironment(manifest, options))
     .map(([name, value]) => {
       if (
         typeof value !== "string" ||
@@ -506,6 +678,59 @@ async function persistCompletedOperationReceipt(stateRoot) {
   return receipt;
 }
 
+function replaceableFailedInitialOperation(state, pending) {
+  const migrationPhaseIndex = deploymentPhases.indexOf("migration");
+  return (
+    state === null &&
+    pending?.kind === "DEPLOY" &&
+    pending.status === "FAILED" &&
+    pending.from_current === null &&
+    pending.recovery_catalog === null &&
+    pending.migration_applied === false &&
+    pending.migration_verified === false &&
+    pending.failure_code !== null &&
+    pending.completed_phases.every(
+      (phase) => deploymentPhases.indexOf(phase) < migrationPhaseIndex,
+    ) &&
+    (pending.active_phase === null ||
+      deploymentPhases.indexOf(pending.active_phase) < migrationPhaseIndex)
+  );
+}
+
+async function persistSupersededInitialOperationReceipt(
+  stateRoot,
+  pending,
+  replacementManifest,
+) {
+  if (!replaceableFailedInitialOperation(null, pending)) {
+    fail("RELEASE_INITIAL_REPLACEMENT_INVALID", pending?.target?.release_id);
+  }
+  validateReleaseManifest(replacementManifest);
+  const receipts = pending.completed_phases.map((phase) => ({
+    phase,
+    result: "PASS",
+  }));
+  if (pending.active_phase !== null) {
+    receipts.push({ phase: pending.active_phase, result: "FAIL" });
+  }
+  const receipt = {
+    completed_at_utc: pending.updated_at_utc,
+    failure_code: pending.failure_code,
+    manifest_sha256: pending.target.manifest_sha256,
+    operation: "superseded-initial-deploy",
+    operation_id: pending.operation_id,
+    release_id: pending.target.release_id,
+    replacement: {
+      manifest_sha256: releaseManifestDigest(replacementManifest),
+      release_id: replacementManifest.release_id,
+    },
+    receipts,
+    status: "SUPERSEDED_BEFORE_MIGRATION",
+  };
+  await persistReceipt(stateRoot, receipt);
+  return receipt;
+}
+
 async function finalizeCommittedOperation(stateRoot, state, pending) {
   const applicationCommitted =
     pending.kind !== "RECOVER_CURRENT" &&
@@ -524,32 +749,35 @@ async function finalizeCommittedOperation(stateRoot, state, pending) {
 
 async function probeRecoveryCatalog({
   bundleRoot,
+  composeSecretDirectory,
   manifest,
   runner,
-  secretEnvironment,
   stateRoot,
 }) {
   const environmentFile = path.join(
     stateRoot,
     `catalog-probe-${manifest.release_id}-${releaseManifestDigest(manifest).slice(0, 12)}.env`,
   );
-  await writeExact(environmentFile, renderComposeEnvironment(manifest));
+  await writeExact(
+    environmentFile,
+    renderComposeEnvironment(manifest, { composeSecretDirectory }),
+  );
   const command = developmentDeploymentCommands(
     bundleRoot,
     environmentFile,
   ).migration.at(-1);
   const result = await runner(command, {
     cwd: bundleRoot,
-    environment: secretEnvironment,
+    environment: {},
   });
   return !result.error && result.code === 0;
 }
 
 async function resolveRecoveryCatalogReference({
   bundleRoot,
+  composeSecretDirectory,
   pending,
   runner,
-  secretEnvironment,
   state,
   stateRoot,
 }) {
@@ -571,9 +799,9 @@ async function resolveRecoveryCatalogReference({
     if (
       await probeRecoveryCatalog({
         bundleRoot,
+        composeSecretDirectory,
         manifest: candidate,
         runner,
-        secretEnvironment,
         stateRoot,
       })
     ) {
@@ -590,7 +818,6 @@ async function runPhases({
   onPhasePass = async () => undefined,
   onPhaseStart = async () => undefined,
   runner,
-  secretEnvironment,
 }) {
   const commands = developmentDeploymentCommands(bundleRoot, environmentFile);
   const receipts = [];
@@ -599,7 +826,7 @@ async function runPhases({
     for (const command of commands[phase]) {
       const result = await runner(command, {
         cwd: bundleRoot,
-        environment: command.executable === "docker" ? secretEnvironment : {},
+        environment: {},
       });
       if (result.error || result.code !== 0) {
         fail("E012_DEPLOY_PHASE_FAILED", phase);
@@ -622,7 +849,7 @@ export async function executeDevelopmentDeployment({
   releaseLock = withReleaseLock,
   runner = runCommand,
   runtimeEvidence,
-  secretEnvironmentLoader = loadDevelopmentComposeSecretEnvironment,
+  secretMaterializer = materializeDevelopmentComposeSecrets,
   stateRoot = STATE_ROOT,
 }) {
   if (!["deploy", "recover-current", "rollback"].includes(operation)) {
@@ -654,10 +881,12 @@ export async function executeDevelopmentDeployment({
           })
         ) {
           await preflight(manifest, imageSet, runtimeEvidence);
+          await secretMaterializer(manifest);
           return Object.freeze({ idempotent: true, receipts: [] });
         }
       }
       let retryInitialRelease = false;
+      let replaceInitialRelease = false;
       if (operation !== "recover-current" && pending !== null) {
         if (
           operation === "deploy" &&
@@ -667,6 +896,12 @@ export async function executeDevelopmentDeployment({
           pending.target.manifest_sha256 === releaseManifestDigest(manifest)
         ) {
           retryInitialRelease = true;
+        } else if (
+          operation === "deploy" &&
+          pending.target.release_id !== manifest.release_id &&
+          replaceableFailedInitialOperation(state, pending)
+        ) {
+          replaceInitialRelease = true;
         } else {
           fail("RELEASE_RECOVERY_REQUIRED", pending.target.release_id);
         }
@@ -685,12 +920,12 @@ export async function executeDevelopmentDeployment({
           fail("RECOVER_CURRENT_MANIFEST_MISMATCH", manifest.release_id);
         }
         await preflight(manifest, imageSet, runtimeEvidence);
-        const secretEnvironment = await secretEnvironmentLoader(manifest);
+        const composeSecretDirectory = await secretMaterializer(manifest);
         const recoveryCatalogReference = await resolveRecoveryCatalogReference({
           bundleRoot,
+          composeSecretDirectory,
           pending,
           runner,
-          secretEnvironment,
           state,
           stateRoot,
         });
@@ -723,7 +958,9 @@ export async function executeDevelopmentDeployment({
         );
         await writeExact(
           environmentFile,
-          renderComposeEnvironment(convergenceManifest),
+          renderComposeEnvironment(convergenceManifest, {
+            composeSecretDirectory,
+          }),
         );
         try {
           const receipts = await runPhases({
@@ -738,7 +975,6 @@ export async function executeDevelopmentDeployment({
             onPhaseStart: (phase) =>
               updateReleaseOperationPhase(stateRoot, phase, false),
             runner,
-            secretEnvironment,
           });
           await commitRecoveredCurrent(stateRoot, catalogManifest);
           await persistCompletedOperationReceipt(stateRoot);
@@ -758,6 +994,7 @@ export async function executeDevelopmentDeployment({
             fail("RELEASE_ID_CONTENT_DRIFT", manifest.release_id);
           }
           await preflight(manifest, imageSet, runtimeEvidence);
+          await secretMaterializer(manifest);
           return Object.freeze({ idempotent: true, receipts: [] });
         }
         validateReleaseTransition(current, manifest);
@@ -775,12 +1012,23 @@ export async function executeDevelopmentDeployment({
       }
 
       const environmentFile = path.join(bundleRoot, "release.env");
-      await writeExact(environmentFile, renderComposeEnvironment(manifest));
       await preflight(manifest, imageSet, runtimeEvidence);
-      const secretEnvironment = await secretEnvironmentLoader(manifest);
+      const composeSecretDirectory = await secretMaterializer(manifest);
+      await writeExact(
+        environmentFile,
+        renderComposeEnvironment(manifest, { composeSecretDirectory }),
+      );
       if (retryInitialRelease) {
         await restartInitialReleaseOperation(stateRoot, manifest);
       } else {
+        if (replaceInitialRelease) {
+          await persistSupersededInitialOperationReceipt(
+            stateRoot,
+            pending,
+            manifest,
+          );
+          await clearReleaseOperation(stateRoot);
+        }
         await beginReleaseOperation(
           stateRoot,
           operation.toUpperCase(),
@@ -801,7 +1049,6 @@ export async function executeDevelopmentDeployment({
           onPhaseStart: (phase) =>
             updateReleaseOperationPhase(stateRoot, phase, false),
           runner,
-          secretEnvironment,
         });
         const committed =
           operation === "deploy"

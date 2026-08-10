@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -24,18 +26,18 @@ const OVERLAY_SERVICES = Object.freeze(
 );
 const CADDY_BASE =
   "caddy:2.11.4-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648";
-const DEV_SECRET_ENVIRONMENTS = Object.freeze({
-  dev_cos_config: "DAILYENERGY_DEV_COS_CONFIG",
-  dev_cos_secret_id: "DAILYENERGY_DEV_COS_SECRET_ID",
-  dev_cos_secret_key: "DAILYENERGY_DEV_COS_SECRET_KEY",
-  dev_database_admin_url: "DAILYENERGY_DEV_DATABASE_ADMIN_URL",
-  dev_database_api_url: "DAILYENERGY_DEV_DATABASE_API_URL",
-  dev_database_background_url: "DAILYENERGY_DEV_DATABASE_BACKGROUND_URL",
-  dev_database_interactive_url: "DAILYENERGY_DEV_DATABASE_INTERACTIVE_URL",
-  dev_database_migration_url: "DAILYENERGY_DEV_DATABASE_MIGRATION_URL",
-  dev_database_restricted_url: "DAILYENERGY_DEV_DATABASE_RESTRICTED_URL",
-  dev_fault_control_token: "DAILYENERGY_DEV_FAULT_CONTROL_TOKEN",
-  dev_postgres_password: "DAILYENERGY_DEV_POSTGRES_PASSWORD",
+const DEV_SECRET_FILES = Object.freeze({
+  dev_cos_config: "cos-config.env",
+  dev_cos_secret_id: "cos-secret-id",
+  dev_cos_secret_key: "cos-secret-key",
+  dev_database_admin_url: "database-admin-url",
+  dev_database_api_url: "database-api-url",
+  dev_database_background_url: "database-background-url",
+  dev_database_interactive_url: "database-interactive-url",
+  dev_database_migration_url: "database-migration-url",
+  dev_database_restricted_url: "database-restricted-url",
+  dev_fault_control_token: "fault-control-token",
+  dev_postgres_password: "postgres-password",
 });
 const DEV_SECRET_GRANTS = Object.freeze({
   api: [["dev_database_api_url", "/run/secrets/database_api_url", "1000"]],
@@ -115,19 +117,21 @@ function sameSet(left, right) {
   return JSON.stringify(sorted(left)) === JSON.stringify(sorted(right));
 }
 
-function validateEnvironmentSecretGrants(overlay) {
+function validateFileSecretGrants(overlay) {
   if (
     !sameSet(
       Object.keys(overlay.secrets ?? {}),
-      Object.keys(DEV_SECRET_ENVIRONMENTS),
+      Object.keys(DEV_SECRET_FILES),
     ) ||
-    Object.entries(DEV_SECRET_ENVIRONMENTS).some(
-      ([name, environment]) =>
+    Object.entries(DEV_SECRET_FILES).some(
+      ([name, fileName]) =>
         JSON.stringify(overlay.secrets[name]) !==
-        JSON.stringify({ environment }),
+        JSON.stringify({
+          file: `${"${DAILYENERGY_DEV_COMPOSE_SECRET_DIR:?run the E-012 deploy controller}"}/${fileName}`,
+        }),
     )
   ) {
-    fail("DEV_COMPOSE_ENVIRONMENT_SECRET_SET", "top-level");
+    fail("DEV_COMPOSE_FILE_SECRET_SET", "top-level");
   }
   for (const [serviceName, expected] of Object.entries(DEV_SECRET_GRANTS)) {
     const grants = overlay.services[serviceName]?.secrets;
@@ -147,7 +151,7 @@ function validateEnvironmentSecretGrants(overlay) {
         );
       })
     ) {
-      fail("DEV_COMPOSE_ENVIRONMENT_SECRET_GRANT", serviceName);
+      fail("DEV_COMPOSE_FILE_SECRET_GRANT", serviceName);
     }
   }
 }
@@ -156,6 +160,7 @@ export function validateMergedDevCompose(value) {
   for (const [serviceName, expected] of Object.entries(DEV_SECRET_GRANTS)) {
     const actual = value.services?.[serviceName]?.secrets;
     if (
+      value.services?.[serviceName]?.read_only !== true ||
       !Array.isArray(actual) ||
       actual.length !== expected.length ||
       actual.some((grant, index) => {
@@ -176,20 +181,30 @@ export function validateMergedDevCompose(value) {
     .filter((name) => name.startsWith("dev_"))
     .sort();
   if (
-    !sameSet(devSecretNames, Object.keys(DEV_SECRET_ENVIRONMENTS)) ||
+    !sameSet(devSecretNames, Object.keys(DEV_SECRET_FILES)) ||
     devSecretNames.some(
       (name) =>
-        value.secrets[name]?.environment !== DEV_SECRET_ENVIRONMENTS[name],
+        path.basename(value.secrets[name]?.file ?? "") !==
+          DEV_SECRET_FILES[name] ||
+        Object.hasOwn(value.secrets[name] ?? {}, "environment"),
     ) ||
     JSON.stringify(value).includes("e012-synthetic-secret-canary")
   ) {
-    fail("DEV_COMPOSE_MERGED_SECRET_SET", "environment");
+    fail("DEV_COMPOSE_MERGED_SECRET_SET", "file");
   }
   return Object.freeze({ grants: 10, secret_sources: devSecretNames.length });
 }
 
 function mergedComposeModel() {
   const canary = "e012-synthetic-secret-canary";
+  const secretDirectory = mkdtempSync(
+    path.join(tmpdir(), "dailyenergy-e012-compose-secrets-"),
+  );
+  for (const fileName of Object.values(DEV_SECRET_FILES)) {
+    writeFileSync(path.join(secretDirectory, fileName), canary, {
+      mode: 0o400,
+    });
+  }
   const environment = {
     ...process.env,
     DAILYENERGY_ADMIN_IMAGE: "synthetic-admin-image",
@@ -199,6 +214,7 @@ function mergedComposeModel() {
     DAILYENERGY_COS_CONFIG_REF: "dev-cos-config-v1",
     DAILYENERGY_COS_SECRET_DIR:
       "/srv/dailyenergy/secrets/dev-cos-credential-v1",
+    DAILYENERGY_DEV_COMPOSE_SECRET_DIR: secretDirectory,
     DAILYENERGY_LOG_LEVEL: "INFO",
     DAILYENERGY_MIGRATION_IMAGE: "synthetic-migration-image",
     DAILYENERGY_PROXY_IMAGE: "synthetic-proxy-image",
@@ -214,41 +230,42 @@ function mergedComposeModel() {
     DAILYENERGY_WORKER_RESTORE_READINESS: "NORMAL",
     DAILYENERGY_WORKER_RESTRICTED_FINGERPRINT: "e".repeat(64),
   };
-  for (const name of Object.values(DEV_SECRET_ENVIRONMENTS)) {
-    environment[name] = canary;
-  }
-  const result = spawnSync(
-    "docker",
-    [
-      "compose",
-      "--project-name",
-      "dailyenergy-dev-policy",
-      "--file",
-      path.join(repositoryRoot, "compose.yaml"),
-      "--file",
-      path.join(repositoryRoot, "docker/compose.dev.yaml"),
-      "--profile",
-      "dev",
-      "--profile",
-      "dev-smoke",
-      "config",
-      "--format",
-      "json",
-    ],
-    {
-      encoding: "utf8",
-      env: environment,
-      maxBuffer: 2 * 1024 * 1024,
-      timeout: 15_000,
-    },
-  );
-  if (result.status !== 0 || result.error) {
-    fail("DEV_COMPOSE_MERGED_CONFIG", "docker-compose");
-  }
   try {
-    return JSON.parse(result.stdout);
-  } catch {
-    fail("DEV_COMPOSE_MERGED_CONFIG", "json");
+    const result = spawnSync(
+      "docker",
+      [
+        "compose",
+        "--project-name",
+        "dailyenergy-dev-policy",
+        "--file",
+        path.join(repositoryRoot, "compose.yaml"),
+        "--file",
+        path.join(repositoryRoot, "docker/compose.dev.yaml"),
+        "--profile",
+        "dev",
+        "--profile",
+        "dev-smoke",
+        "config",
+        "--format",
+        "json",
+      ],
+      {
+        encoding: "utf8",
+        env: environment,
+        maxBuffer: 2 * 1024 * 1024,
+        timeout: 15_000,
+      },
+    );
+    if (result.status !== 0 || result.error) {
+      fail("DEV_COMPOSE_MERGED_CONFIG", "docker-compose");
+    }
+    try {
+      return JSON.parse(result.stdout);
+    } catch {
+      fail("DEV_COMPOSE_MERGED_CONFIG", "json");
+    }
+  } finally {
+    rmSync(secretDirectory, { force: true, recursive: true });
   }
 }
 
@@ -269,7 +286,7 @@ export function validateDevComposePolicy({
   if (!sameSet(Object.keys(overlay.services), OVERLAY_SERVICES)) {
     fail("DEV_COMPOSE_SERVICE_SET", "overlay");
   }
-  validateEnvironmentSecretGrants(overlay);
+  validateFileSecretGrants(overlay);
   for (const serviceName of CORE_DEV_SERVICES) {
     if (
       JSON.stringify(overlay.services[serviceName]?.profiles) !==
@@ -466,7 +483,7 @@ async function main() {
   });
   const merged = validateMergedDevCompose(mergedComposeModel());
   process.stdout.write(
-    `DEV_COMPOSE_POLICY_OK:services=${result.dev_services}:tls=${result.tls_endpoints}:public_ports=${result.public_ports}:object_smoke=${result.object_smoke}:environment_secrets=${merged.secret_sources}\n`,
+    `DEV_COMPOSE_POLICY_OK:services=${result.dev_services}:tls=${result.tls_endpoints}:public_ports=${result.public_ports}:object_smoke=${result.object_smoke}:file_secrets=${merged.secret_sources}\n`,
   );
 }
 

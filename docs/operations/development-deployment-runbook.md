@@ -23,7 +23,7 @@
 2. Docker `>=29.0.0`、Compose `>=2.40.0`，且系统提供 util-linux `flock`；防火墙只允许 SSH，80/443/5432/6379 不得在非 loopback 地址监听；
 3. 运行 `tooling/deployment/bootstrap-host.sh`，安装 checksum 固定的隔离 Node `24.18.0` 到 `/opt/dailyenergy/runtime/node-v24.18.0`，部署命令只使用 `/usr/local/bin/dailyenergy-node`；
 4. PostgreSQL/故障控制 secret 使用 `dev-secret-v1`，COS credential 使用 `dev-cos-credential-v1`；version directory 为 `root:root 0700`，父目录由 root 拥有且不可被 group/other 写入，文件为 `root:root 0600`；
-5. COS 无值配置位于 `/srv/dailyenergy/config/dev-cos-config-v1.env`，也是 `root:root 0600`。Linux Compose 对 `file` secret/config 使用 bind mount，不能安全重映射非 root UID/GID；部署控制器因此在 preflight 后由 root 读取已验证文件，只在 Docker Compose 根进程的环境中提供 `environment` secret source，并在容器内挂载为目标 UID/GID 的 `0400` 文件。值不进入命令参数、`release.env`、Compose 输出或仓库。
+5. COS 无值配置位于 `/srv/dailyenergy/config/dev-cos-config-v1.env`，也是 `root:root 0600`。Linux Compose 对 `file` secret/config 使用 bind mount且不能重映射源文件 owner；同时 `environment` secret source 不能用于本项目的 `read_only: true` 服务。部署控制器因此在 preflight 后由 root 把已验证内容原子 materialize 到 `/srv/dailyenergy/runtime-secrets/<release_id>`：父目录和版本目录为 `root:root 0700`，文件按目标服务 UID/GID 设置为 `0400`。Compose 只接收该非秘密目录路径并使用 `file` source；密钥值不进入子进程环境、命令参数、`release.env`、Compose 输出或仓库。同一 release 重放会验证闭合文件集、内容、owner、mode 与 link，漂移立即失败。
 
 不得把 SecretId、SecretKey、数据库密码、数据库 URL、fault token 或 GHCR token 粘贴到 issue、PR、聊天、日志或仓库。
 
@@ -183,7 +183,7 @@ checkpoint 恰好在 migration 生效后、`migration_applied` 落盘前丢失�
 operation。恢复自身失败时继续保留同一 `operation_id` 的 dirty operation，修复外部原因后重复同一 `recover-current`，不得改用
 deploy/rollback 绕过。
 
-首次发布尚无 Accepted state 时不能执行 `recover-current`；修复失败原因后，只能对同一 manifest 重试 `deploy`。其它候选会被拒绝。
+首次发布尚无 Accepted state 时不能执行 `recover-current`。修复外部原因后可对同一 manifest 重试 `deploy`。如果根因必须通过新 artifact 修复，只有旧 operation 为 `FAILED`、没有 from-current/recovery catalog、active/completed phase 都在 migration 之前且 `migration_applied=false`、`migration_verified=false` 时，才可从新 candidate bundle 执行普通 `deploy`。控制器会在新 candidate 的 preflight 和 file secret materialization 通过后，先写绑定旧 `operation_id`、失败阶段及 replacement digest 的 `SUPERSEDED_BEFORE_MIGRATION` receipt，再清理旧 pending 并开始新 operation。已进入 migration 或 checkpoint 不明确时，新候选仍被拒绝；不得人工删除 operation/state。
 
 ## 7. 回滚
 
