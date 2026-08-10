@@ -1,15 +1,15 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-09（E-012 PR #121 已合并，等待获授权后的 DEV image publication 与首次真实部署证据）
+- **最后更新**：2026-08-10（DEV image publication 已获授权；首次运行因缺少 Checks 读取权限在构建前失败，正在最小修复）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Review
-- **任务分支**：`agent/e012-development-deployment`
+- **任务分支**：`agent/e012-publish-checks-permission`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **实现合并提交**：E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
-- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_PUBLICATION_DEPLOYMENT_PENDING_AUTHORIZATION / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_PUBLICATION_CHECKS_PERMISSION_REPAIR / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -115,13 +115,20 @@ approved development infrastructure
   receipt 为 `CI_MANUAL_MERGE_GATE_OK:pr=121:head=79b2e8dbfeda68da5ef08a185756e606edaac135:run=31295404849:checks=11`；
   PR 已于 `2026-08-09T04:55:02Z` squash 合并为 `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`；该实现合并时本地
   `main`、`origin/main` 与 GitHub `main` 已核对一致；Issue #50 保持 Open；
-- **下一动作**：取得 DEV image publication 与首次部署这两项外部状态变更的明确操作授权后，从已合并的固定 CI run 手动发布
-  digest-only images 与 deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、
-  执行首次真实 Compose 发布并通过 SSH tunnel 验收；不在服务器现场 build；
+- **首次发布尝试**：用户已明确批准 DEV image publication 与首次真实部署；手动 publication
+  [run #31347312900](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31347312900) 在读取固定 main CI
+  check-runs 时返回 `HTTP 403`，根因是 job 仅有 `actions: read`、没有 `checks: read`。失败发生在镜像构建、push、artifact
+  生成和服务器变更之前，因此没有发布镜像，也没有改变 DEV 主机；修复限定为补充只读 Checks 权限及对应工作流合同测试；
+- **下一动作**：合并上述最小权限修复后，重新从合并提交 `3c00d952be6fa7e44aba683fc79fee4e1a1687fe` 发布 digest-only
+  images 与 deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、执行首次真实
+  Compose 发布并通过 SSH tunnel 验收；不在服务器现场 build；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- publication 权限修复的精确工作流合同用例通过，Prettier 与 `git diff --check` 通过；本机完整 E-012
+  security Gate 已运行并保持 `FAIL`，唯一失败仍是 macOS 缺少 Linux `flock` 导致 deployment suite `33/35`，
+  权限合同断言本身通过；合并前以固定 `ubuntu-24.04` PR CI 为权威自动证据；
 - 第三轮新增的 seed failure、checkpoint loss、state→receipt 重建和重复 release receipt 场景 `4/4` 通过；目标 ESLint、Prettier 与
   `git diff --check` 通过；DEV Compose/image/preflight 的 Windows 可执行子集 `15` 项通过，另 `1` 项只因 Windows 无 `process.getgid()` 未进入逻辑；
 - 本轮私有 COS 决策与审核修复已进入 ADR-0007、部署规范、Runbook、任务状态和 `ReleaseManifestV1` 合同；PR 前一 head 定向

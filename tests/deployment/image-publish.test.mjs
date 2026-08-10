@@ -611,6 +611,7 @@ test("T-E012-IMAGE-001 keeps image publication manual, main-bound and non-deploy
   assert.equal(job.environment, "development");
   assert.deepEqual(job.permissions, {
     actions: "read",
+    checks: "read",
     contents: "read",
     packages: "write",
   });

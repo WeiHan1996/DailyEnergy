@@ -23,6 +23,7 @@ jobs:
     environment: development
     permissions:
       actions: read
+      checks: read
       contents: read
       packages: write
     steps:
