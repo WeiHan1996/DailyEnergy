@@ -162,14 +162,16 @@ approved development infrastructure
 - **GHCR 拉取与部署排队**：服务器管理员已在主机上交互式配置有 `read:packages` 的 GHCR 只读身份；Codex 仅验证 root Docker
   config 为 `root:root 0600`，未读取或记录 token。`admin`、`proxy`、`server`、`stub` 四类镜像已按
   `ReleaseManifestV1` 的不可变摘要完成并经本地 image metadata 复核；`migration` 的约 262 MB 独立大层受中国大陆到 GHCR
-  链路约 28 KB/s 限制，已切换为主机 transient systemd unit `dailyenergy-e012-migration-pull.service` 继续断点拉取。
+  链路约 28 KB/s 限制，使用主机 transient systemd unit 继续断点拉取。
   第一版 `dailyenergy-e012-deploy.service` 因把 `activating` 误判为非运行状态而在 image inspect 处 fail closed；bounded journal 与路径检查确认
   部署控制器未启动、没有 Accepted state。修正后的 `dailyenergy-e012-deploy-after-pull.service` 正在每 30 秒轮询精确 migration 摘要，
   仅在拉取保持 `active/activating` 时等待，摘要可 inspect 后才执行 candidate 的 18 阶段部署；拉取失败或摘要不存在时以状态 42
   停止。首次后台拉取于 `2026-08-10T16:15:24+08:00` 在 `137804490/261527051` bytes（约 52.7%）收到远端
   `connection reset by peer` 后失败，deploy waiter 随即以状态 42 停止；bounded journal 和路径检查确认没有运行部署控制器、没有
   Accepted state。两个 transient units 已于 `17:16` 重新创建，Docker 复用原断点，并在 35 秒复测中增长到 `138853066` bytes；
-  没有现场 build、没有公网端口变更、尚未写入 Accepted release state；
+  随后进一步收敛为 `dailyenergy-e012-migration-pull-retrying.service`，配置 `Restart=on-failure`、`RestartSec=30s`，以后连接重置会
+  自动复用缓存续传；`dailyenergy-e012-deploy-after-retrying-pull.service` 仅在精确摘要可 inspect 后执行部署，并在 pull unit
+  不再 `active/activating` 时以状态 42 fail closed。没有现场 build、没有公网端口变更、尚未写入 Accepted release state；
 - **下一动作**：拉取预计完成后，读取两个 transient unit 的 bounded journal 和精确 image metadata，验证首次 Compose 发布、Accepted
   state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel；失败时保持 operation state 并按 recover-current 合同诊断；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
