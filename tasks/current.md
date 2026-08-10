@@ -163,8 +163,10 @@ approved development infrastructure
   config 为 `root:root 0600`，未读取或记录 token。`admin`、`proxy`、`server`、`stub` 四类镜像已按
   `ReleaseManifestV1` 的不可变摘要完成并经本地 image metadata 复核；`migration` 的约 262 MB 独立大层受中国大陆到 GHCR
   链路约 28 KB/s 限制，已切换为主机 transient systemd unit `dailyenergy-e012-migration-pull.service` 继续断点拉取。
-  `dailyenergy-e012-deploy.service` 已排队等待该 unit 结束，并在精确 migration 摘要可 inspect 时才执行 candidate 的 18 阶段部署；
-  下载失败或摘要不存在时 fail closed。没有现场 build、没有公网端口变更、尚未写入 Accepted release state；
+  第一版 `dailyenergy-e012-deploy.service` 因把 `activating` 误判为非运行状态而在 image inspect 处 fail closed；bounded journal 与路径检查确认
+  部署控制器未启动、没有 Accepted state。修正后的 `dailyenergy-e012-deploy-after-pull.service` 正在每 30 秒轮询精确 migration 摘要，
+  仅在拉取保持 `active/activating` 时等待，摘要可 inspect 后才执行 candidate 的 18 阶段部署；拉取失败或摘要不存在时以状态 42
+  停止。没有现场 build、没有公网端口变更、尚未写入 Accepted release state；
 - **下一动作**：拉取预计完成后，读取两个 transient unit 的 bounded journal 和精确 image metadata，验证首次 Compose 发布、Accepted
   state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel；失败时保持 operation state 并按 recover-current 合同诊断；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
