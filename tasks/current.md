@@ -9,7 +9,7 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 PR #126](https://github.com/WeiHan1996/DailyEnergy/pull/126)
-- **当前 PR**：待创建
+- **当前 PR**：[E-012 草稿 PR #127](https://github.com/WeiHan1996/DailyEnergy/pull/127)
 - **实现合并提交**：E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
 - **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_GHCR_READER_LOGIN_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
