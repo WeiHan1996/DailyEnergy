@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-10（GHCR 只读身份已配置；四类镜像已完成，migration 断点拉取与首次部署已在主机排队）
+- **最后更新**：2026-08-10（七类镜像已完成；首次真实部署发现 Compose 只读服务 environment secret 阻断，file materialization 修复中）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Review
@@ -11,7 +11,7 @@
 - **最近合并 PR**：[E-012 PR #126](https://github.com/WeiHan1996/DailyEnergy/pull/126)
 - **当前 PR**：[E-012 草稿 PR #127](https://github.com/WeiHan1996/DailyEnergy/pull/127)
 - **实现合并提交**：E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
-- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_GHCR_READER_LOGIN_VERIFIED / DEV_IMAGE_PREFETCH_IN_PROGRESS / DEV_DEPLOY_QUEUED / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_IMAGES_READY / DEV_DEPLOY_BLOCKED_COMPOSE_ENV_SECRET / FILE_SECRET_FIX_IN_PROGRESS / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -98,8 +98,9 @@ approved development infrastructure
   deployment bundle；root-only 安装入口验证文件集、digest、权限、COS config fingerprint 后原子生成
   `ReleaseManifestV1`；preflight、release lock、18 阶段 Compose 顺序发布、COS/Safety/owner/deletion
   smoke、Accepted state、唯一 N-1 rollback 与幂等 replay 已进入代码和定向测试；外部 secret/config
-  保持宿主机 `root:root 0600`，部署控制器只在内存中将值交给 Compose，容器按服务以 `0400`
-  secret mount 获取最小集合，值不进入命令参数、release env、Compose 解析结果或日志；
+  保持宿主机 `root:root 0600`，本 PR 正把 Linux DEV 注入修正为 release-scoped file materialization：父目录
+  `root:root 0700`、文件按目标服务 UID/GID 设置为 `0400`，Compose 只接收非秘密目录路径，值不进入子进程环境、
+  命令参数、release env、Compose 解析结果或日志；
 - **审核修复**：PR #121 的三项审核意见已修复：主机健康探针与 Caddy `localhost` Host/SNI 一致；部分发布失败会留下
   pending/dirty operation，并可显式 `recover-current` 收敛回当前 Accepted application/config/secret 与已验证兼容的
   catalog；安装入口必须接收受严格校验且不含值的 database/COS secret version 与 object config ref，使轮换生成并绑定
@@ -109,7 +110,8 @@ approved development infrastructure
 - **第三轮审核修复**：migration 阶段拆为 prepare/migrate/seed/drift 子步骤，Prisma migrate 核验成功后原子记录 `migration_applied`，完整阶段通过后才记录
   `migration_verified`；checkpoint 落盘窗口丢失时用只读 state/candidate drift probe 判定实际 catalog，两个都不通过则保持 dirty 并 fail closed；每次
   operation 生成持久 UUID，receipt 内容和路径均绑定该 ID，同一 release 合法重复 deploy/rollback 不再碰撞。新增 seed failure、checkpoint loss、
-  state→receipt 重建与 deploy N+1 → rollback N → 再 deploy N+1 场景；secret 仍只通过 root Compose 环境进入最小 mount，probe 不输出值；
+  state→receipt 重建与 deploy N+1 → rollback N → 再 deploy N+1 场景；该轮采用的 Compose environment secret 设计后来被真实 Linux
+  `read_only` 运行时证伪，本轮 file materialization 修复取代它，probe 仍不输出值；
 - **供应链修复**：head `87af40e` 的 run `31294911129` 中 9 个 automated lane 全部成功，但 supply-chain 因 2026-08-07 完成 GitHub review 的
   `GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.16`，聚合 Gate 随之失败；已用精确 pnpm override 升到 patched `3.3.17`，未豁免 high Gate；
 - **合并交接**：PR #121 最终 head `79b2e8dbfeda68da5ef08a185756e606edaac135` 的固定 Ubuntu CI
@@ -172,12 +174,32 @@ approved development infrastructure
   随后进一步收敛为 `dailyenergy-e012-migration-pull-retrying.service`，配置 `Restart=on-failure`、`RestartSec=30s`，以后连接重置会
   自动复用缓存续传；`dailyenergy-e012-deploy-after-retrying-pull.service` 仅在精确摘要可 inspect 后执行部署，并在 pull unit
   不再 `active/activating` 时以状态 42 fail closed。没有现场 build、没有公网端口变更、尚未写入 Accepted release state；
-- **下一动作**：拉取预计完成后，读取两个 transient unit 的 bounded journal 和精确 image metadata，验证首次 Compose 发布、Accepted
-  state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel；失败时保持 operation state 并按 recover-current 合同诊断；
+- **首次真实部署与新阻断**：migration 精确摘要于 `2026-08-10T19:28+08:00` 完成；自动部署首次在 `pull` 阶段失败，诊断确认缺少
+  PostgreSQL 18 与 Redis 8 基础镜像且 Docker Hub 直连 443 超时。按腾讯云轻量服务器官方配置加入内网
+  `https://mirror.ccs.tencentyun.com`，经 `dockerd --validate`、Docker 重启和配置回读后，两类基础镜像均按 manifest 摘要完成；七类镜像
+  digest 全部匹配。相同 candidate 合法重放越过 pull 后在 `stateful-ready` fail closed；Redis 健康，PostgreSQL/依赖桩未启动，migration
+  未执行，Accepted state 未写入，监听端口仍只有 SSH。脱敏重放取得 Compose 2.40.3 原始错误：`read_only: true` 服务只支持 `file`
+  secret，现有 `environment` source 无法注入。修复限定为把 root-only 源值原子 materialize 到
+  `/srv/dailyenergy/runtime-secrets/<release_id>`，使用闭合文件集、目标 UID/GID `0400`、相同 release 漂移拒绝与无密钥子进程环境；
+- **首次失败候选替换合同**：真实主机 operation `fc6dc204-140a-4004-bc88-2a051032db31` 已完成 `preflight`/`pull` 并失败停在
+  `stateful-ready`，`migration_applied=false`、`migration_verified=false` 且没有 Accepted state；新修复会产生不同 release ID，因此控制器增加严格的 pre-migration initial replacement：新 candidate 先通过 preflight/file secret
+  materialization，再为旧 `operation_id` 写入含失败阶段和 replacement digest 的 `SUPERSEDED_BEFORE_MIGRATION` receipt，随后才清旧 pending 并开始
+  新 operation。active phase 已进入 migration、任一 migration checkpoint 为 true 或已有 Accepted state 时继续 fail closed，禁止人工删除 state；
+- **真实 file secret 兼容性证明**：在同一 DEV Docker 29.1.3 / Compose 2.40.3 上，使用现有 Redis 精确摘要运行一次性
+  `read_only: true`、UID/GID 999、无真实值的 file-secret probe，容器成功读取 `0400` 合成文件并以 0 退出；Compose 同时警告声明的
+  `uid/gid/mode` 会被忽略，证明宿主 materializer 必须预设实际 owner/mode。临时容器、网络、合成文件和目录已清理；旧失败候选遗留的
+  无端口 Redis 容器已停止，PostgreSQL/依赖桩未运行，等待新候选；
+- **下一动作**：完成 file secret 修复的文档、部署专项与 E-012 task Gate，推送 PR #127；经用户批准和固定 Ubuntu CI 后合并、重新 publication，
+  用新 candidate 完成首次 Compose 发布、Accepted state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel 验收；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- 本轮真实服务器已证明 Docker Compose 2.40.3 对 `read_only: true` + `environment` secret fail closed；file materialization 修复的真实
+  Compose merged-config policy、DEV overlay 负例、materializer 权限/漂移/无密钥命令环境、pre-migration initial replacement 与
+  migration-active replacement rejection 用例均通过。`pnpm agent:validate --mode=changed --task=E-012` 自动升级 `security/full`，格式、全仓
+  ESLint、架构、codegen、contracts、agent、数据库等前置 Gate 通过后，在 deployment suite 停止；task Gate 结果相同。完整 deployment suite
+  为 `36/38`，仅两个失败因 macOS 没有 Linux `flock`，固定 Ubuntu PR CI 将作为合并前权威自动证据；
 - PR #126 合并后的 main CI、publication、artifact 双端 digest 校验和 root-only 原子安装均通过；真实安装后的全部文件/目录 owner、mode
   与 hardlink Gate 满足预期；GHCR 只读身份已由管理员交互式配置，四类不可变镜像摘要已落盘，migration 拉取与后续部署由主机 transient
   systemd units 持续执行；
@@ -197,7 +219,7 @@ approved development infrastructure
   deployment suite `31/31` 通过，覆盖 Caddy Host/SNI 一致性、source-free bundle
   build/verify、root-only 原子安装、首次 materialize、幂等 replay、篡改拒绝、顺序发布失败不落状态和
   dirty operation、`Accepted N → N+1 中途失败 → recover-current N`、唯一 rollback、v1→v2 配置/secret 引用轮换，以及
-  root-only 外部值仅通过 service-specific Compose environment secret 进入容器；source registry 为
+  root-only 外部值通过 service-specific Compose file secret 进入容器且 Docker/curl 子进程环境不含值；source registry 为
   `736 total / 170 COVERED / 566 PLANNED / 0 NA_WITH_REASON`，`git diff --check` 通过；真实 DEV
   主机的 root-only credential/config 权限、内网 DNS/TLS、最小 CAM 策略和 signed
   write/read/delete/delete-verification smoke 均通过，输出不含 secret 或对象内容；

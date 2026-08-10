@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   chmod,
+  lstat,
   mkdir,
   mkdtemp,
   readFile,
@@ -34,7 +35,7 @@ import {
 import {
   developmentDeploymentCommands,
   executeDevelopmentDeployment as executeWithReleaseLock,
-  loadDevelopmentComposeSecretEnvironment,
+  materializeDevelopmentComposeSecrets,
   renderComposeEnvironment,
 } from "../../tooling/deployment/deploy-dev.mjs";
 import { releaseManifestFixture as manifest } from "./release-fixture.mjs";
@@ -45,7 +46,7 @@ async function temporaryRoot(t) {
   return root;
 }
 
-const noSecretEnvironment = async () => Object.freeze({});
+const noSecretMaterializer = async () => "/synthetic/runtime-secrets";
 const inProcessReleaseLock = async (_root, _owner, operation) => operation();
 
 function executeDevelopmentDeployment(options) {
@@ -269,7 +270,7 @@ test("T-E012-ORDER-001 requires consumer-before-producer and complete smoke rece
   );
 });
 
-test("T-E012-DEPLOY-001 keeps root-only source values in Compose environment secrets", async (t) => {
+test("T-E012-DEPLOY-001 materializes root-only values as release-scoped file secrets", async (t) => {
   const root = await temporaryRoot(t);
   const value = manifest("e012-compose-secrets");
   const configDirectory = path.join(root, "config");
@@ -317,37 +318,65 @@ test("T-E012-DEPLOY-001 keeps root-only source values in Compose environment sec
     );
   }
   const options = {
-    expectedGid: process.getgid(),
-    expectedUid: process.getuid(),
+    expectedSourceGid: process.getgid(),
+    expectedSourceUid: process.getuid(),
+    postgresGid: process.getgid(),
+    postgresUid: process.getuid(),
     root: await resolveRealpath(root),
+    serviceGid: process.getgid(),
+    serviceUid: process.getuid(),
   };
-  const environment = await loadDevelopmentComposeSecretEnvironment(
-    value,
-    options,
-  );
-  assert.deepEqual(Object.keys(environment).sort(), [
-    "DAILYENERGY_DEV_COS_CONFIG",
-    "DAILYENERGY_DEV_COS_SECRET_ID",
-    "DAILYENERGY_DEV_COS_SECRET_KEY",
-    "DAILYENERGY_DEV_DATABASE_ADMIN_URL",
-    "DAILYENERGY_DEV_DATABASE_API_URL",
-    "DAILYENERGY_DEV_DATABASE_BACKGROUND_URL",
-    "DAILYENERGY_DEV_DATABASE_INTERACTIVE_URL",
-    "DAILYENERGY_DEV_DATABASE_MIGRATION_URL",
-    "DAILYENERGY_DEV_DATABASE_RESTRICTED_URL",
-    "DAILYENERGY_DEV_FAULT_CONTROL_TOKEN",
-    "DAILYENERGY_DEV_POSTGRES_PASSWORD",
-  ]);
-  const persistedEnvironment = renderComposeEnvironment(value);
+  const directory = await materializeDevelopmentComposeSecrets(value, options);
   assert.equal(
-    persistedEnvironment.includes("DAILYENERGY_DEV_COS_CONFIG"),
+    directory,
+    path.join(options.root, "runtime-secrets", value.release_id),
+  );
+  assert.deepEqual((await readdir(directory)).sort(), [
+    "cos-config.env",
+    "cos-secret-id",
+    "cos-secret-key",
+    "database-admin-url",
+    "database-api-url",
+    "database-background-url",
+    "database-interactive-url",
+    "database-migration-url",
+    "database-restricted-url",
+    "fault-control-token",
+    "postgres-password",
+  ]);
+  const directoryMetadata = await lstat(directory);
+  assert.equal(directoryMetadata.mode & 0o777, 0o700);
+  for (const fileName of await readdir(directory)) {
+    const metadata = await lstat(path.join(directory, fileName));
+    assert.equal(metadata.mode & 0o777, 0o400);
+    assert.equal(metadata.uid, process.getuid());
+    assert.equal(metadata.gid, process.getgid());
+  }
+  const persistedEnvironment = renderComposeEnvironment(value, {
+    composeSecretDirectory: directory,
+  });
+  assert.ok(persistedEnvironment.includes(directory));
+  assert.equal(persistedEnvironment.includes("synthetic-"), false);
+  assert.equal(
+    persistedEnvironment.includes("DAILYENERGY_DEV_DATABASE_"),
     false,
   );
-  assert.equal(persistedEnvironment.includes("synthetic-"), false);
+  assert.equal(
+    await materializeDevelopmentComposeSecrets(value, options),
+    directory,
+  );
+
+  const materializedConfig = path.join(directory, "cos-config.env");
+  await chmod(materializedConfig, 0o600);
+  await assert.rejects(
+    materializeDevelopmentComposeSecrets(value, options),
+    /E012_DEPLOY_MATERIALIZED_SECRET_DRIFT:cos_config/u,
+  );
+  await chmod(materializedConfig, 0o400);
 
   await chmod(configFile, 0o640);
   await assert.rejects(
-    loadDevelopmentComposeSecretEnvironment(value, options),
+    materializeDevelopmentComposeSecrets(value, options),
     /E012_DEPLOY_SECRET_FILE_PROTECTION:dev-cos-config-v1.env/u,
   );
 });
@@ -374,9 +403,7 @@ test("T-E012-DEPLOY-001 executes the closed phase plan and makes exact replay id
       return { code: 0 };
     },
     runtimeEvidence: {},
-    secretEnvironmentLoader: async () => ({
-      DAILYENERGY_DEV_DATABASE_API_URL: "synthetic-only",
-    }),
+    secretMaterializer: async () => "/synthetic/runtime-secrets",
     stateRoot,
   });
   assert.equal(first.idempotent, false);
@@ -401,22 +428,16 @@ test("T-E012-DEPLOY-001 executes the closed phase plan and makes exact replay id
     path.join(bundleRoot, "release.env"),
     "utf8",
   );
-  assert.equal(environment, renderComposeEnvironment(value));
+  assert.equal(
+    environment,
+    renderComposeEnvironment(value, {
+      composeSecretDirectory: "/synthetic/runtime-secrets",
+    }),
+  );
   assert.equal(environment.includes("postgresql://"), false);
   assert.equal(environment.includes("COS_BUCKET"), false);
   assert.equal(
-    seenEnvironments
-      .filter(([executable]) => executable === "docker")
-      .every(
-        ([, values]) =>
-          values.DAILYENERGY_DEV_DATABASE_API_URL === "synthetic-only",
-      ),
-    true,
-  );
-  assert.equal(
-    seenEnvironments
-      .filter(([executable]) => executable === "curl")
-      .every(([, values]) => Object.keys(values).length === 0),
+    seenEnvironments.every(([, values]) => Object.keys(values).length === 0),
     true,
   );
 
@@ -431,9 +452,7 @@ test("T-E012-DEPLOY-001 executes the closed phase plan and makes exact replay id
       throw new Error("idempotent replay must not execute Docker commands");
     },
     runtimeEvidence: {},
-    secretEnvironmentLoader: async () => {
-      throw new Error("idempotent replay must not reload secret values");
-    },
+    secretMaterializer: async () => "/synthetic/runtime-secrets",
     stateRoot,
   });
   assert.deepEqual(replay, { idempotent: true, receipts: [] });
@@ -455,7 +474,7 @@ test("T-E012-DEPLOY-001 does not accept release state when any ordered phase fai
         code: command.arguments.includes("object-smoke") ? 1 : 0,
       }),
       runtimeEvidence: {},
-      secretEnvironmentLoader: noSecretEnvironment,
+      secretMaterializer: noSecretMaterializer,
       stateRoot,
     }),
     /E012_DEPLOY_PHASE_FAILED:smoke-object/u,
@@ -471,7 +490,7 @@ test("T-E012-DEPLOY-001 does not accept release state when any ordered phase fai
     preflight: async () => undefined,
     runner: async () => ({ code: 0 }),
     runtimeEvidence: {},
-    secretEnvironmentLoader: noSecretEnvironment,
+    secretMaterializer: noSecretMaterializer,
     stateRoot,
   });
   assert.equal(retried.receipts.length, deploymentPhases.length);
@@ -480,6 +499,109 @@ test("T-E012-DEPLOY-001 does not accept release state when any ordered phase fai
     "e012-deploy-fail",
   );
   assert.equal(await readReleaseOperation(stateRoot), null);
+});
+
+test("T-E012-DEPLOY-001 replaces only a failed pre-migration initial candidate", async (t) => {
+  const root = await temporaryRoot(t);
+  const firstBundle = path.join(root, "first");
+  const replacementBundle = path.join(root, "replacement");
+  const stateRoot = path.join(root, "state");
+  await Promise.all([mkdir(firstBundle), mkdir(replacementBundle)]);
+  const first = manifest("e012-initial-runtime-broken");
+  const replacement = manifest("e012-initial-runtime-fixed");
+  const common = {
+    imageSet: {},
+    preflight: async () => undefined,
+    runtimeEvidence: {},
+    secretMaterializer: noSecretMaterializer,
+    stateRoot,
+  };
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      bundleRoot: firstBundle,
+      manifest: first,
+      runner: async (command) => ({
+        code: command.arguments.includes("postgres") ? 1 : 0,
+      }),
+    }),
+    /E012_DEPLOY_PHASE_FAILED:stateful-ready/u,
+  );
+  const failed = await readReleaseOperation(stateRoot);
+  assert.equal(failed.active_phase, "stateful-ready");
+  assert.equal(failed.migration_applied, false);
+
+  const deployed = await executeDevelopmentDeployment({
+    ...common,
+    bundleRoot: replacementBundle,
+    manifest: replacement,
+    runner: async () => ({ code: 0 }),
+  });
+  assert.equal(deployed.receipts.length, deploymentPhases.length);
+  assert.equal(
+    (await readReleaseState(stateRoot)).current.release_id,
+    replacement.release_id,
+  );
+  assert.equal(await readReleaseOperation(stateRoot), null);
+  const receiptFiles = await readdir(path.join(stateRoot, "receipts"));
+  const supersededFile = receiptFiles.find((file) =>
+    file.startsWith(`superseded-initial-deploy-${first.release_id}-`),
+  );
+  assert.ok(supersededFile);
+  const superseded = JSON.parse(
+    await readFile(path.join(stateRoot, "receipts", supersededFile), "utf8"),
+  );
+  assert.equal(superseded.operation_id, failed.operation_id);
+  assert.equal(superseded.status, "SUPERSEDED_BEFORE_MIGRATION");
+  assert.equal(superseded.replacement.release_id, replacement.release_id);
+  assert.deepEqual(superseded.receipts.at(-1), {
+    phase: "stateful-ready",
+    result: "FAIL",
+  });
+});
+
+test("T-E012-DEPLOY-001 refuses to replace an initial candidate that reached migration", async (t) => {
+  const root = await temporaryRoot(t);
+  const firstBundle = path.join(root, "first");
+  const replacementBundle = path.join(root, "replacement");
+  const stateRoot = path.join(root, "state");
+  await Promise.all([mkdir(firstBundle), mkdir(replacementBundle)]);
+  const first = manifest("e012-initial-migration-uncertain");
+  const replacement = manifest("e012-initial-migration-replacement");
+  const common = {
+    imageSet: {},
+    preflight: async () => undefined,
+    runtimeEvidence: {},
+    secretMaterializer: noSecretMaterializer,
+    stateRoot,
+  };
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      bundleRoot: firstBundle,
+      manifest: first,
+      runner: async (command) => ({
+        code: command.arguments.at(-1) === "prepare" ? 1 : 0,
+      }),
+    }),
+    /E012_DEPLOY_PHASE_FAILED:migration/u,
+  );
+  const failed = await readReleaseOperation(stateRoot);
+  assert.equal(failed.active_phase, "migration");
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      bundleRoot: replacementBundle,
+      manifest: replacement,
+      runner: async () => ({ code: 0 }),
+    }),
+    new RegExp(`RELEASE_RECOVERY_REQUIRED:${first.release_id}`, "u"),
+  );
+  assert.equal(
+    (await readReleaseOperation(stateRoot)).operation_id,
+    failed.operation_id,
+  );
+  assert.equal(await readReleaseState(stateRoot), null);
 });
 
 test("T-E012-DEPLOY-001 converges Accepted N after N+1 fails after migration", async (t) => {
@@ -505,7 +627,7 @@ test("T-E012-DEPLOY-001 converges Accepted N after N+1 fails after migration", a
     imageSet: {},
     preflight: async () => undefined,
     runtimeEvidence: {},
-    secretEnvironmentLoader: noSecretEnvironment,
+    secretMaterializer: noSecretMaterializer,
     stateRoot,
   };
   await executeDevelopmentDeployment({
@@ -612,7 +734,7 @@ test("T-E012-DEPLOY-001 keeps the effective catalog when candidate migration doe
     imageSet: {},
     preflight: async () => undefined,
     runtimeEvidence: {},
-    secretEnvironmentLoader: noSecretEnvironment,
+    secretMaterializer: noSecretMaterializer,
     stateRoot,
   };
   await executeDevelopmentDeployment({
@@ -684,7 +806,7 @@ test("T-E012-DEPLOY-001 recovers candidate catalog after migration applies and s
     imageSet: {},
     preflight: async () => undefined,
     runtimeEvidence: {},
-    secretEnvironmentLoader: noSecretEnvironment,
+    secretMaterializer: noSecretMaterializer,
     stateRoot,
   };
   await executeDevelopmentDeployment({
@@ -751,7 +873,7 @@ test("T-E012-DEPLOY-001 probes candidate catalog when the host checkpoint is los
     imageSet: {},
     preflight: async () => undefined,
     runtimeEvidence: {},
-    secretEnvironmentLoader: noSecretEnvironment,
+    secretMaterializer: noSecretMaterializer,
     stateRoot,
   };
   await executeDevelopmentDeployment({
@@ -831,7 +953,7 @@ test("T-E012-DEPLOY-001 rebuilds a PASS receipt after state commit", async (t) =
       throw new Error("receipt recovery must not rerun deployment phases");
     },
     runtimeEvidence: {},
-    secretEnvironmentLoader: noSecretEnvironment,
+    secretMaterializer: noSecretMaterializer,
     stateRoot,
   });
   assert.deepEqual(replay, { idempotent: true, receipts: [] });
@@ -871,7 +993,7 @@ test("T-E012-DEPLOY-001 rolls back only to the recorded compatible manifest and 
     preflight: async () => undefined,
     runner: async () => ({ code: 0 }),
     runtimeEvidence: {},
-    secretEnvironmentLoader: noSecretEnvironment,
+    secretMaterializer: noSecretMaterializer,
     stateRoot,
   };
   await executeDevelopmentDeployment({
