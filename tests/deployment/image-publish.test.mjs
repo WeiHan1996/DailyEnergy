@@ -624,12 +624,14 @@ test("T-E012-IMAGE-001 keeps image publication manual, main-bound and non-deploy
     [
       "actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
       "actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020",
+      "docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c",
       "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
     ],
   );
   assert.equal(actions[0].with.ref, "${{ inputs.release_sha }}");
   assert.equal(actions[0].with["fetch-depth"], 0);
   assert.equal(actions[0].with["persist-credentials"], false);
+  assert.equal(actions[2].with.driver, "docker-container");
 
   const commands = job.steps
     .map((step) => step.run)

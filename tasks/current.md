@@ -1,16 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-10（DEV image publication 已获授权；首次运行因缺少 Checks 读取权限在构建前失败，正在最小修复）
+- **最后更新**：2026-08-10（Checks 权限修复已合并；第二次 DEV publication 在 attestation-capable Buildx 初始化处阻断）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Review
-- **任务分支**：`agent/e012-publish-checks-permission`
+- **任务分支**：`agent/e012-buildx-attestations`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **当前 PR**：[E-012 草稿 PR #124](https://github.com/WeiHan1996/DailyEnergy/pull/124)
+- **最近合并 PR**：[E-012 PR #124](https://github.com/WeiHan1996/DailyEnergy/pull/124)
+- **当前 PR**：待创建
 - **实现合并提交**：E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
-- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_PUBLICATION_CHECKS_PERMISSION_REPAIR / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_PUBLICATION_BUILDX_ATTESTATION_REPAIR / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -120,13 +121,25 @@ approved development infrastructure
   [run #31347312900](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31347312900) 在读取固定 main CI
   check-runs 时返回 `HTTP 403`，根因是 job 仅有 `actions: read`、没有 `checks: read`。失败发生在镜像构建、push、artifact
   生成和服务器变更之前，因此没有发布镜像，也没有改变 DEV 主机；修复限定为补充只读 Checks 权限及对应工作流合同测试；
-- **下一动作**：合并上述最小权限修复后，重新从合并提交 `3c00d952be6fa7e44aba683fc79fee4e1a1687fe` 发布 digest-only
+- **权限修复合并**：PR #124 最终 head `2ab09f5d471b26ca3e45b56eab72776b56997747` 的固定 Ubuntu CI
+  [run #31348236686](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31348236686) 为 11/11 checks 全部成功；人工 merge
+  receipt 为 `CI_MANUAL_MERGE_GATE_OK:pr=124:head=2ab09f5d471b26ca3e45b56eab72776b56997747:run=31348236686:checks=11`；
+  用户明确批准后，PR 于 `2026-08-10T01:55:43Z` squash 合并为 `6c122943ffb71175ff8e0d4861b5f226c58876db`；
+- **第二次发布尝试**：publication
+  [run #31348424543](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31348424543) 已通过 immutable main CI 绑定、supply-chain
+  evidence 下载和 job-scoped GHCR 登录，但 runner 默认 Docker driver 不支持 `--provenance=mode=max` 与 `--sbom=true` attestation，
+  首个 buildx 调用以 `Attestation is not supported for the docker driver` 失败；没有镜像 push、deployment artifact 或 DEV 主机变更；
+  修复限定为固定官方 Buildx action 并显式使用 `docker-container` driver，以及对应工作流合同测试；
+- **下一动作**：合并 Buildx 初始化修复后，重新从合并提交 `3c00d952be6fa7e44aba683fc79fee4e1a1687fe` 发布 digest-only
   images 与 deployment artifact。服务器管理员再交互式配置有 `read:packages` 的 GHCR 只读身份，安装 artifact、执行首次真实
   Compose 发布并通过 SSH tunnel 验收；不在服务器现场 build；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- Buildx attestation 修复的精确工作流合同用例、Prettier、CI policy 与 `git diff --check` 通过；本机完整 E-012
+  security Gate 已运行并保持 `FAIL`，失败仍限定为 macOS 缺少 Linux `flock` 导致 deployment suite `33/35`，
+  Buildx action/driver 合同断言本身通过；合并前以固定 `ubuntu-24.04` PR CI 为权威自动证据；
 - publication 权限修复的精确工作流合同用例通过，Prettier 与 `git diff --check` 通过；本机完整 E-012
   security Gate 已运行并保持 `FAIL`，唯一失败仍是 macOS 缺少 Linux `flock` 导致 deployment suite `33/35`，
   权限合同断言本身通过；合并前以固定 `ubuntu-24.04` PR CI 为权威自动证据；
