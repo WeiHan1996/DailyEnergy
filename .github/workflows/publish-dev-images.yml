@@ -39,6 +39,11 @@ jobs:
         with:
           node-version: 24.18.0
 
+      - name: Set up the attestation-capable Buildx builder
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4
+        with:
+          driver: docker-container
+
       - name: Require an immutable main commit and one complete CI run
         id: ci_gate
         env:
