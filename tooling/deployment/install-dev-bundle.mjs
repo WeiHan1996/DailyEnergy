@@ -2,6 +2,7 @@
 import { constants } from "node:fs";
 import {
   chmod,
+  chown,
   copyFile,
   lstat,
   mkdir,
@@ -104,9 +105,14 @@ async function bundleFileList(directory) {
   return ["bundle-manifest.json", ...manifest.files.map((entry) => entry.path)];
 }
 
-async function copyProtectedFile(source, destination) {
+async function copyProtectedFile(
+  source,
+  destination,
+  { expectedGid, expectedUid },
+) {
   await mkdir(path.dirname(destination), { mode: 0o700, recursive: true });
   await copyFile(source, destination, constants.COPYFILE_EXCL);
+  await chown(destination, expectedUid, expectedGid);
   await chmod(destination, 0o600);
 }
 
@@ -335,6 +341,7 @@ export async function installDevelopmentBundle(
         await copyProtectedFile(
           path.join(source, file),
           path.join(stage, file),
+          { expectedGid, expectedUid },
         );
       }
       await writeFile(
