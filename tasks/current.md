@@ -166,7 +166,10 @@ approved development infrastructure
   第一版 `dailyenergy-e012-deploy.service` 因把 `activating` 误判为非运行状态而在 image inspect 处 fail closed；bounded journal 与路径检查确认
   部署控制器未启动、没有 Accepted state。修正后的 `dailyenergy-e012-deploy-after-pull.service` 正在每 30 秒轮询精确 migration 摘要，
   仅在拉取保持 `active/activating` 时等待，摘要可 inspect 后才执行 candidate 的 18 阶段部署；拉取失败或摘要不存在时以状态 42
-  停止。没有现场 build、没有公网端口变更、尚未写入 Accepted release state；
+  停止。首次后台拉取于 `2026-08-10T16:15:24+08:00` 在 `137804490/261527051` bytes（约 52.7%）收到远端
+  `connection reset by peer` 后失败，deploy waiter 随即以状态 42 停止；bounded journal 和路径检查确认没有运行部署控制器、没有
+  Accepted state。两个 transient units 已于 `17:16` 重新创建，Docker 复用原断点，并在 35 秒复测中增长到 `138853066` bytes；
+  没有现场 build、没有公网端口变更、尚未写入 Accepted release state；
 - **下一动作**：拉取预计完成后，读取两个 transient unit 的 bounded journal 和精确 image metadata，验证首次 Compose 发布、Accepted
   state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel；失败时保持 operation state 并按 recover-current 合同诊断；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
