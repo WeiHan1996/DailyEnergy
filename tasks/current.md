@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-10（file secret 与首次候选替换修复的固定 Ubuntu CI 11/11 成功；等待规范确认与 PR 合并批准）
+- **最后更新**：2026-08-10（用户已接受 file secret 与首次候选替换合同并批准合并 PR #127）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Review
@@ -11,7 +11,7 @@
 - **最近合并 PR**：[E-012 PR #126](https://github.com/WeiHan1996/DailyEnergy/pull/126)
 - **当前 PR**：[E-012 草稿 PR #127](https://github.com/WeiHan1996/DailyEnergy/pull/127)
 - **实现合并提交**：E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
-- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / DEV_IMAGES_READY / DEV_DEPLOY_BLOCKED_COMPOSE_ENV_SECRET / FILE_SECRET_FIX_UBUNTU_CI_PASS / SPEC_CONFIRMATION_AND_MERGE_APPROVAL_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / DEV_IMAGES_READY / DEV_DEPLOY_BLOCKED_COMPOSE_ENV_SECRET / FILE_SECRET_FIX_UBUNTU_CI_PASS / SPEC_CONFIRMED / PR_127_MERGE_APPROVED / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -192,8 +192,9 @@ approved development infrastructure
 - **修复 PR Gate**：提交 `cde89f13e2a26f4fa08e0379e0b70b6ec2c2e5aa` 已推送到草稿 PR #127；固定 Ubuntu CI
   [run #31401247915](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31401247915) 的 9 个 automated lane、supply-chain 与聚合 Gate
   共 11/11 SUCCESS，补齐本机无法执行的 Linux `flock` 证据；
-- **下一动作**：请求用户明确接受 Accepted 部署规范中的 release-scoped file secret materialization 与
-  `SUPERSEDED_BEFORE_MIGRATION` 首次失败候选替换合同，并批准合并 PR #127；合并后重新 publication，用新 candidate 完成首次 Compose
+- **规范确认与合并批准**：用户于 2026-08-10 明确接受 Accepted 部署规范中的 release-scoped file secret materialization 与
+  `SUPERSEDED_BEFORE_MIGRATION` 首次失败候选替换合同，并批准合并 PR #127；
+- **下一动作**：把批准记录绑定到 PR #127 的精确 head 与同一轮 11/11 Gate，squash 合并并核对 `main`；随后重新 publication，用新 candidate 完成首次 Compose
   发布、Accepted state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel 验收；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 

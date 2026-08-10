@@ -946,6 +946,8 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 - 状态：Accepted；
 - 接受日期：2026-07-26；
+- 2026-08-10 修订：用户明确接受 E-012 的 release-scoped file secret materialization 与
+  `SUPERSEDED_BEFORE_MIGRATION` 首次失败候选替换合同，并批准合并 PR #127；
 - 2026-08-04 修订：用户明确接受测试策略 22.2 的私有 GitHub Free 临时补偿控制；
   E-014/RC 前必须恢复 platform-enforced required checks；
 - 内容 PR：[PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)；
