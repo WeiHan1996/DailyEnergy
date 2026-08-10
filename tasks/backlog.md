@@ -125,7 +125,7 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 | [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done        | 可重复本地环境                                       |
 | [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done        | 单元、集成、契约和端到端                             |
 | [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done        | 11/11 Gate、365 天 retention 与临时合并控制          |
-| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | In Progress | PR #127 已合并；修复旧 release secret bind 容器复用  |
+| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | In Progress | PR #128；修复旧 release secret bind 容器复用         |
 | [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Planned     | 脱敏日志、指标和告警                                 |
 | [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Planned     | 环境可重复、CI 通过、服务可访问                      |
 | [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done        | P0/P1 上下文路由、任务 Profile 与安静验证            |

@@ -9,7 +9,7 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 PR #127](https://github.com/WeiHan1996/DailyEnergy/pull/127)
-- **当前 PR**：待创建（force-recreate release-scoped secret bindings）
+- **当前 PR**：[E-012 草稿 PR #128](https://github.com/WeiHan1996/DailyEnergy/pull/128)
 - **实现合并提交**：E-012 latest squash merge `6c597fa85d383386bdd257388ce3166bb6d8bcfb`
 - **Gate 结论**：`E012_IN_PROGRESS / PR_127_MERGED / FILE_SECRET_MATERIALIZATION_PASS / DEV_DEPLOY_BLOCKED_STALE_SECRET_BIND_CONTAINER / MIGRATION_NOT_APPLIED / FORCE_RECREATE_FIX_PENDING_REVIEW / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
@@ -214,7 +214,9 @@ approved development infrastructure
 - **force-recreate 修复边界**：所有 Compose `up` 服务收敛阶段必须显式 `--force-recreate`，使 deploy/rollback/recover-current 不会因 top-level
   file secret source path 未进入 service hash 而复用旧 release 容器；不改变 phase 顺序、数据卷、migration/rollback 合同、镜像 digest 或 production Gate。
   精确命令合同测试已通过；Accepted 部署规范修订保持待用户确认，完整固定 Ubuntu Gate 与真实重新 publication 尚待执行；
-- **下一动作**：完成 force-recreate 定向与 task Gate，创建小型草稿 PR，请用户确认规范修订并在 11/11 Gate 后批准合并；随后重新 publication，用新 candidate
+- **force-recreate 草稿 PR**：修复提交 `734b092ce6511fb686b0b52e53a3cb85149f5d8e` 已推送并创建
+  [PR #128](https://github.com/WeiHan1996/DailyEnergy/pull/128)；等待固定 Ubuntu 11-check Gate，并请求用户确认部署规范修订；
+- **下一动作**：PR #128 取得 11/11 Gate 后记录用户规范确认并申请批准合并；随后重新 publication，用新 candidate
   替换当前迁移前失败 operation，完成首次 Compose 发布、Accepted state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel 验收；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
