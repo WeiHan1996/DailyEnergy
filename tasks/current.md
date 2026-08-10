@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-10（DEV publication 已成功；首次真实安装在传输文件 owner 规范化处 fail closed）
+- **最后更新**：2026-08-10（owner 修复已合并并通过真实安装；等待管理员交互式配置 GHCR 只读身份）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Review
-- **任务分支**：`agent/e012-install-owner-normalization`
+- **任务分支**：`agent/e012-first-dev-deployment-evidence`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **最近合并 PR**：[E-012 PR #125](https://github.com/WeiHan1996/DailyEnergy/pull/125)
-- **当前 PR**：[E-012 草稿 PR #126](https://github.com/WeiHan1996/DailyEnergy/pull/126)
+- **最近合并 PR**：[E-012 PR #126](https://github.com/WeiHan1996/DailyEnergy/pull/126)
+- **当前 PR**：待创建
 - **实现合并提交**：E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
-- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_INSTALL_OWNER_NORMALIZATION_REPAIR / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / FIXED_LINUX_GATE_PASS / DEV_GHCR_READER_LOGIN_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -146,12 +146,27 @@ approved development infrastructure
   `gid=1001`、`mode=600`、`nlink=1`，证明 Node `copyFile` 保留源 owner，而 root-only 安装 Gate 正确拒绝。失败后 stage 已清理，
   `/srv/dailyenergy/bundles` 为空且没有 Accepted release state；修复限定为复制后显式 `chown(expectedUid, expectedGid)`、再设 `0600`，
   并增加顺序合同测试；
-- **下一动作**：完成 owner 规范化修复 PR 并取得固定 Ubuntu CI；合并后用 `dev-cos-config-v2` 重新安装 artifact，服务器管理员再交互式
-  配置有 `read:packages` 的 GHCR 只读身份，执行首次真实 Compose 发布并通过 SSH tunnel 验收；不在服务器现场 build；
+- **owner 修复合并**：PR #126 最终 head `b5013f9cbb67ee196cd0b683e5174dd44fc9482a` 的固定 Ubuntu CI
+  [run #31350663734](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31350663734) 为 11/11 checks 全部成功；人工 merge
+  receipt 为 `CI_MANUAL_MERGE_GATE_OK:pr=126:head=b5013f9cbb67ee196cd0b683e5174dd44fc9482a:run=31350663734:checks=11`；
+  用户明确批准后，PR 于 `2026-08-10T03:05:57Z` squash 合并为 `7582e3c51238f7917841ed1d269fb6f4e4d364f8`；本地
+  `main` 与 `origin/main` 已快进核对一致；
+- **修复后 publication**：合并提交的 main CI
+  [run #31351619060](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31351619060) 11/11 成功；手动 publication
+  [run #31351757432](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31351757432) 已从该精确提交重新发布五类 digest-only image 和
+  source-free bundle `dev-7582e3c51238-31351757432-1`。artifact `9049272100` 保留至 `2027-08-10T03:08:52Z`，本地与
+  传输后校验均为 `files=16`、`production_eligible=false`；
+- **修复后真实安装**：使用 `dev-secret-v1`、`dev-cos-credential-v1` 与 `dev-cos-config-v2` 原子生成 candidate release
+  `devr-7582e3c51238-101ee4bf43be64a5ef17f2f4`、generation `1`；18 个文件全部为 `root:root 0600`、`nlink=1`，5 个目录
+  全部为 `root:root 0700`，证明传输用户与安装 owner 不同的真实路径已收敛。尚未启动容器或写入 Accepted release state；
+- **下一动作**：服务器管理员在 SSH 密码提示中交互式配置有 `read:packages` 的 GHCR 只读身份，Codex 不接收 token；随后验证
+  immutable pull、执行首次真实 Compose 发布并通过 SSH tunnel 验收；不在服务器现场 build；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- PR #126 合并后的 main CI、publication、artifact 双端 digest 校验和 root-only 原子安装均通过；真实安装后的全部文件/目录 owner、mode
+  与 hardlink Gate 满足预期，当前仅等待外部 GHCR 交互式授权；
 - owner 规范化顺序合同 `1/1`、目标 ESLint、Prettier、CI policy 与 `git diff --check` 通过；本机完整 E-012 code Gate 已运行并保持
   `FAIL`，deployment suite 为 `34/36`，两个失败均限定为 macOS 缺少 Linux `flock`，新增 owner 合同通过；合并前以固定
   `ubuntu-24.04` PR CI 为权威自动证据。真实主机证据已证明 transfer owner 与 root-only 安装目标不同，失败未留下 candidate bundle
