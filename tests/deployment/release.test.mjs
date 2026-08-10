@@ -1104,3 +1104,23 @@ test("T-E012-DEPLOY-001 keeps Docker builds, public bindings and raw secrets out
     environment.includes("/srv/dailyenergy/secrets/dev-cos-credential-v1"),
   );
 });
+
+test("T-E012-DEPLOY-001 force-recreates every service convergence phase", () => {
+  const commands = developmentDeploymentCommands(
+    "/srv/dailyenergy/bundles/e012-force-recreate",
+    "/srv/dailyenergy/bundles/e012-force-recreate/release.env",
+  );
+  const composeUpCommands = Object.values(commands)
+    .flat()
+    .filter(
+      (command) =>
+        command.executable === "docker" && command.arguments.includes("up"),
+    );
+  assert.equal(composeUpCommands.length, 7);
+  for (const command of composeUpCommands) {
+    assert.ok(
+      command.arguments.includes("--force-recreate"),
+      `Compose up must replace stale release-scoped secret mounts: ${command.arguments.at(-1)}`,
+    );
+  }
+});

@@ -397,6 +397,8 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
     arguments: [...compose, ...arguments_],
     executable: "docker",
   });
+  const convergeService = (...arguments_) =>
+    command("up", "-d", "--force-recreate", ...arguments_);
   const databaseCommand = (mode, operationCheckpoint) => ({
     ...command(
       "run",
@@ -411,18 +413,10 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
   });
   return Object.freeze({
     admin: [
-      command(
-        "up",
-        "-d",
-        "--no-deps",
-        "--wait",
-        "--wait-timeout",
-        "90",
-        "admin",
-      ),
+      convergeService("--no-deps", "--wait", "--wait-timeout", "90", "admin"),
     ],
     api: [
-      command("up", "-d", "--no-deps", "--wait", "--wait-timeout", "90", "api"),
+      convergeService("--no-deps", "--wait", "--wait-timeout", "90", "api"),
     ],
     health: [
       {
@@ -517,9 +511,7 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
       ),
     ],
     "stateful-ready": [
-      command(
-        "up",
-        "-d",
+      convergeService(
         "--wait",
         "--wait-timeout",
         "90",
@@ -529,9 +521,7 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
       ),
     ],
     "tls-ingress": [
-      command(
-        "up",
-        "-d",
+      convergeService(
         "--no-deps",
         "--wait",
         "--wait-timeout",
@@ -540,9 +530,7 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
       ),
     ],
     "worker-background": [
-      command(
-        "up",
-        "-d",
+      convergeService(
         "--no-deps",
         "--wait",
         "--wait-timeout",
@@ -561,9 +549,7 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
       ),
     ],
     "worker-interactive": [
-      command(
-        "up",
-        "-d",
+      convergeService(
         "--no-deps",
         "--wait",
         "--wait-timeout",
@@ -572,9 +558,7 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
       ),
     ],
     "worker-restricted": [
-      command(
-        "up",
-        "-d",
+      convergeService(
         "--no-deps",
         "--wait",
         "--wait-timeout",

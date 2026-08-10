@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-10（用户已接受 file secret 与首次候选替换合同并批准合并 PR #127）
+- **最后更新**：2026-08-11（PR #127 已合并；真实 DEV 发现旧 release secret bind 容器复用阻断）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **任务状态**：In Review
-- **任务分支**：`agent/e012-first-dev-deployment-evidence`
+- **任务状态**：In Progress
+- **任务分支**：`agent/e012-force-recreate-secret-bindings`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **最近合并 PR**：[E-012 PR #126](https://github.com/WeiHan1996/DailyEnergy/pull/126)
-- **当前 PR**：[E-012 草稿 PR #127](https://github.com/WeiHan1996/DailyEnergy/pull/127)
-- **实现合并提交**：E-012 squash merge `3c00d952be6fa7e44aba683fc79fee4e1a1687fe`
-- **Gate 结论**：`E012_IN_REVIEW / PR_MERGED / DEV_IMAGES_READY / DEV_DEPLOY_BLOCKED_COMPOSE_ENV_SECRET / FILE_SECRET_FIX_UBUNTU_CI_PASS / SPEC_CONFIRMED / PR_127_MERGE_APPROVED / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **最近合并 PR**：[E-012 PR #127](https://github.com/WeiHan1996/DailyEnergy/pull/127)
+- **当前 PR**：待创建（force-recreate release-scoped secret bindings）
+- **实现合并提交**：E-012 latest squash merge `6c597fa85d383386bdd257388ce3166bb6d8bcfb`
+- **Gate 结论**：`E012_IN_PROGRESS / PR_127_MERGED / FILE_SECRET_MATERIALIZATION_PASS / DEV_DEPLOY_BLOCKED_STALE_SECRET_BIND_CONTAINER / MIGRATION_NOT_APPLIED / FORCE_RECREATE_FIX_PENDING_REVIEW / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -194,12 +194,37 @@ approved development infrastructure
   共 11/11 SUCCESS，补齐本机无法执行的 Linux `flock` 证据；
 - **规范确认与合并批准**：用户于 2026-08-10 明确接受 Accepted 部署规范中的 release-scoped file secret materialization 与
   `SUPERSEDED_BEFORE_MIGRATION` 首次失败候选替换合同，并批准合并 PR #127；
-- **下一动作**：把批准记录绑定到 PR #127 的精确 head 与同一轮 11/11 Gate，squash 合并并核对 `main`；随后重新 publication，用新 candidate 完成首次 Compose
-  发布、Accepted state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel 验收；
+- **PR #127 合并与再发布**：接受记录提交 `31d0e66d8ccdaea04d863f1e55f7f2d130910a32` 的固定 Ubuntu CI
+  [run #31403160907](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31403160907) 为 11/11 SUCCESS，人工 merge receipt 为
+  `CI_MANUAL_MERGE_GATE_OK:pr=127:head=31d0e66d8ccdaea04d863f1e55f7f2d130910a32:run=31403160907:checks=11`；PR 于
+  `2026-08-10T15:25:52Z` squash 合并为 `6c597fa85d383386bdd257388ce3166bb6d8bcfb`，main CI
+  [run #31403542958](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31403542958) 11/11 SUCCESS；publication
+  [run #31403819687](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31403819687) 成功生成 source-free bundle
+  `dev-6c597fa85d38-31403819687-1`，双端离线校验均为 `files=16`、`production_eligible=false`；
+- **新候选安装与镜像收敛**：使用既有 `dev-secret-v1`、`dev-cos-credential-v1`、`dev-cos-config-v2` 安装 candidate
+  `devr-6c597fa85d38-702dc533a82eef74e10d230a`、generation `1`；第一次重放在 pull 阶段因三个 GHCR digest 尚未落盘而 fail closed。
+  用户于 2026-08-11 明确授权临时使用本机 HTTP proxy 中转 GHCR TLS 流量；端口只通过 SSH 绑定服务器 loopback，TLS verify PASS，认证文件只在服务器本地读取、未输出 token。五类应用镜像最终均按 manifest `RepoDigest` 精确匹配；两个临时转发已关闭，约 2.2 GB 镜像归档与新候选传输目录已删除，临时 `skopeo` 及 5 个自动依赖已按 dry-run 清单卸载，Docker/Compose 与精确镜像复核正常；
+- **真实 stale secret bind 阻断**：同一 candidate 再重放越过 pull 后在 `stateful-ready` fail closed；operation
+  `410abc67-fb78-44fa-b823-69d6d162e3c7` 只完成 preflight/pull，`migration_applied=false`、`migration_verified=false`，没有 Accepted state。
+  PostgreSQL 日志仅报告 `/run/secrets/postgres_password` 不存在；现有容器 `working_dir` 仍指向上一 candidate
+  `devr-7582e3c51238-101ee4bf43be64a5ef17f2f4`，而上一与当前 Compose service hash 同为
+  `c8eb6b019af4faf00c3c2b75d620208aa4f6f52d494f1c78af0437dd26c44d49`，所以 Compose 复用了没有当前 release bind 的旧容器。
+  使用当前已签名 bundle 单独 `--force-recreate --no-deps postgres` 后，实际 mount source 指向当前 release-scoped secret、owner/mode 为
+  `999:999 0400`，PostgreSQL 立即 healthy，证明根因不是 secret value 或 materializer，而是服务收敛命令缺少强制重建；
+- **force-recreate 修复边界**：所有 Compose `up` 服务收敛阶段必须显式 `--force-recreate`，使 deploy/rollback/recover-current 不会因 top-level
+  file secret source path 未进入 service hash 而复用旧 release 容器；不改变 phase 顺序、数据卷、migration/rollback 合同、镜像 digest 或 production Gate。
+  精确命令合同测试已通过；Accepted 部署规范修订保持待用户确认，完整固定 Ubuntu Gate 与真实重新 publication 尚待执行；
+- **下一动作**：完成 force-recreate 定向与 task Gate，创建小型草稿 PR，请用户确认规范修订并在 11/11 Gate 后批准合并；随后重新 publication，用新 candidate
+  替换当前迁移前失败 operation，完成首次 Compose 发布、Accepted state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel 验收；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- 本轮 stale secret bind 证据已在真实 DEV Compose 2.40.3 上复现：未强制重建时容器继续绑定上一 bundle/无当前 secret mount，使用当前签名 bundle
+  `--force-recreate` 后 PostgreSQL 实际 bind source、预设 owner/mode 与 health 全部正确；新增
+  `T-E012-DEPLOY-001 force-recreates every service convergence phase` 精确合同测试 `1/1` PASS。macOS 定向 release/Compose suite 为
+  `24/25`；changed Gate 自动扩大为 full、task Gate 均执行到 deployment suite 并为 `37/39`，两个失败仍是本机缺少 Linux `flock`，不伪装为 PASS；
+  格式、ESLint、类型、架构、codegen、合同、数据库静态检查与新增测试均通过，固定 Ubuntu PR CI 将作为完整权威自动证据；
 - 本轮真实服务器已证明 Docker Compose 2.40.3 对 `read_only: true` + `environment` secret fail closed；file materialization 修复的真实
   Compose merged-config policy、DEV overlay 负例、materializer 权限/漂移/无密钥命令环境、pre-migration initial replacement 与
   migration-active replacement rejection 用例均通过。`pnpm agent:validate --mode=changed --task=E-012` 自动升级 `security/full`，格式、全仓

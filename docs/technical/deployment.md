@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-08-10（E-012 Linux Compose 只读服务的 file secret materialization 合同已修正）
+- **最后更新**：2026-08-11（E-012 release-scoped file secret 的容器强制收敛合同待确认）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0007 临时 DEV 同机例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
@@ -132,7 +132,7 @@ PostgreSQL/Redis 与 COS application object 都按 disposable DEV state 管理�
 
 E-012 的 DEV 控制面使用隔离、checksum 固定的 Node 24.18.0，不替换主机系统 Node。手动 publication workflow 只接受已经进入 `main` 且一个 CI run 内 11 个 required checks 全部成功的精确 commit；它分别记录 CI run 与 publication run，发布 `admin/migration/proxy/server/stub` 五个 `linux/amd64` digest，并生成 source-free deployment bundle。服务器安装入口验证 allowlist、SHA-256、publication evidence、外部 COS 配置 fingerprint 与 root-only 权限后，原子安装到版本化 bundle 目录；服务器不 checkout、不 build，也不接收 CI 远程 SSH。
 
-DEV 发布控制器固定执行 preflight、digest pull、stateful readiness、关闭 loopback TLS、worker drain、migration/drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、COS object、Safety、owner、deletion 与退出维护共 18 个有序阶段；全通过后才写 Accepted state 和唯一 N-1 rollback target。该短维护窗口只适用于尚无公网和真实用户的 DEV，不构成 Production 零停机设计。具体操作者步骤见 [DEV 发布、回滚与换机 Runbook](../operations/development-deployment-runbook.md)。
+DEV 发布控制器固定执行 preflight、digest pull、stateful readiness、关闭 loopback TLS、worker drain、migration/drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、COS object、Safety、owner、deletion 与退出维护共 18 个有序阶段；全通过后才写 Accepted state 和唯一 N-1 rollback target。每个创建持久服务容器的 Compose `up` 阶段必须显式 `--force-recreate`：Compose 的 service config hash 不保证包含 top-level file secret 的 source path，不能把“hash 相同”当成 release-scoped secret bind 已收敛。该短维护窗口只适用于尚无公网和真实用户的 DEV，不构成 Production 零停机设计。具体操作者步骤见 [DEV 发布、回滚与换机 Runbook](../operations/development-deployment-runbook.md)。
 
 首次发布尚无 Accepted state 时，同一失败 manifest 可以重放。若失败发生在 migration 阶段之前、`migration_applied=false`、`migration_verified=false` 且没有 from-current/recovery catalog，显式部署一个不同且已通过 preflight/secret materialization 的新 candidate 可以替换该失败候选；控制器必须先写入绑定旧 `operation_id`、失败阶段和 replacement manifest digest 的 `SUPERSEDED_BEFORE_MIGRATION` receipt，再清除旧 pending 并开始新 operation。active phase 已进入 migration 或任一 migration checkpoint 为 true 时禁止替换，必须保持 dirty state 并人工判定数据库事实；不得删除或编辑 operation/state 绕过。
 
@@ -373,7 +373,7 @@ E-012 DEV materializer 必须允许操作者为每次安装选择 database secre
 - 优先使用 GitHub Actions OIDC/云工作负载身份获取短期部署 credential，不在仓库保存长期云密钥；
 - 若目标平台暂不支持 OIDC，使用 environment-protected、最小权限、短期且可轮换的部署凭据；该路径必须单独记录风险与 expiry；
 - Compose service 通过显式 `secrets` 挂载只读文件；应用只从批准路径读取；
-- Docker Compose 对 `file` 来源使用 bind mount，`uid/gid/mode` 重映射会被忽略，而 Compose `environment` secret source 不能注入 `read_only: true` 的 Linux 服务。E-012 Linux DEV 因此保持外部源文件 `root:root 0600`；root 部署控制器在 preflight 后把已验证值原子 materialize 到 `/srv/dailyenergy/runtime-secrets/<release_id>`。版本目录及其父目录为 `root:root 0700`，文件按获授权服务使用的 UID/GID 写为 `0400`，相同 release 重放必须逐文件验证内容、owner、mode、link 和闭合文件集，任何漂移 fail closed。Compose 只从 `release.env` 获得该非秘密目录路径并使用 `file` source，所有 Docker/curl 子进程环境均不得携带密钥值；版本目录至少保留 current 与唯一 rollback target，且该 DEV 适配不替代 Production secret store；
+- Docker Compose 对 `file` 来源使用 bind mount，`uid/gid/mode` 重映射会被忽略，而 Compose `environment` secret source 不能注入 `read_only: true` 的 Linux 服务。E-012 Linux DEV 因此保持外部源文件 `root:root 0600`；root 部署控制器在 preflight 后把已验证值原子 materialize 到 `/srv/dailyenergy/runtime-secrets/<release_id>`。版本目录及其父目录为 `root:root 0700`，文件按获授权服务使用的 UID/GID 写为 `0400`，相同 release 重放必须逐文件验证内容、owner、mode、link 和闭合文件集，任何漂移 fail closed。Compose 只从 `release.env` 获得该非秘密目录路径并使用 `file` source，所有 Docker/curl 子进程环境均不得携带密钥值；所有 `deploy`、`rollback` 与 `recover-current` 的服务启动阶段必须强制重建容器，并核验实际 bind source 属于目标 `release_id`，不得复用仍指向旧 runtime-secret 目录的相同 service hash 容器；版本目录至少保留 current 与唯一 rollback target，且该 DEV 适配不替代 Production secret store；
 - 环境变量只携带 secret file path/ref，不携带 secret 明文；
 - 每个 environment/profile/用途独立 secret，不跨环境或跨 profile 复用；
 - CI fork/untrusted PR 不获得 environment secret 或 OIDC deployment permission；
@@ -946,6 +946,8 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 - 状态：Accepted；
 - 接受日期：2026-07-26；
+- 2026-08-11 修订待确认：真实 DEV 证明 Compose service hash 不包含足以区分 release-scoped
+  file secret source 的信息；拟要求所有服务 `up` 阶段显式强制重建并核验目标 release bind；
 - 2026-08-10 修订：用户明确接受 E-012 的 release-scoped file secret materialization 与
   `SUPERSEDED_BEFORE_MIGRATION` 首次失败候选替换合同，并批准合并 PR #127；
 - 2026-08-04 修订：用户明确接受测试策略 22.2 的私有 GitHub Free 临时补偿控制；
