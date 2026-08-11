@@ -9,7 +9,7 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 reconcile-current PR #133](https://github.com/WeiHan1996/DailyEnergy/pull/133)
-- **当前 PR**：E-012 final evidence Draft PR 待创建
+- **当前 PR**：[E-012 final evidence Draft PR #134](https://github.com/WeiHan1996/DailyEnergy/pull/134)
 - **实现合并提交**：E-012 latest squash merge `0717c9c7a20aa7e999125c0fa82c88e5397e1795`
 - **Gate 结论**：`E012_IN_REVIEW / SECOND_ACCEPTED_RELEASE_ACTIVE / RECONCILE_CURRENT_REAL_17_OF_17_PASS / DEPLOY_ROLLBACK_REDEPLOY_18_OF_18_PASS / FINAL_INDEPENDENT_AUDIT_PASS / FINAL_EVIDENCE_REVIEW_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
@@ -440,8 +440,8 @@ approved development infrastructure
   put/get/hash/delete/head-404、Safety、owner 与 deletion；9 个容器 healthy、13 网络、2 volume、无 dirty operation，两个 deploy receipt 与两个
   reconciliation receipt 的 operation ID/文件名均唯一；
 - **当前阻塞与解锁条件**：实现、publication、真实 deploy/reconcile/rollback/redeploy、临时网络清理和最终独立 audit 均已完成。E-012 只等待
-  项目所有者审核最终证据 PR，并确认首次引入 bootstrap 约束和 E-012 验收；尚未把任务标记 Done、关闭 Issue #50 或提升 E-013；
-- **下一动作**：创建 final evidence Draft PR，运行 changed/task Gate 与固定 Ubuntu PR CI；证据齐备后请求项目所有者验收。获批后再更新
+  Draft PR #134 固定 Ubuntu CI 与项目所有者审核，并确认首次引入 bootstrap 约束和 E-012 验收；尚未把任务标记 Done、关闭 Issue #50 或提升 E-013；
+- **下一动作**：等待 Draft PR #134 最终 head 的固定 Ubuntu CI；11/11 全部成功后请求项目所有者验收。获批后再更新
   Runbook lifecycle、squash 合并、关闭 Issue #50、将 E-012 置为 Done 并仅把 E-013 提升为 Ready；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
