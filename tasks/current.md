@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（PR #131 已合并并成功重新 publication/install；等待本机 GHCR 只读登录后传输精确镜像）
+- **最后更新**：2026-08-11（PR #131 已合并并成功重新 publication/install；五个精确镜像已中转至服务器，等待新的 synthetic DEV 重建授权）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Progress
@@ -9,9 +9,9 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 publication runtime evidence 修复 PR #131](https://github.com/WeiHan1996/DailyEnergy/pull/131)
-- **当前 PR**：无（后续 deployment evidence 尚未提交）
+- **当前 PR**：[E-012 post-PR-131 deployment evidence PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)（Draft；持续记录镜像中转与真实部署验收）
 - **实现合并提交**：E-012 latest squash merge `a03993d2018ee212a1c92169cab8795452c4251d`
-- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / PROXY_FIX_MERGED / PULL_PROBE_FIX_MERGED / MERGE_MAIN_CI_11_OF_11_PASS / PUBLICATION_PASS / HARDENED_CADDY_PROBE_PASS / BUNDLE_INSTALLED / LOCAL_GHCR_READ_PACKAGES_REQUIRED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / PROXY_FIX_MERGED / PULL_PROBE_FIX_MERGED / MERGE_MAIN_CI_11_OF_11_PASS / PUBLICATION_PASS / HARDENED_CADDY_PROBE_PASS / BUNDLE_INSTALLED / EXACT_IMAGES_5_OF_5_READY / RESET_REAUTHORIZATION_REQUIRED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -318,13 +318,25 @@ approved development infrastructure
   使用既有 `dev-secret-v1`、`dev-cos-credential-v1` 与 `dev-cos-config-v2` 原子安装 candidate
   `devr-a03993d2018e-0e738aec3f7c3b7a6197c896`、generation `1`、`installed=true`；服务器 48 KB 临时传输副本已删除，installed bundle 与 GitHub
   artifact 保留，尚未启动新 candidate 或改变数据库；
-- **当前阻塞与解锁条件**：本机 Docker Desktop 已就绪，但现有 GitHub CLI token 只有 `repo/workflow` 等 scope、没有 `read:packages`；最小 stub
-  精确 digest pull 以 GHCR `403 Forbidden` 失败，没有拉取或导入镜像，也没有读取/复制服务器 root-only token。继续本机中转需要项目所有者在本机
-  交互式执行 `docker login ghcr.io -u WeiHan1996` 并在密码提示中输入具备 `read:packages` 的 token；不得把 token 发到聊天、命令参数或日志。
-  服务器现有 failed operation `1b3431ea-5b44-4fd9-85f8-4434224a503d`、synthetic volume 与 no-Accepted-state 仍保持不变；新镜像全部落盘后，因旧
-  operation 已进入并核验 migration，仍必须重新生成精确删除预览并取得新的显式授权，不能复用上次 destructive reset 授权；
-- **下一动作**：项目所有者完成本机 GHCR 只读登录后，按新 manifest 的五个精确 digest 下载、导出、SSH 上传并在服务器复核 `RepoDigest`；随后生成
-  新的 synthetic DEV reset 删除预览并请求授权，再完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
+- **本机中转与服务端镜像复核**：项目所有者已为本机 GitHub token 增加 `read:packages`，凭据仅通过 stdin 登录 Docker，未输出或复制 token。
+  Apple Silicon 本机使用显式 `--platform linux/amd64` 按 manifest 五个精确 digest 下载并逐项复核 `RepoDigest`/平台；五镜像导出为
+  `638471680` 字节临时 archive，SHA-256 为
+  `2535c11be6037f2a144952489be85f1cec3713820c4cf91a6ba843bbecfa50c7`。SSH 上传后服务器复算完全一致，`docker load` 复用全部层，再按
+  精确 digest 仅补拉 registry manifest；admin、migration、proxy、server、stub 均通过 `RepoDigest` 与 `linux/amd64` 复核（`5/5`）。双端临时
+  archive 和本机临时 tag 已删除，服务器临时 transfer tag 保留到本轮重建结束；immutable bundle、精确 digest 镜像和 root-only credential 均保留；
+- **新的受控重建删除预览**：只读复核确认 `release-state.json` 不存在；dirty operation
+  `1b3431ea-5b44-4fd9-85f8-4434224a503d` 为 `FAILED`/`DEPLOY`、`active_phase=tls-ingress`、
+  `failure_code=E012_DEPLOY_PHASE_FAILED`，已完成 `preflight` 至 `worker-restricted` 的前 11 阶段，且
+  `migration_applied=true`、`migration_verified=true`。失败 target
+  `devr-ba1edac23036-948f7a62e227544c8a88993c` 与新 candidate
+  `devr-a03993d2018e-0e738aec3f7c3b7a6197c896` 的 immutable bundle 均存在。完整 DEV Compose 重建会停止并移除 9 个现有容器
+  `tls-proxy`、`worker-restricted`、`admin`、`api`、`worker-background`、`worker-interactive`、`postgres`、`redis`、
+  `dependency-stub`，移除并重建 12 个 Compose network；唯一 permanent data 删除目标严格限定为
+  `dailyenergy-dev_postgres_data` 与 `dailyenergy-dev_redis_data`，其中 synthetic 数据永久不可恢复；
+- **当前阻塞与解锁条件**：旧 operation 已进入并核验 migration，不能由新 candidate 覆盖；必须由项目所有者基于上述精确预览重新明确批准归档
+  dirty operation、删除完整 DEV Compose 环境及上述两个 volume，并从空 deployment state 重建。上次 destructive reset 授权已经消费，不能复用；
+- **下一动作**：取得新的精确 destructive reset 授权后，先归档无 secret 的 dirty evidence 并校验，再删除预览中的 Compose 环境和两个 volume，
+  从空 state 部署新 candidate；随后完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
