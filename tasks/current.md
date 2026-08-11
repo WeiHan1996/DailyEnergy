@@ -9,7 +9,7 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 database smoke invocation 修复 PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)
-- **当前 PR**：待创建 E-012 post-PR #132 publication / reset evidence Draft PR
+- **当前 PR**：[E-012 post-PR #132 publication / reset evidence PR #133](https://github.com/WeiHan1996/DailyEnergy/pull/133)（Draft）
 - **实现合并提交**：E-012 latest squash merge `372b3db99b3b4e14a3d5b10f4907232f03b7a646`
 - **Gate 结论**：`E012_IN_PROGRESS / PR_132_MERGED / MERGE_MAIN_CI_11_OF_11_PASS / NEW_ARTIFACT_INSTALLED / EXACT_IMAGES_5_OF_5_READY / RESET_REAUTHORIZATION_REQUIRED / REDEPLOY_NOT_STARTED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
