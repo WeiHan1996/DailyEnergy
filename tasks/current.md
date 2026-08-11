@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（PR #128 已合并，进入首次完整 DEV 发布收敛）
+- **最后更新**：2026-08-11（首次发布已验证 migration 后在 API 指纹 Gate fail closed，修复与重建授权待审）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **任务状态**：In Progress
+- **任务状态**：Blocked
 - **任务分支**：`agent/e012-first-dev-release`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 PR #128](https://github.com/WeiHan1996/DailyEnergy/pull/128)
-- **当前 PR**：暂无；下一 PR 只承载首次完整 DEV 发布证据或真实发布发现的必要修复
+- **当前 PR**：待创建；仅承载真实发布发现的最终 release 指纹修复、规范边界与失败证据
 - **实现合并提交**：E-012 latest squash merge `7d30e840294413a9169fc83bf3c5c953a106ff65`
-- **Gate 结论**：`E012_IN_PROGRESS / PR_128_MERGED / MAIN_CI_PASS / FILE_SECRET_MATERIALIZATION_PASS / FORCE_RECREATE_CONTRACT_ACCEPTED / DEV_REPUBLICATION_PENDING / MIGRATION_NOT_APPLIED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_BLOCKED / PR_128_MERGED / MAIN_CI_PASS / MIGRATION_APPLIED_AND_VERIFIED / API_DEPLOY_FINGERPRINT_DEFECT_CONFIRMED / DIRTY_OPERATION_PRESERVED / NO_ACCEPTED_RELEASE_STATE / FIX_PR_PENDING / FULL_SYNTHETIC_DEV_RESET_AUTHORIZATION_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -223,12 +223,43 @@ approved development infrastructure
   `CI_MANUAL_MERGE_GATE_OK:pr=128:head=92ece6883fbb27f7fd58324715885a463fff3520:run=31449151810:checks=11`；PR 于
   `2026-08-11T01:28:48Z` squash 合并为 `7d30e840294413a9169fc83bf3c5c953a106ff65`，本地 `main` 与 `origin/main` 已快进核对一致，合并后 main CI
   [run #31449423856](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31449423856) 为 11/11 SUCCESS；
-- **下一动作**：从精确 main merge `7d30e840294413a9169fc83bf3c5c953a106ff65` 重新 publication，用新 candidate
-  替换当前迁移前失败 operation，完成首次 Compose 发布、Accepted state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel 验收；
+- **PR #128 精确 publication 与安装**：手动 publication
+  [run #31450010969](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31450010969) 从精确 main
+  `7d30e840294413a9169fc83bf3c5c953a106ff65` 成功生成五类 `linux/amd64` digest 和 source-free bundle；artifact
+  `9086063301`、bundle `dev-7d30e8402944-31450010969-1` 保留至 `2027-08-11T01:40:12Z`，本地与服务器传输后校验均为
+  `files=16`、`production_eligible=false`。使用既有 `dev-secret-v1`、`dev-cos-credential-v1` 与 `dev-cos-config-v2`
+  原子安装 candidate `devr-7d30e8402944-d3c55bed18694f657bd4f6fe`、generation `1`；旧 operation
+  `410abc67-fb78-44fa-b823-69d6d162e3c7` 满足严格 pre-migration replacement 并已形成
+  `SUPERSEDED_BEFORE_MIGRATION` receipt；
+- **本轮 GHCR 精确镜像收敛**：中国大陆直连在 `admin` 最后一层再次停滞；按用户已有授权启动本机 Clash Verge，经 SSH reverse forward
+  仅绑定服务器 `127.0.0.1:17897`，GHCR 返回预期 `401` 且 TLS verify 为 `0`。临时 `skopeo` 使用服务器 root-only Docker auth
+  读取凭据但未输出 token，以 `--all --preserve-digests` OCI archive 导入五个完整 image index；Docker 对五个 manifest `RepoDigest`
+  均精确匹配。清理临时 tag 时曾暴露 Docker index 引用语义：移除唯一 tag 会使未被容器引用的 migration/proxy index 不可 inspect；两者已立即
+  重新导入并保留本地 `e012-index` tag。最终严格复核 `EXACT_IMAGES=5/5`、`RETAINED_INDEX_TAGS=2/2`；2.1 GB 临时归档、传输目录、
+  `skopeo` 与同批 5 个依赖均删除，临时 reverse forward 已关闭，服务器 `17897/18080` 无监听；
+- **首次 post-migration API 阻断**：candidate 的受控 18 阶段发布 operation
+  `9447435d-eef7-448b-ab16-3fcee11acb4f` 已通过 `preflight`、`pull`、`stateful-ready`、`maintenance-on`、`worker-drain`、
+  `migration`、`worker-interactive` 与 `worker-background`，并记录 `migration_applied=true`、`migration_verified=true`；API 容器随后以稳定
+  `DEPLOY_CONFIG_FINGERPRINT_MISMATCH` 启动失败码退出，operation 保持 `FAILED`/`active_phase=api`，没有写入
+  `release-state.json` 或 Accepted release。PostgreSQL、Redis、dependency stub 与两个 Worker 保持 healthy，API exited；未开放公网端口；
+- **根因与修复边界**：publication runtime evidence 使用 `image_set_id=dev-*` 运行 server image fingerprint probe，安装器生成最终
+  `release_id=devr-*` 后却原样复制该 API deploy fingerprint；应用算法把 release ID 纳入 closed config fingerprint，因此真实启动必然 mismatch。
+  修复改为以最终 materialized release ID 复算 manifest API fingerprint，同时分别验证 publication evidence 与最终 manifest 的 ID 绑定，并增加
+  publication fingerprint reuse 拒绝测试。因为故障发生在 migration 已核验后，Accepted 合同禁止新 candidate 覆盖 dirty initial operation；不得
+  手改 manifest/release env/operation 绕过。ADR-0007 已允许 synthetic DEV 整体重建，但永久删除 PostgreSQL/Redis volume 仍需项目所有者明确授权；
+- **当前阻塞与解锁条件**：先完成本分支 Gate、Draft PR 与用户对上述指纹/恢复规范修订的确认；合并并重新 publication 后，用户还需在执行前明确
+  批准“归档无 secret 失败证据并永久删除当前 synthetic DEV PostgreSQL/Redis volume、从空 deployment state 重建”。在该授权前保留 dirty
+  operation、volume、installed bundle 与不可变镜像，不运行新 deploy；
+- **下一动作**：完成本分支验证并创建 Draft PR，等待规范确认、合并批准与完整 synthetic DEV 重建授权；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- 最终 release 指纹修复的精准 Node 用例与 DEV preflight 共 `7/7` PASS；新增独立 materialized `devr-*` fingerprint、publication
+  fingerprint reuse 拒绝与 runtime evidence 漂移拒绝断言均已执行。`pnpm agent:validate --mode=changed --task=E-012` 自动升级 full，格式、
+  ESLint、类型、架构、codegen、contracts、agent、数据库及新增测试通过后，deployment suite 为 `38/40`；
+  `pnpm agent:validate --mode=task --task=E-012` 结果同为 `38/40`。两项失败均限定为 macOS 缺少 Linux `flock`，不伪装为代码失败或 PASS；
+  固定 Ubuntu PR CI 尚待执行；
 - 本轮 stale secret bind 证据已在真实 DEV Compose 2.40.3 上复现：未强制重建时容器继续绑定上一 bundle/无当前 secret mount，使用当前签名 bundle
   `--force-recreate` 后 PostgreSQL 实际 bind source、预设 owner/mode 与 health 全部正确；新增
   `T-E012-DEPLOY-001 force-recreates every service convergence phase` 精确合同测试 `1/1` PASS。macOS 定向 release/Compose suite 为

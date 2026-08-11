@@ -10,6 +10,7 @@ const SHA256 = /^[a-f0-9]{64}$/u;
 const IMAGE_DIGEST = /^sha256:[a-f0-9]{64}$/u;
 const GIT_SHA = /^[a-f0-9]{40}$/u;
 const RUN_ID = /^\d{1,20}$/u;
+const RELEASE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{2,63}$/u;
 
 function fail(code, detail) {
   throw new Error(`${code}:${detail}`);
@@ -35,6 +36,30 @@ export function developmentReleaseId({
     fail("DEV_RUNTIME_CONTEXT_INVALID", "release-id");
   }
   return `dev-${commitSha.slice(0, 12)}-${publicationRunId}-${publicationRunAttempt}`;
+}
+
+export function apiDeployConfigFingerprint(releaseId) {
+  if (!RELEASE_ID.test(releaseId ?? "")) {
+    fail("DEV_RUNTIME_CONTEXT_INVALID", "api-release-id");
+  }
+  return createHash("sha256")
+    .update(
+      JSON.stringify({
+        config_schema_version: "api-runtime-config-v1",
+        contract_bundle_version: "api-contract-v1",
+        database_url_file: "/run/secrets/database_api_url",
+        environment: "DEV",
+        host: "0.0.0.0",
+        log_level: "INFO",
+        maintenance_mode: "OFF",
+        port: 3000,
+        product_date_policy_version: "product-date-v1",
+        release_id: releaseId,
+        runtime_profile: "API",
+        shutdown_grace_ms: 5000,
+      }),
+    )
+    .digest("hex");
 }
 
 export function validateDevRuntimeEvidence(value) {
@@ -65,6 +90,12 @@ export function validateDevRuntimeEvidence(value) {
   );
   if (Object.values(value.fingerprints).some((entry) => !SHA256.test(entry))) {
     fail("DEV_RUNTIME_FINGERPRINT_INVALID", "value");
+  }
+  if (
+    value.fingerprints.api_deploy_config !==
+    apiDeployConfigFingerprint(value.release_id)
+  ) {
+    fail("DEV_RUNTIME_FINGERPRINT_INVALID", "api-deploy-config");
   }
   return value;
 }
@@ -169,6 +200,9 @@ export async function collectDevRuntimeEvidence(
     );
   } catch {
     fail("DEV_RUNTIME_IMAGE_PROBE_INVALID", "server");
+  }
+  if (api.deployConfigFingerprint !== apiDeployConfigFingerprint(releaseId)) {
+    fail("DEV_RUNTIME_IMAGE_PROBE_INVALID", "api-deploy-config");
   }
   return validateDevRuntimeEvidence({
     evidence_version: RUNTIME_EVIDENCE_VERSION,

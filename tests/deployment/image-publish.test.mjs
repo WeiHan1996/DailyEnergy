@@ -34,6 +34,7 @@ import {
   readReleaseState,
 } from "../../tooling/deployment/release-state.mjs";
 import {
+  apiDeployConfigFingerprint,
   collectDevRuntimeEvidence,
   devRuntimeEvidenceDigest,
   validateDevRuntimeEvidence,
@@ -61,7 +62,7 @@ function runtimeEvidence(releaseId) {
     evidence_version: "DevRuntimeEvidenceV1",
     fingerprints: {
       api_capability: "a".repeat(64),
-      api_deploy_config: "b".repeat(64),
+      api_deploy_config: apiDeployConfigFingerprint(releaseId),
       worker_background: "c".repeat(64),
       worker_interactive: "d".repeat(64),
       worker_restricted: "e".repeat(64),
@@ -441,6 +442,64 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
   );
 });
 
+test("T-E012-IMAGE-001 binds the API deploy fingerprint to the materialized release identity", async (t) => {
+  const directory = await metadataDirectory(t);
+  const publicationReleaseId = `dev-${COMMIT_SHA.slice(0, 12)}-50000000001-1`;
+  const evidence = supplyEvidence(publicationReleaseId);
+  const imageSet = await generateDevImageSet(directory, {
+    ciRunAttempt: "1",
+    ciRunId: "40000000001",
+    commitSha: COMMIT_SHA,
+    createdAtUtc: "2026-08-05T02:03:04.000Z",
+    publicationRunAttempt: "1",
+    publicationRunId: "50000000001",
+    supplyEvidence: evidence,
+  });
+  const publicationRuntimeEvidence = runtimeEvidence(publicationReleaseId);
+  const manifest = materializeDevelopmentRelease({
+    imageSet,
+    objectConfigSource: [
+      "COS_BUCKET=dailyenergy-dev-1250000000",
+      "COS_ENDPOINT=dailyenergy-dev-1250000000.cos-internal.ap-shanghai.tencentcos.cn",
+      "COS_PREFIX=dev/objects/",
+      "COS_REGION=ap-shanghai",
+      "",
+    ].join("\n"),
+    runtimeEvidence: publicationRuntimeEvidence,
+    selection: RELEASE_SELECTION_V1,
+    supplyEvidence: evidence,
+  });
+
+  assert.equal(
+    manifest.config.runtime_fingerprints.api_deploy_config,
+    apiDeployConfigFingerprint(manifest.release_id),
+  );
+  assert.notEqual(
+    manifest.config.runtime_fingerprints.api_deploy_config,
+    publicationRuntimeEvidence.fingerprints.api_deploy_config,
+  );
+  assert.doesNotThrow(() =>
+    validateManifestRuntimeEvidence(
+      manifest,
+      imageSet,
+      publicationRuntimeEvidence,
+    ),
+  );
+
+  const publicationFingerprintReuse = structuredClone(manifest);
+  publicationFingerprintReuse.config.runtime_fingerprints.api_deploy_config =
+    publicationRuntimeEvidence.fingerprints.api_deploy_config;
+  assert.throws(
+    () =>
+      validateManifestRuntimeEvidence(
+        publicationFingerprintReuse,
+        imageSet,
+        publicationRuntimeEvidence,
+      ),
+    /DEV_RUNTIME_EVIDENCE_MANIFEST_DRIFT/u,
+  );
+});
+
 test("T-E012-IMAGE-001 rejects missing and inconsistent BuildKit metadata", async (t) => {
   const directory = await metadataDirectory(t);
   await rm(path.join(directory, "stub.json"));
@@ -475,7 +534,9 @@ test("T-E012-IMAGE-001 binds runtime fingerprints and CI supply evidence to the 
         arguments_.join(" ").includes("runtime-config")
           ? JSON.stringify({
               capabilityFingerprint: "a".repeat(64),
-              deployConfigFingerprint: "b".repeat(64),
+              deployConfigFingerprint: apiDeployConfigFingerprint(
+                environment.DAILYENERGY_RELEASE_ID,
+              ),
               releaseId: environment.DAILYENERGY_RELEASE_ID,
             })
           : JSON.stringify({
@@ -487,6 +548,12 @@ test("T-E012-IMAGE-001 binds runtime fingerprints and CI supply evidence to the 
   );
   assert.equal(validateDevRuntimeEvidence(runtime), runtime);
   assert.equal(runtime.release_id, releaseId);
+  const driftedRuntimeFingerprint = structuredClone(runtime);
+  driftedRuntimeFingerprint.fingerprints.api_deploy_config = "b".repeat(64);
+  assert.throws(
+    () => validateDevRuntimeEvidence(driftedRuntimeFingerprint),
+    /DEV_RUNTIME_FINGERPRINT_INVALID:api-deploy-config/u,
+  );
 
   const supplyDirectory = path.join(directory, "supply");
   const migrationsDirectory = path.join(directory, "migrations");

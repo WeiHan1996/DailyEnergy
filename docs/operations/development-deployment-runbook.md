@@ -185,6 +185,13 @@ deploy/rollback 绕过。
 
 首次发布尚无 Accepted state 时不能执行 `recover-current`。修复外部原因后可对同一 manifest 重试 `deploy`。如果根因必须通过新 artifact 修复，只有旧 operation 为 `FAILED`、没有 from-current/recovery catalog、active/completed phase 都在 migration 之前且 `migration_applied=false`、`migration_verified=false` 时，才可从新 candidate bundle 执行普通 `deploy`。控制器会在新 candidate 的 preflight 和 file secret materialization 通过后，先写绑定旧 `operation_id`、失败阶段及 replacement digest 的 `SUPERSEDED_BEFORE_MIGRATION` receipt，再清理旧 pending 并开始新 operation。已进入 migration 或 checkpoint 不明确时，新候选仍被拒绝；不得人工删除 operation/state。
 
+若首次发布已经进入 migration，且根因只能由新 artifact 修复，保持任务为 `Blocked` 并保留完整 dirty operation、已安装 bundle、不可变镜像和
+有状态 volume。不得单独删除或移动 `release-operation.json` 来伪造空环境。当前 DEV 仅含 synthetic、可重建数据时，项目所有者可以依据
+ADR-0007 另行明确批准“完整 DEV 环境重建”：执行前必须再次证明没有 Accepted release、记录 operation ID/失败阶段/migration checkpoints
+与 artifact identity，预览将停止的容器和将永久删除的 PostgreSQL/Redis volume；批准后归档无 secret 的失败证据，删除整个 DEV Compose
+环境及其有状态 volume，并从空 deployment state 用新 artifact 重建。该授权不适用于 STAGING/PRODUCTION，也不能由一般发布批准或自动化 Gate
+推定获得。
+
 ## 7. 回滚
 
 只有 `release-state.json` 中记录的唯一 `rollback_target` 可以回滚。先查看无 secret 状态文件并抄录精确 target release ID：
