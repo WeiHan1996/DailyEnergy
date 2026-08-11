@@ -1,8 +1,9 @@
 # DailyEnergy DEV 发布、回滚与换机 Runbook
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
 - **所属任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **最后更新**：2026-08-12
+- **接受日期**：2026-08-12
 - **适用范围**：腾讯云上海临时 DEV 主机；loopback TLS；PostgreSQL 18、Redis 8 与应用同机；私有 COS application object
 - **上游权威**：[ADR-0007](../decisions/ADR-0007-development-colocation-exception.md)、[部署、配置与回滚规范](../technical/deployment.md)、[测试策略](../technical/testing.md)、[故障和安全事件响应](./incident-response.md)
 - **生产资格**：无；本流程和产物都固定为 `production_eligible=false`

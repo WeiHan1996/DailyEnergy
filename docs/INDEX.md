@@ -169,7 +169,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/operations/content-moderation.md](./operations/content-moderation.md)                         | Accepted | 审核、抽检和申诉                                               | safety、evaluation、privacy                           |
 | [docs/operations/user-support.md](./operations/user-support.md)                                     | Accepted | FAQ、支持、升级、用户权利摘要与受限访问                        | journey、privacy、moderation                          |
 | [docs/operations/incident-response.md](./operations/incident-response.md)                           | Accepted | 故障和安全事件流程                                             | safety、privacy、moderation、support                  |
-| [docs/operations/development-deployment-runbook.md](./operations/development-deployment-runbook.md) | Draft    | DEV publication、安装、发布、current reconciliation、回滚、secret 轮换与换机恢复 | deployment、testing、ADR-0007                         |
+| [docs/operations/development-deployment-runbook.md](./operations/development-deployment-runbook.md) | Accepted | DEV publication、安装、发布、current reconciliation、回滚、secret 轮换与换机恢复 | deployment、testing、ADR-0007                         |
 
 ### 7.6 工程架构与交付
 
@@ -182,7 +182,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                 | metrics、Gateway、privacy、incident、architecture、deployment |
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                     | database、testing、deployment、ADR-0005、Issue #44            |
 | [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness 与 E-011 CI、artifact、SBOM/provenance 证据入口                   | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-012 PR #133 已合并，真实演练完成并等待最终证据验收 | Accepted Phase 0B specs、E-012 Issue #50                      |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-012 最终证据已接受，E-013 为唯一 Ready | Accepted Phase 0B specs、E-013 Issue #51                      |
 
 ### 7.7 Phase Gate
 
@@ -248,7 +248,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-011 与 E-015 已完成，E-012 是唯一当前任务并处于 In Review。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-012 与 E-015 已完成，E-013 是唯一 Ready 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
@@ -289,10 +289,10 @@ CI workflow/artifacts 已由 E-011 交付；私有 GitHub Free 的 platform requ
 视觉设计与外部 Production Gate 未被自动解除；E-015 只实现了 P0/P1，没有提前交付 E-010、E-011、
 E-013 或 D 系列能力。E-009 已随 PR #115 squash 合并并进入 Done，Issue #47 已关闭；
 E-010 已随 PR #117 squash 合并并进入 Done；E-011 已随 PR #119 squash 合并为
-`266a7dc39b87aec23740d64656bf33081a3aa34b` 并进入 Done。E-012 是唯一当前任务；开发基础设施与
+`266a7dc39b87aec23740d64656bf33081a3aa34b` 并进入 Done。E-012 的开发基础设施与
 ADR-0007 DEV-only 例外已获明确授权，首个 Accepted DEV release 已建立。项目所有者于 2026-08-12 接受显式
-`reconcile-current` 合同与第二候选的 deploy/rollback/redeploy 演练方案；PR #133 已 squash 合并，第二 candidate 的 18 阶段
-deploy/rollback/redeploy、17 阶段 clean restart reconciliation、无代理清理和独立验收审计均已完成。当前分支为
-`agent/e012-final-evidence`，Draft PR #134 固定 Ubuntu Gate 已 11/11 SUCCESS，等待项目所有者验收；E-012 尚未置为 Done，E-013 尚未提升。
+`reconcile-current` 合同、首次引入 bootstrap 澄清及第二候选的 deploy/rollback/redeploy 最终证据；PR #133 已 squash 合并，第二 candidate 的
+18 阶段 deploy/rollback/redeploy、17 阶段 clean restart reconciliation、无代理清理和独立验收审计均已完成。E-012 final evidence
+PR #134 获准在精确 final-head Gate 后 squash 合并，E-012 进入 Done；E-013 是唯一 Ready 任务。
 公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。

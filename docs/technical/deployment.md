@@ -956,10 +956,13 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 - 状态：Accepted；
 - 接受日期：2026-07-26；
-- 2026-08-12 验收前真实演练：首次从不含该命令的旧 Accepted bundle 调用时以
+- 2026-08-12 E-012 最终真实演练：首次从不含该命令的旧 Accepted bundle 调用时以
   `E012_DEPLOY_OPERATION_INVALID:reconcile-current` 在状态变更前 fail closed；state 逐字节不变且无 dirty operation。
   随后按 18 阶段发布含能力的 N+1，再从 N+1 current bundle 完成两次 clean restart reconciliation、
-  rollback N 与 redeploy N+1；该证据明确了上述一次性 bootstrap 顺序，等待 E-012 最终接受；
+  rollback N 与 redeploy N+1；该证据明确了上述一次性 bootstrap 顺序，并已随 E-012 最终证据获接受；
+- 2026-08-12 E-012 最终验收：项目所有者明确接受首次引入 `reconcile-current` 的 bootstrap 澄清与全部最终证据，
+  并授权 PR #134 在精确 final-head Gate 通过后标记 Ready、squash 合并、关闭 Issue #50，将 E-012 置为 Done，
+  且只把 E-013 提升为 Ready；公网 ICP/DNS/TLS 与 STAGING/PRODUCTION 独立状态服务 Gate 不因此解除；
 - 2026-08-12 修订：项目所有者明确接受 `reconcile-current` 合同与第二 DEV 候选形成及
   `deploy N+1 → rollback N → redeploy N+1` 演练方案；该批准不包含合并实现 PR，也不授权删除 volume 或重建 deployment state；
 - 2026-08-11 修订：用户明确接受 TLS proxy 在构建阶段移除上游 Caddy 对 8443/8444 不需要的
