@@ -349,7 +349,8 @@ approved development infrastructure
   `node tooling/deployment/database-smoke.mjs <mode>`；跨 Compose 合同新增逐项断言，确保 phase 只能附加在完整 service command 后。定向
   `tests/deployment/dev-compose.test.mjs` 为 `7/7` PASS；changed Gate 自动扩大为 full，E-012 task Gate 也已执行，两者 deployment suite 均为
   `40/42`，仅两个失败严格限定为 macOS 缺少 Linux `flock`，其余格式、Lint、类型、架构、codegen、contracts、agent、CI policy、数据库与新增断言
-  均通过，不将结果冒充为 PASS；固定 Ubuntu PR CI 待提交后补齐 Linux 权威证据。不得手改已安装 bundle 绕过；
+  均通过，不将结果冒充为 PASS；固定 Ubuntu review head `6ec99a72345dfedb0d1982e7dfd8801767ddd543` 的 PR CI run
+  `31483290015` 已 11/11 SUCCESS，补齐 Linux `flock` 权威证据。不得手改已安装 bundle 绕过；
 - **当前阻塞与解锁条件**：新 operation 已进入并核验 migration，必须保持 dirty；修复需经 PR #132 完整 Gate、用户批准、合并、merge-main CI、
   重新 publication/install 和精确镜像收敛后，再生成新的删除预览并取得另一份显式 destructive reset 授权。当前批准已消费，不能复用；
 - **下一动作**：完成 PR #132 的完整验证与审核材料；用户批准合并后生成新 immutable artifact，再按本机中转路径收敛镜像并请求下一次精确 reset 授权，
