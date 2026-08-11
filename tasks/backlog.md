@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-11
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：[E-012 开发环境部署](./current.md)（Blocked：首次 synthetic DEV 在 migration 后触发 artifact 指纹缺陷；等待修复 PR 与完整环境重建授权）
+- **当前任务**：[E-012 开发环境部署](./current.md)（Blocked：Draft PR #129 修复 post-migration 指纹缺陷；等待 CI、规范确认与完整环境重建授权）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
