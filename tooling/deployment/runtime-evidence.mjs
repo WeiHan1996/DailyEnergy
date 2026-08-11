@@ -107,15 +107,48 @@ export function devRuntimeEvidenceDigest(value) {
     .digest("hex");
 }
 
-function dockerRun(image, arguments_, environment = {}) {
+function validateRuntimeServerImage(image) {
+  if (
+    !/^ghcr\.io\/weihan1996\/dailyenergy-server@sha256:[a-f0-9]{64}$/u.test(
+      image ?? "",
+    )
+  ) {
+    fail("DEV_RUNTIME_IMAGE_REFERENCE_INVALID", "server");
+  }
+}
+
+export function pullDevelopmentRuntimeImage(
+  image,
+  { runner = spawnSync } = {},
+) {
+  validateRuntimeServerImage(image);
+  const result = runner("docker", ["pull", image], {
+    encoding: "utf8",
+    maxBuffer: 1024 * 1024,
+    timeout: 180_000,
+  });
+  if (result.status !== 0 || result.error) {
+    fail("DEV_RUNTIME_IMAGE_PULL_FAILED", "server");
+  }
+}
+
+export function runDevelopmentRuntimeImage(
+  image,
+  arguments_,
+  environment = {},
+  { runner = spawnSync } = {},
+) {
+  validateRuntimeServerImage(image);
   const environmentArguments = Object.entries(environment).flatMap(
     ([name, value]) => ["--env", `${name}=${value}`],
   );
-  const result = spawnSync(
+  const result = runner(
     "docker",
     [
       "run",
       "--rm",
+      "--pull",
+      "never",
       "--network",
       "none",
       "--read-only",
@@ -138,7 +171,10 @@ function dockerRun(image, arguments_, environment = {}) {
 export async function collectDevRuntimeEvidence(
   serverMetadataFile,
   context,
-  { runImage = dockerRun } = {},
+  {
+    pullImage = pullDevelopmentRuntimeImage,
+    runImage = runDevelopmentRuntimeImage,
+  } = {},
 ) {
   let metadata;
   try {
@@ -156,6 +192,7 @@ export async function collectDevRuntimeEvidence(
   }
   const releaseId = developmentReleaseId(context);
   const serverImage = `ghcr.io/weihan1996/dailyenergy-server@${digest}`;
+  await pullImage(serverImage);
   let api;
   let workers;
   try {

@@ -37,6 +37,8 @@ import {
   apiDeployConfigFingerprint,
   collectDevRuntimeEvidence,
   devRuntimeEvidenceDigest,
+  pullDevelopmentRuntimeImage,
+  runDevelopmentRuntimeImage,
   validateDevRuntimeEvidence,
 } from "../../tooling/deployment/runtime-evidence.mjs";
 import {
@@ -522,6 +524,7 @@ test("T-E012-IMAGE-001 rejects missing and inconsistent BuildKit metadata", asyn
 test("T-E012-IMAGE-001 binds runtime fingerprints and CI supply evidence to the published commit", async (t) => {
   const directory = await metadataDirectory(t);
   const releaseId = `dev-${COMMIT_SHA.slice(0, 12)}-50000000001-1`;
+  const pulledImages = [];
   const runtime = await collectDevRuntimeEvidence(
     path.join(directory, "server.json"),
     {
@@ -530,6 +533,7 @@ test("T-E012-IMAGE-001 binds runtime fingerprints and CI supply evidence to the 
       publicationRunId: "50000000001",
     },
     {
+      pullImage: (image) => pulledImages.push(image),
       runImage: (_image, arguments_, environment) =>
         arguments_.join(" ").includes("runtime-config")
           ? JSON.stringify({
@@ -548,6 +552,7 @@ test("T-E012-IMAGE-001 binds runtime fingerprints and CI supply evidence to the 
   );
   assert.equal(validateDevRuntimeEvidence(runtime), runtime);
   assert.equal(runtime.release_id, releaseId);
+  assert.deepEqual(pulledImages, [runtime.server_image]);
   const driftedRuntimeFingerprint = structuredClone(runtime);
   driftedRuntimeFingerprint.fingerprints.api_deploy_config = "b".repeat(64);
   assert.throws(
@@ -652,6 +657,56 @@ test("T-E012-IMAGE-001 binds runtime fingerprints and CI supply evidence to the 
       supplyChainDirectory: supplyDirectory,
     }),
     /DEV_SUPPLY_BINDING_INVALID/u,
+  );
+});
+
+test("T-E012-IMAGE-001 separates immutable image pull from the bounded runtime probe", () => {
+  const image = `ghcr.io/weihan1996/dailyenergy-server@sha256:${"7".repeat(64)}`;
+  const invocations = [];
+  pullDevelopmentRuntimeImage(image, {
+    runner: (executable, arguments_, options) => {
+      invocations.push({ arguments_, executable, options });
+      return { error: undefined, status: 0, stdout: "" };
+    },
+  });
+  assert.equal(
+    runDevelopmentRuntimeImage(
+      image,
+      ["--eval", "process.stdout.write('ok')"],
+      { DAILYENERGY_ENVIRONMENT: "DEV" },
+      {
+        runner: (executable, arguments_, options) => {
+          invocations.push({ arguments_, executable, options });
+          return { error: undefined, status: 0, stdout: "ok\n" };
+        },
+      },
+    ),
+    "ok",
+  );
+  assert.deepEqual(invocations[0].arguments_, ["pull", image]);
+  assert.equal(invocations[0].options.timeout, 180_000);
+  assert.deepEqual(invocations[1].arguments_.slice(0, 6), [
+    "run",
+    "--rm",
+    "--pull",
+    "never",
+    "--network",
+    "none",
+  ]);
+  assert.equal(invocations[1].options.timeout, 30_000);
+  assert.throws(
+    () =>
+      pullDevelopmentRuntimeImage("dailyenergy-server:latest", {
+        runner: () => ({ error: undefined, status: 0, stdout: "" }),
+      }),
+    /DEV_RUNTIME_IMAGE_REFERENCE_INVALID:server/u,
+  );
+  assert.throws(
+    () =>
+      pullDevelopmentRuntimeImage(image, {
+        runner: () => ({ error: undefined, status: 1, stdout: "" }),
+      }),
+    /DEV_RUNTIME_IMAGE_PULL_FAILED:server/u,
   );
 });
 

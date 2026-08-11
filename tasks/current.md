@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（已获授权并完成首次 synthetic DEV 清空重建；真实 TLS proxy capability 缺陷已复现并进入修复）
+- **最后更新**：2026-08-11（PR #130 已合并；正在修复 publication 首次 digest pull 与 bounded runtime probe 的超时耦合）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Progress
-- **任务分支**：`agent/e012-dev-reset-recovery`
+- **任务分支**：`agent/e012-runtime-evidence-pull`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **最近合并 PR**：[E-012 PR #129](https://github.com/WeiHan1996/DailyEnergy/pull/129)
-- **当前 PR**：[E-012 受控重建与 TLS proxy 修复 PR #130](https://github.com/WeiHan1996/DailyEnergy/pull/130)（Draft；记录重建证据并修复 Caddy 文件能力与 `cap_drop: ALL` 的真实运行冲突）
-- **实现合并提交**：E-012 latest squash merge `ba1edac2303622d5b5417f23286c72c27eab5d45`
-- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / CADDY_FILE_CAPABILITY_ROOT_CAUSE_CONFIRMED / PROXY_FIX_ACCEPTED / PR_130_MERGE_APPROVED / HEAD_CI_11_OF_11_PASS / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **最近合并 PR**：[E-012 TLS proxy 修复 PR #130](https://github.com/WeiHan1996/DailyEnergy/pull/130)
+- **当前 PR**：待创建（publication runtime evidence pull/probe 解耦）
+- **实现合并提交**：E-012 latest squash merge `a2fdc184e16bfbb0b2ed882ab314973127213ce7`
+- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / PROXY_FIX_MERGED / MAIN_CI_11_OF_11_PASS / PUBLICATION_RUNTIME_EVIDENCE_PULL_TIMEOUT / NO_NEW_ARTIFACT / SERVER_UNCHANGED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -286,15 +286,35 @@ approved development infrastructure
   `caddy version`。不得在服务器加 capability、手改 Compose 或覆盖 immutable digest；
 - **规范确认与合并批准**：用户于 2026-08-11 明确接受上述 TLS proxy 文件能力移除与 publication hardened runtime probe，并批准合并
   PR #130；review head `9fa70fb2ce980775278f2c7a9882e26656ac6a95` 的固定 Ubuntu run `31474271915` 已 11/11 SUCCESS；
-- **当前阻塞与解锁条件**：提交本次 Accepted 记录并让精确新 head 通过 11/11 checks 后，以 head guard 合并 PR #130，重新
-  publication/install 精确 artifact；因为本轮失败再次发生在
-  migration 已核验后，替换 artifact 前仍须保留 operation 与新建 volume，待新 artifact 就绪后按精确新预览确认是否需要再次执行完整 synthetic DEV 重建；
-- **下一动作**：完成 Accepted 记录的 final head CI，以精确 head guard 合并 PR #130、重新 publication/install，再按 Accepted
+- **PR #130 合并与 main 验证**：Accepted 记录 head `72394439bddb6a8af79361d83b8cf6fb6554dd9b` 的固定 Ubuntu run
+  `31475148571` 为 11/11 SUCCESS；PR #130 已于 `2026-08-11T08:56:32Z` squash 合并为
+  `a2fdc184e16bfbb0b2ed882ab314973127213ce7`，合并后的 main run `31475462454` 也已 11/11 SUCCESS，本地 `main` 与
+  `origin/main` 已快进核对一致；
+- **合并后 publication 新阻断**：精确 merge SHA 的 `Publish DEV images` run `31475655703` 已完成五类 image build/push，但在
+  `Collect immutable image runtime evidence` 以 `DEV_RUNTIME_IMAGE_PROBE_INVALID:server` 失败，后续 hardened Caddy probe、bundle
+  validation 与 artifact upload 均未执行，因此没有新的 qualified deployment bundle，也没有安装或改变 DEV 主机。失败时间精确接近 30 秒；
+- **publication 根因与修复边界**：runtime evidence 把 server 精确 digest 的首次 registry pull 包含在 30 秒 `docker run` probe 中，
+  把网络下载超时误分类为运行时证据不合格。修复先单独 `docker pull` 经过严格校验的
+  `ghcr.io/weihan1996/dailyenergy-server@sha256:*`，使用 180 秒 pull timeout 与稳定
+  `DEV_RUNTIME_IMAGE_PULL_FAILED:server`；随后 probe 保持 30 秒、`--network none`、只读文件系统并增加 `--pull never`，确保运行证据不再
+  隐式访问 registry。不得接受 mutable tag、延长真正 probe 或绕过 runtime evidence；
+- **当前阻塞与解锁条件**：完成 pull/probe 解耦的本地 Gate、固定 Ubuntu PR Gate、用户合并批准与 merge-main publication，取得新的
+  qualified artifact 后才能继续真实部署。服务器现有 failed operation `1b3431ea-5b44-4fd9-85f8-4434224a503d`、新建 synthetic volume 与
+  no-Accepted-state 保持不变；若新 artifact 仍需替换 post-migration dirty operation，必须重新生成精确删除预览并取得新的显式授权，不能复用上次删除授权；
+- **后续传输路径**：用户提出服务器直连下载较慢时优先由本机下载再上传。新的 qualified bundle 生成后，应用镜像计划按 manifest 精确 digest
+  在本机下载和校验，经 SSH/SCP 传到服务器，导入后再次核对 `RepoDigest`，最后清理双端临时 archive；不使用 mutable tag，也不把本机代理或
+  registry credential 固化到服务器；
+- **下一动作**：提交 pull/probe 解耦 PR，待固定 Ubuntu 11/11 Gate 和用户批准后合并、重新 publication/install，再按 Accepted
   post-migration 恢复边界完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- publication runtime evidence 的定向合同 `2/2` PASS，完整 publication 文件为 `7/8`：新增逻辑已证明只接受 server 精确 GHCR digest；pull
+  独立使用 180 秒 timeout；真正 probe 使用 `--pull never` 并保持 30 秒 hardened boundary；mutable tag 与 pull failure 均返回稳定错误。
+  `pnpm agent:validate --mode=changed --task=E-012` 自动提升为 full，`pnpm agent:validate --mode=task --task=E-012` 也已执行；两者均通过格式、
+  Lint、类型、架构、codegen、contracts、agent、CI policy、数据库与新增断言，deployment suite 为 `39/41`。仅两项失败严格限定为本机 macOS
+  缺少 Linux `flock`，不将结果伪装为 PASS；固定 Ubuntu PR CI 待创建 PR 后补齐权威自动证据；
 - 本轮 TLS proxy 修复的 Compose/Caddy/host 定向合同 `7/7` PASS，publication workflow 合同 `1/1` PASS；真实主机无网络探针分别证明原始镜像在
   baseline 与仅 `no-new-privileges` 下可执行、在 `cap_drop: ALL` 下因 `cap_net_bind_service=ep` 失败，并证明复制后的无文件能力二进制在完整
   hardened 边界下成功执行。`pnpm agent:validate --mode=changed --task=E-012` 自动提升为 `security/full`，
