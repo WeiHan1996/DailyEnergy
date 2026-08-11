@@ -9,7 +9,7 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 TLS proxy 修复 PR #130](https://github.com/WeiHan1996/DailyEnergy/pull/130)
-- **当前 PR**：待创建（publication runtime evidence pull/probe 解耦）
+- **当前 PR**：[E-012 publication runtime evidence 修复 PR #131](https://github.com/WeiHan1996/DailyEnergy/pull/131)（Draft；解耦精确 digest pull 与 bounded runtime probe）
 - **实现合并提交**：E-012 latest squash merge `a2fdc184e16bfbb0b2ed882ab314973127213ce7`
 - **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / PROXY_FIX_MERGED / MAIN_CI_11_OF_11_PASS / PUBLICATION_RUNTIME_EVIDENCE_PULL_TIMEOUT / NO_NEW_ARTIFACT / SERVER_UNCHANGED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
@@ -304,7 +304,7 @@ approved development infrastructure
 - **后续传输路径**：用户提出服务器直连下载较慢时优先由本机下载再上传。新的 qualified bundle 生成后，应用镜像计划按 manifest 精确 digest
   在本机下载和校验，经 SSH/SCP 传到服务器，导入后再次核对 `RepoDigest`，最后清理双端临时 archive；不使用 mutable tag，也不把本机代理或
   registry credential 固化到服务器；
-- **下一动作**：提交 pull/probe 解耦 PR，待固定 Ubuntu 11/11 Gate 和用户批准后合并、重新 publication/install，再按 Accepted
+- **下一动作**：等待 PR #131 固定 Ubuntu 11/11 Gate，用户批准后合并、重新 publication/install，再按 Accepted
   post-migration 恢复边界完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
