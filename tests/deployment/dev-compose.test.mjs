@@ -99,6 +99,16 @@ test("T-E012-COMPOSE-001 rejects public ingress and server-side builds", () => {
     () => validateDevComposePolicy(environmentSecret),
     /DEV_COMPOSE_FILE_SECRET_SET:top-level/u,
   );
+
+  const privilegedCaddyBinary = policyInput();
+  privilegedCaddyBinary.dockerfile = privilegedCaddyBinary.dockerfile.replace(
+    "cp /usr/bin/caddy /usr/bin/caddy-unprivileged",
+    "cp /usr/bin/caddy /usr/bin/caddy",
+  );
+  assert.throws(
+    () => validateDevComposePolicy(privilegedCaddyBinary),
+    /DEV_CADDY_IMAGE:pin-or-user/u,
+  );
 });
 
 test("T-E012-COMPOSE-001 keeps COS credential and egress on one-shot smoke only", () => {

@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（固定 main publication、新 candidate 安装与 5/5 精确镜像已完成；等待完整 synthetic DEV 重建独立授权）
+- **最后更新**：2026-08-11（已获授权并完成首次 synthetic DEV 清空重建；真实 TLS proxy capability 缺陷已复现并进入修复）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **任务状态**：Blocked
+- **任务状态**：In Progress
 - **任务分支**：`agent/e012-dev-reset-recovery`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 PR #129](https://github.com/WeiHan1996/DailyEnergy/pull/129)
-- **当前 PR**：[E-012 受控重建交接 PR #130](https://github.com/WeiHan1996/DailyEnergy/pull/130)（Draft；只记录合并后 publication、精确删除预览与受控恢复交接，未执行完整环境重建）
+- **当前 PR**：[E-012 受控重建与 TLS proxy 修复 PR #130](https://github.com/WeiHan1996/DailyEnergy/pull/130)（Draft；记录重建证据并修复 Caddy 文件能力与 `cap_drop: ALL` 的真实运行冲突）
 - **实现合并提交**：E-012 latest squash merge `ba1edac2303622d5b5417f23286c72c27eab5d45`
-- **Gate 结论**：`E012_BLOCKED / PR_129_MERGED / MAIN_CI_PASS / REPUBLICATION_PASS / NEW_CANDIDATE_INSTALLED / EXACT_IMAGES_READY_5_OF_5 / MIGRATION_APPLIED_AND_VERIFIED / DIRTY_OPERATION_PRESERVED / NO_ACCEPTED_RELEASE_STATE / FULL_SYNTHETIC_DEV_RESET_AUTHORIZATION_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / CADDY_FILE_CAPABILITY_ROOT_CAUSE_CONFIRMED / PROXY_FIX_IN_PROGRESS / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -270,14 +270,33 @@ approved development infrastructure
   `worker-interactive`、`worker-background`，且 `migration_applied=true`、`migration_verified=true`。
   当前 permanent data 删除目标严格限定为 `dailyenergy-dev_postgres_data` 与
   `dailyenergy-dev_redis_data`；Compose 容器/网络会随空环境重建而移除后重建，installed bundles 和五个精确镜像在重建成功前保留；
-- **当前阻塞与解锁条件**：publication、candidate 安装与精确镜像准备均已完成。执行环境重建前，用户仍需在上述精确预览后单独明确批准
-  “归档无 secret 失败证据并永久删除当前 synthetic DEV PostgreSQL/Redis volume、从空 deployment state 重建”。普通“继续”不替代该不可逆数据删除授权；
-- **下一动作**：展示 `dailyenergy-dev_postgres_data`、`dailyenergy-dev_redis_data` 与 dirty operation 的最终删除预览并请求独立明确授权；获批后归档无 secret
-  evidence、执行空状态重建、完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
+- **重建授权与执行结果**：用户于 2026-08-11 明确批准永久删除 `dailyenergy-dev_postgres_data` 与
+  `dailyenergy-dev_redis_data`、归档 dirty operation 后从空 deployment state 重建 synthetic DEV。执行前再次核对没有 Accepted state、operation
+  `9447435d-eef7-448b-ab16-3fcee11acb4f`、6 个容器、11 个网络和仅上述两个 volume；Compose 环境及两个 volume 已删除，卷内 synthetic 数据不可恢复。
+  完整旧 deployment state 与无 secret snapshot 已移至 root-only
+  `/srv/dailyenergy/reset-evidence/e012-reset-9447435d-eef7-448b-ab16-3fcee11acb4f`，checksum、空 state、零容器和零 volume 复核通过；installed bundles、root-only secret/config 与 5 个镜像均保留；
+- **重建后真实 TLS 阻断**：新 candidate operation `1b3431ea-5b44-4fd9-85f8-4434224a503d` 已通过
+  `preflight`、`pull`、`stateful-ready`、`maintenance-on`、`worker-drain`、`migration`、`worker-interactive`、`worker-background`、`api`、`admin` 与
+  `worker-restricted`，`migration_applied=true`、`migration_verified=true`；`tls-ingress` 因 proxy 容器
+  `[FATAL tini] exec caddy failed: Operation not permitted` 停止，仍没有 Accepted state。无网络一次性真实探针证明 baseline 与仅
+  `no-new-privileges` 均可执行、`cap_drop: ALL` 与完整 hardened 组合均以 255 失败；镜像内 `/usr/bin/caddy` 精确携带
+  `cap_net_bind_service=ep`，复制为无文件能力的同一二进制后在 UID/GID 1000、`cap_drop: ALL`、`no-new-privileges` 下执行成功；
+- **修复边界**：DEV 监听 8443/8444，不需要低端口 capability；保持非 root、只读根文件系统、`cap_drop: ALL` 与
+  `no-new-privileges`，在 `e012-proxy` 构建阶段复制替换 Caddy 二进制以移除文件能力，并在 publication workflow 中按真实 hardened 参数执行
+  `caddy version`。不得在服务器加 capability、手改 Compose 或覆盖 immutable digest；
+- **当前阻塞与解锁条件**：完成 proxy 修复 Gate、用户确认规范修订并合并 PR #130，重新 publication/install 精确 artifact；因为本轮失败再次发生在
+  migration 已核验后，替换 artifact 前仍须保留 operation 与新建 volume，待新 artifact 就绪后按精确新预览确认是否需要再次执行完整 synthetic DEV 重建；
+- **下一动作**：完成 proxy 静态/合同/full Gate 与固定 Ubuntu CI；获用户确认后合并、重新 publication/install，再按 Accepted post-migration
+  恢复边界完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- 本轮 TLS proxy 修复的 Compose/Caddy/host 定向合同 `7/7` PASS，publication workflow 合同 `1/1` PASS；真实主机无网络探针分别证明原始镜像在
+  baseline 与仅 `no-new-privileges` 下可执行、在 `cap_drop: ALL` 下因 `cap_net_bind_service=ep` 失败，并证明复制后的无文件能力二进制在完整
+  hardened 边界下成功执行。`pnpm agent:validate --mode=changed --task=E-012` 自动提升为 `security/full`，
+  `pnpm agent:validate --mode=task --task=E-012` 也已执行；两者均通过格式、Lint、类型、架构、codegen、contracts、agent、CI policy、数据库及新增断言，
+  deployment suite 均为 `38/40`，仅两个失败严格限定为本机 macOS 缺少 Linux `flock`，不将结果伪装为 PASS；固定 Ubuntu PR CI 仍是合并前权威自动证据；
 - 本轮 publication/install/镜像就绪状态更新执行 `pnpm agent:validate --mode=changed --task=E-012`，结果为
   `PASS`、rule=`STATUS_DOCS_TARGETED`、executed=`2`；随后执行完整
   `pnpm agent:validate --mode=task --task=E-012`，结果保持 `FAIL 38/40`，两项失败仍严格限定为本机 macOS 缺少 Linux

@@ -432,6 +432,9 @@ export function validateDevComposePolicy({
     !dockerfile.includes(
       "COPY --chown=1000:1000 docker/deployment/Caddyfile /etc/caddy/Caddyfile",
     ) ||
+    !dockerfile.includes("cp /usr/bin/caddy /usr/bin/caddy-unprivileged") ||
+    !dockerfile.includes("mv /usr/bin/caddy-unprivileged /usr/bin/caddy") ||
+    !dockerfile.includes('test -z "$(getcap /usr/bin/caddy)"') ||
     !/AS e012-proxy[\s\S]*?USER 1000:1000/u.test(dockerfile) ||
     /caddy:(?:latest|2|2\.11-alpine)(?:\s|@)/u.test(dockerfile)
   ) {

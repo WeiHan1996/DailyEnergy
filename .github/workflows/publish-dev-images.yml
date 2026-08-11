@@ -110,6 +110,29 @@ jobs:
           .artifacts/deployment/image-metadata/server.json
           .artifacts/deployment/dev-runtime-evidence.json
 
+      - name: Prove proxy starts under the DEV capability boundary
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          set -euo pipefail
+          proxy_image="ghcr.io/weihan1996/dailyenergy-proxy:${RELEASE_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          docker pull --platform linux/amd64 "${proxy_image}"
+          test -z "$(docker run --rm \
+            --network none \
+            --read-only \
+            --entrypoint getcap \
+            "${proxy_image}" \
+            /usr/bin/caddy)"
+          docker run --rm \
+            --network none \
+            --read-only \
+            --user 1000:1000 \
+            --cap-drop ALL \
+            --security-opt no-new-privileges=true \
+            --entrypoint caddy \
+            "${proxy_image}" \
+            version
+
       - name: Bind CI supply chain, migration catalog and runtime evidence
         env:
           RELEASE_SHA: ${{ inputs.release_sha }}

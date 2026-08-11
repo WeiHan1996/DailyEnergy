@@ -90,5 +90,10 @@ CMD ["node", "stub-server.mjs"]
 
 FROM caddy:2.11.4-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648 AS e012-proxy
 
+RUN cp /usr/bin/caddy /usr/bin/caddy-unprivileged \
+  && chown root:root /usr/bin/caddy-unprivileged \
+  && chmod 0755 /usr/bin/caddy-unprivileged \
+  && mv /usr/bin/caddy-unprivileged /usr/bin/caddy \
+  && test -z "$(getcap /usr/bin/caddy)"
 COPY --chown=1000:1000 docker/deployment/Caddyfile /etc/caddy/Caddyfile
 USER 1000:1000

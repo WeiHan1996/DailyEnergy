@@ -25,6 +25,8 @@
 4. PostgreSQL/故障控制 secret 使用 `dev-secret-v1`，COS credential 使用 `dev-cos-credential-v1`；version directory 为 `root:root 0700`，父目录由 root 拥有且不可被 group/other 写入，文件为 `root:root 0600`；
 5. COS 无值配置位于 `/srv/dailyenergy/config/dev-cos-config-v1.env`，也是 `root:root 0600`。Linux Compose 对 `file` secret/config 使用 bind mount且不能重映射源文件 owner；同时 `environment` secret source 不能用于本项目的 `read_only: true` 服务。部署控制器因此在 preflight 后由 root 把已验证内容原子 materialize 到 `/srv/dailyenergy/runtime-secrets/<release_id>`：父目录和版本目录为 `root:root 0700`，文件按目标服务 UID/GID 设置为 `0400`。Compose 只接收该非秘密目录路径并使用 `file` source；密钥值不进入子进程环境、命令参数、`release.env`、Compose 输出或仓库。同一 release 重放会验证闭合文件集、内容、owner、mode 与 link，漂移立即失败。
 
+TLS proxy 必须保持非 root、`cap_drop: ALL`、`no-new-privileges` 和只读根文件系统。上游 Caddy 二进制自带的 `cap_net_bind_service` 文件能力对 8443/8444 没有用途，必须由 CI 构建的 proxy image 移除，并在 publication 中按上述边界实际执行验证。若日志出现 `exec caddy failed: Operation not permitted`，停止发布并修复、重新发布 immutable image；不得在主机上给容器加 capability 或手改镜像。
+
 不得把 SecretId、SecretKey、数据库密码、数据库 URL、fault token 或 GHCR token 粘贴到 issue、PR、聊天、日志或仓库。
 
 ## 3. 从 `main` 生成一次 DEV 发布
