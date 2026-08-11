@@ -108,12 +108,14 @@
     },
     "T-E012-DEPLOY-001": {
       "file": "tests/deployment/release.test.mjs",
-      "selector": "closed DEV deployment, failure recovery, exact replay and rollback execution cases",
+      "selector": "closed DEV deployment, failure recovery, current reconciliation, exact replay and rollback execution cases",
       "level": "INTEGRATION",
       "assertions": [
         "preflight, digest pull, co-located state readiness, ingress closure, worker drain, migration/drift proof, consumer-before-producer startup, loopback TLS and object/Safety/owner/deletion smoke execute in one closed order",
         "a failed phase does not replace Accepted state, persists a root-only pending/dirty operation and blocks ordinary deploy or rollback until explicit recover-current completes",
         "Accepted N followed by N+1 failure after migration converges N application/config/secret against the compatible effective catalog, records application and catalog state separately and then restores idempotent replay",
+        "reconcile-current requires an exact Accepted current and effective catalog, force-recreates the current runtime through read-only drift and complete smoke without pull, prepare, migration, seed or any Accepted state and rollback-target rewrite",
+        "failed reconciliation preserves the same operation ID and byte-identical Accepted state for retry, rejects unrelated dirty operations and deterministically repairs a PASS receipt after all phases complete",
         "rollback accepts only the recorded manifest digest, reruns the complete proof sequence and consumes the single rollback target",
         "the generated release environment contains only immutable references, fingerprints and external secret paths while root-only values are passed only to the Compose process for service-specific secrets and no credential, database URL, bucket identity or public binding is persisted"
       ]
@@ -125,7 +127,8 @@
       "assertions": [
         "migration and ordinary consumer workers precede the API producer",
         "Admin and Restricted capability start only after the API producer",
-        "health plus separate object, Safety, owner and deletion smoke phases must pass before maintenance is disabled and a release can be recorded"
+        "health plus separate object, Safety, owner and deletion smoke phases must pass before maintenance is disabled and a release can be recorded",
+        "current reconciliation omits pull and migration while requiring read-only drift proof before consumer and producer convergence"
       ]
     }
   },

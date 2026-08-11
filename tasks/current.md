@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（第三次 synthetic DEV 重建已执行；新候选 18/18 通过并建立首个 Accepted release，等待 clean restart 恢复合同与 rollback candidate 决策）
+- **最后更新**：2026-08-12（`reconcile-current` 合同与第二 DEV 候选演练方案已获批准，Draft PR #133 正在实现与验证）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Progress
@@ -11,7 +11,7 @@
 - **最近合并 PR**：[E-012 database smoke invocation 修复 PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)
 - **当前 PR**：[E-012 post-PR #132 publication / reset evidence PR #133](https://github.com/WeiHan1996/DailyEnergy/pull/133)（Draft）
 - **实现合并提交**：E-012 latest squash merge `372b3db99b3b4e14a3d5b10f4907232f03b7a646`
-- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_REAUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / ACCEPTED_RELEASE_ESTABLISHED / DEPLOY_18_OF_18_PASS / IDEMPOTENT_REPLAY_PASS / CLEAN_DOCKER_RESTART_RECONVERGENCE_GAP_RECORDED / ROLLBACK_TARGET_NULL / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_PROGRESS / ACCEPTED_RELEASE_ESTABLISHED / RECONCILE_CURRENT_OWNER_ACCEPTED / RECONCILE_CURRENT_IMPLEMENTATION_IN_REVIEW / SECOND_DEV_CANDIDATE_EXERCISE_APPROVED / ROLLBACK_TARGET_NULL / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -403,16 +403,24 @@ approved development infrastructure
   `idempotent=true`、`phases=0`；随后 state SHA-256 仍为
   `9541cde7e1e405f185f28a07ecb6bfb25dde092c6c4ced5cb3fad9ae84ed2f53`、无 dirty operation、9 容器 healthy；首次 Accepted state 的
   `rollback_target=null` 符合没有上一 Accepted release 的事实，不能伪造 rollback target；
-- **当前阻塞与解锁条件**：E-012 尚不能关闭。第一份 Accepted release 没有 N-1，因此必须先获得一个真实、兼容的第二 candidate 才能证明
-  deploy → rollback → redeploy；同时 clean Docker restart 已证明当前 restart policy 与 `idempotent=true/phases=0` 入口之间缺少 Accepted runtime
-  reconvergence 合同。修改 Accepted 部署行为前需项目所有者确认恢复方案（建议增加显式、无 migration/state rewrite 的 current-release reconcile 操作），
-  并明确批准用于 rollback 演练的第二 DEV release/config reference；
-- **下一动作**：先确认 clean restart reconcile 合同与第二 DEV candidate 形成方式；随后完成对应规范/实现 Gate、真实 deploy → rollback → redeploy 与
-  post-restart recovery evidence，再关闭 E-012；
+- **2026-08-12 所有者决策**：项目所有者明确批准显式 `reconcile-current` 合同，并批准使用合并修复后形成的第二个真实 immutable DEV 候选执行
+  `deploy N+1 → rollback N → redeploy N+1` 与 clean restart 后 reconciliation 演练。批准范围不包括合并 Draft PR #133，也不包含新的 destructive reset、
+  volume 删除或 deployment state 清空；
+- **reconcile-current 实现状态**：Draft PR #133 正在加入独立 `RECONCILE_CURRENT` operation、17 阶段无 pull/migration/seed 收敛、current/effective-catalog
+  绑定、同 operation ID 失败重试、state/rollback target 不改写及 receipt crash repair。定向新增合同 `9/9` PASS；完整 Linux Gate 与最终 PR CI 尚待完成；
+- **当前阻塞与解锁条件**：E-012 尚不能关闭，但方案决策已解除。仍需完成 PR #133 实现 Gate、取得最终 head 的 Ubuntu 11/11 CI、获得另一次明确合并批准，
+  再从 merge-main 精确提交形成并安装第二候选，完成真实 reconciliation 与 `deploy → rollback → redeploy` 证据；当前首个 Accepted release 的
+  `rollback_target=null` 保持事实，不伪造 N-1；
+- **下一动作**：完成本分支全量 Gate 并更新 Draft PR #133，等待 11/11 CI 后请求合并批准；合并后再 publication/install 第二候选并执行已批准演练；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- 本轮 `reconcile-current` 的阶段顺序、成功收敛、Accepted state 逐字节不变、current/effective-catalog 组合、无 pull/prepare/migrate/seed、
+  `--force-recreate`、失败后同 operation ID 重试、无关 dirty operation 拒绝和 receipt crash repair 定向合同 `9/9` PASS；source registry 保持
+  `736 total / 170 COVERED / 566 PLANNED / 0 NA_WITH_REASON`。`pnpm agent:validate --mode=changed --task=E-012` 自动扩大为 full，
+  `pnpm agent:validate --mode=task --task=E-012` 也已执行；格式、Lint、类型、架构、codegen、contracts、agent、CI policy、数据库前置与新增断言均通过，
+  deployment suite 为 `48/50`。仅两项失败严格限定为本机 macOS 缺少 Linux `flock`，不将 task Gate 冒充为 PASS；最终 Ubuntu PR CI 尚待取得；
 - 本轮第三次 reset、首次 Accepted release、临时 proxy 完整清理、post-restart 收敛、独立 acceptance audit 与幂等重放均已在真实 DEV 主机完成；
   `pnpm agent:validate --mode=changed --task=E-012` 对两份项目状态文档返回 `PASS`、rule=`STATUS_DOCS_TARGETED`、executed=`2`。该自动 Gate
   只证明 Markdown/任务状态一致性；远端 18-phase receipt、resource set、smoke、state digest 与人工 destructive authorization 仍作为独立原始证据记录；

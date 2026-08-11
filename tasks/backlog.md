@@ -1,9 +1,9 @@
 # DailyEnergy 项目 Backlog
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11
+- **最后更新**：2026-08-12
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：[E-012 开发环境部署](./current.md)（In Progress：首个 Accepted DEV release 已建立；等待 clean restart reconcile 合同与 rollback candidate 决策）
+- **当前任务**：[E-012 开发环境部署](./current.md)（In Progress：reconcile-current 与第二候选演练方案已批准；实现、CI 与真实证据待完成）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -154,8 +154,10 @@ root-only 安装与五个 `linux/amd64` digest 本机中转/服务器复核均�
 完整 synthetic DEV 重建；dirty operation 与无 secret evidence 已 root-only 归档，两个指定 volume 已永久删除并从空 state 重建。新 candidate
 `devr-372b3db99b3b-78988352a735ec2d1a6ea69b` 已完成 18/18 phase，建立首个 Accepted release；独立 drift/TLS/COS/Safety/owner/deletion audit、
 9 个 healthy 容器和幂等重放均通过。首次 Accepted state 没有 N-1，`rollback_target=null`；临时 Docker proxy 清理所需的 clean daemon restart 还证明
-当前 `on-failure:3` 与 `idempotent=true/phases=0` 之间缺少自动 runtime reconvergence 合同。E-012 关闭前需先确认显式 current-release reconcile
-方案与第二 DEV candidate/config reference，再完成真实 deploy → rollback → redeploy。域名 ICP、DNS/TLS 和
+当前 `on-failure:3` 与 `idempotent=true/phases=0` 之间缺少自动 runtime reconvergence 合同。项目所有者于 2026-08-12 明确接受无
+pull/migration/state rewrite 的 `reconcile-current` 合同，并批准从合并后的真实 immutable artifact 形成第二 DEV candidate，执行
+`deploy N+1 → rollback N → redeploy N+1` 与 clean restart reconciliation 演练；该批准不包含合并 PR #133 或新的 volume 删除/reset。
+E-012 关闭前仍需完成实现 Gate、Ubuntu PR CI、另行合并批准、publication/install 与真实演练证据。域名 ICP、DNS/TLS 和
 STAGING/PRODUCTION 独立状态服务仍为外部 Gate；E-013 与其它
 任务继续 Planned。
 

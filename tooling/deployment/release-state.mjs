@@ -13,6 +13,7 @@ import path from "node:path";
 import {
   canonicalReleaseManifest,
   deploymentPhases,
+  reconciliationPhases,
   releaseManifestDigest,
   validateReleaseManifest,
   validateReleaseTransition,
@@ -20,7 +21,7 @@ import {
 } from "./release-contract.mjs";
 
 const STATE_VERSION = "e012-release-state-v2";
-const OPERATION_VERSION = "e012-release-operation-v3";
+const OPERATION_VERSION = "e012-release-operation-v4";
 const LOCK_CONFLICT_EXIT_CODE = 75;
 const LOCK_ACQUIRED_MARKER = "E012_RELEASE_LOCK_ACQUIRED\n";
 
@@ -146,7 +147,26 @@ function validateOperationReference(reference, detail) {
   }
 }
 
+function operationPhases(kind) {
+  return kind === "RECONCILE_CURRENT" ? reconciliationPhases : deploymentPhases;
+}
+
+function operationReference(reference) {
+  return {
+    manifest_sha256: reference.manifest_sha256,
+    release_id: reference.release_id,
+  };
+}
+
+function operationReferenceMatches(left, right) {
+  return (
+    left?.manifest_sha256 === right?.manifest_sha256 &&
+    left?.release_id === right?.release_id
+  );
+}
+
 function validateOperation(value) {
+  const phases = operationPhases(value?.kind);
   const keys = Object.keys(value ?? {}).sort();
   if (
     JSON.stringify(keys) !==
@@ -170,8 +190,12 @@ function validateOperation(value) {
     !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/u.test(
       value.operation_id,
     ) ||
-    !["DEPLOY", "RECOVER_CURRENT", "ROLLBACK"].includes(value.kind) ||
-    !["FAILED", "PENDING", "RECOVERING"].includes(value.status) ||
+    !["DEPLOY", "RECONCILE_CURRENT", "RECOVER_CURRENT", "ROLLBACK"].includes(
+      value.kind,
+    ) ||
+    !["FAILED", "PENDING", "RECONCILING", "RECOVERING"].includes(
+      value.status,
+    ) ||
     !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u.test(
       value.started_at_utc,
     ) ||
@@ -182,12 +206,9 @@ function validateOperation(value) {
     typeof value.migration_verified !== "boolean" ||
     (value.failure_code !== null &&
       !/^[A-Z][A-Z0-9_]{2,127}$/u.test(value.failure_code)) ||
-    (value.active_phase !== null &&
-      !deploymentPhases.includes(value.active_phase)) ||
+    (value.active_phase !== null && !phases.includes(value.active_phase)) ||
     !Array.isArray(value.completed_phases) ||
-    value.completed_phases.some(
-      (phase, index) => phase !== deploymentPhases[index],
-    )
+    value.completed_phases.some((phase, index) => phase !== phases[index])
   ) {
     fail("RELEASE_OPERATION_INVALID", "document");
   }
@@ -197,6 +218,26 @@ function validateOperation(value) {
   }
   if (value.from_current !== null) {
     validateReference(value.from_current, "operation-from-current");
+  }
+  const statusValid =
+    (value.kind === "RECOVER_CURRENT" &&
+      ["FAILED", "RECOVERING"].includes(value.status)) ||
+    (value.kind === "RECONCILE_CURRENT" &&
+      ["FAILED", "RECONCILING"].includes(value.status)) ||
+    (["DEPLOY", "ROLLBACK"].includes(value.kind) &&
+      ["FAILED", "PENDING"].includes(value.status));
+  if (!statusValid) {
+    fail("RELEASE_OPERATION_INVALID", "status");
+  }
+  if (
+    value.kind === "RECONCILE_CURRENT" &&
+    (value.from_current === null ||
+      value.recovery_catalog === null ||
+      value.migration_applied ||
+      value.migration_verified ||
+      !operationReferenceMatches(value.target, value.from_current))
+  ) {
+    fail("RELEASE_OPERATION_INVALID", "reconcile-current");
   }
   return value;
 }
@@ -434,9 +475,56 @@ export async function beginReleaseOperation(
   return operation;
 }
 
+export async function beginReconciliationOperation(
+  root,
+  manifest,
+  currentReference,
+  catalogReference,
+  { operationId = randomUUID(), startedAtUtc = new Date().toISOString() } = {},
+) {
+  const existing = await readReleaseOperation(root);
+  if (existing !== null) {
+    fail("RELEASE_RECOVERY_REQUIRED", existing.target.release_id);
+  }
+  validateReleaseManifest(manifest);
+  validateReference(currentReference, "reconcile-current");
+  validateCatalogReference(catalogReference, "reconcile-catalog");
+  if (
+    !operationReferenceMatches(currentReference, {
+      manifest_sha256: releaseManifestDigest(manifest),
+      release_id: manifest.release_id,
+    })
+  ) {
+    fail("RECONCILE_CURRENT_MANIFEST_MISMATCH", manifest.release_id);
+  }
+  await persistReleaseManifest(root, manifest);
+  const operation = {
+    active_phase: null,
+    completed_phases: [],
+    failure_code: null,
+    from_current: currentReference,
+    kind: "RECONCILE_CURRENT",
+    migration_applied: false,
+    migration_verified: false,
+    operation_id: operationId,
+    operation_version: OPERATION_VERSION,
+    recovery_catalog: operationReference(catalogReference),
+    started_at_utc: startedAtUtc,
+    status: "RECONCILING",
+    target: operationReference(currentReference),
+    updated_at_utc: startedAtUtc,
+  };
+  validateOperation(operation);
+  await atomicWrite(
+    paths(root).operation,
+    `${JSON.stringify(operation, null, 2)}\n`,
+  );
+  return operation;
+}
+
 export async function updateReleaseOperationPhase(root, phase, passed) {
   const operation = await readReleaseOperation(root);
-  if (operation === null || !deploymentPhases.includes(phase)) {
+  if (operation === null || !operationPhases(operation.kind).includes(phase)) {
     fail("RELEASE_OPERATION_MISSING", phase);
   }
   const next = {
@@ -501,7 +589,10 @@ export async function markReleaseOperationFailed(root, error) {
 
 export async function markReleaseOperationRecovering(root, recoveryCatalog) {
   const operation = await readReleaseOperation(root);
-  if (operation === null) {
+  if (
+    operation === null ||
+    !["DEPLOY", "RECOVER_CURRENT", "ROLLBACK"].includes(operation.kind)
+  ) {
     fail("RELEASE_OPERATION_MISSING", "recover-current");
   }
   validateOperationReference(recoveryCatalog, "recovery-catalog");
@@ -543,6 +634,49 @@ export async function restartInitialReleaseOperation(root, manifest) {
     migration_verified: false,
     recovery_catalog: null,
     status: "PENDING",
+    updated_at_utc: new Date().toISOString(),
+  };
+  validateOperation(next);
+  await atomicWrite(
+    paths(root).operation,
+    `${JSON.stringify(next, null, 2)}\n`,
+  );
+  return next;
+}
+
+export async function restartReconciliationOperation(
+  root,
+  manifest,
+  currentReference,
+  catalogReference,
+) {
+  const operation = await readReleaseOperation(root);
+  validateReleaseManifest(manifest);
+  validateReference(currentReference, "reconcile-current");
+  validateCatalogReference(catalogReference, "reconcile-catalog");
+  if (
+    operation === null ||
+    operation.kind !== "RECONCILE_CURRENT" ||
+    operation.status !== "FAILED" ||
+    operation.failure_code === null ||
+    !operationReferenceMatches(operation.target, currentReference) ||
+    !operationReferenceMatches(operation.from_current, currentReference) ||
+    !operationReferenceMatches(operation.recovery_catalog, catalogReference) ||
+    !operationReferenceMatches(currentReference, {
+      manifest_sha256: releaseManifestDigest(manifest),
+      release_id: manifest.release_id,
+    })
+  ) {
+    fail("RECONCILE_CURRENT_RETRY_INVALID", manifest.release_id);
+  }
+  const next = {
+    ...operation,
+    active_phase: null,
+    completed_phases: [],
+    failure_code: null,
+    migration_applied: false,
+    migration_verified: false,
+    status: "RECONCILING",
     updated_at_utc: new Date().toISOString(),
   };
   validateOperation(next);
