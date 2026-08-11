@@ -125,7 +125,7 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 | [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done      | 可重复本地环境                                       |
 | [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done      | 单元、集成、契约和端到端                             |
 | [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done      | 11/11 Gate、365 天 retention 与临时合并控制          |
-| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | In Review | 草稿 PR #121；待固定 Linux Gate、批准与真实发布      |
+| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | In Review | PR #128 已批准；待接受记录 head Gate 与合并          |
 | [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Planned   | 脱敏日志、指标和告警                                 |
 | [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Planned   | 环境可重复、CI 通过、服务可访问                      |
 | [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done      | P0/P1 上下文路由、任务 Profile 与安静验证            |
@@ -141,8 +141,10 @@ merged-main 验证。E-010 已随 PR #117 squash 合并并进入 Done；E-011 �
 disposable synthetic state、最小 CAM 权限、生命周期与迁移退出边界；专用 CAM 策略、root-only
 凭证、内网 DNS/TLS 与 signed write/read/delete smoke 已通过。五角色 digest publication、source-free
 deployment bundle、root-only 原子安装、18 阶段顺序发布、唯一 N-1 rollback 和 loopback TLS Runbook
-已在 E-012 草稿 PR #121 实现；下一步是固定 Linux Gate、用户评审、合并后的手动 image publication 与首次真实
-Compose 发布。域名 ICP、DNS/TLS 和 STAGING/PRODUCTION 独立状态服务仍为外部 Gate；E-013 与其它
+已进入 main；PR #127 的 file secret materialization 已通过固定 Linux Gate、publication 与真实安装。首次真实
+Compose 发布证明相同 service hash 会复用仍指向旧 release secret source 的容器；当前修复限定为所有服务
+`up` 阶段强制重建，数据库 migration 尚未执行且没有 Accepted release state。域名 ICP、DNS/TLS 和
+STAGING/PRODUCTION 独立状态服务仍为外部 Gate；E-013 与其它
 任务继续 Planned。
 
 ## 5. Phase 2：确定性核心闭环
