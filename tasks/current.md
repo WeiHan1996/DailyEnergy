@@ -11,7 +11,7 @@
 - **最近合并 PR**：[E-012 PR #129](https://github.com/WeiHan1996/DailyEnergy/pull/129)
 - **当前 PR**：[E-012 受控重建与 TLS proxy 修复 PR #130](https://github.com/WeiHan1996/DailyEnergy/pull/130)（Draft；记录重建证据并修复 Caddy 文件能力与 `cap_drop: ALL` 的真实运行冲突）
 - **实现合并提交**：E-012 latest squash merge `ba1edac2303622d5b5417f23286c72c27eab5d45`
-- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / CADDY_FILE_CAPABILITY_ROOT_CAUSE_CONFIRMED / PROXY_FIX_IN_PROGRESS / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / CADDY_FILE_CAPABILITY_ROOT_CAUSE_CONFIRMED / PROXY_FIX_ACCEPTED / PR_130_MERGE_APPROVED / HEAD_CI_11_OF_11_PASS / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -284,10 +284,13 @@ approved development infrastructure
 - **修复边界**：DEV 监听 8443/8444，不需要低端口 capability；保持非 root、只读根文件系统、`cap_drop: ALL` 与
   `no-new-privileges`，在 `e012-proxy` 构建阶段复制替换 Caddy 二进制以移除文件能力，并在 publication workflow 中按真实 hardened 参数执行
   `caddy version`。不得在服务器加 capability、手改 Compose 或覆盖 immutable digest；
-- **当前阻塞与解锁条件**：完成 proxy 修复 Gate、用户确认规范修订并合并 PR #130，重新 publication/install 精确 artifact；因为本轮失败再次发生在
+- **规范确认与合并批准**：用户于 2026-08-11 明确接受上述 TLS proxy 文件能力移除与 publication hardened runtime probe，并批准合并
+  PR #130；review head `9fa70fb2ce980775278f2c7a9882e26656ac6a95` 的固定 Ubuntu run `31474271915` 已 11/11 SUCCESS；
+- **当前阻塞与解锁条件**：提交本次 Accepted 记录并让精确新 head 通过 11/11 checks 后，以 head guard 合并 PR #130，重新
+  publication/install 精确 artifact；因为本轮失败再次发生在
   migration 已核验后，替换 artifact 前仍须保留 operation 与新建 volume，待新 artifact 就绪后按精确新预览确认是否需要再次执行完整 synthetic DEV 重建；
-- **下一动作**：完成 proxy 静态/合同/full Gate 与固定 Ubuntu CI；获用户确认后合并、重新 publication/install，再按 Accepted post-migration
-  恢复边界完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
+- **下一动作**：完成 Accepted 记录的 final head CI，以精确 head guard 合并 PR #130、重新 publication/install，再按 Accepted
+  post-migration 恢复边界完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
@@ -296,7 +299,8 @@ approved development infrastructure
   baseline 与仅 `no-new-privileges` 下可执行、在 `cap_drop: ALL` 下因 `cap_net_bind_service=ep` 失败，并证明复制后的无文件能力二进制在完整
   hardened 边界下成功执行。`pnpm agent:validate --mode=changed --task=E-012` 自动提升为 `security/full`，
   `pnpm agent:validate --mode=task --task=E-012` 也已执行；两者均通过格式、Lint、类型、架构、codegen、contracts、agent、CI policy、数据库及新增断言，
-  deployment suite 均为 `38/40`，仅两个失败严格限定为本机 macOS 缺少 Linux `flock`，不将结果伪装为 PASS；固定 Ubuntu PR CI 仍是合并前权威自动证据；
+  deployment suite 均为 `38/40`，仅两个失败严格限定为本机 macOS 缺少 Linux `flock`，不将结果伪装为 PASS；固定 Ubuntu PR #130 review head
+  `9fa70fb2ce980775278f2c7a9882e26656ac6a95` 的 run `31474271915` 已 11/11 PASS，补齐 Linux `flock` 权威自动证据；
 - 本轮 publication/install/镜像就绪状态更新执行 `pnpm agent:validate --mode=changed --task=E-012`，结果为
   `PASS`、rule=`STATUS_DOCS_TARGETED`、executed=`2`；随后执行完整
   `pnpm agent:validate --mode=task --task=E-012`，结果保持 `FAIL 38/40`，两项失败仍严格限定为本机 macOS 缺少 Linux

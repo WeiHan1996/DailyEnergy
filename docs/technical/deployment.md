@@ -951,6 +951,9 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 - 状态：Accepted；
 - 接受日期：2026-07-26；
+- 2026-08-11 修订：用户明确接受 TLS proxy 在构建阶段移除上游 Caddy 对 8443/8444 不需要的
+  `cap_net_bind_service` 文件能力，并要求 publication 在非 root、只读根文件系统、`cap_drop: ALL` 与
+  `no-new-privileges` 的真实 hardened 边界下执行 Caddy；用户同时批准合并 PR #130；
 - 2026-08-11 修订：用户明确接受真实 DEV 证据驱动的 release-scoped file secret 容器强制
   收敛合同；所有服务 `up` 阶段必须显式强制重建并核验目标 release bind，并批准合并 PR #128；
 - 2026-08-11 修订：用户明确接受 API deploy fingerprint 必须从 publication `image_set_id` 重新绑定到最终
