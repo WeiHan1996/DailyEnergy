@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-11
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：[E-012 开发环境部署](./current.md)（Blocked：PR #129 指纹/恢复规范已确认并获合并批准；等待接受记录 head 的精确 CI、合并及后续完整环境重建独立授权）
+- **当前任务**：[E-012 开发环境部署](./current.md)（Blocked：PR #129 已合并且 main CI 通过；等待重新 publication、安装新 candidate 及完整 synthetic DEV 重建独立授权）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
