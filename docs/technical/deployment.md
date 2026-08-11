@@ -366,6 +366,11 @@ E-012 DEV materializer 必须允许操作者为每次安装选择 database secre
 这三个参数只包含版本引用，不含值，并与 object config fingerprint 一同进入不可变 release 身份。轮换不得要求修改常量、重跑 CI
 或重新构建相同 image，且不得覆盖已有 version directory/config file。
 
+DEV publication runtime evidence 使用 publication `image_set_id` 探测并证明 server image 内的 API deploy fingerprint 算法；安装器生成最终
+`devr-*` release identity 后，必须用相同 closed runtime config 和最终 `release_id` 重新计算 manifest 中的 API deploy fingerprint。preflight
+分别校验 publication evidence fingerprint 绑定 `image_set_id`、materialized manifest fingerprint 绑定最终 `release_id`，不得把前者原样复制到
+后者，也不得用环境变量或手改 `release.env` 绕过 startup mismatch。
+
 ## 12. Secret 与凭据
 
 ### 12.1 注入
@@ -948,6 +953,10 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 - 接受日期：2026-07-26；
 - 2026-08-11 修订：用户明确接受真实 DEV 证据驱动的 release-scoped file secret 容器强制
   收敛合同；所有服务 `up` 阶段必须显式强制重建并核验目标 release bind，并批准合并 PR #128；
+- 2026-08-11 修订：用户明确接受 API deploy fingerprint 必须从 publication `image_set_id` 重新绑定到最终
+  materialized `release_id`；首次 synthetic DEV 在 migration 后遇到必须更换 artifact 的不可恢复故障时，必须保持 dirty operation，
+  只有项目所有者另行明确批准完整 DEV 环境重建后才可按 ADR-0007 从空状态重新部署；用户同时批准合并 PR #129，
+  该合并批准不包含删除 PostgreSQL/Redis volume；
 - 2026-08-10 修订：用户明确接受 E-012 的 release-scoped file secret materialization 与
   `SUPERSEDED_BEFORE_MIGRATION` 首次失败候选替换合同，并批准合并 PR #127；
 - 2026-08-04 修订：用户明确接受测试策略 22.2 的私有 GitHub Free 临时补偿控制；

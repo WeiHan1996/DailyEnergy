@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 
 import { validateReleaseManifest } from "./release-contract.mjs";
 import {
+  apiDeployConfigFingerprint,
   devRuntimeEvidenceDigest,
   validateDevRuntimeEvidence,
 } from "./runtime-evidence.mjs";
@@ -237,9 +238,11 @@ export function validateManifestRuntimeEvidence(
     runtimeEvidence.server_image !== manifest.images.server ||
     devRuntimeEvidenceDigest(runtimeEvidence) !==
       imageSet.evidence.runtime_evidence_sha256 ||
-    Object.entries(runtimeEvidence.fingerprints).some(
-      ([name, fingerprint]) =>
-        manifest.config.runtime_fingerprints[name] !== fingerprint,
+    Object.entries(runtimeEvidence.fingerprints).some(([name, fingerprint]) =>
+      name === "api_deploy_config"
+        ? manifest.config.runtime_fingerprints[name] !==
+          apiDeployConfigFingerprint(manifest.release_id)
+        : manifest.config.runtime_fingerprints[name] !== fingerprint,
     )
   ) {
     fail("DEV_RUNTIME_EVIDENCE_MANIFEST_DRIFT", manifest.release_id);

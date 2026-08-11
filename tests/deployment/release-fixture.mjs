@@ -1,3 +1,5 @@
+import { apiDeployConfigFingerprint } from "../../tooling/deployment/runtime-evidence.mjs";
+
 const SHA = "a".repeat(64);
 
 export function releaseManifestFixture(releaseId, options = {}) {
@@ -42,7 +44,7 @@ export function releaseManifestFixture(releaseId, options = {}) {
       product_date_policy_version: "product-date-v1",
       runtime_fingerprints: {
         api_capability: SHA,
-        api_deploy_config: "b".repeat(64),
+        api_deploy_config: apiDeployConfigFingerprint(releaseId),
         object_config: options.objectConfigFingerprint ?? "f".repeat(64),
         worker_background: "c".repeat(64),
         worker_interactive: "d".repeat(64),
