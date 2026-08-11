@@ -9,9 +9,9 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 TLS proxy 修复 PR #130](https://github.com/WeiHan1996/DailyEnergy/pull/130)
-- **当前 PR**：[E-012 publication runtime evidence 修复 PR #131](https://github.com/WeiHan1996/DailyEnergy/pull/131)（Draft；解耦精确 digest pull 与 bounded runtime probe）
+- **当前 PR**：[E-012 publication runtime evidence 修复 PR #131](https://github.com/WeiHan1996/DailyEnergy/pull/131)（Draft；解耦精确 digest pull 与 bounded runtime probe；review CI 11/11 PASS）
 - **实现合并提交**：E-012 latest squash merge `a2fdc184e16bfbb0b2ed882ab314973127213ce7`
-- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / PROXY_FIX_MERGED / MAIN_CI_11_OF_11_PASS / PUBLICATION_RUNTIME_EVIDENCE_PULL_TIMEOUT / NO_NEW_ARTIFACT / SERVER_UNCHANGED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / PROXY_FIX_MERGED / MAIN_CI_11_OF_11_PASS / PUBLICATION_RUNTIME_EVIDENCE_PULL_TIMEOUT / PULL_PROBE_FIX_REVIEW_CI_11_OF_11_PASS / NO_NEW_ARTIFACT / SERVER_UNCHANGED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -314,7 +314,8 @@ approved development infrastructure
   独立使用 180 秒 timeout；真正 probe 使用 `--pull never` 并保持 30 秒 hardened boundary；mutable tag 与 pull failure 均返回稳定错误。
   `pnpm agent:validate --mode=changed --task=E-012` 自动提升为 full，`pnpm agent:validate --mode=task --task=E-012` 也已执行；两者均通过格式、
   Lint、类型、架构、codegen、contracts、agent、CI policy、数据库与新增断言，deployment suite 为 `39/41`。仅两项失败严格限定为本机 macOS
-  缺少 Linux `flock`，不将结果伪装为 PASS；固定 Ubuntu PR CI 待创建 PR 后补齐权威自动证据；
+  缺少 Linux `flock`，不将结果伪装为 PASS；固定 Ubuntu PR #131 review head `24743a3dd12cc0c191295b1d42009baa2f2b1ef9` 的 run
+  `31477403956` 已 11/11 SUCCESS，补齐 Linux 权威自动证据；
 - 本轮 TLS proxy 修复的 Compose/Caddy/host 定向合同 `7/7` PASS，publication workflow 合同 `1/1` PASS；真实主机无网络探针分别证明原始镜像在
   baseline 与仅 `no-new-privileges` 下可执行、在 `cap_drop: ALL` 下因 `cap_net_bind_service=ep` 失败，并证明复制后的无文件能力二进制在完整
   hardened 边界下成功执行。`pnpm agent:validate --mode=changed --task=E-012` 自动提升为 `security/full`，
