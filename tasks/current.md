@@ -11,7 +11,7 @@
 - **最近合并 PR**：[E-012 reconcile-current PR #133](https://github.com/WeiHan1996/DailyEnergy/pull/133)
 - **当前 PR**：[E-012 final evidence Draft PR #134](https://github.com/WeiHan1996/DailyEnergy/pull/134)
 - **实现合并提交**：E-012 latest squash merge `0717c9c7a20aa7e999125c0fa82c88e5397e1795`
-- **Gate 结论**：`E012_IN_REVIEW / SECOND_ACCEPTED_RELEASE_ACTIVE / RECONCILE_CURRENT_REAL_17_OF_17_PASS / DEPLOY_ROLLBACK_REDEPLOY_18_OF_18_PASS / FINAL_INDEPENDENT_AUDIT_PASS / FINAL_EVIDENCE_REVIEW_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_REVIEW / SECOND_ACCEPTED_RELEASE_ACTIVE / RECONCILE_CURRENT_REAL_17_OF_17_PASS / DEPLOY_ROLLBACK_REDEPLOY_18_OF_18_PASS / FINAL_INDEPENDENT_AUDIT_PASS / FINAL_EVIDENCE_PR_CI_11_OF_11_PASS / ACCEPTANCE_APPROVAL_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -439,9 +439,9 @@ approved development infrastructure
   `tables=70/enums=35/indexes=184/constraints=149/triggers=20/functions=17`、API/Admin loopback TLS HTTP 200、COS
   put/get/hash/delete/head-404、Safety、owner 与 deletion；9 个容器 healthy、13 网络、2 volume、无 dirty operation，两个 deploy receipt 与两个
   reconciliation receipt 的 operation ID/文件名均唯一；
-- **当前阻塞与解锁条件**：实现、publication、真实 deploy/reconcile/rollback/redeploy、临时网络清理和最终独立 audit 均已完成。E-012 只等待
-  Draft PR #134 固定 Ubuntu CI 与项目所有者审核，并确认首次引入 bootstrap 约束和 E-012 验收；尚未把任务标记 Done、关闭 Issue #50 或提升 E-013；
-- **下一动作**：等待 Draft PR #134 最终 head 的固定 Ubuntu CI；11/11 全部成功后请求项目所有者验收。获批后再更新
+- **当前阻塞与解锁条件**：实现、publication、真实 deploy/reconcile/rollback/redeploy、临时网络清理、最终独立 audit 与 Draft PR #134
+  固定 Ubuntu 11/11 CI 均已完成。E-012 只等待项目所有者审核并确认首次引入 bootstrap 约束和最终验收；尚未把任务标记 Done、关闭 Issue #50 或提升 E-013；
+- **下一动作**：请求项目所有者验收 Draft PR #134 和 E-012。获批后再更新
   Runbook lifecycle、squash 合并、关闭 Issue #50、将 E-012 置为 Done 并仅把 E-013 提升为 Ready；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
@@ -457,7 +457,7 @@ approved development infrastructure
 - final evidence 分支的 `pnpm agent:validate --mode=changed --task=E-012` 自动扩大为 `code/full`，
   `pnpm agent:validate --mode=task --task=E-012` 也已执行；两者均通过格式、Lint、类型、架构、codegen、contracts、agent、CI policy、
   数据库和其余 deployment 合同，deployment suite 为 `48/50`。两项失败只因本机 macOS 缺少 Linux `flock`，不冒充 PASS；
-  固定 Ubuntu Draft PR CI 将作为该平台合同的权威自动证据；
+  Draft PR #134 固定 Ubuntu CI 已 11/11 SUCCESS，补齐该平台合同的权威自动证据；精确 final head/run receipt 记录在 PR 审计评论；
 - 本轮 `reconcile-current` 的阶段顺序、成功收敛、Accepted state 逐字节不变、current/effective-catalog 组合、无 pull/prepare/migrate/seed、
   `--force-recreate`、失败后同 operation ID 重试、无关 dirty operation 拒绝和 receipt crash repair 定向合同 `9/9` PASS；source registry 保持
   `736 total / 170 COVERED / 566 PLANNED / 0 NA_WITH_REASON`。`pnpm agent:validate --mode=changed --task=E-012` 自动扩大为 full，

@@ -162,7 +162,7 @@ publication、source-free bundle、第二 candidate 安装和五个 `linux/amd64
 reconciliation、rollback N、redeploy N+1 与无代理最终 reconciliation；18/18、17/17 receipts、state byte identity、唯一 operation IDs、
 9/13/2 资源闭集和独立 drift/TLS/COS/Safety/owner/deletion audit 均通过。首次引入时旧 N bundle 不含新命令并在状态写入前 fail closed，
 因此 Runbook 补充“先发布含能力的 N+1，再从 current N+1 演练 reconciliation”的一次性 bootstrap 约束，禁止跨 bundle controller。
-E-012 关闭前只等待 final evidence Draft PR #134 自动 Gate 与项目所有者验收；域名 ICP、DNS/TLS 和 STAGING/PRODUCTION 独立状态服务仍为外部 Gate，
+E-012 final evidence Draft PR #134 固定 Ubuntu CI 已 11/11 SUCCESS，关闭前只等待项目所有者验收；域名 ICP、DNS/TLS 和 STAGING/PRODUCTION 独立状态服务仍为外部 Gate，
 E-013 与其它任务继续 Planned。
 
 ## 5. Phase 2：确定性核心闭环

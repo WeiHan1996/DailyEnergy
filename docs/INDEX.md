@@ -293,6 +293,6 @@ E-010 已随 PR #117 squash 合并并进入 Done；E-011 已随 PR #119 squash �
 ADR-0007 DEV-only 例外已获明确授权，首个 Accepted DEV release 已建立。项目所有者于 2026-08-12 接受显式
 `reconcile-current` 合同与第二候选的 deploy/rollback/redeploy 演练方案；PR #133 已 squash 合并，第二 candidate 的 18 阶段
 deploy/rollback/redeploy、17 阶段 clean restart reconciliation、无代理清理和独立验收审计均已完成。当前分支为
-`agent/e012-final-evidence`，Draft PR #134 等待固定 Ubuntu Gate 与项目所有者验收；E-012 尚未置为 Done，E-013 尚未提升。
+`agent/e012-final-evidence`，Draft PR #134 固定 Ubuntu Gate 已 11/11 SUCCESS，等待项目所有者验收；E-012 尚未置为 Done，E-013 尚未提升。
 公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。
