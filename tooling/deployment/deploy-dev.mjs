@@ -24,18 +24,22 @@ import {
 import {
   canonicalReleaseManifest,
   deploymentPhases,
+  reconciliationPhases,
   releaseManifestDigest,
   validateDeploymentReceipts,
+  validateReconciliationReceipts,
   validateReleaseManifest,
   validateReleaseTransition,
   validateRollbackTransition,
 } from "./release-contract.mjs";
 import {
+  beginReconciliationOperation,
   commitSuccessfulDeployment,
   commitSuccessfulRollback,
   beginReleaseOperation,
   clearReleaseOperation,
   commitRecoveredCurrent,
+  loadCatalogManifest,
   loadOperationManifest,
   loadReleaseManifest,
   markReleaseOperationFailed,
@@ -44,6 +48,7 @@ import {
   readReleaseOperation,
   readReleaseState,
   restartInitialReleaseOperation,
+  restartReconciliationOperation,
   updateReleaseOperationPhase,
   withReleaseLock,
 } from "./release-state.mjs";
@@ -423,6 +428,8 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
       "tooling/deployment/database-smoke.mjs",
       phase,
     );
+  const databaseVerifyCommand = () =>
+    command("run", "--rm", "--no-deps", "database-verify");
   return Object.freeze({
     admin: [
       convergeService("--no-deps", "--wait", "--wait-timeout", "90", "admin"),
@@ -430,6 +437,7 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
     api: [
       convergeService("--no-deps", "--wait", "--wait-timeout", "90", "api"),
     ],
+    drift: [databaseVerifyCommand()],
     health: [
       {
         arguments: [
@@ -475,7 +483,7 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
       databaseCommand("prepare"),
       databaseCommand("migrate", "MIGRATION_APPLIED"),
       databaseCommand("seed"),
-      command("run", "--rm", "--no-deps", "database-verify"),
+      databaseVerifyCommand(),
     ],
     preflight: [],
     pull: [command("--profile", "dev-smoke", "pull", "--policy", "always")],
@@ -611,7 +619,11 @@ function completedOperationReceipt(pending, completedAtUtc) {
     phase,
     result: "PASS",
   }));
-  validateDeploymentReceipts(receipts);
+  if (pending.kind === "RECONCILE_CURRENT") {
+    validateReconciliationReceipts(receipts);
+  } else {
+    validateDeploymentReceipts(receipts);
+  }
   if (pending.active_phase !== null) {
     fail("RELEASE_RECEIPT_OPERATION_INCOMPLETE", pending.target.release_id);
   }
@@ -622,6 +634,9 @@ function completedOperationReceipt(pending, completedAtUtc) {
   }
   return {
     completed_at_utc: completedAtUtc,
+    ...(pending.kind === "RECONCILE_CURRENT"
+      ? { effective_catalog: pending.recovery_catalog }
+      : {}),
     manifest_sha256: reference.manifest_sha256,
     operation: pending.kind.toLowerCase().replaceAll("_", "-"),
     operation_id: pending.operation_id,
@@ -639,7 +654,11 @@ async function persistCompletedOperationReceipt(stateRoot) {
   if (pending === null || state === null) {
     fail("RELEASE_RECEIPT_OPERATION_MISSING", "pending-operation-or-state");
   }
-  const receipt = completedOperationReceipt(pending, state.updated_at_utc);
+  const completedAtUtc =
+    pending.kind === "RECONCILE_CURRENT"
+      ? pending.updated_at_utc
+      : state.updated_at_utc;
+  const receipt = completedOperationReceipt(pending, completedAtUtc);
   await persistReceipt(stateRoot, receipt);
   return receipt;
 }
@@ -699,13 +718,19 @@ async function persistSupersededInitialOperationReceipt(
 
 async function finalizeCommittedOperation(stateRoot, state, pending) {
   const applicationCommitted =
-    pending.kind !== "RECOVER_CURRENT" &&
+    !["RECONCILE_CURRENT", "RECOVER_CURRENT"].includes(pending.kind) &&
     operationReferenceMatches(state?.current, pending.target);
   const recoveryCommitted =
     pending.kind === "RECOVER_CURRENT" &&
     operationReferenceMatches(state?.current, pending.from_current) &&
     operationReferenceMatches(state?.catalog, pending.recovery_catalog);
-  if (!applicationCommitted && !recoveryCommitted) {
+  const reconciliationCommitted =
+    pending.kind === "RECONCILE_CURRENT" &&
+    pending.active_phase === null &&
+    pending.completed_phases.length === reconciliationPhases.length &&
+    operationReferenceMatches(state?.current, pending.from_current) &&
+    operationReferenceMatches(state?.catalog, pending.recovery_catalog);
+  if (!applicationCommitted && !recoveryCommitted && !reconciliationCommitted) {
     return false;
   }
   await persistCompletedOperationReceipt(stateRoot);
@@ -783,11 +808,13 @@ async function runPhases({
   onCommandPass = async () => undefined,
   onPhasePass = async () => undefined,
   onPhaseStart = async () => undefined,
+  phases = deploymentPhases,
+  receiptValidator = validateDeploymentReceipts,
   runner,
 }) {
   const commands = developmentDeploymentCommands(bundleRoot, environmentFile);
   const receipts = [];
-  for (const phase of deploymentPhases) {
+  for (const phase of phases) {
     await onPhaseStart(phase);
     for (const command of commands[phase]) {
       const result = await runner(command, {
@@ -802,7 +829,7 @@ async function runPhases({
     receipts.push({ phase, result: "PASS" });
     await onPhasePass(phase);
   }
-  validateDeploymentReceipts(receipts);
+  receiptValidator(receipts);
   return receipts;
 }
 
@@ -818,7 +845,11 @@ export async function executeDevelopmentDeployment({
   secretMaterializer = materializeDevelopmentComposeSecrets,
   stateRoot = STATE_ROOT,
 }) {
-  if (!["deploy", "recover-current", "rollback"].includes(operation)) {
+  if (
+    !["deploy", "reconcile-current", "recover-current", "rollback"].includes(
+      operation,
+    )
+  ) {
     fail("E012_DEPLOY_OPERATION_INVALID", operation);
   }
   return releaseLock(
@@ -852,8 +883,12 @@ export async function executeDevelopmentDeployment({
         }
       }
       let retryInitialRelease = false;
+      let retryReconciliation = false;
       let replaceInitialRelease = false;
-      if (operation !== "recover-current" && pending !== null) {
+      if (
+        !["reconcile-current", "recover-current"].includes(operation) &&
+        pending !== null
+      ) {
         if (
           operation === "deploy" &&
           state === null &&
@@ -872,9 +907,104 @@ export async function executeDevelopmentDeployment({
           fail("RELEASE_RECOVERY_REQUIRED", pending.target.release_id);
         }
       }
+      if (operation === "reconcile-current") {
+        if (state === null) {
+          fail("RECONCILE_CURRENT_MISSING", "release-state");
+        }
+        const manifestReference = {
+          manifest_sha256: releaseManifestDigest(manifest),
+          release_id: manifest.release_id,
+        };
+        if (!operationReferenceMatches(state.current, manifestReference)) {
+          fail("RECONCILE_CURRENT_MANIFEST_MISMATCH", manifest.release_id);
+        }
+        if (pending !== null) {
+          if (
+            pending.kind === "RECONCILE_CURRENT" &&
+            pending.status === "FAILED" &&
+            operationReferenceMatches(pending.target, state.current) &&
+            operationReferenceMatches(pending.from_current, state.current) &&
+            operationReferenceMatches(pending.recovery_catalog, state.catalog)
+          ) {
+            retryReconciliation = true;
+          } else {
+            fail("RELEASE_RECOVERY_REQUIRED", pending.target.release_id);
+          }
+        }
+        const [currentManifest, catalogManifest] = await Promise.all([
+          loadReleaseManifest(stateRoot, state.current),
+          loadCatalogManifest(stateRoot, state.catalog),
+        ]);
+        if (
+          !currentManifest.compatibility.accepted_generations.includes(
+            catalogManifest.migrations.catalog_generation,
+          )
+        ) {
+          fail(
+            "RECONCILE_CURRENT_CATALOG_INCOMPATIBLE",
+            `${currentManifest.release_id}->${catalogManifest.release_id}`,
+          );
+        }
+        await preflight(currentManifest, imageSet, runtimeEvidence);
+        const composeSecretDirectory =
+          await secretMaterializer(currentManifest);
+        const convergenceManifest = structuredClone(currentManifest);
+        convergenceManifest.images.migration = catalogManifest.images.migration;
+        convergenceManifest.migrations = structuredClone(
+          catalogManifest.migrations,
+        );
+        const environmentFile = path.join(
+          stateRoot,
+          `reconcile-${currentManifest.release_id}-${catalogManifest.release_id}.env`,
+        );
+        await writeExact(
+          environmentFile,
+          renderComposeEnvironment(convergenceManifest, {
+            composeSecretDirectory,
+          }),
+        );
+        if (retryReconciliation) {
+          await restartReconciliationOperation(
+            stateRoot,
+            currentManifest,
+            state.current,
+            state.catalog,
+          );
+        } else {
+          await beginReconciliationOperation(
+            stateRoot,
+            currentManifest,
+            state.current,
+            state.catalog,
+          );
+        }
+        let receipts;
+        try {
+          receipts = await runPhases({
+            bundleRoot,
+            environmentFile,
+            onPhasePass: (phase) =>
+              updateReleaseOperationPhase(stateRoot, phase, true),
+            onPhaseStart: (phase) =>
+              updateReleaseOperationPhase(stateRoot, phase, false),
+            phases: reconciliationPhases,
+            receiptValidator: validateReconciliationReceipts,
+            runner,
+          });
+        } catch (error) {
+          await markReleaseOperationFailed(stateRoot, error);
+          throw error;
+        }
+        await persistCompletedOperationReceipt(stateRoot);
+        await clearReleaseOperation(stateRoot);
+        return Object.freeze({ idempotent: false, receipts });
+      }
       if (operation === "recover-current") {
         if (pending === null || state === null) {
           fail("RECOVER_CURRENT_MISSING", "pending-operation");
+        }
+        if (pending.kind === "RECONCILE_CURRENT") {
+          fail("RELEASE_RECOVERY_REQUIRED", pending.target.release_id);
         }
         if (
           state.current.release_id !== manifest.release_id ||
@@ -1040,7 +1170,7 @@ async function main() {
   if (!operation || !manifestFile || !imageSetFile || !runtimeFile) {
     fail(
       "E012_DEPLOY_USAGE",
-      "deploy|rollback|recover-current manifest image-set runtime-evidence",
+      "deploy|rollback|recover-current|reconcile-current manifest image-set runtime-evidence",
     );
   }
   const bundleRoot = path.resolve(".");

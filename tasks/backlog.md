@@ -1,9 +1,9 @@
 # DailyEnergy 项目 Backlog
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11
+- **最后更新**：2026-08-12
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：[E-012 开发环境部署](./current.md)（In Progress：PR #131 已合并并成功 publication/install；等待本机 GHCR 只读登录后中转精确镜像）
+- **当前任务**：[E-012 开发环境部署](./current.md)（In Progress：reconcile-current 与第二候选演练方案已批准；实现、CI 与真实证据待完成）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -125,7 +125,7 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 | [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done        | 可重复本地环境                                        |
 | [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done        | 单元、集成、契约和端到端                              |
 | [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done        | 11/11 Gate、365 天 retention 与临时合并控制           |
-| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | In Progress | 本机中转精确镜像后重建并完成真实 deploy/rollback 验收 |
+| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | In Progress | 完成 clean restart 恢复与真实 deploy/rollback 验收    |
 | [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Planned     | 脱敏日志、指标和告警                                  |
 | [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Planned     | 环境可重复、CI 通过、服务可访问                       |
 | [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done        | P0/P1 上下文路由、任务 Profile 与安静验证             |
@@ -147,9 +147,17 @@ PR #131 merge-main CI 11/11 SUCCESS；精确 merge SHA 的 publication 已通过
 source-free bundle Gate，新 candidate 已完成 root-only 原子安装但尚未启动。本机 token 已由项目所有者补充 `read:packages`，五个 manifest 精确
 digest 已按 `linux/amd64` 下载，经 638471680 字节 archive SSH 中转并在服务器完成 SHA-256、`RepoDigest` 与平台 `5/5` 复核；双端临时 archive
 已清理。项目所有者已再次明确批准完整 synthetic DEV 重建；旧 state/Compose snapshot 已 root-only 归档，9 容器、12 网络和两个指定 volume 已删除，
-空 state 复核通过。新 candidate 真实发布通过前 14/18 阶段（含 migration、TLS、health、COS），在 `smoke-safety` 暴露 Compose run 覆盖默认脚本命令的
-稳定缺口；三条 database smoke invocation 修复与跨 Compose 合同进入 Draft PR #132。服务器仍无 Accepted release state，新 operation 已核验
-migration；修复合并并重新 publication 后，任何再次删除 synthetic PostgreSQL/Redis volume 仍需新的精确授权。域名 ICP、DNS/TLS 和
+空 state 复核通过。旧 candidate 真实发布通过前 14/18 阶段（含 migration、TLS、health、COS），在 `smoke-safety` 暴露 Compose run 覆盖默认脚本命令的
+稳定缺口；三条 database smoke invocation 修复与跨 Compose 合同已随 PR #132 squash 合并为
+`372b3db99b3b4e14a3d5b10f4907232f03b7a646`，merge-main CI 11/11 SUCCESS。精确 merge SHA 的新 publication、source-free bundle 双端校验、
+root-only 安装与五个 `linux/amd64` digest 本机中转/服务器复核均已完成。项目所有者基于新的 9 容器、13 网络、2 volume 精确 preview 另行批准第三次
+完整 synthetic DEV 重建；dirty operation 与无 secret evidence 已 root-only 归档，两个指定 volume 已永久删除并从空 state 重建。新 candidate
+`devr-372b3db99b3b-78988352a735ec2d1a6ea69b` 已完成 18/18 phase，建立首个 Accepted release；独立 drift/TLS/COS/Safety/owner/deletion audit、
+9 个 healthy 容器和幂等重放均通过。首次 Accepted state 没有 N-1，`rollback_target=null`；临时 Docker proxy 清理所需的 clean daemon restart 还证明
+当前 `on-failure:3` 与 `idempotent=true/phases=0` 之间缺少自动 runtime reconvergence 合同。项目所有者于 2026-08-12 明确接受无
+pull/migration/state rewrite 的 `reconcile-current` 合同，并批准从合并后的真实 immutable artifact 形成第二 DEV candidate，执行
+`deploy N+1 → rollback N → redeploy N+1` 与 clean restart reconciliation 演练；该批准不包含合并 PR #133 或新的 volume 删除/reset。
+E-012 关闭前仍需完成实现 Gate、Ubuntu PR CI、另行合并批准、publication/install 与真实演练证据。域名 ICP、DNS/TLS 和
 STAGING/PRODUCTION 独立状态服务仍为外部 Gate；E-013 与其它
 任务继续 Planned。
 

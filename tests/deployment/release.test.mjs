@@ -17,16 +17,21 @@ import test from "node:test";
 import {
   assertSecretVersionsActive,
   deploymentPhases,
+  reconciliationPhases,
   releaseManifestDigest,
   validateDeploymentReceipts,
+  validateReconciliationReceipts,
   validateReleaseManifest,
   validateReleaseTransition,
   validateRollbackTransition,
 } from "../../tooling/deployment/release-contract.mjs";
 import {
+  beginReconciliationOperation,
   beginReleaseOperation,
+  commitRecoveredCurrent,
   commitSuccessfulDeployment,
   commitSuccessfulRollback,
+  markReleaseOperationRecovering,
   readReleaseOperation,
   readReleaseState,
   updateReleaseOperationPhase,
@@ -266,6 +271,26 @@ test("T-E012-ORDER-001 requires consumer-before-producer and complete smoke rece
   failed[failed.length - 2].result = "FAIL";
   assert.throws(
     () => validateDeploymentReceipts(failed),
+    /RELEASE_PHASE_ORDER_OR_RESULT/u,
+  );
+
+  const reconciliationReceipts = reconciliationPhases.map((phase) => ({
+    phase,
+    result: "PASS",
+  }));
+  assert.deepEqual(validateReconciliationReceipts(reconciliationReceipts), {
+    phases: reconciliationPhases.length,
+  });
+  assert.equal(reconciliationPhases.includes("pull"), false);
+  assert.equal(reconciliationPhases.includes("migration"), false);
+  assert.ok(
+    reconciliationPhases.indexOf("drift") <
+      reconciliationPhases.indexOf("worker-interactive"),
+  );
+  const outOfOrder = structuredClone(reconciliationReceipts);
+  [outOfOrder[4], outOfOrder[5]] = [outOfOrder[5], outOfOrder[4]];
+  assert.throws(
+    () => validateReconciliationReceipts(outOfOrder),
     /RELEASE_PHASE_ORDER_OR_RESULT/u,
   );
 });
@@ -1042,6 +1067,315 @@ test("T-E012-DEPLOY-001 rolls back only to the recorded compatible manifest and 
     }),
   );
   assert.equal(new Set(operationIds).size, operationIds.length);
+});
+
+test("T-E012-DEPLOY-001 reconciles Accepted current against its effective catalog without changing state", async (t) => {
+  const root = await temporaryRoot(t);
+  const bundleRoot = path.join(root, "bundle");
+  const stateRoot = path.join(root, "state");
+  await mkdir(bundleRoot);
+  const current = manifest("e012-reconcile-current", {
+    acceptedGenerations: [1, 2],
+  });
+  const catalog = manifest("e012-reconcile-catalog", {
+    acceptedGenerations: [1, 2],
+    catalogGeneration: 2,
+    generation: 2,
+    rollbackCompatibleReleaseIds: [current.release_id],
+    mutate: (value) => {
+      value.images.migration = `ghcr.io/weihan1996/dailyenergy-migration@sha256:${"9".repeat(64)}`;
+      value.migrations.catalog_fingerprint = "f".repeat(64);
+    },
+  });
+  await commitSuccessfulDeployment(stateRoot, current);
+  await commitRecoveredCurrent(stateRoot, catalog);
+  const stateFile = path.join(stateRoot, "release-state.json");
+  const stateBefore = await readFile(stateFile, "utf8");
+  const seen = [];
+  const reconciled = await executeDevelopmentDeployment({
+    bundleRoot,
+    imageSet: {},
+    manifest: current,
+    operation: "reconcile-current",
+    preflight: async () => undefined,
+    runner: async (command) => {
+      seen.push([command.executable, ...command.arguments]);
+      return { code: 0 };
+    },
+    runtimeEvidence: {},
+    secretMaterializer: noSecretMaterializer,
+    stateRoot,
+  });
+  assert.equal(reconciled.idempotent, false);
+  assert.equal(reconciled.receipts.length, reconciliationPhases.length);
+  assert.equal(await readFile(stateFile, "utf8"), stateBefore);
+  assert.equal(await readReleaseOperation(stateRoot), null);
+  assert.equal(
+    seen.some((command) => command.includes("pull")),
+    false,
+  );
+  for (const forbidden of ["prepare", "migrate", "seed"]) {
+    assert.equal(
+      seen.some((command) => command.at(-1) === forbidden),
+      false,
+      forbidden,
+    );
+  }
+  assert.equal(
+    seen.filter((command) => command.includes("database-verify")).length,
+    1,
+  );
+  const convergenceCommands = seen.filter((command) => command.includes("up"));
+  assert.equal(convergenceCommands.length, 7);
+  assert.equal(
+    convergenceCommands.every((command) =>
+      command.includes("--force-recreate"),
+    ),
+    true,
+  );
+  const environment = await readFile(
+    path.join(
+      stateRoot,
+      `reconcile-${current.release_id}-${catalog.release_id}.env`,
+    ),
+    "utf8",
+  );
+  for (const image of [
+    current.images.admin,
+    current.images.proxy,
+    current.images.server,
+    current.images.stub,
+    catalog.images.migration,
+  ]) {
+    assert.ok(environment.includes(image), image);
+  }
+  assert.equal(environment.includes(current.images.migration), false);
+
+  const receiptFiles = await readdir(path.join(stateRoot, "receipts"));
+  const reconciliationFile = receiptFiles.find((file) =>
+    file.startsWith(`reconcile-current-${current.release_id}-`),
+  );
+  assert.ok(reconciliationFile);
+  const receipt = JSON.parse(
+    await readFile(
+      path.join(stateRoot, "receipts", reconciliationFile),
+      "utf8",
+    ),
+  );
+  assert.equal(receipt.operation, "reconcile-current");
+  assert.match(
+    receipt.operation_id,
+    /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/u,
+  );
+  assert.deepEqual(receipt.effective_catalog, {
+    manifest_sha256: releaseManifestDigest(catalog),
+    release_id: catalog.release_id,
+  });
+  const operationIds = await Promise.all(
+    receiptFiles.map(
+      async (file) =>
+        JSON.parse(
+          await readFile(path.join(stateRoot, "receipts", file), "utf8"),
+        ).operation_id,
+    ),
+  );
+  assert.equal(new Set(operationIds).size, operationIds.length);
+});
+
+test("T-E012-DEPLOY-001 retries only the same failed reconciliation operation", async (t) => {
+  const root = await temporaryRoot(t);
+  const bundleRoot = path.join(root, "bundle");
+  const stateRoot = path.join(root, "state");
+  await mkdir(bundleRoot);
+  const current = manifest("e012-reconcile-retry");
+  await commitSuccessfulDeployment(stateRoot, current);
+  const stateFile = path.join(stateRoot, "release-state.json");
+  const stateBefore = await readFile(stateFile, "utf8");
+  const common = {
+    bundleRoot,
+    imageSet: {},
+    manifest: current,
+    operation: "reconcile-current",
+    preflight: async () => undefined,
+    runtimeEvidence: {},
+    secretMaterializer: noSecretMaterializer,
+    stateRoot,
+  };
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      runner: async (command) => ({
+        code:
+          command.arguments.some((argument) =>
+            argument.endsWith("database-smoke.mjs"),
+          ) && command.arguments.at(-1) === "safety"
+            ? 1
+            : 0,
+      }),
+    }),
+    /E012_DEPLOY_PHASE_FAILED:smoke-safety/u,
+  );
+  assert.equal(await readFile(stateFile, "utf8"), stateBefore);
+  const failed = await readReleaseOperation(stateRoot);
+  assert.equal(failed.kind, "RECONCILE_CURRENT");
+  assert.equal(failed.status, "FAILED");
+  assert.equal(failed.active_phase, "smoke-safety");
+  assert.equal(failed.migration_applied, false);
+  assert.equal(failed.migration_verified, false);
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      operation: "recover-current",
+      runner: async () => ({ code: 0 }),
+    }),
+    new RegExp(`RELEASE_RECOVERY_REQUIRED:${current.release_id}`, "u"),
+  );
+  assert.equal(
+    (await readReleaseOperation(stateRoot)).operation_id,
+    failed.operation_id,
+  );
+
+  const retried = await executeDevelopmentDeployment({
+    ...common,
+    runner: async () => ({ code: 0 }),
+  });
+  assert.equal(retried.receipts.length, reconciliationPhases.length);
+  assert.equal(await readFile(stateFile, "utf8"), stateBefore);
+  assert.equal(await readReleaseOperation(stateRoot), null);
+  const receiptFile = (await readdir(path.join(stateRoot, "receipts"))).find(
+    (file) => file.startsWith(`reconcile-current-${current.release_id}-`),
+  );
+  assert.ok(receiptFile);
+  const receipt = JSON.parse(
+    await readFile(path.join(stateRoot, "receipts", receiptFile), "utf8"),
+  );
+  assert.equal(receipt.operation_id, failed.operation_id);
+});
+
+test("T-E012-DEPLOY-001 rejects reconciliation without exact Accepted state", async (t) => {
+  const root = await temporaryRoot(t);
+  const bundleRoot = path.join(root, "bundle");
+  const stateRoot = path.join(root, "state");
+  await mkdir(bundleRoot);
+  const current = manifest("e012-reconcile-required");
+  const common = {
+    bundleRoot,
+    imageSet: {},
+    operation: "reconcile-current",
+    preflight: async () => undefined,
+    runner: async () => ({ code: 0 }),
+    runtimeEvidence: {},
+    secretMaterializer: noSecretMaterializer,
+    stateRoot,
+  };
+  await assert.rejects(
+    executeDevelopmentDeployment({ ...common, manifest: current }),
+    /RECONCILE_CURRENT_MISSING:release-state/u,
+  );
+  await commitSuccessfulDeployment(stateRoot, current);
+  await assert.rejects(
+    executeDevelopmentDeployment({
+      ...common,
+      manifest: manifest("e012-reconcile-not-current"),
+    }),
+    /RECONCILE_CURRENT_MANIFEST_MISMATCH:e012-reconcile-not-current/u,
+  );
+});
+
+test("T-E012-DEPLOY-001 rejects unrelated dirty operations during reconciliation", async (t) => {
+  for (const kind of ["DEPLOY", "RECOVER_CURRENT", "ROLLBACK"]) {
+    await t.test(kind, async (t) => {
+      const root = await temporaryRoot(t);
+      const bundleRoot = path.join(root, "bundle");
+      const stateRoot = path.join(root, "state");
+      await mkdir(bundleRoot);
+      const current = manifest(
+        `e012-reconcile-dirty-${kind.toLowerCase().replaceAll("_", "-")}`,
+      );
+      const candidate = manifest(
+        `e012-reconcile-pending-${kind.toLowerCase().replaceAll("_", "-")}`,
+      );
+      const accepted = await commitSuccessfulDeployment(stateRoot, current);
+      await beginReleaseOperation(
+        stateRoot,
+        kind === "RECOVER_CURRENT" ? "DEPLOY" : kind,
+        candidate,
+        accepted.state.current,
+      );
+      if (kind === "RECOVER_CURRENT") {
+        await markReleaseOperationRecovering(stateRoot, {
+          manifest_sha256: releaseManifestDigest(candidate),
+          release_id: candidate.release_id,
+        });
+      }
+      await assert.rejects(
+        executeDevelopmentDeployment({
+          bundleRoot,
+          imageSet: {},
+          manifest: current,
+          operation: "reconcile-current",
+          preflight: async () => undefined,
+          runner: async () => ({ code: 0 }),
+          runtimeEvidence: {},
+          secretMaterializer: noSecretMaterializer,
+          stateRoot,
+        }),
+        new RegExp(`RELEASE_RECOVERY_REQUIRED:${candidate.release_id}`, "u"),
+      );
+    });
+  }
+});
+
+test("T-E012-DEPLOY-001 repairs a completed reconciliation receipt without rerunning phases", async (t) => {
+  const root = await temporaryRoot(t);
+  const bundleRoot = path.join(root, "bundle");
+  const stateRoot = path.join(root, "state");
+  await mkdir(bundleRoot);
+  const current = manifest("e012-reconcile-receipt-repair");
+  const operationId = "00000000-0000-4000-8000-000000000012";
+  const accepted = await commitSuccessfulDeployment(stateRoot, current);
+  const stateFile = path.join(stateRoot, "release-state.json");
+  const stateBefore = await readFile(stateFile, "utf8");
+  await beginReconciliationOperation(
+    stateRoot,
+    current,
+    accepted.state.current,
+    accepted.state.catalog,
+    { operationId },
+  );
+  for (const phase of reconciliationPhases) {
+    await updateReleaseOperationPhase(stateRoot, phase, false);
+    await updateReleaseOperationPhase(stateRoot, phase, true);
+  }
+
+  const repaired = await executeDevelopmentDeployment({
+    bundleRoot,
+    imageSet: {},
+    manifest: current,
+    operation: "reconcile-current",
+    preflight: async () => undefined,
+    runner: async () => {
+      throw new Error("receipt repair must not rerun reconciliation phases");
+    },
+    runtimeEvidence: {},
+    secretMaterializer: noSecretMaterializer,
+    stateRoot,
+  });
+  assert.deepEqual(repaired, { idempotent: true, receipts: [] });
+  assert.equal(await readFile(stateFile, "utf8"), stateBefore);
+  assert.equal(await readReleaseOperation(stateRoot), null);
+  const receipt = JSON.parse(
+    await readFile(
+      path.join(
+        stateRoot,
+        "receipts",
+        `reconcile-current-${current.release_id}-${operationId}.json`,
+      ),
+      "utf8",
+    ),
+  );
+  assert.equal(receipt.operation_id, operationId);
+  assert.equal(receipt.receipts.length, reconciliationPhases.length);
 });
 
 test("T-E012-DEPLOY-001 keeps Docker builds, public bindings and raw secrets out of the deployment plan", () => {

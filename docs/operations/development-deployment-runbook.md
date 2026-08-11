@@ -2,7 +2,7 @@
 
 - **文档状态**：Draft
 - **所属任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **最后更新**：2026-08-09
+- **最后更新**：2026-08-12
 - **适用范围**：腾讯云上海临时 DEV 主机；loopback TLS；PostgreSQL 18、Redis 8 与应用同机；私有 COS application object
 - **上游权威**：[ADR-0007](../decisions/ADR-0007-development-colocation-exception.md)、[部署、配置与回滚规范](../technical/deployment.md)、[测试策略](../technical/testing.md)、[故障和安全事件响应](./incident-response.md)
 - **生产资格**：无；本流程和产物都固定为 `production_eligible=false`
@@ -151,7 +151,34 @@ curl --fail --insecure https://localhost:8444/login
 
 DEV 使用 Caddy internal certificate，因此浏览器会显示本地不受信任证书；这不是公网证书验收。不要为了消除警告而开放 80/443、修改 DNS 或导入未授权证书。
 
-## 6. 发布失败后的恢复
+## 6. Clean restart 后收敛当前 Accepted release
+
+计划内 Docker daemon clean restart、主机重启或已确认 state 未改变但服务没有全部恢复时，不能用普通 `deploy` 的 `idempotent=true/phases=0` 证明运行态已收敛。先读取无 secret state 并确认：
+
+- `release-state.json` 存在，`current` 与 `catalog` 引用完整；
+- `release-operation.json` 不存在；若存在，先按其原操作恢复，不能用 reconciliation 覆盖；
+- 当前 bundle、root-only config/secret、全部 immutable image 与 effective catalog bundle 仍在主机；
+- 本次只恢复 synthetic DEV 运行态，不删除 volume、network、state、bundle、secret 或审计证据。
+
+进入 state 中 `current.release_id` 对应 bundle，执行：
+
+```bash
+sudo -i
+CURRENT_RELEASE_ID='<STATE_CURRENT_RELEASE_ID>'
+cd "/srv/dailyenergy/bundles/${CURRENT_RELEASE_ID}"
+/usr/local/bin/dailyenergy-node tooling/deployment/deploy-dev.mjs \
+  reconcile-current \
+  release-manifest.json \
+  evidence/dev-image-set.json \
+  evidence/dev-runtime-evidence.json
+exit
+```
+
+控制器要求调用 manifest 与 state `current` 的 release ID/digest 完全一致，并组合当前 Accepted application/config/secret 与 state `catalog` 指向的 immutable migration image/metadata。它不 pull image，不执行 role/credential prepare、Prisma migrate 或 synthetic seed，也不改写 Accepted state、effective catalog 或 rollback target。固定 17 阶段为：preflight、stateful readiness、关闭 loopback TLS、worker drain、只读 drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、COS object smoke、Safety smoke、owner smoke、deletion smoke、退出维护；所有 Compose `up` 都使用 `--force-recreate`。
+
+成功后写一份同时绑定 current、effective catalog 与唯一 `operation_id` 的 PASS receipt，再清除 reconciliation operation；`release-state.json` 必须逐字节不变。任一阶段失败时保留 `RECONCILE_CURRENT/FAILED` operation 与原 Accepted state，修复外部原因后只能从同一 current bundle 重跑同一 `reconcile-current`，并沿用原 operation ID。无关 deploy/rollback/recover dirty operation、不同 manifest 或缺失 Accepted state 一律 fail closed。17 阶段已经全部通过而进程在 receipt/cleanup 前退出时，相同入口只确定性补建 receipt 并清理 operation，不重跑运行态命令。
+
+## 7. 发布失败后的恢复
 
 如果已有 Accepted release 的候选发布失败，先查看无 secret 的 state/operation，确认 `current`、`target`、`active_phase`、
 `migration_applied` 和 `migration_verified`：
@@ -194,7 +221,7 @@ ADR-0007 另行明确批准“完整 DEV 环境重建”：执行前必须再次
 环境及其有状态 volume，并从空 deployment state 用新 artifact 重建。该授权不适用于 STAGING/PRODUCTION，也不能由一般发布批准或自动化 Gate
 推定获得。
 
-## 7. 回滚
+## 8. 回滚
 
 只有 `release-state.json` 中记录的唯一 `rollback_target` 可以回滚。先查看无 secret 状态文件并抄录精确 target release ID：
 
@@ -218,7 +245,7 @@ exit
 
 控制器会重新校验 manifest digest、双向 catalog generation 兼容和完整 18 阶段 smoke。成功后消费旧 rollback target；禁止手改 state、指定任意历史 tag、恢复旧数据库 volume 或跳过 migration/Smoke。
 
-## 8. Secret/配置轮换
+## 9. Secret/配置轮换
 
 - secret value 变化必须创建新 version directory，并以新 release manifest 引用；不得覆盖 `dev-secret-v1` 或 `dev-cos-credential-v1` 的现有文件；
 - COS bucket、region、prefix 或 endpoint 变化属于 deploy config 变化，必须生成新 fingerprint 和 release；
@@ -254,7 +281,7 @@ sudo /usr/local/bin/dailyenergy-node \
 安装器会因 version refs/config fingerprint 变化生成新的 `release_id`，manifest 明确绑定 v2；无需修改代码、重跑 CI 或重建相同镜像。
 先发布并通过完整 smoke，再吊销旧 application/COS credential。疑似泄露时先 containment/吊销的事件流程优先，不能为了无缝轮换继续使用泄露值。
 
-## 9. 临时主机迁移或丢失
+## 10. 临时主机迁移或丢失
 
 DEV 的恢复单位是“同一 GitHub artifact + immutable image digest + migration catalog + 外部无值配置 + 重新创建的版本化 secret”，不是容器文件系统或旧 volume：
 
@@ -267,7 +294,7 @@ DEV 的恢复单位是“同一 GitHub artifact + immutable image digest + migra
 
 PostgreSQL/Redis DEV volume 不承诺备份、PITR、RPO、RTO 或 HA；COS application objects 会按 7 天生命周期删除。需要保留的测试事实必须来自可重复 seed/fixture，而不是迁移可变 DEV 数据。
 
-## 10. 必须停止的情况
+## 11. 必须停止的情况
 
 出现以下任一情况，停止发布且不得写 PASS：
 

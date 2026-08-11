@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（第二次 synthetic DEV 重建已执行；真实发布在 smoke-safety 暴露 Compose run 命令覆盖缺口，修复进入 PR #132）
+- **最后更新**：2026-08-12（`reconcile-current` 合同与第二 DEV 候选演练方案已获批准，Draft PR #133 正在实现与验证）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Progress
-- **任务分支**：`agent/e012-post-131-publication`
+- **任务分支**：`agent/e012-post-132-publication`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **最近合并 PR**：[E-012 publication runtime evidence 修复 PR #131](https://github.com/WeiHan1996/DailyEnergy/pull/131)
-- **当前 PR**：[E-012 database smoke invocation 修复与部署证据 PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)（Draft）
-- **实现合并提交**：E-012 latest squash merge `a03993d2018ee212a1c92169cab8795452c4251d`
-- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_REAUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / EXACT_IMAGES_5_OF_5_READY / REDEPLOY_14_OF_18_PHASES_PASS / MIGRATION_APPLIED_AND_VERIFIED / TLS_HEALTH_COS_PASS / DATABASE_SMOKE_INVOCATION_FIX_IN_PR_132 / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **最近合并 PR**：[E-012 database smoke invocation 修复 PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)
+- **当前 PR**：[E-012 post-PR #132 publication / reset evidence PR #133](https://github.com/WeiHan1996/DailyEnergy/pull/133)（Draft）
+- **实现合并提交**：E-012 latest squash merge `372b3db99b3b4e14a3d5b10f4907232f03b7a646`
+- **Gate 结论**：`E012_IN_PROGRESS / ACCEPTED_RELEASE_ESTABLISHED / RECONCILE_CURRENT_OWNER_ACCEPTED / RECONCILE_CURRENT_PR_CI_11_OF_11_PASS / SECOND_DEV_CANDIDATE_EXERCISE_APPROVED / MERGE_APPROVAL_PENDING / ROLLBACK_TARGET_NULL / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -351,14 +351,80 @@ approved development infrastructure
   `40/42`，仅两个失败严格限定为 macOS 缺少 Linux `flock`，其余格式、Lint、类型、架构、codegen、contracts、agent、CI policy、数据库与新增断言
   均通过，不将结果冒充为 PASS；固定 Ubuntu review head `6ec99a72345dfedb0d1982e7dfd8801767ddd543` 的 PR CI run
   `31483290015` 已 11/11 SUCCESS，补齐 Linux `flock` 权威证据。不得手改已安装 bundle 绕过；
-- **当前阻塞与解锁条件**：新 operation 已进入并核验 migration，必须保持 dirty；修复需经 PR #132 完整 Gate、用户批准、合并、merge-main CI、
-  重新 publication/install 和精确镜像收敛后，再生成新的删除预览并取得另一份显式 destructive reset 授权。当前批准已消费，不能复用；
-- **下一动作**：完成 PR #132 的完整验证与审核材料；用户批准合并后生成新 immutable artifact，再按本机中转路径收敛镜像并请求下一次精确 reset 授权，
-  最终完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
+- **PR #132 批准、合并与 main 证明**：项目所有者于 2026-08-11 明确确认修复并批准 squash 合并；最终 head
+  `f70e05daf1420fb8fac773376fa3b90ef808a30f` 的固定 Ubuntu run `31483551073` 为 11/11 SUCCESS，机器 receipt 为
+  `CI_MANUAL_MERGE_GATE_OK:pr=132:head=f70e05daf1420fb8fac773376fa3b90ef808a30f:run=31483551073:checks=11`，审计记录在
+  [PR comment](https://github.com/WeiHan1996/DailyEnergy/pull/132#issuecomment-5252959644)。PR 已 squash 合并为
+  `372b3db99b3b4e14a3d5b10f4907232f03b7a646`，merge-main run `31489984647` 也为 11/11 SUCCESS；
+- **新 publication 与 bundle 安装**：对精确 merge SHA 触发的 `Publish DEV images` run `31490307068` 在 `5m30s` 内完成五镜像构建、
+  runtime/supply evidence、hardened Caddy probe 与 source-free bundle Gate。artifact `9100900114`、name
+  `dev-deployment-bundle-372b3db99b3b4e14a3d5b10f4907232f03b7a646-31490307068-1`、digest
+  `sha256:9a3a29a6117f656ed61441fcb130b3dce609c719e373d68c6f197b887849ae4f` 保留至 `2027-08-11T12:14:57Z`；本机和服务器均通过
+  `image_set=dev-372b3db99b3b-31490307068-1`、runtime `5`、supply `6`、bundle files `16`、无 symlink/源码与
+  `production_eligible=false` 校验。使用 `dev-secret-v1`、`dev-cos-credential-v1`、`dev-cos-config-v2` 原子安装 root-only candidate
+  `devr-372b3db99b3b-78988352a735ec2d1a6ea69b`，generation `1`、manifest SHA-256
+  `ecde45be5c5a04808932d8c05cf3a0ffc66c57d8b2f48304f0dbf0c89f87acba`；临时上传副本已删除；
+- **新五镜像本机中转与服务器复核**：按新 manifest 精确 digest 在本机下载并验证 `linux/amd64`，五镜像导出为
+  `638471168` 字节 archive、SHA-256 `6a856583614b9add6c34e8fb9775002844e1685c53145e82b062d5160953d12d`，以约
+  `4.97 MiB/s` 经 SSH 中转。服务器复算完全一致后 `docker load`，再只读取 registry manifest 绑定正式 digest；admin、migration、proxy、server、stub
+  均通过 `RepoDigest` 与平台 `5/5` 复核。双端临时 archive 和本机 transfer tag 已删除；服务器 transfer tag 保留到重建结束；
+- **第三次受控重建删除预览**：只读复核确认 `release-state.json` 不存在；dirty operation
+  `1fe81f82-cdbb-400b-b509-a183e138ae04` 仍为 `FAILED`/`DEPLOY`、`active_phase=smoke-safety`、
+  `failure_code=E012_DEPLOY_PHASE_FAILED`，已完成前 14/18 阶段，且 `migration_applied=true`、`migration_verified=true`、
+  `from_current=null`、`recovery_catalog=null`。失败 target manifest SHA-256 为
+  `dcf8c3658997340d4cc73f1a92461f1483444b1220173cb31bdda5195b6583dd`；新 candidate、五个正式 digest 镜像和 root-only secret/config 均已就绪。
+  完整重建会停止并移除 9 个健康容器 `admin`、`api`、`dependency-stub`、`postgres`、`redis`、`tls-proxy`、
+  `worker-background`、`worker-interactive`、`worker-restricted`，移除并重建 13 个 Compose network
+  `admin_api`、`api_data`、`api_external`、`background_data`、`background_external`、`dev_ingress`、`fault_control`、
+  `interactive_data`、`interactive_external`、`migration_data`、`object_external`、`restricted_data`、`restricted_external`；唯一永久数据删除目标严格限定为
+  `dailyenergy-dev_postgres_data` 与 `dailyenergy-dev_redis_data`，其中 synthetic 数据不可恢复。新的 root-only 归档目标
+  `/srv/dailyenergy/reset-evidence/e012-reset-1fe81f82-cdbb-400b-b509-a183e138ae04` 已确认不存在；
+- **第三次重建授权与执行结果**：项目所有者于 2026-08-11 基于上述精确 preview 明确批准归档 dirty operation、永久删除两个指定 volume，
+  并从空 deployment state 使用新 candidate 完整重建 synthetic DEV。执行脚本在同一 release `flock` 内重新证明无 Accepted state、operation
+  `1fe81f82-cdbb-400b-b509-a183e138ae04` 的 14/18 phase 与 migration checkpoint、9 容器/13 网络/2 volume 闭合集合、候选 manifest digest 和
+  五个 `linux/amd64` 精确镜像；无 secret 的 operation/manifest/Compose/资源摘要已归档到 root-only
+  `/srv/dailyenergy/reset-evidence/e012-reset-1fe81f82-cdbb-400b-b509-a183e138ae04`，`SHA256SUMS` 文件本身的 SHA-256 为
+  `77c973a7ca1354f202b3993fe64355d19b806c021261de0fc4c7c1374530552b` 且归档内 checksum 全量复核通过。9 个容器、13 个网络和
+  `dailyenergy-dev_postgres_data`/`dailyenergy-dev_redis_data` 已删除，卷内 synthetic 数据不可恢复；空 deployment state、installed bundles、
+  root-only secret/config/runtime material 与五镜像保留均复核通过；
+- **首次 Accepted release**：新 candidate 首次标准 deploy 在 `pull` 阶段因服务器 Docker 无 GHCR 网络代理 fail closed；同一 operation 当时只完成
+  `preflight`、`migration_applied=false`、`migration_verified=false`，没有 Accepted state。项目所有者此前已批准的临时 GHCR 中转路径保持
+  loopback-only：本机 Clash mixed port `127.0.0.1:7897` 与服务器 reverse forward `127.0.0.1:17897` 均通过 GHCR `401`/TLS verify `0` 探针，
+  Docker daemon 临时 systemd drop-in 只含该 loopback proxy、无 credential。同一 manifest 重试后 operation
+  `b12dc3ad-3d67-40f6-9a3c-aa565be3924b` 完成全部 18/18 phase，migration 两个 checkpoint、TLS、health、COS、Safety、owner 与 deletion 均 PASS；
+  receipt `deploy-devr-372b3db99b3b-78988352a735ec2d1a6ea69b-b12dc3ad-3d67-40f6-9a3c-aa565be3924b.json` 已写入，首次 Accepted state SHA-256 为
+  `9541cde7e1e405f185f28a07ecb6bfb25dde092c6c4ced5cb3fad9ae84ed2f53`；
+- **临时网络清理与运行态复核**：Accepted 写入后已删除临时 Docker proxy drop-in、`daemon-reload`/重启 Docker 并关闭 SSH reverse forward；
+  Docker `HTTPProxy`/`HTTPSProxy` 恢复为空，服务器 `17897` 无监听。clean Docker restart 证明当前 `on-failure:3` 不会收敛全部 clean-exit 服务：仅 Admin
+  自动恢复，其余容器保持 exited，两个 Worker 在依赖未 ready 时短暂以 1 退出。使用同一 Accepted bundle/release env、`--force-recreate` 与控制器原顺序
+  收敛后，独立 acceptance audit 再次通过 drift、两个 TLS endpoint、COS write/read/delete、Safety、owner、deletion，且 9 容器 healthy、13 网络、
+  2 volume、Accepted state/receipt 不变；没有手改 state、manifest、migration、secret 或镜像；
+- **幂等重放证据**：同一 Accepted release 标准 `deploy` 重放返回
+  `idempotent=true`、`phases=0`；随后 state SHA-256 仍为
+  `9541cde7e1e405f185f28a07ecb6bfb25dde092c6c4ced5cb3fad9ae84ed2f53`、无 dirty operation、9 容器 healthy；首次 Accepted state 的
+  `rollback_target=null` 符合没有上一 Accepted release 的事实，不能伪造 rollback target；
+- **2026-08-12 所有者决策**：项目所有者明确批准显式 `reconcile-current` 合同，并批准使用合并修复后形成的第二个真实 immutable DEV 候选执行
+  `deploy N+1 → rollback N → redeploy N+1` 与 clean restart 后 reconciliation 演练。批准范围不包括合并 Draft PR #133，也不包含新的 destructive reset、
+  volume 删除或 deployment state 清空；
+- **reconcile-current 实现状态**：Draft PR #133 已加入独立 `RECONCILE_CURRENT` operation、17 阶段无 pull/migration/seed 收敛、current/effective-catalog
+  绑定、同 operation ID 失败重试、state/rollback target 不改写及 receipt crash repair。定向新增合同 `9/9` PASS；代码 head
+  `a2b09984f93c2b9798c268c40bad7a71a3823c65` 的固定 Ubuntu run `31513265580` 已 11/11 SUCCESS；
+- **当前阻塞与解锁条件**：E-012 尚不能关闭，但方案决策和实现 Gate 已解除。仍需项目所有者另行明确批准合并 PR #133，再从 merge-main 精确提交形成并安装
+  第二候选，完成真实 reconciliation 与 `deploy → rollback → redeploy` 证据；当前首个 Accepted release 的 `rollback_target=null` 保持事实，不伪造 N-1；
+- **下一动作**：确认 PR #133 最终状态记录 head 的 11/11 CI 后请求合并批准；获批并合并后再 publication/install 第二候选并执行已批准演练；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- 本轮 `reconcile-current` 的阶段顺序、成功收敛、Accepted state 逐字节不变、current/effective-catalog 组合、无 pull/prepare/migrate/seed、
+  `--force-recreate`、失败后同 operation ID 重试、无关 dirty operation 拒绝和 receipt crash repair 定向合同 `9/9` PASS；source registry 保持
+  `736 total / 170 COVERED / 566 PLANNED / 0 NA_WITH_REASON`。`pnpm agent:validate --mode=changed --task=E-012` 自动扩大为 full，
+  `pnpm agent:validate --mode=task --task=E-012` 也已执行；格式、Lint、类型、架构、codegen、contracts、agent、CI policy、数据库前置与新增断言均通过，
+  deployment suite 为 `48/50`。仅两项失败严格限定为本机 macOS 缺少 Linux `flock`，不将 task Gate 冒充为 PASS；代码 head
+  `a2b09984f93c2b9798c268c40bad7a71a3823c65` 的固定 Ubuntu run `31513265580` 已 11/11 SUCCESS，补齐 Linux 权威自动证据；
+- 本轮第三次 reset、首次 Accepted release、临时 proxy 完整清理、post-restart 收敛、独立 acceptance audit 与幂等重放均已在真实 DEV 主机完成；
+  `pnpm agent:validate --mode=changed --task=E-012` 对两份项目状态文档返回 `PASS`、rule=`STATUS_DOCS_TARGETED`、executed=`2`。该自动 Gate
+  只证明 Markdown/任务状态一致性；远端 18-phase receipt、resource set、smoke、state digest 与人工 destructive authorization 仍作为独立原始证据记录；
 - publication runtime evidence 的定向合同 `2/2` PASS，完整 publication 文件为 `7/8`：新增逻辑已证明只接受 server 精确 GHCR digest；pull
   独立使用 180 秒 timeout；真正 probe 使用 `--pull never` 并保持 30 秒 hardened boundary；mutable tag 与 pull failure 均返回稳定错误。
   `pnpm agent:validate --mode=changed --task=E-012` 自动提升为 full，`pnpm agent:validate --mode=task --task=E-012` 也已执行；两者均通过格式、

@@ -25,6 +25,26 @@ export const deploymentPhases = Object.freeze([
   "maintenance-off",
 ]);
 
+export const reconciliationPhases = Object.freeze([
+  "preflight",
+  "stateful-ready",
+  "maintenance-on",
+  "worker-drain",
+  "drift",
+  "worker-interactive",
+  "worker-background",
+  "api",
+  "admin",
+  "worker-restricted",
+  "tls-ingress",
+  "health",
+  "smoke-object",
+  "smoke-safety",
+  "smoke-owner",
+  "smoke-delete",
+  "maintenance-off",
+]);
+
 const IMAGE_NAMES = Object.freeze([
   "admin",
   "migration",
@@ -533,11 +553,11 @@ export function assertSecretVersionsActive(manifest, revokedVersions) {
   }
 }
 
-export function validateDeploymentReceipts(receipts) {
-  if (!Array.isArray(receipts) || receipts.length !== deploymentPhases.length) {
+function validatePhaseReceipts(receipts, phases) {
+  if (!Array.isArray(receipts) || receipts.length !== phases.length) {
     fail("RELEASE_PHASE_RECEIPT_COUNT", receipts?.length ?? "missing");
   }
-  for (const [index, phase] of deploymentPhases.entries()) {
+  for (const [index, phase] of phases.entries()) {
     const receipt = receipts[index];
     exactKeys(receipt, ["phase", "result"], "RELEASE_PHASE_RECEIPT_KEYS");
     if (receipt.phase !== phase || receipt.result !== "PASS") {
@@ -545,4 +565,12 @@ export function validateDeploymentReceipts(receipts) {
     }
   }
   return { phases: receipts.length };
+}
+
+export function validateDeploymentReceipts(receipts) {
+  return validatePhaseReceipts(receipts, deploymentPhases);
+}
+
+export function validateReconciliationReceipts(receipts) {
+  return validatePhaseReceipts(receipts, reconciliationPhases);
 }

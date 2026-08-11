@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-08-11（E-012 release-scoped file secret 的容器强制收敛合同已接受）
+- **最后更新**：2026-08-12（E-012 Accepted current runtime reconciliation 合同已接受）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0007 临时 DEV 同机例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
@@ -133,6 +133,8 @@ PostgreSQL/Redis 与 COS application object 都按 disposable DEV state 管理�
 E-012 的 DEV 控制面使用隔离、checksum 固定的 Node 24.18.0，不替换主机系统 Node。手动 publication workflow 只接受已经进入 `main` 且一个 CI run 内 11 个 required checks 全部成功的精确 commit；它分别记录 CI run 与 publication run，发布 `admin/migration/proxy/server/stub` 五个 `linux/amd64` digest，并生成 source-free deployment bundle。服务器安装入口验证 allowlist、SHA-256、publication evidence、外部 COS 配置 fingerprint 与 root-only 权限后，原子安装到版本化 bundle 目录；服务器不 checkout、不 build，也不接收 CI 远程 SSH。
 
 DEV 发布控制器固定执行 preflight、digest pull、stateful readiness、关闭 loopback TLS、worker drain、migration/drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、COS object、Safety、owner、deletion 与退出维护共 18 个有序阶段；全通过后才写 Accepted state 和唯一 N-1 rollback target。每个创建持久服务容器的 Compose `up` 阶段必须显式 `--force-recreate`：Compose 的 service config hash 不保证包含 top-level file secret 的 source path，不能把“hash 相同”当成 release-scoped secret bind 已收敛。TLS proxy 继续以 UID/GID 1000、`cap_drop: ALL`、`no-new-privileges` 和只读根文件系统运行；因为 DEV 仅监听 8443/8444，proxy image 必须在构建阶段移除上游 Caddy 二进制不再需要的 `cap_net_bind_service` 文件能力，并在 publication 中以同一 capability boundary 实际执行 Caddy，不能靠恢复 capability 绕过启动失败。该短维护窗口只适用于尚无公网和真实用户的 DEV，不构成 Production 零停机设计。具体操作者步骤见 [DEV 发布、回滚与换机 Runbook](../operations/development-deployment-runbook.md)。
+
+已有 Accepted state 时，计划内 Docker daemon clean restart、主机重启或同 release 运行态漂移必须使用显式 `reconcile-current`，不能依赖普通 `deploy` 的 `idempotent=true/phases=0`。该操作要求调用 manifest 与 state `current` 的 release ID/digest 完全一致，绑定当前 Accepted application/config/secret 和 state 中的 effective catalog，拒绝任何未完成的 deploy/rollback/recover operation；只有同一失败 `RECONCILE_CURRENT` operation 才能保留原 `operation_id` 重试。控制器不 pull image，不执行 role/credential prepare、Prisma migrate 或 synthetic seed，也不改写 Accepted state、effective catalog 或 rollback target；它只按 preflight、stateful readiness、关闭 TLS、worker drain、只读 drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、COS object、Safety、owner、deletion、退出维护共 17 个阶段强制重建并验证当前组合。成功 receipt 必须绑定 current 与 effective catalog；失败时 Accepted state 保持逐字节不变并保留 dirty reconciliation operation。若 17 阶段全通过后在 receipt 写入或 operation 清理前退出，下次相同入口必须按原 operation phase 记录确定性修复 receipt，不能重跑阶段或生成新 operation ID。
 
 首次发布尚无 Accepted state 时，同一失败 manifest 可以重放。若失败发生在 migration 阶段之前、`migration_applied=false`、`migration_verified=false` 且没有 from-current/recovery catalog，显式部署一个不同且已通过 preflight/secret materialization 的新 candidate 可以替换该失败候选；控制器必须先写入绑定旧 `operation_id`、失败阶段和 replacement manifest digest 的 `SUPERSEDED_BEFORE_MIGRATION` receipt，再清除旧 pending 并开始新 operation。active phase 已进入 migration 或任一 migration checkpoint 为 true 时禁止替换，必须保持 dirty state 并人工判定数据库事实；不得删除或编辑 operation/state 绕过。
 
@@ -378,7 +380,7 @@ DEV publication runtime evidence 使用 publication `image_set_id` 探测并证�
 - 优先使用 GitHub Actions OIDC/云工作负载身份获取短期部署 credential，不在仓库保存长期云密钥；
 - 若目标平台暂不支持 OIDC，使用 environment-protected、最小权限、短期且可轮换的部署凭据；该路径必须单独记录风险与 expiry；
 - Compose service 通过显式 `secrets` 挂载只读文件；应用只从批准路径读取；
-- Docker Compose 对 `file` 来源使用 bind mount，`uid/gid/mode` 重映射会被忽略，而 Compose `environment` secret source 不能注入 `read_only: true` 的 Linux 服务。E-012 Linux DEV 因此保持外部源文件 `root:root 0600`；root 部署控制器在 preflight 后把已验证值原子 materialize 到 `/srv/dailyenergy/runtime-secrets/<release_id>`。版本目录及其父目录为 `root:root 0700`，文件按获授权服务使用的 UID/GID 写为 `0400`，相同 release 重放必须逐文件验证内容、owner、mode、link 和闭合文件集，任何漂移 fail closed。Compose 只从 `release.env` 获得该非秘密目录路径并使用 `file` source，所有 Docker/curl 子进程环境均不得携带密钥值；所有 `deploy`、`rollback` 与 `recover-current` 的服务启动阶段必须强制重建容器，并核验实际 bind source 属于目标 `release_id`，不得复用仍指向旧 runtime-secret 目录的相同 service hash 容器；版本目录至少保留 current 与唯一 rollback target，且该 DEV 适配不替代 Production secret store；
+- Docker Compose 对 `file` 来源使用 bind mount，`uid/gid/mode` 重映射会被忽略，而 Compose `environment` secret source 不能注入 `read_only: true` 的 Linux 服务。E-012 Linux DEV 因此保持外部源文件 `root:root 0600`；root 部署控制器在 preflight 后把已验证值原子 materialize 到 `/srv/dailyenergy/runtime-secrets/<release_id>`。版本目录及其父目录为 `root:root 0700`，文件按获授权服务使用的 UID/GID 写为 `0400`，相同 release 重放必须逐文件验证内容、owner、mode、link 和闭合文件集，任何漂移 fail closed。Compose 只从 `release.env` 获得该非秘密目录路径并使用 `file` source，所有 Docker/curl 子进程环境均不得携带密钥值；所有 `deploy`、`rollback`、`recover-current` 与 `reconcile-current` 的服务启动阶段必须强制重建容器，并核验实际 bind source 属于目标 `release_id`，不得复用仍指向旧 runtime-secret 目录的相同 service hash 容器；版本目录至少保留 current 与唯一 rollback target，且该 DEV 适配不替代 Production secret store；
 - 环境变量只携带 secret file path/ref，不携带 secret 明文；
 - 每个 environment/profile/用途独立 secret，不跨环境或跨 profile 复用；
 - CI fork/untrusted PR 不获得 environment secret 或 OIDC deployment permission；
@@ -652,10 +654,11 @@ remote Turbo cache 在 v1 继续禁用。job-local cache 只含可重建依赖/�
 
 发布控制器必须在第一次可能改变运行态的阶段前生成唯一 `operation_id`、持久化 pending operation，并在每个阶段开始/通过时原子更新。任一阶段失败或进程中断后：
 
-- release/install/deploy/rollback/recover-current 共享 Linux 内核 advisory lock；锁元数据文件可以持久存在，但不得作为占用哨兵，进程异常退出或主机重启后必须由内核释放实际所有权；
+- release/install/deploy/rollback/recover-current/reconcile-current 共享 Linux 内核 advisory lock；锁元数据文件可以持久存在，但不得作为占用哨兵，进程异常退出或主机重启后必须由内核释放实际所有权；
 - Accepted application release 与唯一 rollback target 不被候选覆盖；
 - 普通 deploy/rollback 必须以 `RELEASE_RECOVERY_REQUIRED` fail closed，不能把同一 Accepted release 当作无操作 replay；
 - `recover-current` 必须重新执行完整阶段，把当前 Accepted application/config/secret 收敛回来；
+- `reconcile-current` 只适用于已有且精确匹配的 Accepted current，按 state effective catalog 执行无 pull、无 migration、无 seed、无 state rewrite 的 17 阶段运行态重建；无关 dirty operation 必须拒绝，同一失败 reconciliation 才能重试；
 - migration 阶段把 role/credential prepare、Prisma migrate、synthetic seed 与 drift verify 作为同一阶段内的独立受控命令；只有 Prisma migrate 自身完成并核验 migration history 后才记录 `migration_applied=true`，只有 seed 与 drift verify 也通过后才记录 `migration_verified=true`；
 - prepare 或 Prisma migrate 自身失败且 `migration_applied=false` 时，恢复先用只读 drift probe 核验 state 已记录的 effective catalog；若 host checkpoint 恰好在 migration 生效后、`migration_applied` 落盘前丢失，旧 catalog probe 会失败且候选 probe 必须通过，恢复才能选择候选。Prisma migrate 已核验生效但 seed/drift 等后续命令失败时，恢复必须使用候选 immutable migration image/catalog 收敛；两个 probe 都失败时保持 dirty operation 并 fail closed；
 - state 分别记录 Accepted application ref 与 effective catalog ref。代码回滚不声称执行 down migration，也不能把应用切到不接受当前
@@ -951,6 +954,8 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 - 状态：Accepted；
 - 接受日期：2026-07-26；
+- 2026-08-12 修订：项目所有者明确接受 `reconcile-current` 合同与第二 DEV 候选形成及
+  `deploy N+1 → rollback N → redeploy N+1` 演练方案；该批准不包含合并实现 PR，也不授权删除 volume 或重建 deployment state；
 - 2026-08-11 修订：用户明确接受 TLS proxy 在构建阶段移除上游 Caddy 对 8443/8444 不需要的
   `cap_net_bind_service` 文件能力，并要求 publication 在非 root、只读根文件系统、`cap_drop: ALL` 与
   `no-new-privileges` 的真实 hardened 边界下执行 Caddy；用户同时批准合并 PR #130；
