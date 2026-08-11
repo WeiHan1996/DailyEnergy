@@ -146,8 +146,10 @@ deployment bundle、root-only 原子安装、18 阶段顺序发布、唯一 N-1 
 PR #131 merge-main CI 11/11 SUCCESS；精确 merge SHA 的 publication 已通过独立 digest pull、bounded runtime probe、hardened Caddy probe 和
 source-free bundle Gate，新 candidate 已完成 root-only 原子安装但尚未启动。本机 token 已由项目所有者补充 `read:packages`，五个 manifest 精确
 digest 已按 `linux/amd64` 下载，经 638471680 字节 archive SSH 中转并在服务器完成 SHA-256、`RepoDigest` 与平台 `5/5` 复核；双端临时 archive
-已清理。服务器仍无 Accepted release state；旧 operation `1b3431ea-5b44-4fd9-85f8-4434224a503d` 失败在 `tls-ingress` 且已核验 migration，新的
-删除预览严格限定永久删除 `dailyenergy-dev_postgres_data` 与 `dailyenergy-dev_redis_data`，等待项目所有者重新明确授权后才能从空 state 重建。域名 ICP、DNS/TLS 和
+已清理。项目所有者已再次明确批准完整 synthetic DEV 重建；旧 state/Compose snapshot 已 root-only 归档，9 容器、12 网络和两个指定 volume 已删除，
+空 state 复核通过。新 candidate 真实发布通过前 14/18 阶段（含 migration、TLS、health、COS），在 `smoke-safety` 暴露 Compose run 覆盖默认脚本命令的
+稳定缺口；三条 database smoke invocation 修复与跨 Compose 合同进入 Draft PR #132。服务器仍无 Accepted release state，新 operation 已核验
+migration；修复合并并重新 publication 后，任何再次删除 synthetic PostgreSQL/Redis volume 仍需新的精确授权。域名 ICP、DNS/TLS 和
 STAGING/PRODUCTION 独立状态服务仍为外部 Gate；E-013 与其它
 任务继续 Planned。
 

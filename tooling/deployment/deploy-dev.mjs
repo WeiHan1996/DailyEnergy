@@ -411,6 +411,18 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
     ),
     ...(operationCheckpoint === undefined ? {} : { operationCheckpoint }),
   });
+  const databaseSmokeCommand = (phase) =>
+    command(
+      "--profile",
+      "dev-smoke",
+      "run",
+      "--rm",
+      "--no-deps",
+      "database-smoke",
+      "node",
+      "tooling/deployment/database-smoke.mjs",
+      phase,
+    );
   return Object.freeze({
     admin: [
       convergeService("--no-deps", "--wait", "--wait-timeout", "90", "admin"),
@@ -467,17 +479,7 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
     ],
     preflight: [],
     pull: [command("--profile", "dev-smoke", "pull", "--policy", "always")],
-    "smoke-delete": [
-      command(
-        "--profile",
-        "dev-smoke",
-        "run",
-        "--rm",
-        "--no-deps",
-        "database-smoke",
-        "deletion",
-      ),
-    ],
+    "smoke-delete": [databaseSmokeCommand("deletion")],
     "smoke-object": [
       command(
         "--profile",
@@ -488,28 +490,8 @@ export function developmentDeploymentCommands(bundleRoot, environmentFile) {
         "object-smoke",
       ),
     ],
-    "smoke-owner": [
-      command(
-        "--profile",
-        "dev-smoke",
-        "run",
-        "--rm",
-        "--no-deps",
-        "database-smoke",
-        "owner",
-      ),
-    ],
-    "smoke-safety": [
-      command(
-        "--profile",
-        "dev-smoke",
-        "run",
-        "--rm",
-        "--no-deps",
-        "database-smoke",
-        "safety",
-      ),
-    ],
+    "smoke-owner": [databaseSmokeCommand("owner")],
+    "smoke-safety": [databaseSmokeCommand("safety")],
     "stateful-ready": [
       convergeService(
         "--wait",

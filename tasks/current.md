@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（PR #131 已合并并成功重新 publication/install；五个精确镜像已中转至服务器，等待新的 synthetic DEV 重建授权）
+- **最后更新**：2026-08-11（第二次 synthetic DEV 重建已执行；真实发布在 smoke-safety 暴露 Compose run 命令覆盖缺口，修复进入 PR #132）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Progress
@@ -9,9 +9,9 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 publication runtime evidence 修复 PR #131](https://github.com/WeiHan1996/DailyEnergy/pull/131)
-- **当前 PR**：[E-012 post-PR-131 deployment evidence PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)（Draft；持续记录镜像中转与真实部署验收）
+- **当前 PR**：[E-012 database smoke invocation 修复与部署证据 PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)（Draft）
 - **实现合并提交**：E-012 latest squash merge `a03993d2018ee212a1c92169cab8795452c4251d`
-- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / PROXY_FIX_MERGED / PULL_PROBE_FIX_MERGED / MERGE_MAIN_CI_11_OF_11_PASS / PUBLICATION_PASS / HARDENED_CADDY_PROBE_PASS / BUNDLE_INSTALLED / EXACT_IMAGES_5_OF_5_READY / RESET_REAUTHORIZATION_REQUIRED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_REAUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / EXACT_IMAGES_5_OF_5_READY / REDEPLOY_14_OF_18_PHASES_PASS / MIGRATION_APPLIED_AND_VERIFIED / TLS_HEALTH_COS_PASS / DATABASE_SMOKE_INVOCATION_FIX_IN_PR_132 / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -333,10 +333,27 @@ approved development infrastructure
   `tls-proxy`、`worker-restricted`、`admin`、`api`、`worker-background`、`worker-interactive`、`postgres`、`redis`、
   `dependency-stub`，移除并重建 12 个 Compose network；唯一 permanent data 删除目标严格限定为
   `dailyenergy-dev_postgres_data` 与 `dailyenergy-dev_redis_data`，其中 synthetic 数据永久不可恢复；
-- **当前阻塞与解锁条件**：旧 operation 已进入并核验 migration，不能由新 candidate 覆盖；必须由项目所有者基于上述精确预览重新明确批准归档
-  dirty operation、删除完整 DEV Compose 环境及上述两个 volume，并从空 deployment state 重建。上次 destructive reset 授权已经消费，不能复用；
-- **下一动作**：取得新的精确 destructive reset 授权后，先归档无 secret 的 dirty evidence 并校验，再删除预览中的 Compose 环境和两个 volume，
-  从空 state 部署新 candidate；随后完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
+- **第二次重建授权与执行结果**：项目所有者于 2026-08-11 基于上述精确预览明确批准完整 synthetic DEV 重建并永久删除两个指定 volume。执行脚本在
+  release `flock` 内再次验证 operation、闭合的 9 容器/12 网络/2 volume 集合、两个 bundle 与五个 `linux/amd64` 精确镜像；完整旧 state 和
+  无 secret Compose snapshot 已归档到 root-only
+  `/srv/dailyenergy/reset-evidence/e012-reset-1b3431ea-5b44-4fd9-85f8-4434224a503d`，checksum manifest SHA-256 为
+  `8a3c6943089be1f6d6a06b2ee98f1fb74a7365c3b6b5b55370d07aa2106111ef` 且复核通过。9 个容器、12 个网络和
+  `dailyenergy-dev_postgres_data`/`dailyenergy-dev_redis_data` 已删除，卷内 synthetic 数据不可恢复；空 state/零 Compose 资源、两个 bundle 与五个镜像
+  保留均复核通过，一次性脚本已从双端删除；
+- **重建后 database smoke 阻断**：新 operation `1fe81f82-cdbb-400b-b509-a183e138ae04`、target manifest
+  `dcf8c3658997340d4cc73f1a92461f1483444b1220173cb31bdda5195b6583dd` 已通过前 14/18 阶段，包括 migration 两个 checkpoint、完整服务收敛、
+  hardened TLS、health 与 COS object smoke；9 个运行容器均 healthy。第 15 阶段 `smoke-safety` 稳定失败，仍无 Accepted state。单独复现证明
+  `docker compose run database-smoke safety` 覆盖 Compose service 的 `node tooling/deployment/database-smoke.mjs` 默认 command；Node 官方入口因而
+  尝试加载 `/workspace/safety` 并返回 `MODULE_NOT_FOUND`，不是数据库、权限或服务器故障；
+- **修复与自动证明**：部署控制器改为对 Safety、Owner、Deletion 三个 smoke 显式执行
+  `node tooling/deployment/database-smoke.mjs <mode>`；跨 Compose 合同新增逐项断言，确保 phase 只能附加在完整 service command 后。定向
+  `tests/deployment/dev-compose.test.mjs` 为 `7/7` PASS；changed Gate 自动扩大为 full，E-012 task Gate 也已执行，两者 deployment suite 均为
+  `40/42`，仅两个失败严格限定为 macOS 缺少 Linux `flock`，其余格式、Lint、类型、架构、codegen、contracts、agent、CI policy、数据库与新增断言
+  均通过，不将结果冒充为 PASS；固定 Ubuntu PR CI 待提交后补齐 Linux 权威证据。不得手改已安装 bundle 绕过；
+- **当前阻塞与解锁条件**：新 operation 已进入并核验 migration，必须保持 dirty；修复需经 PR #132 完整 Gate、用户批准、合并、merge-main CI、
+  重新 publication/install 和精确镜像收敛后，再生成新的删除预览并取得另一份显式 destructive reset 授权。当前批准已消费，不能复用；
+- **下一动作**：完成 PR #132 的完整验证与审核材料；用户批准合并后生成新 immutable artifact，再按本机中转路径收敛镜像并请求下一次精确 reset 授权，
+  最终完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
