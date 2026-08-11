@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（PR #132 已合并并完成新 publication/install 与五镜像收敛；等待第三次 synthetic DEV 重建的精确授权）
+- **最后更新**：2026-08-11（第三次 synthetic DEV 重建已执行；新候选 18/18 通过并建立首个 Accepted release，等待 clean restart 恢复合同与 rollback candidate 决策）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Progress
@@ -11,7 +11,7 @@
 - **最近合并 PR**：[E-012 database smoke invocation 修复 PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)
 - **当前 PR**：[E-012 post-PR #132 publication / reset evidence PR #133](https://github.com/WeiHan1996/DailyEnergy/pull/133)（Draft）
 - **实现合并提交**：E-012 latest squash merge `372b3db99b3b4e14a3d5b10f4907232f03b7a646`
-- **Gate 结论**：`E012_IN_PROGRESS / PR_132_MERGED / MERGE_MAIN_CI_11_OF_11_PASS / NEW_ARTIFACT_INSTALLED / EXACT_IMAGES_5_OF_5_READY / RESET_REAUTHORIZATION_REQUIRED / REDEPLOY_NOT_STARTED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_REAUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / ACCEPTED_RELEASE_ESTABLISHED / DEPLOY_18_OF_18_PASS / IDEMPOTENT_REPLAY_PASS / CLEAN_DOCKER_RESTART_RECONVERGENCE_GAP_RECORDED / ROLLBACK_TARGET_NULL / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -379,14 +379,43 @@ approved development infrastructure
   `interactive_data`、`interactive_external`、`migration_data`、`object_external`、`restricted_data`、`restricted_external`；唯一永久数据删除目标严格限定为
   `dailyenergy-dev_postgres_data` 与 `dailyenergy-dev_redis_data`，其中 synthetic 数据不可恢复。新的 root-only 归档目标
   `/srv/dailyenergy/reset-evidence/e012-reset-1fe81f82-cdbb-400b-b509-a183e138ae04` 已确认不存在；
-- **当前阻塞与解锁条件**：当前 operation 已进入并核验 migration，不能普通重放或手动清理；只有项目所有者针对上述精确
-  9 容器/13 网络/2 volume 集合重新明确批准完整 synthetic DEV 重建，才可在 release `flock` 内归档 dirty evidence、删除完整 Compose 环境及两个卷，
-  再从空 deployment state 发布新 candidate。此前重复发送的旧重建批准发生在新 artifact/镜像/预览形成前，未执行且不得复用；
-- **下一动作**：取得第三次精确 destructive reset 授权后执行受控重建；随后完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
+- **第三次重建授权与执行结果**：项目所有者于 2026-08-11 基于上述精确 preview 明确批准归档 dirty operation、永久删除两个指定 volume，
+  并从空 deployment state 使用新 candidate 完整重建 synthetic DEV。执行脚本在同一 release `flock` 内重新证明无 Accepted state、operation
+  `1fe81f82-cdbb-400b-b509-a183e138ae04` 的 14/18 phase 与 migration checkpoint、9 容器/13 网络/2 volume 闭合集合、候选 manifest digest 和
+  五个 `linux/amd64` 精确镜像；无 secret 的 operation/manifest/Compose/资源摘要已归档到 root-only
+  `/srv/dailyenergy/reset-evidence/e012-reset-1fe81f82-cdbb-400b-b509-a183e138ae04`，`SHA256SUMS` 文件本身的 SHA-256 为
+  `77c973a7ca1354f202b3993fe64355d19b806c021261de0fc4c7c1374530552b` 且归档内 checksum 全量复核通过。9 个容器、13 个网络和
+  `dailyenergy-dev_postgres_data`/`dailyenergy-dev_redis_data` 已删除，卷内 synthetic 数据不可恢复；空 deployment state、installed bundles、
+  root-only secret/config/runtime material 与五镜像保留均复核通过；
+- **首次 Accepted release**：新 candidate 首次标准 deploy 在 `pull` 阶段因服务器 Docker 无 GHCR 网络代理 fail closed；同一 operation 当时只完成
+  `preflight`、`migration_applied=false`、`migration_verified=false`，没有 Accepted state。项目所有者此前已批准的临时 GHCR 中转路径保持
+  loopback-only：本机 Clash mixed port `127.0.0.1:7897` 与服务器 reverse forward `127.0.0.1:17897` 均通过 GHCR `401`/TLS verify `0` 探针，
+  Docker daemon 临时 systemd drop-in 只含该 loopback proxy、无 credential。同一 manifest 重试后 operation
+  `b12dc3ad-3d67-40f6-9a3c-aa565be3924b` 完成全部 18/18 phase，migration 两个 checkpoint、TLS、health、COS、Safety、owner 与 deletion 均 PASS；
+  receipt `deploy-devr-372b3db99b3b-78988352a735ec2d1a6ea69b-b12dc3ad-3d67-40f6-9a3c-aa565be3924b.json` 已写入，首次 Accepted state SHA-256 为
+  `9541cde7e1e405f185f28a07ecb6bfb25dde092c6c4ced5cb3fad9ae84ed2f53`；
+- **临时网络清理与运行态复核**：Accepted 写入后已删除临时 Docker proxy drop-in、`daemon-reload`/重启 Docker 并关闭 SSH reverse forward；
+  Docker `HTTPProxy`/`HTTPSProxy` 恢复为空，服务器 `17897` 无监听。clean Docker restart 证明当前 `on-failure:3` 不会收敛全部 clean-exit 服务：仅 Admin
+  自动恢复，其余容器保持 exited，两个 Worker 在依赖未 ready 时短暂以 1 退出。使用同一 Accepted bundle/release env、`--force-recreate` 与控制器原顺序
+  收敛后，独立 acceptance audit 再次通过 drift、两个 TLS endpoint、COS write/read/delete、Safety、owner、deletion，且 9 容器 healthy、13 网络、
+  2 volume、Accepted state/receipt 不变；没有手改 state、manifest、migration、secret 或镜像；
+- **幂等重放证据**：同一 Accepted release 标准 `deploy` 重放返回
+  `idempotent=true`、`phases=0`；随后 state SHA-256 仍为
+  `9541cde7e1e405f185f28a07ecb6bfb25dde092c6c4ced5cb3fad9ae84ed2f53`、无 dirty operation、9 容器 healthy；首次 Accepted state 的
+  `rollback_target=null` 符合没有上一 Accepted release 的事实，不能伪造 rollback target；
+- **当前阻塞与解锁条件**：E-012 尚不能关闭。第一份 Accepted release 没有 N-1，因此必须先获得一个真实、兼容的第二 candidate 才能证明
+  deploy → rollback → redeploy；同时 clean Docker restart 已证明当前 restart policy 与 `idempotent=true/phases=0` 入口之间缺少 Accepted runtime
+  reconvergence 合同。修改 Accepted 部署行为前需项目所有者确认恢复方案（建议增加显式、无 migration/state rewrite 的 current-release reconcile 操作），
+  并明确批准用于 rollback 演练的第二 DEV release/config reference；
+- **下一动作**：先确认 clean restart reconcile 合同与第二 DEV candidate 形成方式；随后完成对应规范/实现 Gate、真实 deploy → rollback → redeploy 与
+  post-restart recovery evidence，再关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- 本轮第三次 reset、首次 Accepted release、临时 proxy 完整清理、post-restart 收敛、独立 acceptance audit 与幂等重放均已在真实 DEV 主机完成；
+  `pnpm agent:validate --mode=changed --task=E-012` 对两份项目状态文档返回 `PASS`、rule=`STATUS_DOCS_TARGETED`、executed=`2`。该自动 Gate
+  只证明 Markdown/任务状态一致性；远端 18-phase receipt、resource set、smoke、state digest 与人工 destructive authorization 仍作为独立原始证据记录；
 - publication runtime evidence 的定向合同 `2/2` PASS，完整 publication 文件为 `7/8`：新增逻辑已证明只接受 server 精确 GHCR digest；pull
   独立使用 180 秒 timeout；真正 probe 使用 `--pull never` 并保持 30 秒 hardened boundary；mutable tag 与 pull failure 均返回稳定错误。
   `pnpm agent:validate --mode=changed --task=E-012` 自动提升为 full，`pnpm agent:validate --mode=task --task=E-012` 也已执行；两者均通过格式、
