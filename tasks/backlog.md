@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-11
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：[E-012 开发环境部署](./current.md)（In Progress：PR #130 已修复 TLS proxy；当前解耦 publication 的 digest pull 与 bounded runtime probe）
+- **当前任务**：[E-012 开发环境部署](./current.md)（In Progress：PR #131 已合并并成功 publication/install；等待本机 GHCR 只读登录后中转精确镜像）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -112,23 +112,23 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 
 ## 4. Phase 1：工程基础
 
-| ID                                                            | 任务                                       | 状态        | 主要结果                                                            |
-| ------------------------------------------------------------- | ------------------------------------------ | ----------- | ------------------------------------------------------------------- |
-| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)  | 初始化 TypeScript Monorepo                 | Done        | Workspace、包管理和统一脚本                                         |
-| [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)  | 代码质量基线                               | Done        | TypeScript、ESLint、Prettier、提交规范                              |
-| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)  | NestJS API 骨架                            | Done        | 配置、错误、健康检查和日志                                          |
-| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)  | 微信小程序骨架                             | Done        | 原生小程序、TypeScript、路由和环境                                  |
-| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)  | Next.js 管理后台骨架                       | Done        | 登录外壳和基础布局                                                  |
-| [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)  | PostgreSQL 与 Prisma                       | Done        | 初始 Schema、迁移和测试数据；PR #108 安全返工                       |
-| [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45)  | Redis 与 BullMQ                            | Done        | 缓存、队列和连接管理                                                |
-| [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)  | 统一 Zod Schema、OpenAPI 与生成 API Client | Done        | client-safe Schema、OpenAPI、生成客户端与 drift Gate                |
-| [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done        | 可重复本地环境                                                      |
-| [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done        | 单元、集成、契约和端到端                                            |
-| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done        | 11/11 Gate、365 天 retention 与临时合并控制                         |
-| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | In Progress | 修复 publication runtime evidence pull/probe 超时耦合并重跑真实部署 |
-| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Planned     | 脱敏日志、指标和告警                                                |
-| [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Planned     | 环境可重复、CI 通过、服务可访问                                     |
-| [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done        | P0/P1 上下文路由、任务 Profile 与安静验证                           |
+| ID                                                            | 任务                                       | 状态        | 主要结果                                              |
+| ------------------------------------------------------------- | ------------------------------------------ | ----------- | ----------------------------------------------------- |
+| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)  | 初始化 TypeScript Monorepo                 | Done        | Workspace、包管理和统一脚本                           |
+| [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)  | 代码质量基线                               | Done        | TypeScript、ESLint、Prettier、提交规范                |
+| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)  | NestJS API 骨架                            | Done        | 配置、错误、健康检查和日志                            |
+| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)  | 微信小程序骨架                             | Done        | 原生小程序、TypeScript、路由和环境                    |
+| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)  | Next.js 管理后台骨架                       | Done        | 登录外壳和基础布局                                    |
+| [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)  | PostgreSQL 与 Prisma                       | Done        | 初始 Schema、迁移和测试数据；PR #108 安全返工         |
+| [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45)  | Redis 与 BullMQ                            | Done        | 缓存、队列和连接管理                                  |
+| [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)  | 统一 Zod Schema、OpenAPI 与生成 API Client | Done        | client-safe Schema、OpenAPI、生成客户端与 drift Gate  |
+| [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done        | 可重复本地环境                                        |
+| [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done        | 单元、集成、契约和端到端                              |
+| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done        | 11/11 Gate、365 天 retention 与临时合并控制           |
+| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | In Progress | 本机中转精确镜像后重建并完成真实 deploy/rollback 验收 |
+| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Planned     | 脱敏日志、指标和告警                                  |
+| [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Planned     | 环境可重复、CI 通过、服务可访问                       |
+| [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done        | P0/P1 上下文路由、任务 Profile 与安静验证             |
 
 E-004 已随 PR #96 合并，E-008 已随 PR #97 squash 合并，E-005 已随 PR #98
 合并，E-015 已随 PR #106 squash 合并。E-006 已随 PR #110/#111 完成，E-007 已随
@@ -142,10 +142,14 @@ disposable synthetic state、最小 CAM 权限、生命周期与迁移退出边�
 凭证、内网 DNS/TLS 与 signed write/read/delete smoke 已通过。五角色 digest publication、source-free
 deployment bundle、root-only 原子安装、18 阶段顺序发布、唯一 N-1 rollback 和 loopback TLS Runbook
 已进入 main；PR #127 的 file secret materialization 已通过固定 Linux Gate、publication 与真实安装，PR #128 的
-`--force-recreate`、PR #129 的最终 release fingerprint 和 PR #130 的 hardened TLS proxy 修复也已进入 main。
-PR #130 合并后的 publication 已构建并推送五类镜像，但首次 server digest pull 被包含在 30 秒 runtime probe 中而超时；没有生成 artifact、
-没有改变服务器且仍无 Accepted release state。当前修复限定为单独拉取精确 digest，再以 `--pull never` 执行 bounded probe；新的 qualified
-bundle 生成后优先采用本机按精确 digest 下载、校验并经 SSH 上传服务器的传输路径。域名 ICP、DNS/TLS 和
+`--force-recreate`、PR #129 的最终 release fingerprint、PR #130 的 hardened TLS proxy 和 PR #131 的 runtime evidence pull/probe 解耦均已进入 main。
+PR #131 merge-main CI 11/11 SUCCESS；精确 merge SHA 的 publication 已通过独立 digest pull、bounded runtime probe、hardened Caddy probe 和
+source-free bundle Gate，新 candidate 已完成 root-only 原子安装但尚未启动。本机 token 已由项目所有者补充 `read:packages`，五个 manifest 精确
+digest 已按 `linux/amd64` 下载，经 638471680 字节 archive SSH 中转并在服务器完成 SHA-256、`RepoDigest` 与平台 `5/5` 复核；双端临时 archive
+已清理。项目所有者已再次明确批准完整 synthetic DEV 重建；旧 state/Compose snapshot 已 root-only 归档，9 容器、12 网络和两个指定 volume 已删除，
+空 state 复核通过。新 candidate 真实发布通过前 14/18 阶段（含 migration、TLS、health、COS），在 `smoke-safety` 暴露 Compose run 覆盖默认脚本命令的
+稳定缺口；三条 database smoke invocation 修复与跨 Compose 合同进入 Draft PR #132。服务器仍无 Accepted release state，新 operation 已核验
+migration；修复合并并重新 publication 后，任何再次删除 synthetic PostgreSQL/Redis volume 仍需新的精确授权。域名 ICP、DNS/TLS 和
 STAGING/PRODUCTION 独立状态服务仍为外部 Gate；E-013 与其它
 任务继续 Planned。
 

@@ -69,6 +69,31 @@ test("T-E012-COMPOSE-001 keeps host health probes aligned with Caddy Host and SN
   }
 });
 
+test("T-E012-COMPOSE-001 preserves the database smoke executable when adding a phase", () => {
+  const commands = developmentDeploymentCommands(
+    "/srv/dailyenergy/bundles/synthetic",
+    "/srv/dailyenergy/bundles/synthetic/release.env",
+  );
+  const serviceCommand =
+    policyInput().overlay.services["database-smoke"].command;
+  const cases = [
+    ["smoke-safety", "safety"],
+    ["smoke-owner", "owner"],
+    ["smoke-delete", "deletion"],
+  ];
+
+  for (const [phase, mode] of cases) {
+    const arguments_ = commands[phase][0].arguments;
+    const serviceIndex = arguments_.lastIndexOf("database-smoke");
+    assert.notEqual(serviceIndex, -1, phase);
+    assert.deepEqual(
+      arguments_.slice(serviceIndex + 1),
+      [...serviceCommand, mode],
+      `${phase} must execute the Compose service command before its mode`,
+    );
+  }
+});
+
 test("T-E012-COMPOSE-001 rejects public ingress and server-side builds", () => {
   const publicIngress = policyInput();
   publicIngress.overlay.services["tls-proxy"].ports[0] = "0.0.0.0:8443:8443";
