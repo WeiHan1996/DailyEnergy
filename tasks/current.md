@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（用户已接受 force-recreate 规范修订并批准合并 PR #128）
+- **最后更新**：2026-08-11（PR #128 已合并，进入首次完整 DEV 发布收敛）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **任务状态**：In Review
-- **任务分支**：`agent/e012-force-recreate-secret-bindings`
+- **任务状态**：In Progress
+- **任务分支**：`agent/e012-first-dev-release`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **最近合并 PR**：[E-012 PR #127](https://github.com/WeiHan1996/DailyEnergy/pull/127)
-- **当前 PR**：[E-012 PR #128](https://github.com/WeiHan1996/DailyEnergy/pull/128)（已获合并批准）
-- **实现合并提交**：E-012 latest squash merge `6c597fa85d383386bdd257388ce3166bb6d8bcfb`
-- **Gate 结论**：`E012_IN_REVIEW / PR_127_MERGED / FILE_SECRET_MATERIALIZATION_PASS / DEV_DEPLOY_BLOCKED_STALE_SECRET_BIND_CONTAINER / MIGRATION_NOT_APPLIED / PR_128_REVIEW_HEAD_UBUNTU_CI_PASS / SPEC_AMENDMENT_CONFIRMED / PR_128_MERGE_APPROVED / ACCEPTANCE_HEAD_CI_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **最近合并 PR**：[E-012 PR #128](https://github.com/WeiHan1996/DailyEnergy/pull/128)
+- **当前 PR**：暂无；下一 PR 只承载首次完整 DEV 发布证据或真实发布发现的必要修复
+- **实现合并提交**：E-012 latest squash merge `7d30e840294413a9169fc83bf3c5c953a106ff65`
+- **Gate 结论**：`E012_IN_PROGRESS / PR_128_MERGED / MAIN_CI_PASS / FILE_SECRET_MATERIALIZATION_PASS / FORCE_RECREATE_CONTRACT_ACCEPTED / DEV_REPUBLICATION_PENDING / MIGRATION_NOT_APPLIED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -218,7 +218,12 @@ approved development infrastructure
   [PR #128](https://github.com/WeiHan1996/DailyEnergy/pull/128)；review head `885e38d7671937b647befadb82c9e802e1df752b` 的固定 Ubuntu CI
   [run #31412595534](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31412595534) attempt 2 为 11/11 SUCCESS；attempt 1 仅因 npm registry
   下载超时失败，同一 head 未改代码重跑后通过。用户于 2026-08-11 明确接受强制重建规范修订并批准合并 PR #128；
-- **下一动作**：提交接受记录并通过精确 head 的 11/11 Gate，生成机器 merge receipt 后把 PR #128 转为 Ready 并 squash 合并；随后重新 publication，用新 candidate
+- **PR #128 合并与 main 验证**：接受记录 head `92ece6883fbb27f7fd58324715885a463fff3520` 的固定 Ubuntu CI
+  [run #31449151810](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31449151810) 为 11/11 SUCCESS，人工 merge receipt 为
+  `CI_MANUAL_MERGE_GATE_OK:pr=128:head=92ece6883fbb27f7fd58324715885a463fff3520:run=31449151810:checks=11`；PR 于
+  `2026-08-11T01:28:48Z` squash 合并为 `7d30e840294413a9169fc83bf3c5c953a106ff65`，本地 `main` 与 `origin/main` 已快进核对一致，合并后 main CI
+  [run #31449423856](https://github.com/WeiHan1996/DailyEnergy/actions/runs/31449423856) 为 11/11 SUCCESS；
+- **下一动作**：从精确 main merge `7d30e840294413a9169fc83bf3c5c953a106ff65` 重新 publication，用新 candidate
   替换当前迁移前失败 operation，完成首次 Compose 发布、Accepted state/receipt、loopback TLS、COS/Safety/owner/deletion smoke 与 SSH tunnel 验收；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
