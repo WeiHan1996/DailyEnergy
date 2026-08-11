@@ -9,9 +9,9 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 TLS proxy 修复 PR #130](https://github.com/WeiHan1996/DailyEnergy/pull/130)
-- **当前 PR**：[E-012 publication runtime evidence 修复 PR #131](https://github.com/WeiHan1996/DailyEnergy/pull/131)（Draft；解耦精确 digest pull 与 bounded runtime probe；review CI 11/11 PASS）
+- **当前 PR**：[E-012 publication runtime evidence 修复 PR #131](https://github.com/WeiHan1996/DailyEnergy/pull/131)（Draft；解耦精确 digest pull 与 bounded runtime probe；用户已批准合并）
 - **实现合并提交**：E-012 latest squash merge `a2fdc184e16bfbb0b2ed882ab314973127213ce7`
-- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / PROXY_FIX_MERGED / MAIN_CI_11_OF_11_PASS / PUBLICATION_RUNTIME_EVIDENCE_PULL_TIMEOUT / PULL_PROBE_FIX_REVIEW_CI_11_OF_11_PASS / NO_NEW_ARTIFACT / SERVER_UNCHANGED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / PROXY_FIX_MERGED / MAIN_CI_11_OF_11_PASS / PUBLICATION_RUNTIME_EVIDENCE_PULL_TIMEOUT / PULL_PROBE_FIX_FINAL_CI_11_OF_11_PASS / PR_131_MERGE_APPROVED / NO_NEW_ARTIFACT / SERVER_UNCHANGED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -304,7 +304,10 @@ approved development infrastructure
 - **后续传输路径**：用户提出服务器直连下载较慢时优先由本机下载再上传。新的 qualified bundle 生成后，应用镜像计划按 manifest 精确 digest
   在本机下载和校验，经 SSH/SCP 传到服务器，导入后再次核对 `RepoDigest`，最后清理双端临时 archive；不使用 mutable tag，也不把本机代理或
   registry credential 固化到服务器；
-- **下一动作**：等待 PR #131 固定 Ubuntu 11/11 Gate，用户批准后合并、重新 publication/install，再按 Accepted
+- **PR #131 合并批准**：最终 review head `10b48012ff0db77cb2ad972b310796b69bfc1eb0` 的固定 Ubuntu run `31477768595` 已 11/11
+  SUCCESS；用户于 2026-08-11 明确确认 pull/probe 解耦修复并批准合并。批准不授权跳过 final head Gate、改变服务器或复用旧的 destructive reset 授权；
+- **下一动作**：让本次批准记录的最终 head 通过固定 Ubuntu 11/11 Gate，以 `--match-head-commit` squash 合并 PR #131；验证 merge-main 后重新
+  publication/install，再按 Accepted
   post-migration 恢复边界完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
@@ -315,7 +318,8 @@ approved development infrastructure
   `pnpm agent:validate --mode=changed --task=E-012` 自动提升为 full，`pnpm agent:validate --mode=task --task=E-012` 也已执行；两者均通过格式、
   Lint、类型、架构、codegen、contracts、agent、CI policy、数据库与新增断言，deployment suite 为 `39/41`。仅两项失败严格限定为本机 macOS
   缺少 Linux `flock`，不将结果伪装为 PASS；固定 Ubuntu PR #131 review head `24743a3dd12cc0c191295b1d42009baa2f2b1ef9` 的 run
-  `31477403956` 已 11/11 SUCCESS，补齐 Linux 权威自动证据；
+  `31477403956` 与最终 review head `10b48012ff0db77cb2ad972b310796b69bfc1eb0` 的 run `31477768595` 均已 11/11 SUCCESS，补齐 Linux
+  权威自动证据；
 - 本轮 TLS proxy 修复的 Compose/Caddy/host 定向合同 `7/7` PASS，publication workflow 合同 `1/1` PASS；真实主机无网络探针分别证明原始镜像在
   baseline 与仅 `no-new-privileges` 下可执行、在 `cap_drop: ALL` 下因 `cap_net_bind_service=ep` 失败，并证明复制后的无文件能力二进制在完整
   hardened 边界下成功执行。`pnpm agent:validate --mode=changed --task=E-012` 自动提升为 `security/full`，
