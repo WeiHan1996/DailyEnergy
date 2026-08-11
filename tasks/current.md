@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（PR #129 指纹/恢复规范已确认并获合并批准，接受记录 head 的精确 CI 待核验）
+- **最后更新**：2026-08-11（已获授权并完成首次 synthetic DEV 清空重建；真实 TLS proxy capability 缺陷已复现并进入修复）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **任务状态**：Blocked
-- **任务分支**：`agent/e012-first-dev-release`
+- **任务状态**：In Progress
+- **任务分支**：`agent/e012-dev-reset-recovery`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **最近合并 PR**：[E-012 PR #128](https://github.com/WeiHan1996/DailyEnergy/pull/128)
-- **当前 PR**：[E-012 Draft PR #129](https://github.com/WeiHan1996/DailyEnergy/pull/129)；指纹/恢复规范已获用户确认与合并批准，等待接受记录 head 的精确 CI 后转 Ready
-- **实现合并提交**：E-012 latest squash merge `7d30e840294413a9169fc83bf3c5c953a106ff65`
-- **Gate 结论**：`E012_BLOCKED / PR_128_MERGED / MAIN_CI_PASS / MIGRATION_APPLIED_AND_VERIFIED / API_DEPLOY_FINGERPRINT_DEFECT_CONFIRMED / DIRTY_OPERATION_PRESERVED / NO_ACCEPTED_RELEASE_STATE / FIX_PR_129_ACCEPTED_AND_MERGE_APPROVED / PRE_ACCEPTANCE_HEAD_CI_11_OF_11 / ACCEPTANCE_RECORD_HEAD_CI_PENDING / FULL_SYNTHETIC_DEV_RESET_AUTHORIZATION_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **最近合并 PR**：[E-012 PR #129](https://github.com/WeiHan1996/DailyEnergy/pull/129)
+- **当前 PR**：[E-012 受控重建与 TLS proxy 修复 PR #130](https://github.com/WeiHan1996/DailyEnergy/pull/130)（Draft；记录重建证据并修复 Caddy 文件能力与 `cap_drop: ALL` 的真实运行冲突）
+- **实现合并提交**：E-012 latest squash merge `ba1edac2303622d5b5417f23286c72c27eab5d45`
+- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_AUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / REDEPLOY_MIGRATION_APPLIED_AND_VERIFIED / TLS_INGRESS_FAILED / CADDY_FILE_CAPABILITY_ROOT_CAUSE_CONFIRMED / PROXY_FIX_ACCEPTED / PR_130_MERGE_APPROVED / HEAD_CI_11_OF_11_PASS / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -247,25 +247,70 @@ approved development infrastructure
   修复改为以最终 materialized release ID 复算 manifest API fingerprint，同时分别验证 publication evidence 与最终 manifest 的 ID 绑定，并增加
   publication fingerprint reuse 拒绝测试。因为故障发生在 migration 已核验后，Accepted 合同禁止新 candidate 覆盖 dirty initial operation；不得
   手改 manifest/release env/operation 绕过。ADR-0007 已允许 synthetic DEV 整体重建，但永久删除 PostgreSQL/Redis volume 仍需项目所有者明确授权；
-- **修复 Draft PR**：[Draft PR #129](https://github.com/WeiHan1996/DailyEnergy/pull/129) 的实现 head
-  `74e7b356e7f865d05dc9c03e4a65b89c683a58ac` 已由固定 Ubuntu run `31453623860` 证明 11/11 checks 全部成功；PR 明确列出真实
-  operation/checkpoint 证据、本机 Gate 的 Linux `flock` 限制、规范修订和后续完整 synthetic DEV 重建的独立破坏性授权点。用户已于
-  2026-08-11 明确确认指纹/恢复规范并批准合并 PR #129；接受记录提交产生的新 head 仍须独立通过同一 11-check Gate；
-- **当前阻塞与解锁条件**：接受记录 head 的固定 Ubuntu 11/11 CI 通过后，以精确 head guard 将 PR #129 转 Ready 并 squash 合并；合并并重新 publication 后，用户还需在执行前明确
-  批准“归档无 secret 失败证据并永久删除当前 synthetic DEV PostgreSQL/Redis volume、从空 deployment state 重建”。在该授权前保留 dirty
-  operation、volume、installed bundle 与不可变镜像，不运行新 deploy；
-- **下一动作**：推送接受记录并监控其精确 head 的固定 Ubuntu CI；11/11 全绿后记录机器 receipt、转 Ready 并按用户已有批准 squash 合并；
-  完整 synthetic DEV 重建仍需合并后的独立明确授权；
+- **修复已合并**：[PR #129](https://github.com/WeiHan1996/DailyEnergy/pull/129) 的最终 head
+  `1c2370177365921aa591c7f544f2c85ed7b7426a` 已由固定 Ubuntu run `31454973835` 证明 11/11 checks 全部成功，并以精确 head guard squash
+  合并为 `ba1edac2303622d5b5417f23286c72c27eab5d45`；审计 receipt 记录于
+  [PR comment](https://github.com/WeiHan1996/DailyEnergy/pull/129#issuecomment-5248613717)。merge SHA 的 main run `31455208851` 也已 11/11 PASS；
+- **重新 publication 与安装**：对精确 main merge SHA `ba1edac2303622d5b5417f23286c72c27eab5d45` 手动触发
+  `Publish DEV images`，run `31458470966` 已成功；artifact `9088988161`、name
+  `dev-deployment-bundle-ba1edac2303622d5b5417f23286c72c27eab5d45-31458470966-1`、digest
+  `sha256:50d37af39f73b89cfefa71514ee8a74576dd797c997f1ed1babb9eb557b6082f` 已在本机与服务器双端通过 source-free bundle 和 publication evidence
+  校验。使用既有 `dev-secret-v1`、`dev-cos-credential-v1`、`dev-cos-config-v2` 原子安装 candidate
+  `devr-ba1edac23036-948f7a62e227544c8a88993c`、generation `1`，首次安装 `installed=true`，幂等重放 `installed=false`；
+- **精确镜像就绪**：新 candidate 的五个完整 image index 已导入 Docker 并保留本地
+  `e012-index-ba1edac` tag；逐项 `RepoDigest` 精确匹配 admin
+  `sha256:7fde70816c2caa540804631e3af9aa03452bb97374a7a4d666974daa85981fa7`、migration
+  `sha256:144e9ec4a819b46d2b91ad159a77029a7fd6550393813e12bfa13c446f8b7355`、proxy
+  `sha256:b7845b83b613adab72d45b307f083ad6e7e9642991e08c7b0d79fde66babf47f`、server
+  `sha256:0a1f21fb328f298178dfd4bc71239453b9c45189b8b297c44b3821e965982520`、stub
+  `sha256:bc3ddb72836f2951466878fb2f596bbf67e7455be880080184b810281a099a6e`。下载使用的 loopback-only CONNECT proxy、SSH reverse forward、OCI 归档、共享缓存、短期签名 URL、临时脚本、`skopeo` 与同批 5 个依赖均已清理；本机 `18080` 与服务器 `17897` 无监听；
+- **受控重建删除预览**：Accepted release state 仍不存在；dirty operation
+  `9447435d-eef7-448b-ab16-3fcee11acb4f` 保持 `FAILED`/`active_phase=api`，已完成
+  `preflight`、`pull`、`stateful-ready`、`maintenance-on`、`worker-drain`、`migration`、
+  `worker-interactive`、`worker-background`，且 `migration_applied=true`、`migration_verified=true`。
+  当前 permanent data 删除目标严格限定为 `dailyenergy-dev_postgres_data` 与
+  `dailyenergy-dev_redis_data`；Compose 容器/网络会随空环境重建而移除后重建，installed bundles 和五个精确镜像在重建成功前保留；
+- **重建授权与执行结果**：用户于 2026-08-11 明确批准永久删除 `dailyenergy-dev_postgres_data` 与
+  `dailyenergy-dev_redis_data`、归档 dirty operation 后从空 deployment state 重建 synthetic DEV。执行前再次核对没有 Accepted state、operation
+  `9447435d-eef7-448b-ab16-3fcee11acb4f`、6 个容器、11 个网络和仅上述两个 volume；Compose 环境及两个 volume 已删除，卷内 synthetic 数据不可恢复。
+  完整旧 deployment state 与无 secret snapshot 已移至 root-only
+  `/srv/dailyenergy/reset-evidence/e012-reset-9447435d-eef7-448b-ab16-3fcee11acb4f`，checksum、空 state、零容器和零 volume 复核通过；installed bundles、root-only secret/config 与 5 个镜像均保留；
+- **重建后真实 TLS 阻断**：新 candidate operation `1b3431ea-5b44-4fd9-85f8-4434224a503d` 已通过
+  `preflight`、`pull`、`stateful-ready`、`maintenance-on`、`worker-drain`、`migration`、`worker-interactive`、`worker-background`、`api`、`admin` 与
+  `worker-restricted`，`migration_applied=true`、`migration_verified=true`；`tls-ingress` 因 proxy 容器
+  `[FATAL tini] exec caddy failed: Operation not permitted` 停止，仍没有 Accepted state。无网络一次性真实探针证明 baseline 与仅
+  `no-new-privileges` 均可执行、`cap_drop: ALL` 与完整 hardened 组合均以 255 失败；镜像内 `/usr/bin/caddy` 精确携带
+  `cap_net_bind_service=ep`，复制为无文件能力的同一二进制后在 UID/GID 1000、`cap_drop: ALL`、`no-new-privileges` 下执行成功；
+- **修复边界**：DEV 监听 8443/8444，不需要低端口 capability；保持非 root、只读根文件系统、`cap_drop: ALL` 与
+  `no-new-privileges`，在 `e012-proxy` 构建阶段复制替换 Caddy 二进制以移除文件能力，并在 publication workflow 中按真实 hardened 参数执行
+  `caddy version`。不得在服务器加 capability、手改 Compose 或覆盖 immutable digest；
+- **规范确认与合并批准**：用户于 2026-08-11 明确接受上述 TLS proxy 文件能力移除与 publication hardened runtime probe，并批准合并
+  PR #130；review head `9fa70fb2ce980775278f2c7a9882e26656ac6a95` 的固定 Ubuntu run `31474271915` 已 11/11 SUCCESS；
+- **当前阻塞与解锁条件**：提交本次 Accepted 记录并让精确新 head 通过 11/11 checks 后，以 head guard 合并 PR #130，重新
+  publication/install 精确 artifact；因为本轮失败再次发生在
+  migration 已核验后，替换 artifact 前仍须保留 operation 与新建 volume，待新 artifact 就绪后按精确新预览确认是否需要再次执行完整 synthetic DEV 重建；
+- **下一动作**：完成 Accepted 记录的 final head CI，以精确 head guard 合并 PR #130、重新 publication/install，再按 Accepted
+  post-migration 恢复边界完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- 本轮 TLS proxy 修复的 Compose/Caddy/host 定向合同 `7/7` PASS，publication workflow 合同 `1/1` PASS；真实主机无网络探针分别证明原始镜像在
+  baseline 与仅 `no-new-privileges` 下可执行、在 `cap_drop: ALL` 下因 `cap_net_bind_service=ep` 失败，并证明复制后的无文件能力二进制在完整
+  hardened 边界下成功执行。`pnpm agent:validate --mode=changed --task=E-012` 自动提升为 `security/full`，
+  `pnpm agent:validate --mode=task --task=E-012` 也已执行；两者均通过格式、Lint、类型、架构、codegen、contracts、agent、CI policy、数据库及新增断言，
+  deployment suite 均为 `38/40`，仅两个失败严格限定为本机 macOS 缺少 Linux `flock`，不将结果伪装为 PASS；固定 Ubuntu PR #130 review head
+  `9fa70fb2ce980775278f2c7a9882e26656ac6a95` 的 run `31474271915` 已 11/11 PASS，补齐 Linux `flock` 权威自动证据；
+- 本轮 publication/install/镜像就绪状态更新执行 `pnpm agent:validate --mode=changed --task=E-012`，结果为
+  `PASS`、rule=`STATUS_DOCS_TARGETED`、executed=`2`；随后执行完整
+  `pnpm agent:validate --mode=task --task=E-012`，结果保持 `FAIL 38/40`，两项失败仍严格限定为本机 macOS 缺少 Linux
+  `flock`，其余 deployment、publication fingerprint、配置、类型、架构、contracts、agent 与 policy Gate 通过，不将该结果冒充为 task PASS；
 - 最终 release 指纹修复的精准 Node 用例与 DEV preflight 共 `7/7` PASS；新增独立 materialized `devr-*` fingerprint、publication
   fingerprint reuse 拒绝与 runtime evidence 漂移拒绝断言均已执行。`pnpm agent:validate --mode=changed --task=E-012` 自动升级 full，格式、
   ESLint、类型、架构、codegen、contracts、agent、数据库及新增测试通过后，deployment suite 为 `38/40`；
   `pnpm agent:validate --mode=task --task=E-012` 结果同为 `38/40`。两项失败均限定为 macOS 缺少 Linux `flock`，不伪装为代码失败或 PASS；
-  固定 Ubuntu PR #129 实现 head `74e7b356e7f865d05dc9c03e4a65b89c683a58ac` 的 run `31453623860` 已 11/11 PASS；
-  接受记录提交产生的新 head 仍须重新通过相同 Gate，不复用旧 run；
+  固定 Ubuntu PR #129 最终 head `1c2370177365921aa591c7f544f2c85ed7b7426a` 的 run `31454973835` 已 11/11 PASS；
+  squash merge `ba1edac2303622d5b5417f23286c72c27eab5d45` 的 main run `31455208851` 也已 11/11 PASS；
 - 本轮 stale secret bind 证据已在真实 DEV Compose 2.40.3 上复现：未强制重建时容器继续绑定上一 bundle/无当前 secret mount，使用当前签名 bundle
   `--force-recreate` 后 PostgreSQL 实际 bind source、预设 owner/mode 与 health 全部正确；新增
   `T-E012-DEPLOY-001 force-recreates every service convergence phase` 精确合同测试 `1/1` PASS。macOS 定向 release/Compose suite 为
