@@ -136,6 +136,8 @@ DEV 发布控制器固定执行 preflight、digest pull、stateful readiness、�
 
 已有 Accepted state 时，计划内 Docker daemon clean restart、主机重启或同 release 运行态漂移必须使用显式 `reconcile-current`，不能依赖普通 `deploy` 的 `idempotent=true/phases=0`。该操作要求调用 manifest 与 state `current` 的 release ID/digest 完全一致，绑定当前 Accepted application/config/secret 和 state 中的 effective catalog，拒绝任何未完成的 deploy/rollback/recover operation；只有同一失败 `RECONCILE_CURRENT` operation 才能保留原 `operation_id` 重试。控制器不 pull image，不执行 role/credential prepare、Prisma migrate 或 synthetic seed，也不改写 Accepted state、effective catalog 或 rollback target；它只按 preflight、stateful readiness、关闭 TLS、worker drain、只读 drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、COS object、Safety、owner、deletion、退出维护共 17 个阶段强制重建并验证当前组合。成功 receipt 必须绑定 current 与 effective catalog；失败时 Accepted state 保持逐字节不变并保留 dirty reconciliation operation。若 17 阶段全通过后在 receipt 写入或 operation 清理前退出，下次相同入口必须按原 operation phase 记录确定性修复 receipt，不能重跑阶段或生成新 operation ID。
 
+执行该操作的控制器必须来自同一 current immutable bundle，禁止用新 candidate 控制器跨 bundle 驱动旧 current。首次把 `reconcile-current` 能力引入已有 DEV 时，旧 Accepted bundle 不具备该命令属于预期 bootstrap 边界：先证明旧入口在状态写入前 fail closed、state 字节不变且无 dirty operation，再通过普通 18 阶段发布使带能力的 candidate 成为 current；之后才能用该 current bundle 的控制器执行 clean restart reconciliation。该一次性顺序不得通过修改旧 bundle、复用新控制器脚本、普通 deploy 幂等返回或 recover-current 绕过。
+
 首次发布尚无 Accepted state 时，同一失败 manifest 可以重放。若失败发生在 migration 阶段之前、`migration_applied=false`、`migration_verified=false` 且没有 from-current/recovery catalog，显式部署一个不同且已通过 preflight/secret materialization 的新 candidate 可以替换该失败候选；控制器必须先写入绑定旧 `operation_id`、失败阶段和 replacement manifest digest 的 `SUPERSEDED_BEFORE_MIGRATION` receipt，再清除旧 pending 并开始新 operation。active phase 已进入 migration 或任一 migration checkpoint 为 true 时禁止替换，必须保持 dirty state 并人工判定数据库事实；不得删除或编辑 operation/state 绕过。
 
 此例外不改变 5.2 与第 6、18、19 节的生产合同。`STAGING`、`PRODUCTION` 和处理真实备份的 `RECOVERY` 必须使用独立受控 PostgreSQL、Redis 与对象服务，并使用不同 bucket/prefix、credential、retention 与审计边界；其 preflight 遇到 `DEV_COLOCATED_EXCEPTION` 必须 fail closed。DEV volume、dump、COS object 或 secret 不得迁入 STAGING/PRODUCTION。
@@ -954,6 +956,13 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 - 状态：Accepted；
 - 接受日期：2026-07-26；
+- 2026-08-12 E-012 最终真实演练：首次从不含该命令的旧 Accepted bundle 调用时以
+  `E012_DEPLOY_OPERATION_INVALID:reconcile-current` 在状态变更前 fail closed；state 逐字节不变且无 dirty operation。
+  随后按 18 阶段发布含能力的 N+1，再从 N+1 current bundle 完成两次 clean restart reconciliation、
+  rollback N 与 redeploy N+1；该证据明确了上述一次性 bootstrap 顺序，并已随 E-012 最终证据获接受；
+- 2026-08-12 E-012 最终验收：项目所有者明确接受首次引入 `reconcile-current` 的 bootstrap 澄清与全部最终证据，
+  并授权 PR #134 在精确 final-head Gate 通过后标记 Ready、squash 合并、关闭 Issue #50，将 E-012 置为 Done，
+  且只把 E-013 提升为 Ready；公网 ICP/DNS/TLS 与 STAGING/PRODUCTION 独立状态服务 Gate 不因此解除；
 - 2026-08-12 修订：项目所有者明确接受 `reconcile-current` 合同与第二 DEV 候选形成及
   `deploy N+1 → rollback N → redeploy N+1` 演练方案；该批准不包含合并实现 PR，也不授权删除 volume 或重建 deployment state；
 - 2026-08-11 修订：用户明确接受 TLS proxy 在构建阶段移除上游 Caddy 对 8443/8444 不需要的

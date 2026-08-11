@@ -1,8 +1,9 @@
 # DailyEnergy DEV 发布、回滚与换机 Runbook
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
 - **所属任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **最后更新**：2026-08-12
+- **接受日期**：2026-08-12
 - **适用范围**：腾讯云上海临时 DEV 主机；loopback TLS；PostgreSQL 18、Redis 8 与应用同机；私有 COS application object
 - **上游权威**：[ADR-0007](../decisions/ADR-0007-development-colocation-exception.md)、[部署、配置与回滚规范](../technical/deployment.md)、[测试策略](../technical/testing.md)、[故障和安全事件响应](./incident-response.md)
 - **生产资格**：无；本流程和产物都固定为 `production_eligible=false`
@@ -159,6 +160,14 @@ DEV 使用 Caddy internal certificate，因此浏览器会显示本地不受信�
 - `release-operation.json` 不存在；若存在，先按其原操作恢复，不能用 reconciliation 覆盖；
 - 当前 bundle、root-only config/secret、全部 immutable image 与 effective catalog bundle 仍在主机；
 - 本次只恢复 synthetic DEV 运行态，不删除 volume、network、state、bundle、secret 或审计证据。
+
+`reconcile-current` 只能由 state 中 `current.release_id` 对应的 immutable bundle 自身提供和执行；不得用
+新 candidate 的控制器脚本驱动旧 current bundle。首次引入该命令时，如果现有 Accepted release 早于
+此能力并返回 `E012_DEPLOY_OPERATION_INVALID:reconcile-current`，先证明失败发生在任何 state/runtime
+写入之前、Accepted state 逐字节不变且没有 `release-operation.json`。随后按普通 18 阶段流程先发布
+包含该能力的新 candidate；只有它成为 current 后，才通过一次新的 clean restart 和本节命令验证
+17 阶段 reconciliation。不得用跨 bundle 控制器、手改旧 bundle、普通 deploy 的幂等返回或
+`recover-current` 伪造该一次性 bootstrap。
 
 进入 state 中 `current.release_id` 对应 bundle，执行：
 
