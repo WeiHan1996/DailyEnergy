@@ -182,7 +182,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                 | metrics、Gateway、privacy、incident、architecture、deployment |
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                     | database、testing、deployment、ADR-0005、Issue #44            |
 | [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness 与 E-011 CI、artifact、SBOM/provenance 证据入口                   | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-012 reconcile-current 实现位于 Draft PR #133 | Accepted Phase 0B specs、E-012 Issue #50                      |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-012 PR #133 已合并，真实演练完成并等待最终证据验收 | Accepted Phase 0B specs、E-012 Issue #50                      |
 
 ### 7.7 Phase Gate
 
@@ -291,6 +291,8 @@ E-013 或 D 系列能力。E-009 已随 PR #115 squash 合并并进入 Done，Is
 E-010 已随 PR #117 squash 合并并进入 Done；E-011 已随 PR #119 squash 合并为
 `266a7dc39b87aec23740d64656bf33081a3aa34b` 并进入 Done。E-012 是唯一当前任务；开发基础设施与
 ADR-0007 DEV-only 例外已获明确授权，首个 Accepted DEV release 已建立。项目所有者于 2026-08-12 接受显式
-`reconcile-current` 合同与第二候选的 deploy/rollback/redeploy 演练方案；实现分支为 `agent/e012-post-132-publication`，Draft PR 为 #133。公网固定
-TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
+`reconcile-current` 合同与第二候选的 deploy/rollback/redeploy 演练方案；PR #133 已 squash 合并，第二 candidate 的 18 阶段
+deploy/rollback/redeploy、17 阶段 clean restart reconciliation、无代理清理和独立验收审计均已完成。当前分支为
+`agent/e012-final-evidence`，等待 final evidence Draft PR Gate 与项目所有者验收；E-012 尚未置为 Done，E-013 尚未提升。
+公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。

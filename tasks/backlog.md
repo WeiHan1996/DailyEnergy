@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-12
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：[E-012 开发环境部署](./current.md)（In Progress：reconcile-current 与第二候选演练方案已批准；实现、CI 与真实证据待完成）
+- **当前任务**：[E-012 开发环境部署](./current.md)（In Review：第二候选 deploy/reconcile/rollback/redeploy 与最终独立审计已完成，等待最终证据验收）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -125,7 +125,7 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 | [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done        | 可重复本地环境                                        |
 | [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done        | 单元、集成、契约和端到端                              |
 | [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done        | 11/11 Gate、365 天 retention 与临时合并控制           |
-| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | In Progress | 完成 clean restart 恢复与真实 deploy/rollback 验收    |
+| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | In Review   | 审核最终真实演练证据与首次引入 bootstrap 约束          |
 | [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Planned     | 脱敏日志、指标和告警                                  |
 | [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Planned     | 环境可重复、CI 通过、服务可访问                       |
 | [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done        | P0/P1 上下文路由、任务 Profile 与安静验证             |
@@ -157,9 +157,13 @@ root-only 安装与五个 `linux/amd64` digest 本机中转/服务器复核均�
 当前 `on-failure:3` 与 `idempotent=true/phases=0` 之间缺少自动 runtime reconvergence 合同。项目所有者于 2026-08-12 明确接受无
 pull/migration/state rewrite 的 `reconcile-current` 合同，并批准从合并后的真实 immutable artifact 形成第二 DEV candidate，执行
 `deploy N+1 → rollback N → redeploy N+1` 与 clean restart reconciliation 演练；该批准不包含合并 PR #133 或新的 volume 删除/reset。
-E-012 关闭前仍需完成实现 Gate、Ubuntu PR CI、另行合并批准、publication/install 与真实演练证据。域名 ICP、DNS/TLS 和
-STAGING/PRODUCTION 独立状态服务仍为外部 Gate；E-013 与其它
-任务继续 Planned。
+PR #133 已 squash 合并为 `0717c9c7a20aa7e999125c0fa82c88e5397e1795`，PR/merge-main CI 均为 11/11 SUCCESS；精确 merge SHA 的
+publication、source-free bundle、第二 candidate 安装和五个 `linux/amd64` digest 证明已完成。真实 DEV 已完成 N+1 deploy、clean restart
+reconciliation、rollback N、redeploy N+1 与无代理最终 reconciliation；18/18、17/17 receipts、state byte identity、唯一 operation IDs、
+9/13/2 资源闭集和独立 drift/TLS/COS/Safety/owner/deletion audit 均通过。首次引入时旧 N bundle 不含新命令并在状态写入前 fail closed，
+因此 Runbook 补充“先发布含能力的 N+1，再从 current N+1 演练 reconciliation”的一次性 bootstrap 约束，禁止跨 bundle controller。
+E-012 关闭前只等待 final evidence PR 自动 Gate 与项目所有者验收；域名 ICP、DNS/TLS 和 STAGING/PRODUCTION 独立状态服务仍为外部 Gate，
+E-013 与其它任务继续 Planned。
 
 ## 5. Phase 2：确定性核心闭环
 

@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-12（`reconcile-current` 合同与第二 DEV 候选演练方案已获批准，Draft PR #133 正在实现与验证）
+- **最后更新**：2026-08-12（PR #133 已合并；第二 DEV 候选 deploy/reconcile/rollback/redeploy 与最终独立审计已完成，等待最终证据审核）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **任务状态**：In Progress
-- **任务分支**：`agent/e012-post-132-publication`
+- **任务状态**：In Review
+- **任务分支**：`agent/e012-final-evidence`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **最近合并 PR**：[E-012 database smoke invocation 修复 PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)
-- **当前 PR**：[E-012 post-PR #132 publication / reset evidence PR #133](https://github.com/WeiHan1996/DailyEnergy/pull/133)（Draft）
-- **实现合并提交**：E-012 latest squash merge `372b3db99b3b4e14a3d5b10f4907232f03b7a646`
-- **Gate 结论**：`E012_IN_PROGRESS / ACCEPTED_RELEASE_ESTABLISHED / RECONCILE_CURRENT_OWNER_ACCEPTED / RECONCILE_CURRENT_PR_CI_11_OF_11_PASS / SECOND_DEV_CANDIDATE_EXERCISE_APPROVED / MERGE_APPROVAL_PENDING / ROLLBACK_TARGET_NULL / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **最近合并 PR**：[E-012 reconcile-current PR #133](https://github.com/WeiHan1996/DailyEnergy/pull/133)
+- **当前 PR**：E-012 final evidence Draft PR 待创建
+- **实现合并提交**：E-012 latest squash merge `0717c9c7a20aa7e999125c0fa82c88e5397e1795`
+- **Gate 结论**：`E012_IN_REVIEW / SECOND_ACCEPTED_RELEASE_ACTIVE / RECONCILE_CURRENT_REAL_17_OF_17_PASS / DEPLOY_ROLLBACK_REDEPLOY_18_OF_18_PASS / FINAL_INDEPENDENT_AUDIT_PASS / FINAL_EVIDENCE_REVIEW_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -406,16 +406,58 @@ approved development infrastructure
 - **2026-08-12 所有者决策**：项目所有者明确批准显式 `reconcile-current` 合同，并批准使用合并修复后形成的第二个真实 immutable DEV 候选执行
   `deploy N+1 → rollback N → redeploy N+1` 与 clean restart 后 reconciliation 演练。批准范围不包括合并 Draft PR #133，也不包含新的 destructive reset、
   volume 删除或 deployment state 清空；
-- **reconcile-current 实现状态**：Draft PR #133 已加入独立 `RECONCILE_CURRENT` operation、17 阶段无 pull/migration/seed 收敛、current/effective-catalog
-  绑定、同 operation ID 失败重试、state/rollback target 不改写及 receipt crash repair。定向新增合同 `9/9` PASS；代码 head
-  `a2b09984f93c2b9798c268c40bad7a71a3823c65` 的固定 Ubuntu run `31513265580` 已 11/11 SUCCESS；
-- **当前阻塞与解锁条件**：E-012 尚不能关闭，但方案决策和实现 Gate 已解除。仍需项目所有者另行明确批准合并 PR #133，再从 merge-main 精确提交形成并安装
-  第二候选，完成真实 reconciliation 与 `deploy → rollback → redeploy` 证据；当前首个 Accepted release 的 `rollback_target=null` 保持事实，不伪造 N-1；
-- **下一动作**：确认 PR #133 最终状态记录 head 的 11/11 CI 后请求合并批准；获批并合并后再 publication/install 第二候选并执行已批准演练；
+- **reconcile-current 实现合并**：PR #133 加入独立 `RECONCILE_CURRENT` operation、17 阶段无 pull/migration/seed 收敛、current/effective-catalog
+  绑定、同 operation ID 失败重试、state/rollback target 不改写及 receipt crash repair。定向新增合同 `9/9` PASS；项目所有者批准最终 head
+  `248a47fdabd3b0e2b6785cebbf8d5717a2dcafcc`，固定 Ubuntu PR run `31513653857` 为 11/11 SUCCESS；PR 已 squash 合并为
+  `0717c9c7a20aa7e999125c0fa82c88e5397e1795`，merge-main run `31515046431` 也为 11/11 SUCCESS；
+- **合并后 publication**：精确 merge SHA 的 publication run `31515278549` 成功，artifact `9110953066`、name
+  `dev-deployment-bundle-0717c9c7a20aa7e999125c0fa82c88e5397e1795-31515278549-1`、digest
+  `sha256:07bc56c592995f2795e725b16a6552d8ab665c8c6d307b8aaf07813dd8f81bda` 保留至 `2027-08-11T16:59:32Z`；
+- **第二候选安装与镜像证明**：bundle 本机与服务器均通过闭合 `files=16`、无 symlink、runtime/supply/image binding 与
+  `production_eligible=false` 校验；使用既有三个 root-only ref 原子安装 candidate
+  `devr-0717c9c7a20a-6b552b3b08f28a19d3256195`，manifest SHA-256
+  `bdf62ad4931bd8b6126159bbacdd09589070efca1ab658b00aacf2fc40e4170e`。五个精确 digest 经本机
+  `linux/amd64` 验证、638473728 字节 archive 与双端 SHA-256
+  `e4647bd88a7616bd4b6cf365d87f7b59440afcf6edd7c8df0bcba3ea7ebd1a09` 中转，在服务器完成正式
+  RepoDigest/platform `5/5` 复核；transfer tags 和双端临时 archive 已清理；
+- **首次引入 bootstrap 证据**：clean Docker restart 后旧 N bundle 的 immutable controller 不包含新命令，真实调用以
+  `E012_DEPLOY_OPERATION_INVALID:reconcile-current` 在 state/runtime 写入前 fail closed；Accepted state hash 仍为
+  `9541cde7e1e405f185f28a07ecb6bfb25dde092c6c4ced5cb3fad9ae84ed2f53`、逐字节不变且无 dirty operation。
+  因此首次引入顺序收敛为先用标准 18 阶段发布含能力的 N+1，再从 N+1 current bundle 演练 clean restart reconciliation；禁止跨 bundle
+  运行新 controller、修改旧 bundle 或用幂等 deploy/recover-current 伪造证明；
+- **N+1 deploy 与 reconciliation**：首次 N+1 deploy operation `1a4152e9-3986-48ae-851d-5480dae18e1a` 完成 18/18，
+  state current/catalog 均为 N+1、rollback target 为 N。随后 clean restart 再现仅 Admin 自启、其余 8 个容器退出；从 N+1 bundle 执行
+  `reconcile-current` operation `bd658d5f-69bf-4279-8360-044c1230e38d` 完成 17/17，state hash 前后均为
+  `6c4863d3cc1618a12f323c76aede00b95f039fff86b1e024c854ad28e06f65ea` 且逐字节不变；
+- **rollback 与 redeploy**：rollback operation `89386748-3f23-4349-addf-5bb2df149353` 完成 18/18，current 回到 N、
+  rollback target 被消费为 `null`，effective catalog 正确保留 N+1。第二次 N+1 deploy operation
+  `215f50f8-74a7-4763-9ee7-065196d90188` 再完成 18/18，生成不同 receipt；最终 current/catalog 为 N+1、唯一 rollback target 为 N；
+- **无代理最终状态与独立审计**：临时 Docker proxy drop-in、SSH reverse forward、registry 临时凭据、transfer tags、上传 bundle/archive 和
+  state 比较副本均已清理；Docker `HTTPProxy/HTTPSProxy` 为空，服务器 `17897` 无监听。无代理 clean restart 后 reconciliation operation
+  `83172703-d502-4780-853e-1501f69526e6` 再完成 17/17，最终 state hash 前后均为
+  `56433f48fbf743f2ef38dab437647e188d01a40b90e4a3f62f37e9bb9e3d08d6` 且逐字节不变。独立 audit 通过 DB drift
+  `tables=70/enums=35/indexes=184/constraints=149/triggers=20/functions=17`、API/Admin loopback TLS HTTP 200、COS
+  put/get/hash/delete/head-404、Safety、owner 与 deletion；9 个容器 healthy、13 网络、2 volume、无 dirty operation，两个 deploy receipt 与两个
+  reconciliation receipt 的 operation ID/文件名均唯一；
+- **当前阻塞与解锁条件**：实现、publication、真实 deploy/reconcile/rollback/redeploy、临时网络清理和最终独立 audit 均已完成。E-012 只等待
+  项目所有者审核最终证据 PR，并确认首次引入 bootstrap 约束和 E-012 验收；尚未把任务标记 Done、关闭 Issue #50 或提升 E-013；
+- **下一动作**：创建 final evidence Draft PR，运行 changed/task Gate 与固定 Ubuntu PR CI；证据齐备后请求项目所有者验收。获批后再更新
+  Runbook lifecycle、squash 合并、关闭 Issue #50、将 E-012 置为 Done 并仅把 E-013 提升为 Ready；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- PR #133 final head `248a47fdabd3b0e2b6785cebbf8d5717a2dcafcc`、merge SHA
+  `0717c9c7a20aa7e999125c0fa82c88e5397e1795` 与 publication run `31515278549` 已分别通过 11/11 PR CI、
+  11/11 merge-main CI、五镜像/runtime/supply/hardened proxy/source-free artifact Gate；
+- 真实 N+1 deploy、rollback、redeploy 均为 18/18 PASS，两次 N+1 deploy receipt operation ID 唯一；N+1 clean restart reconciliation
+  在临时 GHCR proxy 存在和完全移除后各为 17/17 PASS，两次 reconciliation receipt operation ID 唯一且 state 均逐字节不变；
+- 最终无代理独立 audit 通过 drift、API/Admin loopback TLS、COS write/read/delete/delete-verification、Safety、owner、deletion、9/13/2
+  资源闭集、current/catalog/rollback target 和无 dirty operation 核验；公网 ICP/DNS/TLS 与 STAGING/PRODUCTION 状态服务 Gate 未被误报解除；
+- final evidence 分支的 `pnpm agent:validate --mode=changed --task=E-012` 自动扩大为 `code/full`，
+  `pnpm agent:validate --mode=task --task=E-012` 也已执行；两者均通过格式、Lint、类型、架构、codegen、contracts、agent、CI policy、
+  数据库和其余 deployment 合同，deployment suite 为 `48/50`。两项失败只因本机 macOS 缺少 Linux `flock`，不冒充 PASS；
+  固定 Ubuntu Draft PR CI 将作为该平台合同的权威自动证据；
 - 本轮 `reconcile-current` 的阶段顺序、成功收敛、Accepted state 逐字节不变、current/effective-catalog 组合、无 pull/prepare/migrate/seed、
   `--force-recreate`、失败后同 operation ID 重试、无关 dirty operation 拒绝和 receipt crash repair 定向合同 `9/9` PASS；source registry 保持
   `736 total / 170 COVERED / 566 PLANNED / 0 NA_WITH_REASON`。`pnpm agent:validate --mode=changed --task=E-012` 自动扩大为 full，
