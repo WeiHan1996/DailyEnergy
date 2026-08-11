@@ -1,17 +1,17 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（第二次 synthetic DEV 重建已执行；真实发布在 smoke-safety 暴露 Compose run 命令覆盖缺口，修复进入 PR #132）
+- **最后更新**：2026-08-11（PR #132 已合并并完成新 publication/install 与五镜像收敛；等待第三次 synthetic DEV 重建的精确授权）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：In Progress
-- **任务分支**：`agent/e012-post-131-publication`
+- **任务分支**：`agent/e012-post-132-publication`
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
-- **最近合并 PR**：[E-012 publication runtime evidence 修复 PR #131](https://github.com/WeiHan1996/DailyEnergy/pull/131)
-- **当前 PR**：[E-012 database smoke invocation 修复与部署证据 PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)（Draft）
-- **实现合并提交**：E-012 latest squash merge `a03993d2018ee212a1c92169cab8795452c4251d`
-- **Gate 结论**：`E012_IN_PROGRESS / SYNTHETIC_DEV_RESET_REAUTHORIZED_AND_EXECUTED / RESET_EVIDENCE_ARCHIVED / EXACT_IMAGES_5_OF_5_READY / REDEPLOY_14_OF_18_PHASES_PASS / MIGRATION_APPLIED_AND_VERIFIED / TLS_HEALTH_COS_PASS / DATABASE_SMOKE_INVOCATION_FIX_IN_PR_132 / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **最近合并 PR**：[E-012 database smoke invocation 修复 PR #132](https://github.com/WeiHan1996/DailyEnergy/pull/132)
+- **当前 PR**：待创建 E-012 post-PR #132 publication / reset evidence Draft PR
+- **实现合并提交**：E-012 latest squash merge `372b3db99b3b4e14a3d5b10f4907232f03b7a646`
+- **Gate 结论**：`E012_IN_PROGRESS / PR_132_MERGED / MERGE_MAIN_CI_11_OF_11_PASS / NEW_ARTIFACT_INSTALLED / EXACT_IMAGES_5_OF_5_READY / RESET_REAUTHORIZATION_REQUIRED / REDEPLOY_NOT_STARTED / NO_ACCEPTED_RELEASE_STATE / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -351,10 +351,38 @@ approved development infrastructure
   `40/42`，仅两个失败严格限定为 macOS 缺少 Linux `flock`，其余格式、Lint、类型、架构、codegen、contracts、agent、CI policy、数据库与新增断言
   均通过，不将结果冒充为 PASS；固定 Ubuntu review head `6ec99a72345dfedb0d1982e7dfd8801767ddd543` 的 PR CI run
   `31483290015` 已 11/11 SUCCESS，补齐 Linux `flock` 权威证据。不得手改已安装 bundle 绕过；
-- **当前阻塞与解锁条件**：新 operation 已进入并核验 migration，必须保持 dirty；修复需经 PR #132 完整 Gate、用户批准、合并、merge-main CI、
-  重新 publication/install 和精确镜像收敛后，再生成新的删除预览并取得另一份显式 destructive reset 授权。当前批准已消费，不能复用；
-- **下一动作**：完成 PR #132 的完整验证与审核材料；用户批准合并后生成新 immutable artifact，再按本机中转路径收敛镜像并请求下一次精确 reset 授权，
-  最终完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
+- **PR #132 批准、合并与 main 证明**：项目所有者于 2026-08-11 明确确认修复并批准 squash 合并；最终 head
+  `f70e05daf1420fb8fac773376fa3b90ef808a30f` 的固定 Ubuntu run `31483551073` 为 11/11 SUCCESS，机器 receipt 为
+  `CI_MANUAL_MERGE_GATE_OK:pr=132:head=f70e05daf1420fb8fac773376fa3b90ef808a30f:run=31483551073:checks=11`，审计记录在
+  [PR comment](https://github.com/WeiHan1996/DailyEnergy/pull/132#issuecomment-5252959644)。PR 已 squash 合并为
+  `372b3db99b3b4e14a3d5b10f4907232f03b7a646`，merge-main run `31489984647` 也为 11/11 SUCCESS；
+- **新 publication 与 bundle 安装**：对精确 merge SHA 触发的 `Publish DEV images` run `31490307068` 在 `5m30s` 内完成五镜像构建、
+  runtime/supply evidence、hardened Caddy probe 与 source-free bundle Gate。artifact `9100900114`、name
+  `dev-deployment-bundle-372b3db99b3b4e14a3d5b10f4907232f03b7a646-31490307068-1`、digest
+  `sha256:9a3a29a6117f656ed61441fcb130b3dce609c719e373d68c6f197b887849ae4f` 保留至 `2027-08-11T12:14:57Z`；本机和服务器均通过
+  `image_set=dev-372b3db99b3b-31490307068-1`、runtime `5`、supply `6`、bundle files `16`、无 symlink/源码与
+  `production_eligible=false` 校验。使用 `dev-secret-v1`、`dev-cos-credential-v1`、`dev-cos-config-v2` 原子安装 root-only candidate
+  `devr-372b3db99b3b-78988352a735ec2d1a6ea69b`，generation `1`、manifest SHA-256
+  `ecde45be5c5a04808932d8c05cf3a0ffc66c57d8b2f48304f0dbf0c89f87acba`；临时上传副本已删除；
+- **新五镜像本机中转与服务器复核**：按新 manifest 精确 digest 在本机下载并验证 `linux/amd64`，五镜像导出为
+  `638471168` 字节 archive、SHA-256 `6a856583614b9add6c34e8fb9775002844e1685c53145e82b062d5160953d12d`，以约
+  `4.97 MiB/s` 经 SSH 中转。服务器复算完全一致后 `docker load`，再只读取 registry manifest 绑定正式 digest；admin、migration、proxy、server、stub
+  均通过 `RepoDigest` 与平台 `5/5` 复核。双端临时 archive 和本机 transfer tag 已删除；服务器 transfer tag 保留到重建结束；
+- **第三次受控重建删除预览**：只读复核确认 `release-state.json` 不存在；dirty operation
+  `1fe81f82-cdbb-400b-b509-a183e138ae04` 仍为 `FAILED`/`DEPLOY`、`active_phase=smoke-safety`、
+  `failure_code=E012_DEPLOY_PHASE_FAILED`，已完成前 14/18 阶段，且 `migration_applied=true`、`migration_verified=true`、
+  `from_current=null`、`recovery_catalog=null`。失败 target manifest SHA-256 为
+  `dcf8c3658997340d4cc73f1a92461f1483444b1220173cb31bdda5195b6583dd`；新 candidate、五个正式 digest 镜像和 root-only secret/config 均已就绪。
+  完整重建会停止并移除 9 个健康容器 `admin`、`api`、`dependency-stub`、`postgres`、`redis`、`tls-proxy`、
+  `worker-background`、`worker-interactive`、`worker-restricted`，移除并重建 13 个 Compose network
+  `admin_api`、`api_data`、`api_external`、`background_data`、`background_external`、`dev_ingress`、`fault_control`、
+  `interactive_data`、`interactive_external`、`migration_data`、`object_external`、`restricted_data`、`restricted_external`；唯一永久数据删除目标严格限定为
+  `dailyenergy-dev_postgres_data` 与 `dailyenergy-dev_redis_data`，其中 synthetic 数据不可恢复。新的 root-only 归档目标
+  `/srv/dailyenergy/reset-evidence/e012-reset-1fe81f82-cdbb-400b-b509-a183e138ae04` 已确认不存在；
+- **当前阻塞与解锁条件**：当前 operation 已进入并核验 migration，不能普通重放或手动清理；只有项目所有者针对上述精确
+  9 容器/13 网络/2 volume 集合重新明确批准完整 synthetic DEV 重建，才可在 release `flock` 内归档 dirty evidence、删除完整 Compose 环境及两个卷，
+  再从空 deployment state 发布新 candidate。此前重复发送的旧重建批准发生在新 artifact/镜像/预览形成前，未执行且不得复用；
+- **下一动作**：取得第三次精确 destructive reset 授权后执行受控重建；随后完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
