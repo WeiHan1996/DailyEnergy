@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-11（PR #129 已合并且 main CI 通过，等待重新 publication 与完整 synthetic DEV 重建独立授权）
+- **最后更新**：2026-08-11（固定 main publication、新 candidate 安装与 5/5 精确镜像已完成；等待完整 synthetic DEV 重建独立授权）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **任务状态**：Blocked
@@ -9,9 +9,9 @@
 - **当前 Issue**：[E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
 - **实现 PR**：[E-012 已合并 PR #121](https://github.com/WeiHan1996/DailyEnergy/pull/121)
 - **最近合并 PR**：[E-012 PR #129](https://github.com/WeiHan1996/DailyEnergy/pull/129)
-- **当前 PR**：暂无；`agent/e012-dev-reset-recovery` 只记录合并后 publication 与受控恢复交接，未执行完整环境重建
+- **当前 PR**：[E-012 受控重建交接 PR #130](https://github.com/WeiHan1996/DailyEnergy/pull/130)（Draft；只记录合并后 publication、精确删除预览与受控恢复交接，未执行完整环境重建）
 - **实现合并提交**：E-012 latest squash merge `ba1edac2303622d5b5417f23286c72c27eab5d45`
-- **Gate 结论**：`E012_BLOCKED / PR_129_MERGED / MAIN_CI_PASS / MIGRATION_APPLIED_AND_VERIFIED / API_DEPLOY_FINGERPRINT_FIX_MERGED / DIRTY_OPERATION_PRESERVED / NO_ACCEPTED_RELEASE_STATE / REPUBLICATION_PENDING / FULL_SYNTHETIC_DEV_RESET_AUTHORIZATION_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E012_BLOCKED / PR_129_MERGED / MAIN_CI_PASS / REPUBLICATION_PASS / NEW_CANDIDATE_INSTALLED / EXACT_IMAGES_READY_5_OF_5 / MIGRATION_APPLIED_AND_VERIFIED / DIRTY_OPERATION_PRESERVED / NO_ACCEPTED_RELEASE_STATE / FULL_SYNTHETIC_DEV_RESET_AUTHORIZATION_PENDING / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
 
 ## 1. 当前目标
 
@@ -251,15 +251,37 @@ approved development infrastructure
   `1c2370177365921aa591c7f544f2c85ed7b7426a` 已由固定 Ubuntu run `31454973835` 证明 11/11 checks 全部成功，并以精确 head guard squash
   合并为 `ba1edac2303622d5b5417f23286c72c27eab5d45`；审计 receipt 记录于
   [PR comment](https://github.com/WeiHan1996/DailyEnergy/pull/129#issuecomment-5248613717)。merge SHA 的 main run `31455208851` 也已 11/11 PASS；
-- **当前阻塞与解锁条件**：先从精确 main merge SHA `ba1edac2303622d5b5417f23286c72c27eab5d45` 重新 publication 并安装新 candidate；在执行环境重建前，用户还需明确
-  批准“归档无 secret 失败证据并永久删除当前 synthetic DEV PostgreSQL/Redis volume、从空 deployment state 重建”。在该授权前保留 dirty
-  operation、volume、installed bundle 与不可变镜像，不运行新 deploy；
-- **下一动作**：以 `release_sha=ba1edac2303622d5b5417f23286c72c27eab5d45` 手动触发 `Publish DEV images`，核验 publication artifact 并安装新 candidate；
-  随后再次展示准确的容器/volume 删除预览并请求完整 synthetic DEV 重建的独立明确授权；
+- **重新 publication 与安装**：对精确 main merge SHA `ba1edac2303622d5b5417f23286c72c27eab5d45` 手动触发
+  `Publish DEV images`，run `31458470966` 已成功；artifact `9088988161`、name
+  `dev-deployment-bundle-ba1edac2303622d5b5417f23286c72c27eab5d45-31458470966-1`、digest
+  `sha256:50d37af39f73b89cfefa71514ee8a74576dd797c997f1ed1babb9eb557b6082f` 已在本机与服务器双端通过 source-free bundle 和 publication evidence
+  校验。使用既有 `dev-secret-v1`、`dev-cos-credential-v1`、`dev-cos-config-v2` 原子安装 candidate
+  `devr-ba1edac23036-948f7a62e227544c8a88993c`、generation `1`，首次安装 `installed=true`，幂等重放 `installed=false`；
+- **精确镜像就绪**：新 candidate 的五个完整 image index 已导入 Docker 并保留本地
+  `e012-index-ba1edac` tag；逐项 `RepoDigest` 精确匹配 admin
+  `sha256:7fde70816c2caa540804631e3af9aa03452bb97374a7a4d666974daa85981fa7`、migration
+  `sha256:144e9ec4a819b46d2b91ad159a77029a7fd6550393813e12bfa13c446f8b7355`、proxy
+  `sha256:b7845b83b613adab72d45b307f083ad6e7e9642991e08c7b0d79fde66babf47f`、server
+  `sha256:0a1f21fb328f298178dfd4bc71239453b9c45189b8b297c44b3821e965982520`、stub
+  `sha256:bc3ddb72836f2951466878fb2f596bbf67e7455be880080184b810281a099a6e`。下载使用的 loopback-only CONNECT proxy、SSH reverse forward、OCI 归档、共享缓存、短期签名 URL、临时脚本、`skopeo` 与同批 5 个依赖均已清理；本机 `18080` 与服务器 `17897` 无监听；
+- **受控重建删除预览**：Accepted release state 仍不存在；dirty operation
+  `9447435d-eef7-448b-ab16-3fcee11acb4f` 保持 `FAILED`/`active_phase=api`，已完成
+  `preflight`、`pull`、`stateful-ready`、`maintenance-on`、`worker-drain`、`migration`、
+  `worker-interactive`、`worker-background`，且 `migration_applied=true`、`migration_verified=true`。
+  当前 permanent data 删除目标严格限定为 `dailyenergy-dev_postgres_data` 与
+  `dailyenergy-dev_redis_data`；Compose 容器/网络会随空环境重建而移除后重建，installed bundles 和五个精确镜像在重建成功前保留；
+- **当前阻塞与解锁条件**：publication、candidate 安装与精确镜像准备均已完成。执行环境重建前，用户仍需在上述精确预览后单独明确批准
+  “归档无 secret 失败证据并永久删除当前 synthetic DEV PostgreSQL/Redis volume、从空 deployment state 重建”。普通“继续”不替代该不可逆数据删除授权；
+- **下一动作**：展示 `dailyenergy-dev_postgres_data`、`dailyenergy-dev_redis_data` 与 dirty operation 的最终删除预览并请求独立明确授权；获批后归档无 secret
+  evidence、执行空状态重建、完成 18 阶段 acceptance、幂等重放、rollback/redeploy 证据并关闭 E-012；
 - **下一任务**：E-012 完成后才评估 E-013；当前不提升其它任务。
 
 ## 6. 验证与环境说明
 
+- 本轮 publication/install/镜像就绪状态更新执行 `pnpm agent:validate --mode=changed --task=E-012`，结果为
+  `PASS`、rule=`STATUS_DOCS_TARGETED`、executed=`2`；随后执行完整
+  `pnpm agent:validate --mode=task --task=E-012`，结果保持 `FAIL 38/40`，两项失败仍严格限定为本机 macOS 缺少 Linux
+  `flock`，其余 deployment、publication fingerprint、配置、类型、架构、contracts、agent 与 policy Gate 通过，不将该结果冒充为 task PASS；
 - 最终 release 指纹修复的精准 Node 用例与 DEV preflight 共 `7/7` PASS；新增独立 materialized `devr-*` fingerprint、publication
   fingerprint reuse 拒绝与 runtime evidence 漂移拒绝断言均已执行。`pnpm agent:validate --mode=changed --task=E-012` 自动升级 full，格式、
   ESLint、类型、架构、codegen、contracts、agent、数据库及新增测试通过后，deployment suite 为 `38/40`；
