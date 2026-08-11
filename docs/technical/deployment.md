@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-08-11（E-012 release-scoped file secret 的容器强制收敛合同待确认）
+- **最后更新**：2026-08-11（E-012 release-scoped file secret 的容器强制收敛合同已接受）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0007 临时 DEV 同机例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
@@ -946,8 +946,8 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 - 状态：Accepted；
 - 接受日期：2026-07-26；
-- 2026-08-11 修订待确认：真实 DEV 证明 Compose service hash 不包含足以区分 release-scoped
-  file secret source 的信息；拟要求所有服务 `up` 阶段显式强制重建并核验目标 release bind；
+- 2026-08-11 修订：用户明确接受真实 DEV 证据驱动的 release-scoped file secret 容器强制
+  收敛合同；所有服务 `up` 阶段必须显式强制重建并核验目标 release bind，并批准合并 PR #128；
 - 2026-08-10 修订：用户明确接受 E-012 的 release-scoped file secret materialization 与
   `SUPERSEDED_BEFORE_MIGRATION` 首次失败候选替换合同，并批准合并 PR #127；
 - 2026-08-04 修订：用户明确接受测试策略 22.2 的私有 GitHub Free 临时补偿控制；
