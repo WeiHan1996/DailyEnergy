@@ -11,15 +11,15 @@
 - [content-layout.md](./content-layout.md)
 - [prototype-validation.md](./prototype-validation.md)
 
-正式视觉工作流已进入 Phase 2。D-001 为唯一 Ready 任务，后续任务保持 Planned：
+正式视觉工作流已进入 Phase 2。D-001 为唯一 In Progress 任务，后续任务保持 Planned：
 
-| Issue                                                              | 状态    | 计划文档                      | 主要结果                                 |
-| ------------------------------------------------------------------ | ------- | ----------------------------- | ---------------------------------------- |
-| [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)   | Ready   | `visual-direction.md`         | 品牌与视觉方向                           |
-| [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100) | Planned | `design-system.md`            | Figma Variables、Design Tokens 与组件    |
-| [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101) | Planned | `core-flow-high-fidelity.md`  | 核心流程八页及关键状态                   |
-| [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) | Planned | `developer-handoff.md`        | 核心流程可点击原型、验证与开发交付       |
-| [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) | Planned | `phase2-remaining-handoff.md` | 晚间、趋势与数据权利页面高保真及开发交付 |
+| Issue                                                              | 状态        | 计划文档                                     | 主要结果                                 |
+| ------------------------------------------------------------------ | ----------- | -------------------------------------------- | ---------------------------------------- |
+| [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)   | In Progress | [visual-direction.md](./visual-direction.md) | 三条品牌与视觉方向 Draft                 |
+| [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100) | Planned     | `design-system.md`                           | Figma Variables、Design Tokens 与组件    |
+| [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101) | Planned     | `core-flow-high-fidelity.md`                 | 核心流程八页及关键状态                   |
+| [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) | Planned     | `developer-handoff.md`                       | 核心流程可点击原型、验证与开发交付       |
+| [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) | Planned     | `phase2-remaining-handoff.md`                | 晚间、趋势与数据权利页面高保真及开发交付 |
 
 依赖顺序为 `D-001 → D-002 → D-003 → D-004 → D-005`。
 
