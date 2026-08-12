@@ -1,0 +1,150 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+connectors:
+  count/raw-content:
+    logs:
+      raw_content_matches:
+        description: Count of ordinary log records stopped by the raw-content detector
+        conditions:
+          - 'IsMatch(body["log"], "(?i)(authorization|cookie|password|secret|prompt|provider_response|preferred_name|bind_values)")'
+
+receivers:
+  fluentforward:
+    endpoint: 0.0.0.0:8006
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 256
+    spike_limit_mib: 64
+  transform/closed-spans:
+    error_mode: ignore
+    trace_statements:
+      - context: span
+        statements:
+          - keep_keys(resource.attributes, ["service.namespace", "service.name", "service.version", "deployment.environment.name", "dailyenergy.runtime_profile", "dailyenergy.release_id", "dailyenergy.config_schema_version", "dailyenergy.contract_bundle_version"])
+          - keep_keys(attributes, ["operation_code", "outcome_code", "reason_code", "http_method", "status_class", "queue_family", "workload", "generation_mode", "provider_code", "model_revision_bucket"])
+  filter/closed-spans:
+    error_mode: ignore
+    traces:
+      span:
+        - 'resource.attributes["service.namespace"] != "dailyenergy"'
+        - 'attributes["operation_code"] == nil'
+        - 'attributes["outcome_code"] == nil'
+  filter/raw-content:
+    error_mode: ignore
+    logs:
+      log_record:
+        - 'IsMatch(body["log"], "(?i)(authorization|cookie|password|secret|prompt|provider_response|preferred_name|bind_values)")'
+  transform/closed-logs:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+          - set(cache, ParseJSON(body["log"])) where body["log"] != nil
+          - set(attributes["contract_version"], cache["contract_version"])
+          - set(attributes["environment"], cache["environment"])
+          - set(attributes["service"], cache["service"])
+          - set(attributes["runtime_profile"], cache["runtime_profile"])
+          - set(attributes["release_id"], cache["release_id"])
+          - set(attributes["operation_code"], cache["operation_code"])
+          - set(attributes["outcome_code"], cache["outcome_code"])
+          - set(attributes["reason_code"], cache["reason_code"])
+          - set(attributes["severity"], cache["severity"])
+          - set(attributes["request_id"], cache["request_id"])
+          - set(attributes["trace_id"], cache["trace_id"])
+          - set(resource.attributes["service.namespace"], "dailyenergy")
+          - set(resource.attributes["service.name"], cache["service"])
+          - set(resource.attributes["deployment.environment.name"], cache["environment"])
+          - set(resource.attributes["dailyenergy.runtime_profile"], cache["runtime_profile"])
+          - set(resource.attributes["dailyenergy.release_id"], cache["release_id"])
+          - set(body, cache["message_code"])
+          - keep_keys(resource.attributes, ["service.namespace", "service.name", "deployment.environment.name", "dailyenergy.runtime_profile", "dailyenergy.release_id"])
+          - keep_keys(attributes, ["contract_version", "environment", "service", "runtime_profile", "release_id", "operation_code", "outcome_code", "reason_code", "severity", "request_id", "trace_id"])
+  filter/closed-logs:
+    error_mode: ignore
+    logs:
+      log_record:
+        - 'attributes["contract_version"] != "ordinary-log-v1"'
+        - 'attributes["operation_code"] == nil'
+        - 'attributes["outcome_code"] == nil'
+  tail_sampling:
+    decision_wait: 10s
+    expected_new_traces_per_sec: 100
+    policies:
+      - name: errors
+        type: status_code
+        status_code:
+          status_codes: [ERROR]
+      - name: normal-success-10-percent
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: 10
+  batch:
+    send_batch_size: 512
+    timeout: 5s
+
+exporters:
+  otlphttp/loki:
+    logs_endpoint: http://loki:3100/otlp/v1/logs
+    sending_queue:
+      enabled: true
+      queue_size: 2048
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_elapsed_time: 30s
+  otlphttp/tempo:
+    endpoint: http://tempo:4318
+    sending_queue:
+      enabled: true
+      queue_size: 2048
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_elapsed_time: 30s
+  prometheus/raw-content:
+    endpoint: 0.0.0.0:9464
+    namespace: dailyenergy
+
+service:
+  extensions: [health_check]
+  telemetry:
+    metrics:
+      address: 0.0.0.0:8888
+  pipelines:
+    logs/raw-content-detector:
+      receivers: [fluentforward]
+      processors: [memory_limiter]
+      exporters: [count/raw-content]
+    logs:
+      receivers: [fluentforward]
+      processors:
+        [
+          memory_limiter,
+          filter/raw-content,
+          transform/closed-logs,
+          filter/closed-logs,
+          batch,
+        ]
+      exporters: [otlphttp/loki]
+    metrics/raw-content-detector:
+      receivers: [count/raw-content]
+      exporters: [prometheus/raw-content]
+    traces:
+      receivers: [otlp]
+      processors:
+        [
+          memory_limiter,
+          transform/closed-spans,
+          filter/closed-spans,
+          tail_sampling,
+          batch,
+        ]
+      exporters: [otlphttp/tempo]

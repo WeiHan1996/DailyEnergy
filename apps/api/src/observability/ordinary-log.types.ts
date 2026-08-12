@@ -85,6 +85,7 @@ export interface OrdinaryLogEvent {
   readonly service: "api";
   readonly severity: RuntimeLogLevel;
   readonly timestamp: string;
+  readonly trace_id?: string;
 }
 
 export const OrdinaryLogEventSchema = z.strictObject({
@@ -111,6 +112,10 @@ export const OrdinaryLogEventSchema = z.strictObject({
   service: z.literal("api"),
   severity: z.enum(["DEBUG", "INFO", "WARN", "ERROR"]),
   timestamp: z.iso.datetime({ offset: true }),
+  trace_id: z
+    .string()
+    .regex(/^[a-f0-9]{32}$/u)
+    .optional(),
 });
 
 export interface OrdinaryLogSink {

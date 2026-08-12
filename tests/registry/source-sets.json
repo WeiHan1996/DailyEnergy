@@ -247,6 +247,10 @@
     {
       "path": "tests/registry/e012-evidence-manifest.json",
       "kind": "proof-map"
+    },
+    {
+      "path": "tests/registry/e013-evidence-manifest.json",
+      "kind": "proof-map"
     }
   ],
   "automatic_evidence": [

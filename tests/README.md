@@ -40,12 +40,29 @@ job 冒充 PASS。普通合成报告保留 14 天，SBOM/provenance 等供应链
 出现第二位可合并协作者或平台能力可用前，合并必须先执行上述只读 Gate，再使用
 `gh pr merge --squash --match-head-commit <HEAD_SHA>`。该控制不豁免任何失败或缺失 lane。
 
+## E-013 可观测性入口
+
+| 命令                          | 证据                                                                                                   |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `pnpm observability:check`    | Collector/backend、22 条 alert、7 个 SLO/21 条 recording rule、5 个 Dashboard 与 6 个 Runbook 静态合同 |
+| `pnpm observability:test`     | 字段/平面/基数、低流量、告警、成本、TTL 和 E-014 pending 的 known-fail fixture                         |
+| `pnpm observability:validate` | 上述 checker 与静态 suite 的聚合 Gate                                                                  |
+| `pnpm observability:runtime`  | exact-digest Collector、Prometheus、Alertmanager、Loki 与 Tempo 对真实配置和 PromQL 的解析 Gate        |
+| `pnpm registry:check`         | `S33-OBS-001..048` 独立 assertion 与 coverage registry 漂移                                            |
+
+参考栈由 `docker/compose.observability.yaml` 显式叠加，不改变 E-012 默认 11-service
+Compose 闭集。`docker/observability/contract.json` 固定 vendor-neutral 信号、字段、平面、
+期限和 Production `BLOCKED` Gate；`exercise-contract.json` 明确保持
+`E014_REQUIRED / completed=false`，不能由 E-013 静态证据冒充 alert delivery、TTL 删除、
+backend outage 或 RC 演练已经完成。
+
 ## Registry 与证据
 
 - `registry/source-sets.json` 从 Accepted 原文和 executable Schema 提取 ID；
 - `registry/coverage-registry.json` 是确定性生成物，只允许 `COVERED`、`PLANNED`、
   `NA_WITH_REASON`；
-- `registry/e010-evidence-manifest.json`、`registry/e011-evidence-manifest.json` 与已有
+- `registry/e010-evidence-manifest.json`、`registry/e011-evidence-manifest.json`、
+  `registry/e013-evidence-manifest.json` 与已有
   database/queue/Compose manifest 提供逐项
   assertion，不把低层证据升级为高层 conformance；
 - 尚未实现的业务、恢复、模型、真机或人工场景保持 `PLANNED` 或明确 pending，不能因

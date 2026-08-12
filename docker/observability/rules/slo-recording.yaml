@@ -1,0 +1,84 @@
+groups:
+  - name: dailyenergy-slo-recording-v1
+    interval: 30s
+    rules:
+      - record: dailyenergy:slo_core_api_total:rate5m
+        expr: sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP"}[5m]))
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_api_bad:rate5m
+        expr: sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP",outcome_code=~"RETRYABLE|TERMINAL|UNKNOWN"}[5m]))
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_api_error_ratio:5m
+        expr: dailyenergy:slo_core_api_bad:rate5m / clamp_min(dailyenergy:slo_core_api_total:rate5m, 0.000001)
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_api_error_ratio:30m
+        expr: sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP",outcome_code=~"RETRYABLE|TERMINAL|UNKNOWN"}[30m])) / clamp_min(sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP"}[30m])), 0.000001)
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_api_error_ratio:1h
+        expr: sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP",outcome_code=~"RETRYABLE|TERMINAL|UNKNOWN"}[1h])) / clamp_min(sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP"}[1h])), 0.000001)
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_api_error_ratio:2h
+        expr: sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP",outcome_code=~"RETRYABLE|TERMINAL|UNKNOWN"}[2h])) / clamp_min(sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP"}[2h])), 0.000001)
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_api_error_ratio:6h
+        expr: sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP",outcome_code=~"RETRYABLE|TERMINAL|UNKNOWN"}[6h])) / clamp_min(sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP"}[6h])), 0.000001)
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_api_error_ratio:24h
+        expr: sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP",outcome_code=~"RETRYABLE|TERMINAL|UNKNOWN"}[24h])) / clamp_min(sum(rate(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP"}[24h])), 0.000001)
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_api_error_ratio:3d
+        expr: sum(increase(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP",outcome_code=~"RETRYABLE|TERMINAL|UNKNOWN"}[3d])) / clamp_min(sum(increase(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP"}[3d])), 1)
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_api_error_ratio:28d
+        expr: sum(increase(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP",outcome_code=~"RETRYABLE|TERMINAL|UNKNOWN"}[28d])) / clamp_min(sum(increase(dailyenergy_http_server_requests_total{operation_code!="UNKNOWN_HTTP"}[28d])), 1)
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_api_budget_remaining:28d
+        expr: 1 - (dailyenergy:slo_core_api_error_ratio:28d / 0.005)
+        labels:
+          slo_id: S33-SLO-01
+      - record: dailyenergy:slo_core_read_good_ratio:28d
+        expr: sum(increase(dailyenergy_http_server_request_duration_seconds_bucket{operation_code=~"PUBLIC_BOOTSTRAP_PLACEHOLDER",outcome_code="SUCCESS",le="0.5"}[28d])) / clamp_min(sum(increase(dailyenergy_http_server_request_duration_seconds_count{operation_code=~"PUBLIC_BOOTSTRAP_PLACEHOLDER",outcome_code="SUCCESS"}[28d])), 1)
+        labels:
+          slo_id: S33-SLO-02
+      - record: dailyenergy:slo_core_write_good_ratio:28d
+        expr: sum(increase(dailyenergy_http_server_request_duration_seconds_bucket{operation_code=~"PUBLIC_WECHAT_SESSION_PLACEHOLDER",outcome_code="SUCCESS",le="0.75"}[28d])) / clamp_min(sum(increase(dailyenergy_http_server_request_duration_seconds_count{operation_code=~"PUBLIC_WECHAT_SESSION_PLACEHOLDER",outcome_code="SUCCESS"}[28d])), 1)
+        labels:
+          slo_id: S33-SLO-03
+      - record: dailyenergy:slo_generation_available_ratio:28d
+        expr: sum(increase(dailyenergy_gateway_generation_mode_total{outcome_code="SUCCESS",generation_mode=~"PRIMARY_AI|BACKUP_AI|CONTROLLED_TEMPLATE"}[28d])) / clamp_min(sum(increase(dailyenergy_gateway_invocations_total[28d])), 1)
+        labels:
+          slo_id: S33-SLO-04
+      - record: dailyenergy:slo_generation_latency_good_ratio:28d
+        expr: sum(increase(dailyenergy_gateway_end_to_end_duration_seconds_bucket{outcome_code="SUCCESS",le="10"}[28d])) / clamp_min(sum(increase(dailyenergy_gateway_end_to_end_duration_seconds_count{outcome_code="SUCCESS"}[28d])), 1)
+        labels:
+          slo_id: S33-SLO-05
+      - record: dailyenergy:slo_ai_8s_good_ratio:28d
+        expr: sum(increase(dailyenergy_gateway_end_to_end_duration_seconds_bucket{workload="DAILY",generation_mode=~"PRIMARY_AI|BACKUP_AI",outcome_code="SUCCESS",le="8"}[28d])) / clamp_min(sum(increase(dailyenergy_gateway_end_to_end_duration_seconds_count{workload="DAILY",generation_mode=~"PRIMARY_AI|BACKUP_AI",outcome_code="SUCCESS"}[28d])), 1)
+        labels:
+          metric_contract: S25-M20
+          slo_id: S33-SLO-06
+      - record: dailyenergy:slo_template_ratio:28d
+        expr: sum(increase(dailyenergy_gateway_generation_mode_total{workload="DAILY",generation_mode="CONTROLLED_TEMPLATE",outcome_code="SUCCESS"}[28d])) / clamp_min(sum(increase(dailyenergy_gateway_generation_mode_total{workload="DAILY",outcome_code="SUCCESS"}[28d])), 1)
+        labels:
+          metric_contract: S25-M21
+          slo_id: S33-SLO-07
+      - record: dailyenergy:cost_known_ratio:35d
+        expr: (sum(increase(dailyenergy_cost_terminal_total[35d])) - sum(increase(dailyenergy_cost_unknown_total[35d]))) / sum(increase(dailyenergy_cost_terminal_total[35d]))
+        labels:
+          metric_contract: S25-M23
+      - record: dailyenergy:cost_price_coverage_ratio:35d
+        expr: sum(increase(dailyenergy_cost_price_covered_total[35d])) / sum(increase(dailyenergy_cost_terminal_total[35d]))
+      - record: dailyenergy:budget_consumption_ratio
+        expr: max(label_replace(max(dailyenergy_budget_forecast_micros), "__dailyenergy_budget_source", "forecast", "", ".*") or label_replace(sum(dailyenergy_cost_micros_total), "__dailyenergy_budget_source", "actual", "", ".*")) / max(dailyenergy_budget_approved_micros)
+      - record: dailyenergy:observability_cost_ratio:30d
+        expr: sum(increase(dailyenergy_cost_micros_total{operation_code="TELEMETRY_EXPORT"}[30d])) / clamp_min(sum(increase(dailyenergy_cost_micros_total[30d])), 1)

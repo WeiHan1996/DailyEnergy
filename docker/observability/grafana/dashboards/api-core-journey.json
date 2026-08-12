@@ -1,0 +1,90 @@
+{
+  "annotations": { "list": [] },
+  "editable": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Status: PROVISIONAL / BLOCKED",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "max(time() - dailyenergy_telemetry_heartbeat_timestamp_seconds)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Request rate by operation",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (operation_code) (rate(dailyenergy_http_server_requests_total[5m]))"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Availability bad",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (operation_code) (rate(dailyenergy_http_server_requests_total{outcome_code=~\"RETRYABLE|TERMINAL|UNKNOWN\"}[5m]))"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Expected rejects",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (operation_code) (rate(dailyenergy_http_server_requests_total{outcome_code=\"EXPECTED_REJECT\"}[5m]))"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Success latency P95",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, operation_code) (rate(dailyenergy_http_server_request_duration_seconds_bucket{outcome_code=\"SUCCESS\"}[5m])))"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Contract failures",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(dailyenergy_http_response_contract_failures_total[5m]))"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": [
+    "dailyenergy",
+    "api",
+    "contract:dailyenergy-telemetry-v1",
+    "window:5m",
+    "environment:single",
+    "freshness:required"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "custom",
+        "query": "LOCAL,CI,DEV,STAGING",
+        "current": { "text": "CI", "value": "CI" }
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "title": "API Core Journey",
+  "uid": "api-core-journey",
+  "version": 1
+}

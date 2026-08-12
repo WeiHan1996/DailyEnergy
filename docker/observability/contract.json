@@ -1,0 +1,161 @@
+{
+  "contract_version": "dailyenergy-observability-v1",
+  "telemetry_schema_version": "dailyenergy-telemetry-v1",
+  "reference_environments": ["LOCAL", "CI", "STAGING"],
+  "production_backend": {
+    "status": "BLOCKED",
+    "required_gates": [
+      "VENDOR",
+      "REGION",
+      "TTL",
+      "RBAC_MFA_AUDIT",
+      "CROSS_BORDER",
+      "EXIT_EXPORT",
+      "INDEPENDENT_FAILURE_DOMAIN",
+      "ON_CALL_DELIVERY"
+    ]
+  },
+  "resource_attributes": [
+    "service.namespace",
+    "service.name",
+    "service.version",
+    "deployment.environment.name",
+    "dailyenergy.runtime_profile",
+    "dailyenergy.release_id",
+    "dailyenergy.config_schema_version",
+    "dailyenergy.contract_bundle_version"
+  ],
+  "signal_attributes": {
+    "generation_mode": 4,
+    "http_method": 6,
+    "model_revision_bucket": 4,
+    "operation_code": 64,
+    "outcome_code": 12,
+    "provider_code": 4,
+    "queue_family": 4,
+    "reason_code": 24,
+    "status_class": 6,
+    "workload": 4
+  },
+  "forbidden_attributes": [
+    "account_ref",
+    "attempt_ref",
+    "authorization",
+    "bind_values",
+    "body",
+    "cookie",
+    "device_id",
+    "exception_message",
+    "ip",
+    "job_ref",
+    "object_ref",
+    "openid",
+    "preferred_name",
+    "prompt",
+    "provider_response",
+    "query",
+    "raw_url",
+    "request_id",
+    "safety_raw_text",
+    "session_id",
+    "span_id",
+    "sql",
+    "stack",
+    "task_ref",
+    "trace_id",
+    "unionid",
+    "user_agent"
+  ],
+  "loki_index_labels": [
+    "service.name",
+    "deployment.environment.name",
+    "dailyenergy.runtime_profile"
+  ],
+  "loki_structured_metadata": [
+    "dailyenergy.release_id",
+    "dailyenergy.config_schema_version",
+    "dailyenergy.contract_bundle_version",
+    "request_id",
+    "trace_id"
+  ],
+  "planes": {
+    "ORDINARY_RUNTIME": {
+      "classification": ["T1", "T4"],
+      "indexed_labels": [
+        "service.name",
+        "deployment.environment.name",
+        "dailyenergy.runtime_profile"
+      ],
+      "forbidden_details": ["SAFETY", "DATA_TASK_SCOPE", "IP", "USER_CONTENT"]
+    },
+    "SECURITY": {
+      "classification": ["T2"],
+      "backend_status": "PRODUCTION_BLOCKED"
+    },
+    "GOVERNANCE": {
+      "classification": ["T2", "T4"],
+      "backend_status": "RESTRICTED_ONLY"
+    },
+    "SAFETY_CONTROL": {
+      "classification": ["T2", "T4"],
+      "backend_status": "RESTRICTED_ONLY"
+    },
+    "COST": {
+      "classification": ["T1", "T4"],
+      "dimensions": ["workload", "provider_code", "model_revision_bucket"]
+    },
+    "PRODUCT_ANALYTICS": {
+      "classification": ["T4"],
+      "source": "S24_S25_ONLY",
+      "runtime_derivation": "FORBIDDEN"
+    }
+  },
+  "cardinality": {
+    "global_active_series_limit": 12288,
+    "per_metric_active_series_limit": 128,
+    "new_label_requires": [
+      "OWNER",
+      "PURPOSE",
+      "ALLOWED_VALUES",
+      "MAXIMUM_CARDINALITY",
+      "RETENTION",
+      "QUERY_REFERENCE",
+      "KNOWN_FAIL_FIXTURE"
+    ]
+  },
+  "sampling": {
+    "staging_recovery_synthetic_percent": 100,
+    "production_error_percent": 100,
+    "production_normal_success_percent": 10,
+    "normal_success_minimum_percent": 1,
+    "normal_success_maximum_percent": 10
+  },
+  "retention": {
+    "ordinary_logs_days": 30,
+    "raw_traces_days": 7,
+    "detailed_metrics_days": 35,
+    "t4_daily_aggregate_months": 13,
+    "security_logs_months": 6,
+    "alert_payload_days": 30
+  },
+  "cost_unknown_policy": "NULL_AND_BLOCKED",
+  "alert_delivery": {
+    "reference_receiver": "local-null",
+    "production_status": "BLOCKED"
+  },
+  "dashboards": [
+    "executive-reliability",
+    "api-core-journey",
+    "async-data",
+    "ai-cost",
+    "telemetry-health"
+  ],
+  "runbooks": [
+    "core-api-burn",
+    "async-data",
+    "database",
+    "ai-cost",
+    "telemetry-health",
+    "data-lifecycle"
+  ]
+}

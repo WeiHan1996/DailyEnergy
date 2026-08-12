@@ -1,0 +1,51 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+common:
+  path_prefix: /var/lib/loki
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+schema_config:
+  configs:
+    - from: 2026-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: dailyenergy_
+        period: 24h
+
+storage_config:
+  filesystem:
+    directory: /var/lib/loki/chunks
+
+limits_config:
+  retention_period: 720h
+  allow_structured_metadata: true
+  otlp_config:
+    resource_attributes:
+      attributes_config:
+        - action: index_label
+          attributes:
+            - service.name
+            - deployment.environment.name
+            - dailyenergy.runtime_profile
+        - action: structured_metadata
+          attributes:
+            - dailyenergy.release_id
+            - dailyenergy.config_schema_version
+            - dailyenergy.contract_bundle_version
+
+compactor:
+  working_directory: /var/lib/loki/compactor
+  retention_enabled: true
+  delete_request_store: filesystem
+
+# Index labels are intentionally closed; trace_id/request_id remain structured metadata.
+frontend:
+  max_outstanding_per_tenant: 256

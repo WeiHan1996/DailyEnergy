@@ -11,6 +11,7 @@ import {
 import type { Response } from "express";
 
 import { OrdinaryLogger } from "../../observability/ordinary-logger.js";
+import { ApiTelemetry } from "../../observability/api-telemetry.js";
 import {
   ApiException,
   type ApiErrorCategory,
@@ -97,6 +98,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
   public constructor(
     private readonly contextStore: RequestContextStore,
     private readonly logger: OrdinaryLogger,
+    private readonly telemetry: ApiTelemetry,
   ) {}
 
   public catch(exception: unknown, host: ArgumentsHost): void {
@@ -125,17 +127,28 @@ export class ApiExceptionFilter implements ExceptionFilter {
       },
     });
 
+    const outcomeCode =
+      normalized.status < 500
+        ? "EXPECTED_REJECT"
+        : normalized.retryable
+          ? "RETRYABLE"
+          : "TERMINAL";
+    const statusClass = normalized.status >= 500 ? "5xx" : "4xx";
+    this.telemetry.record("dailyenergy_http_server_requests_total", 1, {
+      httpMethod: context.httpMethod,
+      operationCode: context.operationCode,
+      outcomeCode,
+      statusClass,
+    });
+    context.telemetrySpan.end(outcomeCode);
+
     this.logger.write(normalized.status >= 500 ? "ERROR" : "INFO", {
       duration_ms_bucket: this.logger.durationBucket(
         performance.now() - context.startedAt,
       ),
       message_code: "HTTP_REQUEST_COMPLETED",
       operation_code: context.operationCode,
-      outcome_code: normalized.retryable
-        ? "RETRYABLE"
-        : normalized.status >= 500
-          ? "TERMINAL"
-          : "EXPECTED_REJECT",
+      outcome_code: outcomeCode,
       reason_code: normalized.code,
       request_id: context.requestId,
     });

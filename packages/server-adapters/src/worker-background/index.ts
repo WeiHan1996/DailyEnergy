@@ -14,6 +14,11 @@ import {
   type WorkerInfrastructureConfig,
   type WorkerInfrastructureRuntime,
 } from "../queue/worker-runtime.js";
+import { createQueueTelemetrySink } from "../telemetry/queue-sink.js";
+import {
+  startTelemetryRuntime,
+  type TelemetryTransportConfig,
+} from "../telemetry/runtime.js";
 
 export type WorkerBackgroundDatabaseCapability =
   DatabaseCapability<"worker-background">;
@@ -48,6 +53,27 @@ export function startWorkerBackgroundInfrastructure(
   });
 }
 
+export function startWorkerBackgroundTelemetry(
+  config: TelemetryTransportConfig,
+) {
+  const runtime = startTelemetryRuntime({
+    enabled: config.enabled,
+    metricsHost: config.metricsHost,
+    metricsPort: config.metricsPort,
+    otlpTraceUrl: config.otlpTraceUrl,
+    resource: {
+      configSchemaVersion: config.configSchemaVersion,
+      contractBundleVersion: config.contractBundleVersion,
+      environment: config.environment,
+      releaseId: config.releaseId,
+      runtimeProfile: "BACKGROUND",
+      service: "background",
+      serviceVersion: config.serviceVersion,
+    },
+  });
+  return Object.freeze({ runtime, sink: createQueueTelemetrySink(runtime) });
+}
+
 export type {
   DatabaseConnection,
   DatabaseFactory,
@@ -66,3 +92,7 @@ export type {
   WorkerInfrastructureConfig,
   WorkerInfrastructureRuntime,
 } from "../queue/worker-runtime.js";
+export type {
+  TelemetryRuntime,
+  TelemetryTransportConfig,
+} from "../telemetry/runtime.js";

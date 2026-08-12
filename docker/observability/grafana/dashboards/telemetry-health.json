@@ -1,0 +1,89 @@
+{
+  "annotations": { "list": [] },
+  "editable": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Status: PROVISIONAL / BLOCKED",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "max(time() - dailyenergy_telemetry_heartbeat_timestamp_seconds)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Collector export failures",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "sum(rate(otelcol_exporter_send_failed_spans[5m]))" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Dropped telemetry",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (reason_code) (rate(dailyenergy_telemetry_dropped_total[5m]))"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Contract / raw-content rejection",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (reason_code) (rate(dailyenergy_telemetry_contract_rejections_total[5m]))"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Missing service/profile/release",
+      "type": "table",
+      "targets": [
+        { "expr": "time() - dailyenergy_telemetry_heartbeat_timestamp_seconds" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Series cardinality",
+      "type": "timeseries",
+      "targets": [{ "expr": "prometheus_tsdb_head_series" }]
+    },
+    {
+      "id": 7,
+      "title": "Backend query/storage health",
+      "type": "timeseries",
+      "targets": [{ "expr": "up{job=~\"collector|dailyenergy-runtime\"}" }]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": [
+    "dailyenergy",
+    "telemetry",
+    "contract:dailyenergy-telemetry-v1",
+    "window:15m",
+    "environment:single",
+    "freshness:required",
+    "retention:logs30d-traces7d-metrics35d"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "custom",
+        "query": "LOCAL,CI,DEV,STAGING",
+        "current": { "text": "CI", "value": "CI" }
+      }
+    ]
+  },
+  "time": { "from": "now-24h", "to": "now" },
+  "title": "Telemetry Health",
+  "uid": "telemetry-health",
+  "version": 1
+}

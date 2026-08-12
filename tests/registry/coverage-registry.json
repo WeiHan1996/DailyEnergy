@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 170, "NA_WITH_REASON": 0, "PLANNED": 566 },
+  "counts": { "COVERED": 203, "NA_WITH_REASON": 0, "PLANNED": 533 },
   "entries": [
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
@@ -10148,11 +10148,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "request body preferred-name-like synthetic content is absent from every OrdinaryLogV1 event while the stable operation and outcome remain"
+          ],
+          "file": "apps/api/src/api.e2e.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "logs only allowlisted metadata",
+          "test_id": "T-E013-OBS-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10161,11 +10169,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "span and log attributes are projected through closed keep_keys allowlists, Prompt/provider raw response attributes are discarded, and the raw-content detector produces only a content-free incident signal"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "forbidden fields and Collector allowlist",
+          "test_id": "T-E013-OBS-002"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10186,6 +10202,16 @@
           "origin": "tests/registry/e011-evidence-manifest.json",
           "selector": "low-cardinality telemetry contract and forbidden-field tests",
           "test_id": "T-E011-CI-TELEMETRY-001"
+        },
+        {
+          "assertions": [
+            "AccountRef and every other forbidden telemetry key fail the strict metric attribute Schema"
+          ],
+          "file": "packages/server-adapters/src/telemetry/contracts.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "closed signal attributes",
+          "test_id": "T-E013-OBS-003"
         }
       ],
       "status": "COVERED",
@@ -10209,6 +10235,16 @@
           "origin": "tests/registry/e011-evidence-manifest.json",
           "selector": "low-cardinality telemetry contract and forbidden-field tests",
           "test_id": "T-E011-CI-TELEMETRY-001"
+        },
+        {
+          "assertions": [
+            "trace_id is rejected as a Loki index label and retained only as non-index structured metadata"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "Loki index known-fail",
+          "test_id": "T-E013-OBS-004"
         }
       ],
       "status": "COVERED",
@@ -10232,6 +10268,16 @@
           "origin": "tests/registry/e011-evidence-manifest.json",
           "selector": "low-cardinality telemetry contract and forbidden-field tests",
           "test_id": "T-E011-CI-TELEMETRY-001"
+        },
+        {
+          "assertions": [
+            "raw URL and query values never enter telemetry; a closed OpenAPI operation code is recorded instead"
+          ],
+          "file": "apps/api/src/api.e2e.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "low-cardinality HTTP telemetry",
+          "test_id": "T-E013-OBS-005"
         }
       ],
       "status": "COVERED",
@@ -10255,6 +10301,16 @@
           "origin": "tests/registry/e011-evidence-manifest.json",
           "selector": "low-cardinality telemetry contract and forbidden-field tests",
           "test_id": "T-E011-CI-TELEMETRY-001"
+        },
+        {
+          "assertions": [
+            "exception/parser text, SQL bind-like values and credentials are replaced by fixed reason and message codes"
+          ],
+          "file": "apps/api/src/api.e2e.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "parser and ordinary log redaction",
+          "test_id": "T-E013-OBS-006"
         }
       ],
       "status": "COVERED",
@@ -10278,6 +10334,16 @@
           "origin": "tests/registry/e011-evidence-manifest.json",
           "selector": "low-cardinality telemetry contract and forbidden-field tests",
           "test_id": "T-E011-CI-TELEMETRY-001"
+        },
+        {
+          "assertions": [
+            "every metric has a declared closed label set and active-series limit; undeclared or unbounded labels fail the contract Gate"
+          ],
+          "file": "packages/server-adapters/src/telemetry/contracts.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "bounded metric registry",
+          "test_id": "T-E013-OBS-007"
         }
       ],
       "status": "COVERED",
@@ -10301,6 +10367,16 @@
           "origin": "tests/registry/e011-evidence-manifest.json",
           "selector": "low-cardinality telemetry contract and forbidden-field tests",
           "test_id": "T-E011-CI-TELEMETRY-001"
+        },
+        {
+          "assertions": [
+            "ordinary runtime cannot join Product Analytics or accept Safety/DataTask restricted details, and an isolation mutation fails with E013_PLANE_ISOLATION"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "plane isolation known-fail",
+          "test_id": "T-E013-OBS-008"
         }
       ],
       "status": "COVERED",
@@ -10312,11 +10388,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "an expected revision conflict is availability GOOD, latency EXCLUDED and remains independently countable as a command conflict"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "expected reject SLO classification",
+          "test_id": "T-E013-OBS-009"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10325,11 +10409,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a fast service failure increments availability bad and is excluded from the success-latency denominator"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "fast service failure classification",
+          "test_id": "T-E013-OBS-010"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10338,11 +10430,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "the 1h and 5m windows must both exceed 14.4x before PAGE_HIGH and Alertmanager inhibits lower burn alerts for the same SLO"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "14.4x multi-window page rule",
+          "test_id": "T-E013-OBS-011"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10351,11 +10451,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high long window with a recovered short window returns NONE rather than paging"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "both-window burn requirement",
+          "test_id": "T-E013-OBS-012"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10364,11 +10472,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "one low-traffic failure does not page without synthetic failure or five absolute failures"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "low-traffic corroboration",
+          "test_id": "T-E013-OBS-013"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10377,11 +10493,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "zero real traffic and host loss remain visible through absent-aware independent synthetic and telemetry heartbeat outage rules"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "independent synthetic and heartbeat alerts",
+          "test_id": "T-E013-OBS-014"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10390,11 +10514,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "synthetic success is displayed separately and cannot remove real-request bad events from burn calculations"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "separate synthetic dashboard and real burn expressions",
+          "test_id": "T-E013-OBS-015"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10403,11 +10535,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "an exhausted budget denies ordinary features while allowing the closed repair, rollback, Safety/Privacy, recovery and compliance classes"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "error-budget release decision",
+          "test_id": "T-E013-OBS-016"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10416,11 +10556,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "dynamic paths and query values collapse to UNKNOWN_HTTP or a fixed operation code without creating new series"
+          ],
+          "file": "apps/api/src/api.e2e.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "normalized operation telemetry",
+          "test_id": "T-E013-OBS-017"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10429,11 +10577,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "external exchange latency is represented by a separate operation metric family and is not merged into database command latency"
+          ],
+          "file": "packages/server-adapters/src/telemetry/contracts.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "minimum dependency and command metric registry",
+          "test_id": "T-E013-OBS-018"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10442,11 +10598,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "95 percent pool saturation or wait P95 above one second pages with the database Dashboard and Runbook"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "PostgreSQL pool alert and database Runbook",
+          "test_id": "T-E013-OBS-019"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10455,11 +10619,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "slow-query telemetry accepts only stable operation/reason buckets; SQL, bind values and exception messages fail the closed attribute Schema"
+          ],
+          "file": "packages/server-adapters/src/telemetry/contracts.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "SQL and exception telemetry rejection",
+          "test_id": "T-E013-OBS-020"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10479,6 +10651,16 @@
           "origin": "tests/compose/evidence-manifest.json",
           "selector": "deterministic PostgreSQL, Redis, provider, network, clock and telemetry faults",
           "test_id": "T-COMPOSE-FAULT-001"
+        },
+        {
+          "assertions": [
+            "Redis loss is visible while PostgreSQL remains authoritative, stale personal cache is not restored and eligible state rebuilds from PostgreSQL"
+          ],
+          "file": "tests/compose/integration.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "Redis fault and PostgreSQL fact recovery",
+          "test_id": "T-E013-OBS-021"
         }
       ],
       "status": "COVERED",
@@ -10490,11 +10672,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "an unreadable breaker produces provider calls zero, controlled template continuation and a stable BREAKER_STATE_UNAVAILABLE reason"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "breaker unreadable Gateway decision",
+          "test_id": "T-E013-OBS-022"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10525,6 +10715,16 @@
           "origin": "tests/compose/evidence-manifest.json",
           "selector": "worker capability fingerprint, heartbeat and bounded rebuild",
           "test_id": "T-COMPOSE-PROFILE-001"
+        },
+        {
+          "assertions": [
+            "schema/grant fingerprint drift creates PAGE_CRITICAL and a release/profile readiness hard Gate"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "schema/grant hard alert",
+          "test_id": "T-E013-OBS-023"
         }
       ],
       "status": "COVERED",
@@ -10547,6 +10747,16 @@
           "origin": "tests/compose/evidence-manifest.json",
           "selector": "API role readiness and detail-free health",
           "test_id": "T-COMPOSE-API-001"
+        },
+        {
+          "assertions": [
+            "public health returns only stable status/reason envelopes without dependency, host, provider or version-catalog details"
+          ],
+          "file": "apps/api/src/api.e2e.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "detail-free health endpoints",
+          "test_id": "T-E013-OBS-024"
         }
       ],
       "status": "COVERED",
@@ -10569,6 +10779,16 @@
           "origin": "tests/queue/evidence-manifest.json",
           "selector": "S29-ARCH-018/S31-TEST-025 relay crash replays one domain effect",
           "test_id": "T-QUEUE-INTEGRATION-RELAY-001"
+        },
+        {
+          "assertions": [
+            "enqueue-before-PUBLISHED crash is replayable, duplicate delivery is observable and the transaction-scoped domain effect remains one"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "relay crash replay plus telemetry mapping",
+          "test_id": "T-E013-OBS-025"
         }
       ],
       "status": "COVERED",
@@ -10580,11 +10800,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Interactive eligible age above 60 seconds pages with an async Runbook/release link and no job reference"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "Interactive queue age hard alert",
+          "test_id": "T-E013-OBS-026"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10593,11 +10821,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Background lag is independently alerted and the API readiness contract is not coupled to Background or Restricted heartbeat"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "profile-separated async signals",
+          "test_id": "T-E013-OBS-027"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10617,6 +10853,16 @@
           "origin": "tests/queue/evidence-manifest.json",
           "selector": "S29-ARCH-007/020/024 profile, stale guard and retry fail closed",
           "test_id": "T-QUEUE-INTEGRATION-TERMINAL-001"
+        },
+        {
+          "assertions": [
+            "terminal contract failure stops blind retry, retry telemetry is bounded and the original opaque business key is unchanged"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "terminal contract failure retry bound",
+          "test_id": "T-E013-OBS-028"
         }
       ],
       "status": "COVERED",
@@ -10650,6 +10896,16 @@
           "origin": "tests/queue/evidence-manifest.json",
           "selector": "worker capability manifests",
           "test_id": "T-QUEUE-MANIFEST-001"
+        },
+        {
+          "assertions": [
+            "a disallowed profile job produces a hard capability rejection metric and never invokes the handler"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "profile allowlist rejection",
+          "test_id": "T-E013-OBS-029"
         }
       ],
       "status": "COVERED",
@@ -10694,6 +10950,16 @@
           "origin": "tests/queue/evidence-manifest.json",
           "selector": "S29-ARCH-022/S31-TEST-027 empty Redis rebuilds eligible PG facts only",
           "test_id": "T-QUEUE-INTEGRATION-REBUILD-001"
+        },
+        {
+          "assertions": [
+            "total Redis loss rebuilds only eligible PostgreSQL facts within the bounded workflow and changes zero PostgreSQL fact counts"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "empty Redis rebuild",
+          "test_id": "T-E013-OBS-030"
         }
       ],
       "status": "COVERED",
@@ -10716,6 +10982,16 @@
           "origin": "tests/queue/evidence-manifest.json",
           "selector": "S29-ARCH-019/S31-TEST-026 commit-before-ACK crash is inbox no-op",
           "test_id": "T-QUEUE-INTEGRATION-INBOX-001"
+        },
+        {
+          "assertions": [
+            "commit-before-ACK retry increments low-cardinality Inbox duplicate telemetry and produces one domain effect"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "commit-before-ACK duplicate",
+          "test_id": "T-E013-OBS-031"
         }
       ],
       "status": "COVERED",
@@ -10738,6 +11014,16 @@
           "origin": "tests/queue/evidence-manifest.json",
           "selector": "versioned queue contract",
           "test_id": "T-QUEUE-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "queue payload fields and business content fail the queue/log contract and are never serialized by the telemetry sink"
+          ],
+          "file": "packages/server-adapters/src/queue/contracts.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "content-free queue envelope and logs",
+          "test_id": "T-E013-OBS-032"
         }
       ],
       "status": "COVERED",
@@ -10749,11 +11035,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "UNKNOWN usage/cost requires null, rejects zero and makes aggregate cost status BLOCKED"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "UNKNOWN CostEntry contract",
+          "test_id": "T-E013-OBS-033"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10762,11 +11056,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "observed model mismatch makes the route inactive, provider calls zero and exposes only MODEL_MISMATCH for PAGE_CRITICAL"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "model mismatch Gateway decision",
+          "test_id": "T-E013-OBS-034"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10775,11 +11077,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a stale price catalog permits zero provider calls, selects the controlled template and emits PRICE_CATALOG_STALE"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "stale price Gateway decision",
+          "test_id": "T-E013-OBS-035"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10788,11 +11098,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "template output can satisfy SLO-04 while the independent S25-M21 template ratio can fail; neither expression cancels the other"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "generation availability and template-rate recording rules",
+          "test_id": "T-E013-OBS-036"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10801,11 +11119,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "70 percent actual or forecast returns TICKET and keeps the reviewed provider route available"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "70 percent budget decision",
+          "test_id": "T-E013-OBS-037"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10814,11 +11140,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "100 percent budget returns HARD_STOP, allows zero new provider calls and keeps template, Safety and deletion controls active"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "100 percent budget hard stop",
+          "test_id": "T-E013-OBS-038"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10827,11 +11161,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "cost UNKNOWN above one percent or price coverage below 99 percent returns BLOCKED rather than a below-budget conclusion"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "cost completeness block",
+          "test_id": "T-E013-OBS-039"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10840,11 +11182,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "per-user/account cost fields fail strict CostEntryV1 and only workload/provider revision aggregates are accepted"
+          ],
+          "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "anonymous CostEntry Schema",
+          "test_id": "T-E013-OBS-040"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10853,11 +11203,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a raw-content match stops ordinary export, increments a content-free detector metric and creates PAGE_CRITICAL/IR-SEV0 candidate routing"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "raw-content detector and hard alert",
+          "test_id": "T-E013-OBS-041"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10866,11 +11224,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "75 percent DataTask deadline pages by aggregate scope/stage/outcome without task or user reference and preserves the guard"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "DataTask 75 percent deadline alert",
+          "test_id": "T-E013-OBS-042"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10879,11 +11245,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "one deletion guard, restore-deny or deleted-data detector failure pages immediately without an error budget"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "deletion and restore hard detector alert",
+          "test_id": "T-E013-OBS-043"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10892,11 +11266,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a 10-minute WAL gap pages high and a 15-minute gap becomes PAGE_CRITICAL plus Release Gate/incident candidate"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "WAL 10 and 15 minute alerts",
+          "test_id": "T-E013-OBS-044"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10905,11 +11287,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a backup expiry violation creates a lifecycle incident candidate and the Runbook forbids using the expired backup as a recovery source"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "backup expiry hard alert and lifecycle Runbook",
+          "test_id": "T-E013-OBS-045"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10918,11 +11308,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "15 minutes of stale heartbeat, a missing heartbeat series, or exporter failure creates PAGE_HIGH and the Runbook explicitly forbids compensating with body logging"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "Collector/backend outage alert",
+          "test_id": "T-E013-OBS-046"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10931,11 +11329,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "observability cost pressure pages and the Runbook reduces normal-success sampling/query retention before preserving hard detectors, SLO metrics and security logs"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "observability cost alert and containment",
+          "test_id": "T-E013-OBS-047"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],
@@ -10944,11 +11350,19 @@
     },
     {
       "authority_paths": ["docs/technical/observability.md"],
-      "planned": {
-        "owner": "E-013 or the owning runtime implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "the RC contract requires signal, SLO, burn, alert, Runbook, cost, TTL and delivery evidence while remaining E014_REQUIRED/completed=false; a false PASS is rejected"
+          ],
+          "file": "tests/observability/static.test.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e013-evidence-manifest.json",
+          "selector": "E-014 exercise contract false-PASS rejection",
+          "test_id": "T-E013-OBS-048"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "RESILIENCE", "STATIC"] }
       ],

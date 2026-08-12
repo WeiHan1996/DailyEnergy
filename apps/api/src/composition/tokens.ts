@@ -1,5 +1,6 @@
 import type { RuntimeConfig } from "../bootstrap/runtime-config.js";
 import type { OrdinaryLogSink } from "../observability/ordinary-log.types.js";
+import type { TelemetryRuntime } from "@daily-energy/server-adapters/api";
 import type {
   AudienceVerifier,
   ReadinessCheck,
@@ -16,10 +17,12 @@ export const ADMIN_AUDIENCE_VERIFIER = Symbol("ADMIN_AUDIENCE_VERIFIER");
 export const READINESS_CHECKS = Symbol("READINESS_CHECKS");
 export const SHUTDOWN_DRAIN_HOOKS = Symbol("SHUTDOWN_DRAIN_HOOKS");
 export const ORDINARY_LOG_SINK = Symbol("ORDINARY_LOG_SINK");
+export const TELEMETRY_RUNTIME = Symbol("TELEMETRY_RUNTIME");
 
 export interface ApiCompositionOverrides {
   readonly adminAudienceVerifier?: AudienceVerifier;
   readonly ordinaryLogSink?: OrdinaryLogSink;
+  readonly telemetryRuntime?: TelemetryRuntime;
   readonly publicAudienceVerifier?: AudienceVerifier;
   readonly readinessChecks?: readonly ReadinessCheck[];
   readonly safetyContinuationVerifier?: SafetyContinuationVerifier;

@@ -23,32 +23,80 @@ interface WorkerRuntime {
   }): Promise<unknown>;
 }
 
+interface WorkerTelemetryEvent {
+  readonly operationCode:
+    | "QUEUE_CONNECT"
+    | "QUEUE_ENQUEUE"
+    | "QUEUE_HANDLE"
+    | "QUEUE_DRAIN"
+    | "OUTBOX_RELAY"
+    | "REDIS_REBUILD";
+  readonly outcomeCode:
+    "SUCCESS" | "DUPLICATE" | "EXPECTED_REJECT" | "RETRYABLE" | "TERMINAL";
+  readonly profile:
+    "worker-interactive" | "worker-background" | "worker-restricted";
+  readonly queueFamily: "interactive" | "background" | "restricted";
+  readonly reasonCode?: string;
+  readonly retryOrdinal?: number;
+}
+
+interface WorkerTelemetrySink {
+  record(event: WorkerTelemetryEvent): void;
+}
+
 interface WorkerProcess {
   readonly runtime: WorkerRuntime;
   drain(): Promise<void>;
 }
 
 interface WorkerEntrypoint {
-  start(config: {
-    readonly database: {
-      readonly applicationName: string;
-      readonly connectionString: string;
-    };
-    readonly queue: {
-      readonly concurrency: number;
-      readonly drainTimeoutMs: number;
-      readonly egressAllowlist: string[];
-      readonly expectedCapabilityFingerprint: string;
-      readonly expectedDatabaseRole: string;
-      readonly expectedProfile: WorkerManifest["profile"];
-      readonly keyPrefix: string;
-      readonly redisUrl: string;
-      readonly restoreReadiness: "NORMAL" | "RESTORE_VERIFIED";
-    };
-  }): Promise<WorkerProcess>;
+  start(
+    config: {
+      readonly database: {
+        readonly applicationName: string;
+        readonly connectionString: string;
+      };
+      readonly queue: {
+        readonly concurrency: number;
+        readonly drainTimeoutMs: number;
+        readonly egressAllowlist: string[];
+        readonly expectedCapabilityFingerprint: string;
+        readonly expectedDatabaseRole: string;
+        readonly expectedProfile: WorkerManifest["profile"];
+        readonly keyPrefix: string;
+        readonly redisUrl: string;
+        readonly restoreReadiness: "NORMAL" | "RESTORE_VERIFIED";
+      };
+    },
+    telemetry?: WorkerTelemetrySink,
+  ): Promise<WorkerProcess>;
 }
 
+interface WorkerTelemetryRuntime {
+  readonly runtime: { shutdown(): Promise<void> };
+  readonly sink: WorkerTelemetrySink;
+}
+
+interface WorkerTelemetryFactory {
+  (config: {
+    readonly configSchemaVersion: string;
+    readonly contractBundleVersion: string;
+    readonly enabled: boolean;
+    readonly environment:
+      "LOCAL" | "CI" | "DEV" | "STAGING" | "PRODUCTION" | "RECOVERY";
+    readonly metricsHost: "127.0.0.1" | "0.0.0.0";
+    readonly metricsPort: number;
+    readonly otlpTraceUrl: string;
+    readonly releaseId: string;
+    readonly serviceVersion: string;
+  }): WorkerTelemetryRuntime;
+}
+
+type WorkerTelemetryConfig = Parameters<WorkerTelemetryFactory>[0];
+
 const secretFilePattern = /^\/run\/secrets\/[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/u;
+const WORKER_RUNTIME_CONFIG_SCHEMA_VERSION = "worker-runtime-config-v1";
+const WORKER_CONTRACT_BUNDLE_VERSION = "worker-contract-v1";
 
 const WorkerEnvironmentSchema = z
   .object({
@@ -85,6 +133,33 @@ const WorkerEnvironmentSchema = z
       "NORMAL",
       "RESTORE_VERIFIED",
     ]),
+    DAILYENERGY_WORKER_TELEMETRY_ENABLED: z
+      .enum(["true", "false"])
+      .transform((value) => value === "true")
+      .default(false),
+    DAILYENERGY_WORKER_TELEMETRY_ENVIRONMENT: z.enum([
+      "LOCAL",
+      "CI",
+      "DEV",
+      "STAGING",
+      "PRODUCTION",
+      "RECOVERY",
+    ]),
+    DAILYENERGY_WORKER_TELEMETRY_METRICS_HOST: z
+      .enum(["127.0.0.1", "0.0.0.0"])
+      .default("127.0.0.1"),
+    DAILYENERGY_WORKER_TELEMETRY_METRICS_PORT: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(65_535)
+      .default(9464),
+    DAILYENERGY_WORKER_TELEMETRY_OTLP_TRACE_URL: z
+      .url()
+      .default("http://127.0.0.1:4318/v1/traces"),
+    DAILYENERGY_WORKER_TELEMETRY_RELEASE_ID: z
+      .string()
+      .regex(/^[A-Za-z0-9][A-Za-z0-9._-]{2,63}$/u),
   })
   .strict();
 
@@ -94,41 +169,60 @@ export async function runWorker(options: {
   readonly capabilityFingerprint: string;
   readonly entrypoint: WorkerEntrypoint;
   readonly manifest: WorkerManifest;
+  readonly telemetryFactory?: WorkerTelemetryFactory;
 }): Promise<void> {
   let processRuntime: WorkerProcess | undefined;
   let timer: NodeJS.Timeout | undefined;
   let stopping = false;
   let runningCheck = false;
+  let telemetry: WorkerTelemetryRuntime | undefined;
+  let config: WorkerEnvironment | undefined;
 
   try {
-    const config = parseWorkerEnvironment(process.env);
-    assertManifest(config, options);
+    const runtimeConfig = parseWorkerEnvironment(process.env);
+    config = runtimeConfig;
+    assertManifest(runtimeConfig, options);
+    telemetry = startWorkerTelemetrySafely(options.telemetryFactory, {
+      configSchemaVersion: WORKER_RUNTIME_CONFIG_SCHEMA_VERSION,
+      contractBundleVersion: WORKER_CONTRACT_BUNDLE_VERSION,
+      enabled: runtimeConfig.DAILYENERGY_WORKER_TELEMETRY_ENABLED,
+      environment: runtimeConfig.DAILYENERGY_WORKER_TELEMETRY_ENVIRONMENT,
+      metricsHost: runtimeConfig.DAILYENERGY_WORKER_TELEMETRY_METRICS_HOST,
+      metricsPort: runtimeConfig.DAILYENERGY_WORKER_TELEMETRY_METRICS_PORT,
+      otlpTraceUrl: runtimeConfig.DAILYENERGY_WORKER_TELEMETRY_OTLP_TRACE_URL,
+      releaseId: runtimeConfig.DAILYENERGY_WORKER_TELEMETRY_RELEASE_ID,
+      serviceVersion: "0.1.0",
+    });
     const connectionString = (
-      await readFile(config.DAILYENERGY_WORKER_DATABASE_URL_FILE, "utf8")
+      await readFile(runtimeConfig.DAILYENERGY_WORKER_DATABASE_URL_FILE, "utf8")
     ).trim();
     if (connectionString.length === 0) {
       throw new Error("WORKER_DATABASE_SECRET_EMPTY");
     }
-    processRuntime = await options.entrypoint.start({
-      database: {
-        applicationName: `daily-energy:${options.manifest.profile}`,
-        connectionString,
+    processRuntime = await options.entrypoint.start(
+      {
+        database: {
+          applicationName: `daily-energy:${options.manifest.profile}`,
+          connectionString,
+        },
+        queue: {
+          concurrency: runtimeConfig.DAILYENERGY_WORKER_CONCURRENCY,
+          drainTimeoutMs: runtimeConfig.DAILYENERGY_WORKER_DRAIN_TIMEOUT_MS,
+          egressAllowlist: parseEgress(
+            runtimeConfig.DAILYENERGY_WORKER_EGRESS_ALLOWLIST,
+          ),
+          expectedCapabilityFingerprint:
+            runtimeConfig.DAILYENERGY_WORKER_CAPABILITY_FINGERPRINT_EXPECTED,
+          expectedDatabaseRole:
+            runtimeConfig.DAILYENERGY_WORKER_DATABASE_ROLE_EXPECTED,
+          expectedProfile: runtimeConfig.DAILYENERGY_WORKER_PROFILE,
+          keyPrefix: runtimeConfig.DAILYENERGY_WORKER_KEY_PREFIX,
+          redisUrl: runtimeConfig.DAILYENERGY_WORKER_REDIS_URL,
+          restoreReadiness: runtimeConfig.DAILYENERGY_WORKER_RESTORE_READINESS,
+        },
       },
-      queue: {
-        concurrency: config.DAILYENERGY_WORKER_CONCURRENCY,
-        drainTimeoutMs: config.DAILYENERGY_WORKER_DRAIN_TIMEOUT_MS,
-        egressAllowlist: parseEgress(
-          config.DAILYENERGY_WORKER_EGRESS_ALLOWLIST,
-        ),
-        expectedCapabilityFingerprint:
-          config.DAILYENERGY_WORKER_CAPABILITY_FINGERPRINT_EXPECTED,
-        expectedDatabaseRole: config.DAILYENERGY_WORKER_DATABASE_ROLE_EXPECTED,
-        expectedProfile: config.DAILYENERGY_WORKER_PROFILE,
-        keyPrefix: config.DAILYENERGY_WORKER_KEY_PREFIX,
-        redisUrl: config.DAILYENERGY_WORKER_REDIS_URL,
-        restoreReadiness: config.DAILYENERGY_WORKER_RESTORE_READINESS,
-      },
-    });
+      telemetry?.sink,
+    );
 
     const check = async (): Promise<void> => {
       if (runningCheck || stopping || processRuntime === undefined) {
@@ -141,28 +235,29 @@ export async function runWorker(options: {
         }
         await processRuntime.runtime.rebuild(100);
         await writeHeartbeat(
-          config.DAILYENERGY_WORKER_HEARTBEAT_FILE,
+          runtimeConfig.DAILYENERGY_WORKER_HEARTBEAT_FILE,
           options.manifest.profile,
         );
       } catch {
-        await rm(config.DAILYENERGY_WORKER_HEARTBEAT_FILE, {
+        await rm(runtimeConfig.DAILYENERGY_WORKER_HEARTBEAT_FILE, {
           force: true,
         });
-        writeLifecycle(
-          "WARN",
-          options.manifest.profile,
-          "DEPENDENCY_UNAVAILABLE",
-        );
+        writeLifecycle("WARN", runtimeConfig, "DEPENDENCY_UNAVAILABLE");
       } finally {
         runningCheck = false;
       }
     };
 
-    if (config.DAILYENERGY_WORKER_RESTORE_READINESS === "RESTORE_VERIFIED") {
+    if (
+      runtimeConfig.DAILYENERGY_WORKER_RESTORE_READINESS === "RESTORE_VERIFIED"
+    ) {
       await rebuildUntilEmpty(processRuntime.runtime);
     }
     await check();
-    timer = setInterval(check, config.DAILYENERGY_WORKER_POLL_INTERVAL_MS);
+    timer = setInterval(
+      check,
+      runtimeConfig.DAILYENERGY_WORKER_POLL_INTERVAL_MS,
+    );
 
     const stop = async (): Promise<void> => {
       if (stopping) {
@@ -172,19 +267,28 @@ export async function runWorker(options: {
       if (timer !== undefined) {
         clearInterval(timer);
       }
-      await rm(config.DAILYENERGY_WORKER_HEARTBEAT_FILE, { force: true });
+      await rm(runtimeConfig.DAILYENERGY_WORKER_HEARTBEAT_FILE, {
+        force: true,
+      });
       await processRuntime?.drain();
-      writeLifecycle("INFO", options.manifest.profile, "DRAINED");
+      await telemetry?.runtime.shutdown().catch(() => undefined);
+      writeLifecycle("INFO", runtimeConfig, "DRAINED");
     };
     process.once("SIGINT", () => void stop().then(() => process.exit(0)));
     process.once("SIGTERM", () => void stop().then(() => process.exit(0)));
-    writeLifecycle("INFO", options.manifest.profile, "STARTED");
+    writeLifecycle("INFO", runtimeConfig, "STARTED");
   } catch {
     if (timer !== undefined) {
       clearInterval(timer);
     }
     await processRuntime?.drain().catch(() => undefined);
-    writeLifecycle("ERROR", options.manifest.profile, "STARTUP_REJECTED");
+    await telemetry?.runtime.shutdown().catch(() => undefined);
+    writeLifecycle(
+      "ERROR",
+      config,
+      "STARTUP_REJECTED",
+      options.manifest.profile,
+    );
     process.exitCode = 1;
   }
 }
@@ -203,6 +307,17 @@ function parseWorkerEnvironment(
     throw new Error("WORKER_CONFIG_INVALID");
   }
   return result.data;
+}
+
+function startWorkerTelemetrySafely(
+  factory: WorkerTelemetryFactory | undefined,
+  config: WorkerTelemetryConfig,
+): WorkerTelemetryRuntime | undefined {
+  try {
+    return factory?.(config);
+  } catch {
+    return undefined;
+  }
 }
 
 function assertManifest(
@@ -261,16 +376,35 @@ async function writeHeartbeat(file: string, profile: string): Promise<void> {
 
 function writeLifecycle(
   severity: "ERROR" | "INFO" | "WARN",
-  profile: string,
+  config: WorkerEnvironment | undefined,
   reasonCode: string,
+  fallbackProfile?: WorkerManifest["profile"],
 ): void {
+  const profile = config?.DAILYENERGY_WORKER_PROFILE ?? fallbackProfile;
+  const runtimeProfile =
+    profile === "worker-interactive"
+      ? "INTERACTIVE"
+      : profile === "worker-background"
+        ? "BACKGROUND"
+        : "RESTRICTED";
+  const service =
+    profile === "worker-interactive"
+      ? "interactive"
+      : profile === "worker-background"
+        ? "background"
+        : "restricted";
   process.stdout.write(
     `${JSON.stringify({
+      contract_version: "ordinary-log-v1",
+      environment: config?.DAILYENERGY_WORKER_TELEMETRY_ENVIRONMENT ?? "LOCAL",
       message_code: "WORKER_LIFECYCLE",
       operation_code: "WORKER_LIFECYCLE",
       outcome_code: severity === "INFO" ? "SUCCESS" : "TERMINAL",
-      profile,
+      release_id:
+        config?.DAILYENERGY_WORKER_TELEMETRY_RELEASE_ID ?? "startup-rejected",
       reason_code: reasonCode,
+      runtime_profile: runtimeProfile,
+      service,
       severity,
       timestamp: new Date().toISOString(),
     })}\n`,
@@ -282,5 +416,7 @@ export const workerRuntimeTesting = Object.freeze({
   parseEgress,
   parseWorkerEnvironment,
   rebuildUntilEmpty,
+  startWorkerTelemetrySafely,
   writeHeartbeat,
+  writeLifecycle,
 });

@@ -22,6 +22,8 @@ const PositiveMillisecondsSchema = z
   .transform((value) => Number(value))
   .pipe(z.number().int().min(1_000).max(60_000));
 
+const PortNumberSchema = z.coerce.number().int().min(1).max(65_535);
+
 const RELEASE_ENVIRONMENTS = ["STAGING", "PRODUCTION", "RECOVERY"] as const;
 const SECRET_FILE_PATTERN =
   /^\/run\/secrets\/[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/u;
@@ -61,6 +63,20 @@ const RuntimeConfigValueShape = {
   DAILYENERGY_RELEASE_ID: z.string().regex(RELEASE_ID_PATTERN),
   DAILYENERGY_RUNTIME_PROFILE: z.literal("API"),
   DAILYENERGY_SHUTDOWN_GRACE_MS: PositiveMillisecondsSchema.default(10_000),
+  DAILYENERGY_TELEMETRY_ENABLED: z
+    .enum(["true", "false"])
+    .transform((value) => value === "true")
+    .default(false),
+  DAILYENERGY_TELEMETRY_METRICS_HOST: z
+    .enum(["127.0.0.1", "0.0.0.0"])
+    .default("127.0.0.1"),
+  DAILYENERGY_TELEMETRY_METRICS_PORT: PortNumberSchema.default(9464),
+  DAILYENERGY_TELEMETRY_OTLP_TRACE_URL: z
+    .url()
+    .refine(
+      (value) => value.startsWith("http://") || value.startsWith("https://"),
+    )
+    .default("http://127.0.0.1:4318/v1/traces"),
 } as const;
 
 const RuntimeConfigValueObjectSchema = z.strictObject(RuntimeConfigValueShape);
@@ -176,6 +192,12 @@ export interface RuntimeConfig {
   readonly releaseId: string;
   readonly runtimeProfile: "API";
   readonly shutdownGraceMs: number;
+  readonly telemetry: {
+    readonly enabled: boolean;
+    readonly metricsHost: "127.0.0.1" | "0.0.0.0";
+    readonly metricsPort: number;
+    readonly otlpTraceUrl: string;
+  };
 }
 
 export interface RuntimeFingerprints {
@@ -250,6 +272,10 @@ export function calculateRuntimeFingerprints(
       release_id: input.DAILYENERGY_RELEASE_ID,
       runtime_profile: input.DAILYENERGY_RUNTIME_PROFILE,
       shutdown_grace_ms: input.DAILYENERGY_SHUTDOWN_GRACE_MS,
+      telemetry_enabled: input.DAILYENERGY_TELEMETRY_ENABLED,
+      telemetry_metrics_host: input.DAILYENERGY_TELEMETRY_METRICS_HOST,
+      telemetry_metrics_port: input.DAILYENERGY_TELEMETRY_METRICS_PORT,
+      telemetry_otlp_trace_url: input.DAILYENERGY_TELEMETRY_OTLP_TRACE_URL,
     }),
   };
 }
@@ -299,5 +325,11 @@ export function loadRuntimeConfig(
     releaseId: input.DAILYENERGY_RELEASE_ID,
     runtimeProfile: input.DAILYENERGY_RUNTIME_PROFILE,
     shutdownGraceMs: input.DAILYENERGY_SHUTDOWN_GRACE_MS,
+    telemetry: {
+      enabled: input.DAILYENERGY_TELEMETRY_ENABLED,
+      metricsHost: input.DAILYENERGY_TELEMETRY_METRICS_HOST,
+      metricsPort: input.DAILYENERGY_TELEMETRY_METRICS_PORT,
+      otlpTraceUrl: input.DAILYENERGY_TELEMETRY_OTLP_TRACE_URL,
+    },
   };
 }

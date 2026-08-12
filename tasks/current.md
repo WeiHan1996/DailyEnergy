@@ -1,15 +1,15 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-12（E-012 最终证据获接受，E-013 成为唯一 Ready）
+- **最后更新**：2026-08-12（E-013 实现与固定 Ubuntu full Gate 已通过，进入 Draft PR 人工审查）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-013 — 实现脱敏日志、指标、Trace、SLO 与成本监控基线
-- **任务状态**：Ready
-- **任务分支**：待创建；必须从 PR #134 squash merge 后核验一致的 `main` 创建
+- **任务状态**：In Review
+- **任务分支**：`agent/e013-observability`，基于 PR #134 squash merge `dd201713a90b9f49e27cf66f6967210db8dc7f36`
 - **当前 Issue**：[E-013 Issue #51](https://github.com/WeiHan1996/DailyEnergy/issues/51)
-- **当前 PR**：无；开工后创建一个聚焦的 Draft PR
+- **当前 PR**：[Draft PR #135](https://github.com/WeiHan1996/DailyEnergy/pull/135)，实现证据 head `8fe2fa5f6aa6e3ef97b40a9480f53303ba5962ce`
 - **最近完成 PR**：[E-012 final evidence PR #134](https://github.com/WeiHan1996/DailyEnergy/pull/134)
-- **Gate 结论**：`E013_READY / E012_DONE / E012_FINAL_EVIDENCE_ACCEPTED / DEV_ACCEPTED_RELEASE_HEALTHY / PUBLIC_TLS_ICP_PENDING / PRODUCTION_STATEFUL_SERVICES_BLOCKED`
+- **Gate 结论**：`E013_AUTOMATED_FULL_GATE_PASS / SECURITY_MANUAL_EVIDENCE_PENDING / E014_REQUIRED / PRODUCTION_OBSERVABILITY_BLOCKED`
 
 ## 1. 当前目标
 
@@ -80,10 +80,45 @@ pnpm agent:prepare E-013 --remote --deep
 
 ## 7. 精确下一动作
 
-1. 开工前确认 PR #134 的 exact-head CI、merge receipt、squash merge、merged-main 核验与 E-012 Issue #50 关闭均已完成；任一不满足即停止；
-2. 核对 `main`、`origin/main` 与 GitHub main 一致；
-3. 运行 `pnpm agent:prepare E-013 --remote --deep` 并读取全部 required sources；
-4. 从核验后的 `main` 创建 `agent/e013-observability`；
-5. 建立 requirement-to-proof matrix，确认 bounded deliverables 后再开始实现并创建 Draft PR。
+1. 用户审查 Draft PR #135 的实现、数据边界与 Requirement-to-Proof Matrix，并完成或明确处置人工 `threatBoundaryReview`；
+2. `productionAuthorizationWhenApplicable` 仅在启用真实 Production backend/on-call/delivery 时处理；未获授权前相关能力继续 BLOCKED，不影响 LOCAL/CI/STAGING-like 自动化证据结论；
+3. 未经用户明确批准，不把 PR 标记 Ready、不合并、不关闭 Issue #51；E-014 演练继续保持 `E014_REQUIRED / completed=false`。
 
-本状态只把 E-013 提升为 Ready，不表示已创建分支、开始实现或解除任何 Production Gate。
+## 8. Requirement-to-Proof Matrix
+
+| Requirement                                                            | Accepted authority                                                                  | Automated proof                                                                                                | External/manual boundary                                               |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| structured JSON、OTel Trace/Metrics、OTLP/OpenMetrics 与字段平面隔离   | `docs/technical/observability.md` 5～10、24～26 节                                  | logger/span/metric contract tests、Collector config lint、raw-content/secret/cardinality known-fail            | Production backend region/RBAC/cross-border 仍 BLOCKED                 |
+| API/PG/Redis/outbox/BullMQ/Worker/Gateway/DataTask/backup/release 指标 | `docs/technical/observability.md` 15～21 节                                         | metric registry completeness、runtime adapter、OpenMetrics exposition 与 component fault tests                 | 不用 telemetry 代替 PostgreSQL 业务事实或真实 restore proof            |
+| 28 天 SLO、14.4x/6x burn、低流量与 hard-trigger 告警                   | `docs/technical/observability.md` 11～14 节                                         | Prometheus rule tests、alert contract/known-fail、release policy unit tests                                    | alert 只产生 S-23 incident candidate，不替代人工分级                   |
+| Dashboard、Runbook、telemetry health 与 retention                      | `docs/technical/observability.md` 22～26 节；`docs/operations/incident-response.md` | provisioning/config lint、Dashboard query reference lint、runbook/alert link coverage、backend-loss fault test | 真实通知接收人、on-call、状态页和 Production delivery 演练保持 BLOCKED |
+| `CostEntryV1`、`BudgetEnvelopeV1`、70/85/100%、UNKNOWN                 | `docs/technical/observability.md` 18～19 节；`docs/analytics/metrics.md` M20～M23   | closed Schema/state tests、budget threshold and per-user-query rejection fixtures                              | 绝对 Production infrastructure budget 等待 owner/vendor 决定           |
+| `S33-OBS-001..048` 从 PLANNED 到有断言 COVERED                         | `docs/technical/observability.md` 28 节；`docs/technical/testing.md` 9、21、24 节   | E-013 evidence manifest + source registry Gate + full CI lanes                                                 | E-014 的 RC delivery/restore exercise 不在本任务冒充完成               |
+
+## 9. 开工核验
+
+- `pnpm agent:prepare E-013 --remote --deep`：READY，变更路径将 profile 提升为 `security`，remote/dependencies PASS；自动化要求 full Gate，人工边界为 `productionAuthorizationWhenApplicable` 与 `threatBoundaryReview`；
+- PR #134：head `5c598132787ba14a62de793827e4fb86a6dfb59c`，11/11 exact-head checks SUCCESS，squash merge `dd201713a90b9f49e27cf66f6967210db8dc7f36`；
+- Issue #50：CLOSED；本地 `main`、`origin/main` 与 GitHub `main` 均为上述 merge commit；
+- required/explicit Accepted sources 已读取；Production stateful services、public TLS/ICP、backend vendor/on-call/notification authorization 未解除。
+
+## 10. 已完成实现
+
+- 在现有 `server-adapters` profile subpath 内实现 closed telemetry resource/attribute、低基数 metric catalog、active-series budget、OTel NodeSDK、OTLP HTTP Trace 与 OpenMetrics；未新增 workspace、业务 service 或 unrestricted capability；
+- API 已接入 request span、request/in-flight/latency metric、expected 4xx 与 readiness failure 口径、trace correlation 和 exporter fail-open startup；Worker 三 profile 已接入 queue/outbox/lifecycle telemetry 与有界 shutdown；
+- `CostEntryV1`、`BudgetEnvelopeV1`、UNKNOWN=`null`、70/85/100 控制、SLO classification、error-budget 与 Gateway fail-closed policy 已落地并有单元证明；
+- 显式 `--observability` Compose overlay 提供 Collector、Prometheus、Loki、Tempo、Alertmanager 与 Grafana；六个镜像使用 exact digest，端口仅 loopback，网络 internal，容器为 read-only、drop-all-capabilities 与有界资源；默认 E-012 11-service Compose 不变；
+- Collector 对 log/span resource 与 signal attributes 使用闭集 allowlist，raw-content detector、tail sampling、batch/retry 和 telemetry self metric 已配置；应用 heartbeat 每分钟发出，缺失 heartbeat/synthetic 使用 `absent(...)` 告警；
+- 7 个 SLO、21 条 recording rules、22 条 alerts、5 个 Dashboard、6 个 Runbook 与 alert payload contract 已实现；alert 只产生 S-23 incident candidate；
+- `S33-OBS-001..048` 全部绑定独立 assertion 与现有 Ubuntu `unit-contract` lane；registry 为 `736 total / 203 COVERED / 533 PLANNED / 0 NA_WITH_REASON`；E-014 exercise 保持 `E014_REQUIRED / completed=false`。
+
+## 11. 验证与未完成证据
+
+- PASS：Draft PR #135 实现证据 head `8fe2fa5f6aa6e3ef97b40a9480f53303ba5962ce` 的固定 Ubuntu CI run `31563077585` 为 11/11 SUCCESS，包含 docs、static、unit-contract、db/queue integration、API/Admin E2E、resilience、AI deterministic、supply-chain 与最终 aggregate Gate；
+- PASS：format、ESLint/architecture/codegen/contracts、typecheck、全仓 build、API 45、Worker 10、server-adapters 40、Admin unit 14 + Chromium E2E 6、Miniapp 10、shared-schemas 38、api-client 4；
+- PASS：PostgreSQL 18 integration 82、Redis/BullMQ/PostgreSQL resilience 7、Compose static/evidence 9、observability static 7、CI policy 24、registry 5；
+- PASS：真实 loopback OpenMetrics probe 已验证 telemetry heartbeat、HTTP `0.5s/0.75s` bucket 和仅保留 environment/service/profile 的 Prometheus resource constant labels；
+- PASS：exact-digest Collector `validate`、Prometheus `promtool check config`、Alertmanager `amtool check-config`、Loki `-verify-config` 与 Tempo `-config.verify=true`；该五项已固化为 `pnpm observability:runtime` 并加入现有 Ubuntu `unit-contract` lane；
+- LOCAL LIMITATION：deployment suite `48/50`，仅 `T-E012-IMAGE-001` 与 `T-E012-LOCK-001` 因 macOS 缺少 Linux `flock`；必须由固定 Ubuntu CI 提供最终证据；
+- LOCAL LIMITATION：`pnpm ci:audit` 因配置的 npmmirror audit response 缺少所需 metadata 而 fail closed；`pnpm ci:supply-chain:evidence` 因本机 Darwin optional package `@img/sharp-libvips-darwin-arm64@1.3.2` 未获 LGPL 例外而 fail closed；不为本机放宽 Ubuntu policy；
+- PENDING：`productionAuthorizationWhenApplicable`、人工 `threatBoundaryReview`、Production backend vendor/region/RBAC/TTL/cross-border/on-call/delivery，以及 E-014 alert delivery、backend outage、TTL deletion、restore/RC 演练；这些均未声明 PASS。

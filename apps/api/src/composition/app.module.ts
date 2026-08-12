@@ -1,7 +1,9 @@
 import { Module, type DynamicModule, type Provider } from "@nestjs/common";
+import { NOOP_TELEMETRY_RUNTIME } from "../observability/api-telemetry.js";
 
 import { ShutdownObserver } from "../bootstrap/shutdown-observer.js";
 import { OrdinaryLogger } from "../observability/ordinary-logger.js";
+import { ApiTelemetry } from "../observability/api-telemetry.js";
 import { AdminAudienceGuard } from "../transport/admin/admin-audience.guard.js";
 import { AdminController } from "../transport/admin/admin.controller.js";
 import { ApiExceptionFilter } from "../transport/common/api-exception.filter.js";
@@ -22,6 +24,7 @@ import {
   RUNTIME_CONFIG,
   SAFETY_CONTINUATION_VERIFIER,
   SHUTDOWN_DRAIN_HOOKS,
+  TELEMETRY_RUNTIME,
 } from "./tokens.js";
 import {
   DENY_ALL_AUDIENCE_VERIFIER,
@@ -68,7 +71,13 @@ export class ApiModule {
         useValue:
           composition.overrides?.ordinaryLogSink ?? STANDARD_OUTPUT_LOG_SINK,
       },
+      {
+        provide: TELEMETRY_RUNTIME,
+        useValue:
+          composition.overrides?.telemetryRuntime ?? NOOP_TELEMETRY_RUNTIME,
+      },
       AdminAudienceGuard,
+      ApiTelemetry,
       ApiExceptionFilter,
       HealthService,
       HttpLoggingInterceptor,

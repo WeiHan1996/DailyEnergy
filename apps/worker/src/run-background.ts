@@ -1,5 +1,6 @@
 import {
   fingerprintCapabilityManifest,
+  startWorkerBackgroundTelemetry,
   workerBackgroundManifest,
 } from "@daily-energy/server-adapters/worker-background";
 
@@ -12,4 +13,5 @@ await runWorker({
   ),
   entrypoint: createBackgroundWorkerEntrypoint(),
   manifest: workerBackgroundManifest,
+  telemetryFactory: startWorkerBackgroundTelemetry,
 });

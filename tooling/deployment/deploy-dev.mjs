@@ -357,6 +357,8 @@ export function developmentComposeEnvironment(
     DAILYENERGY_SECRET_DIR: `${DEVELOPMENT_ROOT}/secrets/${databaseSecretVersion(manifest)}`,
     DAILYENERGY_SERVER_IMAGE: manifest.images.server,
     DAILYENERGY_STUB_IMAGE: manifest.images.stub,
+    DAILYENERGY_TELEMETRY_ENABLED: "false",
+    DAILYENERGY_TELEMETRY_OTLP_TRACE_URL: "http://collector:4318/v1/traces",
     DAILYENERGY_WORKER_BACKGROUND_FINGERPRINT: fingerprints.worker_background,
     DAILYENERGY_WORKER_INTERACTIVE_FINGERPRINT: fingerprints.worker_interactive,
     DAILYENERGY_WORKER_REDIS_URL: "redis://redis:6379",
