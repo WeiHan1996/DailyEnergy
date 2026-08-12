@@ -4,11 +4,11 @@
 - **最后更新**：2026-08-13（Figma 原始证据已建立，等待方向选择）
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：D-001 — 确定品牌与视觉方向
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **任务 Profile**：`design`
 - **任务分支**：`agent/d001-visual-direction`（基于 `cad3a98`）
 - **当前 Issue**：[D-001 Issue #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)
-- **当前 PR**：无；仓库与 Figma Draft 已完成，等待验证、Draft PR 和项目所有者方向选择
+- **当前 PR**：[D-001 Draft PR #140](https://github.com/WeiHan1996/DailyEnergy/pull/140)；等待项目所有者方向选择与接受
 - **最近完成 PR**：[E-014 PR #138](https://github.com/WeiHan1996/DailyEnergy/pull/138)，squash merge `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -31,7 +31,7 @@ D-001 的交付范围以 Issue #99 为准：
 
 - S-02 信息架构、S-03 页面/交互规格和 S-04 静态原型/可用性计划均为 Done，D-001 依赖已满足；
 - E-014 已完成，Phase 1 已结束；Phase 2 development 获条件放行；
-- D-001 是唯一 In Progress 任务；D-002～D-005、C-001～C-017 和其它任务均保持 Planned；
+- D-001 是唯一 In Review 任务；D-002～D-005、C-001～C-017 和其它任务均保持 Planned；
 - D-001 不得降低 Accepted 产品定位、人格、页面状态、无障碍、隐私、Safety、删除、幂等或微信
   client-safe 边界；如需改变一级导航、产品承诺或高风险流程，停止并回到上游规范/ADR；
 - Production/RC 仍为 `NO_GO`，D-001 不触碰 Production、真实用户数据、secret、云资源或服务器。
@@ -128,8 +128,8 @@ D-001 的交付范围以 Issue #99 为准：
 
 ## 6. 精确下一动作
 
-1. 运行 D-001 的 changed/full Gate，核对只包含预期文件；
-2. 提交一个聚焦的 D-001 Draft PR，保持 `MANUAL_EVIDENCE_REQUIRED`；
-3. 项目所有者在 Figma/仓库证据中评审 A、B、C，并选择唯一主方向、理由和允许吸收的次方向元素；
-4. 用户明确选择并接受 D-001 后，更新本文和项目状态，再把 D-002 移为唯一 Ready；不在当前任务中
+1. 项目所有者在 Figma、仓库证据和 Draft PR #140 中评审 A、B、C；
+2. 如需调整，在最终选择前修改任一路线并保存新的 Figma 评审版本；
+3. 项目所有者选择唯一主方向、理由和允许吸收的次方向元素，并明确接受 D-001；
+4. 接受后更新视觉方向文档和项目状态，完成 PR #140 审核与合并，再把 D-002 移为唯一 Ready；不在当前任务中
    启动 D-002。
