@@ -7,7 +7,7 @@
 - **任务状态**：In Progress
 - **任务分支**：`agent/e013-observability`，基于 PR #134 squash merge `dd201713a90b9f49e27cf66f6967210db8dc7f36`
 - **当前 Issue**：[E-013 Issue #51](https://github.com/WeiHan1996/DailyEnergy/issues/51)
-- **当前 PR**：无；下一步创建一个聚焦的 Draft PR
+- **当前 PR**：[Draft PR #135](https://github.com/WeiHan1996/DailyEnergy/pull/135)，实现 commit `c1a557505b67bdfb5d7dee7e0340da6b5967fec4`
 - **最近完成 PR**：[E-012 final evidence PR #134](https://github.com/WeiHan1996/DailyEnergy/pull/134)
 - **Gate 结论**：`E013_IMPLEMENTED_LOCAL / SECURITY_MANUAL_EVIDENCE_PENDING / UBUNTU_CI_PENDING / E014_REQUIRED / PRODUCTION_OBSERVABILITY_BLOCKED`
 
@@ -80,10 +80,9 @@ pnpm agent:prepare E-013 --remote --deep
 
 ## 7. 精确下一动作
 
-1. 审计相对 `dd201713a90b9f49e27cf66f6967210db8dc7f36` 的最终文件闭集并提交 E-013；
-2. push `agent/e013-observability`，为 Issue #51 创建 Draft PR；
-3. 等待固定 Ubuntu 11-check CI，重点核验 `unit-contract` 中的锁定 Collector/Prometheus/Alertmanager runtime config Gate、Linux `flock`、audit 与 supply-chain；
-4. 只有固定 Ubuntu CI 全绿后才把任务改为 `In Review`；Production 授权、人工 threat-boundary review 与 E-014 演练继续保持 pending。
+1. 等待 Draft PR #135 最终 head 的固定 Ubuntu 11-check CI，重点核验 `unit-contract` 中的锁定 Collector/Prometheus/Alertmanager/Loki/Tempo runtime config Gate、Linux `flock`、audit 与 supply-chain；
+2. CI 若失败，只修复 E-013 范围内的根因并重新运行完整 Gate；不得放宽 license、字段、Production 或 manual evidence policy；
+3. 只有固定 Ubuntu CI 全绿后才把任务改为 `In Review`；Production 授权、人工 threat-boundary review 与 E-014 演练继续保持 pending。
 
 ## 8. Requirement-to-Proof Matrix
 
