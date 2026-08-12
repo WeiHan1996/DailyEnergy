@@ -1,6 +1,7 @@
 # DailyEnergy Phase 1 工程基础 Gate
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-08-12
 - **所属任务**：E-014 — 执行 Phase 1 工程基础 Gate
 - **最后更新**：2026-08-12
 - **评审对象**：Phase 2 development admission；不是 Production 或 Release Candidate 审批
@@ -12,11 +13,14 @@
 ```text
 Phase 2 development: CONDITIONAL_GO_FOR_PHASE_2
 Production / Release Candidate: NO_GO
-Owner decision: PENDING_REVIEW
+Owner decision: ACCEPTED_FOR_THIS_DEVELOPMENT_MERGE_ONLY
+Threat boundary review: COMPLETED
+Production authorization: NOT_GRANTED
 ```
 
-建议允许下一阶段的设计和确定性核心开发，但要满足两个条件：E-014 final PR head 的固定
-Ubuntu CI 必须 11/11 全绿，项目所有者必须审核并明确接受本报告和 GitHub Free 的残余合并风险。
+项目所有者已接受下一阶段的设计和确定性核心开发条件放行，并仅为 PR #138 本次开发合并
+接受 GitHub Free 的残余合并风险。E-014 final PR head 仍必须在固定 Ubuntu CI 中同一 run
+11/11 全绿；接受决定不能替代机器 Gate。
 
 这不是“工程已经可以上线”。Production PostgreSQL PITR、当前 deletion/restore-deny ledger、
 真实告警投递、真实 backend TTL 删除、微信 DevTools/真机和完整 incident/manual RC 没有证据，
@@ -85,7 +89,25 @@ post-merge receipt。E-013 合并曾遗漏 `--match-head-commit`，本 Gate 将�
 它最迟于 2026-11-02 到期，平台能力可用、第二位 merge-capable actor 出现或 owner 撤回接受时
 也必须提前停止。
 
-## 6. 审核前 Gate
+## 6. Threat Boundary Review
+
+2026-08-12 已按 `security` profile 完成人工威胁边界复核，结论为：
+
+- 开发准入和 Production/RC 准入由不同字段及负向测试约束；所有 Production/RC 未决项仍为
+  `NO_GO / completed=false / pass_claim=PROHIBITED`，本次没有授予 Production authorization；
+- stale head、跨 run 拼接检查和审核后换头由 exact head、同一 run 11/11、
+  `--match-head-commit` 与 post-merge receipt 控制；任一不一致必须停止合并；
+- GitHub Free 缺少 platform enforcement 的残余风险只接受于 PR #138 本次 development merge，
+  不可复用于 RC/Production，也不构成以后合并的持续授权；
+- E-012/E-013 receipt 只可按固定 commit/run/digest 复用；checker 拒绝 receipt 替换、silent
+  `PLANNED`、unmapped、Production false-PASS 和 manual RC false-PASS；
+- 本 PR 不接触 Production、真实用户数据、secret、云资源或服务器；macOS 的 Linux `flock`
+  缺口不作 waiver，仍由 exact final-head Ubuntu CI 提供平台证据。
+
+复核未发现需要改变当前分层结论的新威胁。剩余风险是单一 merge-capable actor 在 GitHub Free
+下执行人工补偿控制的操作风险；项目所有者已明确接受其仅用于本次开发合并。
+
+## 7. 合并前 Gate
 
 E-014 请求合并审核前必须完成：
 
@@ -93,13 +115,14 @@ E-014 请求合并审核前必须完成：
 2. 真实 PostgreSQL 18、replacement Redis 8 和 Compose fault suites；
 3. E-014 contract、source inventory、observability/CI false-PASS tests；
 4. final PR head 的固定 Ubuntu 11/11 CI；
-5. 项目所有者明确接受 `CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO` 和临时合并残余风险。
+5. 项目所有者明确接受 `CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`、完成
+   `threatBoundaryReview`，并仅为本次开发合并接受临时合并残余风险。
 
 本机 task/full Gate 均已执行，但 macOS 因缺少 Linux `flock` 在 deployment suite 48/50
 处稳定停止，automated status 如实为 `FAIL`，没有跳过或放宽合同。真实 PostgreSQL 18、replacement
 Redis 8、Compose fault、build 和 reference observability runtime 的聚焦 suites 已通过；Linux
 平台结论必须由 final PR head 的固定 Ubuntu 11/11 CI 给出。security profile 的
-`threatBoundaryReview` 仍待项目所有者完成，Production authorization 明确不在本次请求范围内。
+`threatBoundaryReview` 已完成；Production authorization 明确未授予。
 
 PR #138 首轮 head `2ba9b0b1cbc9ef0fcd517431307948d13b9835d5` 的 CI run `31579999699`
 正确拒绝了 current/backlog 的 `In Review`/`In Progress` 状态冲突：9 个前置 checks 成功，
@@ -112,5 +135,6 @@ CI run `31580514678` 获得同一 run 11/11 SUCCESS，PR 状态为 `CLEAN/MERGEA
 Draft 状态下 merge-gate verifier 返回 `CI_MANUAL_MERGE_GATE_PR_NOT_READY` 是预期的 fail-closed
 行为，只有项目所有者批准并标 Ready 后才能执行最终 exact-head merge 核验。
 
-通过审核后才把 E-014 置为 Done，并从 Phase 2 依赖图中选择恰好一个下一任务 Ready；本 Draft
-报告不提前启动 D-001、C-001 或其它下游任务。
+项目所有者审核已经完成。只有 acceptance commit 的 exact-head CI 与 merge control 全部通过并
+完成合并后，才把 E-014 置为 Done，并从 Phase 2 依赖图中选择恰好一个下一任务 Ready；本报告
+不提前启动 D-001、C-001 或其它下游任务。

@@ -2,8 +2,11 @@
   "contract_version": "dailyenergy-observability-exercise-v2",
   "development_gate": {
     "status": "CONDITIONAL_GO_FOR_PHASE_2",
-    "evidence_status": "READY_FOR_REVIEW",
-    "owner_decision": "PENDING_REVIEW",
+    "evidence_status": "ACCEPTED_FOR_DEVELOPMENT_MERGE",
+    "owner_decision": "ACCEPTED_FOR_THIS_DEVELOPMENT_MERGE_ONLY",
+    "accepted_on": "2026-08-12",
+    "threat_boundary_review": "COMPLETED",
+    "production_authorization": "NOT_GRANTED",
     "allowed_claim": "REFERENCE_STACK_AND_DEVELOPMENT_CONTROLS_VERIFIED",
     "production_readiness_claim": "PROHIBITED"
   },

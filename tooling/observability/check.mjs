@@ -127,8 +127,13 @@ export function validateExerciseContract(exercise) {
   if (
     exercise?.contract_version !== "dailyenergy-observability-exercise-v2" ||
     exercise.development_gate?.status !== "CONDITIONAL_GO_FOR_PHASE_2" ||
-    exercise.development_gate?.evidence_status !== "READY_FOR_REVIEW" ||
-    exercise.development_gate?.owner_decision !== "PENDING_REVIEW" ||
+    exercise.development_gate?.evidence_status !==
+      "ACCEPTED_FOR_DEVELOPMENT_MERGE" ||
+    exercise.development_gate?.owner_decision !==
+      "ACCEPTED_FOR_THIS_DEVELOPMENT_MERGE_ONLY" ||
+    exercise.development_gate?.accepted_on !== "2026-08-12" ||
+    exercise.development_gate?.threat_boundary_review !== "COMPLETED" ||
+    exercise.development_gate?.production_authorization !== "NOT_GRANTED" ||
     exercise.development_gate?.production_readiness_claim !== "PROHIBITED" ||
     exercise.production_rc_gate?.status !== "NO_GO" ||
     exercise.production_rc_gate?.completed !== false ||

@@ -191,7 +191,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | 文件                                                        | 状态     | 目的                                                                      | 主要依赖              |
 | ----------------------------------------------------------- | -------- | ------------------------------------------------------------------------- | --------------------- |
 | [docs/reports/phase-0b-gate.md](./reports/phase-0b-gate.md) | Accepted | 复核 Phase 0B 总退出门槛、端到端追踪、延后项、外部 Gate 与 E-001 开工合同 | S-01～S-34、ROADMAP   |
-| [docs/reports/phase-1-gate.md](./reports/phase-1-gate.md)   | Draft    | E-014 Phase 2 development 条件放行与 Production/RC NO-GO                  | E-001～E-014、ROADMAP |
+| [docs/reports/phase-1-gate.md](./reports/phase-1-gate.md)   | Accepted | E-014 Phase 2 development 条件放行与 Production/RC NO-GO                  | E-001～E-014、ROADMAP |
 
 ## 8. 计划 ADR
 
@@ -298,7 +298,8 @@ ADR-0007 DEV-only 例外已获明确授权，首个 Accepted DEV release 已建�
 `reconcile-current` 合同、首次引入 bootstrap 澄清及第二候选的 deploy/rollback/redeploy 最终证据；PR #133 已 squash 合并，第二 candidate 的
 18 阶段 deploy/rollback/redeploy、17 阶段 clean restart reconciliation、无代理清理和独立验收审计均已完成。E-012 final evidence
 PR #134 已 squash 合并，E-012 进入 Done；E-013 已随 PR #135 squash 合并并获接受。E-014 在
-`agent/e014-phase1-gate` 开工并成为唯一 In Progress 任务；Phase 1 Gate Draft 只建议 Phase 2
-development 条件放行，Production/RC 仍 `NO_GO`。
+`agent/e014-phase1-gate` 开工并成为唯一 In Review 任务；项目所有者于 2026-08-12 接受 Phase 1
+Gate 的 Phase 2 development 条件放行、完成 `threatBoundaryReview`，并仅为 PR #138 本次开发合并
+接受 GitHub Free 残余风险；Production authorization 未授予，Production/RC 仍 `NO_GO`。
 公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。

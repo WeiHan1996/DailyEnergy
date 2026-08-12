@@ -65,6 +65,27 @@ test("T-E014-GATE-002 rejects an unconditional or Production PASS decision", () 
     /E014_GATE_DECISION/u,
   );
 
+  const pendingOwner = structuredClone(contract);
+  pendingOwner.decision.owner_decision = "PENDING_REVIEW";
+  assert.throws(
+    () => validatePhaseGateContract(pendingOwner, dependencies),
+    /E014_GATE_DECISION/u,
+  );
+
+  const missingThreatReview = structuredClone(contract);
+  missingThreatReview.decision.threat_boundary_review = "PENDING";
+  assert.throws(
+    () => validatePhaseGateContract(missingThreatReview, dependencies),
+    /E014_GATE_DECISION/u,
+  );
+
+  const productionAuthorized = structuredClone(contract);
+  productionAuthorized.decision.production_authorization = "GRANTED";
+  assert.throws(
+    () => validatePhaseGateContract(productionAuthorized, dependencies),
+    /E014_GATE_DECISION/u,
+  );
+
   const substitutedReceipt = structuredClone(contract);
   substitutedReceipt.baseline.e012.ci_run += 1;
   assert.throws(

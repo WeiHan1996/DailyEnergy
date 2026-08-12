@@ -5,7 +5,11 @@
   "decision": {
     "phase_2_development": "CONDITIONAL_GO_FOR_PHASE_2",
     "production_release_candidate": "NO_GO",
-    "owner_decision": "PENDING_REVIEW",
+    "owner_decision": "ACCEPTED_FOR_THIS_DEVELOPMENT_MERGE_ONLY",
+    "accepted_on": "2026-08-12",
+    "threat_boundary_review": "COMPLETED",
+    "production_authorization": "NOT_GRANTED",
+    "github_free_residual_risk": "ACCEPTED_FOR_THIS_DEVELOPMENT_MERGE_ONLY",
     "production_readiness_claim": "PROHIBITED"
   },
   "baseline": {

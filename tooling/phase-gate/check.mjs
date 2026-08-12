@@ -147,7 +147,13 @@ export function validatePhaseGateContract(contract, dependencies) {
   if (
     contract.decision?.phase_2_development !== "CONDITIONAL_GO_FOR_PHASE_2" ||
     contract.decision.production_release_candidate !== "NO_GO" ||
-    contract.decision.owner_decision !== "PENDING_REVIEW" ||
+    contract.decision.owner_decision !==
+      "ACCEPTED_FOR_THIS_DEVELOPMENT_MERGE_ONLY" ||
+    contract.decision.accepted_on !== "2026-08-12" ||
+    contract.decision.threat_boundary_review !== "COMPLETED" ||
+    contract.decision.production_authorization !== "NOT_GRANTED" ||
+    contract.decision.github_free_residual_risk !==
+      "ACCEPTED_FOR_THIS_DEVELOPMENT_MERGE_ONLY" ||
     contract.decision.production_readiness_claim !== "PROHIBITED"
   ) {
     fail("E014_GATE_DECISION", "development-or-production");
@@ -230,6 +236,15 @@ export function validatePhaseGateContract(contract, dependencies) {
   if (
     exercise?.development_gate?.status !==
       contract.decision.phase_2_development ||
+    exercise.development_gate?.evidence_status !==
+      "ACCEPTED_FOR_DEVELOPMENT_MERGE" ||
+    exercise.development_gate?.owner_decision !==
+      contract.decision.owner_decision ||
+    exercise.development_gate?.accepted_on !== contract.decision.accepted_on ||
+    exercise.development_gate?.threat_boundary_review !==
+      contract.decision.threat_boundary_review ||
+    exercise.development_gate?.production_authorization !==
+      contract.decision.production_authorization ||
     exercise.production_rc_gate?.status !== "NO_GO" ||
     exercise.production_rc_gate?.completed !== false ||
     exercise.production_rc_gate?.pass_claim !== "PROHIBITED"

@@ -1,15 +1,15 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-12（E-014 分层 Gate 已实现并进入 Draft PR 审核准备）
+- **最后更新**：2026-08-12（E-014 分层结论、威胁边界复核和本次开发合并残余风险已获接受）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-014 — 执行 Phase 1 工程基础 Gate
 - **任务状态**：In Review
 - **任务分支**：`agent/e014-phase1-gate`，基于 `a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae`
 - **当前 Issue**：[E-014 Issue #52](https://github.com/WeiHan1996/DailyEnergy/issues/52)
-- **当前 PR**：[Draft PR #138](https://github.com/WeiHan1996/DailyEnergy/pull/138)；实现 head 已 11/11，等待最终状态 head CI 与项目所有者审核
+- **当前 PR**：[Draft PR #138](https://github.com/WeiHan1996/DailyEnergy/pull/138)；用户审核已通过，等待 acceptance commit 的 exact-head CI 11/11 后标 Ready 并合并
 - **最近完成 PR**：[E-013 PR #135](https://github.com/WeiHan1996/DailyEnergy/pull/135)
-- **Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO / OWNER_REVIEW_PENDING`
+- **Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO / OWNER_ACCEPTED_FOR_THIS_DEVELOPMENT_MERGE_ONLY`
 
 ## 1. 当前目标
 
@@ -26,6 +26,9 @@ Accepted E-012/E-013 evidence + current full automated Gate
 ## 2. 已确认决策
 
 - 用户于 2026-08-12 明确要求按务实方案实现 E-014 至可审核合并；
+- 用户于 2026-08-12 明确接受上述分层结论、完成 security profile 的
+  `threatBoundaryReview`，并仅为 PR #138 本次 development merge 接受 GitHub Free 残余风险；
+  Production authorization 明确未授予；
 - Phase 2 development admission 与 Production/RC admission 分开判断；前者可建议
   `CONDITIONAL_GO_FOR_PHASE_2`，后者在 PITR、真实告警投递/TTL、微信 runner/真机和完整
   incident/manual RC 未完成时必须 `NO_GO`；
@@ -35,7 +38,8 @@ Accepted E-012/E-013 evidence + current full automated Gate
   有 owner/reason，任何 silent `PLANNED` 或 `UNMAPPED` 都失败；
 - 不创建新 ADR：技术栈、服务边界、Production hard Gate 和安全边界未改变；这是 Accepted
   testing/deployment/observability 规范的分层修订；
-- PR 只进入 Draft/In Review；未经后续明确批准，不标 Ready、不合并、不关闭 Issue，也不启动
+- 用户已授权在 acceptance commit 的同 run 11/11、exact-head verifier 和
+  `--match-head-commit` 全部通过后标 Ready、squash 合并并关闭 Issue #52；合并前不启动
   D-001、C-001 或其它下游任务。
 
 ## 3. 开工与基线证据
@@ -62,7 +66,7 @@ Accepted E-012/E-013 evidence + current full automated Gate
 
 ## 4. 已实现交付
 
-- [Phase 1 Gate Draft](../docs/reports/phase-1-gate.md)：结论、复用证据、PLANNED 解释、Production
+- [Phase 1 Gate Accepted](../docs/reports/phase-1-gate.md)：结论、复用证据、PLANNED 解释、Production
   阻塞项、GitHub Free 风险与审核前 Gate；
 - `tests/phase-gate/contract.json`：7 项 development requirement、7 项 deferred Production
   requirement、baseline receipts 和 merge-control scope；
@@ -112,8 +116,9 @@ Accepted E-012/E-013 evidence + current full automated Gate
   修正冲突后必须整套重跑；
 - 仓库 merge-gate verifier 在 PR 仍为 Draft 时正确返回 `CI_MANUAL_MERGE_GATE_PR_NOT_READY`；不为
   预验而提前标 Ready。项目所有者批准后，必须对当时 exact final head 再运行 verifier；
-- security profile 的 `threatBoundaryReview` 仍需项目所有者审核；Production authorization 明确
-  未授予，且本任务不请求授予。
+- security profile 的 `threatBoundaryReview` 已完成；审核覆盖开发/Production 分层、receipt
+  替换、stale head、跨 run 拼接、`--match-head-commit`、RC/Production 禁用与敏感数据边界；
+  Production authorization 明确未授予。
 
 本机已知平台/环境限制：
 
@@ -143,8 +148,7 @@ Accepted E-012/E-013 evidence + current full automated Gate
 
 ## 7. 精确下一动作
 
-1. 提交本次纯状态证据回写，并等待其 final head 的固定 Ubuntu CI 11/11；
-2. 用 PR comment 固化 final status head/run/checks，保持 PR 为 Draft并请求项目所有者审核；
-3. 只有后续明确批准后，才能标 Ready、对当时 exact head 运行 merge-gate verifier，并使用
-   `--match-head-commit` 的补偿控制 squash merge、
-   关闭 Issue #52、把 E-014 设为 Done，并从依赖图选择恰好一个 Phase 2 下一任务 Ready。
+1. 提交并推送 acceptance evidence，等待其 final head 的固定 Ubuntu CI 同一 run 11/11；
+2. 用 PR comment 固化 exact final head/run/checks，标 Ready 后运行 exact-head merge-gate verifier；
+3. 使用 `--match-head-commit` 的补偿控制 squash merge，关闭 Issue #52，验证 merged main CI；
+4. 把 E-014 设为 Done，并从依赖图选择恰好一个 Phase 2 下一任务 Ready，不在同一交接中开工。

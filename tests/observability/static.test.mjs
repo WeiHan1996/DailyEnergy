@@ -166,4 +166,25 @@ test("T-E013-KNOWN-FAIL-001 separates development admission from the full RC exe
     () => validateExerciseContract(unconditionalDevelopment),
     /E014_PRODUCTION_RC_PENDING/u,
   );
+
+  const pendingOwner = structuredClone(exercise);
+  pendingOwner.development_gate.owner_decision = "PENDING_REVIEW";
+  assert.throws(
+    () => validateExerciseContract(pendingOwner),
+    /E014_PRODUCTION_RC_PENDING/u,
+  );
+
+  const missingThreatReview = structuredClone(exercise);
+  missingThreatReview.development_gate.threat_boundary_review = "PENDING";
+  assert.throws(
+    () => validateExerciseContract(missingThreatReview),
+    /E014_PRODUCTION_RC_PENDING/u,
+  );
+
+  const productionAuthorized = structuredClone(exercise);
+  productionAuthorized.development_gate.production_authorization = "GRANTED";
+  assert.throws(
+    () => validateExerciseContract(productionAuthorized),
+    /E014_PRODUCTION_RC_PENDING/u,
+  );
 });
