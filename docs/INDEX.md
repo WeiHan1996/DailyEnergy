@@ -2,7 +2,7 @@
 
 - **文档状态**：Active
 - **最后更新**：2026-08-12
-- **当前阶段**：Phase 1 — 工程基础
+- **当前阶段**：Phase 2 — 确定性核心闭环
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
 
@@ -184,14 +184,14 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                              | database、testing、deployment、ADR-0005、Issue #44            |
 | [docker/observability/contract.json](../docker/observability/contract.json)                                                                                                                            | Implemented | E-013 vendor-neutral 信号、字段/平面/基数、期限、成本与 Production blocked Gate                                   | observability、privacy、deployment                            |
 | [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011 CI/供应链、E-013 observability 与 E-014 Phase Gate 证据入口                         | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-014 为唯一 In Progress 任务                              | Accepted Phase 0B specs、E-014 Issue #52                      |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；D-001 为唯一 Ready 任务                                    | Accepted Phase 0B specs、E-014 Gate、D-001 Issue #99          |
 
 ### 7.7 Phase Gate
 
 | 文件                                                        | 状态     | 目的                                                                      | 主要依赖              |
 | ----------------------------------------------------------- | -------- | ------------------------------------------------------------------------- | --------------------- |
 | [docs/reports/phase-0b-gate.md](./reports/phase-0b-gate.md) | Accepted | 复核 Phase 0B 总退出门槛、端到端追踪、延后项、外部 Gate 与 E-001 开工合同 | S-01～S-34、ROADMAP   |
-| [docs/reports/phase-1-gate.md](./reports/phase-1-gate.md)   | Accepted | E-014 Phase 2 development 条件放行与 Production/RC NO-GO                  | E-001～E-014、ROADMAP |
+| [docs/reports/phase-1-gate.md](./reports/phase-1-gate.md)   | Accepted | E-014 Phase 2 development 条件放行、Production/RC NO-GO 与最终合并证据    | E-001～E-014、ROADMAP |
 
 ## 8. 计划 ADR
 
@@ -251,20 +251,20 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-013 与 E-015 已完成，E-014 是唯一 In Progress 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-015 已完成，Phase 1 已结束；D-001 是 Phase 2 唯一 Ready 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-014 Issue #52](https://github.com/WeiHan1996/DailyEnergy/issues/52)；
+6. [D-001 Issue #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)；
 7. `docs/agent/PROJECT_CONTEXT.md`、Agent 工作流规范与
-   `pnpm agent:prepare E-014 --remote --deep` 返回的全部 required sources；
-8. [系统架构](./technical/architecture.md)、[仓库结构与模块边界](./technical/repository-structure.md)、
-   [测试策略](./technical/testing.md)、[部署、配置和回滚](./technical/deployment.md)与
-   [可观测性和成本监控](./technical/observability.md)；
-9. 现有 runner、fixture、Source-ID evidence、API/Admin/miniapp、数据库/队列测试与附近代码；
+   `pnpm agent:prepare D-001 --remote` 返回的全部 required sources；
+8. [产品愿景](./product/vision.md)、[数字朋友人格](./ai/personality.md)、
+   [页面与路由清单](./design/screen-inventory.md)、[页面详细规格](./design/screen-specs.md)、
+   [内容布局](./design/content-layout.md)与[原型验证](./design/prototype-validation.md)；
+9. D-001 的 Figma 原始证据、素材来源/许可、固定内容对照与人工评审记录；
 10. tasks/backlog.md（仅在需要重排优先级时）。
 
 E-001～E-004 已分别随 PR #89、#91、#93、#96 合并并进入 Done；E-008 已随
@@ -283,7 +283,7 @@ E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squas
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
 [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
 [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 已纳入
-Phase 2，全部保持 Planned。D-004 是 C-003、C-004、C-009 的直接前置；
+Phase 2；D-001 为唯一 Ready，D-002～D-005 保持 Planned。D-004 是 C-003、C-004、C-009 的直接前置；
 D-005 是 C-012、C-013、C-014 的直接前置。
 正式 Source-ID registry 已由 E-010 实现；E-011 已接入 CI、artifact、cache、
 telemetry 与供应链 evidence 且不改变原有证据层级，未实现项继续为 `PLANNED`。
@@ -297,9 +297,13 @@ E-010 已随 PR #117 squash 合并并进入 Done；E-011 已随 PR #119 squash �
 ADR-0007 DEV-only 例外已获明确授权，首个 Accepted DEV release 已建立。项目所有者于 2026-08-12 接受显式
 `reconcile-current` 合同、首次引入 bootstrap 澄清及第二候选的 deploy/rollback/redeploy 最终证据；PR #133 已 squash 合并，第二 candidate 的
 18 阶段 deploy/rollback/redeploy、17 阶段 clean restart reconciliation、无代理清理和独立验收审计均已完成。E-012 final evidence
-PR #134 已 squash 合并，E-012 进入 Done；E-013 已随 PR #135 squash 合并并获接受。E-014 在
-`agent/e014-phase1-gate` 开工并成为唯一 In Review 任务；项目所有者于 2026-08-12 接受 Phase 1
-Gate 的 Phase 2 development 条件放行、完成 `threatBoundaryReview`，并仅为 PR #138 本次开发合并
-接受 GitHub Free 残余风险；Production authorization 未授予，Production/RC 仍 `NO_GO`。
+PR #134 已 squash 合并，E-012 进入 Done；E-013 已随 PR #135 squash 合并并获接受。项目所有者
+于 2026-08-12 接受 E-014 的 Phase 2 development 条件放行、完成 `threatBoundaryReview`，并仅为
+PR #138 本次开发合并接受 GitHub Free 残余风险；Production authorization 未授予，Production/RC
+仍 `NO_GO`。PR #138 final head `8365e41ad98034e724bb46bc3cb889c4861569de` 的 CI run
+`31586034272` 11/11 SUCCESS，并经 exact-head verifier 与 `--match-head-commit` squash 合并为
+`c1ad026cd1ac1be131b56b8f5c82bf76e407b503`。merged-main CI run `31586384383` 首次因 Docker Hub
+Tempo 镜像拉取超时失败，失败 jobs 重跑后 attempt 2 同一提交 11/11 SUCCESS。E-014 进入 Done，
+Phase 1 结束，D-001 成为 Phase 2 唯一 Ready 任务。
 公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。
