@@ -101,5 +101,10 @@ Redis 8、Compose fault、build 和 reference observability runtime 的聚焦 su
 平台结论必须由 final PR head 的固定 Ubuntu 11/11 CI 给出。security profile 的
 `threatBoundaryReview` 仍待项目所有者完成，Production authorization 明确不在本次请求范围内。
 
+PR #138 首轮 head `2ba9b0b1cbc9ef0fcd517431307948d13b9835d5` 的 CI run `31579999699`
+正确拒绝了 current/backlog 的 `In Review`/`In Progress` 状态冲突：9 个前置 checks 成功，
+`unit-contract` 与 aggregate Gate 失败。该 run 不是 final-head PASS；状态修正后必须由一个新 run
+完整给出 11/11。
+
 通过审核后才把 E-014 置为 Done，并从 Phase 2 依赖图中选择恰好一个下一任务 Ready；本 Draft
 报告不提前启动 D-001、C-001 或其它下游任务。
