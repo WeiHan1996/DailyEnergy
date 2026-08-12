@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-33 — 可观测性和成本监控
-- **最后更新**：2026-07-26
+- **最后更新**：2026-08-12（E-014 开发准入与 Production/RC 演练分层）
 - **适用范围**：Phase 1～3 的 API、Admin、Worker、PostgreSQL、Redis/BullMQ、AI Gateway、数据权利、发布、备份恢复、日志、指标、Trace、SLO、告警与成本治理
 - **上游权威**：[指标唯一口径](../analytics/metrics.md)、[埋点事件字典](../analytics/event-tracking.md)、[AI Gateway](../ai/gateway.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)、[系统架构](./architecture.md)、[测试策略](./testing.md)、[部署、配置与回滚](./deployment.md)
 - **下游任务**：S-34～S-35、E-003、E-006～E-014、C-014～C-015、AI-002、AI-006、AI-012、AI-016、A-005～A-010
@@ -71,25 +71,25 @@
 
 ## 4. S-33 决策摘要
 
-| 主题 | v1 唯一结论 |
-|---|---|
-| 应用标准 | Node 服务使用 OpenTelemetry API/SDK 产生 Trace 与 Metrics；OTLP 作为 Trace 传输合同 |
-| 指标暴露 | 每个服务只在 internal network 暴露 Prometheus/OpenMetrics endpoint；不公网开放 |
-| 日志 | 继续使用成熟的结构化 JSON logger 输出 stdout；不等待 OpenTelemetry JS Logs API 稳定 |
-| 采集 | 每 application host 部署 OpenTelemetry Collector 或等价批准 agent；应用不直接持有第三方 telemetry key |
-| 参考后端 | Prometheus + Loki + Tempo + Grafana + Alertmanager 用于 LOCAL/CI/STAGING-like 验证 |
-| 生产后端 | 必须兼容 OTLP/OpenMetrics、位于独立故障域并通过 region/TTL/RBAC/跨境/退出 Gate；厂商未选前为 BLOCKED |
-| 关联 | `trace_id` 可进入普通日志字段但不作为 index label；metric exemplar 只关联已采样无正文 Trace |
-| 标签 | 只允许低基数 environment/service/profile/operation/outcome/version；用户、opaque ref 和自由文本永久禁止 |
-| 时间窗口 | SLO 使用滚动 28 天；ProductDate 指标继续使用 S-25 的 `Asia/Shanghai` 04:00 |
-| 可用性 | 核心 API 99.5%；生成意图 30 秒内可用 99.0%；单 host 限制明确计入 |
-| 延迟 | 核心读 P95 ≤500ms；核心写接受 P95 ≤750ms；生成结果 P95 ≤10s |
-| AI | 保留 S-25：AI 8 秒内 ≥95%、模板降级 ≤5%、≤¥0.10/CoreActiveUserDay、cost known ≥99% |
-| 告警 | SLO 使用 14.4×/6× multi-window burn rate；低流量必须叠加 synthetic 与绝对故障数 |
-| 硬触发 | Safety/删除/owner/secret/raw-content/restore 等单个确认案例直接事件化，无 error budget |
-| 成本 | `CostEntryV1` + `BudgetEnvelopeV1`；70% forecast、85% actual/forecast、100% hard limit |
-| 保存 | ordinary logs 30 天、raw Trace 7 天、细粒度 metrics 35 天、T4 日聚合 13 个月；security logs 6 个月 |
-| 观测故障 | telemetry 丢失单独告警；业务继续遵循 fail-closed/fallback，禁止打印 body 补偿 |
+| 主题     | v1 唯一结论                                                                                             |
+| -------- | ------------------------------------------------------------------------------------------------------- |
+| 应用标准 | Node 服务使用 OpenTelemetry API/SDK 产生 Trace 与 Metrics；OTLP 作为 Trace 传输合同                     |
+| 指标暴露 | 每个服务只在 internal network 暴露 Prometheus/OpenMetrics endpoint；不公网开放                          |
+| 日志     | 继续使用成熟的结构化 JSON logger 输出 stdout；不等待 OpenTelemetry JS Logs API 稳定                     |
+| 采集     | 每 application host 部署 OpenTelemetry Collector 或等价批准 agent；应用不直接持有第三方 telemetry key   |
+| 参考后端 | Prometheus + Loki + Tempo + Grafana + Alertmanager 用于 LOCAL/CI/STAGING-like 验证                      |
+| 生产后端 | 必须兼容 OTLP/OpenMetrics、位于独立故障域并通过 region/TTL/RBAC/跨境/退出 Gate；厂商未选前为 BLOCKED    |
+| 关联     | `trace_id` 可进入普通日志字段但不作为 index label；metric exemplar 只关联已采样无正文 Trace             |
+| 标签     | 只允许低基数 environment/service/profile/operation/outcome/version；用户、opaque ref 和自由文本永久禁止 |
+| 时间窗口 | SLO 使用滚动 28 天；ProductDate 指标继续使用 S-25 的 `Asia/Shanghai` 04:00                              |
+| 可用性   | 核心 API 99.5%；生成意图 30 秒内可用 99.0%；单 host 限制明确计入                                        |
+| 延迟     | 核心读 P95 ≤500ms；核心写接受 P95 ≤750ms；生成结果 P95 ≤10s                                             |
+| AI       | 保留 S-25：AI 8 秒内 ≥95%、模板降级 ≤5%、≤¥0.10/CoreActiveUserDay、cost known ≥99%                      |
+| 告警     | SLO 使用 14.4×/6× multi-window burn rate；低流量必须叠加 synthetic 与绝对故障数                         |
+| 硬触发   | Safety/删除/owner/secret/raw-content/restore 等单个确认案例直接事件化，无 error budget                  |
+| 成本     | `CostEntryV1` + `BudgetEnvelopeV1`；70% forecast、85% actual/forecast、100% hard limit                  |
+| 保存     | ordinary logs 30 天、raw Trace 7 天、细粒度 metrics 35 天、T4 日聚合 13 个月；security logs 6 个月      |
+| 观测故障 | telemetry 丢失单独告警；业务继续遵循 fail-closed/fallback，禁止打印 body 补偿                           |
 
 ## 5. 信号架构与后端边界
 
@@ -150,14 +150,14 @@ LOCAL/CI/STAGING-like 的参考实现使用：
 
 ## 6. Telemetry 平面与数据等级
 
-| 平面 | 内容 | 数据等级 | 普通访问 | 最长期限 |
-|---|---|---|---|---|
-| `ORDINARY_RUNTIME` | API/Worker/queue/DB/Gateway 的脱敏运行信号 | T1/T4 | Engineering/Operations | logs 30d；Trace 7d；metrics 35d |
-| `SECURITY` | 必需 IP、认证、越权、secret/攻击检测 | T2 | Security/Privacy restricted | 6 个自然月 |
-| `GOVERNANCE` | DataTask SLA、restore deny、期限和删除检测结果 | T2/T4 | Privacy/Restricted operations | 证据按 PDM；匿名日聚合 13 个月 |
-| `SAFETY_CONTROL` | Safety 组件、固定资源和 ordinary bypass detector | T2/T4 | Safety/Restricted operations | 证据按 Safety；匿名日聚合 13 个月 |
-| `COST` | 非个人 usage、price、amount、预算和 completeness | T1/T4 | Engineering/Finance/AI owner | 细粒度 35d；T4 13 个月 |
-| `PRODUCT_ANALYTICS` | S-24/S-25 T4 匿名指标 | T4 | Product Analytics | 13 个自然月 |
+| 平面                | 内容                                             | 数据等级 | 普通访问                      | 最长期限                          |
+| ------------------- | ------------------------------------------------ | -------- | ----------------------------- | --------------------------------- |
+| `ORDINARY_RUNTIME`  | API/Worker/queue/DB/Gateway 的脱敏运行信号       | T1/T4    | Engineering/Operations        | logs 30d；Trace 7d；metrics 35d   |
+| `SECURITY`          | 必需 IP、认证、越权、secret/攻击检测             | T2       | Security/Privacy restricted   | 6 个自然月                        |
+| `GOVERNANCE`        | DataTask SLA、restore deny、期限和删除检测结果   | T2/T4    | Privacy/Restricted operations | 证据按 PDM；匿名日聚合 13 个月    |
+| `SAFETY_CONTROL`    | Safety 组件、固定资源和 ordinary bypass detector | T2/T4    | Safety/Restricted operations  | 证据按 Safety；匿名日聚合 13 个月 |
+| `COST`              | 非个人 usage、price、amount、预算和 completeness | T1/T4    | Engineering/Finance/AI owner  | 细粒度 35d；T4 13 个月            |
+| `PRODUCT_ANALYTICS` | S-24/S-25 T4 匿名指标                            | T4       | Product Analytics             | 13 个自然月                       |
 
 规则：
 
@@ -191,20 +191,20 @@ cloud.region?                  // 只有已批准粗粒度 region
 
 ### 7.2 允许的低基数维度
 
-| 维度 | 最大活动值 | 示例 |
-|---|---:|---|
-| `service` | 8 | api/admin/interactive/background/restricted/collector |
-| `runtime_profile` | 8 | API/ADMIN/INTERACTIVE/BACKGROUND/RESTRICTED/MIGRATION/EVALUATION |
-| `operation_code` | 64 | 封闭的 HTTP operation / job family / DB operation |
-| `outcome_code` | 每操作 ≤12 | SUCCESS/EXPECTED_REJECT/RETRYABLE/TERMINAL/UNKNOWN |
-| `http_method` | 6 | GET/POST/PATCH/DELETE/OPTIONS/OTHER |
-| `status_class` | 6 | 2xx/3xx/4xx/5xx/CANCELLED |
-| `queue_family` | 8 | INTERACTIVE/BACKGROUND/RESTRICTED 等 |
-| `workload` | 4 | DAILY/WEEKLY/EVALUATION/OTHER |
-| `generation_mode` | 4 | PRIMARY_AI/BACKUP_AI/CONTROLLED_TEMPLATE/NO_RESULT |
-| `provider_code` | ≤4 | 受限运行视图中的批准 provider |
-| `model_revision_bucket` | ≤8 | 当前批准 revision/OTHER |
-| `reason_code` | 每子系统 ≤24 | 稳定封闭 reason |
+| 维度                    |   最大活动值 | 示例                                                             |
+| ----------------------- | -----------: | ---------------------------------------------------------------- |
+| `service`               |            8 | api/admin/interactive/background/restricted/collector            |
+| `runtime_profile`       |            8 | API/ADMIN/INTERACTIVE/BACKGROUND/RESTRICTED/MIGRATION/EVALUATION |
+| `operation_code`        |           64 | 封闭的 HTTP operation / job family / DB operation                |
+| `outcome_code`          |   每操作 ≤12 | SUCCESS/EXPECTED_REJECT/RETRYABLE/TERMINAL/UNKNOWN               |
+| `http_method`           |            6 | GET/POST/PATCH/DELETE/OPTIONS/OTHER                              |
+| `status_class`          |            6 | 2xx/3xx/4xx/5xx/CANCELLED                                        |
+| `queue_family`          |            8 | INTERACTIVE/BACKGROUND/RESTRICTED 等                             |
+| `workload`              |            4 | DAILY/WEEKLY/EVALUATION/OTHER                                    |
+| `generation_mode`       |            4 | PRIMARY_AI/BACKUP_AI/CONTROLLED_TEMPLATE/NO_RESULT               |
+| `provider_code`         |           ≤4 | 受限运行视图中的批准 provider                                    |
+| `model_revision_bucket` |           ≤8 | 当前批准 revision/OTHER                                          |
+| `reason_code`           | 每子系统 ≤24 | 稳定封闭 reason                                                  |
 
 ### 7.3 永久禁止的 label / index
 
@@ -252,12 +252,12 @@ message_code         // 封闭模板码，不是自由文本 message
 
 ### 8.2 日志级别
 
-| 级别 | 用途 | 禁止 |
-|---|---|---|
+| 级别    | 用途                                                         | 禁止                         |
+| ------- | ------------------------------------------------------------ | ---------------------------- |
 | `ERROR` | 需要人工关注或进入 error budget 的 terminal/internal failure | expected validation/409 重试 |
-| `WARN` | 降级、重试耗尽前、即将超阈值、配置兼容提醒 | 每请求重复噪声 |
-| `INFO` | startup/shutdown、release、受控状态转换和稀疏关键事件 | 每个成功 DB query |
-| `DEBUG` | LOCAL/DEV 合成调试 | PRODUCTION、真实内容、secret |
+| `WARN`  | 降级、重试耗尽前、即将超阈值、配置兼容提醒                   | 每请求重复噪声               |
+| `INFO`  | startup/shutdown、release、受控状态转换和稀疏关键事件        | 每个成功 DB query            |
+| `DEBUG` | LOCAL/DEV 合成调试                                           | PRODUCTION、真实内容、secret |
 
 生产 log level 变化必须有 scope、approver、expiry；不得打开 body logging。
 
@@ -294,13 +294,13 @@ message_code         // 封闭模板码，不是自由文本 message
 
 ### 9.3 采样
 
-| 场景 | v1 采样 |
-|---|---|
-| STAGING/RECOVERY synthetic | 100% |
-| PRODUCTION ERROR / SLO-slow | 100%，受每分钟上限保护 |
-| PRODUCTION normal success | tail/head 组合 10%，允许在 1%～10% 受审范围内调节 |
-| Safety/Restricted | 默认只保留最小受限 audit ref；不把内容带入 Trace |
-| DEBUG 临时提升 | 明确 scope、expiry、approver；仍不能记录禁止字段 |
+| 场景                        | v1 采样                                           |
+| --------------------------- | ------------------------------------------------- |
+| STAGING/RECOVERY synthetic  | 100%                                              |
+| PRODUCTION ERROR / SLO-slow | 100%，受每分钟上限保护                            |
+| PRODUCTION normal success   | tail/head 组合 10%，允许在 1%～10% 受审范围内调节 |
+| Safety/Restricted           | 默认只保留最小受限 audit ref；不把内容带入 Trace  |
+| DEBUG 临时提升              | 明确 scope、expiry、approver；仍不能记录禁止字段  |
 
 - sampling decision 与 rate 作为版本化 config；
 - error storm 不能无限写满 backend；超过 cap 只保留计数、代表 trace 和 dropped count；
@@ -352,30 +352,30 @@ dailyenergy_cost_*
 
 ### 11.2 用户旅程 SLO
 
-| ID | SLI | Good / Total | 目标 / 28d |
-|---|---|---|---:|
-| S33-SLO-01 | 核心 API 可用性 | 核心 operation 的 contract-success 或 expected reject / 全部 eligible request | ≥99.5% |
-| S33-SLO-02 | 核心读取延迟 | Today/history/bootstrap 等成功读取 ≤0.5s / latency-known success | ≥95% |
-| S33-SLO-03 | 核心写接受延迟 | checkin/light/feedback 等同步事实提交 ≤0.75s / latency-known success | ≥95% |
-| S33-SLO-04 | 生成结果 30s 可用 | 合法 intent 在 30s 内 AVAILABLE（含 template）/ eligible intent | ≥99.0% |
-| S33-SLO-05 | 生成端到端 P95 | intent commit → AVAILABLE；失败不进入 latency 分母但进入 SLO-04 | ≤10s |
-| S33-SLO-06 | AI 8s 达标 | 继承 `S25-M20` 的 DAILY AI AVAILABLE latency bucket | ≥95% |
-| S33-SLO-07 | 模板降级比例 | 继承 `S25-M21` | ≤5% |
+| ID         | SLI               | Good / Total                                                                  | 目标 / 28d |
+| ---------- | ----------------- | ----------------------------------------------------------------------------- | ---------: |
+| S33-SLO-01 | 核心 API 可用性   | 核心 operation 的 contract-success 或 expected reject / 全部 eligible request |     ≥99.5% |
+| S33-SLO-02 | 核心读取延迟      | Today/history/bootstrap 等成功读取 ≤0.5s / latency-known success              |       ≥95% |
+| S33-SLO-03 | 核心写接受延迟    | checkin/light/feedback 等同步事实提交 ≤0.75s / latency-known success          |       ≥95% |
+| S33-SLO-04 | 生成结果 30s 可用 | 合法 intent 在 30s 内 AVAILABLE（含 template）/ eligible intent               |     ≥99.0% |
+| S33-SLO-05 | 生成端到端 P95    | intent commit → AVAILABLE；失败不进入 latency 分母但进入 SLO-04               |       ≤10s |
+| S33-SLO-06 | AI 8s 达标        | 继承 `S25-M20` 的 DAILY AI AVAILABLE latency bucket                           |       ≥95% |
+| S33-SLO-07 | 模板降级比例      | 继承 `S25-M21`                                                                |        ≤5% |
 
 `S33-SLO-04/05` 不把 guard cancel、窗口关闭、合法 existing result 或用户主动取消算服务失败；queue/worker/provider/template 导致的无结果、terminal failure 或超 30 秒算 bad。
 
 ### 11.3 运行目标与硬不变量
 
-| ID | 目标 | 阈值 |
-|---|---|---|
-| S33-OBJ-01 | Interactive outbox → consumer commit | P99 ≤30s |
-| S33-OBJ-02 | Background outbox → consumer commit | P99 ≤5min |
-| S33-OBJ-03 | Interactive queue oldest eligible age | 正常 ≤5s；60s page threshold |
-| S33-OBJ-04 | PostgreSQL pool saturation | active/max <80% sustained |
-| S33-OBJ-05 | Redis/queue rebuild | Redis loss drill 后 15min 内恢复 intake，业务事实丢失 0 |
-| S33-OBJ-06 | telemetry completeness | required service/resource/profile signals ≥99% |
-| S33-OBJ-07 | AI cost completeness | 继承 `S25-M23`，KNOWN terminal DAILY ≥99% |
-| S33-OBJ-08 | WAL archive gap | ≤15min；5min warning、10min page、15min breach |
+| ID         | 目标                                  | 阈值                                                    |
+| ---------- | ------------------------------------- | ------------------------------------------------------- |
+| S33-OBJ-01 | Interactive outbox → consumer commit  | P99 ≤30s                                                |
+| S33-OBJ-02 | Background outbox → consumer commit   | P99 ≤5min                                               |
+| S33-OBJ-03 | Interactive queue oldest eligible age | 正常 ≤5s；60s page threshold                            |
+| S33-OBJ-04 | PostgreSQL pool saturation            | active/max <80% sustained                               |
+| S33-OBJ-05 | Redis/queue rebuild                   | Redis loss drill 后 15min 内恢复 intake，业务事实丢失 0 |
+| S33-OBJ-06 | telemetry completeness                | required service/resource/profile signals ≥99%          |
+| S33-OBJ-07 | AI cost completeness                  | 继承 `S25-M23`，KNOWN terminal DAILY ≥99%               |
+| S33-OBJ-08 | WAL archive gap                       | ≤15min；5min warning、10min page、15min breach          |
 
 以下没有 error budget，确认一次即失败：
 
@@ -409,12 +409,12 @@ remaining_budget = 1 - consumed_bad / allowed_bad
 
 ### 12.2 Multi-window burn rate
 
-| 动作 | 长窗口 | 短窗口 | Burn rate | 预算消耗含义 |
-|---|---:|---:|---:|---:|
-| Page | 1h | 5m | 14.4× | 约 1h 消耗 2% |
-| Page | 6h | 30m | 6× | 约 6h 消耗 5% |
-| Ticket | 24h | 2h | 3× | 持续快速消耗 |
-| Ticket | 3d | 6h | 1× | 约 3d 消耗 10% |
+| 动作   | 长窗口 | 短窗口 | Burn rate |   预算消耗含义 |
+| ------ | -----: | -----: | --------: | -------------: |
+| Page   |     1h |     5m |     14.4× |  约 1h 消耗 2% |
+| Page   |     6h |    30m |        6× |  约 6h 消耗 5% |
+| Ticket |    24h |     2h |        3× |   持续快速消耗 |
+| Ticket |     3d |     6h |        1× | 约 3d 消耗 10% |
 
 长短窗口必须同时超过阈值；Alertmanager 做 inhibition，严重告警抑制同根因较低级告警。
 
@@ -444,12 +444,12 @@ remaining_budget = 1 - consumed_bad / allowed_bad
 
 ### 14.1 告警等级
 
-| Alert severity | 人工动作 | Incident 映射 |
-|---|---|---|
-| `PAGE_CRITICAL` | 立即确认、containment、声明候选事件 | 通常 IR-SEV0/1 |
-| `PAGE_HIGH` | 15 分钟内确认，按影响声明 | 通常 IR-SEV1 |
-| `TICKET` | 下一工作日内 owner 处理 | IR-SEV2/3 或缺陷 |
-| `INFO` | Dashboard/发布观察，不主动通知 | 无 |
+| Alert severity  | 人工动作                            | Incident 映射    |
+| --------------- | ----------------------------------- | ---------------- |
+| `PAGE_CRITICAL` | 立即确认、containment、声明候选事件 | 通常 IR-SEV0/1   |
+| `PAGE_HIGH`     | 15 分钟内确认，按影响声明           | 通常 IR-SEV1     |
+| `TICKET`        | 下一工作日内 owner 处理             | IR-SEV2/3 或缺陷 |
+| `INFO`          | Dashboard/发布观察，不主动通知      | 无               |
 
 alert severity 只是路由优先级，不能自动替代 S-23 的 Incident Commander 分级。
 
@@ -738,14 +738,14 @@ dailyenergy_recovery_copy_destroy_age_seconds
 
 ## 21. Health、Readiness 与 Synthetic
 
-| Endpoint/Probe | 目的 | 对外 |
-|---|---|---|
-| liveness | 进程 event loop/基本存活 | internal only |
-| readiness | profile config、DB role/schema、必要依赖、catalog/capability | reverse proxy/internal |
-| startup | migration/config/fingerprint 验证 | internal only |
-| public black-box | DNS/TLS/reverse proxy/隐私安全最小响应 | 可公开但无详情 |
-| STAGING journey | 合成账户完成核心流程与故障注入 | staging only |
-| RECOVERY probe | owner/Safety/delete/restore/invariant 检测 | recovery restricted |
+| Endpoint/Probe   | 目的                                                         | 对外                   |
+| ---------------- | ------------------------------------------------------------ | ---------------------- |
+| liveness         | 进程 event loop/基本存活                                     | internal only          |
+| readiness        | profile config、DB role/schema、必要依赖、catalog/capability | reverse proxy/internal |
+| startup          | migration/config/fingerprint 验证                            | internal only          |
+| public black-box | DNS/TLS/reverse proxy/隐私安全最小响应                       | 可公开但无详情         |
+| STAGING journey  | 合成账户完成核心流程与故障注入                               | staging only           |
+| RECOVERY probe   | owner/Safety/delete/restore/invariant 检测                   | recovery restricted    |
 
 - liveness 不因外部 provider 暂停而 restart storm；
 - readiness 不打印 hostname、DB/provider account、用户计数、版本目录或 secret；
@@ -839,16 +839,16 @@ Runbook 不能建议：
 
 ## 25. 保存、访问与删除
 
-| 资产 | 默认期限 | 访问 |
-|---|---:|---|
-| ordinary structured logs | 30 天 | Engineering/Operations |
-| sampled raw Trace | 7 天 | Engineering；受限 Trace 另走 restricted |
-| detailed runtime metrics | 35 天 | Engineering/Operations |
-| recording rules / SLO window | 至少 35 天 | Engineering/Product read |
-| T4 daily runtime/cost aggregate | 13 个自然月 | 对应只读 owner |
-| network security logs | 6 个自然月 | Security/Privacy restricted |
-| alert notification payload | 30 天且无内容 | Engineering/Incident |
-| Dashboard/alert/runbook version | 被 release 引用期间 | T4 non-personal |
+| 资产                            |            默认期限 | 访问                                    |
+| ------------------------------- | ------------------: | --------------------------------------- |
+| ordinary structured logs        |               30 天 | Engineering/Operations                  |
+| sampled raw Trace               |                7 天 | Engineering；受限 Trace 另走 restricted |
+| detailed runtime metrics        |               35 天 | Engineering/Operations                  |
+| recording rules / SLO window    |          至少 35 天 | Engineering/Product read                |
+| T4 daily runtime/cost aggregate |         13 个自然月 | 对应只读 owner                          |
+| network security logs           |          6 个自然月 | Security/Privacy restricted             |
+| alert notification payload      |       30 天且无内容 | Engineering/Incident                    |
+| Dashboard/alert/runbook version | 被 release 引用期间 | T4 non-personal                         |
 
 - shorter PDM/incident/legal deadline 优先；
 - ordinary log/Trace 若意外含个人内容，不等待 TTL，立即隔离/删除并按事件处理；
@@ -893,102 +893,115 @@ Release Manifest 必须增加或引用：
 
 ## 27. 实施交接
 
-| 任务 | S-33 直接输入 |
-|---|---|
-| E-003 | API metrics/log/trace、health/readiness、operation code 与错误预算 |
-| E-006 | PG exporter、pool/transaction/lock/WAL/migration/grant 指标 |
-| E-007 | outbox/BullMQ/Worker/Redis loss 指标与告警 |
-| E-009 | LOCAL/CI/STAGING reference observability profile |
-| E-010 | 48 场景、telemetry known-fail、synthetic 和 alert contract tests |
-| E-011 | rule/dashboard/runbook lint、cardinality/secret/raw-content Gate |
-| E-012 | production backend、独立黑盒、RBAC/region/TTL/egress 与 release wiring |
-| E-013 | OTel/metrics/logging、Collector、backend、SLO、alerts、dashboards、cost 实现 |
-| E-014 | clean install、alert delivery、outage、budget、restore 和事件演练证据 |
-| C-015 | S-24/S-25 T4 与 S-33 runtime/cost 的隔离聚合 |
-| AI-016 | Gateway usage/cost reconcile、budget state、anomaly 与 model drift |
-| A-005 | 只读 T4 产品指标与 restricted operations Dashboard 边界 |
+| 任务   | S-33 直接输入                                                                |
+| ------ | ---------------------------------------------------------------------------- |
+| E-003  | API metrics/log/trace、health/readiness、operation code 与错误预算           |
+| E-006  | PG exporter、pool/transaction/lock/WAL/migration/grant 指标                  |
+| E-007  | outbox/BullMQ/Worker/Redis loss 指标与告警                                   |
+| E-009  | LOCAL/CI/STAGING reference observability profile                             |
+| E-010  | 48 场景、telemetry known-fail、synthetic 和 alert contract tests             |
+| E-011  | rule/dashboard/runbook lint、cardinality/secret/raw-content Gate             |
+| E-012  | production backend、独立黑盒、RBAC/region/TTL/egress 与 release wiring       |
+| E-013  | OTel/metrics/logging、Collector、backend、SLO、alerts、dashboards、cost 实现 |
+| E-014  | clean install、alert delivery、outage、budget、restore 和事件演练证据        |
+| C-015  | S-24/S-25 T4 与 S-33 runtime/cost 的隔离聚合                                 |
+| AI-016 | Gateway usage/cost reconcile、budget state、anomaly 与 model drift           |
+| A-005  | 只读 T4 产品指标与 restricted operations Dashboard 边界                      |
 
 E-013 不是“接入一个日志 SaaS”即可完成。必须交付信号合同、采集失败行为、字段/label Gate、SLO recording rules、低流量策略、alert routing、Runbook、成本与期限证据。
+
+### 27.1 E-014 证据分层
+
+`docker/observability/exercise-contract.json` 同时保存两个状态：
+
+- reference stack、closed signal/SLO/alert/cost 合同与合成故障证据支持 Phase 2 development 的
+  `CONDITIONAL_GO_FOR_PHASE_2`；
+- Production backend、真实 notification recipient、真实 TTL deletion、独立 outage detection、
+  named on-call 和完整 incident/recovery observation 未验证时，Production/RC 保持
+  `NO_GO / completed=false / pass_claim=PROHIBITED`。
+
+静态 alert rule、synthetic canary 或 reference retention config 不能升级为真实投递、真实删除或
+Production 故障域证据。E-014 报告必须逐项保留 reason、owner 与 unlock condition。
 
 ## 28. 固定验证场景（48）
 
 ### 28.1 字段、隐私与基数（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S33-OBS-001 | request body 含 preferred name 被 logger 传入 | 字段 allowlist 丢弃，raw-content Gate 通过 |
-| S33-OBS-002 | Prompt/provider raw response 进入 span event | export 拒绝并触发受限事件候选 |
-| S33-OBS-003 | AccountRef 被添加为 metric label | CI cardinality/privacy Gate 失败 |
-| S33-OBS-004 | trace_id 被设为 Loki index label | 配置 Gate 失败，只能作为非索引关联字段 |
-| S33-OBS-005 | 原始 URL/query 被记录 | route template/operation code 替代，原值为 0 |
-| S33-OBS-006 | exception message 含 SQL bind/secret | 固定 reason/message code；原异常不导出 |
-| S33-OBS-007 | 新 label 未声明最大基数 | telemetry contract Gate 失败 |
-| S33-OBS-008 | ordinary backend 收到 Safety/DataTask 受限细节 | 平面隔离失败，停止 export 并按 S-23 处理 |
+| ID          | 场景                                           | 必须结果                                     |
+| ----------- | ---------------------------------------------- | -------------------------------------------- |
+| S33-OBS-001 | request body 含 preferred name 被 logger 传入  | 字段 allowlist 丢弃，raw-content Gate 通过   |
+| S33-OBS-002 | Prompt/provider raw response 进入 span event   | export 拒绝并触发受限事件候选                |
+| S33-OBS-003 | AccountRef 被添加为 metric label               | CI cardinality/privacy Gate 失败             |
+| S33-OBS-004 | trace_id 被设为 Loki index label               | 配置 Gate 失败，只能作为非索引关联字段       |
+| S33-OBS-005 | 原始 URL/query 被记录                          | route template/operation code 替代，原值为 0 |
+| S33-OBS-006 | exception message 含 SQL bind/secret           | 固定 reason/message code；原异常不导出       |
+| S33-OBS-007 | 新 label 未声明最大基数                        | telemetry contract Gate 失败                 |
+| S33-OBS-008 | ordinary backend 收到 Safety/DataTask 受限细节 | 平面隔离失败，停止 export 并按 S-23 处理     |
 
 ### 28.2 SLO、低流量与告警（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S33-OBS-009 | expected 409 revision conflict | 不计 SLO availability bad，单独 conflict metric |
-| S33-OBS-010 | 快速 5xx 大量出现 | latency SLO 不被快速失败改善；availability bad 增加 |
-| S33-OBS-011 | 1h/5m 同时 >14.4× burn | PAGE alert，较低窗口被抑制 |
-| S33-OBS-012 | 1h 高但最近 5m 已恢复 | 不 page；保留 ticket/观察证据 |
-| S33-OBS-013 | 低流量单次 ephemeral 5xx | 不因比例单独 page；记录并等待 corroboration |
-| S33-OBS-014 | 零真实流量且 host 全失效 | 独立 black-box/heartbeat 告警 |
-| S33-OBS-015 | synthetic 成功但真实错误上升 | 两组分开，synthetic 不掩盖真实 burn |
-| S33-OBS-016 | error budget exhausted 后普通功能发布 | Release Gate 拒绝，只允许批准的修复类变更 |
+| ID          | 场景                                  | 必须结果                                            |
+| ----------- | ------------------------------------- | --------------------------------------------------- |
+| S33-OBS-009 | expected 409 revision conflict        | 不计 SLO availability bad，单独 conflict metric     |
+| S33-OBS-010 | 快速 5xx 大量出现                     | latency SLO 不被快速失败改善；availability bad 增加 |
+| S33-OBS-011 | 1h/5m 同时 >14.4× burn                | PAGE alert，较低窗口被抑制                          |
+| S33-OBS-012 | 1h 高但最近 5m 已恢复                 | 不 page；保留 ticket/观察证据                       |
+| S33-OBS-013 | 低流量单次 ephemeral 5xx              | 不因比例单独 page；记录并等待 corroboration         |
+| S33-OBS-014 | 零真实流量且 host 全失效              | 独立 black-box/heartbeat 告警                       |
+| S33-OBS-015 | synthetic 成功但真实错误上升          | 两组分开，synthetic 不掩盖真实 burn                 |
+| S33-OBS-016 | error budget exhausted 后普通功能发布 | Release Gate 拒绝，只允许批准的修复类变更           |
 
 ### 28.3 API、数据库与缓存（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S33-OBS-017 | 动态 UUID path 产生大量 series | OpenAPI operation code 聚合，series 不增长 |
-| S33-OBS-018 | WeChat exchange 慢 | 独立 dependency SLI，不污染纯 DB command latency |
-| S33-OBS-019 | PG pool 95% 且 wait P95>1s | PAGE_HIGH + DB runbook |
-| S33-OBS-020 | slow query detector | 只记录 fingerprint/bucket，不记录 SQL/bind |
-| S33-OBS-021 | Redis unavailable、PG 正常 | cache miss/PG fallback 可见，个人旧 cache 不返回 |
-| S33-OBS-022 | breaker state 不可读 | provider calls=0、template 路径与告警可见 |
-| S33-OBS-023 | schema/grant fingerprint drift | PAGE_CRITICAL，profile 不 ready |
-| S33-OBS-024 | public health 被访问 | 只返回稳定状态，不泄露内部依赖或版本目录 |
+| ID          | 场景                           | 必须结果                                         |
+| ----------- | ------------------------------ | ------------------------------------------------ |
+| S33-OBS-017 | 动态 UUID path 产生大量 series | OpenAPI operation code 聚合，series 不增长       |
+| S33-OBS-018 | WeChat exchange 慢             | 独立 dependency SLI，不污染纯 DB command latency |
+| S33-OBS-019 | PG pool 95% 且 wait P95>1s     | PAGE_HIGH + DB runbook                           |
+| S33-OBS-020 | slow query detector            | 只记录 fingerprint/bucket，不记录 SQL/bind       |
+| S33-OBS-021 | Redis unavailable、PG 正常     | cache miss/PG fallback 可见，个人旧 cache 不返回 |
+| S33-OBS-022 | breaker state 不可读           | provider calls=0、template 路径与告警可见        |
+| S33-OBS-023 | schema/grant fingerprint drift | PAGE_CRITICAL，profile 不 ready                  |
+| S33-OBS-024 | public health 被访问           | 只返回稳定状态，不泄露内部依赖或版本目录         |
 
 ### 28.4 Outbox、Queue 与 Worker（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S33-OBS-025 | enqueue 成功、outbox 标记前崩溃 | duplicate delivery 可见，业务 duplicate effect=0 |
-| S33-OBS-026 | Interactive oldest eligible age >60s | PAGE_HIGH，包含 runbook/release，无 job ref |
-| S33-OBS-027 | Background lag 高但 API 正常 | Background 告警，不让 API 自动 not ready |
-| S33-OBS-028 | terminal contract failure 被无限重试 | retry storm detector 命中，原 business key 不变 |
-| S33-OBS-029 | Worker 收到非 profile allowlist job | hard capability alert，handler 不执行 |
-| S33-OBS-030 | Redis 全量丢失 | 从 PG 重建，15min 目标、业务事实丢失 0 |
-| S33-OBS-031 | commit 后 ACK 前 crash | Inbox duplicate metric 增加，单领域效果 |
-| S33-OBS-032 | queue payload 被 log 序列化 | log contract test 失败，不输出 payload |
+| ID          | 场景                                 | 必须结果                                         |
+| ----------- | ------------------------------------ | ------------------------------------------------ |
+| S33-OBS-025 | enqueue 成功、outbox 标记前崩溃      | duplicate delivery 可见，业务 duplicate effect=0 |
+| S33-OBS-026 | Interactive oldest eligible age >60s | PAGE_HIGH，包含 runbook/release，无 job ref      |
+| S33-OBS-027 | Background lag 高但 API 正常         | Background 告警，不让 API 自动 not ready         |
+| S33-OBS-028 | terminal contract failure 被无限重试 | retry storm detector 命中，原 business key 不变  |
+| S33-OBS-029 | Worker 收到非 profile allowlist job  | hard capability alert，handler 不执行            |
+| S33-OBS-030 | Redis 全量丢失                       | 从 PG 重建，15min 目标、业务事实丢失 0           |
+| S33-OBS-031 | commit 后 ACK 前 crash               | Inbox duplicate metric 增加，单领域效果          |
+| S33-OBS-032 | queue payload 被 log 序列化          | log contract test 失败，不输出 payload           |
 
 ### 28.5 AI 与成本（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S33-OBS-033 | usage UNKNOWN 被写为 0 | cost contract Gate 失败，Dashboard BLOCKED |
-| S33-OBS-034 | observed model 与 manifest 不符 | route inactive、PAGE_CRITICAL/事件候选 |
-| S33-OBS-035 | price catalog 过期 | provider calls=0，template，cost reason 可见 |
-| S33-OBS-036 | template rate >5% 但结果可用 | SLO-04 可成功，S25-M21/AI 告警失败，互不抵消 |
-| S33-OBS-037 | 月度 AI forecast 达 70% | TICKET，继续受审 route |
-| S33-OBS-038 | 月度 AI budget 达 100% | 新 provider calls=0，template/Safety/delete 继续 |
-| S33-OBS-039 | cost UNKNOWN >1% | 成本结论 BLOCKED，不显示“低于预算” |
-| S33-OBS-040 | 想按单用户查看 AI 成本 | 查询/Schema 拒绝，只允许匿名 workload 聚合 |
+| ID          | 场景                            | 必须结果                                         |
+| ----------- | ------------------------------- | ------------------------------------------------ |
+| S33-OBS-033 | usage UNKNOWN 被写为 0          | cost contract Gate 失败，Dashboard BLOCKED       |
+| S33-OBS-034 | observed model 与 manifest 不符 | route inactive、PAGE_CRITICAL/事件候选           |
+| S33-OBS-035 | price catalog 过期              | provider calls=0，template，cost reason 可见     |
+| S33-OBS-036 | template rate >5% 但结果可用    | SLO-04 可成功，S25-M21/AI 告警失败，互不抵消     |
+| S33-OBS-037 | 月度 AI forecast 达 70%         | TICKET，继续受审 route                           |
+| S33-OBS-038 | 月度 AI budget 达 100%          | 新 provider calls=0，template/Safety/delete 继续 |
+| S33-OBS-039 | cost UNKNOWN >1%                | 成本结论 BLOCKED，不显示“低于预算”               |
+| S33-OBS-040 | 想按单用户查看 AI 成本          | 查询/Schema 拒绝，只允许匿名 workload 聚合       |
 
 ### 28.6 部署、删除、备份与观测自身（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S33-OBS-041 | raw-content detector MATCH | PAGE_CRITICAL，停止 export，IR-SEV0 候选 |
-| S33-OBS-042 | DataTask 到 75% deadline 未完成 | PAGE_HIGH；guard 保持，不显示 task/user ref |
-| S33-OBS-043 | deletion guard/restore-deny detector 失败一次 | 无 error budget，立即 PAGE_CRITICAL |
-| S33-OBS-044 | WAL gap 10min / 15min | 10min PAGE_HIGH；15min Release Gate + IR-SEV1 candidate |
-| S33-OBS-045 | 36 天 backup 仍 AVAILABLE | IR-SEV1 candidate，禁止作为恢复源 |
-| S33-OBS-046 | Collector/backend 丢 telemetry 15min | PAGE_HIGH；禁止改为 body logging |
-| S33-OBS-047 | monitoring cost 达预算 | 先降 normal success trace/查询保留，hard signals 保持 |
-| S33-OBS-048 | RC 完整观测演练 | signal、SLO、burn、alert、runbook、cost、TTL 与 delivery 证据全部可追踪 |
+| ID          | 场景                                          | 必须结果                                                                |
+| ----------- | --------------------------------------------- | ----------------------------------------------------------------------- |
+| S33-OBS-041 | raw-content detector MATCH                    | PAGE_CRITICAL，停止 export，IR-SEV0 候选                                |
+| S33-OBS-042 | DataTask 到 75% deadline 未完成               | PAGE_HIGH；guard 保持，不显示 task/user ref                             |
+| S33-OBS-043 | deletion guard/restore-deny detector 失败一次 | 无 error budget，立即 PAGE_CRITICAL                                     |
+| S33-OBS-044 | WAL gap 10min / 15min                         | 10min PAGE_HIGH；15min Release Gate + IR-SEV1 candidate                 |
+| S33-OBS-045 | 36 天 backup 仍 AVAILABLE                     | IR-SEV1 candidate，禁止作为恢复源                                       |
+| S33-OBS-046 | Collector/backend 丢 telemetry 15min          | PAGE_HIGH；禁止改为 body logging                                        |
+| S33-OBS-047 | monitoring cost 达预算                        | 先降 normal success trace/查询保留，hard signals 保持                   |
+| S33-OBS-048 | RC 完整观测演练                               | signal、SLO、burn、alert、runbook、cost、TTL 与 delivery 证据全部可追踪 |
 
 ## 29. 验收标准
 
@@ -1058,6 +1071,8 @@ E-013 不是“接入一个日志 SaaS”即可完成。必须交付信号合同
 
 - 状态：Accepted；
 - 接受日期：2026-07-27；
+- 2026-08-12 E-014 修订：用户明确选择务实分层 Gate；reference observability 合同可支持
+  Phase 2 开发条件放行，但真实投递、TTL、Production outage 与完整 RC 演练继续 `NO_GO`；
 - 内容 PR：[PR #38](https://github.com/WeiHan1996/DailyEnergy/pull/38)；
 - 基线：`main`（S-32 部署、配置与回滚已随 PR #37 合并并获用户确认）；
 - 已确认范围：信号/后端、字段/基数/期限、SLO/error budget、低流量告警、API/Worker/数据/AI 指标、成本预算、Dashboard/Runbook/on-call 与 48 个场景；

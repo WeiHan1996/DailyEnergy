@@ -148,9 +148,22 @@ test("T-E013-KNOWN-FAIL-001 rejects Production enablement and UNKNOWN zero", () 
   assert.throws(() => validateContract(zeroUnknown), /E013_COST_UNKNOWN/u);
 });
 
-test("T-E013-KNOWN-FAIL-001 keeps the full RC exercise pending for E-014", () => {
+test("T-E013-KNOWN-FAIL-001 separates development admission from the full RC exercise", () => {
   const falsePass = structuredClone(exercise);
-  falsePass.status = "PASS";
-  falsePass.completed = true;
-  assert.throws(() => validateExerciseContract(falsePass), /E013_RC_PENDING/u);
+  falsePass.production_rc_gate.status = "GO";
+  falsePass.production_rc_gate.completed = true;
+  falsePass.production_rc_gate.pass_claim = "ALLOWED";
+  assert.throws(
+    () => validateExerciseContract(falsePass),
+    /E014_PRODUCTION_RC_PENDING/u,
+  );
+
+  const unconditionalDevelopment = structuredClone(exercise);
+  unconditionalDevelopment.development_gate.status = "GO";
+  unconditionalDevelopment.development_gate.production_readiness_claim =
+    "ALLOWED";
+  assert.throws(
+    () => validateExerciseContract(unconditionalDevelopment),
+    /E014_PRODUCTION_RC_PENDING/u,
+  );
 });

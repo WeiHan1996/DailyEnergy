@@ -390,7 +390,7 @@
       "selector": "E-014 exercise contract false-PASS rejection",
       "level": "CONTRACT",
       "assertions": [
-        "the RC contract requires signal, SLO, burn, alert, Runbook, cost, TTL and delivery evidence while remaining E014_REQUIRED/completed=false; a false PASS is rejected"
+        "the exercise contract permits only conditional Phase 2 development admission while Production/RC remains NO_GO/completed=false; a false Production PASS or unconditional development GO is rejected"
       ]
     }
   },

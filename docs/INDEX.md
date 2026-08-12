@@ -183,14 +183,15 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                                          | metrics、Gateway、privacy、incident、architecture、deployment |
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                              | database、testing、deployment、ADR-0005、Issue #44            |
 | [docker/observability/contract.json](../docker/observability/contract.json)                                                                                                                            | Implemented | E-013 vendor-neutral 信号、字段/平面/基数、期限、成本与 Production blocked Gate                                   | observability、privacy、deployment                            |
-| [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011 CI/供应链与 E-013 observability 证据入口                                            | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-013 为唯一 In Progress 任务                              | Accepted Phase 0B specs、E-013 Issue #51                      |
+| [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011 CI/供应链、E-013 observability 与 E-014 Phase Gate 证据入口                         | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-014 为唯一 In Progress 任务                              | Accepted Phase 0B specs、E-014 Issue #52                      |
 
 ### 7.7 Phase Gate
 
-| 文件                                                        | 状态     | 目的                                                                      | 主要依赖            |
-| ----------------------------------------------------------- | -------- | ------------------------------------------------------------------------- | ------------------- |
-| [docs/reports/phase-0b-gate.md](./reports/phase-0b-gate.md) | Accepted | 复核 Phase 0B 总退出门槛、端到端追踪、延后项、外部 Gate 与 E-001 开工合同 | S-01～S-34、ROADMAP |
+| 文件                                                        | 状态     | 目的                                                                      | 主要依赖              |
+| ----------------------------------------------------------- | -------- | ------------------------------------------------------------------------- | --------------------- |
+| [docs/reports/phase-0b-gate.md](./reports/phase-0b-gate.md) | Accepted | 复核 Phase 0B 总退出门槛、端到端追踪、延后项、外部 Gate 与 E-001 开工合同 | S-01～S-34、ROADMAP   |
+| [docs/reports/phase-1-gate.md](./reports/phase-1-gate.md)   | Draft    | E-014 Phase 2 development 条件放行与 Production/RC NO-GO                  | E-001～E-014、ROADMAP |
 
 ## 8. 计划 ADR
 
@@ -250,16 +251,16 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-012 与 E-015 已完成，E-013 是唯一 In Progress 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-013 与 E-015 已完成，E-014 是唯一 In Progress 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-013 Issue #51](https://github.com/WeiHan1996/DailyEnergy/issues/51)；
+6. [E-014 Issue #52](https://github.com/WeiHan1996/DailyEnergy/issues/52)；
 7. `docs/agent/PROJECT_CONTEXT.md`、Agent 工作流规范与
-   `pnpm agent:prepare E-013 --remote --deep` 返回的全部 required sources；
+   `pnpm agent:prepare E-014 --remote --deep` 返回的全部 required sources；
 8. [系统架构](./technical/architecture.md)、[仓库结构与模块边界](./technical/repository-structure.md)、
    [测试策略](./technical/testing.md)、[部署、配置和回滚](./technical/deployment.md)与
    [可观测性和成本监控](./technical/observability.md)；
@@ -287,7 +288,8 @@ D-005 是 C-012、C-013、C-014 的直接前置。
 正式 Source-ID registry 已由 E-010 实现；E-011 已接入 CI、artifact、cache、
 telemetry 与供应链 evidence 且不改变原有证据层级，未实现项继续为 `PLANNED`。
 CI workflow/artifacts 已由 E-011 交付；私有 GitHub Free 的 platform required checks
-暂由 testing 22.2 于 2026-08-04 获用户接受的有期限补偿控制替代，最迟在 E-014/RC 前恢复。
+暂由 testing 22.2 的有期限补偿控制替代。E-014 将其限定为 development branch merges；进入任一
+RC、平台能力可用、出现第二位 merge-capable actor、owner 撤回接受或 2026-11-02 到期时停止。
 视觉设计与外部 Production Gate 未被自动解除；E-015 只实现了 P0/P1，没有提前交付 E-010、E-011、
 E-013 或 D 系列能力。E-009 已随 PR #115 squash 合并并进入 Done，Issue #47 已关闭；
 E-010 已随 PR #117 squash 合并并进入 Done；E-011 已随 PR #119 squash 合并为
@@ -295,7 +297,8 @@ E-010 已随 PR #117 squash 合并并进入 Done；E-011 已随 PR #119 squash �
 ADR-0007 DEV-only 例外已获明确授权，首个 Accepted DEV release 已建立。项目所有者于 2026-08-12 接受显式
 `reconcile-current` 合同、首次引入 bootstrap 澄清及第二候选的 deploy/rollback/redeploy 最终证据；PR #133 已 squash 合并，第二 candidate 的
 18 阶段 deploy/rollback/redeploy、17 阶段 clean restart reconciliation、无代理清理和独立验收审计均已完成。E-012 final evidence
-PR #134 获准在精确 final-head Gate 后 squash 合并，E-012 进入 Done；E-013 已在
-`agent/e013-observability` 开工并成为唯一 In Progress 任务。
+PR #134 已 squash 合并，E-012 进入 Done；E-013 已随 PR #135 squash 合并并获接受。E-014 在
+`agent/e014-phase1-gate` 开工并成为唯一 In Progress 任务；Phase 1 Gate Draft 只建议 Phase 2
+development 条件放行，Production/RC 仍 `NO_GO`。
 公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。

@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-31 — 测试策略
-- **最后更新**：2026-08-04（私有 GitHub Free required-check 临时补偿控制获接受）
+- **最后更新**：2026-08-12（E-014 将开发准入与 Production/RC 准入分离）
 - **适用范围**：Phase 1～3 的静态边界、单元、模块、数据库、契约、集成、端到端、故障恢复、AI 评测与发布证据
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[共享 Schema](../../packages/shared-schemas/README.md)、[AI 质量评价](../ai/evaluation.md)、[数据库规格](./database.md)、[API 契约](./api.md)、[隐私数据地图](../operations/privacy-data-map.md)
 - **可执行合同**：[AI 评测语料](../ai/evaluation-corpus.json)、[Prisma 草案](../../prisma/schema.prisma)、[OpenAPI 草案](../../openapi/openapi.yaml)
@@ -72,21 +72,21 @@
 
 ## 4. 测试决策摘要
 
-| 主题 | 唯一结论 |
-|---|---|
-| 主测试 runner | Vitest 4；root 使用 Vitest `projects` 编排 package/app 的 Node 与 browser-safe 单元/模块/契约测试 |
-| 覆盖率 | `@vitest/coverage-v8`；只作缺口信号，不能补偿场景、Safety、权限或事务失败 |
-| 性质测试 | `fast-check` 或等价 TypeScript property runner；用于日期、canonicalization、Schema、幂等和状态机不变量 |
-| 数据/队列集成 | Testcontainers for Node；真实 PostgreSQL 18、Redis 8 与必要 Toxiproxy，镜像 exact + digest 由 E-010/E-011 固定 |
-| API 黑盒 | 启动真实 Nest app，通过 Playwright `APIRequestContext` 或等价 HTTP client 验证 OpenAPI、鉴权、信封、幂等和错误 |
-| Admin E2E | Playwright Test；Chromium 为每 PR 主 Gate，WebKit/Firefox 兼容矩阵在 main/RC，具体范围由实际支持策略固定 |
-| Mini Program | 纯逻辑用 Vitest；真实页面/平台行为用微信开发者工具 CLI + automator 的受控 runner；RC 再做真机冒烟 |
-| OpenAPI | Redocly CLI lint/bundle + 自定义 path/schema/source-ID drift；生成 public/Admin client 后编译与黑盒响应验证 |
-| 架构边界 | dependency-cruiser + 项目 Node 检查器；同时扫描 manifest、exports、module edge、capability manifest 和 build metafile |
-| Prisma/SQL | Prisma format/validate/migrate + PostgreSQL 查询/约束/grant harness；不用 SQLite、内存仓库或 `db push` 证明数据库语义 |
-| 外部系统 | adapter unit 使用封闭 fake；协议集成使用本地 stub + Toxiproxy；普通 CI 不调用微信生产、AI provider 或对象存储 |
-| AI 评价 | corpus integrity/确定性 Gate 进入 CI；真实 model/LOAD/human 只在显式、付费、受限评测 run 执行 |
-| 证据 | 每个测试保留 source IDs、commit、toolchain、fixture/fault 版本和结果；普通 artifact 不含正文、Prompt、secret 或个人标识 |
+| 主题          | 唯一结论                                                                                                                |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 主测试 runner | Vitest 4；root 使用 Vitest `projects` 编排 package/app 的 Node 与 browser-safe 单元/模块/契约测试                       |
+| 覆盖率        | `@vitest/coverage-v8`；只作缺口信号，不能补偿场景、Safety、权限或事务失败                                               |
+| 性质测试      | `fast-check` 或等价 TypeScript property runner；用于日期、canonicalization、Schema、幂等和状态机不变量                  |
+| 数据/队列集成 | Testcontainers for Node；真实 PostgreSQL 18、Redis 8 与必要 Toxiproxy，镜像 exact + digest 由 E-010/E-011 固定          |
+| API 黑盒      | 启动真实 Nest app，通过 Playwright `APIRequestContext` 或等价 HTTP client 验证 OpenAPI、鉴权、信封、幂等和错误          |
+| Admin E2E     | Playwright Test；Chromium 为每 PR 主 Gate，WebKit/Firefox 兼容矩阵在 main/RC，具体范围由实际支持策略固定                |
+| Mini Program  | 纯逻辑用 Vitest；真实页面/平台行为用微信开发者工具 CLI + automator 的受控 runner；RC 再做真机冒烟                       |
+| OpenAPI       | Redocly CLI lint/bundle + 自定义 path/schema/source-ID drift；生成 public/Admin client 后编译与黑盒响应验证             |
+| 架构边界      | dependency-cruiser + 项目 Node 检查器；同时扫描 manifest、exports、module edge、capability manifest 和 build metafile   |
+| Prisma/SQL    | Prisma format/validate/migrate + PostgreSQL 查询/约束/grant harness；不用 SQLite、内存仓库或 `db push` 证明数据库语义   |
+| 外部系统      | adapter unit 使用封闭 fake；协议集成使用本地 stub + Toxiproxy；普通 CI 不调用微信生产、AI provider 或对象存储           |
+| AI 评价       | corpus integrity/确定性 Gate 进入 CI；真实 model/LOAD/human 只在显式、付费、受限评测 run 执行                           |
+| 证据          | 每个测试保留 source IDs、commit、toolchain、fixture/fault 版本和结果；普通 artifact 不含正文、Prompt、secret 或个人标识 |
 
 除 ADR-0006 已冻结的 Vitest 4 外，新增测试工具的精确版本由 E-010 在落地日核验 Node 24/TypeScript 7/ESM 兼容后写入 root lockfile；本文固定职责，不授权使用浮动 `latest`。
 
@@ -94,18 +94,18 @@
 
 ### 5.1 测试层级
 
-| 层级 | 代码/系统范围 | 允许的替身 | 必须证明 |
-|---|---|---|---|
-| `STATIC` | manifest、源码、exports、配置、生成物、bundle | 不适用 | 禁止依赖、循环、secret、drift 和错误 capability 可被确定性拒绝 |
-| `UNIT` | 纯 domain/value/policy/validator/mapper | fake clock/ID/port | 单个不变量、边界值和错误码 |
-| `MODULE` | 一个 server-core module/application use case | in-memory port；无真实 SDK | command/query、事务意图、event 与 public contract |
-| `DB` | migration、constraint、grant、repository、TX | 真实 PostgreSQL 18 | SQL-001～020、并发、回滚、角色和查询语义 |
-| `CONTRACT` | Zod/OpenAPI/client/mapper/job/event/adapter | 协议 stub | 双方对同一版本/字段/失败语义达成一致 |
-| `INTEGRATION` | API/Worker + PG/Redis/BullMQ/adapter | 只替换外部第三方 | outbox/inbox、queue、profile、cache 与外部失败协作 |
-| `E2E` | 用户入口至权威结果/白名单 View | 合成微信/provider 平台 | 跨 app 核心旅程、guard、恢复和客户端状态 |
-| `RESILIENCE` | 多进程、网络、崩溃、恢复 | fault proxy/kill point | duplicate、unknown、late、Redis loss、restore 不破坏事实 |
-| `AI_EVAL` | Gateway/Prompt/template/Safety/evaluation corpus | 合成主体；STAGED provider 需显式 run | S-16 不可补偿 Gate、延迟/成本/人工质量 |
-| `MANUAL_RC` | 微信真机、可访问性、运营/删除演练 | 受控测试账号 | 自动化覆盖不了的平台与人工 Gate |
+| 层级          | 代码/系统范围                                    | 允许的替身                           | 必须证明                                                       |
+| ------------- | ------------------------------------------------ | ------------------------------------ | -------------------------------------------------------------- |
+| `STATIC`      | manifest、源码、exports、配置、生成物、bundle    | 不适用                               | 禁止依赖、循环、secret、drift 和错误 capability 可被确定性拒绝 |
+| `UNIT`        | 纯 domain/value/policy/validator/mapper          | fake clock/ID/port                   | 单个不变量、边界值和错误码                                     |
+| `MODULE`      | 一个 server-core module/application use case     | in-memory port；无真实 SDK           | command/query、事务意图、event 与 public contract              |
+| `DB`          | migration、constraint、grant、repository、TX     | 真实 PostgreSQL 18                   | SQL-001～020、并发、回滚、角色和查询语义                       |
+| `CONTRACT`    | Zod/OpenAPI/client/mapper/job/event/adapter      | 协议 stub                            | 双方对同一版本/字段/失败语义达成一致                           |
+| `INTEGRATION` | API/Worker + PG/Redis/BullMQ/adapter             | 只替换外部第三方                     | outbox/inbox、queue、profile、cache 与外部失败协作             |
+| `E2E`         | 用户入口至权威结果/白名单 View                   | 合成微信/provider 平台               | 跨 app 核心旅程、guard、恢复和客户端状态                       |
+| `RESILIENCE`  | 多进程、网络、崩溃、恢复                         | fault proxy/kill point               | duplicate、unknown、late、Redis loss、restore 不破坏事实       |
+| `AI_EVAL`     | Gateway/Prompt/template/Safety/evaluation corpus | 合成主体；STAGED provider 需显式 run | S-16 不可补偿 Gate、延迟/成本/人工质量                         |
+| `MANUAL_RC`   | 微信真机、可访问性、运营/删除演练                | 受控测试账号                         | 自动化覆盖不了的平台与人工 Gate                                |
 
 ### 5.2 稳定 ID
 
@@ -244,19 +244,19 @@ fake 必须实现与 production adapter 相同的 port contract，并通过 adap
 
 ### 9.1 必须纳入的上游集合
 
-| 上游集合 | 数量/范围 | 主要测试落点 |
-|---|---:|---|
-| S-28 技术栈 | 32 `S28-STACK-*` | STATIC、CONTRACT、DB、INTEGRATION、clean checkout |
-| S-29 系统架构 | 48 `S29-ARCH-*` | MODULE、DB、INTEGRATION、RESILIENCE、E2E |
-| S-30 仓库边界 | 48 `S30-REPO-*` | STATIC、compile、bundle、profile startup |
-| S-19 SQL | 20 `SQL-001..020` | migration SQL、constraint、grant、drift |
-| S-19 事务 | 9 `TX-01..09` | DB/INTEGRATION 原子性与 failure injection |
-| S-19 数据库场景 | 64 `S19-DB-*` | DB、INTEGRATION、restore |
-| S-20 API 场景 | 48 `S20-*` | CONTRACT、API E2E、Admin E2E |
-| S-12 Gateway | 37 个固定场景 | MODULE、adapter conformance、INTEGRATION、AI_EVAL |
-| S-16 AI corpus | 269 个唯一 case | corpus lint、DETERMINISTIC、MODEL、LOAD、HUMAN |
-| S-21 隐私场景 | 34 个唯一 `PDM-*` 场景 | field/content scanner、权限、删除/恢复 E2E |
-| shared-schemas | 当前 Zod/JSON Schema fixtures | UNIT、property、JSON Schema/export contract |
+| 上游集合        |                     数量/范围 | 主要测试落点                                      |
+| --------------- | ----------------------------: | ------------------------------------------------- |
+| S-28 技术栈     |              32 `S28-STACK-*` | STATIC、CONTRACT、DB、INTEGRATION、clean checkout |
+| S-29 系统架构   |               48 `S29-ARCH-*` | MODULE、DB、INTEGRATION、RESILIENCE、E2E          |
+| S-30 仓库边界   |               48 `S30-REPO-*` | STATIC、compile、bundle、profile startup          |
+| S-19 SQL        |             20 `SQL-001..020` | migration SQL、constraint、grant、drift           |
+| S-19 事务       |                 9 `TX-01..09` | DB/INTEGRATION 原子性与 failure injection         |
+| S-19 数据库场景 |                 64 `S19-DB-*` | DB、INTEGRATION、restore                          |
+| S-20 API 场景   |                    48 `S20-*` | CONTRACT、API E2E、Admin E2E                      |
+| S-12 Gateway    |                 37 个固定场景 | MODULE、adapter conformance、INTEGRATION、AI_EVAL |
+| S-16 AI corpus  |               269 个唯一 case | corpus lint、DETERMINISTIC、MODEL、LOAD、HUMAN    |
+| S-21 隐私场景   |        34 个唯一 `PDM-*` 场景 | field/content scanner、权限、删除/恢复 E2E        |
+| shared-schemas  | 当前 Zod/JSON Schema fixtures | UNIT、property、JSON Schema/export contract       |
 
 这些集合存在重叠是预期行为，不能相加后当作“测试用例数”。registry 计算：
 
@@ -268,19 +268,19 @@ fake 必须实现与 production adapter 相同的 port contract，并通过 adap
 
 ### 9.2 coverage map 最低要求
 
-| 合同类型 | 最低证据 |
-|---|---|
-| Schema/cross-field | 正向、边界、未知字段、非法组合、property/golden |
-| 数据库唯一性/constraint | 真实 PG 负向 insert/update + 友好错误映射 |
-| transaction | 成功、每个关键 failure point、回滚后表/outbox/receipt 状态 |
-| 权限/capability | static forbidden import + runtime credential/role/handler deny |
-| API | OpenAPI lint + request/response Schema + HTTP status/header/envelope + post-condition |
-| queue/outbox/inbox | enqueue/mark/commit/ACK 每个 crash window + duplicate/late |
-| cache/Redis | hit/miss、guard change、Redis down/loss/rebuild、内容 allowlist |
-| external adapter | request mapping、deadline/cancel、normalized error/usage、unknown/late |
-| E2E journey | 用户可见状态 + PostgreSQL 权威 post-condition；不能只截屏 |
-| AI hard gate | corpus integrity + 每次 sample 断言；不得取最好 sample |
-| 删除/恢复 | guard 同步、物理清理、迟到消息、cache/queue/provider/object/backup 不复活 |
+| 合同类型                | 最低证据                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| Schema/cross-field      | 正向、边界、未知字段、非法组合、property/golden                                       |
+| 数据库唯一性/constraint | 真实 PG 负向 insert/update + 友好错误映射                                             |
+| transaction             | 成功、每个关键 failure point、回滚后表/outbox/receipt 状态                            |
+| 权限/capability         | static forbidden import + runtime credential/role/handler deny                        |
+| API                     | OpenAPI lint + request/response Schema + HTTP status/header/envelope + post-condition |
+| queue/outbox/inbox      | enqueue/mark/commit/ACK 每个 crash window + duplicate/late                            |
+| cache/Redis             | hit/miss、guard change、Redis down/loss/rebuild、内容 allowlist                       |
+| external adapter        | request mapping、deadline/cancel、normalized error/usage、unknown/late                |
+| E2E journey             | 用户可见状态 + PostgreSQL 权威 post-condition；不能只截屏                             |
+| AI hard gate            | corpus integrity + 每次 sample 断言；不得取最好 sample                                |
+| 删除/恢复               | guard 同步、物理清理、迟到消息、cache/queue/provider/object/backup 不复活             |
 
 ## 10. Static 与 architecture Gate
 
@@ -347,11 +347,11 @@ Module test 不声称证明 transaction/unique/grant；这些必须在 DB/INTEGR
 
 ### 12.1 三种数据库路径
 
-| 路径 | 初始状态 | 必须结果 |
-|---|---|---|
-| Clean | 空 PostgreSQL 18 | 全 migration 应用、SQL-001～020/grants/index/seed contract 通过 |
-| Upgrade | 上一受支持 Schema + 合成 fixture | expand/validate/switch 后数据、version/fingerprint 与兼容读写正确 |
-| Drift/Restore | introspection/format 或隔离备份 | 自定义 SQL/grants 不丢；restore deny/guard/TTL 先应用再开放 |
+| 路径          | 初始状态                         | 必须结果                                                          |
+| ------------- | -------------------------------- | ----------------------------------------------------------------- |
+| Clean         | 空 PostgreSQL 18                 | 全 migration 应用、SQL-001～020/grants/index/seed contract 通过   |
+| Upgrade       | 上一受支持 Schema + 合成 fixture | expand/validate/switch 后数据、version/fingerprint 与兼容读写正确 |
+| Drift/Restore | introspection/format 或隔离备份  | 自定义 SQL/grants 不丢；restore deny/guard/TTL 先应用再开放       |
 
 每个路径记录 PostgreSQL image digest、Prisma CLI/Client exact version、migration checksums 与 test commit。
 
@@ -498,13 +498,13 @@ queue/cache/job/log/trace fixture scanner 必须拒绝：
 
 每个 profile 要同时通过五层证据：
 
-| 层 | 证据 |
-|---|---|
-| Source graph | 只 import 允许的 core runtime 与 adapter subpath |
-| Build graph | artifact/metafile 不含禁止 provider/restricted/migration 能力 |
-| Handler manifest | job type/version/queue 与 profile allowlist 完全一致 |
-| Startup attestation | 配置 fingerprint、DB role、queue、egress 不匹配即 fail closed |
-| Runtime deny | 错 profile job、SQL table、external endpoint 的实际调用被拒绝并产生脱敏诊断 |
+| 层                  | 证据                                                                        |
+| ------------------- | --------------------------------------------------------------------------- |
+| Source graph        | 只 import 允许的 core runtime 与 adapter subpath                            |
+| Build graph         | artifact/metafile 不含禁止 provider/restricted/migration 能力               |
+| Handler manifest    | job type/version/queue 与 profile allowlist 完全一致                        |
+| Startup attestation | 配置 fingerprint、DB role、queue、egress 不匹配即 fail closed               |
+| Runtime deny        | 错 profile job、SQL table、external endpoint 的实际调用被拒绝并产生脱敏诊断 |
 
 角色矩阵至少包括：
 
@@ -555,16 +555,16 @@ Playwright 使用独立 Admin session 测试：
 
 ## 17. 核心 E2E journey
 
-| Journey | 必须跨越 | 关键异常 |
-|---|---|---|
-| J01 First Light | auth、consent、onboarding、checkin、intent、worker、result、light | 双击、Unknown、template |
-| J02 Same Day Return | today/history/interaction | cache stale、revision conflict |
-| J03 Evening | feedback/helpfulness/task TX-04 | 任一 revision 冲突、HIGH_RISK |
-| J04 Seven Days | 七个 ProductDate、light、weekly facts/current | missing day、source invalidation |
-| J05 Matter/Memory | matter、purpose grant、candidate dependency | revoke/delete、fallback/BLOCKED |
-| J06 Safety | free-text gate、TX-05、SafetyView、两步 recovery | deep link、跨日、provider down |
-| J07 Notifications | preference、intent、claim、platform attempt | timeout/late、Safety before dispatch |
-| J08 Data Rights | export、DAY/MATTER/RELATIONSHIP/ACCOUNT delete | failed step、Redis loss、late job、restore |
+| Journey             | 必须跨越                                                          | 关键异常                                   |
+| ------------------- | ----------------------------------------------------------------- | ------------------------------------------ |
+| J01 First Light     | auth、consent、onboarding、checkin、intent、worker、result、light | 双击、Unknown、template                    |
+| J02 Same Day Return | today/history/interaction                                         | cache stale、revision conflict             |
+| J03 Evening         | feedback/helpfulness/task TX-04                                   | 任一 revision 冲突、HIGH_RISK              |
+| J04 Seven Days      | 七个 ProductDate、light、weekly facts/current                     | missing day、source invalidation           |
+| J05 Matter/Memory   | matter、purpose grant、candidate dependency                       | revoke/delete、fallback/BLOCKED            |
+| J06 Safety          | free-text gate、TX-05、SafetyView、两步 recovery                  | deep link、跨日、provider down             |
+| J07 Notifications   | preference、intent、claim、platform attempt                       | timeout/late、Safety before dispatch       |
+| J08 Data Rights     | export、DAY/MATTER/RELATIONSHIP/ACCOUNT delete                    | failed step、Redis loss、late job、restore |
 
 每条 E2E 同时断言用户可见 View、数据库权威事实、外部调用次数、queue payload 和敏感字段扫描。
 
@@ -607,20 +607,20 @@ Playwright 使用独立 Admin session 测试：
 
 ## 19. 故障与恢复矩阵
 
-| 故障 | 注入方式 | 核心断言 |
-|---|---|---|
-| API process kill | command commit 前/后 kill | 原 command receipt/aggregate 恢复 |
-| PG unavailable | proxy cut/stop container | guarded read/write/publish fail closed |
-| Redis unavailable/loss | proxy cut/replace container | PG facts 不丢；queue/cache 可重建 |
-| Relay crash | enqueue 前/后 kill hook | outbox 重投、单业务效果 |
-| Consumer crash | DB commit 前/后 kill hook | Inbox + ACK 顺序正确 |
-| Provider timeout/late | stub + Toxiproxy latency/cut | OUTCOME_UNKNOWN、不重发 role、late 不发布 |
-| Notification timeout | stub claim/late response | 原 intent/claim reconcile |
-| Guard changes | invocation/job 中途 CAS | Publish/consumer 拒绝旧 epoch |
-| Restricted step fails | checkpoint N 抛错 | task/guard 保持、原 scope 重试 |
-| Bad config/role | startup fingerprint mismatch | 进程 fail closed |
-| Migration incompatible | old app + new schema matrix | expand/compat 或发布阻断 |
-| Backup restore | 隔离 old backup fixture | deny/guard/TTL/source invalidation 后才开放 |
+| 故障                   | 注入方式                     | 核心断言                                    |
+| ---------------------- | ---------------------------- | ------------------------------------------- |
+| API process kill       | command commit 前/后 kill    | 原 command receipt/aggregate 恢复           |
+| PG unavailable         | proxy cut/stop container     | guarded read/write/publish fail closed      |
+| Redis unavailable/loss | proxy cut/replace container  | PG facts 不丢；queue/cache 可重建           |
+| Relay crash            | enqueue 前/后 kill hook      | outbox 重投、单业务效果                     |
+| Consumer crash         | DB commit 前/后 kill hook    | Inbox + ACK 顺序正确                        |
+| Provider timeout/late  | stub + Toxiproxy latency/cut | OUTCOME_UNKNOWN、不重发 role、late 不发布   |
+| Notification timeout   | stub claim/late response     | 原 intent/claim reconcile                   |
+| Guard changes          | invocation/job 中途 CAS      | Publish/consumer 拒绝旧 epoch               |
+| Restricted step fails  | checkpoint N 抛错            | task/guard 保持、原 scope 重试              |
+| Bad config/role        | startup fingerprint mismatch | 进程 fail closed                            |
+| Migration incompatible | old app + new schema matrix  | expand/compat 或发布阻断                    |
+| Backup restore         | 隔离 old backup fixture      | deny/guard/TTL/source invalidation 后才开放 |
 
 故障测试使用确定性 hook/barrier 和 event timeline；随机 chaos 只作为补充，不替代上述可重放 case。
 
@@ -647,12 +647,12 @@ S-31 不创建生产 SLO，但测试必须保留测量能力：
 
 ### 21.1 最低覆盖率
 
-| 范围 | Statements/Lines | Branches | Functions |
-|---|---:|---:|---:|
-| shared-schemas/validator | 95% | 95% | 100% |
-| critical pure policies | 100% | 100% | 100% |
-| 其它 server-core | 90% | 85% | 90% |
-| adapters/apps 手写逻辑 | 80% | 75% | 80% |
+| 范围                     | Statements/Lines | Branches | Functions |
+| ------------------------ | ---------------: | -------: | --------: |
+| shared-schemas/validator |              95% |      95% |      100% |
+| critical pure policies   |             100% |     100% |      100% |
+| 其它 server-core         |              90% |      85% |       90% |
+| adapters/apps 手写逻辑   |              80% |      75% |       80% |
 
 critical pure policies 至少包括 ProductDate/窗口、CommandReceipt/fingerprint、revision/CAS、PublishGuard、Safety/deletion guard、source invalidation、retention、outbox/inbox decision、notification claim 和 Gateway route/fallback。
 
@@ -678,20 +678,20 @@ Safety、删除、身份、owner、SQL-ID、TX-ID、profile capability 和 secre
 
 ## 22. CI lane 与触发
 
-| Lane | 内容 | 触发 | 目标性质 |
-|---|---|---|---|
-| `docs` | Markdown/link/status/source-ID/corpus lint | 文档 PR | 快、无容器 |
-| `static` | frozen install、format/lint/type、graph/exports/capability/secret/codegen | 每个代码 PR | 必须阻断 |
-| `unit-contract` | Vitest UNIT/MODULE/Schema/OpenAPI/client | 每个代码 PR | 无外部网络 |
-| `db-integration` | PG clean/upgrade/grants/TX/repository | DB/server 相关 PR；main 全量 | 真实 PG |
-| `queue-integration` | Redis/BullMQ/outbox/inbox/profile | queue/server 相关 PR；main 全量 | 真实 Redis |
-| `api-e2e` | Nest HTTP + PG/Redis + external stubs | API/core 相关 PR | 黑盒 |
-| `admin-e2e` | Playwright Chromium；多浏览器在 main/RC | Admin/API contract 相关 PR | browser |
-| `miniapp-conformance` | 微信开发者工具自动化 | Mini Program/client/Schema 相关 PR；RC | 专用 runner |
-| `resilience` | crash/late/loss/restore | main/nightly；相关核心 PR 必跑受影响集 | 可重放 fault |
-| `ai-deterministic` | corpus + hard validators/template/Gateway fake | AI/Schema/Safety/Prompt PR | 无真实 provider |
-| `ai-model-load-human` | MODEL/LOAD/人工评审 | 显式 RC/evaluation run | 付费/受限 |
-| `manual-rc` | 真机、删除/恢复/安全演练 | release candidate | 人工证据 |
+| Lane                  | 内容                                                                      | 触发                                   | 目标性质        |
+| --------------------- | ------------------------------------------------------------------------- | -------------------------------------- | --------------- |
+| `docs`                | Markdown/link/status/source-ID/corpus lint                                | 文档 PR                                | 快、无容器      |
+| `static`              | frozen install、format/lint/type、graph/exports/capability/secret/codegen | 每个代码 PR                            | 必须阻断        |
+| `unit-contract`       | Vitest UNIT/MODULE/Schema/OpenAPI/client                                  | 每个代码 PR                            | 无外部网络      |
+| `db-integration`      | PG clean/upgrade/grants/TX/repository                                     | DB/server 相关 PR；main 全量           | 真实 PG         |
+| `queue-integration`   | Redis/BullMQ/outbox/inbox/profile                                         | queue/server 相关 PR；main 全量        | 真实 Redis      |
+| `api-e2e`             | Nest HTTP + PG/Redis + external stubs                                     | API/core 相关 PR                       | 黑盒            |
+| `admin-e2e`           | Playwright Chromium；多浏览器在 main/RC                                   | Admin/API contract 相关 PR             | browser         |
+| `miniapp-conformance` | 微信开发者工具自动化                                                      | Mini Program/client/Schema 相关 PR；RC | 专用 runner     |
+| `resilience`          | crash/late/loss/restore                                                   | main/nightly；相关核心 PR 必跑受影响集 | 可重放 fault    |
+| `ai-deterministic`    | corpus + hard validators/template/Gateway fake                            | AI/Schema/Safety/Prompt PR             | 无真实 provider |
+| `ai-model-load-human` | MODEL/LOAD/人工评审                                                       | 显式 RC/evaluation run                 | 付费/受限       |
+| `manual-rc`           | 真机、删除/恢复/安全演练                                                  | release candidate                      | 人工证据        |
 
 ### 22.1 选择性执行
 
@@ -724,9 +724,28 @@ branch protection/rulesets API 返回能力不可用时，允许使用以下人�
    规则并提供可执行核验；任何规则漂移或临时控制到期都使 CI policy fail closed。
 
 该控制由仓库 owner 承担“有权限者仍可绕过”的残余风险，不豁免任何 Safety、删除、owner、
-SQL/TX、capability、secret、contract drift 或其它强制 Gate。它于 2026-08-04 获用户明确接受，
-最迟 2026-11-02 到期；GitHub 计划能力可用、出现第二位 merge-capable actor、E-014 开始或进入
-RC 任一事件先发生时，必须在下一次合并前停止本控制并恢复 platform-enforced required checks。
+SQL/TX、capability、secret、contract drift 或其它强制 Gate。E-014 于 2026-08-12 复核后，
+将它限定为 **development branch merge** 的过渡控制：每次合并都需要 owner 明确接受残余风险，
+仍必须执行同一 run 的 11/11、精确 head、`--match-head-commit` 和 receipt。它不得用于 Phase 2
+Release Candidate、Alpha/Beta RC 或 Production 准入。最迟 2026-11-02 到期；GitHub 能力可用、
+出现第二位 merge-capable actor、进入任一 RC 或 owner 撤回接受时，必须在下一次合并前停止并
+恢复 platform-enforced required checks。
+
+### 22.3 E-014 分层 Gate
+
+E-014 分成两个不可混淆的判定面：
+
+- **Phase 2 development admission**：可以在 E-012 的 Accepted DEV 发布/回滚证据、当前完整
+  CI、真实 PostgreSQL/Redis/Compose 自动化证据和显式 Source-ID owner 盘点基础上，给出
+  `CONDITIONAL_GO_FOR_PHASE_2`；条件是 E-014 final PR head 仍须通过 11/11 并获 owner 审核；
+- **Production/RC admission**：PITR 隔离恢复、当前 deletion/restore-deny ledger、真实告警投递、
+  真实 backend TTL 删除、微信 DevTools/真机和完整 incident/manual RC 未完成时只能是 `NO_GO`，
+  `pass_claim=PROHIBITED`。
+
+registry 中的 `PLANNED` 不等于 silent omission，也不等于 Phase 1 PASS。允许进入 Phase 2 开发的
+前提是每个 Source ID 都存在显式状态，`PLANNED` 均有 owner 与 reason，且属于具名下游实现或
+尚未具备的强制证据层。任何 `UNMAPPED`、无 owner/reason 的 `PLANNED` 或把延后项升级为 PASS，
+都使 E-014 Gate 失败。
 
 ## 23. Retry、flaky 与 quarantine
 
@@ -759,7 +778,7 @@ RC 任一事件先发生时，必须在下一次合并前停止本控制并恢�
 - Prompt、provider body/raw response、Safety 原文；
 - token、secret、header、数据库 URL、外部 identity；
 - production dump、真实截图或可逆 pseudonym；
--无限期保留的高基数 trace。
+  -无限期保留的高基数 trace。
 
 artifact 保存位置、加密、访问、期限和删除由 S-21/S-32/E-011 落地；未完成前只允许本地/CI 短期合成证据，不启用第三方 remote cache 或外部测试报告上传。
 
@@ -795,21 +814,23 @@ artifact 保存位置、加密、访问、期限和删除由 S-21/S-32/E-011 落
 
 任何 hard Gate 失败都阻断，不使用加权总分。
 
+E-014 的 `CONDITIONAL_GO_FOR_PHASE_2` 不是 Release Candidate；它不满足且不替代本节任何一项。
+
 ## 26. E-001～E-011 实施交接
 
-| 任务 | S-31 直接输入 |
-|---|---|
+| 任务  | S-31 直接输入                                                                   |
+| ----- | ------------------------------------------------------------------------------- |
 | E-001 | root test scripts、Vitest projects 位置、single lockfile 与 clean-checkout 命令 |
-| E-002 | dependency-cruiser、runtime zone、exports、strict/coverage/skip rule |
-| E-003 | Nest test bootstrap、HTTP envelope/auth/health contract 与合成 config |
-| E-004 | Mini Program pure logic boundary、DevTools automator runner 与真机清单 |
-| E-005 | Playwright Admin project、独立 Admin session 与 bundle Gate |
-| E-006 | Testcontainers PG、clean/upgrade/drift、SQL-001～020、TX/grants |
-| E-007 | Redis/BullMQ container、outbox/inbox crash hooks、profile/Redis-loss suite |
-| E-008 | Zod/OpenAPI/api-client/mapper/codegen drift 与 client-safe contract |
-| E-009 | 测试 Compose、health、stub/fault services；不创建第二套拓扑 |
-| E-010 | fixture/registry/runner/coverage/E2E/resilience 测试骨架 |
-| E-011 | CI lanes、required checks、artifact/secret/content、exact image/tool pin |
+| E-002 | dependency-cruiser、runtime zone、exports、strict/coverage/skip rule            |
+| E-003 | Nest test bootstrap、HTTP envelope/auth/health contract 与合成 config           |
+| E-004 | Mini Program pure logic boundary、DevTools automator runner 与真机清单          |
+| E-005 | Playwright Admin project、独立 Admin session 与 bundle Gate                     |
+| E-006 | Testcontainers PG、clean/upgrade/drift、SQL-001～020、TX/grants                 |
+| E-007 | Redis/BullMQ container、outbox/inbox crash hooks、profile/Redis-loss suite      |
+| E-008 | Zod/OpenAPI/api-client/mapper/codegen drift 与 client-safe contract             |
+| E-009 | 测试 Compose、health、stub/fault services；不创建第二套拓扑                     |
+| E-010 | fixture/registry/runner/coverage/E2E/resilience 测试骨架                        |
+| E-011 | CI lanes、required checks、artifact/secret/content、exact image/tool pin        |
 
 E-010 不需要一次实现全部业务场景，但必须建立 registry，使尚未实现的 source ID 显示 `PLANNED` 而不是静默缺失。业务 Issue 完成时才能将对应项变为 `COVERED`。
 
@@ -817,81 +838,81 @@ E-010 不需要一次实现全部业务场景，但必须建立 registry，使�
 
 ### 27.1 Registry、fixture 与分层（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S31-TEST-001 | Accepted source ID 没有 coverage entry | Registry Gate 失败，状态 UNMAPPED |
-| S31-TEST-002 | 一个 E2E 标记覆盖 20 个 ID 但无逐项 assertion | MISSING_ASSERTION，不能计覆盖 |
-| S31-TEST-003 | fixture 从当前实现输出自动更新 expected | Golden review 失败；期望必须来自 Accepted contract |
-| S31-TEST-004 | fixture 含真实 AccountRef/openid/用户文本 | Privacy scanner 失败 |
-| S31-TEST-005 | property test 失败但未记录 seed/version | Evidence Gate 失败 |
-| S31-TEST-006 | Unit mock 声称证明 PostgreSQL unique/grant | 强制层级不足，状态 PARTIAL |
-| S31-TEST-007 | 测试辅助 package 被 production import | Architecture/runtime Gate 失败 |
-| S31-TEST-008 | clean checkout 执行 registry lint | 所有 Accepted 集合、数量、ID、强制层级一致 |
+| ID           | 场景                                          | 必须结果                                           |
+| ------------ | --------------------------------------------- | -------------------------------------------------- |
+| S31-TEST-001 | Accepted source ID 没有 coverage entry        | Registry Gate 失败，状态 UNMAPPED                  |
+| S31-TEST-002 | 一个 E2E 标记覆盖 20 个 ID 但无逐项 assertion | MISSING_ASSERTION，不能计覆盖                      |
+| S31-TEST-003 | fixture 从当前实现输出自动更新 expected       | Golden review 失败；期望必须来自 Accepted contract |
+| S31-TEST-004 | fixture 含真实 AccountRef/openid/用户文本     | Privacy scanner 失败                               |
+| S31-TEST-005 | property test 失败但未记录 seed/version       | Evidence Gate 失败                                 |
+| S31-TEST-006 | Unit mock 声称证明 PostgreSQL unique/grant    | 强制层级不足，状态 PARTIAL                         |
+| S31-TEST-007 | 测试辅助 package 被 production import         | Architecture/runtime Gate 失败                     |
+| S31-TEST-008 | clean checkout 执行 registry lint             | 所有 Accepted 集合、数量、ID、强制层级一致         |
 
 ### 27.2 Static、contract 与客户端（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S31-TEST-009 | dependency rule 被删除但无 known-fail fixture | Checker self-test 失败 |
-| S31-TEST-010 | Zod/OpenAPI/client enum 漂移 | Contract drift Gate 失败 |
-| S31-TEST-011 | Nest mapper 返回 Prisma row/未知字段 | HTTP contract test 失败 |
-| S31-TEST-012 | public client 含 `/v1/admin` export | Client subpath Gate 失败 |
-| S31-TEST-013 | Mini Program bundle 含 `node:*`/provider/Prompt | Bundle Gate 失败 |
-| S31-TEST-014 | Admin bundle 含 DB/Redis/provider key canary | Secret/bundle Gate 失败 |
-| S31-TEST-015 | codegen rerun 产生 diff | Generated Gate 失败 |
-| S31-TEST-016 | 微信页面只在 jsdom/浏览器通过 | 仍缺 DevTools conformance，不能标 COVERED |
+| ID           | 场景                                            | 必须结果                                  |
+| ------------ | ----------------------------------------------- | ----------------------------------------- |
+| S31-TEST-009 | dependency rule 被删除但无 known-fail fixture   | Checker self-test 失败                    |
+| S31-TEST-010 | Zod/OpenAPI/client enum 漂移                    | Contract drift Gate 失败                  |
+| S31-TEST-011 | Nest mapper 返回 Prisma row/未知字段            | HTTP contract test 失败                   |
+| S31-TEST-012 | public client 含 `/v1/admin` export             | Client subpath Gate 失败                  |
+| S31-TEST-013 | Mini Program bundle 含 `node:*`/provider/Prompt | Bundle Gate 失败                          |
+| S31-TEST-014 | Admin bundle 含 DB/Redis/provider key canary    | Secret/bundle Gate 失败                   |
+| S31-TEST-015 | codegen rerun 产生 diff                         | Generated Gate 失败                       |
+| S31-TEST-016 | 微信页面只在 jsdom/浏览器通过                   | 仍缺 DevTools conformance，不能标 COVERED |
 
 ### 27.3 Database、事务与并发（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S31-TEST-017 | 空 PG18 应用 migrations | SQL-001～020、grants、Prisma/drift 全通过 |
-| S31-TEST-018 | SQL-ID 只有 must-pass 无 must-fail | SQL coverage Gate 失败 |
-| S31-TEST-019 | TX-02 在 snapshot 后/outbox 前失败 | Checkin/intent/snapshot/receipt/outbox 按合同全回滚 |
-| S31-TEST-020 | TX-04 任一 revision 冲突 | feedback/helpfulness/task 全不写 |
-| S31-TEST-021 | TX-05 high risk | Safety 最小事实提交；ordinary write/provider/template 0 |
-| S31-TEST-022 | 两连接 barrier 并发 publish | 一份结果；输家读取 existing |
-| S31-TEST-023 | 普通 API DB role 读 restricted table | 实际 PostgreSQL grant 拒绝 |
-| S31-TEST-024 | upgrade/restore 后自定义 constraint/grant 丢失 | migration/drift/restore Gate 失败 |
+| ID           | 场景                                           | 必须结果                                                |
+| ------------ | ---------------------------------------------- | ------------------------------------------------------- |
+| S31-TEST-017 | 空 PG18 应用 migrations                        | SQL-001～020、grants、Prisma/drift 全通过               |
+| S31-TEST-018 | SQL-ID 只有 must-pass 无 must-fail             | SQL coverage Gate 失败                                  |
+| S31-TEST-019 | TX-02 在 snapshot 后/outbox 前失败             | Checkin/intent/snapshot/receipt/outbox 按合同全回滚     |
+| S31-TEST-020 | TX-04 任一 revision 冲突                       | feedback/helpfulness/task 全不写                        |
+| S31-TEST-021 | TX-05 high risk                                | Safety 最小事实提交；ordinary write/provider/template 0 |
+| S31-TEST-022 | 两连接 barrier 并发 publish                    | 一份结果；输家读取 existing                             |
+| S31-TEST-023 | 普通 API DB role 读 restricted table           | 实际 PostgreSQL grant 拒绝                              |
+| S31-TEST-024 | upgrade/restore 后自定义 constraint/grant 丢失 | migration/drift/restore Gate 失败                       |
 
 ### 27.4 Queue、profile 与故障（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S31-TEST-025 | relay enqueue 后、mark 前 crash | 原 event 重投；单业务效果 |
-| S31-TEST-026 | consumer commit 后、ACK 前 crash | InboxReceipt 使重投 no-op |
-| S31-TEST-027 | Redis 容器全量替换 | PG facts 保留；outbox/due/task 重建 |
-| S31-TEST-028 | 旧 guard epoch job 迟到 | handler 同步拒绝 |
-| S31-TEST-029 | Interactive 收到 Restricted job | manifest/runtime 双重拒绝 |
-| S31-TEST-030 | profile DB role/egress 与 fingerprint 不匹配 | 启动 fail closed |
-| S31-TEST-031 | provider timeout 后 late success | 不重发同 role；late 不发布 |
-| S31-TEST-032 | queue payload 含 note/Prompt/expression | Contract/content Gate 失败 |
+| ID           | 场景                                         | 必须结果                            |
+| ------------ | -------------------------------------------- | ----------------------------------- |
+| S31-TEST-025 | relay enqueue 后、mark 前 crash              | 原 event 重投；单业务效果           |
+| S31-TEST-026 | consumer commit 后、ACK 前 crash             | InboxReceipt 使重投 no-op           |
+| S31-TEST-027 | Redis 容器全量替换                           | PG facts 保留；outbox/due/task 重建 |
+| S31-TEST-028 | 旧 guard epoch job 迟到                      | handler 同步拒绝                    |
+| S31-TEST-029 | Interactive 收到 Restricted job              | manifest/runtime 双重拒绝           |
+| S31-TEST-030 | profile DB role/egress 与 fingerprint 不匹配 | 启动 fail closed                    |
+| S31-TEST-031 | provider timeout 后 late success             | 不重发同 role；late 不发布          |
+| S31-TEST-032 | queue payload 含 note/Prompt/expression      | Contract/content Gate 失败          |
 
 ### 27.5 E2E、安全、删除与恢复（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S31-TEST-033 | 首次到点亮双击/超时 | 单 command/intent/result/light，可恢复 |
-| S31-TEST-034 | Safety ACTIVE 深链今日页 | 返回 SafetyView；普通路径 0 |
-| S31-TEST-035 | 小程序 session 调 Admin | 鉴权拒绝，audience 不互换 |
-| S31-TEST-036 | 04:00 前后用客户端旧日期写 | 服务端 ProductDate/continuation 权威 |
-| S31-TEST-037 | 删除 confirm 后 Worker 未运行 | guard 已同步阻断全部普通路径 |
-| S31-TEST-038 | Restricted 删除第三步失败 + 重启 | 原 task/checkpoint 重试，guard 保持 |
-| S31-TEST-039 | 删除后旧 cache/job/provider 回调到达 | 全部拒绝，不复活 |
-| S31-TEST-040 | 隔离恢复含已删 DAY 的备份 | deny/guard/TTL/source invalidation 后才开放 |
+| ID           | 场景                                 | 必须结果                                    |
+| ------------ | ------------------------------------ | ------------------------------------------- |
+| S31-TEST-033 | 首次到点亮双击/超时                  | 单 command/intent/result/light，可恢复      |
+| S31-TEST-034 | Safety ACTIVE 深链今日页             | 返回 SafetyView；普通路径 0                 |
+| S31-TEST-035 | 小程序 session 调 Admin              | 鉴权拒绝，audience 不互换                   |
+| S31-TEST-036 | 04:00 前后用客户端旧日期写           | 服务端 ProductDate/continuation 权威        |
+| S31-TEST-037 | 删除 confirm 后 Worker 未运行        | guard 已同步阻断全部普通路径                |
+| S31-TEST-038 | Restricted 删除第三步失败 + 重启     | 原 task/checkpoint 重试，guard 保持         |
+| S31-TEST-039 | 删除后旧 cache/job/provider 回调到达 | 全部拒绝，不复活                            |
+| S31-TEST-040 | 隔离恢复含已删 DAY 的备份            | deny/guard/TTL/source invalidation 后才开放 |
 
 ### 27.6 AI、CI 与证据（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S31-TEST-041 | 269-case corpus ID/source SHA 漂移 | Evaluation run INVALID |
-| S31-TEST-042 | hard case 三次 sample 中一次失败 | candidate INELIGIBLE，不补样 |
-| S31-TEST-043 | breaker/budget state 不可读 | provider calls 0，validated template |
-| S31-TEST-044 | AI output 部分字段安全且部分非法 | 整份拒绝，禁止修补/拼接 |
-| S31-TEST-045 | Playwright retry 第二次通过 | 仍记录 FLAKY_FAIL，不能静默 green |
-| S31-TEST-046 | critical Gate 被 quarantine | 配置 Gate 失败 |
-| S31-TEST-047 | artifact 含 Prompt/secret/真实内容 | 隔离并失败，按事件流程处理 |
-| S31-TEST-048 | RC 执行完整 Gate | S28/S29/S30、SQL/TX、API、profiles、E2E、restore、AI 证据全部可追踪 |
+| ID           | 场景                               | 必须结果                                                            |
+| ------------ | ---------------------------------- | ------------------------------------------------------------------- |
+| S31-TEST-041 | 269-case corpus ID/source SHA 漂移 | Evaluation run INVALID                                              |
+| S31-TEST-042 | hard case 三次 sample 中一次失败   | candidate INELIGIBLE，不补样                                        |
+| S31-TEST-043 | breaker/budget state 不可读        | provider calls 0，validated template                                |
+| S31-TEST-044 | AI output 部分字段安全且部分非法   | 整份拒绝，禁止修补/拼接                                             |
+| S31-TEST-045 | Playwright retry 第二次通过        | 仍记录 FLAKY_FAIL，不能静默 green                                   |
+| S31-TEST-046 | critical Gate 被 quarantine        | 配置 Gate 失败                                                      |
+| S31-TEST-047 | artifact 含 Prompt/secret/真实内容 | 隔离并失败，按事件流程处理                                          |
+| S31-TEST-048 | RC 执行完整 Gate                   | S28/S29/S30、SQL/TX、API、profiles、E2E、restore、AI 证据全部可追踪 |
 
 ## 28. 验收标准
 
@@ -955,6 +976,9 @@ E-010 不需要一次实现全部业务场景，但必须建立 registry，使�
 - 接受日期：2026-07-26；
 - 2026-08-04 修订：用户明确接受 22.2 的私有 GitHub Free 临时补偿控制；它只替代平台
   enforcement，不降低 11 个自动 checks、人工批准、head 绑定或其它 hard Gate；
+- 2026-08-12 E-014 修订：用户明确选择务实分层 Gate；允许对 Phase 2 开发给出条件放行，
+  Production/RC 继续 `NO_GO`。GitHub Free 补偿控制只延续到 development merges，不能用于 RC
+  或 Production，也不能把外部、真机或人工证据冒充 PASS；
 - 内容 PR：[PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/36)；
 - 基线：`main`（S-30 仓库结构与模块边界已随 PR #35 合并并获用户确认）；
 - 已确认范围：测试层级/工具、真实依赖与替身边界、source-ID registry、DB/TX/queue/profile/客户端/AI/恢复矩阵、CI/flaky/artifact 和 48 个场景；

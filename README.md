@@ -347,10 +347,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 1 — 工程基础
-状态：E-012 开发环境部署 Blocked
-当前目标：在已批准的开发基础设施上建立 digest 晋级、Release Manifest、TLS 与可验证回滚
-当前任务：E-012 部署固定开发环境与可回滚发布流程
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/50
+状态：E-014 Phase 1 Gate In Progress
+当前目标：给出 Phase 2 development 准入结论，同时保持 Production/RC Gate 关闭
+当前任务：E-014 执行 Phase 1 工程基础 Gate
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/52
 ```
 
 长期工作入口：
@@ -363,15 +363,14 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- [E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)
-  是唯一当前任务；代码前置已满足，但开发基础设施未授权，因此保持 Blocked；
-- E-011 已随 PR #119 squash 合并，11/11 CI Gate、365 天供应链 artifact retention 和
-  Accepted 私有 Free 临时合并控制均已验证；
-- 解锁 E-012 需要明确选择并授权云厂商/账户、region、主机/预算、域名/DNS/TLS、独立
-  PostgreSQL/Redis/object 服务、部署身份/secret store、责任人与退出方案；
-- 未获授权前不购买或创建云资源、域名、证书、数据库或真实 secret，不开放公网；
+- [E-014 Issue #52](https://github.com/WeiHan1996/DailyEnergy/issues/52)
+  是唯一当前任务；E-012/E-013 已完成并提供可复用 DEV 与 observability 证据；
+- 当前建议结论是 `CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`，仍等待 final 11/11 CI 和 owner 审核；
+- Production PITR、真实告警投递/TTL、微信 DevTools/真机和完整 incident/manual RC 保持
+  `BLOCKED/PENDING`，不因 Phase 2 development admission 自动解除；
+- 私有 GitHub Free 临时合并控制只允许 development branch merges，进入任一 RC 前停止；
 - D-001～D-005 已进入 Phase 2 Backlog，全部保持 Planned；
-- E-012 解锁前不创建实现分支；不启动 E-013、E-014、D-001 或业务实现任务。
+- E-014 获明确接受并合并前，不启动 D-001、C-001 或其它业务实现任务。
 
 [Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。
 E-001～E-005 与 E-008 已合并并进入 Done；E-005 随
@@ -385,6 +384,8 @@ E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squas
 `9630691a87b184bafe6ca78900a31244a6e6c237`，Issue #45 已关闭；状态 PR #114 已合并为
 `5378547300111ec917cd9da3c6c65a294c44074c`；E-009 已随 PR #115 squash 合并为
 `4f1d06b498a5db730661cf39dd5ce005932645e2`，Issue #47 已关闭。
+E-010～E-013 也已完成；E-012 的真实 DEV deploy/rollback/reconciliation 和 E-013 的
+reference observability baseline 已获接受，E-014 在此基础上执行分层 Phase Gate。
 [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
 [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、

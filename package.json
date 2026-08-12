@@ -62,6 +62,9 @@
     "observability:test": "node --test tests/observability/static.test.mjs",
     "observability:validate": "pnpm run observability:check && pnpm run observability:test",
     "observability:runtime": "node tooling/observability/validate-runtime.mjs",
+    "phase-gate:check": "node tooling/phase-gate/check.mjs",
+    "phase-gate:test": "node --test tests/phase-gate/phase-gate.test.mjs",
+    "phase-gate:validate": "pnpm run phase-gate:check && pnpm run phase-gate:test",
     "compose:prepare": "node tooling/compose/control.mjs prepare",
     "compose:config": "node tooling/compose/control.mjs config",
     "compose:up": "node tooling/compose/control.mjs up",
@@ -84,7 +87,7 @@
     "typecheck": "pnpm run config:check && turbo run typecheck",
     "typecheck:fixtures": "node tooling/test-typecheck.mjs",
     "config:fixtures": "node tooling/test-config.mjs",
-    "test": "pnpm run config:fixtures && pnpm run typecheck:fixtures && pnpm run lint:fixtures && pnpm run architecture:fixtures && pnpm run contract:fixtures && pnpm run admin:bundle:fixtures && pnpm run agent:fixtures && pnpm run registry:check && pnpm run registry:test && pnpm run testing:policy && pnpm run testing:playwright-policy && pnpm run ci:test && pnpm run deployment:test && pnpm run test:harness && pnpm run database:test && pnpm run queue:evidence && turbo run test",
+    "test": "pnpm run config:fixtures && pnpm run typecheck:fixtures && pnpm run lint:fixtures && pnpm run architecture:fixtures && pnpm run contract:fixtures && pnpm run admin:bundle:fixtures && pnpm run agent:fixtures && pnpm run registry:check && pnpm run registry:test && pnpm run testing:policy && pnpm run testing:playwright-policy && pnpm run ci:test && pnpm run deployment:test && pnpm run phase-gate:validate && pnpm run test:harness && pnpm run database:test && pnpm run queue:evidence && turbo run test",
     "build": "turbo run build",
     "clean": "node tooling/clean.mjs",
     "validate": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run ci:audit && pnpm run ci:supply-chain:evidence && pnpm run database:validate && pnpm run queue:test"

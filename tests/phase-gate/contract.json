@@ -1,0 +1,164 @@
+{
+  "contract_version": "e-014-phase-gate-v1",
+  "task_id": "E-014",
+  "profile": "security",
+  "decision": {
+    "phase_2_development": "CONDITIONAL_GO_FOR_PHASE_2",
+    "production_release_candidate": "NO_GO",
+    "owner_decision": "PENDING_REVIEW",
+    "production_readiness_claim": "PROHIBITED"
+  },
+  "baseline": {
+    "base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
+    "main_ci_run": 31569245433,
+    "main_ci_checks": 11,
+    "e012": {
+      "pull_request": 134,
+      "final_head": "5c598132787ba14a62de793827e4fb86a6dfb59c",
+      "ci_run": 31546068208,
+      "merge_commit": "dd201713a90b9f49e27cf66f6967210db8dc7f36",
+      "accepted_state_sha256": "56433f48fbf743f2ef38dab437647e188d01a40b90e4a3f62f37e9bb9e3d08d6"
+    },
+    "e013": {
+      "pull_request": 135,
+      "final_head": "a123b553e55df0fec939211af608694155e804e9",
+      "ci_run": 31563458000,
+      "merge_commit": "d7500333eda31d160667a0ae0e49413f600ee0e0",
+      "merge_main_ci_run": 31568032735
+    }
+  },
+  "development_requirements": [
+    {
+      "id": "E014-DEV-001",
+      "status": "VERIFIED_REUSED",
+      "claim": "Immutable DEV deploy, reconcile-current, rollback and redeploy evidence remains valid for the unchanged deployment contract.",
+      "evidence": [
+        "tests/registry/e012-evidence-manifest.json",
+        "docs/operations/development-deployment-runbook.md",
+        "PR-134"
+      ]
+    },
+    {
+      "id": "E014-DEV-002",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "An empty replacement Redis rebuilds only eligible PostgreSQL facts without changing PostgreSQL fact counts.",
+      "evidence": [
+        "tests/queue/integration.test.mjs",
+        "T-QUEUE-INTEGRATION-REBUILD-001",
+        "S31-TEST-027"
+      ]
+    },
+    {
+      "id": "E014-DEV-003",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "Clean Compose startup, health, dependency faults and recovery use synthetic data and fixed infrastructure versions.",
+      "evidence": [
+        "tests/compose/integration.test.mjs",
+        "tests/compose/evidence-manifest.json"
+      ]
+    },
+    {
+      "id": "E014-DEV-004",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "Secret, content, artifact and runtime capability boundaries remain fail closed.",
+      "evidence": [
+        "tests/ci/ci-policy.test.mjs",
+        "tests/deployment/dev-secrets.test.mjs",
+        "tests/architecture/boundary-cases.json"
+      ]
+    },
+    {
+      "id": "E014-DEV-005",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "The reference observability stack, SLO, alert, cost and outage contracts are executable without claiming real Production delivery.",
+      "evidence": [
+        "tests/registry/e013-evidence-manifest.json",
+        "docker/observability/exercise-contract.json"
+      ]
+    },
+    {
+      "id": "E014-DEV-006",
+      "status": "EXPLICITLY_TRACKED",
+      "claim": "Every registered Source ID has an explicit state; every PLANNED entry has an owner and reason and is not treated as PASS.",
+      "evidence": [
+        "tests/phase-gate/source-inventory.json",
+        "tests/registry/coverage-registry.json"
+      ]
+    },
+    {
+      "id": "E014-DEV-007",
+      "status": "REQUIRED_BEFORE_MERGE",
+      "claim": "The final PR head must pass all 11 machine checks from one CI run and receive explicit owner merge approval.",
+      "evidence": [
+        "tests/ci/policy.json",
+        "tooling/ci/verify-pr-merge-gate.mjs"
+      ]
+    }
+  ],
+  "deferred_production_requirements": [
+    {
+      "id": "E014-PROD-001",
+      "status": "BLOCKED",
+      "pass_claim": "PROHIBITED",
+      "owner": "Infrastructure and Privacy/Security owners",
+      "reason": "There is no approved Production PostgreSQL backup, independent restore ledger or RECOVERY environment.",
+      "unlock": "Run an isolated PostgreSQL PITR restore with current deletion/restore-deny ledger replay, detector checks and recovery-copy destruction evidence."
+    },
+    {
+      "id": "E014-PROD-002",
+      "status": "BLOCKED",
+      "pass_claim": "PROHIBITED",
+      "owner": "Operations owner",
+      "reason": "No real on-call recipient or independent Production notification route is authorized.",
+      "unlock": "Configure approved recipients and prove canary delivery, acknowledgement and escalation without user content."
+    },
+    {
+      "id": "E014-PROD-003",
+      "status": "BLOCKED",
+      "pass_claim": "PROHIBITED",
+      "owner": "Observability and Privacy owners",
+      "reason": "Reference retention configuration is not proof of real backend TTL deletion, replicas, exports or support access.",
+      "unlock": "Execute real backend TTL deletion and verify all copies, exports and access controls."
+    },
+    {
+      "id": "E014-PROD-004",
+      "status": "INFRA_BLOCKED",
+      "pass_claim": "PROHIBITED",
+      "owner": "Mini Program owner",
+      "reason": "A dedicated WeChat DevTools runner and approved synthetic test project are not available.",
+      "unlock": "Run the Mini Program conformance suite in WeChat DevTools with fixed runner and base-library evidence."
+    },
+    {
+      "id": "E014-PROD-005",
+      "status": "MANUAL_EVIDENCE_PENDING",
+      "pass_claim": "PROHIBITED",
+      "owner": "Release reviewers",
+      "reason": "iOS and Android device evidence belongs to a named release candidate, not an engineering skeleton Gate.",
+      "unlock": "Complete the approved real-device RC matrix with synthetic accounts and named reviewers."
+    },
+    {
+      "id": "E014-PROD-006",
+      "status": "MANUAL_EVIDENCE_PENDING",
+      "pass_claim": "PROHIBITED",
+      "owner": "Incident Commander and independent Safety/Privacy/Security reviewers",
+      "reason": "A full incident, deletion, restore and recovery-observation exercise requires a real RC and named roles.",
+      "unlock": "Execute and accept the full manual RC and incident exercise without bypassing hard Gates."
+    },
+    {
+      "id": "E014-PROD-007",
+      "status": "BLOCKED",
+      "pass_claim": "PROHIBITED",
+      "owner": "Project owner",
+      "reason": "Production cloud, stateful services, identity, domain, legal, region and cross-border decisions remain unapproved.",
+      "unlock": "Close every Production Gate in deployment section 26 and obtain explicit Production authorization."
+    }
+  ],
+  "merge_control": {
+    "scope": "DEVELOPMENT_BRANCH_MERGES_ONLY",
+    "platform_enforcement": "UNAVAILABLE_ON_PRIVATE_GITHUB_FREE",
+    "required_checks": 11,
+    "explicit_owner_risk_acceptance_per_merge": true,
+    "production_or_rc_use": "PROHIBITED",
+    "expires_on": "2026-11-02"
+  }
+}

@@ -224,6 +224,22 @@ test("T-E011-CI-POLICY-001 keeps external lanes pending", () => {
   );
 });
 
+test("T-E014-CI-POLICY-001 restricts the compensating control to development merges", () => {
+  const productionControl = structuredClone(ciPolicy);
+  productionControl.merge_gate.production_or_rc_use = "ALLOWED";
+  assert.throws(
+    () => validateCiPolicy(productionControl),
+    /CI_POLICY_MERGE_GATE_INVALID/u,
+  );
+
+  const missingOwnerAcceptance = structuredClone(ciPolicy);
+  missingOwnerAcceptance.merge_gate.explicit_owner_risk_acceptance_per_merge = false;
+  assert.throws(
+    () => validateCiPolicy(missingOwnerAcceptance),
+    /CI_POLICY_MERGE_GATE_INVALID/u,
+  );
+});
+
 test("T-E011-CI-POLICY-001 rejects a removed mandatory lane command", () => {
   const altered = structuredClone(ciPolicy);
   const lane = altered.lanes.find(({ id }) => id === "unit-contract");
