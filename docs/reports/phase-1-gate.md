@@ -19,8 +19,8 @@ Production authorization: NOT_GRANTED
 ```
 
 项目所有者已接受下一阶段的设计和确定性核心开发条件放行，并仅为 PR #138 本次开发合并
-接受 GitHub Free 的残余合并风险。E-014 final PR head 仍必须在固定 Ubuntu CI 中同一 run
-11/11 全绿；接受决定不能替代机器 Gate。
+接受 GitHub Free 的残余合并风险。E-014 final PR head 已在固定 Ubuntu CI 中同一 run
+11/11 全绿，并按补偿控制完成合并；接受决定没有替代机器 Gate。
 
 这不是“工程已经可以上线”。Production PostgreSQL PITR、当前 deletion/restore-deny ledger、
 真实告警投递、真实 backend TTL 删除、微信 DevTools/真机和完整 incident/manual RC 没有证据，
@@ -28,16 +28,16 @@ Production authorization: NOT_GRANTED
 
 ## 2. 为什么可以继续开发
 
-| 要求                      | 结论                                 | 证据                                                                                                                        |
-| ------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| 可重复构建与 CI           | 实现 head 已验证，状态 head 仍须重跑 | main `a5d83d5` run `31569245433` 11/11；PR #138 `93b64a6` run `31580514678` 11/11                                           |
-| 不可变 DEV 部署与回滚     | 复用 Accepted E-012                  | PR #134 merge `dd201713`；N+1 deploy 18/18、reconcile 17/17、rollback 18/18、redeploy 18/18；state SHA-256 `56433f48...8d6` |
-| 数据库与迁移              | 自动化证据可重跑                     | PostgreSQL 18 clean/upgrade/grant/TX suites 与 migration/drift Gate                                                         |
-| Redis 整体丢失            | 有真实 replacement Redis 证据        | `T-QUEUE-INTEGRATION-REBUILD-001`：只从 PG 重建 eligible facts，PG fact count 不变                                          |
-| Compose 与故障恢复        | 有可重放合成证据                     | clean startup、smoke、PG/Redis/provider/network/clock/telemetry fault tests                                                 |
-| secret/content/capability | fail-closed 自动 Gate                | 11-lane CI、artifact scan、profile/runtime/egress/secret known-fail fixtures                                                |
-| 监控基线                  | reference stack 可执行               | E-013 48 项 proof、runtime config parse、SLO/alert/cost/outage contracts                                                    |
-| Source-ID                 | 无 silent omission                   | 736 项全部有显式状态；203 COVERED、533 PLANNED、0 NA；每个 PLANNED 有 owner 和 reason                                       |
+| 要求                      | 结论                             | 证据                                                                                                                        |
+| ------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 可重复构建与 CI           | final head 与 merged main 已验证 | PR #138 `8365e41` run `31586034272` 11/11；merge `c1ad026` run `31586384383` attempt 2 11/11                                |
+| 不可变 DEV 部署与回滚     | 复用 Accepted E-012              | PR #134 merge `dd201713`；N+1 deploy 18/18、reconcile 17/17、rollback 18/18、redeploy 18/18；state SHA-256 `56433f48...8d6` |
+| 数据库与迁移              | 自动化证据可重跑                 | PostgreSQL 18 clean/upgrade/grant/TX suites 与 migration/drift Gate                                                         |
+| Redis 整体丢失            | 有真实 replacement Redis 证据    | `T-QUEUE-INTEGRATION-REBUILD-001`：只从 PG 重建 eligible facts，PG fact count 不变                                          |
+| Compose 与故障恢复        | 有可重放合成证据                 | clean startup、smoke、PG/Redis/provider/network/clock/telemetry fault tests                                                 |
+| secret/content/capability | fail-closed 自动 Gate            | 11-lane CI、artifact scan、profile/runtime/egress/secret known-fail fixtures                                                |
+| 监控基线                  | reference stack 可执行           | E-013 48 项 proof、runtime config parse、SLO/alert/cost/outage contracts                                                    |
+| Source-ID                 | 无 silent omission               | 736 项全部有显式状态；203 COVERED、533 PLANNED、0 NA；每个 PLANNED 有 owner 和 reason                                       |
 
 E-012 的部署合同、digest 和 topology 没有被 E-014 修改，因此重复操作真实服务器不能增加新的
 证明力，反而增加时间、成本和运行风险。本 Gate 重跑自动化层，并引用已经接受、仍然适用的真实
@@ -107,9 +107,9 @@ post-merge receipt。E-013 合并曾遗漏 `--match-head-commit`，本 Gate 将�
 复核未发现需要改变当前分层结论的新威胁。剩余风险是单一 merge-capable actor 在 GitHub Free
 下执行人工补偿控制的操作风险；项目所有者已明确接受其仅用于本次开发合并。
 
-## 7. 合并前 Gate
+## 7. 最终 Gate 与合并结果
 
-E-014 请求合并审核前必须完成：
+E-014 请求合并审核前要求：
 
 1. `pnpm agent:validate --mode=task --task=E-014` 与 full code Gate；
 2. 真实 PostgreSQL 18、replacement Redis 8 和 Compose fault suites；
@@ -131,10 +131,25 @@ PR #138 首轮 head `2ba9b0b1cbc9ef0fcd517431307948d13b9835d5` 的 CI run `31579
 
 修正后的实现与状态一致性 head `93b64a686823f18fb3d942e99e2700f1d2cc7e5a` 已在固定 Ubuntu
 CI run `31580514678` 获得同一 run 11/11 SUCCESS，PR 状态为 `CLEAN/MERGEABLE` 且保持 Draft。
-本次纯状态证据回写形成的新 final head 仍须完整 11/11，并由 PR comment 固化 final head/run；
-Draft 状态下 merge-gate verifier 返回 `CI_MANUAL_MERGE_GATE_PR_NOT_READY` 是预期的 fail-closed
-行为，只有项目所有者批准并标 Ready 后才能执行最终 exact-head merge 核验。
+随后 acceptance evidence 形成的新 final head 按合同完整重跑 11/11，并由 PR comment 固化
+final head/run；Draft 状态下 merge-gate verifier 当时返回
+`CI_MANUAL_MERGE_GATE_PR_NOT_READY` 是预期的 fail-closed 行为，只有项目所有者批准并标 Ready
+后才执行最终 exact-head merge 核验。
 
-项目所有者审核已经完成。只有 acceptance commit 的 exact-head CI 与 merge control 全部通过并
-完成合并后，才把 E-014 置为 Done，并从 Phase 2 依赖图中选择恰好一个下一任务 Ready；本报告
-不提前启动 D-001、C-001 或其它下游任务。
+项目所有者审核完成后，acceptance commit
+`8365e41ad98034e724bb46bc3cb889c4861569de` 的固定 Ubuntu CI run `31586034272` 同一 run
+11/11 SUCCESS；exact-head verifier 返回
+`CI_MANUAL_MERGE_GATE_OK:pr=138:head=8365e41ad98034e724bb46bc3cb889c4861569de:run=31586034272:checks=11`，
+并由 [PR comment](https://github.com/WeiHan1996/DailyEnergy/pull/138#issuecomment-5265330997)
+固化审计记录。PR #138 使用 `--match-head-commit` squash 合并为
+`c1ad026cd1ac1be131b56b8f5c82bf76e407b503`，Issue #52 已关闭。
+
+merged-main CI run `31586384383` attempt 1 的 `unit-contract` 仅因 Docker Hub 拉取固定 Tempo
+镜像时 `Client.Timeout exceeded while awaiting headers` 失败，aggregate Gate 因依赖失败而停止；
+失败 jobs 重跑后 attempt 2 对同一 merge commit 11/11 SUCCESS。该瞬时基础设施失败被保留，
+没有改写成首次即通过。
+
+E-014 现为 Done，Phase 1 已结束；Phase 2 development 按已接受的条件放行开始，D-001 成为唯一
+Ready 任务。Production/RC 的第 4 节阻塞项、`NO_GO` 与
+`production_readiness_claim=PROHIBITED` 均未改变。项目所有者对 GitHub Free 残余风险的接受只
+覆盖 PR #138，不自动授权任何后续 PR 合并。
