@@ -1,15 +1,15 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-12（E-013 实现与本地验证已收口，等待 Draft PR 固定 Ubuntu CI）
+- **最后更新**：2026-08-12（E-013 实现与固定 Ubuntu full Gate 已通过，进入 Draft PR 人工审查）
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-013 — 实现脱敏日志、指标、Trace、SLO 与成本监控基线
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **任务分支**：`agent/e013-observability`，基于 PR #134 squash merge `dd201713a90b9f49e27cf66f6967210db8dc7f36`
 - **当前 Issue**：[E-013 Issue #51](https://github.com/WeiHan1996/DailyEnergy/issues/51)
-- **当前 PR**：[Draft PR #135](https://github.com/WeiHan1996/DailyEnergy/pull/135)，实现 commit `c1a557505b67bdfb5d7dee7e0340da6b5967fec4`
+- **当前 PR**：[Draft PR #135](https://github.com/WeiHan1996/DailyEnergy/pull/135)，实现证据 head `8fe2fa5f6aa6e3ef97b40a9480f53303ba5962ce`
 - **最近完成 PR**：[E-012 final evidence PR #134](https://github.com/WeiHan1996/DailyEnergy/pull/134)
-- **Gate 结论**：`E013_IMPLEMENTED_LOCAL / SECURITY_MANUAL_EVIDENCE_PENDING / UBUNTU_CI_PENDING / E014_REQUIRED / PRODUCTION_OBSERVABILITY_BLOCKED`
+- **Gate 结论**：`E013_AUTOMATED_FULL_GATE_PASS / SECURITY_MANUAL_EVIDENCE_PENDING / E014_REQUIRED / PRODUCTION_OBSERVABILITY_BLOCKED`
 
 ## 1. 当前目标
 
@@ -80,9 +80,9 @@ pnpm agent:prepare E-013 --remote --deep
 
 ## 7. 精确下一动作
 
-1. 等待 Draft PR #135 最终 head 的固定 Ubuntu 11-check CI，重点核验 `unit-contract` 中的锁定 Collector/Prometheus/Alertmanager/Loki/Tempo runtime config Gate、Linux `flock`、audit 与 supply-chain；
-2. CI 若失败，只修复 E-013 范围内的根因并重新运行完整 Gate；不得放宽 license、字段、Production 或 manual evidence policy；
-3. 只有固定 Ubuntu CI 全绿后才把任务改为 `In Review`；Production 授权、人工 threat-boundary review 与 E-014 演练继续保持 pending。
+1. 用户审查 Draft PR #135 的实现、数据边界与 Requirement-to-Proof Matrix，并完成或明确处置人工 `threatBoundaryReview`；
+2. `productionAuthorizationWhenApplicable` 仅在启用真实 Production backend/on-call/delivery 时处理；未获授权前相关能力继续 BLOCKED，不影响 LOCAL/CI/STAGING-like 自动化证据结论；
+3. 未经用户明确批准，不把 PR 标记 Ready、不合并、不关闭 Issue #51；E-014 演练继续保持 `E014_REQUIRED / completed=false`。
 
 ## 8. Requirement-to-Proof Matrix
 
@@ -114,6 +114,7 @@ pnpm agent:prepare E-013 --remote --deep
 
 ## 11. 验证与未完成证据
 
+- PASS：Draft PR #135 实现证据 head `8fe2fa5f6aa6e3ef97b40a9480f53303ba5962ce` 的固定 Ubuntu CI run `31563077585` 为 11/11 SUCCESS，包含 docs、static、unit-contract、db/queue integration、API/Admin E2E、resilience、AI deterministic、supply-chain 与最终 aggregate Gate；
 - PASS：format、ESLint/architecture/codegen/contracts、typecheck、全仓 build、API 45、Worker 10、server-adapters 40、Admin unit 14 + Chromium E2E 6、Miniapp 10、shared-schemas 38、api-client 4；
 - PASS：PostgreSQL 18 integration 82、Redis/BullMQ/PostgreSQL resilience 7、Compose static/evidence 9、observability static 7、CI policy 24、registry 5；
 - PASS：真实 loopback OpenMetrics probe 已验证 telemetry heartbeat、HTTP `0.5s/0.75s` bucket 和仅保留 environment/service/profile 的 Prometheus resource constant labels；
