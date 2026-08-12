@@ -44,6 +44,7 @@ const expectedRequiredMergeChecks = [
 const expectedMergeGate = {
   control_type: "TEMPORARY_MANUAL_COMPENSATING_CONTROL",
   reason: "PRIVATE_FREE_BRANCH_PROTECTION_UNAVAILABLE",
+  scope: "DEVELOPMENT_BRANCH_MERGES_ONLY",
   repository: "WeiHan1996/DailyEnergy",
   target_branch: "main",
   required_checks: expectedRequiredMergeChecks,
@@ -54,13 +55,16 @@ const expectedMergeGate = {
   auto_merge: "PROHIBITED",
   receipt: "PR_COMMENT_AND_POST_MERGE_HANDOFF",
   risk_owner: "REPOSITORY_OWNER",
-  accepted_on: "2026-08-04",
+  explicit_owner_risk_acceptance_per_merge: true,
+  production_or_rc_use: "PROHIBITED",
+  accepted_on: "2026-08-12",
   expires_on: "2026-11-02",
   restore_platform_enforcement_on: [
     "CAPABILITY_AVAILABLE",
     "SECOND_MERGE_CAPABLE_ACTOR",
-    "E-014_START",
-    "RELEASE_CANDIDATE",
+    "PHASE_2_RELEASE_CANDIDATE",
+    "PRODUCTION_RELEASE_CANDIDATE",
+    "OWNER_WITHDRAWS_ACCEPTANCE",
   ],
 };
 
@@ -95,6 +99,7 @@ const expectedMinimumLaneCommands = new Map([
       ["pnpm", "run", "deployment:test"],
       ["pnpm", "run", "observability:validate"],
       ["pnpm", "run", "observability:runtime"],
+      ["pnpm", "run", "phase-gate:validate"],
       ["pnpm", "run", "testing:playwright-policy"],
       ["pnpm", "run", "test:projects"],
       ["pnpm", "--filter", "@daily-energy/app-miniapp", "run", "test"],
@@ -263,7 +268,7 @@ function isSha(value) {
 
 export function validateCiPolicy(policy) {
   if (
-    policy?.policy_version !== "e-011-ci-policy-v2" ||
+    policy?.policy_version !== "e-014-ci-policy-v3" ||
     policy.runner !== "ubuntu-24.04" ||
     policy.node_version !== "24.18.0" ||
     policy.pnpm_version !== "11.17.0" ||

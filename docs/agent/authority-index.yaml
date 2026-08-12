@@ -2,6 +2,31 @@ version: 1
 projectContext: docs/agent/PROJECT_CONTEXT.md
 
 taskRules:
+  - match: E-014
+    profile: code
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Repository, evidence, safety, and review rules
+      - path: tasks/current.md
+        required: true
+        reason: Current E-014 scope, conclusion, and handoff
+      - path: ROADMAP.md
+        required: true
+        reason: Phase 1 exit criteria and Phase 2 development boundary
+      - path: docs/technical/testing.md
+        required: true
+        reason: Conditional development Gate, registry, CI, RC, and manual evidence rules
+      - path: docs/technical/deployment.md
+        required: true
+        reason: Reusable DEV evidence and blocked Production restore requirements
+      - path: docs/technical/observability.md
+        required: true
+        reason: Development observability proof and blocked Production exercise boundary
+      - path: docs/operations/incident-response.md
+        required: true
+        reason: Manual incident and recovery evidence that automation cannot replace
+
   - match: E-015
     profile: code
     sources:

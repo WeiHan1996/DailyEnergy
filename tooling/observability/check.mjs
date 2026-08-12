@@ -125,14 +125,34 @@ export function validateContract(contract) {
 
 export function validateExerciseContract(exercise) {
   if (
-    exercise?.contract_version !== "dailyenergy-observability-exercise-v1" ||
-    exercise.status !== "E014_REQUIRED" ||
-    exercise.completed !== false ||
+    exercise?.contract_version !== "dailyenergy-observability-exercise-v2" ||
+    exercise.development_gate?.status !== "CONDITIONAL_GO_FOR_PHASE_2" ||
+    exercise.development_gate?.evidence_status !==
+      "ACCEPTED_FOR_DEVELOPMENT_MERGE" ||
+    exercise.development_gate?.owner_decision !==
+      "ACCEPTED_FOR_THIS_DEVELOPMENT_MERGE_ONLY" ||
+    exercise.development_gate?.accepted_on !== "2026-08-12" ||
+    exercise.development_gate?.threat_boundary_review !== "COMPLETED" ||
+    exercise.development_gate?.production_authorization !== "NOT_GRANTED" ||
+    exercise.development_gate?.production_readiness_claim !== "PROHIBITED" ||
+    exercise.production_rc_gate?.status !== "NO_GO" ||
+    exercise.production_rc_gate?.completed !== false ||
+    exercise.production_rc_gate?.pass_claim !== "PROHIBITED" ||
     exercise.production_business_facts_allowed !== false ||
-    !exercise.required_evidence?.includes("ALERT_DELIVERY_CANARY") ||
-    !exercise.required_evidence?.includes("RETENTION_TTL_DELETION")
+    !exercise.production_rc_gate?.required_evidence?.includes(
+      "ALERT_DELIVERY_CANARY",
+    ) ||
+    !exercise.production_rc_gate?.required_evidence?.includes(
+      "RETENTION_TTL_DELETION",
+    ) ||
+    !exercise.production_rc_gate?.blocked_evidence?.includes(
+      "REAL_ALERT_DELIVERY",
+    ) ||
+    !exercise.production_rc_gate?.blocked_evidence?.includes(
+      "REAL_BACKEND_TTL_DELETION",
+    )
   ) {
-    fail("E013_RC_PENDING", "exercise-contract");
+    fail("E014_PRODUCTION_RC_PENDING", "exercise-contract");
   }
   return exercise;
 }

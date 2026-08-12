@@ -36,8 +36,9 @@ PostgreSQL/Redis/BullMQ。
 普通 PR 自动执行 9 个可用 lane；`miniapp-conformance`、
 `ai-model-load-human` 与 `manual-rc` 保持显式 pending/blocked，不能由普通 GitHub
 job 冒充 PASS。普通合成报告保留 14 天，SBOM/provenance 等供应链证据保留 365 天。
-当前私有 GitHub Free 仓库无法启用 branch protection；到 2026-11-02、E-014/RC 开始、
-出现第二位可合并协作者或平台能力可用前，合并必须先执行上述只读 Gate，再使用
+当前私有 GitHub Free 仓库无法启用 branch protection；该临时控制只允许 development branch
+merge。到 2026-11-02、任一 RC 开始、出现第二位可合并协作者、owner 撤回接受或平台能力可用前，
+合并必须先执行上述只读 Gate，再使用
 `gh pr merge --squash --match-head-commit <HEAD_SHA>`。该控制不豁免任何失败或缺失 lane。
 
 ## E-013 可观测性入口
@@ -53,8 +54,21 @@ job 冒充 PASS。普通合成报告保留 14 天，SBOM/provenance 等供应链
 参考栈由 `docker/compose.observability.yaml` 显式叠加，不改变 E-012 默认 11-service
 Compose 闭集。`docker/observability/contract.json` 固定 vendor-neutral 信号、字段、平面、
 期限和 Production `BLOCKED` Gate；`exercise-contract.json` 明确保持
-`E014_REQUIRED / completed=false`，不能由 E-013 静态证据冒充 alert delivery、TTL 删除、
-backend outage 或 RC 演练已经完成。
+development `CONDITIONAL_GO_FOR_PHASE_2` 与 Production/RC
+`NO_GO / completed=false / pass_claim=PROHIBITED`。不能由 E-013/E-014 静态证据冒充真实 alert
+delivery、真实 TTL 删除、Production backend outage 或 RC 演练已经完成。
+
+## E-014 Phase Gate 入口
+
+| 命令                       | 证据                                                                                     |
+| -------------------------- | ---------------------------------------------------------------------------------------- |
+| `pnpm phase-gate:check`    | 分层 Gate、E-012/E-013 receipt、736 个 Source ID owner 盘点和 Production 延后条件        |
+| `pnpm phase-gate:test`     | 拒绝 unconditional GO、Production PASS、silent PLANNED、RC 合并控制和人工证据 false-PASS |
+| `pnpm phase-gate:validate` | 上述 checker 与负向 suite 的聚合 Gate                                                    |
+
+E-014 只建议 Phase 2 development 条件放行；final PR 仍须 11/11 和 owner 审核。PITR/restore、
+真实投递/TTL、微信 DevTools/真机与完整 incident/manual RC 保持 `BLOCKED/PENDING`，不得因此开启
+Production 或把 C/D 任务提前标记 Ready。
 
 ## Registry 与证据
 
@@ -62,7 +76,7 @@ backend outage 或 RC 演练已经完成。
 - `registry/coverage-registry.json` 是确定性生成物，只允许 `COVERED`、`PLANNED`、
   `NA_WITH_REASON`；
 - `registry/e010-evidence-manifest.json`、`registry/e011-evidence-manifest.json`、
-  `registry/e013-evidence-manifest.json` 与已有
+  `registry/e013-evidence-manifest.json`、`registry/e014-evidence-manifest.json` 与已有
   database/queue/Compose manifest 提供逐项
   assertion，不把低层证据升级为高层 conformance；
 - 尚未实现的业务、恢复、模型、真机或人工场景保持 `PLANNED` 或明确 pending，不能因

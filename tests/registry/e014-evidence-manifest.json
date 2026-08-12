@@ -1,0 +1,20 @@
+{
+  "manifest_version": "e-014-evidence-v1",
+  "scope": "E-014 conditional Phase 2 development admission, Production NO-GO and explicit Source-ID ownership",
+  "authority": [
+    "ROADMAP.md",
+    "docs/technical/testing.md",
+    "docs/technical/deployment.md",
+    "docs/technical/observability.md",
+    "docs/operations/incident-response.md"
+  ],
+  "proofs": {},
+  "entries": [],
+  "non_coverage_evidence": {
+    "development_gate": "tests/phase-gate/contract.json",
+    "source_inventory": "tests/phase-gate/source-inventory.json",
+    "checker": "tooling/phase-gate/check.mjs",
+    "negative_tests": "tests/phase-gate/phase-gate.test.mjs",
+    "statement": "E-014 adds no false Source-ID coverage. It validates explicit existing COVERED/PLANNED ownership and keeps missing mandatory Production, RC, DevTools, device and manual evidence pending."
+  }
+}

@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-08-12（E-012 Accepted current runtime reconciliation 合同已接受）
+- **最后更新**：2026-08-12（E-014 开发准入与 Production/RC 准入分层）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0007 临时 DEV 同机例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
@@ -76,22 +76,22 @@
 
 ## 4. 部署决策摘要
 
-| 主题 | 唯一结论 |
-|---|---|
-| MVP 生产形态 | 单区域、单活、单 Linux application host 的 Docker Compose v2；明确接受主机级短时不可用，不声称 HA |
+| 主题         | 唯一结论                                                                                                               |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| MVP 生产形态 | 单区域、单活、单 Linux application host 的 Docker Compose v2；明确接受主机级短时不可用，不声称 HA                      |
 | Compose 范围 | 只编排 reverse proxy、API、Admin、三个 Worker profile 和受控一次性 job；生产 PostgreSQL/Redis/对象存储使用独立受控端点 |
-| 有状态服务 | PostgreSQL 18 独立服务并具备加密 base backup + WAL/PITR；Redis 8 可整体丢失并由 PostgreSQL 重建 |
-| 构建 | 每个 commit 构建一次 OCI artifact；staging 与 production 使用同一 digest，禁止服务器现场 build |
-| 发布权威 | `ReleaseManifestV1` 固定 commit、lockfile、image digest、SBOM、migration、config、contracts 与 Gate evidence |
-| 配置 | 公开 build config、非秘密 deploy config、secret ref/version、PostgreSQL runtime catalog、emergency switch 五类分离 |
-| 密钥 | 优先短期 OIDC/工作负载身份；运行 secret 通过受控 secret store 生成只读文件并按 service 显式挂载 |
-| migration | 独立 Migration Job；expand → resumable backfill → contract；代码启动不迁移，生产禁止 `db push` |
-| 发布顺序 | preflight → expand migration → 新 consumer → API producer → Admin → restricted capability → observation |
-| 回滚 | 回到上一份 Accepted Release Manifest；只有数据库仍兼容时允许代码回滚，否则 roll forward 或全环境隔离恢复 |
-| 备份 | PostgreSQL 目标 RPO ≤15 分钟、Beta 工程 RTO ≤4 小时；最长 35 天；Redis 不恢复 |
-| 恢复 | 只在隔离 RECOVERY 环境恢复，先重放 restore-deny/删除/TTL/source invalidation，再运行 detector 和 Gate |
-| remote cache | v1 禁用第三方 Turbo remote cache；CI job-local cache 可删除且不含 secret/内容 |
-| CI artifact | 普通合成测试 14 天；RC/Release evidence 365 天；真实内容或 secret 一经发现立即隔离并按事件流程处理 |
+| 有状态服务   | PostgreSQL 18 独立服务并具备加密 base backup + WAL/PITR；Redis 8 可整体丢失并由 PostgreSQL 重建                        |
+| 构建         | 每个 commit 构建一次 OCI artifact；staging 与 production 使用同一 digest，禁止服务器现场 build                         |
+| 发布权威     | `ReleaseManifestV1` 固定 commit、lockfile、image digest、SBOM、migration、config、contracts 与 Gate evidence           |
+| 配置         | 公开 build config、非秘密 deploy config、secret ref/version、PostgreSQL runtime catalog、emergency switch 五类分离     |
+| 密钥         | 优先短期 OIDC/工作负载身份；运行 secret 通过受控 secret store 生成只读文件并按 service 显式挂载                        |
+| migration    | 独立 Migration Job；expand → resumable backfill → contract；代码启动不迁移，生产禁止 `db push`                         |
+| 发布顺序     | preflight → expand migration → 新 consumer → API producer → Admin → restricted capability → observation                |
+| 回滚         | 回到上一份 Accepted Release Manifest；只有数据库仍兼容时允许代码回滚，否则 roll forward 或全环境隔离恢复               |
+| 备份         | PostgreSQL 目标 RPO ≤15 分钟、Beta 工程 RTO ≤4 小时；最长 35 天；Redis 不恢复                                          |
+| 恢复         | 只在隔离 RECOVERY 环境恢复，先重放 restore-deny/删除/TTL/source invalidation，再运行 detector 和 Gate                  |
+| remote cache | v1 禁用第三方 Turbo remote cache；CI job-local cache 可删除且不含 secret/内容                                          |
+| CI artifact  | 普通合成测试 14 天；RC/Release evidence 365 天；真实内容或 secret 一经发现立即隔离并按事件流程处理                     |
 
 RPO/RTO 是 Phase 1/Beta 的工程准备目标，不是对用户的公开承诺。真实规模、区域与服务商确定后，S-33/A-008 必须用演练结果校准。
 
@@ -99,16 +99,16 @@ RPO/RTO 是 Phase 1/Beta 的工程准备目标，不是对用户的公开承诺�
 
 ### 5.1 环境枚举
 
-| 环境 | 生命周期 | 数据 | 外部调用 | 权限/用途 |
-|---|---|---|---|---|
-| `LOCAL` | 开发者本机、可销毁 | 合成 seed | 默认本地 stub，无生产 egress | 全栈开发；可运行 Compose PG/Redis |
-| `CI` | 每次 run 临时 | 合成 fixture | deny-by-default；仅 registry/package 下载等显式 allowlist | static/test/build/security；无生产 secret |
-| `DEV` | 共享开发、可重建 | 合成或专用测试身份 | 微信测试/开发能力；provider 默认 template/stub | 集成开发；不得复制生产 |
-| `STAGING` | 持久、生产同构 | 只用合成主体 | sandbox/stub；真实 provider 仅显式受限 evaluation run | migration、发布、回滚、恢复与 RC 演练 |
-| `PRODUCTION` | 持久、受控 | 真实用户数据 | 只允许已批准微信/provider/object endpoints | 唯一用户服务环境 |
-| `RECOVERY` | 临时、隔离 | 加密生产备份的受限副本 | 默认无互联网和用户流量 | 恢复、删除重放、完整性验证；完成后 24h 内销毁 |
-| `EVALUATION` | 显式付费 run | SyntheticSubjectRef | 仅受批准 provider/profile | S-16 MODEL/LOAD/HUMAN；与生产身份/数据库隔离 |
-| `MINIAPP_RUNNER` | CI/RC 临时 | 合成测试账号 | 只到测试小程序/API | 微信 DevTools automator；不拥有生产 AppSecret |
+| 环境             | 生命周期           | 数据                   | 外部调用                                                  | 权限/用途                                     |
+| ---------------- | ------------------ | ---------------------- | --------------------------------------------------------- | --------------------------------------------- |
+| `LOCAL`          | 开发者本机、可销毁 | 合成 seed              | 默认本地 stub，无生产 egress                              | 全栈开发；可运行 Compose PG/Redis             |
+| `CI`             | 每次 run 临时      | 合成 fixture           | deny-by-default；仅 registry/package 下载等显式 allowlist | static/test/build/security；无生产 secret     |
+| `DEV`            | 共享开发、可重建   | 合成或专用测试身份     | 微信测试/开发能力；provider 默认 template/stub            | 集成开发；不得复制生产                        |
+| `STAGING`        | 持久、生产同构     | 只用合成主体           | sandbox/stub；真实 provider 仅显式受限 evaluation run     | migration、发布、回滚、恢复与 RC 演练         |
+| `PRODUCTION`     | 持久、受控         | 真实用户数据           | 只允许已批准微信/provider/object endpoints                | 唯一用户服务环境                              |
+| `RECOVERY`       | 临时、隔离         | 加密生产备份的受限副本 | 默认无互联网和用户流量                                    | 恢复、删除重放、完整性验证；完成后 24h 内销毁 |
+| `EVALUATION`     | 显式付费 run       | SyntheticSubjectRef    | 仅受批准 provider/profile                                 | S-16 MODEL/LOAD/HUMAN；与生产身份/数据库隔离  |
+| `MINIAPP_RUNNER` | CI/RC 临时         | 合成测试账号           | 只到测试小程序/API                                        | 微信 DevTools automator；不拥有生产 AppSecret |
 
 环境名是封闭枚举。不得使用 `test2`、`prod-copy`、个人命名空间或临时共享数据库绕开规则。
 
@@ -194,15 +194,15 @@ Docker 官方文档明确支持用 production override 调整 Compose 配置、�
 
 ## 7. Runtime profile 与最小能力
 
-| Profile | Inbound | DB role | Queue/handler | Egress | Secret |
-|---|---|---|---|---|---|
-| API | public API only | `api-app` + 封闭 `api-safety` pool | 不消费 BullMQ | 微信身份、必要内部 endpoint | session/signing、微信 server credential、DB role |
-| Admin | reverse proxy + enterprise auth | 无直接 DB | 无 queue | 只到 Admin API | SSO/server session；无 DB/provider |
-| Interactive | none | `worker-core` | Daily generation/recovery | approved Daily providers | provider role、DB/Redis |
-| Background | none | `worker-core` | outbox、relationship、weekly、notification、projection | approved platform/Weekly route | 仅所需 adapter credential |
-| Restricted | none | `worker-deletion` | deletion/export/cleanup/backup deadline | provider delete/object cleanup | restricted DB/object/provider cleanup |
-| Migration | one-shot | `migration owner` | 无业务 queue | DB only | 临时 migration credential |
-| Evaluation | one-shot | `evaluation` | 独立 evaluation queue 或无 queue | approved evaluation providers | evaluation-only provider credential |
+| Profile     | Inbound                         | DB role                            | Queue/handler                                          | Egress                         | Secret                                           |
+| ----------- | ------------------------------- | ---------------------------------- | ------------------------------------------------------ | ------------------------------ | ------------------------------------------------ |
+| API         | public API only                 | `api-app` + 封闭 `api-safety` pool | 不消费 BullMQ                                          | 微信身份、必要内部 endpoint    | session/signing、微信 server credential、DB role |
+| Admin       | reverse proxy + enterprise auth | 无直接 DB                          | 无 queue                                               | 只到 Admin API                 | SSO/server session；无 DB/provider               |
+| Interactive | none                            | `worker-core`                      | Daily generation/recovery                              | approved Daily providers       | provider role、DB/Redis                          |
+| Background  | none                            | `worker-core`                      | outbox、relationship、weekly、notification、projection | approved platform/Weekly route | 仅所需 adapter credential                        |
+| Restricted  | none                            | `worker-deletion`                  | deletion/export/cleanup/backup deadline                | provider delete/object cleanup | restricted DB/object/provider cleanup            |
+| Migration   | one-shot                        | `migration owner`                  | 无业务 queue                                           | DB only                        | 临时 migration credential                        |
+| Evaluation  | one-shot                        | `evaluation`                       | 独立 evaluation queue 或无 queue                       | approved evaluation providers  | evaluation-only provider credential              |
 
 要求：
 
@@ -334,13 +334,13 @@ ReleaseManifestV1 {
 
 ## 10. 配置分级
 
-| 类别 | 示例 | 权威/发布 | 是否 secret | 生效 |
-|---|---|---|---|---|
-| Public build config | app version、public API origin、微信公开 AppID、feature compile target | source + build manifest | 否 | 重新 build |
-| Deploy config | port、service URL、pool size、timeouts 上限、profile、region code | versioned template + environment registry | 否，但受控 | restart/redeploy |
-| Secret | DB password、session/signing key、provider/API secret、KMS material | secret store 的 ref/version | 是 | reload/restart/rotation |
-| Runtime catalog | provider route、model/price/profile、Prompt/template/policy/resource、retention config | PostgreSQL system catalog，受控 publish | 内容可能受限但不是 deploy secret | 新 invocation/明确版本 |
-| Emergency switch | feature/route/resource/admin/deletion freeze、maintenance | 受控 operations command + expiry | 否；操作受限 | 同步/短窗口 |
+| 类别                | 示例                                                                                   | 权威/发布                                 | 是否 secret                      | 生效                    |
+| ------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------- | -------------------------------- | ----------------------- |
+| Public build config | app version、public API origin、微信公开 AppID、feature compile target                 | source + build manifest                   | 否                               | 重新 build              |
+| Deploy config       | port、service URL、pool size、timeouts 上限、profile、region code                      | versioned template + environment registry | 否，但受控                       | restart/redeploy        |
+| Secret              | DB password、session/signing key、provider/API secret、KMS material                    | secret store 的 ref/version               | 是                               | reload/restart/rotation |
+| Runtime catalog     | provider route、model/price/profile、Prompt/template/policy/resource、retention config | PostgreSQL system catalog，受控 publish   | 内容可能受限但不是 deploy secret | 新 invocation/明确版本  |
+| Emergency switch    | feature/route/resource/admin/deletion freeze、maintenance                              | 受控 operations command + expiry          | 否；操作受限                     | 同步/短窗口             |
 
 禁止：
 
@@ -421,14 +421,14 @@ GitHub 官方文档说明 OIDC 可用短期 token 代替长期云 secret，deplo
 
 ### 14.1 Runner 分级
 
-| Runner | 允许 | 禁止 |
-|---|---|---|
-| Untrusted PR | checkout、静态、合成测试、无密钥构建 | secret、OIDC deploy、生产网络、artifact promotion |
-| Trusted main | 全量合成 Gate、签名构建、registry push | production deploy without environment approval |
-| Deployment | 拉取已验证 digest、preflight、staging/prod release | build source、改 migration、打印 secret |
-| Restricted recovery | backup restore、ledger replay、detector | public egress、普通用户流量、长期保留副本 |
-| Miniapp | DevTools/automator + 测试身份 | 生产 AppSecret、真实用户账号 |
-| Evaluation | approved provider + SyntheticSubjectRef | production DB/identity、普通 CI 自动触发 |
+| Runner              | 允许                                               | 禁止                                              |
+| ------------------- | -------------------------------------------------- | ------------------------------------------------- |
+| Untrusted PR        | checkout、静态、合成测试、无密钥构建               | secret、OIDC deploy、生产网络、artifact promotion |
+| Trusted main        | 全量合成 Gate、签名构建、registry push             | production deploy without environment approval    |
+| Deployment          | 拉取已验证 digest、preflight、staging/prod release | build source、改 migration、打印 secret           |
+| Restricted recovery | backup restore、ledger replay、detector            | public egress、普通用户流量、长期保留副本         |
+| Miniapp             | DevTools/automator + 测试身份                      | 生产 AppSecret、真实用户账号                      |
+| Evaluation          | approved provider + SyntheticSubjectRef            | production DB/identity、普通 CI 自动触发          |
 
 - workflow/action 必须 pin 到不可变 commit SHA；版本 tag 仅作可读说明；
 - third-party action 必须经过权限、网络和供应链评审；
@@ -440,15 +440,15 @@ GitHub 官方文档说明 OIDC 可用短期 token 代替长期云 secret，deplo
 
 ### 14.2 Artifact 期限
 
-| Artifact | 默认期限 | 内容边界 |
-|---|---:|---|
-| PR/main test report、coverage、trace | 14 天 | 只含合成数据、stable codes、source IDs |
-| failed test diagnostic | 14 天 | 不含 request/response body、Prompt、secret |
-| RC/Release Gate evidence | 365 天 | manifest、digest、无内容结果与审批 |
-| SBOM/provenance/signature | 365 天且不短于 image 可部署期 | 无用户数据 |
-| production image | 365 天；至少保留 current + previous 2 Accepted | 只读代码/运行时，无数据 |
-| server source map | image 内或受限 artifact 最长 30 天 | 不公开上传，不含 secret |
-| client source map | v1 不外传 | 如需服务商须先隐私/区域/TTL评审 |
+| Artifact                             |                                       默认期限 | 内容边界                                   |
+| ------------------------------------ | ---------------------------------------------: | ------------------------------------------ |
+| PR/main test report、coverage、trace |                                          14 天 | 只含合成数据、stable codes、source IDs     |
+| failed test diagnostic               |                                          14 天 | 不含 request/response body、Prompt、secret |
+| RC/Release Gate evidence             |                                         365 天 | manifest、digest、无内容结果与审批         |
+| SBOM/provenance/signature            |                  365 天且不短于 image 可部署期 | 无用户数据                                 |
+| production image                     | 365 天；至少保留 current + previous 2 Accepted | 只读代码/运行时，无数据                    |
+| server source map                    |             image 内或受限 artifact 最长 30 天 | 不公开上传，不含 secret                    |
+| client source map                    |                                      v1 不外传 | 如需服务商须先隐私/区域/TTL评审            |
 
 GitHub artifact 可以为每个上传项配置 `retention-days` 并提供 digest 校验；项目必须显式设置期限，不能依赖组织默认值：
 
@@ -613,18 +613,18 @@ remote Turbo cache 在 v1 继续禁用。job-local cache 只含可重建依赖/�
 
 ### 20.2 回滚矩阵
 
-| 变更 | 代码回滚 | 数据动作 |
-|---|---|---|
-| 无 DB/config contract 变化 | 允许 | 切回旧 digest，验证 startup/smoke |
-| additive expand migration | 若旧代码兼容新增结构则允许 | 保留 schema，不执行 down |
-| deploy config 变化 | 允许回到旧 manifest/config fingerprint | secret version 需单独判断 |
-| runtime catalog publish | 使用上一 Accepted catalog release | 已发布历史结果不重生成 |
-| secret rotation | 通常不回到已吊销 secret | 修复 consumer，继续使用新 secret |
-| event/job N 且旧 consumer 支持 | 允许 | 原 id 重投，禁止清 queue |
-| contract/drop/type narrowing 已执行 | 默认不允许 | roll forward；必要时全环境隔离恢复 |
-| 数据写入逻辑损坏但 facts 可识别 | 停写/contain，受审修复 | 不用未经验证脚本直接改生产 |
-| 数据/删除/backup corruption | 普通代码回滚不足 | S-23 incident + 隔离 restore |
-| secret/provider/profile 泄露 | 先吊销/禁 route | 回滚不能替代轮换和影响调查 |
+| 变更                                | 代码回滚                               | 数据动作                           |
+| ----------------------------------- | -------------------------------------- | ---------------------------------- |
+| 无 DB/config contract 变化          | 允许                                   | 切回旧 digest，验证 startup/smoke  |
+| additive expand migration           | 若旧代码兼容新增结构则允许             | 保留 schema，不执行 down           |
+| deploy config 变化                  | 允许回到旧 manifest/config fingerprint | secret version 需单独判断          |
+| runtime catalog publish             | 使用上一 Accepted catalog release      | 已发布历史结果不重生成             |
+| secret rotation                     | 通常不回到已吊销 secret                | 修复 consumer，继续使用新 secret   |
+| event/job N 且旧 consumer 支持      | 允许                                   | 原 id 重投，禁止清 queue           |
+| contract/drop/type narrowing 已执行 | 默认不允许                             | roll forward；必要时全环境隔离恢复 |
+| 数据写入逻辑损坏但 facts 可识别     | 停写/contain，受审修复                 | 不用未经验证脚本直接改生产         |
+| 数据/删除/backup corruption         | 普通代码回滚不足                       | S-23 incident + 隔离 restore       |
+| secret/provider/profile 泄露        | 先吊销/禁 route                        | 回滚不能替代轮换和影响调查         |
 
 ### 20.3 硬触发
 
@@ -759,14 +759,14 @@ PostgreSQL 官方文档说明 PITR 需要连续 WAL 序列；`pg_verifybackup` �
 
 ## 24. 灾难恢复目标与已知限制
 
-| 项目 | Phase 1/Beta 目标 | 限制 |
-|---|---|---|
-| PostgreSQL RPO | ≤15 分钟 | 依赖连续 WAL；gap 时阻断发布 |
-| Application host RTO | ≤2 小时重建到 readiness | 单 host 非 HA，可能用户可见维护 |
-| 全数据库恢复 RTO | ≤4 小时工程目标 | 数据量和 detector 增长后需复测 |
-| Redis RPO | 不适用 | 不恢复事实；从 PG 重建 |
-| Object derivative | 按 PDM 重新生成或保持删除 | share/export 不保证恢复 |
-| Region disaster | v1 无自动跨区 failover | 需要新 ADR 和隐私/跨境评审 |
+| 项目                 | Phase 1/Beta 目标         | 限制                            |
+| -------------------- | ------------------------- | ------------------------------- |
+| PostgreSQL RPO       | ≤15 分钟                  | 依赖连续 WAL；gap 时阻断发布    |
+| Application host RTO | ≤2 小时重建到 readiness   | 单 host 非 HA，可能用户可见维护 |
+| 全数据库恢复 RTO     | ≤4 小时工程目标           | 数据量和 detector 增长后需复测  |
+| Redis RPO            | 不适用                    | 不恢复事实；从 PG 重建          |
+| Object derivative    | 按 PDM 重新生成或保持删除 | share/export 不保证恢复         |
+| Region disaster      | v1 无自动跨区 failover    | 需要新 ADR 和隐私/跨境评审      |
 
 - 目标只在 A-008/RC 演练通过后可声明为内部 readiness；
 - 单区域失败可能超过 RTO；MVP 不宣传高可用；
@@ -775,15 +775,15 @@ PostgreSQL 官方文档说明 PITR 需要连续 WAL 序列；`pg_verifybackup` �
 
 ## 25. Emergency switch 与配置回滚
 
-| Switch | 允许作用 | 禁止 |
-|---|---|---|
-| Maintenance | 暂停普通写/生成或整个普通入口 | 替换 Safety、自称删除完成 |
-| Provider route disable | 跳过受影响 provider，走受控 template | 改写历史结果、未评审临时 provider |
-| Feature entry disable | 关闭特定入口/写命令 | 解除 owner/consent/delete |
-| Admin freeze | 关闭后台/session | 阻断用户自助必要权利 |
-| Resource disable | 下线错误 Safety 资源并使用已审核 fallback | 客服临时自由文本 |
-| Deletion/restore freeze | 阻止不可信清理/恢复步骤继续 | 解除已生效 guard |
-| Queue intake pause | 暂停新消费、保留权威 outbox/task | 清空 queue/换 business id |
+| Switch                  | 允许作用                                  | 禁止                              |
+| ----------------------- | ----------------------------------------- | --------------------------------- |
+| Maintenance             | 暂停普通写/生成或整个普通入口             | 替换 Safety、自称删除完成         |
+| Provider route disable  | 跳过受影响 provider，走受控 template      | 改写历史结果、未评审临时 provider |
+| Feature entry disable   | 关闭特定入口/写命令                       | 解除 owner/consent/delete         |
+| Admin freeze            | 关闭后台/session                          | 阻断用户自助必要权利              |
+| Resource disable        | 下线错误 Safety 资源并使用已审核 fallback | 客服临时自由文本                  |
+| Deletion/restore freeze | 阻止不可信清理/恢复步骤继续               | 解除已生效 guard                  |
+| Queue intake pause      | 暂停新消费、保留权威 outbox/task          | 清空 queue/换 business id         |
 
 - switch 必须有 type/version、environment、scope、reason code、actor/approver role、created/expires 和 outcome；
 - 默认自动到期；延长需新批准；
@@ -796,36 +796,49 @@ PostgreSQL 官方文档说明 PITR 需要连续 WAL 序列；`pg_verifybackup` �
 
 以下在真实用户 Production 前必须由 E-011/E-012/A-008 关闭：
 
-| Gate | 当前状态 | 解除条件 |
-|---|---|---|
-| 云厂商、账户主体、region | BLOCKED | 主体、区域、网络、账单、责任和退出方案确定 |
-| PostgreSQL/Redis/object 服务 | BLOCKED | 版本、digest/服务级别、backup、PITR、TTL、加密、访问和演练通过 |
-| 域名、TLS、备案/小程序业务域名 | BLOCKED | 合法主体、证书、续期、微信 allowlist 和故障路径 |
-| Production WeChat identity | BLOCKED | AppID/secret、回调、轮换、测试/生产隔离 |
-| AI provider/subprocessor | BLOCKED | S-12/S-21 data profile、region/training/retention/删除/合同合格 |
-| Admin enterprise identity | BLOCKED | SSO/MFA/RBAC、离职撤权、审计；否则生产 Admin disabled |
-| CI runner/registry/artifact | BLOCKED | 区域、访问、retention、OIDC、action pin、scan 和退出 |
-| Backup key/restore ledger | BLOCKED | 独立 authority、35 天 expiry、隔离恢复和 deleted-data detector |
-| On-call/status/legal contacts | BLOCKED | 真实角色、渠道、演练和适用法律路径；不得预填个人信息 |
-| Cross-border state | UNVERIFIED | 所有云/provider/support/log/CI 路径确认并完成适用评审 |
+| Gate                           | 当前状态   | 解除条件                                                        |
+| ------------------------------ | ---------- | --------------------------------------------------------------- |
+| 云厂商、账户主体、region       | BLOCKED    | 主体、区域、网络、账单、责任和退出方案确定                      |
+| PostgreSQL/Redis/object 服务   | BLOCKED    | 版本、digest/服务级别、backup、PITR、TTL、加密、访问和演练通过  |
+| 域名、TLS、备案/小程序业务域名 | BLOCKED    | 合法主体、证书、续期、微信 allowlist 和故障路径                 |
+| Production WeChat identity     | BLOCKED    | AppID/secret、回调、轮换、测试/生产隔离                         |
+| AI provider/subprocessor       | BLOCKED    | S-12/S-21 data profile、region/training/retention/删除/合同合格 |
+| Admin enterprise identity      | BLOCKED    | SSO/MFA/RBAC、离职撤权、审计；否则生产 Admin disabled           |
+| CI runner/registry/artifact    | BLOCKED    | 区域、访问、retention、OIDC、action pin、scan 和退出            |
+| Backup key/restore ledger      | BLOCKED    | 独立 authority、35 天 expiry、隔离恢复和 deleted-data detector  |
+| On-call/status/legal contacts  | BLOCKED    | 真实角色、渠道、演练和适用法律路径；不得预填个人信息            |
+| Cross-border state             | UNVERIFIED | 所有云/provider/support/log/CI 路径确认并完成适用评审           |
 
 文档完成不解除这些 Gate，也不授权创建账号或购买资源。
 
+### 26.1 E-014 开发准入边界
+
+E-012 已接受的真实 DEV `deploy N+1 → reconcile-current → rollback N → redeploy N+1` 证据在
+部署合同、release manifest、image digest 和 DEV topology 未发生语义变化时可以复用；E-014
+不为重复证明同一事实而再次操作服务器或产生新云费用。完整 CI、clean Compose、真实
+PostgreSQL 18 / replacement Redis 8 rebuild 和 secret/content/capability Gate 仍需在 E-014
+final head 上重新执行。
+
+复用只支持 `CONDITIONAL_GO_FOR_PHASE_2`。它不证明 Production PostgreSQL backup/PITR、当前
+deletion ledger、真实 alert delivery、真实 backend TTL、独立 Production stateful services、
+域名/identity/on-call、跨境或用户流量安全。上述 26 节 Gate 任一未关闭时，Production/RC 必须
+保持 `NO_GO`；不得用 DEV disposable state、checksum、静态配置或 synthetic probe 替代。
+
 ## 27. E-009～E-013 实施交接
 
-| 任务 | S-32 直接输入 |
-|---|---|
-| E-003 | API startup/liveness/readiness、config Schema、profile fingerprint、maintenance response |
-| E-004 | public build config、环境 API origin、DevTools runner、server compatibility |
-| E-005 | Admin 独立 origin/session、production-disabled Gate、bundle/secret scan |
-| E-006 | migration owner、expand/backfill/contract、PITR、grants、restore ledger/detector hook |
-| E-007 | Redis empty rebuild、queue version、drain、graceful shutdown、profile allowlist |
-| E-009 | common/local/staging-like Compose、production overlay contract、stub/fault/recovery profile |
-| E-010 | migration/release/rollback/backup/restore 场景注册与 fault hook |
+| 任务  | S-32 直接输入                                                                                                                                  |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| E-003 | API startup/liveness/readiness、config Schema、profile fingerprint、maintenance response                                                       |
+| E-004 | public build config、环境 API origin、DevTools runner、server compatibility                                                                    |
+| E-005 | Admin 独立 origin/session、production-disabled Gate、bundle/secret scan                                                                        |
+| E-006 | migration owner、expand/backfill/contract、PITR、grants、restore ledger/detector hook                                                          |
+| E-007 | Redis empty rebuild、queue version、drain、graceful shutdown、profile allowlist                                                                |
+| E-009 | common/local/staging-like Compose、production overlay contract、stub/fault/recovery profile                                                    |
+| E-010 | migration/release/rollback/backup/restore 场景注册与 fault hook                                                                                |
 | E-011 | build-once、digest、SBOM/provenance、OIDC/environments、artifact TTL、platform required Gate；能力不可用时仅允许 testing 22.2 的有期限补偿控制 |
-| E-012 | 单 host Compose、reverse proxy/TLS、external PG/Redis/object、release/rollback runbook |
-| E-013 | S-33 稳定 metrics/alerts、backup/WAL/secret/cert/deploy signals |
-| E-014 | clean environment、CI、staging deploy、rollback、PITR/restore、secret/content Gate 证明 |
+| E-012 | 单 host Compose、reverse proxy/TLS、external PG/Redis/object、release/rollback runbook                                                         |
+| E-013 | S-33 稳定 metrics/alerts、backup/WAL/secret/cert/deploy signals                                                                                |
+| E-014 | clean environment、CI、staging deploy、rollback、PITR/restore、secret/content Gate 证明                                                        |
 
 E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempotent deployment entry、Release Manifest、锁、preflight、审批、proof、rollback target 和恢复演练。
 
@@ -833,81 +846,81 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
 
 ### 28.1 环境、配置与 secret（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S32-DEPLOY-001 | STAGING 配置指向 PRODUCTION DB | environment fingerprint 失败，进程不监听/消费 |
-| S32-DEPLOY-002 | 未知项目环境变量注入 | closed config Gate 失败 |
-| S32-DEPLOY-003 | API 获得 migration owner secret | capability/secret manifest Gate 失败 |
-| S32-DEPLOY-004 | Interactive 获得 Restricted provider cleanup key | service secret allowlist 失败 |
-| S32-DEPLOY-005 | secret 明文出现在 Compose/config/log | secret scan 失败并按事件流程隔离 |
-| S32-DEPLOY-006 | production debug/body log=true | startup fail closed |
-| S32-DEPLOY-007 | secret version 已吊销但 manifest 仍引用 | deployment/startup 失败，不回退旧 secret |
-| S32-DEPLOY-008 | untrusted PR 请求 OIDC production token | permission/environment protection 拒绝 |
+| ID             | 场景                                             | 必须结果                                      |
+| -------------- | ------------------------------------------------ | --------------------------------------------- |
+| S32-DEPLOY-001 | STAGING 配置指向 PRODUCTION DB                   | environment fingerprint 失败，进程不监听/消费 |
+| S32-DEPLOY-002 | 未知项目环境变量注入                             | closed config Gate 失败                       |
+| S32-DEPLOY-003 | API 获得 migration owner secret                  | capability/secret manifest Gate 失败          |
+| S32-DEPLOY-004 | Interactive 获得 Restricted provider cleanup key | service secret allowlist 失败                 |
+| S32-DEPLOY-005 | secret 明文出现在 Compose/config/log             | secret scan 失败并按事件流程隔离              |
+| S32-DEPLOY-006 | production debug/body log=true                   | startup fail closed                           |
+| S32-DEPLOY-007 | secret version 已吊销但 manifest 仍引用          | deployment/startup 失败，不回退旧 secret      |
+| S32-DEPLOY-008 | untrusted PR 请求 OIDC production token          | permission/environment protection 拒绝        |
 
 ### 28.2 构建、镜像与供应链（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S32-DEPLOY-009 | production host 现场 build | Release Gate 失败 |
-| S32-DEPLOY-010 | tag 相同但 image digest 漂移 | manifest/digest 验证失败 |
-| S32-DEPLOY-011 | base image 使用 `latest` | static/supply-chain Gate 失败 |
-| S32-DEPLOY-012 | image layer 含 `.env`/test fixture/Prompt | image content Gate 失败 |
-| S32-DEPLOY-013 | SBOM/provenance 缺失或不匹配 | 不得晋级 staging/production |
-| S32-DEPLOY-014 | staging PASS 后 production 重新 build | 新 digest 必须重新完整 Gate |
-| S32-DEPLOY-015 | workflow action 只 pin mutable tag | CI policy 失败 |
-| S32-DEPLOY-016 | artifact 下载 digest mismatch | 停止部署，artifact 隔离 |
+| ID             | 场景                                      | 必须结果                      |
+| -------------- | ----------------------------------------- | ----------------------------- |
+| S32-DEPLOY-009 | production host 现场 build                | Release Gate 失败             |
+| S32-DEPLOY-010 | tag 相同但 image digest 漂移              | manifest/digest 验证失败      |
+| S32-DEPLOY-011 | base image 使用 `latest`                  | static/supply-chain Gate 失败 |
+| S32-DEPLOY-012 | image layer 含 `.env`/test fixture/Prompt | image content Gate 失败       |
+| S32-DEPLOY-013 | SBOM/provenance 缺失或不匹配              | 不得晋级 staging/production   |
+| S32-DEPLOY-014 | staging PASS 后 production 重新 build     | 新 digest 必须重新完整 Gate   |
+| S32-DEPLOY-015 | workflow action 只 pin mutable tag        | CI policy 失败                |
+| S32-DEPLOY-016 | artifact 下载 digest mismatch             | 停止部署，artifact 隔离       |
 
 ### 28.3 Migration 与兼容（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S32-DEPLOY-017 | API startup 自动运行 migration | startup/static Gate 失败 |
-| S32-DEPLOY-018 | 修改已应用 migration checksum | migration history Gate 失败 |
+| ID             | 场景                             | 必须结果                                      |
+| -------------- | -------------------------------- | --------------------------------------------- |
+| S32-DEPLOY-017 | API startup 自动运行 migration   | startup/static Gate 失败                      |
+| S32-DEPLOY-018 | 修改已应用 migration checksum    | migration history Gate 失败                   |
 | S32-DEPLOY-019 | rename/drop 与新代码同一 release | compatibility Gate 失败，拆为 expand/contract |
-| S32-DEPLOY-020 | backfill 中处理已删 scope | guard/source 检查拒绝 |
-| S32-DEPLOY-021 | Migration Job 使用 api-app role | DB role/grant Gate 失败 |
-| S32-DEPLOY-022 | migration lock/statement timeout | 原 transaction 失败并停止，不无限等待 |
-| S32-DEPLOY-023 | expand 后回滚旧代码仍兼容 | 保留新 schema，旧 release smoke 通过 |
-| S32-DEPLOY-024 | contract drop 后请求代码回滚 | 拒绝；roll forward 或隔离 restore |
+| S32-DEPLOY-020 | backfill 中处理已删 scope        | guard/source 检查拒绝                         |
+| S32-DEPLOY-021 | Migration Job 使用 api-app role  | DB role/grant Gate 失败                       |
+| S32-DEPLOY-022 | migration lock/statement timeout | 原 transaction 失败并停止，不无限等待         |
+| S32-DEPLOY-023 | expand 后回滚旧代码仍兼容        | 保留新 schema，旧 release smoke 通过          |
+| S32-DEPLOY-024 | contract drop 后请求代码回滚     | 拒绝；roll forward 或隔离 restore             |
 
 ### 28.4 发布、Worker 与回滚（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S32-DEPLOY-025 | N producer 先于支持 N 的 consumer | deployment order Gate 失败 |
-| S32-DEPLOY-026 | deploy 时清空 Redis queue | 禁止；保留 outbox/task 并按原 id 恢复 |
-| S32-DEPLOY-027 | Worker commit 后 shutdown/ACK 前终止 | 原 job 重投，Inbox 保证单效果 |
-| S32-DEPLOY-028 | old worker 收到新 guard epoch job | 运行时拒绝，不因旧 image 发布 |
-| S32-DEPLOY-029 | Admin SSO/RBAC 未完成却启用生产 | readiness/Production Gate 失败 |
-| S32-DEPLOY-030 | 单 host candidate internal smoke PASS 后切流 | 记录同一 digest/fingerprint，才能切换 |
-| S32-DEPLOY-031 | Safety/owner/delete smoke 失败但普通页面成功 | 立即 containment，发布失败 |
-| S32-DEPLOY-032 | rollback target 有已知 Safety 缺陷 | 不得回滚；选择安全 roll-forward/其它 Accepted target |
+| ID             | 场景                                         | 必须结果                                             |
+| -------------- | -------------------------------------------- | ---------------------------------------------------- |
+| S32-DEPLOY-025 | N producer 先于支持 N 的 consumer            | deployment order Gate 失败                           |
+| S32-DEPLOY-026 | deploy 时清空 Redis queue                    | 禁止；保留 outbox/task 并按原 id 恢复                |
+| S32-DEPLOY-027 | Worker commit 后 shutdown/ACK 前终止         | 原 job 重投，Inbox 保证单效果                        |
+| S32-DEPLOY-028 | old worker 收到新 guard epoch job            | 运行时拒绝，不因旧 image 发布                        |
+| S32-DEPLOY-029 | Admin SSO/RBAC 未完成却启用生产              | readiness/Production Gate 失败                       |
+| S32-DEPLOY-030 | 单 host candidate internal smoke PASS 后切流 | 记录同一 digest/fingerprint，才能切换                |
+| S32-DEPLOY-031 | Safety/owner/delete smoke 失败但普通页面成功 | 立即 containment，发布失败                           |
+| S32-DEPLOY-032 | rollback target 有已知 Safety 缺陷           | 不得回滚；选择安全 roll-forward/其它 Accepted target |
 
 ### 28.5 Backup、PITR 与恢复（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S32-DEPLOY-033 | WAL archive gap 超过 15 分钟目标 | backup/release Gate 失败并升级 |
-| S32-DEPLOY-034 | 36 天 backup 仍可恢复 | retention Gate 失败，阻止使用并清理 |
-| S32-DEPLOY-035 | `pg_verifybackup` PASS 但未做 test restore | readiness 仍不完整 |
-| S32-DEPLOY-036 | 从删除前 PITR point 恢复 | 保持隔离，重放当前 ledger/restore deny 后 detector |
-| S32-DEPLOY-037 | 当前 deletion ledger 不可获得 | 恢复不得对外 |
-| S32-DEPLOY-038 | 恢复旧 Redis snapshot | 拒绝；空 Redis 从 PG 重建 |
-| S32-DEPLOY-039 | restore 后旧 provider callback/notification 到达 | guard/claim/version 拒绝，不复活 |
-| S32-DEPLOY-040 | RECOVERY 环境验证完成 | 24h 内销毁副本并记录无内容证明 |
+| ID             | 场景                                             | 必须结果                                           |
+| -------------- | ------------------------------------------------ | -------------------------------------------------- |
+| S32-DEPLOY-033 | WAL archive gap 超过 15 分钟目标                 | backup/release Gate 失败并升级                     |
+| S32-DEPLOY-034 | 36 天 backup 仍可恢复                            | retention Gate 失败，阻止使用并清理                |
+| S32-DEPLOY-035 | `pg_verifybackup` PASS 但未做 test restore       | readiness 仍不完整                                 |
+| S32-DEPLOY-036 | 从删除前 PITR point 恢复                         | 保持隔离，重放当前 ledger/restore deny 后 detector |
+| S32-DEPLOY-037 | 当前 deletion ledger 不可获得                    | 恢复不得对外                                       |
+| S32-DEPLOY-038 | 恢复旧 Redis snapshot                            | 拒绝；空 Redis 从 PG 重建                          |
+| S32-DEPLOY-039 | restore 后旧 provider callback/notification 到达 | guard/claim/version 拒绝，不复活                   |
+| S32-DEPLOY-040 | RECOVERY 环境验证完成                            | 24h 内销毁副本并记录无内容证明                     |
 
 ### 28.6 Artifact、网络与运营 Gate（8）
 
-| ID | 场景 | 必须结果 |
-|---|---|---|
-| S32-DEPLOY-041 | CI artifact 含用户文本/Prompt/secret | 上传/晋级失败，隔离并按事件处理 |
-| S32-DEPLOY-042 | 普通 test artifact 超过 14 天 | lifecycle 删除 |
-| S32-DEPLOY-043 | 未评审启用第三方 remote cache | policy Gate 失败 |
-| S32-DEPLOY-044 | Restricted Worker 可访问任意互联网 | egress policy Gate 失败 |
-| S32-DEPLOY-045 | container 可访问 Docker socket/cloud metadata | runtime security Gate 失败 |
-| S32-DEPLOY-046 | emergency switch 无 expiry/approver | 操作拒绝 |
-| S32-DEPLOY-047 | 云/主体/区域/跨境仍 UNVERIFIED | production release BLOCKED |
-| S32-DEPLOY-048 | RC 完整发布/回滚/PITR 恢复 | manifest、digest、migration、ledger、detector、Gate 证据全部可追踪 |
+| ID             | 场景                                          | 必须结果                                                           |
+| -------------- | --------------------------------------------- | ------------------------------------------------------------------ |
+| S32-DEPLOY-041 | CI artifact 含用户文本/Prompt/secret          | 上传/晋级失败，隔离并按事件处理                                    |
+| S32-DEPLOY-042 | 普通 test artifact 超过 14 天                 | lifecycle 删除                                                     |
+| S32-DEPLOY-043 | 未评审启用第三方 remote cache                 | policy Gate 失败                                                   |
+| S32-DEPLOY-044 | Restricted Worker 可访问任意互联网            | egress policy Gate 失败                                            |
+| S32-DEPLOY-045 | container 可访问 Docker socket/cloud metadata | runtime security Gate 失败                                         |
+| S32-DEPLOY-046 | emergency switch 无 expiry/approver           | 操作拒绝                                                           |
+| S32-DEPLOY-047 | 云/主体/区域/跨境仍 UNVERIFIED                | production release BLOCKED                                         |
+| S32-DEPLOY-048 | RC 完整发布/回滚/PITR 恢复                    | manifest、digest、migration、ledger、detector、Gate 证据全部可追踪 |
 
 ## 29. 验收标准
 
@@ -976,8 +989,11 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
   该合并批准不包含删除 PostgreSQL/Redis volume；
 - 2026-08-10 修订：用户明确接受 E-012 的 release-scoped file secret materialization 与
   `SUPERSEDED_BEFORE_MIGRATION` 首次失败候选替换合同，并批准合并 PR #127；
+- 2026-08-12 E-014 修订：用户明确选择分层 Gate；E-012 有效 DEV deploy/rollback 证据可复用于
+  Phase 2 development admission，PITR/restore、真实 alert delivery/TTL、微信 runner/真机与
+  incident/manual RC 仍为 Production `NO_GO`。testing 22.2 的补偿控制只延续到 development
+  merges，进入任一 RC 前必须停止；
 - 2026-08-04 修订：用户明确接受测试策略 22.2 的私有 GitHub Free 临时补偿控制；
-  E-014/RC 前必须恢复 platform-enforced required checks；
 - 内容 PR：[PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)；
 - 基线：`main`（S-31 测试策略已随 PR #36 合并并获用户确认）；
 - 已确认范围：环境、单 host Compose、profile 能力、Release Manifest、配置/secret、migration、发布/回滚、backup/PITR、隔离恢复、artifact/供应链与 48 个场景；

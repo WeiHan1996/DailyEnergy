@@ -420,6 +420,11 @@ Phase 0A 的正式文档状态均为 Accepted，冲突时以已接受 ADR 和规
 - 不包含业务密钥和真实用户数据；
 - 开发环境可通过固定地址访问。
 
+E-014 对退出门槛使用分层判定：满足上述工程骨架与开发环境条件后，可以给出 Phase 2
+development `CONDITIONAL_GO`；Production/RC 的 PITR、真实 alert delivery/TTL、微信真机和
+manual incident evidence 不因此通过，仍按各自 Gate 保持 `NO_GO`。下游业务 Source ID 的
+`PLANNED` 必须显式有 owner/reason，但不要求在进入其所属 Phase 前提前 `COVERED`。
+
 ### 本阶段不做
 
 - 大量业务页面；
@@ -791,7 +796,7 @@ S-12 完成后，再依据实际 Issue 数量制定：
 - E-009 已随 PR #115 squash 合并并进入 Done，merged `main` 的完整验证通过；
 - E-010 已随 PR #117 squash 合并并进入 Done；
 - E-011 已随 PR #119 squash 合并并进入 Done，11/11 CI Gate 与 365 天供应链证据通过；
-- E-012 是唯一当前任务；代码前置已满足，但在开发基础设施获得明确选择与授权前保持 Blocked；
+- E-012/E-013 已完成；E-014 是唯一当前任务，正在形成 Phase 2 development 条件放行与 Production/RC NO-GO 的分层 Gate；
 - D-001～D-005 已进入 Phase 2 路线图，当前均为 Planned；
 - 当前唯一执行任务由 tasks/current.md 指定；
 - C-003、C-004、C-009 在 D-004 被接受前不得开始正式页面实现；

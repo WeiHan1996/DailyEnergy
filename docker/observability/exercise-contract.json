@@ -1,23 +1,42 @@
 {
-  "contract_version": "dailyenergy-observability-exercise-v1",
-  "status": "E014_REQUIRED",
-  "completed": false,
+  "contract_version": "dailyenergy-observability-exercise-v2",
+  "development_gate": {
+    "status": "CONDITIONAL_GO_FOR_PHASE_2",
+    "evidence_status": "ACCEPTED_FOR_DEVELOPMENT_MERGE",
+    "owner_decision": "ACCEPTED_FOR_THIS_DEVELOPMENT_MERGE_ONLY",
+    "accepted_on": "2026-08-12",
+    "threat_boundary_review": "COMPLETED",
+    "production_authorization": "NOT_GRANTED",
+    "allowed_claim": "REFERENCE_STACK_AND_DEVELOPMENT_CONTROLS_VERIFIED",
+    "production_readiness_claim": "PROHIBITED"
+  },
+  "production_rc_gate": {
+    "status": "NO_GO",
+    "completed": false,
+    "pass_claim": "PROHIBITED",
+    "required_evidence": [
+      "SIGNAL_CONTRACT",
+      "SLO_28D_PROVISIONAL",
+      "BURN_14_4_AND_6",
+      "LOW_TRAFFIC_CORROBORATION",
+      "HARD_TRIGGER",
+      "ALERT_CONTRACT",
+      "RUNBOOK_EXECUTION",
+      "COST_70_85_100_UNKNOWN",
+      "RETENTION_TTL_DELETION",
+      "ALERT_DELIVERY_CANARY",
+      "COLLECTOR_BACKEND_OUTAGE",
+      "RECOVERY_OBSERVATION_WINDOW"
+    ],
+    "blocked_evidence": [
+      "REAL_ALERT_DELIVERY",
+      "REAL_BACKEND_TTL_DELETION",
+      "PRODUCTION_BACKEND_OUTAGE",
+      "FULL_INCIDENT_AND_RECOVERY_EXERCISE"
+    ]
+  },
   "allowed_environments": ["CI", "STAGING", "RECOVERY"],
   "production_business_facts_allowed": false,
-  "required_evidence": [
-    "SIGNAL_CONTRACT",
-    "SLO_28D_PROVISIONAL",
-    "BURN_14_4_AND_6",
-    "LOW_TRAFFIC_CORROBORATION",
-    "HARD_TRIGGER",
-    "ALERT_CONTRACT",
-    "RUNBOOK_EXECUTION",
-    "COST_70_85_100_UNKNOWN",
-    "RETENTION_TTL_DELETION",
-    "ALERT_DELIVERY_CANARY",
-    "COLLECTOR_BACKEND_OUTAGE",
-    "RECOVERY_OBSERVATION_WINDOW"
-  ],
   "forbidden_evidence": [
     "REAL_USER_CONTENT",
     "PROMPT",
@@ -27,5 +46,5 @@
     "UNVERIFIED_PASS"
   ],
   "acceptance_owner": "PROJECT_OWNER",
-  "execution_owner": "E014_MANUAL_RC"
+  "execution_owner": "RELEASE_CANDIDATE_MANUAL_RC"
 }
