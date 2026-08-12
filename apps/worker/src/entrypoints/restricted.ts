@@ -2,6 +2,7 @@ import type {
   DatabaseConnection,
   DatabaseFactory,
   QueueJobHandler,
+  QueueTelemetrySink,
   WorkerInfrastructureConfig,
   WorkerInfrastructureRuntime,
 } from "@daily-energy/server-adapters/worker-restricted";
@@ -9,12 +10,16 @@ import {
   createWorkerRestrictedDatabaseFactory,
   fingerprintCapabilityManifest,
   startWorkerRestrictedInfrastructure,
+  startWorkerRestrictedTelemetry,
   workerRestrictedManifest,
 } from "@daily-energy/server-adapters/worker-restricted";
+
+export const restrictedTelemetryFactory = startWorkerRestrictedTelemetry;
 
 export type WorkerInfrastructureStarter = (
   config: WorkerInfrastructureConfig,
   handlers: readonly QueueJobHandler[],
+  telemetry?: QueueTelemetrySink,
 ) => Promise<WorkerInfrastructureRuntime>;
 
 export interface WorkerProcess {
@@ -27,7 +32,10 @@ export interface WorkerEntrypoint {
   readonly capabilityFingerprint: string;
   readonly profile: "worker-restricted";
   readonly capabilityFingerprintSource: typeof workerRestrictedManifest;
-  start(config: WorkerInfrastructureConfig): Promise<WorkerProcess>;
+  start(
+    config: WorkerInfrastructureConfig,
+    telemetry?: QueueTelemetrySink,
+  ): Promise<WorkerProcess>;
 }
 
 export function createRestrictedWorkerEntrypoint(
@@ -44,11 +52,18 @@ export function createRestrictedWorkerEntrypoint(
     ),
     capabilityFingerprintSource: workerRestrictedManifest,
     profile: "worker-restricted",
-    async start(config: WorkerInfrastructureConfig): Promise<WorkerProcess> {
+    async start(
+      config: WorkerInfrastructureConfig,
+      telemetry?: QueueTelemetrySink,
+    ): Promise<WorkerProcess> {
       const database = await databaseFactory.connect(config.database);
       let runtime: WorkerInfrastructureRuntime;
       try {
-        runtime = await infrastructureStarter(config, handlers);
+        runtime = await infrastructureStarter(
+          config,
+          handlers,
+          ...(telemetry === undefined ? [] : [telemetry]),
+        );
       } catch (error) {
         await database.disconnect();
         throw error;

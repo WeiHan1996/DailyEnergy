@@ -1,8 +1,13 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
+import { createServer, type AddressInfo } from "node:net";
 import { resolve } from "node:path";
 
 import type { INestApplication } from "@nestjs/common";
+import type {
+  TelemetryRuntime,
+  TelemetrySpan,
+} from "@daily-energy/server-adapters/api";
 import request from "supertest";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -71,6 +76,7 @@ async function createTestApplication(options?: {
   readonly publicAudienceVerifier?: AudienceVerifier;
   readonly readinessChecks?: readonly ReadinessCheck[];
   readonly safetyContinuationVerifier?: SafetyContinuationVerifier;
+  readonly telemetryRuntime?: TelemetryRuntime;
 }): Promise<INestApplication> {
   const silentLogSink: OrdinaryLogSink = {
     write: () => undefined,
@@ -99,6 +105,9 @@ async function createTestApplication(options?: {
         : {
             safetyContinuationVerifier: options.safetyContinuationVerifier,
           }),
+      ...(options?.telemetryRuntime === undefined
+        ? {}
+        : { telemetryRuntime: options.telemetryRuntime }),
     },
   );
   await application.listen(0, "127.0.0.1");
@@ -370,6 +379,97 @@ describe("API HTTP baseline", () => {
       reason_code: "VALIDATION_FAILED",
     });
   });
+
+  it("records low-cardinality HTTP telemetry without raw request data", async () => {
+    const records: Parameters<TelemetryRuntime["record"]>[] = [];
+    const ended: Parameters<TelemetrySpan["end"]>[0][] = [];
+    const beginSpan = vi.fn<TelemetryRuntime["beginSpan"]>(() => ({
+      end: (outcome) => ended.push(outcome),
+    }));
+    const telemetryRuntime: TelemetryRuntime = {
+      beginSpan,
+      record: (...record) => records.push(record),
+      shutdown: vi.fn(async () => undefined),
+      startSpan: (_operation, _attributes, run) => run(),
+    };
+    const application = await createTestApplication({
+      readinessChecks: [
+        {
+          check: () => ({
+            reasonCode: "REQUIRED_DEPENDENCY_UNAVAILABLE",
+            status: "DOWN",
+          }),
+        },
+      ],
+      telemetryRuntime,
+    });
+    const server = application.getHttpServer();
+
+    await request(server).get("/health/live?secret=never-export").expect(200);
+    await request(server)
+      .post("/v1/auth/wechat/session")
+      .send({ code: "never-export-body", unknown: "never-export-field" })
+      .expect(400);
+    await request(server).get("/health/ready").expect(503);
+
+    expect(beginSpan).toHaveBeenCalledTimes(3);
+    expect(records).toEqual(
+      expect.arrayContaining([
+        [
+          "dailyenergy_http_in_flight_requests",
+          1,
+          expect.objectContaining({ operationCode: "HEALTH_LIVE" }),
+        ],
+        [
+          "dailyenergy_http_in_flight_requests",
+          0,
+          expect.objectContaining({ operationCode: "HEALTH_LIVE" }),
+        ],
+      ]),
+    );
+    expect(records).toEqual(
+      expect.arrayContaining([
+        [
+          "dailyenergy_http_server_request_duration_seconds",
+          expect.any(Number),
+          expect.objectContaining({
+            operationCode: "HEALTH_LIVE",
+            outcomeCode: "SUCCESS",
+            statusClass: "2xx",
+          }),
+        ],
+        [
+          "dailyenergy_http_server_requests_total",
+          1,
+          expect.objectContaining({
+            operationCode: "PUBLIC_WECHAT_SESSION_PLACEHOLDER",
+            outcomeCode: "EXPECTED_REJECT",
+            statusClass: "4xx",
+          }),
+        ],
+        [
+          "dailyenergy_http_server_requests_total",
+          1,
+          expect.objectContaining({
+            operationCode: "HEALTH_READY",
+            outcomeCode: "RETRYABLE",
+            statusClass: "5xx",
+          }),
+        ],
+      ]),
+    );
+    expect(
+      records.filter(
+        ([name, , attributes]) =>
+          name === "dailyenergy_http_server_request_duration_seconds" &&
+          attributes.statusClass === "5xx",
+      ),
+    ).toHaveLength(0);
+    expect(JSON.stringify(records)).not.toMatch(
+      /never-export|secret|body|raw_url|query/iu,
+    );
+    expect(ended).toEqual(["SUCCESS", "EXPECTED_REJECT", "RETRYABLE"]);
+  });
 });
 
 async function waitForOutput(
@@ -448,6 +548,57 @@ describe("API process lifecycle", () => {
     expect(output.value).toContain('"message_code":"API_SHUTDOWN_STARTED"');
     expect(output.value).toContain('"message_code":"API_SHUTDOWN_COMPLETED"');
     expect(output.value).not.toMatch(/authorization|secret|stack/iu);
+  }, 10_000);
+
+  it("keeps the API available when the metrics exporter cannot bind", async () => {
+    const blocker = createServer();
+    await new Promise<void>((resolvePromise, rejectPromise) => {
+      blocker.once("error", rejectPromise);
+      blocker.listen(0, "127.0.0.1", resolvePromise);
+    });
+    const metricsPort = (blocker.address() as AddressInfo).port;
+    const child = spawn(process.execPath, [resolve(apiRoot, "dist/main.js")], {
+      env: {
+        PATH: process.env.PATH,
+        ...syntheticEnvironment(),
+        DAILYENERGY_TELEMETRY_ENABLED: "true",
+        DAILYENERGY_TELEMETRY_METRICS_PORT: String(metricsPort),
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const output = { value: "" };
+    child.stdout.on("data", (chunk: Buffer) => {
+      output.value += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk: Buffer) => {
+      output.value += chunk.toString("utf8");
+    });
+
+    try {
+      await waitForOutput(child, output, '"message_code":"API_STARTED"');
+      child.kill("SIGTERM");
+      const [code, signal] = (await once(child, "exit")) as [
+        number | null,
+        NodeJS.Signals | null,
+      ];
+
+      expect(code).toBe(0);
+      expect(signal).toBeNull();
+      expect(output.value).not.toMatch(/body|authorization|secret/iu);
+    } finally {
+      if (child.exitCode === null && child.signalCode === null) {
+        child.kill("SIGKILL");
+      }
+      await new Promise<void>((resolvePromise, rejectPromise) => {
+        blocker.close((error) => {
+          if (error === undefined) {
+            resolvePromise();
+          } else {
+            rejectPromise(error);
+          }
+        });
+      });
+    }
   }, 10_000);
 
   it("terminates with a fixed result when shutdown drain exceeds the grace deadline", async () => {

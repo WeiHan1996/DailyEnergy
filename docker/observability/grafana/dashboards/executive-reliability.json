@@ -1,0 +1,88 @@
+{
+  "annotations": { "list": [] },
+  "editable": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Status: PROVISIONAL / BLOCKED",
+      "type": "stat",
+      "targets": [
+        { "expr": "min(dailyenergy_telemetry_heartbeat_timestamp_seconds)" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "S33-SLO-01 28d",
+      "type": "stat",
+      "targets": [{ "expr": "1 - dailyenergy:slo_core_api_error_ratio:28d" }]
+    },
+    {
+      "id": 3,
+      "title": "S33-SLO-02 / 03",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "dailyenergy:slo_core_read_good_ratio:28d" },
+        { "expr": "dailyenergy:slo_core_write_good_ratio:28d" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "S33-SLO-04 / 05",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "dailyenergy:slo_generation_available_ratio:28d" },
+        { "expr": "dailyenergy:slo_generation_latency_good_ratio:28d" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "S33-SLO-06 / 07 (S25 M20-M21)",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "dailyenergy:slo_ai_8s_good_ratio:28d" },
+        { "expr": "dailyenergy:slo_template_ratio:28d" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Error budget remaining",
+      "type": "gauge",
+      "targets": [{ "expr": "dailyenergy:slo_core_api_budget_remaining:28d" }]
+    },
+    {
+      "id": 7,
+      "title": "Synthetic signal (separate)",
+      "type": "stat",
+      "targets": [{ "expr": "dailyenergy_synthetic_probe_success" }]
+    },
+    {
+      "id": 8,
+      "title": "Current / previous release",
+      "type": "table",
+      "targets": [{ "expr": "dailyenergy_release_gate_total" }]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": [
+    "dailyenergy",
+    "reliability",
+    "contract:dailyenergy-telemetry-v1",
+    "window:28d",
+    "environment:single"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "custom",
+        "query": "LOCAL,CI,DEV,STAGING",
+        "current": { "text": "CI", "value": "CI" }
+      }
+    ]
+  },
+  "time": { "from": "now-28d", "to": "now" },
+  "title": "Executive Reliability",
+  "uid": "executive-reliability",
+  "version": 1
+}

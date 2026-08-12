@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-08-05
+- **最后更新**：2026-08-12
 - **当前阶段**：Phase 1 — 工程基础
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -159,30 +159,32 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 ### 7.5 数据分析、隐私与运营
 
-| 文件                                                                                                | 状态     | 目的                                                           | 主要依赖                                              |
-| --------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------- | ----------------------------------------------------- |
-| [docs/analytics/event-tracking.md](./analytics/event-tracking.md)                                   | Accepted | 事件、属性、平面、匿名聚合与质量 Gate                          | information-architecture、state-machine、API、privacy |
-| [docs/analytics/metrics.md](./analytics/metrics.md)                                                 | Accepted | 激活、D1/D3/D7、互动、运行、成本、小样本与研究 Gate 的唯一口径 | event-tracking                                        |
-| [docs/analytics/experiments.md](./analytics/experiments.md)                                         | Accepted | 实验边界、方法、主指标、样本、停止、回滚与个人 assignment Gate | metrics                                               |
-| [docs/analytics/channel-attribution.md](./analytics/channel-attribution.md)                         | Accepted | 小红书/抖音承接、来源令牌、首次触达、渠道指标与隐私 Gate       | event-tracking、metrics、experiments                  |
-| [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md)                             | Accepted | 数据、用途、位置、访问、保存、删除和用户权利                   | domain、database、API、ADR-0005                       |
-| [docs/operations/content-moderation.md](./operations/content-moderation.md)                         | Accepted | 审核、抽检和申诉                                               | safety、evaluation、privacy                           |
-| [docs/operations/user-support.md](./operations/user-support.md)                                     | Accepted | FAQ、支持、升级、用户权利摘要与受限访问                        | journey、privacy、moderation                          |
-| [docs/operations/incident-response.md](./operations/incident-response.md)                           | Accepted | 故障和安全事件流程                                             | safety、privacy、moderation、support                  |
-| [docs/operations/development-deployment-runbook.md](./operations/development-deployment-runbook.md) | Accepted | DEV publication、安装、发布、current reconciliation、回滚、secret 轮换与换机恢复 | deployment、testing、ADR-0007                         |
+| 文件                                                                                                | 状态        | 目的                                                                             | 主要依赖                                              |
+| --------------------------------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| [docs/analytics/event-tracking.md](./analytics/event-tracking.md)                                   | Accepted    | 事件、属性、平面、匿名聚合与质量 Gate                                            | information-architecture、state-machine、API、privacy |
+| [docs/analytics/metrics.md](./analytics/metrics.md)                                                 | Accepted    | 激活、D1/D3/D7、互动、运行、成本、小样本与研究 Gate 的唯一口径                   | event-tracking                                        |
+| [docs/analytics/experiments.md](./analytics/experiments.md)                                         | Accepted    | 实验边界、方法、主指标、样本、停止、回滚与个人 assignment Gate                   | metrics                                               |
+| [docs/analytics/channel-attribution.md](./analytics/channel-attribution.md)                         | Accepted    | 小红书/抖音承接、来源令牌、首次触达、渠道指标与隐私 Gate                         | event-tracking、metrics、experiments                  |
+| [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md)                             | Accepted    | 数据、用途、位置、访问、保存、删除和用户权利                                     | domain、database、API、ADR-0005                       |
+| [docs/operations/content-moderation.md](./operations/content-moderation.md)                         | Accepted    | 审核、抽检和申诉                                                                 | safety、evaluation、privacy                           |
+| [docs/operations/user-support.md](./operations/user-support.md)                                     | Accepted    | FAQ、支持、升级、用户权利摘要与受限访问                                          | journey、privacy、moderation                          |
+| [docs/operations/incident-response.md](./operations/incident-response.md)                           | Accepted    | 故障和安全事件流程                                                               | safety、privacy、moderation、support                  |
+| [docs/operations/development-deployment-runbook.md](./operations/development-deployment-runbook.md) | Accepted    | DEV publication、安装、发布、current reconciliation、回滚、secret 轮换与换机恢复 | deployment、testing、ADR-0007                         |
+| [docs/operations/observability-runbooks/README.md](./operations/observability-runbooks/README.md)   | Implemented | E-013 的 SLO、队列、数据库、AI/成本、telemetry 与数据生命周期 Runbook 集         | observability、incident-response、E-013               |
 
 ### 7.6 工程架构与交付
 
-| 文件                                                                                                                                                                                                   | 状态        | 目的                                                                                     | 主要依赖                                                      |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted    | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                | Gateway、database、API、ADR-0006                              |
-| [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted    | Monorepo 目录、app/package/module、public exports 与依赖 Gate                            | architecture、ADR-0006                                        |
-| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted    | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵；私有 Free 临时合并控制             | schemas、API、architecture、repository-structure              |
+| 文件                                                                                                                                                                                                   | 状态        | 目的                                                                                                              | 主要依赖                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted    | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                                         | Gateway、database、API、ADR-0006                              |
+| [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted    | Monorepo 目录、app/package/module、public exports 与依赖 Gate                                                     | architecture、ADR-0006                                        |
+| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted    | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵；私有 Free 临时合并控制                                      | schemas、API、architecture、repository-structure              |
 | [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted    | 环境、Compose、配置/密钥、release 容器与 TLS proxy 能力收敛、current reconciliation、发布、迁移、回滚、备份与恢复 | architecture、repository-structure、testing、privacy          |
-| [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                 | metrics、Gateway、privacy、incident、architecture、deployment |
-| [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                     | database、testing、deployment、ADR-0005、Issue #44            |
-| [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness 与 E-011 CI、artifact、SBOM/provenance 证据入口                   | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-012 最终证据已接受，E-013 为唯一 Ready | Accepted Phase 0B specs、E-013 Issue #51                      |
+| [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                                          | metrics、Gateway、privacy、incident、architecture、deployment |
+| [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                              | database、testing、deployment、ADR-0005、Issue #44            |
+| [docker/observability/contract.json](../docker/observability/contract.json)                                                                                                                            | Implemented | E-013 vendor-neutral 信号、字段/平面/基数、期限、成本与 Production blocked Gate                                   | observability、privacy、deployment                            |
+| [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011 CI/供应链与 E-013 observability 证据入口                                            | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；E-013 为唯一 In Progress 任务                              | Accepted Phase 0B specs、E-013 Issue #51                      |
 
 ### 7.7 Phase Gate
 
@@ -248,16 +250,16 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-012 与 E-015 已完成，E-013 是唯一 Ready 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-012 与 E-015 已完成，E-013 是唯一 In Progress 任务。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [E-012 Issue #50](https://github.com/WeiHan1996/DailyEnergy/issues/50)；
+6. [E-013 Issue #51](https://github.com/WeiHan1996/DailyEnergy/issues/51)；
 7. `docs/agent/PROJECT_CONTEXT.md`、Agent 工作流规范与
-   `pnpm agent:prepare E-012 --remote --deep` 返回的全部 required sources；
+   `pnpm agent:prepare E-013 --remote --deep` 返回的全部 required sources；
 8. [系统架构](./technical/architecture.md)、[仓库结构与模块边界](./technical/repository-structure.md)、
    [测试策略](./technical/testing.md)、[部署、配置和回滚](./technical/deployment.md)与
    [可观测性和成本监控](./technical/observability.md)；
@@ -293,6 +295,7 @@ E-010 已随 PR #117 squash 合并并进入 Done；E-011 已随 PR #119 squash �
 ADR-0007 DEV-only 例外已获明确授权，首个 Accepted DEV release 已建立。项目所有者于 2026-08-12 接受显式
 `reconcile-current` 合同、首次引入 bootstrap 澄清及第二候选的 deploy/rollback/redeploy 最终证据；PR #133 已 squash 合并，第二 candidate 的
 18 阶段 deploy/rollback/redeploy、17 阶段 clean restart reconciliation、无代理清理和独立验收审计均已完成。E-012 final evidence
-PR #134 获准在精确 final-head Gate 后 squash 合并，E-012 进入 Done；E-013 是唯一 Ready 任务。
+PR #134 获准在精确 final-head Gate 后 squash 合并，E-012 进入 Done；E-013 已在
+`agent/e013-observability` 开工并成为唯一 In Progress 任务。
 公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。

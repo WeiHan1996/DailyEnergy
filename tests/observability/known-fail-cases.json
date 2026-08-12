@@ -1,0 +1,28 @@
+{
+  "fixture_version": "e013-observability-known-fail-v1",
+  "cases": [
+    {
+      "case_id": "FORBIDDEN_METRIC_LABEL",
+      "expected_rule_id": "E013_ATTRIBUTE_FORBIDDEN"
+    },
+    {
+      "case_id": "TRACE_ID_LOKI_INDEX",
+      "expected_rule_id": "E013_LOKI_INDEX_FORBIDDEN"
+    },
+    {
+      "case_id": "LABEL_WITHOUT_CARDINALITY",
+      "expected_rule_id": "E013_CARDINALITY_DECLARATION"
+    },
+    {
+      "case_id": "PRODUCT_RUNTIME_DERIVATION",
+      "expected_rule_id": "E013_PLANE_ISOLATION"
+    },
+    {
+      "case_id": "PRODUCTION_BACKEND_ENABLED",
+      "expected_rule_id": "E013_PRODUCTION_GATE"
+    },
+    { "case_id": "UNKNOWN_COST_ZERO", "expected_rule_id": "E013_COST_UNKNOWN" },
+    { "case_id": "MISSING_RUNBOOK", "expected_rule_id": "E013_RUNBOOK_SET" },
+    { "case_id": "RC_FALSE_PASS", "expected_rule_id": "E013_RC_PENDING" }
+  ]
+}

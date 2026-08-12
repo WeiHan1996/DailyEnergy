@@ -1,0 +1,450 @@
+groups:
+  - name: dailyenergy-slo-alerts-v1
+    rules:
+      - alert: DailyEnergyCoreApiBurn14_4
+        expr: (dailyenergy:slo_core_api_error_ratio:1h / 0.005 > 14.4) and (dailyenergy:slo_core_api_error_ratio:5m / 0.005 > 14.4) and ((sum(increase(dailyenergy_http_server_requests_total[5m])) >= 20) or (dailyenergy_synthetic_probe_success == 0) or (sum(increase(dailyenergy_http_server_requests_total{status_class="5xx"}[5m])) >= 5))
+        for: 2m
+        labels:
+          alert_id: S33-CORE-API-BURN-14-4
+          alert_class: SLO_BURN_14_4
+          cause_family: CORE_API
+          condition: SLO_BURN
+          environment: "{{ $externalLabels.environment }}"
+          incident_category_candidate: INC-RELIABILITY
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: API
+          service: api
+          severity: PAGE_HIGH
+          slo_id: S33-SLO-01
+        annotations:
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:api:S33-CORE-API-BURN-14-4"
+          config_catalog_version: observability-v1
+          dashboard_url: /d/executive-reliability
+          runbook_url: /runbooks/core-api-burn
+          summary_code: CORE_API_BURN_14_4
+          window: 1h+5m
+      - alert: DailyEnergyCoreApiBurn6
+        expr: (dailyenergy:slo_core_api_error_ratio:6h / 0.005 > 6) and (dailyenergy:slo_core_api_error_ratio:30m / 0.005 > 6) and ((sum(increase(dailyenergy_http_server_requests_total[5m])) >= 20) or (dailyenergy_synthetic_probe_success == 0) or (sum(increase(dailyenergy_http_server_requests_total{status_class="5xx"}[5m])) >= 5))
+        for: 5m
+        labels:
+          alert_id: S33-CORE-API-BURN-6
+          alert_class: SLO_BURN_6
+          cause_family: CORE_API
+          condition: SLO_BURN
+          environment: "{{ $externalLabels.environment }}"
+          incident_category_candidate: INC-RELIABILITY
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: API
+          service: api
+          severity: PAGE_HIGH
+          slo_id: S33-SLO-01
+        annotations:
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:api:S33-CORE-API-BURN-6"
+          config_catalog_version: observability-v1
+          dashboard_url: /d/executive-reliability
+          runbook_url: /runbooks/core-api-burn
+          summary_code: CORE_API_BURN_6
+          window: 6h+30m
+      - alert: DailyEnergyCoreApiBurn3Ticket
+        expr: (dailyenergy:slo_core_api_error_ratio:24h / 0.005 > 3) and (dailyenergy:slo_core_api_error_ratio:2h / 0.005 > 3)
+        for: 15m
+        labels:
+          alert_id: S33-CORE-API-BURN-3
+          alert_class: SLO_BURN_TICKET
+          cause_family: CORE_API
+          condition: SLO_BURN
+          environment: "{{ $externalLabels.environment }}"
+          incident_category_candidate: INC-RELIABILITY
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: API
+          service: api
+          severity: TICKET
+          slo_id: S33-SLO-01
+        annotations:
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:api:S33-CORE-API-BURN-3"
+          config_catalog_version: observability-v1
+          dashboard_url: /d/executive-reliability
+          runbook_url: /runbooks/core-api-burn
+          summary_code: CORE_API_BURN_3
+          window: 24h+2h
+      - alert: DailyEnergyCoreApiBurn1Ticket
+        expr: (dailyenergy:slo_core_api_error_ratio:3d / 0.005 > 1) and (dailyenergy:slo_core_api_error_ratio:6h / 0.005 > 1)
+        for: 30m
+        labels:
+          alert_id: S33-CORE-API-BURN-1
+          alert_class: SLO_BURN_TICKET
+          cause_family: CORE_API
+          condition: SLO_BURN
+          environment: "{{ $externalLabels.environment }}"
+          incident_category_candidate: INC-RELIABILITY
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: API
+          service: api
+          severity: TICKET
+          slo_id: S33-SLO-01
+        annotations:
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:api:S33-CORE-API-BURN-1"
+          config_catalog_version: observability-v1
+          dashboard_url: /d/executive-reliability
+          runbook_url: /runbooks/core-api-burn
+          summary_code: CORE_API_BURN_1
+          window: 3d+6h
+
+  - name: dailyenergy-hard-and-runtime-alerts-v1
+    rules:
+      - alert: DailyEnergyIndependentSyntheticFailure
+        expr: dailyenergy_synthetic_probe_success == 0 or absent(dailyenergy_synthetic_probe_success)
+        for: 2m
+        labels:
+          alert_id: S33-INDEPENDENT-SYNTHETIC-FAILURE
+          cause_family: CORE_API
+          condition: SYNTHETIC_FAILURE
+          incident_category_candidate: INC-RELIABILITY
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: API
+          service: api
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/executive-reliability
+          runbook_url: /runbooks/core-api-burn
+          summary_code: INDEPENDENT_SYNTHETIC_FAILURE
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:api:S33-INDEPENDENT-SYNTHETIC-FAILURE"
+          window: 5m
+      - alert: DailyEnergyAbsoluteCoreFailures
+        expr: sum(increase(dailyenergy_http_server_requests_total{status_class="5xx"}[5m])) >= 5
+        labels:
+          alert_id: S33-CORE-ABSOLUTE-FAILURES
+          cause_family: CORE_API
+          condition: ABSOLUTE_FAILURES
+          incident_category_candidate: INC-RELIABILITY
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: API
+          service: api
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/api-core-journey
+          runbook_url: /runbooks/core-api-burn
+          summary_code: CORE_API_ABSOLUTE_FAILURES
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:api:S33-CORE-ABSOLUTE-FAILURES"
+          window: 5m
+      - alert: DailyEnergyInteractiveQueueAge
+        expr: max(dailyenergy_queue_oldest_eligible_age_seconds{queue_family="INTERACTIVE"}) > 60
+        for: 2m
+        labels:
+          alert_id: S33-INTERACTIVE-QUEUE-AGE
+          cause_family: INTERACTIVE_QUEUE
+          condition: HARD_GATE
+          incident_category_candidate: INC-RELIABILITY
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: INTERACTIVE
+          service: interactive
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/async-data
+          runbook_url: /runbooks/async-data
+          summary_code: INTERACTIVE_QUEUE_AGE
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:interactive:S33-INTERACTIVE-QUEUE-AGE"
+          window: 5m
+      - alert: DailyEnergyPostgresPoolCritical
+        expr: max(dailyenergy_postgres_pool_saturation_ratio) >= 0.95 or histogram_quantile(0.95, sum(rate(dailyenergy_postgres_pool_wait_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          alert_id: S33-POSTGRES-POOL-CRITICAL
+          cause_family: POSTGRES_POOL
+          condition: HARD_GATE
+          incident_category_candidate: INC-RELIABILITY
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: API
+          service: database
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/async-data
+          runbook_url: /runbooks/database
+          summary_code: POSTGRES_POOL_CRITICAL
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:database:S33-POSTGRES-POOL-CRITICAL"
+          window: 5m
+      - alert: DailyEnergyRawContentMatch
+        expr: sum(increase(dailyenergy_raw_content_matches_total[5m])) > 0
+        labels:
+          alert_id: S33-RAW-CONTENT-MATCH
+          cause_family: RAW_CONTENT
+          condition: HARD_GATE
+          hard_gate_id: S33-HARD-RAW-CONTENT
+          incident_category_candidate: INC-PRIVACY-SECURITY
+          owner_role: PRIVACY_SECURITY_OWNER
+          runtime_profile: RESTRICTED
+          service: collector
+          severity: PAGE_CRITICAL
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/telemetry-health
+          runbook_url: /runbooks/telemetry-health
+          summary_code: RAW_CONTENT_MATCH
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:collector:S33-RAW-CONTENT-MATCH"
+          window: 5m
+      - alert: DailyEnergyDeletionRestoreDetector
+        expr: sum(increase(dailyenergy_deletion_guard_failures_total[5m])) > 0 or sum(increase(dailyenergy_restore_deny_replay_total{outcome_code!="SUCCESS"}[5m])) > 0 or sum(increase(dailyenergy_deleted_data_detector_total{outcome_code!="SUCCESS"}[5m])) > 0
+        labels:
+          alert_id: S33-DELETION-RESTORE-DETECTOR
+          cause_family: DATA_LIFECYCLE
+          condition: HARD_GATE
+          hard_gate_id: S33-HARD-DATA-LIFECYCLE
+          incident_category_candidate: INC-DATA-LIFECYCLE
+          owner_role: RESTRICTED_OPERATIONS
+          runtime_profile: RESTRICTED
+          service: restricted
+          severity: PAGE_CRITICAL
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/async-data
+          runbook_url: /runbooks/data-lifecycle
+          summary_code: DELETION_RESTORE_DETECTOR
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:restricted:S33-DELETION-RESTORE-DETECTOR"
+          window: 5m
+      - alert: DailyEnergySchemaGrantDrift
+        expr: sum(increase(dailyenergy_release_gate_total{reason_code="SCHEMA_GRANT_DRIFT"}[5m])) > 0
+        labels:
+          alert_id: S33-SCHEMA-GRANT-DRIFT
+          cause_family: RELEASE_CONFIG
+          condition: HARD_GATE
+          hard_gate_id: S33-HARD-SCHEMA-GRANT
+          incident_category_candidate: INC-RELEASE-CONFIG
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: MIGRATION
+          service: database
+          severity: PAGE_CRITICAL
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/async-data
+          runbook_url: /runbooks/database
+          summary_code: SCHEMA_GRANT_DRIFT
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:database:S33-SCHEMA-GRANT-DRIFT"
+          window: 5m
+      - alert: DailyEnergyWalGapHigh
+        expr: max(dailyenergy_wal_archive_gap_seconds) >= 600
+        labels:
+          alert_id: S33-WAL-GAP-HIGH
+          cause_family: BACKUP_WAL
+          condition: HARD_GATE
+          incident_category_candidate: INC-DATA-LIFECYCLE
+          owner_role: RESTRICTED_OPERATIONS
+          runtime_profile: MIGRATION
+          service: database
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/async-data
+          runbook_url: /runbooks/database
+          summary_code: WAL_GAP_HIGH
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:database:S33-WAL-GAP-HIGH"
+          window: 10m
+      - alert: DailyEnergyWalGapBreach
+        expr: max(dailyenergy_wal_archive_gap_seconds) >= 900
+        labels:
+          alert_id: S33-WAL-GAP-BREACH
+          cause_family: BACKUP_WAL
+          condition: HARD_GATE
+          hard_gate_id: S33-HARD-WAL-GAP
+          incident_category_candidate: INC-DATA-LIFECYCLE
+          owner_role: RESTRICTED_OPERATIONS
+          runtime_profile: MIGRATION
+          service: database
+          severity: PAGE_CRITICAL
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/async-data
+          runbook_url: /runbooks/database
+          summary_code: WAL_GAP_BREACH
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:database:S33-WAL-GAP-BREACH"
+          window: 15m
+      - alert: DailyEnergyDataTaskDeadline75
+        expr: max(dailyenergy_data_task_oldest_age_seconds / clamp_min(dailyenergy_data_task_deadline_seconds, 1)) >= 0.75
+        labels:
+          alert_id: S33-DATA-TASK-DEADLINE-75
+          cause_family: DATA_LIFECYCLE
+          condition: HARD_GATE
+          incident_category_candidate: INC-DATA-LIFECYCLE
+          owner_role: RESTRICTED_OPERATIONS
+          runtime_profile: RESTRICTED
+          service: restricted
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/async-data
+          runbook_url: /runbooks/data-lifecycle
+          summary_code: DATA_TASK_DEADLINE_75
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:restricted:S33-DATA-TASK-DEADLINE-75"
+          window: 24h
+      - alert: DailyEnergyBackupExpired
+        expr: sum(increase(dailyenergy_backup_expiry_violations_total[5m])) > 0
+        labels:
+          alert_id: S33-BACKUP-EXPIRED
+          cause_family: BACKUP_WAL
+          condition: HARD_GATE
+          hard_gate_id: S33-HARD-BACKUP-EXPIRY
+          incident_category_candidate: INC-DATA-LIFECYCLE
+          owner_role: RESTRICTED_OPERATIONS
+          runtime_profile: MIGRATION
+          service: database
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/async-data
+          runbook_url: /runbooks/data-lifecycle
+          summary_code: BACKUP_EXPIRED
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:database:S33-BACKUP-EXPIRED"
+          window: 5m
+      - alert: DailyEnergyTelemetryOutage
+        expr: (time() - max(dailyenergy_telemetry_heartbeat_timestamp_seconds)) > 900 or absent(dailyenergy_telemetry_heartbeat_timestamp_seconds) or sum(increase(otelcol_exporter_send_failed_spans[15m])) > 0
+        labels:
+          alert_id: S33-TELEMETRY-OUTAGE
+          cause_family: TELEMETRY
+          condition: TELEMETRY_OUTAGE
+          incident_category_candidate: INC-RELIABILITY
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: EVALUATION
+          service: collector
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/telemetry-health
+          runbook_url: /runbooks/telemetry-health
+          summary_code: TELEMETRY_OUTAGE
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:collector:S33-TELEMETRY-OUTAGE"
+          window: 15m
+      - alert: DailyEnergyModelMismatch
+        expr: sum(increase(dailyenergy_gateway_observed_model_mismatch_total[5m])) > 0
+        labels:
+          alert_id: S33-MODEL-MISMATCH
+          cause_family: AI_PROVIDER
+          condition: HARD_GATE
+          hard_gate_id: S33-HARD-MODEL-MISMATCH
+          incident_category_candidate: INC-AI-PROVIDER
+          owner_role: AI_OWNER
+          runtime_profile: INTERACTIVE
+          service: interactive
+          severity: PAGE_CRITICAL
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/ai-cost
+          runbook_url: /runbooks/ai-cost
+          summary_code: MODEL_MISMATCH
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:interactive:S33-MODEL-MISMATCH"
+          window: 5m
+      - alert: DailyEnergyBudgetForecast70
+        expr: dailyenergy:budget_consumption_ratio >= 0.70 and dailyenergy:budget_consumption_ratio < 0.85
+        labels:
+          alert_id: S33-BUDGET-FORECAST-70
+          cause_family: COST
+          condition: COST_THRESHOLD
+          incident_category_candidate: INC-AI-PROVIDER
+          owner_role: FINANCE_OWNER
+          runtime_profile: EVALUATION
+          service: collector
+          severity: TICKET
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/ai-cost
+          runbook_url: /runbooks/ai-cost
+          summary_code: BUDGET_FORECAST_70
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:collector:S33-BUDGET-FORECAST-70"
+          window: 24h
+      - alert: DailyEnergyBudgetHigh85
+        expr: dailyenergy:budget_consumption_ratio >= 0.85 and dailyenergy:budget_consumption_ratio < 1
+        labels:
+          alert_id: S33-BUDGET-HIGH-85
+          cause_family: COST
+          condition: COST_THRESHOLD
+          incident_category_candidate: INC-AI-PROVIDER
+          owner_role: FINANCE_OWNER
+          runtime_profile: EVALUATION
+          service: collector
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/ai-cost
+          runbook_url: /runbooks/ai-cost
+          summary_code: BUDGET_HIGH_85
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:collector:S33-BUDGET-HIGH-85"
+          window: 24h
+      - alert: DailyEnergyBudgetHardStop100
+        expr: dailyenergy:budget_consumption_ratio >= 1
+        labels:
+          alert_id: S33-BUDGET-HARD-STOP-100
+          cause_family: COST
+          condition: HARD_GATE
+          hard_gate_id: S33-HARD-AI-BUDGET
+          incident_category_candidate: INC-AI-PROVIDER
+          owner_role: AI_OWNER
+          runtime_profile: INTERACTIVE
+          service: interactive
+          severity: PAGE_CRITICAL
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/ai-cost
+          runbook_url: /runbooks/ai-cost
+          summary_code: BUDGET_HARD_STOP_100
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:interactive:S33-BUDGET-HARD-STOP-100"
+          window: 24h
+      - alert: DailyEnergyCostCompletenessBlocked
+        expr: dailyenergy:cost_known_ratio:35d < 0.99 or dailyenergy:cost_price_coverage_ratio:35d < 0.99
+        labels:
+          alert_id: S33-COST-COMPLETENESS-BLOCKED
+          cause_family: COST
+          condition: COST_THRESHOLD
+          incident_category_candidate: INC-AI-PROVIDER
+          owner_role: FINANCE_OWNER
+          runtime_profile: EVALUATION
+          service: collector
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/ai-cost
+          runbook_url: /runbooks/ai-cost
+          summary_code: COST_COMPLETENESS_BLOCKED
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:collector:S33-COST-COMPLETENESS-BLOCKED"
+          window: 28d
+      - alert: DailyEnergyObservabilityCostHigh
+        expr: dailyenergy:observability_cost_ratio:30d >= 0.85
+        labels:
+          alert_id: S33-OBSERVABILITY-COST-HIGH
+          cause_family: TELEMETRY
+          condition: COST_THRESHOLD
+          incident_category_candidate: INC-RELIABILITY
+          owner_role: ENGINEERING_PRIMARY
+          runtime_profile: EVALUATION
+          service: collector
+          severity: PAGE_HIGH
+        annotations:
+          config_catalog_version: observability-v1
+          dashboard_url: /d/telemetry-health
+          runbook_url: /runbooks/telemetry-health
+          summary_code: OBSERVABILITY_COST_HIGH
+          current_value: "{{ $value }}"
+          dedupe_key: "{{ $externalLabels.environment }}:collector:S33-OBSERVABILITY-COST-HIGH"
+          window: 30d

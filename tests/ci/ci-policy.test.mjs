@@ -238,6 +238,23 @@ test("T-E011-CI-POLICY-001 rejects a removed mandatory lane command", () => {
   );
 });
 
+test("T-E013-CI-POLICY-001 requires the observability contract Gate", () => {
+  for (const requiredCommand of [
+    ["pnpm", "run", "observability:validate"],
+    ["pnpm", "run", "observability:runtime"],
+  ]) {
+    const altered = structuredClone(ciPolicy);
+    const lane = altered.lanes.find(({ id }) => id === "unit-contract");
+    lane.commands = lane.commands.filter(
+      (command) => JSON.stringify(command) !== JSON.stringify(requiredCommand),
+    );
+    assert.throws(
+      () => validateCiPolicy(altered),
+      /CI_POLICY_REQUIRED_COMMAND_MISSING:unit-contract/u,
+    );
+  }
+});
+
 test("T-E011-CI-CACHE-001 rejects sensitive and critical task caching", () => {
   assert.deepEqual(validateTurboPolicy(turboPolicy), { tasks: 5 });
   const sensitive = structuredClone(turboPolicy);

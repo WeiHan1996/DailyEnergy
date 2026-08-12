@@ -1,0 +1,205 @@
+services:
+  api:
+    environment:
+      DAILYENERGY_TELEMETRY_ENABLED: "true"
+      DAILYENERGY_TELEMETRY_OTLP_TRACE_URL: http://collector:4318/v1/traces
+    networks:
+      observability_ingest:
+    logging: &telemetry-logging
+      driver: fluentd
+      options:
+        fluentd-address: 127.0.0.1:${DAILYENERGY_FLUENT_HOST_PORT:-12424}
+        fluentd-async: "true"
+        tag: dailyenergy.api
+
+  worker-interactive:
+    environment:
+      DAILYENERGY_WORKER_TELEMETRY_ENABLED: "true"
+      DAILYENERGY_WORKER_TELEMETRY_OTLP_TRACE_URL: http://collector:4318/v1/traces
+    networks:
+      observability_ingest:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: 127.0.0.1:${DAILYENERGY_FLUENT_HOST_PORT:-12424}
+        fluentd-async: "true"
+        tag: dailyenergy.interactive
+
+  worker-background:
+    environment:
+      DAILYENERGY_WORKER_TELEMETRY_ENABLED: "true"
+      DAILYENERGY_WORKER_TELEMETRY_OTLP_TRACE_URL: http://collector:4318/v1/traces
+    networks:
+      observability_ingest:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: 127.0.0.1:${DAILYENERGY_FLUENT_HOST_PORT:-12424}
+        fluentd-async: "true"
+        tag: dailyenergy.background
+
+  worker-restricted:
+    environment:
+      DAILYENERGY_WORKER_TELEMETRY_ENABLED: "true"
+      DAILYENERGY_WORKER_TELEMETRY_OTLP_TRACE_URL: http://collector:4318/v1/traces
+    networks:
+      observability_ingest:
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: 127.0.0.1:${DAILYENERGY_FLUENT_HOST_PORT:-12424}
+        fluentd-async: "true"
+        tag: dailyenergy.restricted
+
+  collector:
+    image: ${DAILYENERGY_OTEL_COLLECTOR_IMAGE:?immutable collector digest required}
+    command: ["--config=/etc/otelcol/config.yaml"]
+    user: "10001:10001"
+    cap_drop: [ALL]
+    init: true
+    pids_limit: 256
+    read_only: true
+    restart: "no"
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 384m
+    cpus: 0.5
+    volumes:
+      - ./observability/collector.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - 127.0.0.1:${DAILYENERGY_OTLP_HTTP_HOST_PORT:-14318}:4318
+      - 127.0.0.1:${DAILYENERGY_FLUENT_HOST_PORT:-12424}:8006
+      - 127.0.0.1:${DAILYENERGY_COLLECTOR_METRICS_HOST_PORT:-18888}:8888
+    networks:
+      observability_ingest:
+      observability_backend:
+    tmpfs:
+      - /tmp:uid=10001,gid=10001,mode=0700
+
+  prometheus:
+    image: ${DAILYENERGY_PROMETHEUS_IMAGE:?immutable prometheus digest required}
+    command:
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=35d
+      - --web.enable-lifecycle=false
+    user: "65534:65534"
+    cap_drop: [ALL]
+    init: true
+    pids_limit: 256
+    read_only: true
+    restart: "no"
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    cpus: 0.75
+    volumes:
+      - ./observability/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - ./observability/rules:/etc/prometheus/rules:ro
+      - observability_prometheus:/prometheus
+    ports:
+      - 127.0.0.1:${DAILYENERGY_PROMETHEUS_HOST_PORT:-19090}:9090
+    networks:
+      observability_ingest:
+      observability_backend:
+
+  alertmanager:
+    image: ${DAILYENERGY_ALERTMANAGER_IMAGE:?immutable alertmanager digest required}
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yaml
+      - --storage.path=/alertmanager
+    user: "65534:65534"
+    cap_drop: [ALL]
+    init: true
+    pids_limit: 128
+    read_only: true
+    restart: "no"
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+    cpus: 0.25
+    volumes:
+      - ./observability/alertmanager.yaml:/etc/alertmanager/alertmanager.yaml:ro
+      - observability_alertmanager:/alertmanager
+    ports:
+      - 127.0.0.1:${DAILYENERGY_ALERTMANAGER_HOST_PORT:-19093}:9093
+    networks:
+      observability_ingest:
+      observability_backend:
+
+  loki:
+    image: ${DAILYENERGY_LOKI_IMAGE:?immutable loki digest required}
+    command: ["-config.file=/etc/loki/loki.yaml"]
+    user: "10001:10001"
+    cap_drop: [ALL]
+    init: true
+    pids_limit: 256
+    read_only: true
+    restart: "no"
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    cpus: 0.75
+    volumes:
+      - ./observability/loki.yaml:/etc/loki/loki.yaml:ro
+      - observability_loki:/var/lib/loki
+    ports:
+      - 127.0.0.1:${DAILYENERGY_LOKI_HOST_PORT:-13100}:3100
+    networks:
+      observability_backend:
+
+  tempo:
+    image: ${DAILYENERGY_TEMPO_IMAGE:?immutable tempo digest required}
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    user: "10001:10001"
+    cap_drop: [ALL]
+    init: true
+    pids_limit: 256
+    read_only: true
+    restart: "no"
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    cpus: 0.75
+    volumes:
+      - ./observability/tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - observability_tempo:/var/lib/tempo
+    ports:
+      - 127.0.0.1:${DAILYENERGY_TEMPO_HOST_PORT:-13200}:3200
+    networks:
+      observability_backend:
+
+  grafana:
+    image: ${DAILYENERGY_GRAFANA_IMAGE:?immutable grafana digest required}
+    user: "472:472"
+    cap_drop: [ALL]
+    init: true
+    pids_limit: 256
+    read_only: true
+    restart: "no"
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 384m
+    cpus: 0.5
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - observability_grafana:/var/lib/grafana
+    ports:
+      - 127.0.0.1:${DAILYENERGY_GRAFANA_HOST_PORT:-13000}:3000
+    networks:
+      observability_backend:
+    tmpfs:
+      - /tmp:uid=472,gid=472,mode=0700
+
+volumes:
+  observability_alertmanager:
+  observability_grafana:
+  observability_loki:
+  observability_prometheus:
+  observability_tempo:
+
+networks:
+  observability_ingest:
+    internal: true
+  observability_backend:
+    internal: true

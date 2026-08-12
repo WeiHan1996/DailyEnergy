@@ -32,13 +32,34 @@ const modes = Object.freeze({
     overlay: "docker/compose.staging-like.yaml",
   },
 });
+export const observabilityImageDefaults = Object.freeze({
+  DAILYENERGY_ALERTMANAGER_IMAGE:
+    "prom/alertmanager:v0.28.1@sha256:27c475db5fb156cab31d5c18a4251ac7ed567746a2483ff264516437a39b15ba",
+  DAILYENERGY_GRAFANA_IMAGE:
+    "grafana/grafana:11.6.0@sha256:62d2b9d20a19714ebfe48d1bb405086081bc602aa053e28cf6d73c7537640dfb",
+  DAILYENERGY_LOKI_IMAGE:
+    "grafana/loki:3.4.2@sha256:58a6c186ce78ba04d58bfe2a927eff296ba733a430df09645d56cdc158f3ba08",
+  DAILYENERGY_OTEL_COLLECTOR_IMAGE:
+    "otel/opentelemetry-collector-contrib:0.121.0@sha256:789689988e379c58ac12b07718dbcf4b23c2214bd804173c1c77af346d381c15",
+  DAILYENERGY_PROMETHEUS_IMAGE:
+    "prom/prometheus:v3.2.1@sha256:6927e0919a144aa7616fd0137d4816816d42f6b816de3af269ab065250859a62",
+  DAILYENERGY_TEMPO_IMAGE:
+    "grafana/tempo:2.7.1@sha256:4443be217c396b065ee34845534199c36fdba4dc619cb96550e228d73fba6e69",
+});
 
 export function parseArguments(argv) {
   const command = argv[0] ?? "up";
-  const options = { fault: false, mode: "local", values: [] };
+  const options = {
+    fault: false,
+    mode: "local",
+    observability: false,
+    values: [],
+  };
   for (const argument of argv.slice(1)) {
     if (argument === "--fault") {
       options.fault = true;
+    } else if (argument === "--observability") {
+      options.observability = true;
     } else if (argument.startsWith("--mode=")) {
       options.mode = argument.slice("--mode=".length);
     } else {
@@ -165,7 +186,7 @@ function runImage(image, arguments_, environment = {}) {
   );
 }
 
-function apiRuntimeEnvironment(mode) {
+function apiRuntimeEnvironment(mode, observability = false) {
   const selected = modes[mode];
   return {
     DAILYENERGY_CONFIG_SCHEMA_VERSION: "api-runtime-config-v1",
@@ -180,10 +201,14 @@ function apiRuntimeEnvironment(mode) {
     DAILYENERGY_RELEASE_ID: `e009-${mode}-v1`,
     DAILYENERGY_RUNTIME_PROFILE: "API",
     DAILYENERGY_SHUTDOWN_GRACE_MS: "5000",
+    DAILYENERGY_TELEMETRY_ENABLED: String(observability),
+    DAILYENERGY_TELEMETRY_METRICS_HOST: "0.0.0.0",
+    DAILYENERGY_TELEMETRY_METRICS_PORT: "9464",
+    DAILYENERGY_TELEMETRY_OTLP_TRACE_URL: "http://collector:4318/v1/traces",
   };
 }
 
-function calculateFingerprints(serverImage, mode) {
+function calculateFingerprints(serverImage, mode, observability) {
   const api = JSON.parse(
     runImage(
       serverImage,
@@ -192,7 +217,7 @@ function calculateFingerprints(serverImage, mode) {
         "--eval",
         "import('/app/api/dist/bootstrap/runtime-config.js').then(m=>process.stdout.write(JSON.stringify(m.calculateRuntimeFingerprints(process.env))))",
       ],
-      apiRuntimeEnvironment(mode),
+      apiRuntimeEnvironment(mode, observability),
     ),
   );
   const workers = JSON.parse(
@@ -214,7 +239,9 @@ function calculateFingerprints(serverImage, mode) {
 }
 
 function variant(options) {
-  return `${options.mode}${options.fault ? "-fault" : ""}`;
+  return `${options.mode}${options.fault ? "-fault" : ""}${
+    options.observability ? "-observability" : ""
+  }`;
 }
 
 function paths(options) {
@@ -238,10 +265,15 @@ async function prepare(options) {
     fault: options.fault,
   });
   const images = await buildImages();
-  const fingerprints = calculateFingerprints(images.server, options.mode);
+  const fingerprints = calculateFingerprints(
+    images.server,
+    options.mode,
+    options.observability,
+  );
   const values = {
     DAILYENERGY_ADMIN_HOST_PORT: selected.adminPort,
     DAILYENERGY_ADMIN_IMAGE: images.admin,
+    ...(options.observability ? observabilityImageDefaults : {}),
     DAILYENERGY_API_CAPABILITY_FINGERPRINT:
       fingerprints.api.capabilityFingerprint,
     DAILYENERGY_API_DEPLOY_FINGERPRINT:
@@ -258,6 +290,8 @@ async function prepare(options) {
     DAILYENERGY_SOURCE_FINGERPRINT: await sourceFingerprint(),
     DAILYENERGY_STUB_CONTROL_HOST_PORT: 19_090,
     DAILYENERGY_STUB_IMAGE: images.stub,
+    DAILYENERGY_TELEMETRY_ENABLED: String(options.observability),
+    DAILYENERGY_TELEMETRY_OTLP_TRACE_URL: "http://collector:4318/v1/traces",
     DAILYENERGY_WORKER_BACKGROUND_FINGERPRINT: fingerprints.workers.background,
     DAILYENERGY_WORKER_INTERACTIVE_FINGERPRINT:
       fingerprints.workers.interactive,
@@ -294,6 +328,9 @@ function composeArguments(options, envFile) {
   ];
   if (options.fault) {
     args.push("--file", "docker/compose.fault.yaml");
+  }
+  if (options.observability) {
+    args.push("--file", "docker/compose.observability.yaml");
   }
   args.push("--profile", options.mode);
   if (options.fault) {

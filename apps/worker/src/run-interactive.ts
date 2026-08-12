@@ -1,5 +1,6 @@
 import {
   fingerprintCapabilityManifest,
+  startWorkerInteractiveTelemetry,
   workerInteractiveManifest,
 } from "@daily-energy/server-adapters/worker-interactive";
 
@@ -12,4 +13,5 @@ await runWorker({
   ),
   entrypoint: createInteractiveWorkerEntrypoint(),
   manifest: workerInteractiveManifest,
+  telemetryFactory: startWorkerInteractiveTelemetry,
 });

@@ -1,0 +1,32 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    contract_version: dailyenergy-telemetry-v1
+    environment: LOCAL
+    release_id: reference-release-v1
+    config_catalog_version: observability-v1
+
+rule_files:
+  - /etc/prometheus/rules/*.yaml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: [alertmanager:9093]
+
+scrape_configs:
+  - job_name: collector
+    static_configs:
+      - targets: [collector:8888, collector:9464]
+        labels:
+          service: collector
+          runtime_profile: EVALUATION
+  - job_name: dailyenergy-runtime
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - api:9464
+          - worker-interactive:9464
+          - worker-background:9464
+          - worker-restricted:9464

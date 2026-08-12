@@ -1,0 +1,639 @@
+{
+  "manifest_version": "e-013-evidence-v1",
+  "scope": "E-013 structured logs, OTel, metrics, SLO, alerts, dashboards, Runbooks and cost baseline",
+  "authority": [
+    "docs/technical/observability.md",
+    "docs/analytics/metrics.md",
+    "docs/operations/incident-response.md",
+    "docs/technical/deployment.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-E013-OBS-001": {
+      "file": "apps/api/src/api.e2e.test.ts",
+      "selector": "logs only allowlisted metadata",
+      "level": "CONTRACT",
+      "assertions": [
+        "request body preferred-name-like synthetic content is absent from every OrdinaryLogV1 event while the stable operation and outcome remain"
+      ]
+    },
+    "T-E013-OBS-002": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "forbidden fields and Collector allowlist",
+      "level": "STATIC",
+      "assertions": [
+        "span and log attributes are projected through closed keep_keys allowlists, Prompt/provider raw response attributes are discarded, and the raw-content detector produces only a content-free incident signal"
+      ]
+    },
+    "T-E013-OBS-003": {
+      "file": "packages/server-adapters/src/telemetry/contracts.test.ts",
+      "selector": "closed signal attributes",
+      "level": "CONTRACT",
+      "assertions": [
+        "AccountRef and every other forbidden telemetry key fail the strict metric attribute Schema"
+      ]
+    },
+    "T-E013-OBS-004": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "Loki index known-fail",
+      "level": "STATIC",
+      "assertions": [
+        "trace_id is rejected as a Loki index label and retained only as non-index structured metadata"
+      ]
+    },
+    "T-E013-OBS-005": {
+      "file": "apps/api/src/api.e2e.test.ts",
+      "selector": "low-cardinality HTTP telemetry",
+      "level": "CONTRACT",
+      "assertions": [
+        "raw URL and query values never enter telemetry; a closed OpenAPI operation code is recorded instead"
+      ]
+    },
+    "T-E013-OBS-006": {
+      "file": "apps/api/src/api.e2e.test.ts",
+      "selector": "parser and ordinary log redaction",
+      "level": "CONTRACT",
+      "assertions": [
+        "exception/parser text, SQL bind-like values and credentials are replaced by fixed reason and message codes"
+      ]
+    },
+    "T-E013-OBS-007": {
+      "file": "packages/server-adapters/src/telemetry/contracts.test.ts",
+      "selector": "bounded metric registry",
+      "level": "CONTRACT",
+      "assertions": [
+        "every metric has a declared closed label set and active-series limit; undeclared or unbounded labels fail the contract Gate"
+      ]
+    },
+    "T-E013-OBS-008": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "plane isolation known-fail",
+      "level": "STATIC",
+      "assertions": [
+        "ordinary runtime cannot join Product Analytics or accept Safety/DataTask restricted details, and an isolation mutation fails with E013_PLANE_ISOLATION"
+      ]
+    },
+    "T-E013-OBS-009": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "expected reject SLO classification",
+      "level": "CONTRACT",
+      "assertions": [
+        "an expected revision conflict is availability GOOD, latency EXCLUDED and remains independently countable as a command conflict"
+      ]
+    },
+    "T-E013-OBS-010": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "fast service failure classification",
+      "level": "CONTRACT",
+      "assertions": [
+        "a fast service failure increments availability bad and is excluded from the success-latency denominator"
+      ]
+    },
+    "T-E013-OBS-011": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "14.4x multi-window page rule",
+      "level": "STATIC",
+      "assertions": [
+        "the 1h and 5m windows must both exceed 14.4x before PAGE_HIGH and Alertmanager inhibits lower burn alerts for the same SLO"
+      ]
+    },
+    "T-E013-OBS-012": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "both-window burn requirement",
+      "level": "CONTRACT",
+      "assertions": [
+        "a high long window with a recovered short window returns NONE rather than paging"
+      ]
+    },
+    "T-E013-OBS-013": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "low-traffic corroboration",
+      "level": "CONTRACT",
+      "assertions": [
+        "one low-traffic failure does not page without synthetic failure or five absolute failures"
+      ]
+    },
+    "T-E013-OBS-014": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "independent synthetic and heartbeat alerts",
+      "level": "STATIC",
+      "assertions": [
+        "zero real traffic and host loss remain visible through absent-aware independent synthetic and telemetry heartbeat outage rules"
+      ]
+    },
+    "T-E013-OBS-015": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "separate synthetic dashboard and real burn expressions",
+      "level": "STATIC",
+      "assertions": [
+        "synthetic success is displayed separately and cannot remove real-request bad events from burn calculations"
+      ]
+    },
+    "T-E013-OBS-016": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "error-budget release decision",
+      "level": "CONTRACT",
+      "assertions": [
+        "an exhausted budget denies ordinary features while allowing the closed repair, rollback, Safety/Privacy, recovery and compliance classes"
+      ]
+    },
+    "T-E013-OBS-017": {
+      "file": "apps/api/src/api.e2e.test.ts",
+      "selector": "normalized operation telemetry",
+      "level": "CONTRACT",
+      "assertions": [
+        "dynamic paths and query values collapse to UNKNOWN_HTTP or a fixed operation code without creating new series"
+      ]
+    },
+    "T-E013-OBS-018": {
+      "file": "packages/server-adapters/src/telemetry/contracts.test.ts",
+      "selector": "minimum dependency and command metric registry",
+      "level": "CONTRACT",
+      "assertions": [
+        "external exchange latency is represented by a separate operation metric family and is not merged into database command latency"
+      ]
+    },
+    "T-E013-OBS-019": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "PostgreSQL pool alert and database Runbook",
+      "level": "STATIC",
+      "assertions": [
+        "95 percent pool saturation or wait P95 above one second pages with the database Dashboard and Runbook"
+      ]
+    },
+    "T-E013-OBS-020": {
+      "file": "packages/server-adapters/src/telemetry/contracts.test.ts",
+      "selector": "SQL and exception telemetry rejection",
+      "level": "CONTRACT",
+      "assertions": [
+        "slow-query telemetry accepts only stable operation/reason buckets; SQL, bind values and exception messages fail the closed attribute Schema"
+      ]
+    },
+    "T-E013-OBS-021": {
+      "file": "tests/compose/integration.test.mjs",
+      "selector": "Redis fault and PostgreSQL fact recovery",
+      "level": "RESILIENCE",
+      "assertions": [
+        "Redis loss is visible while PostgreSQL remains authoritative, stale personal cache is not restored and eligible state rebuilds from PostgreSQL"
+      ]
+    },
+    "T-E013-OBS-022": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "breaker unreadable Gateway decision",
+      "level": "CONTRACT",
+      "assertions": [
+        "an unreadable breaker produces provider calls zero, controlled template continuation and a stable BREAKER_STATE_UNAVAILABLE reason"
+      ]
+    },
+    "T-E013-OBS-023": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "schema/grant hard alert",
+      "level": "STATIC",
+      "assertions": [
+        "schema/grant fingerprint drift creates PAGE_CRITICAL and a release/profile readiness hard Gate"
+      ]
+    },
+    "T-E013-OBS-024": {
+      "file": "apps/api/src/api.e2e.test.ts",
+      "selector": "detail-free health endpoints",
+      "level": "CONTRACT",
+      "assertions": [
+        "public health returns only stable status/reason envelopes without dependency, host, provider or version-catalog details"
+      ]
+    },
+    "T-E013-OBS-025": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "relay crash replay plus telemetry mapping",
+      "level": "INTEGRATION",
+      "assertions": [
+        "enqueue-before-PUBLISHED crash is replayable, duplicate delivery is observable and the transaction-scoped domain effect remains one"
+      ]
+    },
+    "T-E013-OBS-026": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "Interactive queue age hard alert",
+      "level": "STATIC",
+      "assertions": [
+        "Interactive eligible age above 60 seconds pages with an async Runbook/release link and no job reference"
+      ]
+    },
+    "T-E013-OBS-027": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "profile-separated async signals",
+      "level": "STATIC",
+      "assertions": [
+        "Background lag is independently alerted and the API readiness contract is not coupled to Background or Restricted heartbeat"
+      ]
+    },
+    "T-E013-OBS-028": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "terminal contract failure retry bound",
+      "level": "RESILIENCE",
+      "assertions": [
+        "terminal contract failure stops blind retry, retry telemetry is bounded and the original opaque business key is unchanged"
+      ]
+    },
+    "T-E013-OBS-029": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "profile allowlist rejection",
+      "level": "INTEGRATION",
+      "assertions": [
+        "a disallowed profile job produces a hard capability rejection metric and never invokes the handler"
+      ]
+    },
+    "T-E013-OBS-030": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "empty Redis rebuild",
+      "level": "RESILIENCE",
+      "assertions": [
+        "total Redis loss rebuilds only eligible PostgreSQL facts within the bounded workflow and changes zero PostgreSQL fact counts"
+      ]
+    },
+    "T-E013-OBS-031": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "commit-before-ACK duplicate",
+      "level": "INTEGRATION",
+      "assertions": [
+        "commit-before-ACK retry increments low-cardinality Inbox duplicate telemetry and produces one domain effect"
+      ]
+    },
+    "T-E013-OBS-032": {
+      "file": "packages/server-adapters/src/queue/contracts.test.ts",
+      "selector": "content-free queue envelope and logs",
+      "level": "CONTRACT",
+      "assertions": [
+        "queue payload fields and business content fail the queue/log contract and are never serialized by the telemetry sink"
+      ]
+    },
+    "T-E013-OBS-033": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "UNKNOWN CostEntry contract",
+      "level": "CONTRACT",
+      "assertions": [
+        "UNKNOWN usage/cost requires null, rejects zero and makes aggregate cost status BLOCKED"
+      ]
+    },
+    "T-E013-OBS-034": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "model mismatch Gateway decision",
+      "level": "CONTRACT",
+      "assertions": [
+        "observed model mismatch makes the route inactive, provider calls zero and exposes only MODEL_MISMATCH for PAGE_CRITICAL"
+      ]
+    },
+    "T-E013-OBS-035": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "stale price Gateway decision",
+      "level": "CONTRACT",
+      "assertions": [
+        "a stale price catalog permits zero provider calls, selects the controlled template and emits PRICE_CATALOG_STALE"
+      ]
+    },
+    "T-E013-OBS-036": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "generation availability and template-rate recording rules",
+      "level": "STATIC",
+      "assertions": [
+        "template output can satisfy SLO-04 while the independent S25-M21 template ratio can fail; neither expression cancels the other"
+      ]
+    },
+    "T-E013-OBS-037": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "70 percent budget decision",
+      "level": "CONTRACT",
+      "assertions": [
+        "70 percent actual or forecast returns TICKET and keeps the reviewed provider route available"
+      ]
+    },
+    "T-E013-OBS-038": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "100 percent budget hard stop",
+      "level": "CONTRACT",
+      "assertions": [
+        "100 percent budget returns HARD_STOP, allows zero new provider calls and keeps template, Safety and deletion controls active"
+      ]
+    },
+    "T-E013-OBS-039": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "cost completeness block",
+      "level": "CONTRACT",
+      "assertions": [
+        "cost UNKNOWN above one percent or price coverage below 99 percent returns BLOCKED rather than a below-budget conclusion"
+      ]
+    },
+    "T-E013-OBS-040": {
+      "file": "packages/server-adapters/src/telemetry/policy.test.ts",
+      "selector": "anonymous CostEntry Schema",
+      "level": "CONTRACT",
+      "assertions": [
+        "per-user/account cost fields fail strict CostEntryV1 and only workload/provider revision aggregates are accepted"
+      ]
+    },
+    "T-E013-OBS-041": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "raw-content detector and hard alert",
+      "level": "STATIC",
+      "assertions": [
+        "a raw-content match stops ordinary export, increments a content-free detector metric and creates PAGE_CRITICAL/IR-SEV0 candidate routing"
+      ]
+    },
+    "T-E013-OBS-042": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "DataTask 75 percent deadline alert",
+      "level": "STATIC",
+      "assertions": [
+        "75 percent DataTask deadline pages by aggregate scope/stage/outcome without task or user reference and preserves the guard"
+      ]
+    },
+    "T-E013-OBS-043": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "deletion and restore hard detector alert",
+      "level": "STATIC",
+      "assertions": [
+        "one deletion guard, restore-deny or deleted-data detector failure pages immediately without an error budget"
+      ]
+    },
+    "T-E013-OBS-044": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "WAL 10 and 15 minute alerts",
+      "level": "STATIC",
+      "assertions": [
+        "a 10-minute WAL gap pages high and a 15-minute gap becomes PAGE_CRITICAL plus Release Gate/incident candidate"
+      ]
+    },
+    "T-E013-OBS-045": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "backup expiry hard alert and lifecycle Runbook",
+      "level": "STATIC",
+      "assertions": [
+        "a backup expiry violation creates a lifecycle incident candidate and the Runbook forbids using the expired backup as a recovery source"
+      ]
+    },
+    "T-E013-OBS-046": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "Collector/backend outage alert",
+      "level": "RESILIENCE",
+      "assertions": [
+        "15 minutes of stale heartbeat, a missing heartbeat series, or exporter failure creates PAGE_HIGH and the Runbook explicitly forbids compensating with body logging"
+      ]
+    },
+    "T-E013-OBS-047": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "observability cost alert and containment",
+      "level": "STATIC",
+      "assertions": [
+        "observability cost pressure pages and the Runbook reduces normal-success sampling/query retention before preserving hard detectors, SLO metrics and security logs"
+      ]
+    },
+    "T-E013-OBS-048": {
+      "file": "tests/observability/static.test.mjs",
+      "selector": "E-014 exercise contract false-PASS rejection",
+      "level": "CONTRACT",
+      "assertions": [
+        "the RC contract requires signal, SLO, burn, alert, Runbook, cost, TTL and delivery evidence while remaining E014_REQUIRED/completed=false; a false PASS is rejected"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S33-OBS-001",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-001"]
+    },
+    {
+      "source_id": "S33-OBS-002",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-002"]
+    },
+    {
+      "source_id": "S33-OBS-003",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-003"]
+    },
+    {
+      "source_id": "S33-OBS-004",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-004"]
+    },
+    {
+      "source_id": "S33-OBS-005",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-005"]
+    },
+    {
+      "source_id": "S33-OBS-006",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-006"]
+    },
+    {
+      "source_id": "S33-OBS-007",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-007"]
+    },
+    {
+      "source_id": "S33-OBS-008",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-008"]
+    },
+    {
+      "source_id": "S33-OBS-009",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-009"]
+    },
+    {
+      "source_id": "S33-OBS-010",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-010"]
+    },
+    {
+      "source_id": "S33-OBS-011",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-011"]
+    },
+    {
+      "source_id": "S33-OBS-012",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-012"]
+    },
+    {
+      "source_id": "S33-OBS-013",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-013"]
+    },
+    {
+      "source_id": "S33-OBS-014",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-014"]
+    },
+    {
+      "source_id": "S33-OBS-015",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-015"]
+    },
+    {
+      "source_id": "S33-OBS-016",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-016"]
+    },
+    {
+      "source_id": "S33-OBS-017",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-017"]
+    },
+    {
+      "source_id": "S33-OBS-018",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-018"]
+    },
+    {
+      "source_id": "S33-OBS-019",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-019"]
+    },
+    {
+      "source_id": "S33-OBS-020",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-020"]
+    },
+    {
+      "source_id": "S33-OBS-021",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-021"]
+    },
+    {
+      "source_id": "S33-OBS-022",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-022"]
+    },
+    {
+      "source_id": "S33-OBS-023",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-023"]
+    },
+    {
+      "source_id": "S33-OBS-024",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-024"]
+    },
+    {
+      "source_id": "S33-OBS-025",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-025"]
+    },
+    {
+      "source_id": "S33-OBS-026",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-026"]
+    },
+    {
+      "source_id": "S33-OBS-027",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-027"]
+    },
+    {
+      "source_id": "S33-OBS-028",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-028"]
+    },
+    {
+      "source_id": "S33-OBS-029",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-029"]
+    },
+    {
+      "source_id": "S33-OBS-030",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-030"]
+    },
+    {
+      "source_id": "S33-OBS-031",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-031"]
+    },
+    {
+      "source_id": "S33-OBS-032",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-032"]
+    },
+    {
+      "source_id": "S33-OBS-033",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-033"]
+    },
+    {
+      "source_id": "S33-OBS-034",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-034"]
+    },
+    {
+      "source_id": "S33-OBS-035",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-035"]
+    },
+    {
+      "source_id": "S33-OBS-036",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-036"]
+    },
+    {
+      "source_id": "S33-OBS-037",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-037"]
+    },
+    {
+      "source_id": "S33-OBS-038",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-038"]
+    },
+    {
+      "source_id": "S33-OBS-039",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-039"]
+    },
+    {
+      "source_id": "S33-OBS-040",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-040"]
+    },
+    {
+      "source_id": "S33-OBS-041",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-041"]
+    },
+    {
+      "source_id": "S33-OBS-042",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-042"]
+    },
+    {
+      "source_id": "S33-OBS-043",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-043"]
+    },
+    {
+      "source_id": "S33-OBS-044",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-044"]
+    },
+    {
+      "source_id": "S33-OBS-045",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-045"]
+    },
+    {
+      "source_id": "S33-OBS-046",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-046"]
+    },
+    {
+      "source_id": "S33-OBS-047",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-047"]
+    },
+    {
+      "source_id": "S33-OBS-048",
+      "status": "COVERED",
+      "proof_ids": ["T-E013-OBS-048"]
+    }
+  ]
+}

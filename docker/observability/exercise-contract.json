@@ -1,0 +1,31 @@
+{
+  "contract_version": "dailyenergy-observability-exercise-v1",
+  "status": "E014_REQUIRED",
+  "completed": false,
+  "allowed_environments": ["CI", "STAGING", "RECOVERY"],
+  "production_business_facts_allowed": false,
+  "required_evidence": [
+    "SIGNAL_CONTRACT",
+    "SLO_28D_PROVISIONAL",
+    "BURN_14_4_AND_6",
+    "LOW_TRAFFIC_CORROBORATION",
+    "HARD_TRIGGER",
+    "ALERT_CONTRACT",
+    "RUNBOOK_EXECUTION",
+    "COST_70_85_100_UNKNOWN",
+    "RETENTION_TTL_DELETION",
+    "ALERT_DELIVERY_CANARY",
+    "COLLECTOR_BACKEND_OUTAGE",
+    "RECOVERY_OBSERVATION_WINDOW"
+  ],
+  "forbidden_evidence": [
+    "REAL_USER_CONTENT",
+    "PROMPT",
+    "PROVIDER_RAW_RESPONSE",
+    "SECRET",
+    "PRODUCTION_DUMP",
+    "UNVERIFIED_PASS"
+  ],
+  "acceptance_owner": "PROJECT_OWNER",
+  "execution_owner": "E014_MANUAL_RC"
+}

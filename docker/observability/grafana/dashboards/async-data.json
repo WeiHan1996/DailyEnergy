@@ -1,0 +1,109 @@
+{
+  "annotations": { "list": [] },
+  "editable": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Status: PROVISIONAL / BLOCKED",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "max(time() - dailyenergy_telemetry_heartbeat_timestamp_seconds)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Outbox oldest age",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "max by (queue_family) (dailyenergy_outbox_oldest_unpublished_age_seconds)"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Queue oldest eligible age",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "max by (queue_family) (dailyenergy_queue_oldest_eligible_age_seconds)"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Retry / terminal / duplicate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (queue_family) (rate(dailyenergy_queue_retry_total[5m]))"
+        },
+        {
+          "expr": "sum by (queue_family) (rate(dailyenergy_queue_terminal_failures_total[5m]))"
+        },
+        {
+          "expr": "sum by (queue_family) (rate(dailyenergy_worker_inbox_duplicate_total[5m]))"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "PostgreSQL pool saturation / wait",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "max(dailyenergy_postgres_pool_saturation_ratio)" },
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(dailyenergy_postgres_pool_wait_seconds_bucket[5m])))"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Redis rebuild",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, queue_family) (rate(dailyenergy_redis_rebuild_duration_seconds_bucket[15m])))"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Restricted lifecycle summary",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (outcome_code, reason_code) (rate(dailyenergy_data_task_state_total[15m]))"
+        },
+        { "expr": "max(dailyenergy_wal_archive_gap_seconds)" }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": [
+    "dailyenergy",
+    "async",
+    "data",
+    "contract:dailyenergy-telemetry-v1",
+    "window:15m",
+    "environment:single",
+    "freshness:required"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "custom",
+        "query": "LOCAL,CI,DEV,STAGING",
+        "current": { "text": "CI", "value": "CI" }
+      }
+    ]
+  },
+  "time": { "from": "now-24h", "to": "now" },
+  "title": "Async Data",
+  "uid": "async-data",
+  "version": 1
+}

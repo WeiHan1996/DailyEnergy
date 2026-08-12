@@ -1,6 +1,10 @@
 import "reflect-metadata";
 
 import type { AddressInfo } from "node:net";
+import {
+  startApiTelemetry,
+  type TelemetryRuntime,
+} from "@daily-energy/server-adapters/api";
 
 import {
   loadRuntimeConfig,
@@ -10,6 +14,7 @@ import { ApiDatabaseReadiness } from "./bootstrap/database-readiness.js";
 import { createApiApplication } from "./bootstrap/create-api-application.js";
 import { ShutdownObserver } from "./bootstrap/shutdown-observer.js";
 import { OrdinaryLogger } from "./observability/ordinary-logger.js";
+import { startApiTelemetrySafely } from "./observability/telemetry-startup.js";
 
 type StartupFailureReason =
   | RuntimeConfigError["reasonCode"]
@@ -40,8 +45,20 @@ function writeStartupFailure(reasonCode: StartupFailureReason): void {
 }
 
 async function main(): Promise<void> {
+  let telemetry: TelemetryRuntime | undefined;
   try {
     const config = loadRuntimeConfig(process.env);
+    telemetry = startApiTelemetrySafely(startApiTelemetry, {
+      configSchemaVersion: config.configSchemaVersion,
+      contractBundleVersion: config.contractBundleVersion,
+      enabled: config.telemetry.enabled,
+      environment: config.environment,
+      metricsHost: config.telemetry.metricsHost,
+      metricsPort: config.telemetry.metricsPort,
+      otlpTraceUrl: config.telemetry.otlpTraceUrl,
+      releaseId: config.releaseId,
+      serviceVersion: "0.1.0",
+    });
     const readinessChecks = [];
     if (config.databaseUrlFile !== undefined) {
       const databaseReadiness = new ApiDatabaseReadiness(
@@ -54,6 +71,8 @@ async function main(): Promise<void> {
     }
     const application = await createApiApplication(config, {
       readinessChecks,
+      shutdownDrainHooks: [{ drain: () => telemetry?.shutdown() }],
+      telemetryRuntime: telemetry,
     });
     const logger = application.get(OrdinaryLogger);
     await application.listen(config.port, config.host);
@@ -67,6 +86,7 @@ async function main(): Promise<void> {
       reason_code: address === null ? "LISTENER_UNKNOWN" : "LISTENER_READY",
     });
   } catch (error) {
+    await telemetry?.shutdown().catch(() => undefined);
     writeStartupFailure(
       error instanceof RuntimeConfigError
         ? error.reasonCode

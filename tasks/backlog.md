@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-12
 - **当前阶段**：Phase 1 — 工程基础
-- **当前任务**：[E-013 日志与监控基线](./current.md)（Ready：E-012 最终证据已获接受，等待创建实现分支）
+- **当前任务**：[E-013 日志与监控基线](./current.md)（In Progress：实现分支已创建）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -108,7 +108,7 @@
 | S-34 | Phase 1～3 工程 Issues | Done | 3 个 GitHub Milestones、48 个 Issues                       | S-01～S-33             |
 | S-35 | Phase 0B Gate 评审     | Done | [Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) | S-34                   |
 
-S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)～[E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50) 与 [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) 已完成并进入 Done。E-012 最终证据已获项目所有者接受；E-013 是唯一 Ready 任务。
+S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。[E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)～[E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50) 与 [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) 已完成并进入 Done。E-012 最终证据已获项目所有者接受；E-013 是唯一 In Progress 任务。
 
 ## 4. Phase 1：工程基础
 
@@ -126,7 +126,7 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 | [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done        | 单元、集成、契约和端到端                              |
 | [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done        | 11/11 Gate、365 天 retention 与临时合并控制           |
 | [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | Done        | 固定 DEV、不可变发布、回滚、reconciliation 与真实演练 |
-| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Ready       | 脱敏日志、指标和告警                                  |
+| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | In Progress | 脱敏日志、指标和告警                                  |
 | [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Planned     | 环境可重复、CI 通过、服务可访问                       |
 | [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done        | P0/P1 上下文路由、任务 Profile 与安静验证             |
 
@@ -163,7 +163,7 @@ reconciliation、rollback N、redeploy N+1 与无代理最终 reconciliation；1
 9/13/2 资源闭集和独立 drift/TLS/COS/Safety/owner/deletion audit 均通过。首次引入时旧 N bundle 不含新命令并在状态写入前 fail closed，
 因此 Runbook 补充“先发布含能力的 N+1，再从 current N+1 演练 reconciliation”的一次性 bootstrap 约束，禁止跨 bundle controller。
 E-012 final evidence PR #134 的固定 Ubuntu CI 已 11/11 SUCCESS；项目所有者已接受首次引入 bootstrap 澄清与全部最终证据，
-并授权精确 final-head Gate 后 squash 合并、关闭 Issue #50。E-012 进入 Done，E-013 成为唯一 Ready；域名 ICP、DNS/TLS 和
+并授权精确 final-head Gate 后 squash 合并、关闭 Issue #50。E-012 进入 Done，E-013 成为唯一 In Progress；域名 ICP、DNS/TLS 和
 STAGING/PRODUCTION 独立状态服务仍为外部 Gate，其它任务继续 Planned。
 
 ## 5. Phase 2：确定性核心闭环
