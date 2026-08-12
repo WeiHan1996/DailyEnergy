@@ -5,7 +5,7 @@
 - **当前阶段**：Phase 1 — 工程基础
 - **当前任务**：E-014 — 执行 Phase 1 工程基础 Gate
 - **任务状态**：Ready
-- **任务分支**：待创建；必须从已验证的 E-013 merge main `d7500333eda31d160667a0ae0e49413f600ee0e0` 创建
+- **任务分支**：待创建；必须从状态 PR #136 合并且 merge-main 11/11 通过后的最新 `main` 创建
 - **当前 Issue**：[E-014 Issue #52](https://github.com/WeiHan1996/DailyEnergy/issues/52)
 - **当前 PR**：无；开工后创建一个聚焦的 Draft PR
 - **最近完成 PR**：[E-013 PR #135](https://github.com/WeiHan1996/DailyEnergy/pull/135)
