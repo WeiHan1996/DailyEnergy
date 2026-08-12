@@ -24,16 +24,16 @@ Ubuntu CI 必须 11/11 全绿，项目所有者必须审核并明确接受本报
 
 ## 2. 为什么可以继续开发
 
-| 要求                      | 结论                            | 证据                                                                                                                        |
-| ------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| 可重复构建与 CI           | 基线已验证，final head 仍须重跑 | main `a5d83d5` CI run `31569245433` 11/11；E-014 PR CI 待生成                                                               |
-| 不可变 DEV 部署与回滚     | 复用 Accepted E-012             | PR #134 merge `dd201713`；N+1 deploy 18/18、reconcile 17/17、rollback 18/18、redeploy 18/18；state SHA-256 `56433f48...8d6` |
-| 数据库与迁移              | 自动化证据可重跑                | PostgreSQL 18 clean/upgrade/grant/TX suites 与 migration/drift Gate                                                         |
-| Redis 整体丢失            | 有真实 replacement Redis 证据   | `T-QUEUE-INTEGRATION-REBUILD-001`：只从 PG 重建 eligible facts，PG fact count 不变                                          |
-| Compose 与故障恢复        | 有可重放合成证据                | clean startup、smoke、PG/Redis/provider/network/clock/telemetry fault tests                                                 |
-| secret/content/capability | fail-closed 自动 Gate           | 11-lane CI、artifact scan、profile/runtime/egress/secret known-fail fixtures                                                |
-| 监控基线                  | reference stack 可执行          | E-013 48 项 proof、runtime config parse、SLO/alert/cost/outage contracts                                                    |
-| Source-ID                 | 无 silent omission              | 736 项全部有显式状态；203 COVERED、533 PLANNED、0 NA；每个 PLANNED 有 owner 和 reason                                       |
+| 要求                      | 结论                                 | 证据                                                                                                                        |
+| ------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| 可重复构建与 CI           | 实现 head 已验证，状态 head 仍须重跑 | main `a5d83d5` run `31569245433` 11/11；PR #138 `93b64a6` run `31580514678` 11/11                                           |
+| 不可变 DEV 部署与回滚     | 复用 Accepted E-012                  | PR #134 merge `dd201713`；N+1 deploy 18/18、reconcile 17/17、rollback 18/18、redeploy 18/18；state SHA-256 `56433f48...8d6` |
+| 数据库与迁移              | 自动化证据可重跑                     | PostgreSQL 18 clean/upgrade/grant/TX suites 与 migration/drift Gate                                                         |
+| Redis 整体丢失            | 有真实 replacement Redis 证据        | `T-QUEUE-INTEGRATION-REBUILD-001`：只从 PG 重建 eligible facts，PG fact count 不变                                          |
+| Compose 与故障恢复        | 有可重放合成证据                     | clean startup、smoke、PG/Redis/provider/network/clock/telemetry fault tests                                                 |
+| secret/content/capability | fail-closed 自动 Gate                | 11-lane CI、artifact scan、profile/runtime/egress/secret known-fail fixtures                                                |
+| 监控基线                  | reference stack 可执行               | E-013 48 项 proof、runtime config parse、SLO/alert/cost/outage contracts                                                    |
+| Source-ID                 | 无 silent omission                   | 736 项全部有显式状态；203 COVERED、533 PLANNED、0 NA；每个 PLANNED 有 owner 和 reason                                       |
 
 E-012 的部署合同、digest 和 topology 没有被 E-014 修改，因此重复操作真实服务器不能增加新的
 证明力，反而增加时间、成本和运行风险。本 Gate 重跑自动化层，并引用已经接受、仍然适用的真实
@@ -105,6 +105,12 @@ PR #138 首轮 head `2ba9b0b1cbc9ef0fcd517431307948d13b9835d5` 的 CI run `31579
 正确拒绝了 current/backlog 的 `In Review`/`In Progress` 状态冲突：9 个前置 checks 成功，
 `unit-contract` 与 aggregate Gate 失败。该 run 不是 final-head PASS；状态修正后必须由一个新 run
 完整给出 11/11。
+
+修正后的实现与状态一致性 head `93b64a686823f18fb3d942e99e2700f1d2cc7e5a` 已在固定 Ubuntu
+CI run `31580514678` 获得同一 run 11/11 SUCCESS，PR 状态为 `CLEAN/MERGEABLE` 且保持 Draft。
+本次纯状态证据回写形成的新 final head 仍须完整 11/11，并由 PR comment 固化 final head/run；
+Draft 状态下 merge-gate verifier 返回 `CI_MANUAL_MERGE_GATE_PR_NOT_READY` 是预期的 fail-closed
+行为，只有项目所有者批准并标 Ready 后才能执行最终 exact-head merge 核验。
 
 通过审核后才把 E-014 置为 Done，并从 Phase 2 依赖图中选择恰好一个下一任务 Ready；本 Draft
 报告不提前启动 D-001、C-001 或其它下游任务。

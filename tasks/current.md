@@ -7,7 +7,7 @@
 - **任务状态**：In Review
 - **任务分支**：`agent/e014-phase1-gate`，基于 `a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae`
 - **当前 Issue**：[E-014 Issue #52](https://github.com/WeiHan1996/DailyEnergy/issues/52)
-- **当前 PR**：[Draft PR #138](https://github.com/WeiHan1996/DailyEnergy/pull/138)，等待 final-head Ubuntu CI 与项目所有者审核
+- **当前 PR**：[Draft PR #138](https://github.com/WeiHan1996/DailyEnergy/pull/138)；实现 head 已 11/11，等待最终状态 head CI 与项目所有者审核
 - **最近完成 PR**：[E-013 PR #135](https://github.com/WeiHan1996/DailyEnergy/pull/135)
 - **Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO / OWNER_REVIEW_PENDING`
 
@@ -102,12 +102,16 @@ Accepted E-012/E-013 evidence + current full automated Gate
   通过；测试在 deployment suite 48/50 处以稳定平台错误停止；
 - `pnpm agent:validate --mode=full --task=E-014` 已执行：同样在 deployment suite 48/50 处停止；
   本机 automated status 如实为 `FAIL`，未报告为 PASS；
-- E-014 Draft PR final head 的固定 Ubuntu 11/11 CI 待生成，它是补齐 Linux `flock`、Linux-only
-  supply-chain inventory 和固定 npm audit 环境的权威平台证据；
+- PR #138 实现与状态一致性 head `93b64a686823f18fb3d942e99e2700f1d2cc7e5a` 的固定 Ubuntu
+  CI run `31580514678` 已由同一 run 11/11 SUCCESS；覆盖 Linux `flock`、Linux-only
+  supply-chain inventory、固定 npm audit、9 个 automated lanes 和 aggregate Gate；PR 为
+  `CLEAN/MERGEABLE` 且仍是 Draft；
 - PR #138 首轮 head `2ba9b0b1cbc9ef0fcd517431307948d13b9835d5` 的 CI run `31579999699`
   正确拒绝了 `tasks/current.md=In Review` 与 `tasks/backlog.md=In Progress` 的状态冲突；9 个前置
   checks 成功，`unit-contract` 与 aggregate Gate 失败。该 run 不计作 final-head PASS，本状态提交
   修正冲突后必须整套重跑；
+- 仓库 merge-gate verifier 在 PR 仍为 Draft 时正确返回 `CI_MANUAL_MERGE_GATE_PR_NOT_READY`；不为
+  预验而提前标 Ready。项目所有者批准后，必须对当时 exact final head 再运行 verifier；
 - security profile 的 `threatBoundaryReview` 仍需项目所有者审核；Production authorization 明确
   未授予，且本任务不请求授予。
 
@@ -139,7 +143,8 @@ Accepted E-012/E-013 evidence + current full automated Gate
 
 ## 7. 精确下一动作
 
-1. 推送状态一致性修复，等待并核验新 final head 的固定 Ubuntu CI 11/11；
-2. 把 final PR head/run 写回本文件和报告，再对该状态提交后的新 final head 复跑 11/11；
-3. 请求项目所有者审核。只有后续明确批准后，才能标 Ready、用 exact-head 合并控制 squash merge、
+1. 提交本次纯状态证据回写，并等待其 final head 的固定 Ubuntu CI 11/11；
+2. 用 PR comment 固化 final status head/run/checks，保持 PR 为 Draft并请求项目所有者审核；
+3. 只有后续明确批准后，才能标 Ready、对当时 exact head 运行 merge-gate verifier，并使用
+   `--match-head-commit` 的补偿控制 squash merge、
    关闭 Issue #52、把 E-014 设为 Done，并从依赖图选择恰好一个 Phase 2 下一任务 Ready。
