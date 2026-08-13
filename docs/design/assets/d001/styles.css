@@ -167,11 +167,11 @@ main {
 }
 
 .route {
-  --accent: #3f6552;
-  --accent-2: #e27c67;
-  --soft: #eef3ed;
-  --paper: #f8f8f3;
-  --ink: #243029;
+  --accent: #3f7c69;
+  --accent-2: #dfeadb;
+  --soft: #e4ede4;
+  --paper: #f7f4ea;
+  --ink: #20352e;
   padding: 72px clamp(24px, 6vw, 88px) 88px;
   color: var(--ink);
   background: var(--paper);
@@ -344,7 +344,7 @@ main {
   line-height: 1.8;
 }
 .type-sample-a p {
-  font-family: ui-serif, "Songti SC", STSong, serif;
+  font-weight: 720;
 }
 .type-sample-b p {
   font-weight: 720;
@@ -370,39 +370,42 @@ main {
   position: absolute;
   display: block;
 }
+.shape-sample-a {
+  background: #f7f4ea;
+}
 .shape-sample-a i:nth-child(1) {
-  width: 130px;
-  height: 90px;
-  left: -20px;
-  top: 28px;
-  border: 3px solid var(--accent);
-  border-radius: 64% 36% 58% 42%;
-  transform: rotate(-13deg);
-}
-.shape-sample-a i:nth-child(2) {
-  width: 88px;
-  height: 118px;
-  right: 16px;
-  top: 12px;
-  background: #c9c5e8;
-  border-radius: 62% 38% 48% 52%;
-  transform: rotate(24deg);
-}
-.shape-sample-a i:nth-child(3) {
-  width: 40px;
-  height: 40px;
-  left: 44%;
-  top: 20px;
-  background: var(--accent-2);
+  width: 210px;
+  height: 150px;
+  right: -82px;
+  top: -88px;
+  background: #dfeadb;
   border-radius: 50%;
 }
+.shape-sample-a i:nth-child(2) {
+  width: 220px;
+  height: 154px;
+  right: -94px;
+  top: -94px;
+  border: 2px solid #3f7c69;
+  border-radius: 50%;
+  transform: rotate(38deg);
+}
+.shape-sample-a i:nth-child(3) {
+  width: 84px;
+  height: 22px;
+  left: 20px;
+  top: 54px;
+  background: #e4ede4;
+  border-radius: 12px;
+}
 .shape-sample-a i:nth-child(4) {
-  width: 80px;
-  height: 2px;
-  left: 32%;
-  bottom: 24px;
-  background: var(--ink);
-  transform: rotate(-9deg);
+  height: 46px;
+  right: 20px;
+  bottom: 18px;
+  left: 20px;
+  background: #f0f5eb;
+  border: 1px solid #c7d5ce;
+  border-radius: 18px;
 }
 .shape-sample-b {
   background: transparent;
@@ -695,51 +698,176 @@ main {
 }
 
 .phone-a {
-  background: #fbfcf8;
-  border-color: #243029;
+  width: 100%;
+  max-width: 420px;
+  min-height: 920px;
+  height: 920px;
+  position: relative;
+  padding: 32px 28px 13px;
+  color: #20352e;
+  background: #f7f4ea;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
-.friend-line {
-  height: 42px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.friend-line i {
-  display: block;
-  height: 1px;
-  flex: 1;
-  background: #b4c3b9;
-}
-.friend-line b {
-  display: block;
-  width: 28px;
-  height: 28px;
-  border: 2px solid var(--accent);
-  border-radius: 58% 42% 62% 38%;
-  transform: rotate(-18deg);
-}
-.phone-a .content-label span {
-  width: 8px;
-  height: 8px;
-  background: var(--accent-2);
+.a-light-orbit {
+  width: 440px;
+  height: 360px;
+  position: absolute;
+  top: -280px;
+  right: -290px;
+  z-index: 0;
+  background: #dfeadb;
   border-radius: 50%;
 }
-.phone-a .energy-hero {
-  padding: 22px;
-  background: #eef3ed;
-  border-radius: 30px 8px 30px 8px;
+.a-light-orbit::before {
+  content: "";
+  width: 290px;
+  height: 290px;
+  position: absolute;
+  top: 98px;
+  left: 75px;
+  border: 2px solid #3f7c69;
+  border-radius: 50%;
 }
-.phone-a .energy-hero h3 {
-  font-family: ui-serif, "Songti SC", STSong, serif;
-  font-weight: 600;
+.a-daily-top {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 5px;
 }
-.phone-a .energy-meter,
+.a-daily-top span {
+  color: #69756f;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.a-daily-top strong {
+  font-size: 30px;
+  line-height: 1.25;
+}
+.a-content-label {
+  width: max-content;
+  margin: 7px 0 0;
+  padding: 6px 14px;
+  color: #3f7c69;
+  background: #e4ede4;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+.a-energy-card {
+  min-height: 155px;
+  margin-top: 23px;
+  padding: 19px 22px 17px;
+  background: #fffdf8;
+  border: 1px solid #c7d5ce;
+  border-radius: 24px;
+}
+.a-energy-label {
+  display: block;
+  color: #68746e;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.a-energy-main {
+  display: flex;
+  align-items: baseline;
+  gap: 23px;
+  margin-top: 6px;
+}
+.a-energy-main strong {
+  color: #3f7c69;
+  font-size: 64px;
+  font-weight: 750;
+  line-height: 0.95;
+}
+.a-energy-main b {
+  color: #20352e;
+  font-size: 24px;
+  line-height: 1.2;
+}
+.a-energy-card p {
+  display: flex;
+  gap: 14px;
+  margin: 13px 0 0;
+  color: #68746e;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.a-focus-block {
+  margin-top: 34px;
+}
+.a-focus-block > span,
+.a-action-card > span {
+  color: #3f7c69;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+.a-focus-block h3 {
+  margin: 11px 0 0;
+  font-size: 24px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+.a-focus-block p {
+  margin: 24px 0 0;
+  color: #68746e;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.a-action-card {
+  min-height: 151px;
+  margin-top: 48px;
+  padding: 20px 22px 14px;
+  background: #f0f5eb;
+  border: 1px solid #c7d5ce;
+  border-radius: 24px;
+}
+.a-action-card h3 {
+  margin: 10px 0 0;
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.3;
+}
+.a-action-card p {
+  margin: 7px 0 0;
+  color: #68746e;
+  font-size: 14px;
+  line-height: 1.45;
+}
 .phone-a button {
-  border-radius: 2px;
+  min-height: 56px;
+  margin-top: 35px;
+  background: #3f7c69;
+  border-radius: 30px;
+  font-size: 18px;
 }
-.phone-a .action-block {
-  border-left: 3px solid var(--accent-2);
-  border-radius: 0 14px 14px 0;
+.phone-a .button-note {
+  margin-top: 13px;
+  color: #68746e;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.a-frame-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 31px 0 0;
+  padding-top: 13px;
+  color: #68746e;
+  border-top: 1px solid #c7d5ce;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.a-frame-note i {
+  width: 1px;
+  height: 14px;
+  background: #68746e;
 }
 
 .phone-b {
@@ -1285,6 +1413,45 @@ footer {
     min-height: 760px;
     padding-inline: 18px;
     border-width: 8px;
+  }
+  .phone-a {
+    width: calc(100% + 48px);
+    max-width: none;
+    min-height: 0;
+    height: auto;
+    padding: 28px 24px 17px;
+    border-width: 0;
+  }
+  .a-content-label {
+    margin-top: 7px;
+  }
+  .a-energy-card {
+    margin-top: 18px;
+    padding-inline: 20px;
+  }
+  .a-energy-main {
+    gap: 18px;
+  }
+  .a-energy-main strong {
+    font-size: 58px;
+  }
+  .a-energy-main b {
+    font-size: 22px;
+  }
+  .a-focus-block {
+    margin-top: 25px;
+  }
+  .a-focus-block p {
+    margin-top: 18px;
+  }
+  .a-action-card {
+    margin-top: 30px;
+  }
+  .phone-a button {
+    margin-top: 24px;
+  }
+  .a-frame-note {
+    display: none;
   }
   .phone-c {
     box-shadow: 7px 8px 0 var(--accent-2);

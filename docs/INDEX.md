@@ -114,8 +114,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/design/interaction-states.md](./design/interaction-states.md)                   | Accepted | 加载、失败、降级、权限和恢复                                           | screen-specs                         |
 | [docs/design/content-layout.md](./design/content-layout.md)                           | Accepted | 今日内容、趋势和分享的信息层级                                         | personality、daily-content-schema    |
 | [docs/design/prototype-validation.md](./design/prototype-validation.md)               | Accepted | [S-04 静态原型](../prototype/s04/README.md)、5～8 人测试计划和结果模板 | Accepted S-03 设计规格               |
-| [docs/design/visual-direction.md](./design/visual-direction.md)                       | Draft    | D-001 五条品牌视觉路线、评审证据与选择记录                             | Accepted 页面与交互规格              |
-| [docs/design/assets/d001/evidence/README.md](./design/assets/d001/evidence/README.md) | Active   | D-001 Figma 总览、小屏、大字、状态与减少动态证据索引                   | visual-direction、interaction-states |
+| [docs/design/visual-direction.md](./design/visual-direction.md)                       | Accepted | D-001 唯一 A — 温柔自然方向、反模式、证据与接受记录                    | Accepted 页面与交互规格              |
+| [docs/design/assets/d001/evidence/README.md](./design/assets/d001/evidence/README.md) | Active   | D-001 A 权威 Figma 截图、历史对比、小屏、大字、状态与减少动态证据索引  | visual-direction、interaction-states |
 | docs/design/design-system.md                                                          | Planned  | D-002 Variables、Design Tokens、组件、动效和无障碍                     | D-001、E-004                         |
 | docs/design/core-flow-high-fidelity.md                                                | Planned  | D-003 核心流程八页及关键状态高保真索引                                 | D-002                                |
 | docs/design/developer-handoff.md                                                      | Planned  | D-004 可点击原型、验证结果、Frame ID 和视觉 QA 交付                    | D-003、prototype-validation          |
@@ -252,7 +252,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-015 已完成，Phase 1 已结束；D-001 是 Phase 2 唯一 In Review 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-015 已完成，Phase 1 已结束；D-001 的 A — 温柔自然视觉方向已于 2026-08-13 获项目所有者接受，任务仍为 Phase 2 唯一 In Review，等待 Figma 决策文字同步和远程 PR 合并。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
@@ -305,6 +305,8 @@ PR #138 本次开发合并接受 GitHub Free 残余风险；Production authoriza
 `31586034272` 11/11 SUCCESS，并经 exact-head verifier 与 `--match-head-commit` squash 合并为
 `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`。merged-main CI run `31586384383` 首次因 Docker Hub
 Tempo 镜像拉取超时失败，失败 jobs 重跑后 attempt 2 同一提交 11/11 SUCCESS。E-014 进入 Done，
-Phase 1 结束，D-001 已成为 Phase 2 唯一 In Review 任务；Draft PR #140 等待方向选择。
+Phase 1 结束，D-001 已成为 Phase 2 唯一 In Review 任务。项目所有者于 2026-08-13 接受
+`01B / Gentle Nature / DLY-003`（A — 温柔自然），理由为“清晰自然，排版克制，内容清晰”，并明确
+不吸收其它路线元素；Draft PR #140 因 Actions 额度约束尚未更新或合并，D-002 保持 Planned。
 公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。

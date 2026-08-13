@@ -1,14 +1,14 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-13（A — 温柔自然已选定；等待理由、次方向元素与最终接受）
+- **最后更新**：2026-08-13（A — 温柔自然已接受；等待 Figma 决策同步与 PR 合并）
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：D-001 — 确定品牌与视觉方向
 - **任务状态**：In Review
 - **任务 Profile**：`design`
 - **任务分支**：`agent/d001-visual-direction`（基于 `cad3a98`）
 - **当前 Issue**：[D-001 Issue #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)
-- **当前 PR**：[D-001 Draft PR #140](https://github.com/WeiHan1996/DailyEnergy/pull/140)；A 已在本地选为唯一主方向，远程 PR 暂未更新，等待理由、次方向元素与明确接受
+- **当前 PR**：[D-001 Draft PR #140](https://github.com/WeiHan1996/DailyEnergy/pull/140)；A 已在本地接受为唯一方向，远程 PR 因 Actions 额度约束暂未更新或合并
 - **最近完成 PR**：[E-014 PR #138](https://github.com/WeiHan1996/DailyEnergy/pull/138)，squash merge `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -22,8 +22,8 @@ D-001 的交付范围以 Issue #99 为准：
 - 用同一组固定合成内容和同一张 DLY-003 概念页制作“温柔自然、清醒高级、轻快能量、都市柔光、克制空间”五条方向板；
 - 定义品牌关键词、反关键词、色彩、排版、图形、插画、图标、动效、微信可实施性和无障碍约束；
 - 记录参考素材来源与许可，不把未获许可资产当成可交付品牌资产；
-- 建立 Figma 评审入口、Frame ID 清单和 `docs/design/visual-direction.md` Draft；
-- 在用户明确选择前保持 Draft，不提前声明视觉方向 Accepted。
+- 建立 Figma 评审入口、Frame ID 清单和 `docs/design/visual-direction.md`；
+- 只在用户明确选择后把视觉方向更新为 Accepted，并保留原始视觉证据与选择理由。
 
 不做完整 Token/组件库、全部高保真页面、业务页面实现、管理后台重设计或 Accepted 信息架构修改。
 
@@ -71,13 +71,13 @@ D-001 的交付范围以 Issue #99 为准：
 
 ### 4.1 已完成交付
 
-- [视觉方向 Draft](../docs/design/visual-direction.md)：五条路线、反模式、状态对照、决策矩阵、
+- [已接受视觉方向](../docs/design/visual-direction.md)：五条路线、反模式、状态对照、决策矩阵、
   概念级 Token/组件复用和 Figma Frame 命名；
 - [仓库评审入口](../docs/design/assets/d001/index.html)：同一固定内容和 DLY-003 信息顺序下的
   “温柔自然、清醒高级、轻快能量、都市柔光、克制空间”方向板与代表页；
 - [素材与许可记录](../docs/design/assets/d001/README.md)：所有图形为本任务原创，未使用第三方
   图片、插画、图标库、照片或字体文件；
-- `docs/INDEX.md`、`docs/design/README.md` 和 `tasks/backlog.md` 已同步为 Draft/In Progress。
+- `docs/INDEX.md`、`docs/design/README.md` 和 `tasks/backlog.md` 已同步为 Accepted/In Review。
 
 ### 4.2 验证记录
 
@@ -118,11 +118,24 @@ D-001 的交付范围以 Issue #99 为准：
   Figma 后续异常版本已排除为评审证据，B 代表页父 Frame ID 降为待人工复核；
 - 2026-08-13 项目所有者经过进一步比较，选择 `01B / Gentle Nature / DLY-003`，即 A — 温柔自然，
   替代此前暂定的 D — 都市柔光。A 已记录为唯一主方向；D 的一屏修订保留为历史对比与信息层级参考。
-  方向选择证据为 READY，但选择理由、允许吸收的次方向元素和 D-001 明确接受仍为 Pending，因此
-  D-002 不解锁；本轮继续遵守 Actions 额度约束，只做本地记录与验证；
+  本轮继续遵守 Actions 额度约束，只做本地记录与验证；
+- 2026-08-13 项目所有者明确以截图中的 Figma `01B / Gentle Nature / DLY-003` 为视觉权威，接受 A 为
+  D-001 唯一方向；理由为“清晰自然，排版克制，内容清晰”，并明确不吸收其它路线元素。权威截图已
+  按未裁切 `420 x 920` 归档，本地 A 概念页向其同步；`directionSelection` 与 `userAcceptance` 均为
+  READY。D-001 仍保持 In Review，因为 Figma 决策文字、远程 PR 和合并尚未完成，D-002 保持 Planned；
 - 浏览器视觉检查：320px 与 390px 均无页面横向溢出；已保存小屏、浏览器大字放大、非颜色状态和
   Figma 总览截图；新增五路线在 360px 与 736px 下也无横向溢出；评审页无持续动画，减少动态偏好会
   关闭平滑滚动。微信真机验证不在 D-001 内。
+- 2026-08-13 A 接受稿本地同步复核：权威 Figma 截图按未裁切 `420 x 920` 归档，本地 A 稿使用相同
+  画板尺寸并保存同步截图；两者人工并排核对了区域顺序、系统无衬线层级、换行、圆角、色彩、右上
+  自然弧线、按钮和底部注记。本地 `420 x 920` 画板 `scrollHeight === clientHeight`；`320/360/390 x
+844` 三档下画板均为 `806px` 高，最后内容结束于 `789px`，页面横向溢出、内部纵向溢出和内容重叠
+  均为 0；
+- 2026-08-13 A 接受稿验证：Prettier、`git diff --check`、`pnpm run format:check` 和
+  `pnpm run agent:check` 通过；`pnpm agent:validate --mode=full --task=D-001` 按策略提升为 hybrid，
+  前置格式、架构、合同、Agent workflow 和数据库静态证据通过，但整体仍为 FAIL。唯一根因是本机
+  macOS 缺少 Linux `flock` 的 `RELEASE_LOCK_RUNTIME_MISSING:flock`，deployment 48/50；未改写为
+  自动化 PASS。Figma 决策页已尝试通过登录会话读取，但画布状态连续超时，未执行盲编辑；
 
 ### 4.3 当前人工/外部证据
 
@@ -135,15 +148,17 @@ D-001 的交付范围以 Issue #99 为准：
 - `frameIds`：Partial；12 个稳定命名 Frame ID 已核验，D/E 分别为 `12:36`、`12:66`、`12:101`、
   `12:133`，五路状态/决策对照为 `12:183`、`12:239`；B 代表页顶层 row 显示为 `1:132`，旧记录
   `1:149` 是子文本层，待 Figma 可稳定读取时再次人工核验父 Frame；
-- `stateScreenshots`：Ready；证据索引包含五路线 Figma 总览、360px、736px、原 320px/390px
-  历史证据、浏览器大字放大和非颜色状态；减少动态规则已核对，真机系统字号/减少动态验证留给
-  D-002 及后续任务；
+- `stateScreenshots`：Ready；证据索引包含 A 权威 `420 x 920` Figma 截图、五路线 Figma 总览、
+  360px、736px、原 320px/390px 历史证据、浏览器大字放大和非颜色状态；减少动态规则已核对，
+  真机系统字号/减少动态验证留给 D-002 及后续任务；
 - `tokenAndComponentReuse`：Ready for D-001；同一语义槽位、固定内容/顺序和对应 Frame 可追踪，
   不冒充 D-002 的完整 Variables、Tokens 或正式组件库；
 - `directionSelection`：Ready；项目所有者于 2026-08-13 选择 A — 温柔自然（Frame `1:119`）为唯一
   主方向，替代此前暂定的 D — 都市柔光；
-- `userAcceptance`：Pending；尚未提供最终选择理由、允许吸收的次方向元素或明确接受 D-001，
-  D-002 不解锁。
+- `userAcceptance`：Ready；项目所有者于 2026-08-13 明确接受，理由为“清晰自然，排版克制，内容
+  清晰”，允许吸收的次方向元素为 `None / 不吸收`；
+- `figmaDecisionSync`：Pending；`00 / Read me`、`07 / Decision Matrix` 尚未写回最终选择文字，B
+  代表页父 Frame ID 仍待在线文件稳定可编辑时核验；不影响已完成的用户接受，但必须在 PR 合并前记录。
 - 2026-08-13 D 路线首轮反馈及修订：分数从 80px 主视觉降为 30px 辅助数字；今日重点提升为
   26px；解释首句/正文提升为 17px/16px 并按完整句分组；“今天可以这样做”和主要行动使用梅子色及
   `Noto Serif SC` 18px/24px 层级。Figma Frame `12:66` 保持不变，新固定版本
@@ -159,7 +174,7 @@ D-001 的交付范围以 Issue #99 为准：
 - 本计费周期内默认只做本地编辑、提交与验证；非必要不 push、不重跑 workflow、不改变可能触发
   Actions 的 PR 状态或执行其它远程写操作；
 - 确有必要触发 Actions 时，必须先说明原因并取得项目所有者确认；
-- 本次“A 已选定”决定先仅记录在本地分支，不更新远程 Draft PR #140，以免产生非必要运行。
+- 本次“A 已接受”决定先仅记录在本地分支，不更新远程 Draft PR #140，以免产生非必要运行。
 
 ## 5. Production / RC 未决项
 
@@ -179,9 +194,8 @@ D-001 的交付范围以 Issue #99 为准：
 
 ## 6. 精确下一动作
 
-1. 项目所有者补充选择 A — 温柔自然的最终理由，并明确允许从其它路线吸收哪些元素（也可明确“不吸收”）；
-2. 将 A 选择、理由和次方向元素同步到 Figma Read me/Decision Matrix，保存新的选择版本；同时再次核验
-   B 代表页父 Frame ID，不再改动 B 文本图层；
-3. 项目所有者复核更新后的 A 方向证据并明确接受 D-001；
-4. 接受后更新视觉方向文档和项目状态；待 Actions 额度允许或项目所有者授权后，再更新远程 Draft PR #140、
-   完成审核与合并并把 D-002 移为唯一 Ready；不在当前任务中启动 D-002。
+1. 将 A 的最终选择、原始理由和 `None / 不吸收` 同步到 Figma `00 / Read me` 与
+   `07 / Decision Matrix`，保存新的选择版本；同时再次核验 B 代表页父 Frame ID，不改动 B 文本图层；
+2. 完成本地格式、证据、溢出与 task Gate 验证，记录无法自动替代的人工视觉证据边界；
+3. 待 Actions 额度允许或项目所有者另行授权后，更新远程 Draft PR #140，完成审核与合并；
+4. 合并后把 D-001 移为 Done，并将 D-002 移为唯一 Ready；当前任务不启动 D-002。

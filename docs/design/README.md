@@ -11,11 +11,12 @@
 - [content-layout.md](./content-layout.md)
 - [prototype-validation.md](./prototype-validation.md)
 
-正式视觉工作流已进入 Phase 2。D-001 为唯一 In Review 任务，后续任务保持 Planned：
+正式视觉工作流已进入 Phase 2。项目所有者已接受 D-001 的 A — 温柔自然方向；D-001 仍是唯一
+In Review 任务，等待本地接受记录同步至 Figma/远程 PR 并完成合并，后续任务保持 Planned：
 
 | Issue                                                              | 状态      | 计划文档                                     | 主要结果                                 |
 | ------------------------------------------------------------------ | --------- | -------------------------------------------- | ---------------------------------------- |
-| [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)   | In Review | [visual-direction.md](./visual-direction.md) | 五条品牌与视觉方向 Draft                 |
+| [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)   | In Review | [visual-direction.md](./visual-direction.md) | 已接受 A — 温柔自然；等待 PR 合并        |
 | [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100) | Planned   | `design-system.md`                           | Figma Variables、Design Tokens 与组件    |
 | [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101) | Planned   | `core-flow-high-fidelity.md`                 | 核心流程八页及关键状态                   |
 | [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) | Planned   | `developer-handoff.md`                       | 核心流程可点击原型、验证与开发交付       |
