@@ -252,7 +252,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-015 已完成，Phase 1 已结束；D-001 的 A — 温柔自然视觉方向已于 2026-08-13 获项目所有者接受，任务仍为 Phase 2 唯一 In Review，等待 Figma 决策文字同步和远程 PR 合并。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-015 已完成，Phase 1 已结束；D-001 的 A — 温柔自然视觉方向已于 2026-08-13 获项目所有者接受并同步至 Figma，任务仍为 Phase 2 唯一 In Review，等待远程 PR 更新与合并。读取顺序：
 
 1. AGENTS.md；
 2. README.md；

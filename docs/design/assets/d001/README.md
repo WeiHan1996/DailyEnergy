@@ -75,7 +75,7 @@ http://localhost:4173/docs/design/assets/d001/
 | 仓库内方向板                 | READY   | `index.html`；A 已向权威截图同步                                  |
 | A 权威 Figma 截图            | READY   | `420 x 920` 未裁切归档；Frame `1:119`                             |
 | Figma file                   | READY   | [文件与 Frame IDs](../../visual-direction.md#11-figma-与人工证据) |
-| Figma version                | READY   | A 主方向基线版本 `2386995845583123461`；D 一屏版本保留历史        |
+| Figma version                | READY   | A 视觉基线 `2386995845583123461`；接受记录 `2387205319197099564`  |
 | Frame IDs                    | PARTIAL | A Frame 已核验；B 代表页父 Frame ID 待再次人工核验                |
 | 小屏/大字体/减少动态视觉截图 | READY   | [证据索引](./evidence/README.md)                                  |
 | 非颜色状态检查               | READY   | 状态卡均同时使用文字标题、说明和结构位置                          |
@@ -83,7 +83,7 @@ http://localhost:4173/docs/design/assets/d001/
 | 用户方向选择                 | READY   | A — 温柔自然；`01B / Gentle Nature / DLY-003`，Frame `1:119`      |
 | 选择理由与次方向元素         | READY   | “清晰自然，排版克制，内容清晰”；None / 不吸收                     |
 | D-001 用户接受               | READY   | 项目所有者于 2026-08-13 明确接受                                  |
-| Figma 决策文字同步           | PENDING | 待写回 `00 / Read me` 与 `07 / Decision Matrix`                   |
+| Figma 决策文字同步           | READY   | Frames `12:164`、`12:239` 已写回并在固定版本中可见核验            |
 
 ## 5. 非交付范围
 

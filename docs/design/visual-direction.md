@@ -7,8 +7,9 @@
 - **任务 Issue**：[D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)
 - **仓库评审入口**：[D-001 视觉方向板](./assets/d001/index.html)
 - **Figma 评审入口**：[DailyEnergy / D-001 Visual Direction](https://www.figma.com/design/T5HS32Ciz6LZh81KbqhFGo/DailyEnergy---D-001-Visual-Direction?node-id=0-1&p=f)
-- **Figma 评审版本**：[01B / Gentle Nature / DLY-003](https://www.figma.com/design/T5HS32Ciz6LZh81KbqhFGo/DailyEnergy---D-001-Visual-Direction?version-id=2386995845583123461&node-id=1-119)
-- **人工证据状态**：`USER_ACCEPTANCE_READY / FIGMA_DECISION_SYNC_PENDING`
+- **Figma 视觉基线版本**：[01B / Gentle Nature / DLY-003](https://www.figma.com/design/T5HS32Ciz6LZh81KbqhFGo/DailyEnergy---D-001-Visual-Direction?version-id=2386995845583123461&node-id=1-119)
+- **Figma 接受记录版本**：[D-001 Accepted — Gentle Nature](https://www.figma.com/design/T5HS32Ciz6LZh81KbqhFGo/DailyEnergy---D-001-Visual-Direction?version-id=2387205319197099564&node-id=12-164&p=f)
+- **人工证据状态**：`USER_ACCEPTANCE_READY / FIGMA_DECISION_SYNC_READY`
 
 ## 1. 决策目的
 
@@ -232,7 +233,8 @@ D-002 同时依赖两套主系统。
 2026-08-13，项目所有者经过进一步比较，将 `01B / Gentle Nature / DLY-003`（A — 温柔自然）
 选为唯一主方向，替代此前暂定的 D — 都市柔光，并明确接受 D-001 的视觉方向。选择理由为“清晰自然，
 排版克制，内容清晰”；不吸收其它路线元素。D 的一屏迭代仅保留为历史过程证据，不再作为主方向或
-D-002 的视觉输入。Figma 决策页仍待同步，远程 PR 仍待更新与合并，因此 D-002 暂不开始。
+D-002 的视觉输入。Figma 决策页已在命名版本 `2387205319197099564` 中同步并完成可见核验；远程 PR
+仍待更新与合并，因此 D-002 暂不开始。
 
 ### 10.1 选择记录
 
@@ -275,6 +277,10 @@ Figma 文件命名为 `DailyEnergy / D-001 Visual Direction`，位于新 team �
 `01B / Gentle Nature / DLY-003`（Frame `1:119`）。D 一屏版本 `2387112673004022103` 和首轮阅读
 层级版本 `2387049154733899236` 保留为历史对比与信息层级参考，不作为 D-002 的主视觉输入。
 
+接受记录版本 `2387205319197099564` 将最终选择、原始理由、`None / 不吸收其它路线元素`、接受状态
+和日期写入 `00 / Read me`（Frame `12:164`）与 `07 / Decision Matrix`（Frame `12:239`）。两个 Frame
+已从该固定版本分别打开并完成可见核验；这项记录不改变上面的 A 视觉基线。
+
 项目所有者指定的权威视觉截图已按原始 `840 x 1840` 的 2 倍导出比例缩放为未裁切的 `420 x 920`
 [接受证据](./assets/d001/evidence/a-figma-authoritative.png)。它对应 Frame `1:119`，优先于此前仓库
 评审页中存在差异的 A 概念稿；本地 A 稿只向该截图同步，不从 B、C、D、E 吸收元素。
@@ -303,18 +309,19 @@ Figma 可稳定读取时再次人工核验父 Frame，再移除本注记。
 
 ### 11.3 必需人工证据
 
-| 证据字段                 | 当前状态 | 证据或剩余工作                                             |
-| ------------------------ | -------- | ---------------------------------------------------------- |
-| `figmaFile`              | READY    | file key `T5HS32Ciz6LZh81KbqhFGo`                          |
-| `figmaVersion`           | READY    | A 基线评审 version ID `2386995845583123461`                |
-| `frameIds`               | PARTIAL  | A Frame `1:119` 已核验；B 代表页父 Frame ID 待再次人工核验 |
-| `stateScreenshots`       | READY    | [证据索引](./assets/d001/evidence/README.md)               |
-| `tokenAndComponentReuse` | READY    | 同一语义槽位、固定内容/顺序和对应 Figma Frame 可复核       |
-| `directionSelection`     | READY    | A — 温柔自然；Frame `1:119`                                |
-| `userAcceptance`         | READY    | 2026-08-13；理由和“不吸收其它路线元素”均已记录             |
+| 证据字段                 | 当前状态 | 证据或剩余工作                                                 |
+| ------------------------ | -------- | -------------------------------------------------------------- |
+| `figmaFile`              | READY    | file key `T5HS32Ciz6LZh81KbqhFGo`                              |
+| `figmaVersion`           | READY    | 视觉基线 `2386995845583123461`；接受记录 `2387205319197099564` |
+| `frameIds`               | PARTIAL  | A Frame `1:119` 已核验；B 代表页父 Frame ID 待再次人工核验     |
+| `stateScreenshots`       | READY    | [证据索引](./assets/d001/evidence/README.md)                   |
+| `tokenAndComponentReuse` | READY    | 同一语义槽位、固定内容/顺序和对应 Figma Frame 可复核           |
+| `directionSelection`     | READY    | A — 温柔自然；Frame `1:119`                                    |
+| `userAcceptance`         | READY    | 2026-08-13；理由和“不吸收其它路线元素”均已记录                 |
+| `figmaDecisionSync`      | READY    | Frames `12:164`、`12:239`；固定版本中已写回并可见核验          |
 
-用户接受已完成，本文因此进入 Accepted。Figma `00 / Read me`、`07 / Decision Matrix` 的决定文字和 B
-代表页父 Frame ID 仍待在线文件可稳定编辑时同步/核验；自动化检查不能把这些人工证据改写为 PASS。
+用户接受和 Figma 决策文字同步均已完成，本文因此保持 Accepted。B 代表页父 Frame ID 仍待在线文件可
+稳定读取时再次核验；自动化检查不能把这些人工证据改写为 PASS。
 
 ## 12. 素材与许可
 

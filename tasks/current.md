@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-13（A — 温柔自然已接受；等待 Figma 决策同步与 PR 合并）
+- **最后更新**：2026-08-13（A — 温柔自然已接受且已同步至 Figma；等待 PR 更新与合并）
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：D-001 — 确定品牌与视觉方向
 - **任务状态**：In Review
@@ -122,7 +122,7 @@ D-001 的交付范围以 Issue #99 为准：
 - 2026-08-13 项目所有者明确以截图中的 Figma `01B / Gentle Nature / DLY-003` 为视觉权威，接受 A 为
   D-001 唯一方向；理由为“清晰自然，排版克制，内容清晰”，并明确不吸收其它路线元素。权威截图已
   按未裁切 `420 x 920` 归档，本地 A 概念页向其同步；`directionSelection` 与 `userAcceptance` 均为
-  READY。D-001 仍保持 In Review，因为 Figma 决策文字、远程 PR 和合并尚未完成，D-002 保持 Planned；
+  READY。D-001 仍保持 In Review，因为远程 PR 更新和合并尚未完成，D-002 保持 Planned；
 - 浏览器视觉检查：320px 与 390px 均无页面横向溢出；已保存小屏、浏览器大字放大、非颜色状态和
   Figma 总览截图；新增五路线在 360px 与 736px 下也无横向溢出；评审页无持续动画，减少动态偏好会
   关闭平滑滚动。微信真机验证不在 D-001 内。
@@ -136,15 +136,22 @@ D-001 的交付范围以 Issue #99 为准：
   前置格式、架构、合同、Agent workflow 和数据库静态证据通过，但整体仍为 FAIL。唯一根因是本机
   macOS 缺少 Linux `flock` 的 `RELEASE_LOCK_RUNTIME_MISSING:flock`，deployment 48/50；未改写为
   自动化 PASS。Figma 决策页已尝试通过登录会话读取，但画布状态连续超时，未执行盲编辑；
+- 2026-08-13 Figma 决策同步重试成功：`00 / Read me`（Frame `12:164`）与
+  `07 / Decision Matrix`（Frame `12:239`）已写入 A 唯一方向、原始理由、`None / 不吸收其它路线元素`、
+  `Accepted` 和日期；命名版本 `D-001 Accepted — Gentle Nature` 的 version ID 为
+  `2387205319197099564`，两个 Frame 均从该固定版本打开并完成可见核验；
+- 2026-08-13 Figma 决策同步后验证：Prettier、`git diff --check`、`pnpm run format:check` 和
+  `pnpm run agent:check` 通过；full Gate 仍按变更路径提升为 hybrid，唯一根因保持为本机缺少 Linux
+  `flock` 的 `RELEASE_LOCK_RUNTIME_MISSING:flock`，deployment 48/50，未报告自动化 PASS；
 
 ### 4.3 当前人工/外部证据
 
 - `figmaFile`：Ready；新 team 权限可用，文件已创建并移入 `Team project`，file key
   `T5HS32Ciz6LZh81KbqhFGo`；
-- `figmaVersion`：Ready；A 主方向使用五路线基线版本 `2386995845583123461` 中的
-  `01B / Gentle Nature / DLY-003`（Frame `1:119`）；D 一屏版本 `2387112673004022103`、首轮阅读
-  层级版本 `2387049154733899236` 和原三路线版本 `2386868263609163928` 保留历史；后续异常版本
-  `2387114962205307387` 已恢复且不作为评审证据；
+- `figmaVersion`：Ready；A 主方向视觉基线为 `2386995845583123461` 中的
+  `01B / Gentle Nature / DLY-003`（Frame `1:119`），接受记录版本为 `2387205319197099564`；D 一屏
+  版本 `2387112673004022103`、首轮阅读层级版本 `2387049154733899236` 和原三路线版本
+  `2386868263609163928` 保留历史；后续异常版本 `2387114962205307387` 已恢复且不作为评审证据；
 - `frameIds`：Partial；12 个稳定命名 Frame ID 已核验，D/E 分别为 `12:36`、`12:66`、`12:101`、
   `12:133`，五路状态/决策对照为 `12:183`、`12:239`；B 代表页顶层 row 显示为 `1:132`，旧记录
   `1:149` 是子文本层，待 Figma 可稳定读取时再次人工核验父 Frame；
@@ -157,8 +164,9 @@ D-001 的交付范围以 Issue #99 为准：
   主方向，替代此前暂定的 D — 都市柔光；
 - `userAcceptance`：Ready；项目所有者于 2026-08-13 明确接受，理由为“清晰自然，排版克制，内容
   清晰”，允许吸收的次方向元素为 `None / 不吸收`；
-- `figmaDecisionSync`：Pending；`00 / Read me`、`07 / Decision Matrix` 尚未写回最终选择文字，B
-  代表页父 Frame ID 仍待在线文件稳定可编辑时核验；不影响已完成的用户接受，但必须在 PR 合并前记录。
+- `figmaDecisionSync`：Ready；`00 / Read me`（Frame `12:164`）与 `07 / Decision Matrix`
+  （Frame `12:239`）已在固定版本 `2387205319197099564` 中写回并可见核验；B 代表页父 Frame ID 仍待
+  在线文件稳定可读取时核验。
 - 2026-08-13 D 路线首轮反馈及修订：分数从 80px 主视觉降为 30px 辅助数字；今日重点提升为
   26px；解释首句/正文提升为 17px/16px 并按完整句分组；“今天可以这样做”和主要行动使用梅子色及
   `Noto Serif SC` 18px/24px 层级。Figma Frame `12:66` 保持不变，新固定版本
@@ -194,8 +202,7 @@ D-001 的交付范围以 Issue #99 为准：
 
 ## 6. 精确下一动作
 
-1. 将 A 的最终选择、原始理由和 `None / 不吸收` 同步到 Figma `00 / Read me` 与
-   `07 / Decision Matrix`，保存新的选择版本；同时再次核验 B 代表页父 Frame ID，不改动 B 文本图层；
-2. 完成本地格式、证据、溢出与 task Gate 验证，记录无法自动替代的人工视觉证据边界；
+1. 在不改动 B 文本图层的前提下，再次人工核验 B 代表页父 Frame ID；当前可信候选为 `1:132`；
+2. 若 B 父 Frame ID 核验结果需要修正，只更新 ID 记录并重跑本地格式与证据检查；
 3. 待 Actions 额度允许或项目所有者另行授权后，更新远程 Draft PR #140，完成审核与合并；
 4. 合并后把 D-001 移为 Done，并将 D-002 移为唯一 Ready；当前任务不启动 D-002。
