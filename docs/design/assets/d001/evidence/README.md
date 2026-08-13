@@ -11,6 +11,8 @@
 | [figma-overview.png](./figma-overview.png)                   | Figma 十三个 Frame 的画布总览              | 五案同结构并列，含五路状态和决策矩阵；不能替代用户选择 |
 | [d-hierarchy-figma.jpg](./d-hierarchy-figma.jpg)             | Figma D 代表页首轮层级修订                 | Frame `12:66`；分数降级，重点/解释/行动提升            |
 | [d-hierarchy-360.jpg](./d-hierarchy-360.jpg)                 | D 修订版 360px 完整手机画面                | 无横向溢出；行动与解释完整，按钮未被遮挡               |
+| [d-one-screen-360.png](./d-one-screen-360.png)               | D 一屏版 360 x 844 浏览器证据              | 312 x 734 手机稿完整可见；内容靠浓缩和分组建立层级     |
+| [d-one-screen-figma.png](./d-one-screen-figma.png)           | Figma D 一屏版导出预览                     | 版本 `2387112673004022103`、Frame `12:66`；完整一屏    |
 | [viewport-360.png](./viewport-360.png)                       | 360px 小屏                                 | 页面无横向溢出；D/E 代表页宽度 312px                   |
 | [viewport-736.png](./viewport-736.png)                       | 736px 对话/平板宽度                        | 页面无横向溢出；D/E 代表页宽度 400px                   |
 | [viewport-320.jpg](./viewport-320.jpg)                       | 原三路线 320px 历史证据                    | 保留历史；新增五路线以 360px/736px 证据为准            |
@@ -27,6 +29,6 @@
 ## 3. 证据边界
 
 - 截图使用固定虚构演示内容，不含真实用户信息；
-- D 修订版保持分数、事实、信息顺序、主要行动和点亮规则不变，只调整视觉层级、分句和字体呈现；
+- D 一屏版保持分数、事实、信息顺序、主要行动和点亮规则不变，只浓缩表达并调整视觉层级、分组、颜色与留白；
 - 截图证明本轮浏览器与 Figma 可见结果，不代替读屏、色觉或 iOS/Android 微信真机测试；
 - D-001 在项目所有者选择并接受唯一主方向前仍为 `MANUAL_EVIDENCE_REQUIRED`。

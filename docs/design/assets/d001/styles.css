@@ -866,19 +866,32 @@ main {
   float: right;
 }
 .phone-d {
+  min-height: 0;
   background: #fbfaf8;
   border-color: #2b2830;
   border-radius: 36px;
 }
+.phone-d .phone-bar {
+  padding-bottom: 10px;
+}
+.phone-d .daily-top {
+  padding: 7px 2px 13px;
+}
+.phone-d .daily-top > div:first-child {
+  gap: 4px;
+}
+.phone-d .daily-top strong {
+  font-size: 21px;
+}
 .poise-line {
-  height: 36px;
+  height: 20px;
   position: relative;
   border-top: 1px solid #d8ced7;
 }
 .poise-line i {
   position: absolute;
-  width: 88px;
-  height: 18px;
+  width: 72px;
+  height: 10px;
   left: 12px;
   top: -1px;
   background: #c7b8d5;
@@ -886,53 +899,51 @@ main {
 }
 .poise-line b {
   position: absolute;
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   right: 12px;
-  top: -14px;
+  top: -10px;
   border: 1px solid var(--accent);
   border-radius: 50%;
 }
 .phone-d .energy-hero {
-  padding: 22px 24px 24px;
+  padding: 16px 18px 18px;
   background: #f1eaf0;
   border-radius: 18px 18px 5px 18px;
 }
 .phone-d .content-label {
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 11px;
 }
 .phone-d .content-label span {
   color: #2b2830;
 }
 .phone-d .energy-score {
-  align-items: center;
-  gap: 10px;
+  align-items: baseline;
+  gap: 8px;
 }
 .phone-d .energy-score > strong {
   color: var(--accent);
-  font-size: 30px;
+  font-size: 25px;
   line-height: 1;
-  min-width: 46px;
-  padding-right: 10px;
-  border-right: 1px solid #c7b8d5;
+  letter-spacing: 0;
 }
 .phone-d .energy-score span {
   color: #5d5660;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.4;
 }
 .phone-d .energy-score b {
   color: #2b2830;
-  font-size: 12px;
-}
-.phone-d .energy-meter {
-  height: 3px;
-  margin: 13px 0 14px;
+  font-size: 11px;
 }
 .phone-d .focus-row {
   align-items: baseline;
+  margin-top: 10px;
+  padding: 7px 9px;
   color: #665f68;
+  background: rgb(255 255 255 / 56%);
+  border-left: 2px solid var(--accent);
 }
 .phone-d .focus-row span {
   color: var(--accent);
@@ -943,60 +954,67 @@ main {
 .phone-d .energy-hero h3 {
   font-family: "Noto Serif SC", ui-serif, "Songti SC", STSong, serif;
   font-weight: 600;
-  margin-top: 13px;
-  font-size: 26px;
-  line-height: 1.48;
+  margin-top: 11px;
+  font-size: 22px;
+  line-height: 1.44;
+}
+.phone-d .energy-hero h3 strong {
+  color: var(--accent);
+  font-weight: 600;
 }
 .phone-d .explain-block {
   margin-top: 8px;
-  padding: 21px 4px 20px;
+  padding: 14px 4px;
   border-top-color: #d8ced7;
   border-bottom: 1px solid #d8ced7;
 }
-.phone-d .explain-block p {
-  color: #4c484e;
-  font-size: 16px;
-  line-height: 1.72;
-}
-.phone-d .explain-sentence {
+.phone-d .explain-label {
   display: block;
+  color: #6e6670;
+  font-size: 10px;
+  font-weight: 750;
 }
-.phone-d .explain-sentence:first-child {
-  font-size: 17px;
+.phone-d .explain-block p {
+  margin-top: 6px;
+  color: #4c484e;
+  font-size: 15px;
+  line-height: 1.65;
 }
-.phone-d .explain-sentence + .explain-sentence {
-  margin-top: 8px;
-}
-.phone-d .explain-sentence strong {
+.phone-d .explain-block strong {
   color: var(--accent);
   font-weight: 750;
 }
 .phone-d .action-block {
+  margin: 10px 0 13px;
   background: #e8eeeb;
   border-left: 3px solid var(--accent);
   border-radius: 2px;
-  padding: 22px 21px 21px;
+  padding: 16px 17px 17px;
 }
 .phone-d .action-block > span {
   display: block;
-  padding-bottom: 10px;
+  padding-bottom: 7px;
   color: var(--accent);
   border-bottom: 1px solid #b9c9c2;
   font-family: "Noto Serif SC", ui-serif, "Songti SC", STSong, serif;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
 }
 .phone-d .action-block h3 {
-  margin: 14px 0 12px;
+  margin: 10px 0 8px;
   color: #252329;
   font-family: "Noto Serif SC", ui-serif, "Songti SC", STSong, serif;
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.42;
+}
+.phone-d .action-block h3 strong {
+  color: var(--accent);
+  font-weight: 600;
 }
 .phone-d .action-block p {
   color: #52675f;
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.6;
 }
 .phone-d button {
@@ -1261,6 +1279,10 @@ footer {
   }
   .phone-c {
     box-shadow: 7px 8px 0 var(--accent-2);
+  }
+  .phone-d {
+    min-height: 0;
+    padding: 13px 18px 20px;
   }
   .state-strip article:nth-child(2) {
     border-right: 0;
