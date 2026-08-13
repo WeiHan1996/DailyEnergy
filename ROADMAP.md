@@ -1,7 +1,7 @@
 # DailyEnergy 项目路线图
 
 - **文档状态**：Accepted
-- **最后更新**：2026-08-12
+- **最后更新**：2026-08-14
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **维护方式**：每个里程碑结束或重大决策变更时更新
 - **当前任务入口**：[tasks/current.md](./tasks/current.md)
@@ -468,7 +468,7 @@ D-001 品牌与视觉方向
   → D-005 Phase 2 剩余页面高保真与开发交付
 ```
 
-- D-001 的前置已满足，现为唯一 Ready 任务；D-002～D-005 保持 Planned；
+- D-001 已完成并锁定 A — 温柔自然为唯一视觉方向；D-002 现为唯一 Ready，D-003～D-005 保持 Planned；
 - D-004 是 C-003、C-004、C-009 的直接前置；
 - C-003 前置：C-002、E-004、D-004；
 - C-004 前置：C-002、C-003、E-006、D-004；
@@ -798,7 +798,7 @@ S-12 完成后，再依据实际 Issue 数量制定：
 - E-011 已随 PR #119 squash 合并并进入 Done，11/11 CI Gate 与 365 天供应链证据通过；
 - E-012/E-013 已完成；E-014 已随 PR #138 squash 合并为 `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`，Phase 1 已结束；
 - Phase 2 development 已按 `CONDITIONAL_GO_FOR_PHASE_2` 开始，Production/RC 保持 `NO_GO`；
-- D-001 是唯一 Ready 任务；D-002～D-005 和全部 C 系列任务保持 Planned；
+- D-001 已随 PR #140 squash 合并并进入 Done；D-002 是唯一 Ready，D-003～D-005 和全部 C 系列任务保持 Planned；
 - 当前唯一执行任务由 tasks/current.md 指定；
 - C-003、C-004、C-009 在 D-004 被接受前不得开始正式页面实现；
 - C-012、C-013、C-014 在 D-005 被接受前不得开始正式页面实现；
