@@ -6,7 +6,7 @@
 - **任务 Issue**：[D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)
 - **仓库评审入口**：[D-001 视觉方向板](./assets/d001/index.html)
 - **Figma 评审入口**：[DailyEnergy / D-001 Visual Direction](https://www.figma.com/design/T5HS32Ciz6LZh81KbqhFGo/DailyEnergy---D-001-Visual-Direction?node-id=0-1&p=f)
-- **Figma 评审版本**：[D-001 D compact one-screen revision](https://www.figma.com/design/T5HS32Ciz6LZh81KbqhFGo/DailyEnergy---D-001-Visual-Direction?version-id=2387112673004022103&node-id=12-66)
+- **Figma 评审版本**：[01B / Gentle Nature / DLY-003](https://www.figma.com/design/T5HS32Ciz6LZh81KbqhFGo/DailyEnergy---D-001-Visual-Direction?version-id=2386995845583123461&node-id=1-119)
 - **人工证据状态**：`MANUAL_EVIDENCE_REQUIRED`
 
 ## 1. 决策目的
@@ -228,19 +228,21 @@ Figma 建立后，五条路线在最终选择前都可继续调整；选定主�
 图形、动效和语气。若之后改选另一条主方向，必须更新下方选择记录、影响说明和用户确认，不能让
 D-002 同时依赖两套主系统。
 
-2026-08-13，项目所有者将 D — 都市柔光记录为暂定主方向。该决定只表示当前评审偏好，不构成
-D-001 的最终接受：在项目所有者明确接受前，D 的颜色、排版、图形、动效和语气仍可调整，也可以
-改选其他路线。调整后应保存新的 Figma 评审版本并更新证据；暂定状态不解锁 D-002。
+2026-08-13，项目所有者经过进一步比较，将 `01B / Gentle Nature / DLY-003`（A — 温柔自然）
+选为唯一主方向，替代此前暂定的 D — 都市柔光。D 的一屏迭代保留为历史对比与信息层级参考，不再
+作为主方向输入。该决定完成了方向选择，但不等同于 D-001 最终接受：选择理由、允许吸收的次方向
+元素、Figma 决策记录和明确接受仍需完成，因此 D-002 暂不解锁。
 
 ### 10.1 选择记录
 
 | 字段                 | 当前值                                            |
 | -------------------- | ------------------------------------------------- |
-| 选择状态             | Provisional / 暂定；尚未接受 D-001                |
-| 唯一主方向           | D — 都市柔光（暂定）                              |
+| 选择状态             | Selected / 已选定；尚未接受 D-001                 |
+| 唯一主方向           | A — 温柔自然（`01B / Gentle Nature / DLY-003`）   |
+| 被替代的暂定方向     | D — 都市柔光；保留为历史对比证据                  |
 | 项目所有者           | Project owner                                     |
 | 决定日期             | 2026-08-13                                        |
-| 选择理由             | 当前偏好已确认；最终选择理由待项目所有者补充      |
+| 选择理由             | Pending；待项目所有者补充并确认                   |
 | 允许吸收的次方向元素 | Pending；必须明确且不能形成两套主系统             |
 | D-002 解锁           | 否；待最终理由、次方向元素和 D-001 明确接受后解锁 |
 
@@ -268,10 +270,9 @@ D-001 不建立完整 Design Tokens 或组件库，但五条路线必须复用�
 Figma 文件命名为 `DailyEnergy / D-001 Visual Direction`，位于新 team 的 `Team project`。Frames
 使用稳定名称并记录真实节点 ID：
 
-当前评审版本 `2387112673004022103` 只用于复核 D 代表页的一屏浓缩；D 的 `420 x 920` Frame 完整
-容纳问候、能量摘要、今日重点、解释、主要行动、点亮按钮与条件说明。五路线方向板、状态与决策
-对照继续引用已验证基线版本 `2386995845583123461`；首轮阅读层级版本 `2387049154733899236`
-保留历史。D Frame ID `12:66` 未改变。
+当前主方向评审入口使用已验证五路线基线版本 `2386995845583123461` 中的
+`01B / Gentle Nature / DLY-003`（Frame `1:119`）。D 一屏版本 `2387112673004022103` 和首轮阅读
+层级版本 `2387049154733899236` 保留为历史对比与信息层级参考，不作为 D-002 的主视觉输入。
 
 2026-08-13 曾创建后续版本 `2387114962205307387` 以尝试同步其它路线文案，但 B 代表页出现异常，
 已恢复到上述 D 一屏版本；该异常版本不作为评审证据，也不据此声明五路线 Figma 文案已最终对齐。
@@ -300,11 +301,12 @@ Figma 可稳定读取时再次人工核验父 Frame，再移除本注记。
 | 证据字段                 | 当前状态 | 解锁条件                                             |
 | ------------------------ | -------- | ---------------------------------------------------- |
 | `figmaFile`              | READY    | file key `T5HS32Ciz6LZh81KbqhFGo`                    |
-| `figmaVersion`           | READY    | D 一屏评审 version ID `2387112673004022103`          |
+| `figmaVersion`           | READY    | A 基线评审 version ID `2386995845583123461`          |
 | `frameIds`               | PARTIAL  | 12 个已核验；B 代表页父 Frame ID 待再次人工核验      |
 | `stateScreenshots`       | READY    | [证据索引](./assets/d001/evidence/README.md)         |
 | `tokenAndComponentReuse` | READY    | 同一语义槽位、固定内容/顺序和对应 Figma Frame 可复核 |
-| `userAcceptance`         | Pending  | D 暂定主方向已记录；仍需项目所有者明确接受 D-001     |
+| `directionSelection`     | READY    | A — 温柔自然；Frame `1:119`                          |
+| `userAcceptance`         | Pending  | 待记录理由、次方向元素并明确接受 D-001               |
 
 在上述证据未完成前，D-001 只能报告 `MANUAL_EVIDENCE_REQUIRED`，不得报告自动化 PASS 或 Accepted。
 

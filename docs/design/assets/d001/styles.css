@@ -156,6 +156,15 @@ main {
   border-radius: 50%;
   font-size: 11px;
 }
+.route-index a[aria-current="true"] {
+  color: #ffffff;
+  font-weight: 700;
+}
+.route-index a[aria-current="true"] span {
+  color: #202623;
+  background: #dce1de;
+  border-color: #dce1de;
+}
 
 .route {
   --accent: #3f6552;

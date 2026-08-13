@@ -69,12 +69,13 @@ http://localhost:4173/docs/design/assets/d001/
 | 固定内容对照                 | READY   | 五条路线复用上表内容与同一信息顺序                                |
 | 仓库内方向板                 | READY   | `index.html`                                                      |
 | Figma file                   | READY   | [文件与 Frame IDs](../../visual-direction.md#11-figma-与人工证据) |
-| Figma version                | READY   | D 一屏评审版本 `2387112673004022103`；五路线基线版本保留历史      |
+| Figma version                | READY   | A 主方向基线版本 `2386995845583123461`；D 一屏版本保留历史        |
 | Frame IDs                    | PARTIAL | 12 个已核验；B 代表页父 Frame ID 待再次人工核验                   |
 | 小屏/大字体/减少动态视觉截图 | READY   | [证据索引](./evidence/README.md)                                  |
 | 非颜色状态检查               | READY   | 状态卡均同时使用文字标题、说明和结构位置                          |
 | Token/组件复用               | READY   | 五路线复用同一语义槽位、内容与信息顺序                            |
-| 用户方向选择                 | PENDING | D 为暂定主方向且已完成一屏修订，仍待项目所有者复核与最终接受      |
+| 用户方向选择                 | READY   | A — 温柔自然；`01B / Gentle Nature / DLY-003`，Frame `1:119`      |
+| D-001 最终接受               | PENDING | 待补充选择理由、次方向元素并明确接受                              |
 
 ## 5. 非交付范围
 
