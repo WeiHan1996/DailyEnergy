@@ -1,14 +1,14 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-13（补充 D/E 路线，等待更新 Figma 证据与方向选择）
+- **最后更新**：2026-08-13（D 暂定为主方向；等待细化与最终接受）
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：D-001 — 确定品牌与视觉方向
 - **任务状态**：In Review
 - **任务 Profile**：`design`
 - **任务分支**：`agent/d001-visual-direction`（基于 `cad3a98`）
 - **当前 Issue**：[D-001 Issue #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)
-- **当前 PR**：[D-001 Draft PR #140](https://github.com/WeiHan1996/DailyEnergy/pull/140)；等待项目所有者方向选择与接受
+- **当前 PR**：[D-001 Draft PR #140](https://github.com/WeiHan1996/DailyEnergy/pull/140)；D 暂定为主方向，等待细化、最终理由、次方向元素与明确接受
 - **最近完成 PR**：[E-014 PR #138](https://github.com/WeiHan1996/DailyEnergy/pull/138)，squash merge `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -98,6 +98,9 @@ D-001 的交付范围以 Issue #99 为准：
   hybrid，前置格式、架构、合同、Agent workflow、数据库等检查通过；deployment 仍为 48/50，唯一
   根因仍是本机缺少 Linux `flock` 的 `RELEASE_LOCK_RUNTIME_MISSING:flock`；自动化状态保持 FAIL，
   任务终态保持 `MANUAL_EVIDENCE_REQUIRED`；
+- 2026-08-13 记录 D 暂定主方向后，本地 Prettier、`git diff --check`、`pnpm run agent:check` 通过；
+  changed Gate 仍按策略提升为 hybrid/full，唯一根因仍是上述 `flock` 环境限制；本次未 push、未更新
+  PR，也未触发 GitHub Actions；
 - 浏览器视觉检查：320px 与 390px 均无页面横向溢出；已保存小屏、浏览器大字放大、非颜色状态和
   Figma 总览截图；新增五路线在 360px 与 736px 下也无横向溢出；评审页无持续动画，减少动态偏好会
   关闭平滑滚动。微信真机验证不在 D-001 内。
@@ -115,7 +118,17 @@ D-001 的交付范围以 Issue #99 为准：
   D-002 及后续任务；
 - `tokenAndComponentReuse`：Ready for D-001；同一语义槽位、固定内容/顺序和对应 Frame 可追踪，
   不冒充 D-002 的完整 Variables、Tokens 或正式组件库；
-- `userAcceptance`：Pending；五条路线保持平级，项目所有者尚未选择唯一主方向。
+- `userAcceptance`：Pending；项目所有者于 2026-08-13 将 D — 都市柔光记录为暂定主方向，但尚未
+  提供最终选择理由、允许吸收的次方向元素或明确接受 D-001。接受前仍可调整 D 或改选其他路线，
+  D-002 不解锁。
+
+### 4.4 临时 GitHub Actions 额度约束
+
+- 项目所有者于 2026-08-13 通知：GitHub 方案每月包含 2,000 Actions minutes，本计费周期已使用 90%；
+- 本计费周期内默认只做本地编辑、提交与验证；非必要不 push、不重跑 workflow、不改变可能触发
+  Actions 的 PR 状态或执行其它远程写操作；
+- 确有必要触发 Actions 时，必须先说明原因并取得项目所有者确认；
+- 本次“D 暂定”决定先仅记录在本地分支，不更新远程 Draft PR #140，以免产生非必要运行。
 
 ## 5. Production / RC 未决项
 
@@ -135,9 +148,8 @@ D-001 的交付范围以 Issue #99 为准：
 
 ## 6. 精确下一动作
 
-1. 完成 Figma D/E 路线、五案状态/决策对照、新固定版本和响应式证据；
-2. 项目所有者在 Figma、仓库证据和 Draft PR #140 中评审 A、B、C、D、E；
-3. 如需调整，在最终选择前修改任一路线并保存新的 Figma 评审版本；
-4. 项目所有者选择唯一主方向、理由和允许吸收的次方向元素，并明确接受 D-001；
-5. 接受后更新视觉方向文档和项目状态，完成 PR #140 审核与合并，再把 D-002 移为唯一 Ready；不在当前任务中
-   启动 D-002。
+1. 以暂定主方向 D — 都市柔光为基准评审并收集需要调整的颜色、排版、图形、动效和语气；
+2. 如需调整，更新 D 并保存新的 Figma 评审版本；明确接受前也可以改选其他路线；
+3. 项目所有者补充最终选择理由和允许吸收的次方向元素，并明确接受 D-001；
+4. 接受后更新视觉方向文档和项目状态；待 Actions 额度允许或项目所有者授权后，再更新远程 Draft PR #140、
+   完成审核与合并并把 D-002 移为唯一 Ready；不在当前任务中启动 D-002。
