@@ -180,7 +180,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 | ID                                                            | 任务                                  | 状态      | 主要结果                                   |
 | ------------------------------------------------------------- | ------------------------------------- | --------- | ------------------------------------------ |
-| [D-001](https://github.com/WeiHan1996/DailyEnergy/issues/99)  | 确定品牌与视觉方向                    | In Review | 三套方向板、最终方向和视觉反模式           |
+| [D-001](https://github.com/WeiHan1996/DailyEnergy/issues/99)  | 确定品牌与视觉方向                    | In Review | 五套方向板、最终方向和视觉反模式           |
 | [D-002](https://github.com/WeiHan1996/DailyEnergy/issues/100) | 建立设计系统与 Design Tokens          | Planned   | Figma Variables、组件库和代码 Token 交付   |
 | [D-003](https://github.com/WeiHan1996/DailyEnergy/issues/101) | 完成核心流程高保真设计                | Planned   | 核心流程八页及关键状态                     |
 | [D-004](https://github.com/WeiHan1996/DailyEnergy/issues/102) | 完成高保真原型、验证与开发交付        | Planned   | 核心原型回归、Frame ID、视觉 QA 和开发交付 |

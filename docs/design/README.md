@@ -15,7 +15,7 @@
 
 | Issue                                                              | 状态      | 计划文档                                     | 主要结果                                 |
 | ------------------------------------------------------------------ | --------- | -------------------------------------------- | ---------------------------------------- |
-| [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)   | In Review | [visual-direction.md](./visual-direction.md) | 三条品牌与视觉方向 Draft                 |
+| [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)   | In Review | [visual-direction.md](./visual-direction.md) | 五条品牌与视觉方向 Draft                 |
 | [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100) | Planned   | `design-system.md`                           | Figma Variables、Design Tokens 与组件    |
 | [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101) | Planned   | `core-flow-high-fidelity.md`                 | 核心流程八页及关键状态                   |
 | [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) | Planned   | `developer-handoff.md`                       | 核心流程可点击原型、验证与开发交付       |

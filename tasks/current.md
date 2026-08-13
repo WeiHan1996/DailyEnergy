@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-13（Figma 原始证据已建立，等待方向选择）
+- **最后更新**：2026-08-13（补充 D/E 路线，等待更新 Figma 证据与方向选择）
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：D-001 — 确定品牌与视觉方向
 - **任务状态**：In Review
@@ -14,12 +14,12 @@
 
 ## 1. 当前目标
 
-在不改变已接受产品定位、信息架构和页面结构的前提下，比较三条真实可区分的品牌视觉路线，
+在不改变已接受产品定位、信息架构和页面结构的前提下，比较五条真实可区分的品牌视觉路线，
 由项目所有者选定一条，作为 D-002 设计系统与 Design Tokens 的唯一方向输入。
 
 D-001 的交付范围以 Issue #99 为准：
 
-- 用同一组固定合成内容和同一张 DLY-003 概念页制作“温柔自然、清醒高级、轻快能量”三条方向板；
+- 用同一组固定合成内容和同一张 DLY-003 概念页制作“温柔自然、清醒高级、轻快能量、都市柔光、克制空间”五条方向板；
 - 定义品牌关键词、反关键词、色彩、排版、图形、插画、图标、动效、微信可实施性和无障碍约束；
 - 记录参考素材来源与许可，不把未获许可资产当成可交付品牌资产；
 - 建立 Figma 评审入口、Frame ID 清单和 `docs/design/visual-direction.md` Draft；
@@ -71,10 +71,10 @@ D-001 的交付范围以 Issue #99 为准：
 
 ### 4.1 已完成交付
 
-- [视觉方向 Draft](../docs/design/visual-direction.md)：三条路线、反模式、状态对照、决策矩阵、
+- [视觉方向 Draft](../docs/design/visual-direction.md)：五条路线、反模式、状态对照、决策矩阵、
   概念级 Token/组件复用和 Figma Frame 命名；
 - [仓库评审入口](../docs/design/assets/d001/index.html)：同一固定内容和 DLY-003 信息顺序下的
-  “温柔自然、清醒高级、轻快能量”方向板与代表页；
+  “温柔自然、清醒高级、轻快能量、都市柔光、克制空间”方向板与代表页；
 - [素材与许可记录](../docs/design/assets/d001/README.md)：所有图形为本任务原创，未使用第三方
   图片、插画、图标库、照片或字体文件；
 - `docs/INDEX.md`、`docs/design/README.md` 和 `tasks/backlog.md` 已同步为 Draft/In Progress。
@@ -84,7 +84,7 @@ D-001 的交付范围以 Issue #99 为准：
 - `pnpm agent:prepare D-001 --remote`：`READY`，remote check `PASS`，design terminal status
   `MANUAL_EVIDENCE_REQUIRED`；
 - Prettier（D-001 全部新增/修改文件）：通过；`git diff --check`：通过；
-- 固定内容检查：三条代表页的核心提示、主要行动和点亮条件均逐字一致；
+- 固定内容检查：五条代表页的核心提示、主要行动和点亮条件均逐字一致；
 - `pnpm run agent:check`：通过，9 task routes、6 profiles、8 path rules；
 - 敏感内容模式扫描：无命中；
 - `pnpm agent:validate --mode=changed --task=D-001`：策略因新增 HTML/CSS 保守提升为 hybrid/full；
@@ -94,21 +94,28 @@ D-001 的交付范围以 Issue #99 为准：
   失败；未将结果改写为 PASS；
 - 2026-08-13 Figma 证据回填后重跑 `pnpm agent:validate --mode=changed --task=D-001`：策略仍提升为
   hybrid/full，deployment 仍为 48/50 且根因仍是本机缺少 Linux `flock`；未放宽合同或改写为 PASS；
+- 2026-08-13 补充 D/E 五路线后运行 `pnpm agent:validate --mode=full --task=D-001`：profile 为
+  hybrid，前置格式、架构、合同、Agent workflow、数据库等检查通过；deployment 仍为 48/50，唯一
+  根因仍是本机缺少 Linux `flock` 的 `RELEASE_LOCK_RUNTIME_MISSING:flock`；自动化状态保持 FAIL，
+  任务终态保持 `MANUAL_EVIDENCE_REQUIRED`；
 - 浏览器视觉检查：320px 与 390px 均无页面横向溢出；已保存小屏、浏览器大字放大、非颜色状态和
-  Figma 总览截图；评审页无持续动画，减少动态偏好会关闭平滑滚动。微信真机验证不在 D-001 内。
+  Figma 总览截图；新增五路线在 360px 与 736px 下也无横向溢出；评审页无持续动画，减少动态偏好会
+  关闭平滑滚动。微信真机验证不在 D-001 内。
 
 ### 4.3 当前人工/外部证据
 
 - `figmaFile`：Ready；新 team 权限可用，文件已创建并移入 `Team project`，file key
   `T5HS32Ciz6LZh81KbqhFGo`；
-- `figmaVersion`：Ready；固定评审版本 `D-001 visual directions for review`，version ID
-  `2386868263609163928`；
-- `frameIds`：Ready；9 个稳定命名 Frame 的真实节点 ID 已记录于视觉方向 Draft；
-- `stateScreenshots`：Ready；证据索引包含 320px、390px、浏览器大字放大、非颜色状态和 Figma
-  总览；减少动态规则已核对，真机系统字号/减少动态验证留给 D-002 及后续任务；
+- `figmaVersion`：Ready；五路线固定版本 `D-001 five visual directions for review`，version ID
+  `2386995845583123461`；原三路线版本 `2386868263609163928` 保留历史；
+- `frameIds`：Ready；13 个稳定命名 Frame 的真实节点 ID 已记录，D/E 分别为 `12:36`、`12:66`、
+  `12:101`、`12:133`，五路状态/决策对照为 `12:183`、`12:239`；
+- `stateScreenshots`：Ready；证据索引包含五路线 Figma 总览、360px、736px、原 320px/390px
+  历史证据、浏览器大字放大和非颜色状态；减少动态规则已核对，真机系统字号/减少动态验证留给
+  D-002 及后续任务；
 - `tokenAndComponentReuse`：Ready for D-001；同一语义槽位、固定内容/顺序和对应 Frame 可追踪，
   不冒充 D-002 的完整 Variables、Tokens 或正式组件库；
-- `userAcceptance`：Pending；三条路线保持平级，项目所有者尚未选择唯一主方向。
+- `userAcceptance`：Pending；五条路线保持平级，项目所有者尚未选择唯一主方向。
 
 ## 5. Production / RC 未决项
 
@@ -128,8 +135,9 @@ D-001 的交付范围以 Issue #99 为准：
 
 ## 6. 精确下一动作
 
-1. 项目所有者在 Figma、仓库证据和 Draft PR #140 中评审 A、B、C；
-2. 如需调整，在最终选择前修改任一路线并保存新的 Figma 评审版本；
-3. 项目所有者选择唯一主方向、理由和允许吸收的次方向元素，并明确接受 D-001；
-4. 接受后更新视觉方向文档和项目状态，完成 PR #140 审核与合并，再把 D-002 移为唯一 Ready；不在当前任务中
+1. 完成 Figma D/E 路线、五案状态/决策对照、新固定版本和响应式证据；
+2. 项目所有者在 Figma、仓库证据和 Draft PR #140 中评审 A、B、C、D、E；
+3. 如需调整，在最终选择前修改任一路线并保存新的 Figma 评审版本；
+4. 项目所有者选择唯一主方向、理由和允许吸收的次方向元素，并明确接受 D-001；
+5. 接受后更新视觉方向文档和项目状态，完成 PR #140 审核与合并，再把 D-002 移为唯一 Ready；不在当前任务中
    启动 D-002。
