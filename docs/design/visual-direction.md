@@ -3,7 +3,7 @@
 - **文档状态**：Accepted
 - **接受日期**：2026-08-13
 - **所属任务**：D-001 — 确定品牌与视觉方向
-- **最后更新**：2026-08-13
+- **最后更新**：2026-08-14
 - **任务 Issue**：[D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)
 - **仓库评审入口**：[D-001 视觉方向板](./assets/d001/index.html)
 - **Figma 评审入口**：[DailyEnergy / D-001 Visual Direction](https://www.figma.com/design/T5HS32Ciz6LZh81KbqhFGo/DailyEnergy---D-001-Visual-Direction?node-id=0-1&p=f)
@@ -294,7 +294,7 @@ Figma 文件命名为 `DailyEnergy / D-001 Visual Direction`，位于新 team �
 | `01A / Gentle Nature / Direction Board`   | 路线 A 品牌方向板                      | `1:31`   |
 | `01B / Gentle Nature / DLY-003`           | 路线 A 代表页                          | `1:119`  |
 | `02A / Clear Editorial / Direction Board` | 路线 B 品牌方向板                      | `1:59`   |
-| `02B / Clear Editorial / DLY-003`         | 路线 B 代表页；父 Frame ID 待再次核验  | `1:132`* |
+| `02B / Clear Editorial / DLY-003`         | 路线 B 代表页                          | `1:132`  |
 | `03A / Bright Rhythm / Direction Board`   | 路线 C 品牌方向板                      | `1:87`   |
 | `03B / Bright Rhythm / DLY-003`           | 路线 C 代表页                          | `1:179`  |
 | `04A / Urban Poise / Direction Board`     | 路线 D 品牌方向板                      | `12:36`  |
@@ -304,8 +304,8 @@ Figma 文件命名为 `DailyEnergy / D-001 Visual Direction`，位于新 team �
 | `06 / State Comparison`                   | 低状态、Offline、Error、Safety 对照    | `12:183` |
 | `07 / Decision Matrix`                    | 定位、可读性、版权、微信实现与选择记录 | `12:239` |
 
-\* Figma DOM 中顶层 B 代表页 row 显示为 `1:132`；旧记录 `1:149` 指向其子文本层。恢复版本后需在
-Figma 可稳定读取时再次人工核验父 Frame，再移除本注记。
+2026-08-14 已从接受记录固定版本 `2387205319197099564` 直接打开 `node-id=1-132`，画布和图层均选中
+`02B / Clear Editorial / DLY-003`，确认 `1:132` 为父 Frame；旧记录 `1:149` 指向其子文本层。
 
 ### 11.3 必需人工证据
 
@@ -313,15 +313,15 @@ Figma 可稳定读取时再次人工核验父 Frame，再移除本注记。
 | ------------------------ | -------- | -------------------------------------------------------------- |
 | `figmaFile`              | READY    | file key `T5HS32Ciz6LZh81KbqhFGo`                              |
 | `figmaVersion`           | READY    | 视觉基线 `2386995845583123461`；接受记录 `2387205319197099564` |
-| `frameIds`               | PARTIAL  | A Frame `1:119` 已核验；B 代表页父 Frame ID 待再次人工核验     |
+| `frameIds`               | READY    | 13 个稳定命名 Frame 均已核验；B 父 Frame 为 `1:132`            |
 | `stateScreenshots`       | READY    | [证据索引](./assets/d001/evidence/README.md)                   |
 | `tokenAndComponentReuse` | READY    | 同一语义槽位、固定内容/顺序和对应 Figma Frame 可复核           |
 | `directionSelection`     | READY    | A — 温柔自然；Frame `1:119`                                    |
 | `userAcceptance`         | READY    | 2026-08-13；理由和“不吸收其它路线元素”均已记录                 |
 | `figmaDecisionSync`      | READY    | Frames `12:164`、`12:239`；固定版本中已写回并可见核验          |
 
-用户接受和 Figma 决策文字同步均已完成，本文因此保持 Accepted。B 代表页父 Frame ID 仍待在线文件可
-稳定读取时再次核验；自动化检查不能把这些人工证据改写为 PASS。
+用户接受、Figma 决策文字同步和 Frame ID 核验均已完成，本文因此保持 Accepted。自动化检查不能把
+这些人工证据改写为 PASS。
 
 ## 12. 素材与许可
 
