@@ -1,6 +1,7 @@
 # DailyEnergy Miniapp
 
-E-004 提供微信原生小程序 TypeScript 运行骨架。当前只有 `SYS-001`
+E-004 提供微信原生小程序 TypeScript 运行骨架。D-002 在该 client-safe
+边界内增加正式 Design Tokens 和首批共享组件。当前仍只有 `SYS-001`
 启动路由占位和 `SYS-003` 维护/恢复占位，不包含首次认识、签到、今日内容、
 点亮、反馈或趋势业务。
 
@@ -8,12 +9,26 @@ E-004 提供微信原生小程序 TypeScript 运行骨架。当前只有 `SYS-00
 
 - `src/app`：公开构建配置校验和应用上下文；
 - `src/pages`：启动与恢复占位页面；
-- `src/components`：后续页面共享组件；
+- `src/components`：D-002 的 15 个微信原生组件目录，对应 17 个逻辑组件合同；
 - `src/features`：后续按业务能力组织的纯客户端逻辑；
 - `src/platform`：微信 login、storage、network、share、subscription
   adapter 与可替换 port；
 - `src/services`：E-008 交付 API Client 后的调用编排入口；
-- `src/generated`：只放带 `@generated` 与来源指纹的生成物，不手改。
+- `src/generated`：只放带 `@generated` 与来源指纹的公开配置和 Design Token 生成物，不手改。
+
+## Design System
+
+- `design-tokens.json`：primitive、semantic、shared semantic 和 component Token 的唯一可编辑来源；
+- `component-library.json`：17 个逻辑组件的名称、Figma 映射、代码目录、变体和状态合同；
+- `src/generated/design-tokens.wxss`、`design-tokens.ts`：确定性生成的 client-safe 运行时产物；
+- `src/components/*`：只消费 semantic/component Token，不复制 raw 色值或尺寸；
+- `pnpm design-tokens:write`：从 canonical JSON 重建所有运行时、评审页和 Figma 导入产物；
+- `pnpm design-tokens:check`：拒绝缺失或手改生成物；
+- `node tooling/check-miniapp-design-system.mjs`：检查组件合同、文件完整性、Token 消费和关键无障碍信号。
+
+设计规范、Figma 证据边界和人工状态见
+[`docs/design/design-system.md`](../../docs/design/design-system.md)。D-002 不把浏览器检查冒充微信 DevTools
+或真机证据。
 
 小程序是 `client-safe` runtime：不得导入 Node、Nest、Prisma、Redis、
 BullMQ、Prompt、provider SDK、服务端 package、Admin client 或 secret。
@@ -57,9 +72,8 @@ pnpm --filter @daily-energy/app-miniapp build
 
 ## 测试证据边界
 
-- `pnpm test`：10 项 Vitest 纯逻辑/adapter 单测、14 组公开配置
-  build/runtime parity、10 组 DevTools 结果分类、9 条 bundle 静态规则
-  known-fail 与 1 个 known-pass；
+- `pnpm test`：纯逻辑/adapter、公开配置 parity、Design Token、组件合同、
+  DevTools 结果分类和 bundle 静态规则；
 - `pnpm build`：TypeScript 产物与 client-only bundle Gate；
 - `pnpm test:devtools`：需要
   `WECHAT_DEVTOOLS_CLI_PATH`，通过 `miniprogram-automator` 验证启动和恢复页。

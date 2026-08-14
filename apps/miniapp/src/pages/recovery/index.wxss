@@ -1,44 +1,43 @@
 .recovery {
   box-sizing: border-box;
   display: flex;
-  min-height: 100vh;
-  padding: 150rpx 72rpx 88rpx;
+  min-height: var(--de-layout-page-min-height);
+  padding: var(--de-layout-section-gap) var(--de-layout-page-gutter-wide);
   align-items: flex-start;
   flex-direction: column;
 }
 
 .recovery__eyebrow {
-  margin-bottom: 26rpx;
-  color: #607068;
-  font-size: 24rpx;
-  font-weight: 600;
-  letter-spacing: 4rpx;
+  margin-bottom: var(--de-component-card-gap);
+  color: var(--de-color-text-muted);
+  font-size: var(--de-font-label-size);
+  font-weight: var(--de-font-semibold);
 }
 
 .recovery__title {
-  color: #24302b;
-  font-size: 48rpx;
-  font-weight: 650;
-  line-height: 1.35;
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-page-title-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
 }
 
 .recovery__message {
-  margin-top: 32rpx;
-  color: #607068;
-  font-size: 30rpx;
-  line-height: 1.75;
+  margin-top: var(--de-layout-content-gap);
+  color: var(--de-color-text-secondary);
+  font-size: var(--de-font-body-size);
+  line-height: var(--de-font-line-relaxed);
 }
 
 .recovery__button {
   width: 100%;
-  margin-top: 64rpx;
-  background: #2f5b45;
-  color: #ffffff;
-  font-size: 30rpx;
+  margin-top: var(--de-layout-section-gap);
+  background: var(--de-color-brand-primary);
+  color: var(--de-color-text-inverse);
+  font-size: var(--de-font-body-size);
 }
 
 .recovery__reason {
   margin-top: auto;
-  color: #9aa49f;
-  font-size: 22rpx;
+  color: var(--de-color-text-muted);
+  font-size: var(--de-font-meta-size);
 }

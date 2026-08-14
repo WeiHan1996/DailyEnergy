@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "figmaPage": "D-002 / Design System",
+  "components": [
+    {
+      "name": "PageShell",
+      "figmaName": "DE / PageShell",
+      "path": "page-shell",
+      "variants": ["Default", "High Contrast", "Reduced Motion"],
+      "states": ["Normal"]
+    },
+    {
+      "name": "AppHeader",
+      "figmaName": "DE / AppHeader",
+      "path": "app-header",
+      "variants": ["Root", "Back", "Actions"],
+      "states": ["Normal", "Disabled"]
+    },
+    {
+      "name": "PrimaryButton",
+      "figmaName": "DE / Button / Primary",
+      "path": "action-button",
+      "preset": { "variant": "primary" },
+      "variants": ["Primary"],
+      "states": ["Normal", "Loading", "Disabled"]
+    },
+    {
+      "name": "SecondaryButton",
+      "figmaName": "DE / Button / Secondary",
+      "path": "action-button",
+      "preset": { "variant": "secondary" },
+      "variants": ["Secondary"],
+      "states": ["Normal", "Loading", "Disabled"]
+    },
+    {
+      "name": "TextButton",
+      "figmaName": "DE / Button / Text",
+      "path": "action-button",
+      "preset": { "variant": "text" },
+      "variants": ["Text"],
+      "states": ["Normal", "Loading", "Disabled"]
+    },
+    {
+      "name": "ChoiceChip",
+      "figmaName": "DE / ChoiceChip",
+      "path": "choice-chip",
+      "variants": ["Single", "Compact"],
+      "states": ["Normal", "Selected", "Disabled"]
+    },
+    {
+      "name": "StateSelector",
+      "figmaName": "DE / StateSelector",
+      "path": "state-selector",
+      "variants": ["Default", "With Description"],
+      "states": ["Normal", "Selected", "Error", "Disabled"]
+    },
+    {
+      "name": "FriendMessage",
+      "figmaName": "DE / FriendMessage",
+      "path": "friend-message",
+      "variants": ["Default", "Compact"],
+      "states": ["Normal", "Fallback"]
+    },
+    {
+      "name": "EnergySummary",
+      "figmaName": "DE / EnergySummary",
+      "path": "energy-summary",
+      "variants": ["Default", "Compact"],
+      "states": ["Normal", "Loading", "Offline"]
+    },
+    {
+      "name": "ActionCard",
+      "figmaName": "DE / ActionCard",
+      "path": "action-card",
+      "variants": ["Default", "With Reason"],
+      "states": ["Normal", "Completed", "Disabled"]
+    },
+    {
+      "name": "SectionCard",
+      "figmaName": "DE / SectionCard",
+      "path": "section-card",
+      "variants": ["Default", "Subtle", "Raised"],
+      "states": ["Normal", "Loading", "Disabled"]
+    },
+    {
+      "name": "InlineNotice",
+      "figmaName": "DE / InlineNotice",
+      "path": "inline-notice",
+      "variants": ["Info", "Success", "Warning", "Error"],
+      "states": ["Normal", "With Action"]
+    },
+    {
+      "name": "LoadingSkeleton",
+      "figmaName": "DE / LoadingSkeleton",
+      "path": "loading-skeleton",
+      "variants": ["Text", "Card"],
+      "states": ["Loading", "Reduced Motion"]
+    },
+    {
+      "name": "OfflineState",
+      "figmaName": "DE / OfflineState",
+      "path": "offline-state",
+      "variants": ["Inline", "Page"],
+      "states": ["Offline", "Retrying"]
+    },
+    {
+      "name": "RecoverableError",
+      "figmaName": "DE / RecoverableError",
+      "path": "recoverable-error",
+      "variants": ["Inline", "Page"],
+      "states": ["Recoverable Error", "Retrying"]
+    },
+    {
+      "name": "ConfirmSheet",
+      "figmaName": "DE / ConfirmSheet",
+      "path": "confirm-sheet",
+      "variants": ["Standard", "Danger"],
+      "states": ["Normal", "Loading", "Disabled"]
+    },
+    {
+      "name": "SafetyScreen",
+      "figmaName": "DE / SafetyScreen",
+      "path": "safety-screen",
+      "variants": ["General", "Resources Unavailable"],
+      "states": ["Safety", "Loading", "Recoverable Error"]
+    }
+  ]
+}

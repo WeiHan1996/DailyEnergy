@@ -1,0 +1,22 @@
+<view
+  class="de-action-card {{completed ? 'de-action-card--completed' : ''}}"
+  aria-label="{{label}}。{{action}}"
+  aria-role="article"
+>
+  <view class="de-action-card__label">{{label}}</view>
+  <view class="de-action-card__action">{{action}}</view>
+  <view wx:if="{{reason}}" class="de-action-card__reason">{{reason}}</view>
+  <view wx:if="{{completed}}" class="de-action-card__completed" aria-live="polite">
+    <text aria-hidden="true">✓</text>
+    <text>已经留下</text>
+  </view>
+  <de-action-button
+    wx:else
+    accessible-label="{{buttonLabel}}：{{action}}"
+    block
+    disabled="{{disabled}}"
+    label="{{buttonLabel}}"
+    variant="primary"
+    bind:press="handlePress"
+  ></de-action-button>
+</view>

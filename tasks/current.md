@@ -1,15 +1,14 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-14（D-001 已合并并进入 Done；合并后 High advisory 已最小修复；D-002 为唯一 Ready）
+- **最后更新**：2026-08-14（最终本地 Gate 已执行；Draft PR 待创建）
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：D-002 — 建立设计系统与 Design Tokens
-- **任务状态**：Ready
-- **任务 Profile**：`hybrid`
-- **任务分支**：尚未创建；状态收口合并后从最新 `main` 创建 `agent/d002-design-system`
-- **状态收口分支**：`agent/d001-completion-handoff`，基于 D-001 merge `e370094`
+- **任务状态**：In Review
+- **任务 Profile**：`security`（最终 Safety 边界截图触发安全与隐私权威路由，须执行 full Gate）
+- **任务分支**：`agent/d002-design-system`，基于状态收口 merge `128ee8d`
 - **当前 Issue**：[D-002 Issue #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)
-- **当前 PR**：无；D-002 尚未开工
+- **当前 PR**：待由本次唯一 push 后创建的聚焦 Draft PR；以本分支与 Issue #100 为检索入口
 - **最近完成 PR**：[D-001 PR #140](https://github.com/WeiHan1996/DailyEnergy/pull/140)，squash merge `e37009439bce545dd1f19d19f589b209ec178b9e`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -37,7 +36,8 @@ D-002 范围以 Issue #100 为准：
 - D-001 PR #140 已在精确 head `8e32de318ea01442b791d7efeed36362991bbe03` 上以
   `--match-head-commit` squash 合并，Issue #99 已关闭；
 - E-004 微信原生小程序 TypeScript 骨架已 Done，client-safe、公开配置、生成目录和 bundle Gate 可用；
-- D-002 是唯一 Ready 任务；D-003～D-005、C-001～C-017 和其它任务均保持 Planned；
+- D-002 是当前 In Review 任务，代码、Figma source 与三张 Safety 边界刷新证据已收敛；D-003～D-005、
+  C-001～C-017 和其它任务均保持 Planned；
 - D-004 被接受前不得开始 C-003、C-004、C-009 的正式页面实现；D-005 被接受前不得开始
   C-012、C-013、C-014 的正式页面实现；
 - Production/RC 继续 `NO_GO`，D-002 不触碰 Production、真实用户数据、secret、云资源或服务器。
@@ -71,9 +71,10 @@ D-002 范围以 Issue #100 为准：
 - 本机供应链 evidence 仍按既有策略拒绝 Darwin 专属 optional 包
   `@img/sharp-libvips-darwin-arm64` 的 LGPL license，未为本次修复扩大 Linux allowlist。最终 Linux
   license/SBOM/digest 与 audit 证据由状态收口 PR 的固定 supply-chain CI 补齐；不得主动重跑。
-- `pnpm agent:validate --mode=full --task=D-002` 已执行：Profile 为 `hybrid`，格式、lint、架构、
-  codegen、合同、Agent workflow、typecheck 和前置测试通过；deployment 仍为 48/50，唯一根因是
-  macOS 缺少 Linux `flock` 的 `RELEASE_LOCK_RUNTIME_MISSING:flock`，整体保持 FAIL，未改写为 PASS。
+- `pnpm agent:validate --mode=full --task=D-002` 曾在 Blocked 状态重新执行：当时有效 Profile 为
+  `hybrid`，格式、lint、架构、codegen、合同、Agent workflow、typecheck 和前置测试通过；deployment
+  仍为 48/50，唯一根因是 macOS 缺少 Linux `flock` 的 `RELEASE_LOCK_RUNTIME_MISSING:flock`，自动化
+  状态保持 FAIL，未改写为 PASS。该记录是最终 Safety 证据恢复前的历史执行，最终 `security` Gate 见第 7 节。
 
 该 advisory 是 D-001 合并后出现的安全阻断，按 AGENTS 的 urgent safety 规则优先收口；不改变 D-001
 设计结论，也不扩展 D-002 范围。
@@ -109,14 +110,52 @@ Requirement-to-Proof 边界：
 - 不创建没有产品需求的 Dark Mode，不把 D-001 概念色值直接复制成未经验证的正式 Token；
 - 若设计与代码合同不能在一个聚焦 PR 中独立验收，开工前先拆 Issue，不边做边扩范围。
 
-## 7. 临时 GitHub Actions 额度约束
+## 7. 当前实现进展
+
+- `apps/miniapp/design-tokens.json` 已建立 220 个 canonical Token；Figma 导入量为 Primitive 86、
+  Default 70、High Contrast 70、Component 33，来源指纹为
+  `sha256:dcb100ea11fe0d534496af852983bc32d31f2d0a56ca20c4d01a2af79154d8d0`；
+- `apps/miniapp/component-library.json` 已登记 17 个逻辑组件合同，落在 15 个微信原生组件目录；
+- 已建立确定性 WXSS/TypeScript、评审 CSS、Figma manifest/导入文件生成，缺失/手改 drift、组件完整性、
+  raw Token、client-safe bundle 与关键无障碍信号 Gate；
+- 生成器已升级为 `daily-energy-design-tokens-v4`，直接生成 Prettier-compatible 确定性产物，并把
+  Prettier 版本纳入来源指纹；Figma 跨 collection alias 使用已解析 `$value` 加
+  `com.figma.aliasData`，同步与构建调用方均使用 async/await，8 个产物通过格式幂等和 drift Gate；
+- `docs/design/design-system.md` Draft 和 `docs/design/assets/d002/` 本地评审页已建立；320、390、736
+  预览与 1.25x 大字、High Contrast、Reduced Motion 的既有测量仍有效，7 张本地截图均为 READY；
+  Safety 占位改版后的 `safety-screen.png` 已原样归档；
+- 2026-08-14 final focused 本地检查已通过：`pnpm design-tokens:test`、`pnpm design-tokens:check`、
+  `node tooling/test-miniapp-design-system.mjs`、`node tooling/check-miniapp-design-system.mjs`、
+  `pnpm --filter @daily-energy/app-miniapp build`、`git diff --check`；24 组文字对比和 6 组非文字对比均达门槛；
+- 2026-08-14 最终 `pnpm agent:validate --mode=full --task=D-002` 以 `security` Profile 执行；格式、lint、
+  架构、codegen、合同、Agent workflow、数据库证据、typecheck 和 D-002 fixtures 均越过；deployment
+  为 48/50，两个失败测试同因 macOS 缺少 Linux `flock`（`RELEASE_LOCK_RUNTIME_MISSING:flock`），
+  自动化准确保持 FAIL；设计终态另因 owner 接受待完成而保持 `MANUAL_EVIDENCE_REQUIRED`；
+- Figma `D-002 / Design System` page `83:2` 的四个正式 collection 已导入并核验为
+  `86 / 70 / 70 / 33`，代表 alias `color/canvas -> color/paper/50` 与
+  `button/height -> size/control` 可见；
+- 8 个 Text/Effect Styles 已建立并绑定真实节点，17 个逻辑 Components 与真实 SafetyScreen instance
+  已核验；Foundations `174:309`、Components `174:310`、States `174:311` 均为 `1200 x 900`；
+- SafetyScreen 已收敛为纯结构合同：所有可见文案、按钮和 ARIA 名称均由属性注入且默认值为空，Gate
+  使用 `MINIAPP_DESIGN_SAFETY_COPY_BOUNDARY` 拒绝内置未经评审文案，同时保留两个事件、三个资源状态
+  属性和两个按钮的注入式 Loading 文案；12 个 known-fail fixture 与真实仓库 Gate 已复验通过；
+- 最终命名版本 `D-002 Design System / dcb100ea / safety boundary final`（`2387487276296532390`）已建立；
+  10 张当前 Figma JPEG 已归档并目视核验，其中 Components `174:310` 与 States `174:311` 两张刷新证据
+  均为 `1456 x 731`，最终版本与 instance 继续证明占位文案及组件复用；
+- 项目所有者已从当前本地评审页手动提供 `safety-screen.png`；Agent 已原样归档并核验为
+  `1710 x 542` RGBA PNG，SHA-256 为
+  `016063e506d3d86bb3d08493cff02ab9eee219324c61e396a21dfbeee82ebc3c`，五项最新占位完整且未见裁切或重叠；
+- 三张刷新证据与最终本地 Gate 记录已齐备，任务进入 In Review；设计规范继续保持 Draft，终态保持
+  `MANUAL_EVIDENCE_REQUIRED`，不得报告 D-002 PASS 或 Accepted。
+
+## 8. 临时 GitHub Actions 额度约束
 
 - 项目所有者于 2026-08-13 通知：本计费周期 Actions minutes 已使用约 90%；
 - 默认先完成本地编辑、检查和提交，评审前只做一次必要 push；不主动重跑 workflow；
 - D-001 状态同步与 nanoid High advisory 修复合并为同一个收口 PR，避免两次独立 CI；
 - D-002 后续同样应在本地收敛后再一次性 push，确需额外运行必须先说明原因并取得确认。
 
-## 8. Production / RC 未决项
+## 9. Production / RC 未决项
 
 - Production PostgreSQL backup/key、PITR 隔离恢复、删除/恢复拒绝独立证明：`BLOCKED`；
 - 真实 on-call、告警投递/确认/升级、observability TTL/RBAC/副本与导出删除：`BLOCKED`；
@@ -126,12 +165,8 @@ Requirement-to-Proof 边界：
 
 上述项目不是 waiver；任何一项缺失都禁止 Production readiness 或 RC PASS 声明。
 
-## 9. 精确下一动作
+## 10. 精确下一动作
 
-1. 完成当前状态收口分支的格式、Agent workflow、锁文件、build 和 full Gate；
-2. 只 push 一次并创建聚焦 Draft PR，等待 exact-head Linux CI 验证 nanoid audit 修复；不重跑；
-3. 项目所有者另行审核该收口 PR；批准并合并后更新本地 `main`；
-4. 运行 `pnpm agent:prepare D-002 --remote`，确认返回 `READY`，再创建 `agent/d002-design-system`；
-5. 如 Issue #100 可保持一个独立验收 PR，创建 `docs/design/design-system.md` Draft、Figma Variables/Styles
-   与首批组件评审入口；否则先拆 Issue；
-6. D-002 获项目所有者接受并合并后，才把 D-003 移为唯一 Ready；当前不启动 D-003。
+1. 本地收敛后只 commit/push 一次并创建聚焦 Draft PR，不主动重跑 Actions；
+2. 项目所有者审核 Draft PR 与 Figma 证据；若接受，在同一 PR 精确 head 上记录接受决定，随后按临时
+   GitHub Free 合并控制核验同一 run 11/11。经明确批准并合并后，仅把 D-003 移为 Ready。

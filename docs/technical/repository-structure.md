@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-30 — 仓库结构和模块边界
-- **最后更新**：2026-07-29
+- **最后更新**：2026-08-14（补充 D-002 client-safe Design Token 与组件合同落点）
 - **适用范围**：Phase 0B / Phase 1～3 的 Monorepo 目录、workspace package、模块 public API、依赖方向、Worker profile 入口和静态边界 Gate
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[系统架构](./architecture.md)、[共享 Schema](../../packages/shared-schemas/README.md)、[数据库规格](./database.md)、[API 契约](./api.md)
 - **可执行合同**：[Prisma 草案](../../prisma/schema.prisma)、[OpenAPI 草案](../../openapi/openapi.yaml)
@@ -143,6 +143,8 @@ daily-energy/
 
 ```text
 apps/miniapp/
+├── component-library.json
+├── design-tokens.json
 ├── src/
 │   ├── app/
 │   ├── pages/
@@ -157,9 +159,13 @@ apps/miniapp/
 ```
 
 - `pages/features/components` 只消费 client-safe view 与命令类型；
+- `design-tokens.json` 是 D-002 primitive/semantic/component Token 的 canonical source，
+  `component-library.json` 是首批逻辑组件的代码/Figma 映射合同；二者不得包含业务状态、用户资料或 secret；
 - `platform` 封装微信 login、storage、network、share、subscription 等 API；
 - `services` 只能通过 `@daily-energy/api-client/miniapp` 调公开 API；
-- `generated` 必须由 root 生成任务产生且带来源指纹，不允许手改；
+- `generated` 必须由 root 生成任务产生且带来源指纹，不允许手改；D-002 的 WXSS/TypeScript Token
+  生成物与公开配置生成物共享同一 client-safe、无本机路径/时间戳边界；
+- 页面与组件只消费 semantic/component Token；primitive 只存在于 foundations，组件 WXSS 不散落第二套 raw 值；
 - 本地 storage 只保存允许的短期 view/ref/草稿，不能成为 ProductDate、owner、Safety 或删除权威；
 - 禁止 import `node:*`、Nest、Prisma、Redis、BullMQ、Prompt、server package、provider SDK 或任意 secret 配置。
 
@@ -463,6 +469,8 @@ database spec
 - Nest transport mapper 显式把 command/view 与 HTTP envelope 连接；
 - codegen 输出必须带 source fingerprint，可在 clean checkout 重建且 diff 为 0；
 - E-008 决定提交 JSON Schema、OpenAPI bundle 和 Public/Admin client 生成物；生成物带稳定 generator/fingerprint/header，由 clean regeneration Gate 管理且不能手改。
+- D-002 使用同一生成原则从 `apps/miniapp/design-tokens.json` 单向生成 Mini Program WXSS/TypeScript、
+  本地评审 CSS、Figma manifest 和导入文件；这些产物不反向成为 Token 权威。
 
 ### 11.2 Root 权威源
 

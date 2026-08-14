@@ -1,0 +1,13 @@
+<view
+  class="de-loading-skeleton de-loading-skeleton--{{variant}} {{reducedMotion ? 'de-loading-skeleton--reduced' : ''}}"
+  aria-busy="true"
+  aria-label="{{label}}"
+  aria-role="status"
+>
+  <view
+    wx:for="{{lines}}"
+    wx:key="*this"
+    class="de-loading-skeleton__line {{index === lines - 1 ? 'de-loading-skeleton__line--short' : ''}}"
+    aria-hidden="true"
+  ></view>
+</view>

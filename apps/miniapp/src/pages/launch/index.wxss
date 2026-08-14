@@ -1,8 +1,8 @@
 .launch {
   box-sizing: border-box;
   display: flex;
-  min-height: 100vh;
-  padding: 168rpx 72rpx 96rpx;
+  min-height: var(--de-layout-page-min-height);
+  padding: var(--de-layout-section-gap) var(--de-layout-page-gutter-wide);
   align-items: center;
   flex-direction: column;
   text-align: center;
@@ -10,44 +10,42 @@
 
 .launch__mark {
   display: flex;
-  width: 132rpx;
-  height: 132rpx;
-  margin-bottom: 48rpx;
+  width: var(--de-component-header-height);
+  height: var(--de-component-header-height);
+  margin-bottom: var(--de-layout-page-gutter-wide);
   align-items: center;
   justify-content: center;
-  border-radius: 44rpx;
-  background: #dce9df;
-  color: #2f5b45;
-  font-size: 42rpx;
-  font-weight: 700;
-  letter-spacing: 2rpx;
+  border-radius: var(--de-component-card-radius);
+  background: var(--de-color-brand-soft);
+  color: var(--de-color-brand-strong);
+  font-size: var(--de-font-section-size);
+  font-weight: var(--de-font-bold);
 }
 
 .launch__eyebrow {
-  margin-bottom: 22rpx;
-  color: #65766e;
-  font-size: 22rpx;
-  font-weight: 600;
-  letter-spacing: 7rpx;
+  margin-bottom: var(--de-component-card-gap);
+  color: var(--de-color-text-muted);
+  font-size: var(--de-font-meta-size);
+  font-weight: var(--de-font-semibold);
 }
 
 .launch__title {
-  max-width: 560rpx;
-  color: #24302b;
-  font-size: 48rpx;
-  font-weight: 650;
-  line-height: 1.35;
+  max-width: var(--de-layout-content-max);
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-page-title-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
 }
 
 .launch__status {
-  margin-top: 40rpx;
-  color: #607068;
-  font-size: 28rpx;
-  line-height: 1.6;
+  margin-top: var(--de-layout-page-gutter);
+  color: var(--de-color-text-secondary);
+  font-size: var(--de-font-body-size);
+  line-height: var(--de-font-line-body);
 }
 
 .launch__environment {
   margin-top: auto;
-  color: #8b9791;
-  font-size: 22rpx;
+  color: var(--de-color-text-muted);
+  font-size: var(--de-font-meta-size);
 }

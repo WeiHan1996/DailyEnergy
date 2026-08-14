@@ -11,16 +11,23 @@
 - [content-layout.md](./content-layout.md)
 - [prototype-validation.md](./prototype-validation.md)
 
-正式视觉工作流已进入 Phase 2。项目所有者已接受 D-001 的 A — 温柔自然方向，Figma 接受记录已同步，
-PR #140 已合并并关闭 Issue #99。D-002 现为唯一 Ready 任务，尚未开工：
+D-002 当前 Draft 交付：
 
-| Issue                                                              | 状态    | 计划文档                                     | 主要结果                                 |
-| ------------------------------------------------------------------ | ------- | -------------------------------------------- | ---------------------------------------- |
-| [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)   | Done    | [visual-direction.md](./visual-direction.md) | 已接受 A — 温柔自然；PR #140 已合并      |
-| [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100) | Ready   | `design-system.md`                           | Figma Variables、Design Tokens 与组件    |
-| [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101) | Planned | `core-flow-high-fidelity.md`                 | 核心流程八页及关键状态                   |
-| [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) | Planned | `developer-handoff.md`                       | 核心流程可点击原型、验证与开发交付       |
-| [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) | Planned | `phase2-remaining-handoff.md`                | 晚间、趋势与数据权利页面高保真及开发交付 |
+- [design-system.md](./design-system.md)
+- [D-002 评审资产与 Figma 导入说明](./assets/d002/README.md)
+- [D-002 证据索引](./assets/d002/evidence/README.md)
+
+正式视觉工作流已进入 Phase 2。项目所有者已接受 D-001 的 A — 温柔自然方向，Figma 接受记录已同步，
+PR #140 已合并并关闭 Issue #99。D-002 当前为 In Review；Figma Components/States 与本地 Safety 三张
+刷新证据及最终本地 Gate 记录均已归档，项目所有者接受待完成：
+
+| Issue                                                              | 状态      | 计划文档                                     | 主要结果                                     |
+| ------------------------------------------------------------------ | --------- | -------------------------------------------- | -------------------------------------------- |
+| [D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)   | Done      | [visual-direction.md](./visual-direction.md) | 已接受 A — 温柔自然；PR #140 已合并          |
+| [D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100) | In Review | [design-system.md](./design-system.md)       | 证据与本地 Gate 已收敛；项目所有者接受待完成 |
+| [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101) | Planned   | `core-flow-high-fidelity.md`                 | 核心流程八页及关键状态                       |
+| [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) | Planned   | `developer-handoff.md`                       | 核心流程可点击原型、验证与开发交付           |
+| [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) | Planned   | `phase2-remaining-handoff.md`                | 晚间、趋势与数据权利页面高保真及开发交付     |
 
 依赖顺序为 `D-001 → D-002 → D-003 → D-004 → D-005`。
 

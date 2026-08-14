@@ -1,0 +1,71 @@
+.de-safety-screen {
+  box-sizing: border-box;
+  display: flex;
+  min-height: var(--de-layout-page-min-height);
+  padding: calc(env(safe-area-inset-top) + var(--de-component-safety-padding))
+    var(--de-component-safety-padding)
+    calc(env(safe-area-inset-bottom) + var(--de-component-safety-padding));
+  flex-direction: column;
+  background: var(--de-color-safety-canvas);
+  color: var(--de-color-safety-text);
+  font-family: var(--de-font-family);
+  gap: var(--de-component-safety-section-gap);
+}
+
+.de-safety-screen__eyebrow {
+  color: var(--de-color-danger-text);
+  font-size: var(--de-font-label-size);
+  font-weight: var(--de-font-bold);
+  line-height: var(--de-font-line-heading);
+}
+
+.de-safety-screen__title {
+  font-size: var(--de-font-page-title-size);
+  font-weight: var(--de-font-bold);
+  line-height: var(--de-font-line-heading);
+}
+
+.de-safety-screen__message {
+  font-size: var(--de-font-body-large-size);
+  line-height: var(--de-font-line-relaxed);
+}
+
+.de-safety-screen__immediate {
+  display: flex;
+  padding: var(--de-component-notice-padding);
+  flex-direction: column;
+  border: var(--de-component-safety-border-width) solid
+    var(--de-color-safety-border);
+  border-radius: var(--de-component-notice-radius);
+  gap: var(--de-component-notice-gap);
+}
+
+.de-safety-screen__immediate-label {
+  display: flex;
+  color: var(--de-color-danger-text);
+  font-size: var(--de-font-body-size);
+  font-weight: var(--de-font-bold);
+  gap: var(--de-component-notice-gap);
+}
+
+.de-safety-screen__resources {
+  display: flex;
+  flex-direction: column;
+  gap: var(--de-component-notice-gap);
+}
+
+.de-safety-screen__section-title {
+  font-size: var(--de-font-section-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}
+
+.de-safety-screen__resource-state,
+.de-safety-screen__resource {
+  padding: var(--de-component-notice-padding);
+  border-left: var(--de-component-safety-border-width) solid
+    var(--de-color-border-strong);
+  background: var(--de-color-surface-secondary);
+  font-size: var(--de-font-body-size);
+  line-height: var(--de-font-line-body);
+}

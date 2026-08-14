@@ -1,0 +1,21 @@
+<view
+  class="de-recoverable-error de-recoverable-error--{{variant}}"
+  aria-live="assertive"
+  aria-role="alert"
+>
+  <view class="de-recoverable-error__symbol" aria-hidden="true">!</view>
+  <view class="de-recoverable-error__content">
+    <view class="de-recoverable-error__title">{{title}}</view>
+    <view class="de-recoverable-error__message">{{message}}</view>
+    <view wx:if="{{reference}}" class="de-recoverable-error__reference">
+      参考：{{reference}}
+    </view>
+    <de-action-button
+      label="重试"
+      loading="{{retrying}}"
+      loading-label="正在重试"
+      variant="secondary"
+      bind:press="handleRetry"
+    ></de-action-button>
+  </view>
+</view>

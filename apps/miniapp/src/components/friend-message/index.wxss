@@ -1,0 +1,47 @@
+.de-friend-message {
+  display: flex;
+  align-items: stretch;
+  gap: var(--de-component-card-gap);
+}
+
+.de-friend-message__marker {
+  width: var(--de-state-focus-width);
+  flex: 0 0 var(--de-state-focus-width);
+  border-radius: var(--de-component-chip-radius);
+  background: var(--de-color-brand-primary);
+}
+
+.de-friend-message__content {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--de-component-header-gap);
+}
+
+.de-friend-message__label {
+  color: var(--de-color-brand-strong);
+  font-size: var(--de-font-label-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}
+
+.de-friend-message__title {
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-section-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}
+
+.de-friend-message__body {
+  color: var(--de-color-text-secondary);
+  font-size: var(--de-font-body-size);
+  line-height: var(--de-font-line-relaxed);
+}
+
+.de-friend-message__fallback {
+  align-self: flex-start;
+  color: var(--de-color-text-muted);
+  font-size: var(--de-font-meta-size);
+  font-weight: var(--de-font-medium);
+}

@@ -1,0 +1,45 @@
+.de-action-card {
+  box-sizing: border-box;
+  display: flex;
+  padding: var(--de-component-card-padding);
+  flex-direction: column;
+  border: var(--de-component-card-border-width) solid
+    var(--de-color-border-subtle);
+  border-radius: var(--de-component-card-radius);
+  background: var(--de-color-surface-secondary);
+  gap: var(--de-layout-content-gap);
+}
+
+.de-action-card__label {
+  color: var(--de-color-brand-strong);
+  font-size: var(--de-font-label-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}
+
+.de-action-card__action {
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-action-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}
+
+.de-action-card__reason {
+  color: var(--de-color-text-secondary);
+  font-size: var(--de-font-body-size);
+  line-height: var(--de-font-line-body);
+}
+
+.de-action-card__completed {
+  display: flex;
+  min-height: var(--de-state-touch-target);
+  align-items: center;
+  color: var(--de-color-brand-strong);
+  font-size: var(--de-font-body-size);
+  font-weight: var(--de-font-semibold);
+  gap: var(--de-component-button-gap);
+}
+
+.de-action-card--completed {
+  border-color: var(--de-color-brand-primary);
+}

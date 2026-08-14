@@ -1,0 +1,14 @@
+<button
+  class="de-action-button de-action-button--{{variant}} {{block ? 'de-action-button--block' : ''}}"
+  aria-busy="{{loading}}"
+  aria-label="{{accessibleLabel || label}}"
+  disabled="{{disabled || loading}}"
+  bindtap="handlePress"
+  hover-class="de-action-button--pressed"
+>
+  <view class="de-action-button__content">
+    <view wx:if="{{loading}}" class="de-action-button__spinner" aria-hidden="true"></view>
+    <slot wx:else name="icon"></slot>
+    <text>{{loading ? loadingLabel : label}}</text>
+  </view>
+</button>

@@ -1,0 +1,49 @@
+.de-choice-chip {
+  box-sizing: border-box;
+  display: inline-flex;
+  min-width: var(--de-state-touch-target);
+  min-height: var(--de-component-chip-height);
+  margin: 0;
+  padding: 0 var(--de-component-chip-padding-x);
+  align-items: center;
+  justify-content: center;
+  border: var(--de-component-chip-border-width) solid
+    var(--de-color-border-default);
+  border-radius: var(--de-component-chip-radius);
+  background: var(--de-color-surface-primary);
+  color: var(--de-color-text-secondary);
+  font-size: var(--de-font-label-size);
+  font-weight: var(--de-font-medium);
+  line-height: var(--de-font-line-tight);
+  transition:
+    background-color var(--de-motion-fast),
+    border-color var(--de-motion-fast);
+  gap: var(--de-component-chip-gap);
+}
+
+.de-choice-chip::after {
+  border: 0;
+}
+
+.de-choice-chip--selected {
+  border-color: var(--de-color-brand-primary);
+  background: var(--de-color-brand-soft);
+  color: var(--de-color-brand-strong);
+}
+
+.de-choice-chip--pressed {
+  border-color: var(--de-color-border-strong);
+}
+
+.de-choice-chip[disabled] {
+  opacity: var(--de-state-disabled-opacity);
+}
+
+.de-choice-chip__indicator {
+  font-weight: var(--de-font-bold);
+}
+
+.de-choice-chip__state {
+  font-size: var(--de-font-meta-size);
+  font-weight: var(--de-font-semibold);
+}

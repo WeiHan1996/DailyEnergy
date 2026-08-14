@@ -347,7 +347,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 2 — 确定性核心闭环
-状态：D-002 Ready
+状态：D-002 In Review（最终本地 Gate 已记录；项目所有者接受待完成）
 当前目标：把已接受的 A — 温柔自然方向转换为设计系统、Design Tokens 与首批组件
 当前任务：D-002 建立设计系统与 Design Tokens
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/100
@@ -368,13 +368,16 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 - [D-001 Issue #99](https://github.com/WeiHan1996/DailyEnergy/issues/99) 已随
   [PR #140](https://github.com/WeiHan1996/DailyEnergy/pull/140) squash 合并为
   `e37009439bce545dd1f19d19f589b209ec178b9e` 并进入 Done；
-- [D-002 Issue #100](https://github.com/WeiHan1996/DailyEnergy/issues/100) 是唯一 Ready 任务，尚未开工；
+- [D-002 Issue #100](https://github.com/WeiHan1996/DailyEnergy/issues/100) 是当前 In Review 任务；220 个
+  canonical Token、17 个逻辑组件与 Figma source 已收敛，SafetyScreen 已改为无内置文案的结构合同；
+  最新 Components、States 与本地 Safety 三张刷新证据均已归档；最终 `security` full Gate 仅保留本机
+  缺少 Linux `flock` 的既知 48/50 失败，项目所有者接受待完成，分支为 `agent/d002-design-system`；
 - 已接受结论为 `CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`；
 - Production PITR、真实告警投递/TTL、微信 DevTools/真机和完整 incident/manual RC 保持
   `BLOCKED/PENDING`，不因 Phase 2 development admission 自动解除；
 - 私有 GitHub Free 临时合并控制只允许逐次获 owner 风险接受的 development branch merge，
   进入任一 RC 前停止；PR #138 的接受不自动适用于后续 PR；
-- D-003～D-005 和 C-001～C-017 保持 Planned，不随 D-002 Ready 自动开工。
+- D-003～D-005 和 C-001～C-017 保持 Planned，不随 D-002 开工自动启动。
 
 [Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。
 E-001～E-005 与 E-008 已合并并进入 Done；E-005 随
@@ -395,7 +398,7 @@ reference observability baseline 和 E-014 的分层 Phase Gate 已获接受。
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
 [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
 [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 已登记；D-001 为 Done，
-D-002 为唯一 Ready，D-003～D-005 为 Planned。D-004 是 C-003、C-004、C-009 的正式设计交付前置；D-005 是
+D-002 当前为 In Review，D-003～D-005 为 Planned。D-004 是 C-003、C-004、C-009 的正式设计交付前置；D-005 是
 C-012、C-013、C-014 的正式设计交付前置。云厂商、域名、主体、跨境、
 真实账号/密钥、热线和值班等外部 Gate 仍未解除。
 
