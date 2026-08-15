@@ -116,7 +116,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/design/prototype-validation.md](./design/prototype-validation.md)               | Accepted | [S-04 静态原型](../prototype/s04/README.md)、5～8 人测试计划和结果模板 | Accepted S-03 设计规格               |
 | [docs/design/visual-direction.md](./design/visual-direction.md)                       | Accepted | D-001 唯一 A — 温柔自然方向、反模式、证据与接受记录                    | Accepted 页面与交互规格              |
 | [docs/design/assets/d001/evidence/README.md](./design/assets/d001/evidence/README.md) | Active   | D-001 A 权威 Figma 截图、历史对比、小屏、大字、状态与减少动态证据索引  | visual-direction、interaction-states |
-| [docs/design/design-system.md](./design/design-system.md)                             | Accepted | D-002 于 2026-08-15 获项目所有者接受；PR #142 合并待完成               | D-001、E-004                         |
+| [docs/design/design-system.md](./design/design-system.md)                             | Accepted | D-002 已接受并随 PR #142 合并；D-003 的唯一 Token/组件基础             | D-001、E-004                         |
 | [docs/design/assets/d002/evidence/README.md](./design/assets/d002/evidence/README.md) | Active   | D-002 本地/Figma 截图、节点、复用和人工证据索引                        | design-system、interaction-states    |
 | docs/design/core-flow-high-fidelity.md                                                | Planned  | D-003 核心流程八页及关键状态高保真索引                                 | D-002                                |
 | docs/design/developer-handoff.md                                                      | Planned  | D-004 可点击原型、验证结果、Frame ID 和视觉 QA 交付                    | D-003、prototype-validation          |
@@ -186,7 +186,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                              | database、testing、deployment、ADR-0005、Issue #44            |
 | [docker/observability/contract.json](../docker/observability/contract.json)                                                                                                                            | Implemented | E-013 vendor-neutral 信号、字段/平面/基数、期限、成本与 Production blocked Gate                                   | observability、privacy、deployment                            |
 | [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011 CI/供应链、E-013 observability 与 E-014 Phase Gate 证据入口                         | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；D-001 Done，D-002 当前 In Review                           | Accepted Phase 0B specs、E-014 Gate、D-001、D-002 Issue #100  |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；D-001/D-002 Done，D-003 Ready                              | Accepted Phase 0B specs、E-014 Gate、D-001、D-002、D-003 #101 |
 
 ### 7.7 Phase Gate
 
@@ -253,16 +253,16 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-015 与 D-001 已完成；A — 温柔自然是唯一视觉方向，D-002 当前为 In Review。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-015、D-001 与 D-002 已完成；A — 温柔自然与 Accepted D-002 设计系统是当前唯一设计基础，D-003 为唯一 Ready。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [D-002 Issue #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)；
+6. [D-003 Issue #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)；
 7. `docs/agent/PROJECT_CONTEXT.md`、Agent 工作流规范与
-   `pnpm agent:prepare D-002 --remote` 返回的全部 required sources；
+   `pnpm agent:prepare D-003 --remote` 返回的全部 required sources；
 8. [D-001 Accepted 视觉方向](./design/visual-direction.md)与原始 Figma 证据、
    [页面与路由清单](./design/screen-inventory.md)、[页面详细规格](./design/screen-specs.md)、
    [交互状态](./design/interaction-states.md)和[内容布局](./design/content-layout.md)；
@@ -286,7 +286,7 @@ E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squas
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
 [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
 [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 已纳入
-Phase 2；D-001 已进入 Done，D-002 当前为 In Review，D-003～D-005 保持 Planned。D-004 是 C-003、C-004、C-009 的直接前置；
+Phase 2；D-001、D-002 已进入 Done，D-003 为唯一 Ready，D-004～D-005 保持 Planned。D-004 是 C-003、C-004、C-009 的直接前置；
 D-005 是 C-012、C-013、C-014 的直接前置。
 正式 Source-ID registry 已由 E-010 实现；E-011 已接入 CI、artifact、cache、
 telemetry 与供应链 evidence 且不改变原有证据层级，未实现项继续为 `PLANNED`。
@@ -312,8 +312,8 @@ Phase 1 结束。项目所有者于 2026-08-13 接受 `01B / Gentle Nature / DLY
 CI run `31719741937` 11/11 SUCCESS，并 squash 合并为 `e37009439bce545dd1f19d19f589b209ec178b9e`，
 Issue #99 已关闭。merged-main run `31720488027` 的 9 个 automated lane 成功，但 supply-chain 因
 `GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.17`；状态收口 PR #141 已把现有精确 override 最小提升到
-`3.3.18` 并合并为 `128ee8d`。D-002 已在 `agent/d002-design-system` 分支完成本地 Token、组件、
-评审资产与 Figma 原始证据收敛，当前为 In Review；四个 Variables collection、8 个 Styles、17 个
-Components、三个 `1200 x 900` Frames 和最终命名版本均已记录，D-003 不启动。
+`3.3.18` 并合并为 `128ee8d`。项目所有者于 2026-08-15 接受 D-002；PR #142 精确 head `7139cfb`
+的 CI run `31888493133` 11/11 SUCCESS，并 squash 合并为 `1fa5922`，Issue #100 已关闭。D-002 进入
+Done；D-003 成为唯一 Ready，尚未开工。
 公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。

@@ -264,3 +264,7 @@ Accepted testing policy 保持独立证据层。
   17 个基础组件及其作为 D-003 唯一基础组件集的交付；
 - **保留边界**：SafetyScreen 仍不包含可上线危机文案或资源；微信 DevTools、真机、专业 Safety 与
   Production/RC 证据未因本次接受而解除。
+
+合并记录：PR #142 精确 head `7139cfbdd193a8d6570b1cccfb8c4b6b01e90a45` 的 CI run
+`31888493133` 11/11 SUCCESS，并于 2026-08-15 squash 合并为
+`1fa5922ebad7158c42b1fa9949b1f2f95ad71804`；Issue #100 已关闭。
