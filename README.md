@@ -347,7 +347,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 2 — 确定性核心闭环
-状态：D-002 In Review（最终本地 Gate 已记录；项目所有者接受待完成）
+状态：D-002 In Review（项目所有者已接受；PR #142 合并待完成）
 当前目标：把已接受的 A — 温柔自然方向转换为设计系统、Design Tokens 与首批组件
 当前任务：D-002 建立设计系统与 Design Tokens
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/100
@@ -371,7 +371,8 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 - [D-002 Issue #100](https://github.com/WeiHan1996/DailyEnergy/issues/100) 是当前 In Review 任务；220 个
   canonical Token、17 个逻辑组件与 Figma source 已收敛，SafetyScreen 已改为无内置文案的结构合同；
   最新 Components、States 与本地 Safety 三张刷新证据均已归档；最终 `security` full Gate 仅保留本机
-  缺少 Linux `flock` 的既知 48/50 失败，项目所有者接受待完成，分支为 `agent/d002-design-system`；
+  缺少 Linux `flock` 的既知 48/50 失败；项目所有者已于 2026-08-15 接受，PR #142 合并待完成，分支为
+  `agent/d002-design-system`；
 - 已接受结论为 `CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`；
 - Production PITR、真实告警投递/TTL、微信 DevTools/真机和完整 incident/manual RC 保持
   `BLOCKED/PENDING`，不因 Phase 2 development admission 自动解除；

@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-08-14
+- **最后更新**：2026-08-15
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -116,7 +116,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/design/prototype-validation.md](./design/prototype-validation.md)               | Accepted | [S-04 静态原型](../prototype/s04/README.md)、5～8 人测试计划和结果模板 | Accepted S-03 设计规格               |
 | [docs/design/visual-direction.md](./design/visual-direction.md)                       | Accepted | D-001 唯一 A — 温柔自然方向、反模式、证据与接受记录                    | Accepted 页面与交互规格              |
 | [docs/design/assets/d001/evidence/README.md](./design/assets/d001/evidence/README.md) | Active   | D-001 A 权威 Figma 截图、历史对比、小屏、大字、状态与减少动态证据索引  | visual-direction、interaction-states |
-| [docs/design/design-system.md](./design/design-system.md)                             | Draft    | D-002 In Review：证据与本地 Gate 已收敛，项目所有者接受待完成          | D-001、E-004                         |
+| [docs/design/design-system.md](./design/design-system.md)                             | Accepted | D-002 于 2026-08-15 获项目所有者接受；PR #142 合并待完成               | D-001、E-004                         |
 | [docs/design/assets/d002/evidence/README.md](./design/assets/d002/evidence/README.md) | Active   | D-002 本地/Figma 截图、节点、复用和人工证据索引                        | design-system、interaction-states    |
 | docs/design/core-flow-high-fidelity.md                                                | Planned  | D-003 核心流程八页及关键状态高保真索引                                 | D-002                                |
 | docs/design/developer-handoff.md                                                      | Planned  | D-004 可点击原型、验证结果、Frame ID 和视觉 QA 交付                    | D-003、prototype-validation          |

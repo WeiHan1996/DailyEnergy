@@ -1,8 +1,9 @@
 # DailyEnergy Design System 与 Design Tokens
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-08-15
 - **所属任务**：D-002 — 建立设计系统与 Design Tokens
-- **最后更新**：2026-08-14
+- **最后更新**：2026-08-15
 - **任务 Issue**：[D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)
 - **唯一视觉方向**：[A — 温柔自然 / 01B / Gentle Nature / DLY-003](./visual-direction.md)
 - **仓库评审入口**：[D-002 Design System](./assets/d002/index.html)
@@ -11,7 +12,7 @@
 - **代码 Token 来源**：[apps/miniapp/design-tokens.json](../../apps/miniapp/design-tokens.json)
 - **组件合同来源**：[apps/miniapp/component-library.json](../../apps/miniapp/component-library.json)
 - **来源指纹**：`sha256:dcb100ea11fe0d534496af852983bc32d31f2d0a56ca20c4d01a2af79154d8d0`
-- **证据状态**：`MANUAL_EVIDENCE_REQUIRED`
+- **证据状态**：`USER_ACCEPTED / PLATFORM_EVIDENCE_PENDING`
 
 ## 1. 目标
 
@@ -223,19 +224,22 @@ Figma 当前界面以本地 Style path 作为可见稳定标识，不暴露 REST
 组件复用证据为 `Instance / SafetyScreen`（instance ID `191:698`），来源主组件
 `DE / SafetyScreen`（component ID `190:682`）；Figma 右侧面板显示 `From this file`。
 
-| 证据字段                     | 当前状态                     | 当前证据或解锁条件                                         |
-| ---------------------------- | ---------------------------- | ---------------------------------------------------------- |
-| `designSourceEvidence`       | READY                        | Variables、Styles、Components、Frames 与截图均已归档       |
-| `figmaFile`                  | READY                        | file key `T5HS32Ciz6LZh81KbqhFGo`                          |
-| `figmaPage`                  | READY                        | `D-002 / Design System`，page node `83:2`                  |
-| `figmaVersion`               | READY                        | final version `2387487276296532390`                        |
-| `frameIds`                   | READY                        | 三个根 Frame、三个内容 Frame 和 17 个 component ID 已核验  |
-| `stateScreenshots`           | READY                        | Figma Components/States 与本地 Safety 刷新证据均已归档     |
-| `tokenAndComponentReuse`     | READY                        | alias、8 个 Style 使用节点和 instance `191:698` 均可见核验 |
-| `visualAndInteractionReview` | SOURCE_READY / OWNER_PENDING | 原始画布已目视检查；项目所有者最终评审待完成               |
-| `userAcceptance`             | PENDING                      | Draft PR 与 Figma 证据收敛后由项目所有者决定               |
+| 证据字段                     | 当前状态               | 当前证据或解锁条件                                          |
+| ---------------------------- | ---------------------- | ----------------------------------------------------------- |
+| `designSourceEvidence`       | READY                  | Variables、Styles、Components、Frames 与截图均已归档        |
+| `figmaFile`                  | READY                  | file key `T5HS32Ciz6LZh81KbqhFGo`                           |
+| `figmaPage`                  | READY                  | `D-002 / Design System`，page node `83:2`                   |
+| `figmaVersion`               | READY                  | final version `2387487276296532390`                         |
+| `frameIds`                   | READY                  | 三个根 Frame、三个内容 Frame 和 17 个 component ID 已核验   |
+| `stateScreenshots`           | READY                  | Figma Components/States 与本地 Safety 刷新证据均已归档      |
+| `tokenAndComponentReuse`     | READY                  | alias、8 个 Style 使用节点和 instance `191:698` 均可见核验  |
+| `visualAndInteractionReview` | READY                  | 项目所有者已审核 PR #142、Figma 与归档证据                  |
+| `userAcceptance`             | READY                  | 2026-08-15 明确接受 D-002                                   |
+| `threatBoundaryReview`       | READY                  | SafetyScreen 仅提供注入结构；普通娱乐流、日志与资源边界不变 |
+| `productionAuthorization`    | NOT_APPLICABLE / NO_GO | 本任务不授权 Production，既有 Production/RC Gate 保持       |
 
-终态在上述人工证据完成前必须保持 `MANUAL_EVIDENCE_REQUIRED`，不得报告 D-002 PASS 或 Accepted。
+项目所有者人工审核与接受已经完成，本文因此进入 Accepted。微信 DevTools、iOS/Android 真机与专业 Safety
+文案/资源评审仍是独立下游证据，不得将本文的接受写成自动化 PASS、专业 Safety 放行或 Production 授权。
 
 ## 9. 本地命令
 
@@ -251,12 +255,12 @@ pnpm agent:validate --mode=full --task=D-002
 完整 Gate 的 macOS `flock` 环境阻断必须按原诊断保留，不能改写为 PASS。微信 DevTools 和真机证据仍按
 Accepted testing policy 保持独立证据层。
 
-## 10. 审核请求
+## 10. 审核记录
 
-D-002 请求项目所有者在 Figma 和 Draft PR 收敛后确认：
-
-1. A — 温柔自然是否被准确固化，且没有混入其它路线；
-2. 行动是否明显高于分数，正文是否清楚且不过度缩小；
-3. Default/High Contrast、大字、离线、错误、减少动态与 Safety 是否可接受；
-4. 17 个组件是否足以作为 D-003 的唯一基础组件集；
-5. 是否将本文由 Draft 更新为 Accepted。
+- **项目所有者结论**：接受 D-002；
+- **确认日期**：2026-08-15；
+- **审核入口**：[PR #142](https://github.com/WeiHan1996/DailyEnergy/pull/142)、Figma 最终命名版本与本地证据索引；
+- **接受范围**：A — 温柔自然的唯一方向、行动高于分数的层级、Default/High Contrast、大字与关键状态、
+  17 个基础组件及其作为 D-003 唯一基础组件集的交付；
+- **保留边界**：SafetyScreen 仍不包含可上线危机文案或资源；微信 DevTools、真机、专业 Safety 与
+  Production/RC 证据未因本次接受而解除。

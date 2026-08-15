@@ -1,7 +1,7 @@
 # D-002 Evidence Index
 
-- **最后更新**：2026-08-14
-- **当前状态**：`USER_ACCEPTANCE_PENDING / MANUAL_EVIDENCE_REQUIRED`
+- **最后更新**：2026-08-15
+- **当前状态**：`USER_ACCEPTED / PLATFORM_EVIDENCE_PENDING`
 - **来源指纹**：`sha256:dcb100ea11fe0d534496af852983bc32d31f2d0a56ca20c4d01a2af79154d8d0`
 
 ## 1. 本地视觉证据
@@ -166,7 +166,7 @@ Figma 当前 UI 以本地 Style path 作为可见稳定标识，不显示 REST A
 | 微信 DevTools conformance | `INFRA_BLOCKED`，沿用 E-004 明确诊断          |
 | iOS/Android 真机          | `MANUAL_EVIDENCE_PENDING`                     |
 | 专业 Safety 内容评审      | `MANUAL_EVIDENCE_PENDING`；不得由组件占位冒充 |
-| 项目所有者接受 D-002      | PENDING                                       |
+| 项目所有者接受 D-002      | READY；2026-08-15，审核入口 PR #142           |
 
-因此 Figma 原始证据已收敛，但项目所有者接受、微信 DevTools 和真机证据仍不能由仓库自动化替代；D-002
-最终状态保持 `MANUAL_EVIDENCE_REQUIRED`，不得写成自动化 PASS 或 Accepted。
+项目所有者已完成 D-002 的视觉与交互审核并明确接受。微信 DevTools、真机和专业 Safety 内容/资源评审仍
+不能由仓库自动化或本次接受替代；不得据此报告自动化 PASS、专业 Safety 放行或 Production 授权。

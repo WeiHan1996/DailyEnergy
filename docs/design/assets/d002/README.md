@@ -3,7 +3,7 @@
 本目录是 D-002 的仓库评审面和 Figma 导入交付，不是业务页面实现。
 
 - **当前任务状态**：`In Review`
-- **证据状态**：`USER_ACCEPTANCE_PENDING / MANUAL_EVIDENCE_REQUIRED`
+- **证据状态**：`USER_ACCEPTED / PLATFORM_EVIDENCE_PENDING`
 - **Figma 最终命名版本**：`2387487276296532390`
 
 ## 1. 文件边界
@@ -69,4 +69,4 @@ Figma Starter 不能在同一 Semantic collection 中保留仓库定义的两个
 仓库和现有证据可证明生成确定性、漂移、命名、对比度、响应式、触控尺寸、减少动态和大部分静态状态结构。
 它们不能替代 Figma 原始 Variables/Styles/Components、微信 DevTools/真机、专业 Safety 评审或项目所有者
 接受。专业 Safety 文案与资源当前明确为待评审；最新 Components、States 与本地 Safety 三张刷新证据
-均已归档，项目所有者接受前保持 `MANUAL_EVIDENCE_REQUIRED`。
+均已归档，项目所有者已于 2026-08-15 接受 D-002。平台与专业 Safety 证据继续独立保持 pending。
