@@ -1,0 +1,45 @@
+<view
+  class="de-state-selector {{error ? 'de-state-selector--error' : ''}}"
+  aria-label="{{accessibleLabel || label}}"
+  aria-role="radiogroup"
+>
+  <view class="de-state-selector__heading">
+    <view class="de-state-selector__label">{{label}}</view>
+    <view wx:if="{{supportingText}}" class="de-state-selector__supporting">
+      {{supportingText}}
+    </view>
+  </view>
+  <view class="de-state-selector__options">
+    <button
+      wx:for="{{options}}"
+      wx:key="value"
+      class="de-state-selector__option {{selectedValue === item.value ? 'de-state-selector__option--selected' : ''}}"
+      aria-checked="{{selectedValue === item.value}}"
+      aria-label="{{item.label}}"
+      aria-role="radio"
+      data-value="{{item.value}}"
+      disabled="{{disabled}}"
+      bindtap="handleSelect"
+      hover-class="de-state-selector__option--pressed"
+    >
+      <view class="de-state-selector__option-row">
+        <text
+          class="de-state-selector__indicator"
+          aria-hidden="true"
+        >{{selectedValue === item.value ? '✓' : '○'}}</text>
+        <text class="de-state-selector__option-label">{{item.label}}</text>
+        <text
+          wx:if="{{selectedValue === item.value}}"
+          class="de-state-selector__selected-text"
+        >已选</text>
+      </view>
+      <view wx:if="{{item.description}}" class="de-state-selector__description">
+        {{item.description}}
+      </view>
+    </button>
+  </view>
+  <view wx:if="{{error}}" class="de-state-selector__error" aria-live="polite">
+    <text aria-hidden="true">!</text>
+    <text>{{error}}</text>
+  </view>
+</view>

@@ -1,0 +1,95 @@
+.de-action-button {
+  box-sizing: border-box;
+  min-width: var(--de-state-touch-target);
+  min-height: var(--de-component-button-height);
+  margin: 0;
+  padding: 0 var(--de-component-button-padding-x);
+  border: var(--de-component-button-border-width) solid
+    var(--de-color-transparent);
+  border-radius: var(--de-component-button-radius);
+  font-size: var(--de-font-body-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-tight);
+  transition:
+    background-color var(--de-motion-fast),
+    border-color var(--de-motion-fast),
+    color var(--de-motion-fast);
+}
+
+.de-action-button::after {
+  border: 0;
+}
+
+.de-action-button[disabled] {
+  opacity: var(--de-state-disabled-opacity);
+}
+
+.de-action-button--primary {
+  background: var(--de-color-brand-primary);
+  color: var(--de-color-text-inverse);
+}
+
+.de-action-button--secondary {
+  border-color: var(--de-color-brand-primary);
+  background: var(--de-color-surface-primary);
+  color: var(--de-color-brand-strong);
+}
+
+.de-action-button--text {
+  background: var(--de-color-transparent);
+  color: var(--de-color-brand-strong);
+}
+
+.de-action-button--danger {
+  border-color: var(--de-color-safety-action);
+  background: var(--de-color-safety-action);
+  color: var(--de-color-text-inverse);
+}
+
+.de-action-button--pressed.de-action-button--primary {
+  background: var(--de-color-brand-strong);
+}
+
+.de-action-button--pressed.de-action-button--secondary,
+.de-action-button--pressed.de-action-button--text {
+  background: var(--de-color-brand-soft);
+}
+
+.de-action-button--block {
+  width: 100%;
+}
+
+.de-action-button__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--de-component-button-gap);
+}
+
+.de-action-button__spinner {
+  box-sizing: border-box;
+  width: var(--de-icon-small);
+  height: var(--de-icon-small);
+  border: var(--de-state-focus-width) solid currentColor;
+  border-right-color: var(--de-color-transparent);
+  border-radius: 50%;
+  animation: de-button-spin var(--de-motion-gentle) linear infinite;
+}
+
+.de-motion-reduced .de-action-button__spinner {
+  border-right-color: currentColor;
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .de-action-button__spinner {
+    border-right-color: currentColor;
+    animation: none;
+  }
+}
+
+@keyframes de-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

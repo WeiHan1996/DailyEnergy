@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "de-action-button": "../action-button/index"
+  }
+}

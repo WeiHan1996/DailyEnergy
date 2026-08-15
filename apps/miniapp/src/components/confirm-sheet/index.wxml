@@ -1,0 +1,30 @@
+<view wx:if="{{open}}" class="de-confirm-sheet" aria-role="dialog" aria-modal="true">
+  <view class="de-confirm-sheet__scrim" bindtap="handleCancel" aria-hidden="true"></view>
+  <view class="de-confirm-sheet__panel" aria-label="{{title}}">
+    <view class="de-confirm-sheet__handle" aria-hidden="true"></view>
+    <view class="de-confirm-sheet__title">{{title}}</view>
+    <view class="de-confirm-sheet__impact">{{impact}}</view>
+    <view wx:if="{{danger}}" class="de-confirm-sheet__danger">
+      <text aria-hidden="true">!</text>
+      <text>此操作可能无法撤销</text>
+    </view>
+    <view class="de-confirm-sheet__actions">
+      <de-action-button
+        block="{{true}}"
+        disabled="{{disabled}}"
+        label="{{confirmLabel}}"
+        loading="{{loading}}"
+        loading-label="正在处理"
+        variant="{{danger ? 'danger' : 'primary'}}"
+        bind:press="handleConfirm"
+      ></de-action-button>
+      <de-action-button
+        block="{{true}}"
+        disabled="{{loading}}"
+        label="{{cancelLabel}}"
+        variant="text"
+        bind:press="handleCancel"
+      ></de-action-button>
+    </view>
+  </view>
+</view>

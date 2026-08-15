@@ -3,6 +3,7 @@ import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 
 import { scanMiniappBundle } from "./lib/miniapp-bundle-check.mjs";
+import { buildDesignTokenArtifacts } from "./lib/design-token-codegen.mjs";
 import {
   miniappPublicConfigFingerprint,
   normalizeGeneratedSourceLineEndings,
@@ -24,6 +25,7 @@ const generatedRuntimePath = resolve(
   distributionRoot,
   "generated/public-build-config.js",
 );
+const designTokenSourcePath = resolve(miniappRoot, "design-tokens.json");
 const staticExtensions = new Set([".json", ".wxml", ".wxs", ".wxss"]);
 
 async function readJson(path) {
@@ -108,6 +110,22 @@ async function assertGeneratedSource(defaultConfig) {
   }
 }
 
+async function assertGeneratedDesignTokens() {
+  const source = JSON.parse(await readFile(designTokenSourcePath, "utf8"));
+  const result = await buildDesignTokenArtifacts(source);
+  for (const [relativePath, expected] of result.artifacts) {
+    const actual = await readFile(
+      resolve(repositoryRoot, relativePath),
+      "utf8",
+    );
+    if (normalizeGeneratedSourceLineEndings(actual) !== expected) {
+      throw new Error(
+        `MINIAPP_DESIGN_TOKEN_DRIFT:${relativePath}: run pnpm design-tokens:write`,
+      );
+    }
+  }
+}
+
 async function writeGeneratedSource(defaultConfig) {
   await mkdir(resolve(generatedSourcePath, ".."), { recursive: true });
   await writeFile(
@@ -130,6 +148,7 @@ async function main() {
   }
 
   await assertGeneratedSource(defaultConfig);
+  await assertGeneratedDesignTokens();
   await validateProjectConfig();
   const buildConfig = environmentConfig(defaultConfig);
   await rm(distributionRoot, { force: true, recursive: true });

@@ -1,0 +1,21 @@
+<view
+  class="de-offline-state de-offline-state--{{variant}}"
+  aria-live="polite"
+  aria-role="status"
+>
+  <view class="de-offline-state__symbol" aria-hidden="true">↯</view>
+  <view class="de-offline-state__content">
+    <view class="de-offline-state__title">离线内容</view>
+    <view class="de-offline-state__message">{{message}}</view>
+    <view wx:if="{{cachedAt}}" class="de-offline-state__cached">
+      上次同步：{{cachedAt}}
+    </view>
+    <de-action-button
+      label="重试连接"
+      loading="{{retrying}}"
+      loading-label="正在连接"
+      variant="secondary"
+      bind:press="handleRetry"
+    ></de-action-button>
+  </view>
+</view>

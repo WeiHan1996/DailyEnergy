@@ -1,0 +1,67 @@
+.de-confirm-sheet {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+}
+
+.de-confirm-sheet__scrim {
+  position: absolute;
+  background: var(--de-color-overlay);
+  inset: 0;
+}
+
+.de-confirm-sheet__panel {
+  box-sizing: border-box;
+  position: absolute;
+  display: flex;
+  width: 100%;
+  padding: var(--de-component-sheet-padding) var(--de-component-sheet-padding)
+    calc(env(safe-area-inset-bottom) + var(--de-component-sheet-padding));
+  flex-direction: column;
+  border-radius: var(--de-component-sheet-radius)
+    var(--de-component-sheet-radius) 0 0;
+  background: var(--de-color-surface-raised);
+  box-shadow: var(--de-component-sheet-shadow);
+  color: var(--de-color-text-primary);
+  inset: auto 0 0;
+  gap: var(--de-component-sheet-gap);
+}
+
+.de-confirm-sheet__handle {
+  width: var(--de-layout-section-gap);
+  height: var(--de-state-focus-width);
+  align-self: center;
+  border-radius: var(--de-component-chip-radius);
+  background: var(--de-color-border-strong);
+}
+
+.de-confirm-sheet__title {
+  font-size: var(--de-font-section-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}
+
+.de-confirm-sheet__impact {
+  color: var(--de-color-text-secondary);
+  font-size: var(--de-font-body-size);
+  line-height: var(--de-font-line-body);
+}
+
+.de-confirm-sheet__danger {
+  display: flex;
+  padding: var(--de-component-notice-padding);
+  border: var(--de-component-notice-border-width) solid
+    var(--de-color-danger-border);
+  border-radius: var(--de-component-notice-radius);
+  background: var(--de-color-danger-surface);
+  color: var(--de-color-danger-text);
+  font-size: var(--de-font-label-size);
+  font-weight: var(--de-font-semibold);
+  gap: var(--de-component-notice-gap);
+}
+
+.de-confirm-sheet__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--de-component-button-gap);
+}

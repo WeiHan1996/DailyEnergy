@@ -1,0 +1,17 @@
+<view
+  class="de-section-card de-section-card--{{variant}} {{disabled ? 'de-section-card--disabled' : ''}}"
+  aria-busy="{{loading}}"
+  aria-role="group"
+>
+  <view wx:if="{{heading}}" class="de-section-card__heading">{{heading}}</view>
+  <view wx:if="{{loading}}" class="de-section-card__loading" aria-label="正在加载这一部分">
+    <view class="de-section-card__skeleton"></view>
+    <view class="de-section-card__skeleton de-section-card__skeleton--short"></view>
+  </view>
+  <view wx:else class="de-section-card__content">
+    <slot></slot>
+  </view>
+  <view class="de-section-card__footer">
+    <slot name="footer"></slot>
+  </view>
+</view>

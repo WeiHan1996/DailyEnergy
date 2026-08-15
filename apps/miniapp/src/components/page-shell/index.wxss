@@ -1,0 +1,30 @@
+.de-page-shell {
+  box-sizing: border-box;
+  min-height: var(--de-layout-page-min-height);
+  padding: calc(env(safe-area-inset-top) + var(--de-layout-safe-top))
+    var(--de-layout-page-gutter)
+    calc(env(safe-area-inset-bottom) + var(--de-layout-safe-bottom));
+  background: var(--de-color-canvas);
+  color: var(--de-color-text-primary);
+  font-family: var(--de-font-family);
+}
+
+.de-page-shell__header,
+.de-page-shell__content,
+.de-page-shell__footer {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--de-layout-content-max);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.de-page-shell__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--de-layout-section-gap);
+}
+
+.de-page-shell__footer {
+  margin-top: var(--de-layout-section-gap);
+}

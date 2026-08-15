@@ -1,0 +1,13 @@
+<button
+  class="de-choice-chip {{selected ? 'de-choice-chip--selected' : ''}}"
+  aria-checked="{{selected}}"
+  aria-label="{{accessibleLabel || label}}"
+  aria-role="radio"
+  disabled="{{disabled}}"
+  bindtap="handleSelect"
+  hover-class="de-choice-chip--pressed"
+>
+  <text wx:if="{{selected}}" class="de-choice-chip__indicator" aria-hidden="true">✓</text>
+  <text>{{label}}</text>
+  <text wx:if="{{selected}}" class="de-choice-chip__state">已选</text>
+</button>

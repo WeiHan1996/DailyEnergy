@@ -78,11 +78,19 @@ function parseAppConfig(entry, diagnostics) {
   }
 }
 
-export function scanMiniappBundleEntries(entries) {
+export function scanMiniappBundleEntries(entries, options = {}) {
   const diagnostics = [];
   const files = new Map(entries.map((entry) => [entry.path, entry]));
+  const requiredBundleFiles = [
+    ...requiredFiles,
+    ...(options.requiredComponentPaths ?? []).flatMap((componentPath) =>
+      ["js", "json", "wxml", "wxss"].map(
+        (extension) => `components/${componentPath}/index.${extension}`,
+      ),
+    ),
+  ];
 
-  for (const path of requiredFiles) {
+  for (const path of requiredBundleFiles) {
     if (!files.has(path)) {
       diagnostics.push(
         diagnostic(
@@ -188,5 +196,17 @@ async function loadEntries(directory) {
 }
 
 export async function scanMiniappBundle(directory) {
-  return scanMiniappBundleEntries(await loadEntries(directory));
+  const repositoryRoot = resolve(import.meta.dirname, "../..");
+  const componentLibrary = JSON.parse(
+    await readFile(
+      resolve(repositoryRoot, "apps/miniapp/component-library.json"),
+      "utf8",
+    ),
+  );
+  const requiredComponentPaths = [
+    ...new Set(componentLibrary.components.map((component) => component.path)),
+  ];
+  return scanMiniappBundleEntries(await loadEntries(directory), {
+    requiredComponentPaths,
+  });
 }

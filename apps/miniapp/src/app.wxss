@@ -1,17 +1,24 @@
+@import "./generated/design-tokens.wxss";
+
 page {
   min-height: 100%;
-  background: #f6f3ee;
-  color: #24302b;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC",
-    sans-serif;
+  background: var(--de-color-canvas);
+  color: var(--de-color-text-primary);
+  font-family: var(--de-font-family);
 }
 
 button {
-  border-radius: 999rpx;
-  font-weight: 600;
+  min-height: var(--de-state-touch-target);
+  border-radius: var(--de-component-button-radius);
+  font-family: var(--de-font-family);
+  font-weight: var(--de-font-semibold);
 }
 
 button::after {
   border: none;
+}
+
+button:focus {
+  outline: var(--de-state-focus-width) solid var(--de-color-focus);
+  outline-offset: var(--de-state-focus-width);
 }

@@ -1,0 +1,19 @@
+<view
+  class="de-inline-notice de-inline-notice--{{tone}}"
+  aria-live="polite"
+  aria-role="status"
+>
+  <view class="de-inline-notice__symbol" aria-hidden="true">
+    {{tone === 'success' ? '✓' : tone === 'warning' ? '!' : tone === 'error' ? '×' : 'i'}}
+  </view>
+  <view class="de-inline-notice__content">
+    <view wx:if="{{title}}" class="de-inline-notice__title">{{title}}</view>
+    <view class="de-inline-notice__message">{{message}}</view>
+    <de-action-button
+      wx:if="{{actionLabel}}"
+      label="{{actionLabel}}"
+      variant="text"
+      bind:press="handleAction"
+    ></de-action-button>
+  </view>
+</view>

@@ -1,0 +1,43 @@
+<view class="de-safety-screen" aria-label="{{accessibleLabel}}" aria-role="main">
+  <view class="de-safety-screen__eyebrow">{{eyebrow}}</view>
+  <view class="de-safety-screen__title">{{title}}</view>
+  <view class="de-safety-screen__message">{{message}}</view>
+  <view class="de-safety-screen__immediate">
+    <view class="de-safety-screen__immediate-label">
+      <text aria-hidden="true">!</text>
+      <text>{{immediateLabel}}</text>
+    </view>
+    <de-action-button
+      accessible-label="{{emergencyActionAccessibleLabel}}"
+      block="{{true}}"
+      label="{{emergencyActionLabel}}"
+      loading-label="{{actionLoadingLabel}}"
+      variant="danger"
+      bind:press="handleEmergency"
+    ></de-action-button>
+  </view>
+  <de-action-button
+    accessible-label="{{trustedPersonAccessibleLabel}}"
+    block="{{true}}"
+    label="{{trustedPersonLabel}}"
+    loading-label="{{actionLoadingLabel}}"
+    variant="primary"
+    bind:press="handleTrustedPerson"
+  ></de-action-button>
+  <view class="de-safety-screen__resources" aria-live="polite">
+    <view class="de-safety-screen__section-title">{{resourcesTitle}}</view>
+    <view wx:if="{{resourcesLoading}}" class="de-safety-screen__resource-state">
+      {{resourcesLoadingLabel}}
+    </view>
+    <view wx:elif="{{resourcesUnavailable}}" class="de-safety-screen__resource-state">
+      {{resourcesUnavailableLabel}}
+    </view>
+    <view wx:else>
+      <view
+        wx:for="{{resources}}"
+        wx:key="*this"
+        class="de-safety-screen__resource"
+      >{{item}}</view>
+    </view>
+  </view>
+</view>

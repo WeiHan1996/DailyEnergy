@@ -1,0 +1,15 @@
+<view
+  class="de-page-shell de-theme-{{theme}} {{reducedMotion ? 'de-motion-reduced' : ''}}"
+  aria-labelledby="{{labelledBy}}"
+  aria-role="main"
+>
+  <view class="de-page-shell__header">
+    <slot name="header"></slot>
+  </view>
+  <view class="de-page-shell__content">
+    <slot></slot>
+  </view>
+  <view class="de-page-shell__footer">
+    <slot name="footer"></slot>
+  </view>
+</view>

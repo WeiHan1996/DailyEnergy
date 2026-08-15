@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-08-14
+- **最后更新**：2026-08-15
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -116,7 +116,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/design/prototype-validation.md](./design/prototype-validation.md)               | Accepted | [S-04 静态原型](../prototype/s04/README.md)、5～8 人测试计划和结果模板 | Accepted S-03 设计规格               |
 | [docs/design/visual-direction.md](./design/visual-direction.md)                       | Accepted | D-001 唯一 A — 温柔自然方向、反模式、证据与接受记录                    | Accepted 页面与交互规格              |
 | [docs/design/assets/d001/evidence/README.md](./design/assets/d001/evidence/README.md) | Active   | D-001 A 权威 Figma 截图、历史对比、小屏、大字、状态与减少动态证据索引  | visual-direction、interaction-states |
-| docs/design/design-system.md                                                          | Planned  | D-002 Variables、Design Tokens、组件、动效和无障碍；当前唯一 Ready     | D-001、E-004                         |
+| [docs/design/design-system.md](./design/design-system.md)                             | Accepted | D-002 于 2026-08-15 获项目所有者接受；PR #142 合并待完成               | D-001、E-004                         |
+| [docs/design/assets/d002/evidence/README.md](./design/assets/d002/evidence/README.md) | Active   | D-002 本地/Figma 截图、节点、复用和人工证据索引                        | design-system、interaction-states    |
 | docs/design/core-flow-high-fidelity.md                                                | Planned  | D-003 核心流程八页及关键状态高保真索引                                 | D-002                                |
 | docs/design/developer-handoff.md                                                      | Planned  | D-004 可点击原型、验证结果、Frame ID 和视觉 QA 交付                    | D-003、prototype-validation          |
 | docs/design/phase2-remaining-handoff.md                                               | Planned  | D-005 晚间、趋势、数据权利页面高保真、状态矩阵和开发交付               | D-004                                |
@@ -185,7 +186,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                              | database、testing、deployment、ADR-0005、Issue #44            |
 | [docker/observability/contract.json](../docker/observability/contract.json)                                                                                                                            | Implemented | E-013 vendor-neutral 信号、字段/平面/基数、期限、成本与 Production blocked Gate                                   | observability、privacy、deployment                            |
 | [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011 CI/供应链、E-013 observability 与 E-014 Phase Gate 证据入口                         | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；D-001 Done，D-002 为唯一 Ready                             | Accepted Phase 0B specs、E-014 Gate、D-001、D-002 Issue #100  |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；D-001 Done，D-002 当前 In Review                           | Accepted Phase 0B specs、E-014 Gate、D-001、D-002 Issue #100  |
 
 ### 7.7 Phase Gate
 
@@ -252,7 +253,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-015 与 D-001 已完成；A — 温柔自然是唯一视觉方向，D-002 是 Phase 2 唯一 Ready 任务。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-015 与 D-001 已完成；A — 温柔自然是唯一视觉方向，D-002 当前为 In Review。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
@@ -285,7 +286,7 @@ E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squas
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
 [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
 [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 已纳入
-Phase 2；D-001 已进入 Done，D-002 为唯一 Ready，D-003～D-005 保持 Planned。D-004 是 C-003、C-004、C-009 的直接前置；
+Phase 2；D-001 已进入 Done，D-002 当前为 In Review，D-003～D-005 保持 Planned。D-004 是 C-003、C-004、C-009 的直接前置；
 D-005 是 C-012、C-013、C-014 的直接前置。
 正式 Source-ID registry 已由 E-010 实现；E-011 已接入 CI、artifact、cache、
 telemetry 与供应链 evidence 且不改变原有证据层级，未实现项继续为 `PLANNED`。
@@ -310,7 +311,9 @@ Phase 1 结束。项目所有者于 2026-08-13 接受 `01B / Gentle Nature / DLY
 理由为“清晰自然，排版克制，内容清晰”，并明确不吸收其它路线元素；D-001 PR #140 的 exact-head
 CI run `31719741937` 11/11 SUCCESS，并 squash 合并为 `e37009439bce545dd1f19d19f589b209ec178b9e`，
 Issue #99 已关闭。merged-main run `31720488027` 的 9 个 automated lane 成功，但 supply-chain 因
-`GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.17`；独立收口分支已最小提升到 `3.3.18`，等待一次 PR Linux
-audit 验证。D-002 为唯一 Ready，尚未开工。
+`GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.17`；状态收口 PR #141 已把现有精确 override 最小提升到
+`3.3.18` 并合并为 `128ee8d`。D-002 已在 `agent/d002-design-system` 分支完成本地 Token、组件、
+评审资产与 Figma 原始证据收敛，当前为 In Review；四个 Variables collection、8 个 Styles、17 个
+Components、三个 `1200 x 900` Frames 和最终命名版本均已记录，D-003 不启动。
 公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。

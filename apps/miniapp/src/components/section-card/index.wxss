@@ -1,0 +1,55 @@
+.de-section-card {
+  box-sizing: border-box;
+  display: flex;
+  padding: var(--de-component-card-padding);
+  flex-direction: column;
+  border: var(--de-component-card-border-width) solid
+    var(--de-color-border-subtle);
+  border-radius: var(--de-component-card-radius);
+  background: var(--de-color-surface-primary);
+  gap: var(--de-component-card-gap);
+}
+
+.de-section-card--subtle {
+  background: var(--de-color-surface-secondary);
+}
+
+.de-section-card--raised {
+  border-color: var(--de-color-transparent);
+  background: var(--de-color-surface-raised);
+  box-shadow: var(--de-component-card-shadow);
+}
+
+.de-section-card--disabled {
+  opacity: var(--de-state-disabled-opacity);
+}
+
+.de-section-card__heading {
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-section-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}
+
+.de-section-card__content,
+.de-section-card__loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--de-component-card-gap);
+}
+
+.de-section-card__footer:empty {
+  display: none;
+}
+
+.de-section-card__skeleton {
+  width: 100%;
+  height: var(--de-component-skeleton-height);
+  border-radius: var(--de-component-skeleton-radius);
+  background: var(--de-color-brand-soft);
+  opacity: var(--de-component-skeleton-opacity);
+}
+
+.de-section-card__skeleton--short {
+  width: 68%;
+}

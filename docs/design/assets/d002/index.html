@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DailyEnergy D-002 Design System</title>
+    <link rel="stylesheet" href="./design-tokens.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="review-header">
+      <div>
+        <p class="eyebrow">D-002 / DESIGN SYSTEM</p>
+        <h1>Gentle Nature</h1>
+        <p>01B / DLY-003 的正式 Token、组件与状态评审面。</p>
+      </div>
+      <dl>
+        <div>
+          <dt>方向</dt>
+          <dd>清晰自然</dd>
+        </div>
+        <div>
+          <dt>排版</dt>
+          <dd>克制清楚</dd>
+        </div>
+        <div>
+          <dt>范围</dt>
+          <dd>17 个组件</dd>
+        </div>
+        <div>
+          <dt>模式</dt>
+          <dd>Default / High Contrast</dd>
+        </div>
+      </dl>
+    </header>
+
+    <nav class="review-controls" aria-label="设计系统预览控制">
+      <fieldset>
+        <legend>颜色模式</legend>
+        <button type="button" class="is-active" data-theme="default">
+          Default
+        </button>
+        <button type="button" data-theme="high-contrast">High Contrast</button>
+      </fieldset>
+      <fieldset>
+        <legend>字号</legend>
+        <button type="button" class="is-active" data-text-scale="1">
+          标准
+        </button>
+        <button type="button" data-text-scale="1.25">大字</button>
+      </fieldset>
+      <fieldset>
+        <legend>动态</legend>
+        <button type="button" class="is-active" data-motion="full">标准</button>
+        <button type="button" data-motion="reduced">减少动态</button>
+      </fieldset>
+      <fieldset>
+        <legend>预览宽度</legend>
+        <button type="button" data-viewport="320">320</button>
+        <button type="button" class="is-active" data-viewport="390">390</button>
+        <button type="button" data-viewport="736">736</button>
+      </fieldset>
+    </nav>
+
+    <main id="design-system" class="de-theme-default" data-text-scale="1">
+      <section class="band hero-band" aria-labelledby="hierarchy-title">
+        <div class="section-intro">
+          <p class="eyebrow">HIERARCHY PROOF</p>
+          <h2 id="hierarchy-title">行动是主角，分数只是辅助信息</h2>
+          <p>通过信息顺序、色彩分组和留白建立重点；不靠无限放大数字或正文。</p>
+        </div>
+        <div class="viewport-stage">
+          <article class="phone-preview" aria-label="今日内容一屏层级示例">
+            <header class="phone-header">
+              <span>8 月 14 日，周五</span>
+              <strong>早上好。</strong>
+              <mark>娱乐与行动参考</mark>
+            </header>
+            <section class="energy-summary">
+              <div>
+                <span>整体能量</span>
+                <strong>72</strong>
+              </div>
+              <div>
+                <b>稳中有进</b>
+                <p>行动状态还在，先把最好的一小段精力留给重点。</p>
+              </div>
+            </section>
+            <section class="focus-message">
+              <span>核心提示</span>
+              <h3>今天不用排满，先守住最重要的一件事。</h3>
+            </section>
+            <section class="action-card">
+              <span>今天可以这样做</span>
+              <h3>上午留出 20 分钟，只做这件事的第一步。</h3>
+              <p>有一个清楚的开头，就够了。</p>
+            </section>
+            <button class="primary-button" type="button">点亮今天</button>
+            <small>不需要完成任务也可以点亮</small>
+          </article>
+        </div>
+      </section>
+
+      <section class="band foundations" aria-labelledby="foundation-title">
+        <div class="section-intro">
+          <p class="eyebrow">FOUNDATIONS</p>
+          <h2 id="foundation-title">Primitive → Semantic → Component</h2>
+          <p>
+            页面只消费 Semantic 或 Component Token；Primitive 只用于
+            foundations。
+          </p>
+        </div>
+        <div class="foundation-grid">
+          <article class="foundation-panel palette-panel">
+            <h3>Color roles</h3>
+            <div class="swatches">
+              <span style="--swatch: var(--de-color-canvas)"
+                ><b>Canvas</b></span
+              >
+              <span style="--swatch: var(--de-color-surface-primary)"
+                ><b>Surface</b></span
+              >
+              <span style="--swatch: var(--de-color-brand-primary)"
+                ><b>Brand</b></span
+              >
+              <span style="--swatch: var(--de-color-info-surface)"
+                ><b>Info</b></span
+              >
+              <span style="--swatch: var(--de-color-warning-surface)"
+                ><b>Warning</b></span
+              >
+              <span style="--swatch: var(--de-color-danger-surface)"
+                ><b>Danger</b></span
+              >
+            </div>
+          </article>
+          <article class="foundation-panel type-panel">
+            <h3>Typography</h3>
+            <p class="type-page">页面标题 / 28</p>
+            <p class="type-action">重点行动 / 24</p>
+            <p class="type-section">区块标题 / 20</p>
+            <p class="type-body">正文承载解释，不挤成难读的小字 / 16</p>
+            <p class="type-meta">辅助信息 / 12</p>
+          </article>
+          <article class="foundation-panel spacing-panel">
+            <h3>Spacing & shape</h3>
+            <div class="space-row"><i></i><span>4</span></div>
+            <div class="space-row"><i></i><span>8</span></div>
+            <div class="space-row"><i></i><span>16</span></div>
+            <div class="space-row"><i></i><span>24</span></div>
+            <div class="radius-row"><i></i><i></i><i></i></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="band components-band" aria-labelledby="component-title">
+        <div class="section-intro">
+          <p class="eyebrow">17 COMPONENT CONTRACTS</p>
+          <h2 id="component-title">基础组件与适用状态</h2>
+          <p>
+            选中、错误、完成、离线与 Safety 均同时使用文字或结构，不只依赖颜色。
+          </p>
+        </div>
+        <div class="component-grid">
+          <article class="component-board wide">
+            <header>
+              <span>01—02</span>
+              <h3>PageShell + AppHeader</h3>
+            </header>
+            <div class="mini-shell">
+              <div class="app-header">
+                <button aria-label="返回">‹</button><strong>今日内容</strong
+                ><button aria-label="更多">•••</button>
+              </div>
+              <p>安全区、内容最大宽度与页面间距统一由 Token 控制。</p>
+            </div>
+          </article>
+          <article class="component-board wide">
+            <header>
+              <span>03—05</span>
+              <h3>Primary / Secondary / TextButton</h3>
+            </header>
+            <div class="button-row">
+              <button class="primary-button">继续</button>
+              <button class="secondary-button">稍后再说</button>
+              <button class="text-button">查看说明</button>
+              <button class="primary-button loading" aria-busy="true">
+                正在处理
+              </button>
+              <button class="primary-button" disabled>不可用</button>
+            </div>
+          </article>
+          <article class="component-board">
+            <header>
+              <span>06</span>
+              <h3>ChoiceChip</h3>
+            </header>
+            <div
+              class="chip-row"
+              role="radiogroup"
+              aria-label="ChoiceChip 选中状态示例"
+            >
+              <button class="choice-chip" role="radio" aria-checked="false">
+                平静</button
+              ><button
+                class="choice-chip selected"
+                role="radio"
+                aria-checked="true"
+              >
+                ✓ 专注 · 已选</button
+              ><button
+                class="choice-chip"
+                role="radio"
+                aria-checked="false"
+                disabled
+              >
+                疲惫
+              </button>
+            </div>
+          </article>
+          <article class="component-board">
+            <header>
+              <span>07</span>
+              <h3>StateSelector</h3>
+            </header>
+            <div
+              class="state-options"
+              role="radiogroup"
+              aria-label="StateSelector 选中状态示例"
+            >
+              <button role="radio" aria-checked="false">
+                <span>○</span>还有一点余力
+              </button>
+              <button class="selected" role="radio" aria-checked="true">
+                <span>✓</span>刚好够用 <small>已选</small>
+              </button>
+              <p class="field-error" role="status">! 请选择一个最接近的状态</p>
+            </div>
+          </article>
+          <article class="component-board">
+            <header>
+              <span>08</span>
+              <h3>FriendMessage</h3>
+            </header>
+            <div class="friend-message">
+              <i></i>
+              <div>
+                <span>今天想对你说</span><strong>不用一次做到全部。</strong>
+                <p>先把最重要的一件事放回手里，就已经很好。</p>
+              </div>
+            </div>
+          </article>
+          <article class="component-board">
+            <header>
+              <span>09</span>
+              <h3>EnergySummary</h3>
+            </header>
+            <div class="energy-summary compact">
+              <div><span>整体能量</span><strong>72</strong></div>
+              <div>
+                <b>稳中有进</b>
+                <p>娱乐与行动参考</p>
+              </div>
+            </div>
+          </article>
+          <article class="component-board">
+            <header>
+              <span>10</span>
+              <h3>ActionCard</h3>
+            </header>
+            <div class="action-card compact">
+              <span>今天可以这样做</span>
+              <h3>先写下第一步。</h3>
+              <p>已经留下 ✓</p>
+            </div>
+          </article>
+          <article class="component-board">
+            <header>
+              <span>11</span>
+              <h3>SectionCard</h3>
+            </header>
+            <div class="section-card">
+              <strong>为什么这样建议</strong>
+              <p>把事实与解释放在同一个清楚的阅读区块。</p>
+            </div>
+          </article>
+          <article class="component-board wide">
+            <header>
+              <span>12</span>
+              <h3>InlineNotice</h3>
+            </header>
+            <div class="notice-row">
+              <div class="notice info">
+                <b>i</b><span>已显示保存的内容</span>
+              </div>
+              <div class="notice success">
+                <b>✓</b><span>今天已经点亮</span>
+              </div>
+              <div class="notice warning">
+                <b>!</b><span>网络有些不稳定</span>
+              </div>
+              <div class="notice error">
+                <b>×</b><span>这一部分暂时不可用</span>
+              </div>
+            </div>
+          </article>
+          <article class="component-board">
+            <header>
+              <span>13</span>
+              <h3>LoadingSkeleton</h3>
+            </header>
+            <div
+              class="skeleton"
+              role="status"
+              aria-busy="true"
+              aria-label="正在加载"
+            >
+              <i></i><i></i><i></i>
+            </div>
+          </article>
+          <article class="component-board">
+            <header>
+              <span>14</span>
+              <h3>OfflineState</h3>
+            </header>
+            <div class="status-state info">
+              <b>↯</b>
+              <div>
+                <strong>离线内容</strong>
+                <p>上次同步：09:20</p>
+                <button class="text-button">重试连接</button>
+              </div>
+            </div>
+          </article>
+          <article class="component-board">
+            <header>
+              <span>15</span>
+              <h3>RecoverableError</h3>
+            </header>
+            <div class="status-state error">
+              <b>!</b>
+              <div>
+                <strong>可以再试一次</strong>
+                <p>已经保存的内容仍然保留。</p>
+                <button class="text-button">重试</button>
+              </div>
+            </div>
+          </article>
+          <article class="component-board">
+            <header>
+              <span>16</span>
+              <h3>ConfirmSheet</h3>
+            </header>
+            <div class="confirm-sheet">
+              <i></i><strong>删除这条记录？</strong>
+              <p>删除后无法恢复。</p>
+              <div>
+                <button class="danger-button">确认删除</button
+                ><button class="text-button">取消</button>
+              </div>
+            </div>
+          </article>
+          <article class="component-board wide safety-board">
+            <header>
+              <span>17</span>
+              <h3>SafetyScreen</h3>
+            </header>
+            <div
+              class="safety-screen"
+              role="region"
+              aria-label="安全响应结构占位"
+            >
+              <div>
+                <span>SAFETY · 待专业安全评审</span>
+                <h3>安全响应结构占位</h3>
+                <p>仅验证现实帮助优先与无娱乐装饰。</p>
+              </div>
+              <div class="safety-actions">
+                <button class="danger-button">紧急现实帮助（占位）</button
+                ><button class="secondary-button">其他审核资源（占位）</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="band evidence-band" aria-labelledby="evidence-title">
+        <div class="section-intro">
+          <p class="eyebrow">ACCESSIBILITY & STATE EVIDENCE</p>
+          <h2 id="evidence-title">同一套组件在约束下仍可读、可辨、可操作</h2>
+        </div>
+        <div class="evidence-grid">
+          <article>
+            <span>44 px</span>
+            <h3>触控目标</h3>
+            <p>按钮、Chip、Header action 的最小触控尺寸。</p>
+          </article>
+          <article>
+            <span>1.25×</span>
+            <h3>常见大字体</h3>
+            <p>文字换行，不截断主行动与错误说明。</p>
+          </article>
+          <article>
+            <span>Text + Shape</span>
+            <h3>非颜色状态</h3>
+            <p>✓、!、状态文字与结构位置共同表达。</p>
+          </article>
+          <article>
+            <span>0 ms</span>
+            <h3>减少动态</h3>
+            <p>Skeleton 与加载符号停在可识别静态状态。</p>
+          </article>
+        </div>
+      </section>
+    </main>
+    <script src="./script.js"></script>
+  </body>
+</html>

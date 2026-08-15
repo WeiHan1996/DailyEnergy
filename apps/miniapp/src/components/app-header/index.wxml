@@ -1,0 +1,21 @@
+<view class="de-app-header" aria-role="banner">
+  <view class="de-app-header__leading">
+    <button
+      wx:if="{{showBack}}"
+      class="de-app-header__action"
+      aria-label="{{backLabel}}"
+      bindtap="handleBack"
+      hover-class="de-app-header__action--pressed"
+    >
+      <text class="de-app-header__back-mark" aria-hidden="true">‹</text>
+    </button>
+    <slot wx:else name="leading"></slot>
+  </view>
+  <view class="de-app-header__titles">
+    <view class="de-app-header__title">{{title}}</view>
+    <view wx:if="{{subtitle}}" class="de-app-header__subtitle">{{subtitle}}</view>
+  </view>
+  <view class="de-app-header__actions">
+    <slot name="actions"></slot>
+  </view>
+</view>
