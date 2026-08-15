@@ -2,7 +2,7 @@
 
 本目录是 D-002 的仓库评审面和 Figma 导入交付，不是业务页面实现。
 
-- **当前任务状态**：`In Review`
+- **当前任务状态**：`Done`
 - **证据状态**：`USER_ACCEPTED / PLATFORM_EVIDENCE_PENDING`
 - **Figma 最终命名版本**：`2387487276296532390`
 
