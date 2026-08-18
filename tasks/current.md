@@ -4,31 +4,31 @@
 - **最后更新**：2026-08-18
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：D-004 — 完成高保真原型、验证与开发交付
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **任务 Profile**：`design`
 - **任务分支**：`design/d-004-prototype-handoff`
 - **当前 Issue**：[D-004 Issue #102](https://github.com/WeiHan1996/DailyEnergy/issues/102)
-- **当前 PR**：无；全部内容收口后一次性创建 Draft PR
+- **当前 PR**：本分支下一动作创建 Draft PR；为遵守“一次 CI”约束，不在 PR 创建后为写回编号追加状态提交
 - **最近完成 PR**：[D-003 PR #144](https://github.com/WeiHan1996/DailyEnergy/pull/144)，merge `db57fbc7aeb7b9ebceddcc69c6d2d90e41722f7f`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 当前目标
 
-把 D-003 已接受的核心高保真页面连接成可点击、可演练、可由 C-003/C-004/C-009 无歧义实现的首日体验与历史日回看，并固定异常恢复、无障碍、Visual QA 和页面 PR 设计证据合同。
+D-004 已完成设计侧交付，现进入项目负责人评审：把 D-003 已接受的核心高保真页面连接成可点击、可演练、可由 C-003/C-004/C-009 无歧义实现的首日体验与历史日回看，并固定异常恢复、无障碍、Visual QA 和页面 PR 设计证据合同。
 
 D-004 只做 Prototype / design QA / developer handoff；不实现 C 系列业务页面、真实 API、数据库、微信平台行为或生产视觉回归基础设施。
 
-## 2. 前置与当前真相
+## 2. 前置与依赖状态
 
 - D-003 已于 2026-08-18 获项目负责人接受；PR #144 已合并，Issue #101 已关闭；
 - E-004 已 Done；D-004 两个直接前置均满足；
 - D-002 Accepted Token/Component 继续是唯一设计系统来源；
-- D-004 未 Accepted 前，C-003、C-004、C-009 继续被依赖 Gate 阻断；
+- D-004 **尚未 Accepted**，因此 C-003、C-004、C-009 继续被依赖 Gate 阻断；
 - D-005 保持 Planned，不提前启动。
 
-本 ChatGPT/Figma/GitHub connector 会话无法在用户本机 checkout 直接执行 `pnpm agent:prepare D-004 --remote`；已按 AGENTS fallback 实际读取 AGENTS、PROJECT_CONTEXT、current task、D-004 Issue 及相关 Accepted design/interaction/testing/analytics 源，并直接检查 GitHub 与 Figma 原始证据。最终 PR 前仍需在可执行仓库环境完成仓库 Gate。
+本 ChatGPT/Figma/GitHub connector 会话不能执行用户本机 checkout 的 `pnpm agent:prepare` / `agent:validate`。已按 AGENTS fallback 实际读取 AGENTS、PROJECT_CONTEXT、D-004 Issue、Accepted design/interaction/state/testing/analytics 源，并直接检查 GitHub/Figma 原始证据。为减少 Actions 消耗，本轮不另造远端验证；唯一一次 PR CI 作为当前分支最终自动化 Gate。
 
-## 3. Figma 当前交付
+## 3. Figma 交付
 
 Figma file key：`T5HS32Ciz6LZh81KbqhFGo`
 
@@ -39,15 +39,15 @@ Figma file key：`T5HS32Ciz6LZh81KbqhFGo`
 - Start Frame：`220:3` — ENT-001 Normal
 - D-003 正式 Frame：35 / 35，ID 全部保持不变
 
-已连接首日主路径：
+首日路径：
 
 `220:3 ENT → 220:7 ONB → 220:11 DLY-001 → 220:16 DLY-002 → 220:20 DLY-003 → 220:25 Completed`
 
-已连接历史删除：
+历史删除：
 
 `220:20/220:25 → 220:27 REC-002 → 295:227 Confirm → 220:34 Deleting → 220:29 Empty`
 
-已连接 Offline / Recoverable Error / Safety 恢复，并保留同一意图语义。
+Offline / Recoverable Error / Safety 恢复均已连接，并保持同一逻辑意图语义。
 
 ### D-004 Prototype-only 场景
 
@@ -55,7 +55,7 @@ Figma file key：`T5HS32Ciz6LZh81KbqhFGo`
 - `303:210` — Template Fallback Silent
 - `303:245` — Personalization Reduced
 
-完整模板 fallback 与个性化减少已明确拆分：完整受控模板结构完整时用户侧静默；只有明显缺少个性化时才出现中性提示。两者均保持同一 core result identity。
+完整模板 fallback 与个性化减少已拆分：完整受控模板结构完整时用户侧静默；只有明显缺少个性化时才出现中性提示。两者均保持同一 core result identity。
 
 ### Visual QA Baseline
 
@@ -119,7 +119,7 @@ Figma bounded audit：
 
 ## 6. 开发交付文档
 
-当前 Draft：`docs/design/developer-handoff.md`
+Draft：`docs/design/developer-handoff.md`
 
 已记录：
 
@@ -137,18 +137,30 @@ Figma bounded audit：
 
 项目负责人接受前保持 Draft。
 
-## 7. CI / GitHub Actions 使用约束
+## 7. 项目状态一致性
+
+本分支已经同步：
+
+- [x] `README.md` — D-003 Done / D-004 In Review / D-005 Planned
+- [x] `docs/INDEX.md` — D-003 Accepted、D-004 Draft 与当前读取顺序
+- [x] `docs/design/README.md` — D-004 Prototype / baseline 导航
+- [x] `tasks/backlog.md` — D-003 Done / D-004 In Review / D-005 Planned
+- [x] `tasks/current.md` — 本交接
+
+下游 C-003/C-004/C-009 仍保持 Planned；D-004 只有项目负责人明确接受后才会解除前置。
+
+## 8. CI / GitHub Actions 使用约束
 
 项目负责人于 2026-08-18 明确要求：**减少 CI，尽量只做一次 CI**。
 
-当前仓库 `CI` workflow 只在 `pull_request` 和 `push main` 触发；因此执行策略为：
+仓库 `CI` workflow 在 `pull_request` 和 `push main` 触发；本轮执行策略：
 
-1. Figma、文档、项目状态和本地/连接器检查先全部收口；
-2. Draft PR 创建前允许在无 PR 的工作分支完成必要提交，不主动触发 PR CI；
-3. 只在内容确定准备评审后创建 Draft PR，触发一次必要 PR CI；
-4. 不主动 rerun；只有该唯一 CI 暴露真实 blocker 时才评估最小修复，避免无意义消耗 Actions minutes。
+1. 所有 Figma、文档、状态和 connector QA 已在无 PR 分支先收口；
+2. 创建 Draft PR 才触发本任务第一次、也是计划中的唯一一次 PR CI；
+3. 不主动 rerun；只有唯一 CI 暴露真实 blocker 才诊断是否需要最小修复；
+4. 不为写回 PR 编号或 CI 结果追加无业务价值的提交，以免再触发 CI。
 
-## 8. Acceptance Gate
+## 9. Acceptance Gate
 
 已完成：
 
@@ -163,28 +175,26 @@ Figma bounded audit：
 - [x] 15 个 durable Figma Visual QA baseline
 - [x] `developer-handoff.md` Draft
 - [x] C-003/C-004/C-009 设计证据合同
+- [x] README / INDEX / design README / backlog / current 状态同步
 
-剩余：
+待评审：
 
-- [ ] 同步 `docs/design/README.md`、`docs/INDEX.md` 与必要项目状态
-- [ ] 在可执行仓库 checkout 运行最终必要验证
-- [ ] 内容全部收口后创建一个 Draft PR，触发一次 PR CI
+- [ ] 创建 Draft PR 并完成唯一一次 PR CI
 - [ ] 项目负责人审核 Figma Prototype、Visual QA baseline、developer handoff 和 PR
 - [ ] 明确接受后把文档改为 Accepted、关闭 Issue #102
 - [ ] D-004 Done 后让 D-005 成为唯一 Ready；不提前开始 D-005
 
-## 9. 外部/平台未决边界
+## 10. 外部/平台未决边界
 
 - 外部 5～8 人研究未获招募/隐私/联系/补偿授权，不执行；
 - Safety 生产文案与地区资源继续需要独立专业评审；
 - 微信 DevTools / 真机证据按现有平台 Gate 继续处理；
 - Production PostgreSQL restore、on-call、Production identity/legal/region/cross-border 等未决项继续阻止 Production/RC readiness。
 
-## 10. 精确下一动作
+## 11. 精确下一动作
 
-1. 同步 design README / INDEX 与 D-004 In Progress 状态；
-2. 复核 branch diff 仅包含 D-004 设计/文档/状态内容；
-3. 在可执行 checkout 做最终 format/docs/task Gate；
-4. **只在确认无需再改后创建 Draft PR，触发一次 CI**；
-5. 将 Prototype + Visual QA + PR 交项目负责人评审；
-6. 用户明确接受前不把 D-004 标为 Done，不启动 D-005。
+1. 复核 branch diff 仅包含 D-004 设计/文档/状态内容；
+2. 创建一个 Draft PR，触发计划中的唯一一次 PR CI；
+3. 不主动 rerun；读取该 CI 结果；
+4. 将 Figma Prototype + Visual QA + Draft PR 交项目负责人审核；
+5. 用户明确接受前不把 D-004 标为 Done，不启动 D-005。
