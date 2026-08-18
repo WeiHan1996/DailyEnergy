@@ -1,15 +1,15 @@
 # DailyEnergy 项目 Backlog
 
 - **文档状态**：Active
-- **最后更新**：2026-08-15
+- **最后更新**：2026-08-18
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：[D-003 核心流程高保真设计](./current.md)（Ready；D-002 已接受并随 PR #142 合并）
+- **当前任务**：[D-004 高保真原型、验证与开发交付](./current.md)（In Review；D-003 已接受并随 PR #144 合并）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
 
 - 本文件保存有序候选任务，不表示所有任务已经承诺；
-- 同一时间只有 tasks/current.md 中一个任务可以是 Ready 或 In Progress；
+- 同一时间只有 tasks/current.md 中一个任务可以是 Ready、In Progress 或 In Review；
 - 任务进入执行前必须确认依赖和上游文档；
 - 每个任务应能在一个主要 PR 中验收；
 - 发现任务过大时先拆分，再开始编码；
@@ -108,7 +108,7 @@
 | S-34 | Phase 1～3 工程 Issues | Done | 3 个 GitHub Milestones、48 个 Issues                       | S-01～S-33             |
 | S-35 | Phase 0B Gate 评审     | Done | [Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) | S-34                   |
 
-S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。E-001～E-015 已全部完成并进入 Done，Phase 1 已结束。E-014 获项目所有者接受并随 PR #138 squash 合并为 `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`；final-head PR CI 与 merged-main CI 最终均为 11/11 SUCCESS。Phase 2 已开始。项目所有者已接受 D-001 的 A — 温柔自然方向，理由为“清晰自然，排版克制，内容清晰”，且不吸收其它路线元素；Figma 决策文字已同步。D-001 PR #140 已在 exact-head 11/11 后 squash 合并为 `e37009439bce545dd1f19d19f589b209ec178b9e`，Issue #99 已关闭。merged-main run `31720488027` 的 9 个 automated lane 成功，但 supply-chain 因新更新的 `GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.17`；状态收口 PR #141 已把现有精确 override 最小提升到 `3.3.18` 并合并为 `128ee8d`。项目所有者已于 2026-08-15 接受 D-002；PR #142 精确 head `7139cfb` 的 CI run `31888493133` 11/11 SUCCESS，并 squash 合并为 `1fa5922`，Issue #100 已关闭。D-002 进入 Done；D-003 成为唯一 Ready，尚未开工。
+S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。E-001～E-015 已全部完成并进入 Done，Phase 1 已结束。E-014 获项目所有者接受并随 PR #138 squash 合并为 `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`；final-head PR CI 与 merged-main CI 最终均为 11/11 SUCCESS。Phase 2 已开始。项目所有者已接受 D-001 的 A — 温柔自然方向，理由为“清晰自然，排版克制，内容清晰”，且不吸收其它路线元素；Figma 决策文字已同步。D-001 PR #140 已在 exact-head 11/11 后 squash 合并为 `e37009439bce545dd1f19d19f589b209ec178b9e`，Issue #99 已关闭。merged-main run `31720488027` 的 9 个 automated lane 成功，但 supply-chain 因新更新的 `GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.17`；状态收口 PR #141 已把现有精确 override 最小提升到 `3.3.18` 并合并为 `128ee8d`。项目所有者已于 2026-08-15 接受 D-002；PR #142 精确 head `7139cfb` 的 CI run `31888493133` 11/11 SUCCESS，并 squash 合并为 `1fa5922`，Issue #100 已关闭。项目所有者于 2026-08-18 接受 D-003；PR #144 已合并为 `db57fbc7aeb7b9ebceddcc69c6d2d90e41722f7f`，Issue #101 已关闭。D-004 当前进入 In Review：Figma Prototype、异常恢复、20 项内部 scripted walkthrough、15 个 Visual QA raster baseline 与 `developer-handoff.md` Draft 已完成；项目负责人接受前仍不解除 C-003/C-004/C-009 前置。
 
 ## 4. Phase 1：工程基础
 
@@ -178,18 +178,17 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 ### 5.1 正式视觉设计前置
 
-| ID                                                            | 任务                                  | 状态    | 主要结果                                   |
-| ------------------------------------------------------------- | ------------------------------------- | ------- | ------------------------------------------ |
-| [D-001](https://github.com/WeiHan1996/DailyEnergy/issues/99)  | 确定品牌与视觉方向                    | Done    | 五套方向板、最终方向和视觉反模式           |
-| [D-002](https://github.com/WeiHan1996/DailyEnergy/issues/100) | 建立设计系统与 Design Tokens          | Done    | Figma Variables、组件库和代码 Token 交付   |
-| [D-003](https://github.com/WeiHan1996/DailyEnergy/issues/101) | 完成核心流程高保真设计                | Ready   | 核心流程八页及关键状态                     |
-| [D-004](https://github.com/WeiHan1996/DailyEnergy/issues/102) | 完成高保真原型、验证与开发交付        | Planned | 核心原型回归、Frame ID、视觉 QA 和开发交付 |
-| [D-005](https://github.com/WeiHan1996/DailyEnergy/issues/104) | 完成 Phase 2 剩余页面高保真与开发交付 | Planned | 晚间、趋势、数据权利页面与状态开发交付     |
+| ID                                                            | 任务                                  | 状态      | 主要结果                                   |
+| ------------------------------------------------------------- | ------------------------------------- | --------- | ------------------------------------------ |
+| [D-001](https://github.com/WeiHan1996/DailyEnergy/issues/99)  | 确定品牌与视觉方向                    | Done      | 五套方向板、最终方向和视觉反模式           |
+| [D-002](https://github.com/WeiHan1996/DailyEnergy/issues/100) | 建立设计系统与 Design Tokens          | Done      | Figma Variables、组件库和代码 Token 交付   |
+| [D-003](https://github.com/WeiHan1996/DailyEnergy/issues/101) | 完成核心流程高保真设计                | Done      | 核心流程八页及关键状态                     |
+| [D-004](https://github.com/WeiHan1996/DailyEnergy/issues/102) | 完成高保真原型、验证与开发交付        | In Review | 核心原型回归、Frame ID、视觉 QA 和开发交付 |
+| [D-005](https://github.com/WeiHan1996/DailyEnergy/issues/104) | 完成 Phase 2 剩余页面高保真与开发交付 | Planned   | 晚间、趋势、数据权利页面与状态开发交付     |
 
-依赖链为 `D-001 → D-002 → D-003 → D-004 → D-005`。D-001、D-002 与 E-004 已完成；D-003 是唯一
-Ready，尚未开工。D-004～D-005 继续 Planned，不能提前开始。
+依赖链为 `D-001 → D-002 → D-003 → D-004 → D-005`。D-001～D-003 与 E-004 已完成；D-004 是唯一 In Review。D-005 继续 Planned，不能提前开始。
 
-- D-004 是 C-003、C-004、C-009 的直接前置；
+- D-004 是 C-003、C-004、C-009 的直接前置；项目负责人接受 D-004 前这些实现任务继续阻断；
 - C-003：C-002、E-004、D-004；
 - C-004：C-002、C-003、E-006、D-004；
 - C-009：C-003、C-004、C-008、E-004、D-004；
