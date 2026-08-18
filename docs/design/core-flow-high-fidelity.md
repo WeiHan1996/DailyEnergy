@@ -1,11 +1,12 @@
 # D-003 核心流程高保真设计
 
-- **文档状态**：Draft / Ready for Owner Review
+- **文档状态**：Accepted
 - **所属任务**：D-003 — 完成核心流程高保真设计（Issue #101）
 - **设计方向**：A — Gentle Nature / 01B / DLY-003
 - **上游设计系统**：D-002 Accepted（本轮仅做生产可消费性 hardening，不改 Token 值、视觉方向或既有 Component ID）
 - **Figma 文件**：`T5HS32Ciz6LZh81KbqhFGo`
 - **Figma 页面**：`D-003 / Core Flow High Fidelity`（Page ID `220:2`）
+- **Accepted 日期**：2026-08-18
 - **最后更新**：2026-08-18
 
 ## 1. 本轮交付范围
@@ -215,13 +216,15 @@ D-003 初稿发现 D-002 master components 把目录/证据文字包含在组件
 - D-002 master component 可消费性差异已通过原地 production hardening 关闭；
 - D-003 已使用真实 D-002 Component Instance，不再依赖仅命名映射的页面私有组件结构。
 
-当前证据状态为：`DRAFT / FIGMA_IMPLEMENTED / QA_COMPLETE / READY_FOR_OWNER_REVIEW`。
+项目负责人于 2026-08-18 明确确认 D-003，最终 Owner Gate 已通过。
 
-唯一剩余 Gate 是项目负责人在 Figma/PR 上完成最终人工评审。该评审完成前，本文仍保持 Draft，Issue #101 不关闭，D-004 的 D-003 前置仍不解除。
+当前证据状态为：`ACCEPTED / FIGMA_IMPLEMENTED / QA_COMPLETE`。
+
+D-003 已满足 D-004 的设计前置条件；D-004 是否可开始还需同时满足其另一前置 `E-004`。
 
 ## 8. Acceptance Gate
 
-D-003 从 Draft 进入 Accepted 前必须同时满足：
+D-003 从 Draft 进入 Accepted 所需条件均已满足：
 
 - [x] 八页全部正式适用状态 Frame 已建立；
 - [x] 关键 Normal/System/Safety 页面已经高保真化；
@@ -234,6 +237,6 @@ D-003 从 Draft 进入 Accepted 前必须同时满足：
 - [x] Reduced Motion 证据；
 - [x] D-002 可消费 component instance 复用差异关闭；
 - [x] D-002 master / D-003 instance / semantic binding 最终审计通过；
-- [ ] 项目负责人在 Figma / PR 中完成最终人工评审。
+- [x] 项目负责人在 Figma / PR 中完成最终人工评审。
 
-在项目负责人确认前，不得解除 D-004 的 D-003 前置，也不得把本文状态改为 Accepted。
+**结论：D-003 Accepted。** 后续 D-004 必须以本文、上述 Figma Frame ID 与 D-002 生产组件为设计基线，不得静默偏离。
