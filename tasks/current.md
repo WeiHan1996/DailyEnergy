@@ -1,117 +1,190 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-15（D-002 已接受并合并；D-003 为唯一 Ready）
+- **最后更新**：2026-08-18
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：D-003 — 完成核心流程高保真设计
-- **任务状态**：Ready
-- **任务 Profile**：`hybrid`（D-003 权威路由要求 design source、仓库评审资产与 full Gate 联合证明）
-- **任务分支**：尚未创建；状态收尾完成后从最新 `main` 创建 `agent/d003-core-flow-design`
-- **状态收尾分支**：`agent/d002-completion-handoff`，基于 D-002 merge `1fa5922`
-- **当前 Issue**：[D-003 Issue #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)
-- **当前 PR**：无；D-003 尚未开工
-- **最近完成 PR**：[D-002 PR #142](https://github.com/WeiHan1996/DailyEnergy/pull/142)，squash merge `1fa5922ebad7158c42b1fa9949b1f2f95ad71804`
+- **当前任务**：D-004 — 完成高保真原型、验证与开发交付
+- **任务状态**：In Progress
+- **任务 Profile**：`design`
+- **任务分支**：`design/d-004-prototype-handoff`
+- **当前 Issue**：[D-004 Issue #102](https://github.com/WeiHan1996/DailyEnergy/issues/102)
+- **当前 PR**：无；全部内容收口后一次性创建 Draft PR
+- **最近完成 PR**：[D-003 PR #144](https://github.com/WeiHan1996/DailyEnergy/pull/144)，merge `db57fbc7aeb7b9ebceddcc69c6d2d90e41722f7f`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 当前目标
 
-使用 D-002 已接受的 Design Tokens、组件和 Figma library，为首日核心路径、历史日回看及不可绕过系统状态
-交付可开发的高保真页面，不重新发明信息架构、内容顺序或业务行为。
+把 D-003 已接受的核心高保真页面连接成可点击、可演练、可由 C-003/C-004/C-009 无歧义实现的首日体验与历史日回看，并固定异常恢复、无障碍、Visual QA 和页面 PR 设计证据合同。
 
-D-003 范围以 Issue #101 为准：
+D-004 只做 Prototype / design QA / developer handoff；不实现 C 系列业务页面、真实 API、数据库、微信平台行为或生产视觉回归基础设施。
 
-- 完成 `ENT-001`、`ONB-001`、`DLY-001`、`DLY-002`、`DLY-003`、`REC-002`、`SYS-003`、
-  `SAFE-001` 八个核心页面/状态；
-- 覆盖页面清单规定的 Normal、Loading、Offline、Recoverable Error、Disabled、Completed、Fallback、
-  Safety、Deleting 相应子集；
-- 使用页面 ID 命名 Figma Frame，并创建 `docs/design/core-flow-high-fidelity.md` Draft 与 Frame ID 索引；
-- 使用固定合成内容覆盖空/长称呼、不同内容长度、低/中/高状态、无记忆、个性化减少、局部失败和 Safety 替代；
-- 每个状态复用 D-002 semantic/component Token 与组件，差异必须有明确设计理由。
+## 2. 前置与当前真相
 
-不实现小程序业务代码、API、数据库、埋点或生成逻辑；不新增页面、TabBar、聊天、商城、角色、专业排盘、
-完整后续页面、管理后台视觉或未经专业审核的地区危机资源。
+- D-003 已于 2026-08-18 获项目负责人接受；PR #144 已合并，Issue #101 已关闭；
+- E-004 已 Done；D-004 两个直接前置均满足；
+- D-002 Accepted Token/Component 继续是唯一设计系统来源；
+- D-004 未 Accepted 前，C-003、C-004、C-009 继续被依赖 Gate 阻断；
+- D-005 保持 Planned，不提前启动。
 
-## 2. D-002 最终交接
+本 ChatGPT/Figma/GitHub connector 会话无法在用户本机 checkout 直接执行 `pnpm agent:prepare D-004 --remote`；已按 AGENTS fallback 实际读取 AGENTS、PROJECT_CONTEXT、current task、D-004 Issue 及相关 Accepted design/interaction/testing/analytics 源，并直接检查 GitHub 与 Figma 原始证据。最终 PR 前仍需在可执行仓库环境完成仓库 Gate。
 
-- 项目所有者于 2026-08-15 审核 PR #142、Figma 最终版本和归档证据后明确接受 D-002；
-- `docs/design/design-system.md` 已进入 Accepted，接受范围包括 A — 温柔自然唯一方向、行动高于分数的
-  信息层级、Default/High Contrast、大字和关键状态、17 个基础组件及其作为 D-003 唯一基础组件集；
-- PR #142 精确 head `7139cfbdd193a8d6570b1cccfb8c4b6b01e90a45` 的 CI run `31888493133`
-  已 11/11 SUCCESS，并通过 `--match-head-commit` squash 合并为
-  `1fa5922ebad7158c42b1fa9949b1f2f95ad71804`；Issue #100 已关闭；
-- D-002 交付 220 个 canonical Token、17 个逻辑组件合同、15 个微信原生组件目录、8 个生成产物、
-  7 张本地 PNG、10 张 Figma JPEG、四个 Variables collection、8 个 Styles 和三个 `1200 x 900` Frame；
-- Figma file key 为 `T5HS32Ciz6LZh81KbqhFGo`，page `83:2`，最终命名版本
-  `2387487276296532390`，Foundations/Components/States root 分别为 `174:309`、`174:310`、`174:311`；
-- Token 来源指纹为 `sha256:dcb100ea11fe0d534496af852983bc32d31f2d0a56ca20c4d01a2af79154d8d0`；
-- SafetyScreen 保持纯结构合同，所有生产可见文案、资源、按钮与读屏名称由后续专业评审的
-  `SafetyResponsePlan` 注入，D-002 未内置可上线危机文案或资源；
-- 2026-08-14 最终实现与 2026-08-15 接受写回后的本地 `security` full Gate 均只因 macOS 缺少 Linux
-  `flock` 返回 deployment 48/50；其余已执行阶段通过，未把本地自动化写成 PASS；
-- 2026-08-15 合并后状态收尾以 D-003 `hybrid` Profile 执行 full Gate，格式、lint、架构、codegen、合同、
-  Agent workflow、数据库证据、typecheck 与前置 fixtures 均越过；deployment 同样仅因缺少 Linux `flock`
-  返回 48/50，自动化保持 FAIL；
-- 微信 DevTools 为 `INFRA_BLOCKED`，iOS/Android 为 `MANUAL_EVIDENCE_PENDING`，专业 Safety 文案/资源
-  仍待独立评审；这些状态不阻止设计规范被项目所有者接受，但继续阻止相应平台、Safety 和 Production 声明。
+## 3. Figma 当前交付
 
-## 3. D-003 权威输入与依赖
+Figma file key：`T5HS32Ciz6LZh81KbqhFGo`
 
-开工必须读取：
+### Prototype source
 
-1. `AGENTS.md`、`docs/agent/PROJECT_CONTEXT.md`、本文；
-2. `pnpm agent:prepare D-003 --remote` 返回的全部 required sources；
-3. [D-003 Issue #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)；
-4. Accepted [设计系统](../docs/design/design-system.md)、[视觉方向](../docs/design/visual-direction.md)及原始 Figma 证据；
-5. Accepted `screen-inventory.md`、`screen-specs.md`、`interaction-states.md`、`content-layout.md`；
-6. Accepted `personality.md` 与 `safety.md`。
+- Page：`D-003 / Core Flow High Fidelity`
+- Page ID：`220:2`
+- Start Frame：`220:3` — ENT-001 Normal
+- D-003 正式 Frame：35 / 35，ID 全部保持不变
 
-依赖状态：
+已连接首日主路径：
 
-- D-001 已 Done，A — 温柔自然是唯一方向，不吸收其它路线元素；
-- D-002 已 Done，其 Accepted Token、组件和 Safety 结构边界是 D-003 唯一设计基础；
-- D-003 是唯一 Ready；D-004、D-005、C-001～C-017 和其它任务保持 Planned；
-- D-004 被接受前不得开始 C-003、C-004、C-009 的正式页面实现；D-005 被接受前不得开始
-  C-012、C-013、C-014 的正式页面实现。
+`220:3 ENT → 220:7 ONB → 220:11 DLY-001 → 220:16 DLY-002 → 220:20 DLY-003 → 220:25 Completed`
 
-## 4. 设计与验收边界
+已连接历史删除：
 
-- 同一时刻只有一个突出主操作；DLY-003 首屏、长页顺序、五维渐进展开和字数预算必须符合 Accepted S-03；
-- 真实记录、娱乐与行动参考、朋友表达和系统状态至少通过标题、容器、说明中的两种方式区分，不只换颜色；
-- SAFE-001 全屏替代普通旅程，隐藏运势、任务、点亮、分享和普通导航；错误、离线与低状态不使用恐惧或刺激视觉；
-- 常见小屏、微信竖屏、大字体和减少动态下仍能完成核心操作，长内容不遮挡主按钮或安全区；
-- 必须提供八页 × 适用状态矩阵、组件/Token 使用审计、内容预算检查、规格逐项对照、Figma Frame ID、
-  关键状态截图及未决差异；上游差异在开发前停止并回到权威规格审核；
-- 页面数量或状态矩阵扩大时先拆 Issue，不边做边扩范围。
+`220:20/220:25 → 220:27 REC-002 → 295:227 Confirm → 220:34 Deleting → 220:29 Empty`
 
-## 5. Requirement-to-Proof 边界
+已连接 Offline / Recoverable Error / Safety 恢复，并保留同一意图语义。
 
-- 文档状态、链接、命名、证据字段和依赖一致性可由仓库自动检查；
-- Token/组件复用可由 D-002 合同、审计清单和设计证据共同证明，但仓库检查不能替代 Figma 原始节点；
-- 视觉层级、长内容、触控、读屏顺序、微信竖屏、大字体、减少动态和 Safety 替代需要人工/平台证据；
-- `designSourceEvidence`、Figma file/version/Frame ID、视觉交互评审和项目所有者接受不能由自动化替代；
-- D-003 在上述人工证据和用户接受完成前必须保持 Draft/In Review 与 `MANUAL_EVIDENCE_REQUIRED`，不得报告 PASS 或 Accepted。
+### D-004 Prototype-only 场景
 
-## 6. 临时 GitHub Actions 额度约束
+- `295:227` — REC-002 Delete Confirm
+- `303:210` — Template Fallback Silent
+- `303:245` — Personalization Reduced
 
-- 项目所有者于 2026-08-13 通知：本计费周期 Actions minutes 已使用约 90%；
-- 默认先完成本地设计、证据、文档和检查，评审前只做一次必要 push；不主动重跑 workflow；
-- 若确需额外运行，必须先说明必要性并取得确认。
+完整模板 fallback 与个性化减少已明确拆分：完整受控模板结构完整时用户侧静默；只有明显缺少个性化时才出现中性提示。两者均保持同一 core result identity。
 
-## 7. Production / RC 未决项
+### Visual QA Baseline
 
-- Production PostgreSQL backup/key、PITR 隔离恢复、删除/恢复拒绝独立证明：`BLOCKED`；
-- 真实 on-call、告警投递/确认/升级、observability TTL/RBAC/副本与导出删除：`BLOCKED`；
-- 微信 DevTools dedicated runner：`INFRA_BLOCKED`；iOS/Android 真机：`MANUAL_EVIDENCE_PENDING`；
-- 专业 Safety 文案、地区资源和紧急帮助内容仍待独立审核；
-- 完整 incident/recovery observation 与 Production identity/legal/region/cross-border 授权：
-  `BLOCKED/PENDING`。
+- Page：`D-004 / Visual QA Baseline`
+- Page ID：`303:275`
+- durable raster snapshot：15 个
 
-上述项目不是 waiver；任何一项缺失都禁止 Production readiness 或 RC PASS 声明。
+覆盖 ENT、ONB、DLY-001、DLY-002 Loading、DLY-003 Normal/Completed/Offline、REC-002、删除确认、Deleting、Safety、Large Text、Reduced Motion、Silent Fallback、Personalization Reduced。
 
-## 8. 精确下一动作
+Snapshot 只用于视觉比较；可编辑权威仍是 source Frame + D-002 Component/Token。
 
-1. 完成并合并当前 `agent/d002-completion-handoff` 状态收尾，只做项目状态和交接更新；
-2. 从最新 `main` 创建 `agent/d003-core-flow-design`，运行 `pnpm agent:prepare D-003 --remote` 并读取全部来源；
-3. 确认 Issue #101 可保持一个聚焦 PR 后，创建 `docs/design/core-flow-high-fidelity.md` Draft 与 Figma
-   高保真评审入口；如范围无法独立验收，先拆 Issue；
-4. D-003 获项目所有者接受并合并后，才把 D-004 移为唯一 Ready；当前不启动 D-003 实现。
+## 4. 已发现并修复的设计缺陷
+
+### D004-D01 — Fallback 语义混合
+
+问题：完整模板 fallback 与个性化减少若共用同一“简洁版本”提示，会违反 Accepted “完整模板静默，明显减少才提示”。
+
+处理：
+
+- 新增 `303:210` Silent Template Fallback；
+- 新增 `303:245` Personalization Reduced；
+- `220:17` DLY-002 Fallback prototype 改连 `303:210`。
+
+状态：RESOLVED。
+
+### D004-D02 — ConfirmSheet 长文案挤压
+
+问题：`DE / ConfirmSheet` 原 Body 宽度过窄，删除影响文案会和行动区挤压。
+
+处理：在原 D-002 Component ID `190:683` 上 production hardening，不复制组件：
+
+- Body 可用宽度扩到 254；
+- Body 自然高度；
+- Component 高度调整到 146；
+- 保留 Component ID / Properties；
+- 删除确认实例重新居中；
+- Visual QA baseline `303:284` 已刷新。
+
+状态：RESOLVED。
+
+## 5. 内部 QA 结果
+
+Figma bounded audit：
+
+- official Frame：35 / 35
+- missing official Frame：0
+- reaction node：29
+- broken reaction destination：0
+- ON_CLICK target <44px：0
+- ChoiceChip：17
+- ChoiceChip min height：44px
+- 非颜色 Selected 提示：`✓ 平稳 / ✓ 一般 / ✓ 还可以`
+- Reduced Motion `248:105` reaction count：0
+- Prototype-only Hotspot：5，全部 ≥44px
+- Visual QA snapshot：15
+- Accepted D-003 Frame ID 改写：0
+
+内部 scripted walkthrough 已覆盖 20 个场景：首日、重复点击、签到/生成失败、Offline、同任务恢复、Silent Fallback、Personalization Reduced、今日内容恢复、历史回看、删除/取消、Deleting、Safety、Safety 资源失败、Large Text、Reduced Motion、当日重进和跨产品日 implementation note。
+
+跨产品日的服务端 `product-date-v1`、CAS、数据库唯一约束和删除 SLA 不是 Figma 可证明事项，必须由后续实现/测试 Gate 证明。
+
+## 6. 开发交付文档
+
+当前 Draft：`docs/design/developer-handoff.md`
+
+已记录：
+
+- Prototype URL / start Frame / flow entries；
+- 35 个正式 Frame + D-004 场景 Frame/Hotspot 索引；
+- 首日/历史删除 Reaction Map；
+- Recovery / Fallback / Safety 行为；
+- D-002 Component/Token/geometry 复用合同；
+- Accepted analytics 触点和数据最小化边界；
+- Accessibility / 375px / Large Text / Reduced Motion；
+- 20 项内部脚本化回归；
+- 15 个 Visual QA baseline；
+- C-003/C-004/C-009 PR 强制 Frame/截图/Token/组件/恢复/测试证据；
+- 设计差异记录和外部研究授权边界。
+
+项目负责人接受前保持 Draft。
+
+## 7. CI / GitHub Actions 使用约束
+
+项目负责人于 2026-08-18 明确要求：**减少 CI，尽量只做一次 CI**。
+
+当前仓库 `CI` workflow 只在 `pull_request` 和 `push main` 触发；因此执行策略为：
+
+1. Figma、文档、项目状态和本地/连接器检查先全部收口；
+2. Draft PR 创建前允许在无 PR 的工作分支完成必要提交，不主动触发 PR CI；
+3. 只在内容确定准备评审后创建 Draft PR，触发一次必要 PR CI；
+4. 不主动 rerun；只有该唯一 CI 暴露真实 blocker 时才评估最小修复，避免无意义消耗 Actions minutes。
+
+## 8. Acceptance Gate
+
+已完成：
+
+- [x] D-003 / E-004 前置确认
+- [x] 首日主路径 Prototype
+- [x] 历史回看 / Back / Delete Confirm / Deleting / Empty
+- [x] Offline / Error / Safety 恢复
+- [x] Silent Fallback / Personalization Reduced 分离
+- [x] ConfirmSheet defect 修复
+- [x] 44px / reaction / Frame / ChoiceChip / Reduced Motion 审计
+- [x] 20 项内部 scripted walkthrough
+- [x] 15 个 durable Figma Visual QA baseline
+- [x] `developer-handoff.md` Draft
+- [x] C-003/C-004/C-009 设计证据合同
+
+剩余：
+
+- [ ] 同步 `docs/design/README.md`、`docs/INDEX.md` 与必要项目状态
+- [ ] 在可执行仓库 checkout 运行最终必要验证
+- [ ] 内容全部收口后创建一个 Draft PR，触发一次 PR CI
+- [ ] 项目负责人审核 Figma Prototype、Visual QA baseline、developer handoff 和 PR
+- [ ] 明确接受后把文档改为 Accepted、关闭 Issue #102
+- [ ] D-004 Done 后让 D-005 成为唯一 Ready；不提前开始 D-005
+
+## 9. 外部/平台未决边界
+
+- 外部 5～8 人研究未获招募/隐私/联系/补偿授权，不执行；
+- Safety 生产文案与地区资源继续需要独立专业评审；
+- 微信 DevTools / 真机证据按现有平台 Gate 继续处理；
+- Production PostgreSQL restore、on-call、Production identity/legal/region/cross-border 等未决项继续阻止 Production/RC readiness。
+
+## 10. 精确下一动作
+
+1. 同步 design README / INDEX 与 D-004 In Progress 状态；
+2. 复核 branch diff 仅包含 D-004 设计/文档/状态内容；
+3. 在可执行 checkout 做最终 format/docs/task Gate；
+4. **只在确认无需再改后创建 Draft PR，触发一次 CI**；
+5. 将 Prototype + Visual QA + PR 交项目负责人评审；
+6. 用户明确接受前不把 D-004 标为 Done，不启动 D-005。
