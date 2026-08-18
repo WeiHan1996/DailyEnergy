@@ -1,12 +1,12 @@
 # D-003 核心流程高保真设计
 
-- **文档状态**：Draft
+- **文档状态**：Draft / Ready for Owner Review
 - **所属任务**：D-003 — 完成核心流程高保真设计（Issue #101）
 - **设计方向**：A — Gentle Nature / 01B / DLY-003
-- **上游设计系统**：D-002 Accepted
+- **上游设计系统**：D-002 Accepted（本轮仅做生产可消费性 hardening，不改 Token 值、视觉方向或既有 Component ID）
 - **Figma 文件**：`T5HS32Ciz6LZh81KbqhFGo`
 - **Figma 页面**：`D-003 / Core Flow High Fidelity`（Page ID `220:2`）
-- **最后更新**：2026-08-17
+- **最后更新**：2026-08-18
 
 ## 1. 本轮交付范围
 
@@ -63,7 +63,16 @@ D-003 在不修改 Accepted 信息架构、业务行为、人格、安全、隐�
 | SAFE-001 | Loading | `220:36` |
 | SAFE-001 | Recoverable Error | `220:37` |
 
-正式状态矩阵共 **35 个 Frame**，命名统一采用 `<Page ID> / <State> / v1`。
+正式状态矩阵共 **35 个 Frame**，命名统一采用 `<Page ID> / <State> / v1`。生产组件 hardening 和 Instance 替换后，上述 35 个官方 Frame ID 全部保持不变。
+
+### 2.1 QA Frame
+
+| QA | Frame ID | 尺寸 |
+| --- | --- | --- |
+| DLY-003 Small | `248:2` | 375 × 1717 |
+| ENT-001 Small | `248:43` | 375 × 919 |
+| DLY-003 Large Text 125% | `248:64` | 420 × 1918 |
+| DLY-002 Reduced Motion | `248:105` | 420 × 545 |
 
 ## 3. 页面设计摘要
 
@@ -77,17 +86,19 @@ Normal 状态使用“一分钟价值 + 三步收益 + 娱乐/专业边界 + 隐
 
 ### DLY-001
 
-页面明确标记“这是你的真实记录”。情绪、精力、睡眠都支持“说不准”；已选择项同时使用 `✓`、边框和文本语义，不依赖颜色。情绪和精力各五档 + “说不准”，睡眠四档 + “说不准”。生成按钮是唯一突出主操作。
+页面明确标记“这是你的真实记录”。情绪、精力、睡眠都支持“说不准”；已选择项同时使用 `✓`、边框和文本语义，不依赖颜色。情绪和精力各五档 + “说不准”，睡眠四档 + “说不准”。17 个可见状态 Chip 已替换为 `DE / ChoiceChip` 实例，并保持 44px 最小高度。生成按钮是唯一突出主操作。
 
 ### DLY-002
 
-Loading 不显示百分比，不使用“宇宙计算”等虚构阶段；明确“生成后保持不变”。Fallback 保持同一结果身份，仅减少个性化表达；Recoverable Error/Offline 都回到同一请求恢复语义，不提供“重新抽取”。
+Loading 不显示百分比，不使用“宇宙计算”等虚构阶段；明确“生成后保持不变”。Fallback 保持同一结果身份，仅减少个性化表达；Recoverable Error/Offline 都回到同一请求恢复语义，不提供“重新抽取”。Reduced Motion QA 使用稳定静态终态，不使用闪烁、循环进度或位移。
 
 ### DLY-003
 
 Normal/Completed 使用 Gentle Nature 长页结构：日期与问候 → “娱乐与行动参考” → 整体能量 → 今日重点 → 核心提示 → 朋友表达 → 今日行动 → 点亮 → 五维 → 娱乐元素 → 次级入口。
 
-当前视觉 QA 已完成长文案自动高度修正和长页完整滚动高度修正，避免行动卡或后半段内容被裁切。Completed 使用明确的“✓ 今天已点亮”不可重复状态。
+五维已经严格收口为 **1 项默认展开 + 4 项摘要**：行动 78 默认展开；情绪、专注、关系、休息保留摘要和“查看详情”提示。Completed 使用明确的“✓ 今天已点亮”不可重复状态。
+
+长文案自动高度、长页滚动高度、375px 小屏和 125% 大字体均已截图检查，不遮挡 CTA 或安全区。
 
 Safety 状态完全替代普通旅程，不展示能量、行动、点亮、分享和普通导航。
 
@@ -101,7 +112,9 @@ Safety 状态完全替代普通旅程，不展示能量、行动、点亮、分�
 
 ### SAFE-001
 
-采用独立 Safety semantic roles，普通品牌/娱乐叙事退出。当前只提供“现实帮助优先”的结构占位，具体主操作、当地资源、号码和可见安全文案必须由经专业评审且版本化的 `SafetyResponsePlan` 注入；D-003 不内置未经审核的地区危机资源。
+采用独立 Safety semantic roles，普通品牌/娱乐叙事退出。具体主操作、当地资源、号码和可见安全文案必须由经专业评审且版本化的 `SafetyResponsePlan` 注入；D-003 不内置未经审核的地区危机资源。
+
+`SAFE-001 / Safety / v1`（`220:35`）保留官方顶层 Frame ID，内部已收口为单一 `DE / SafetyScreen` 实例；SafetyScreen 自身由 D-002 的 InlineNotice、SectionCard 和 PrimaryButton 等生产组件组合，不引入普通导航、运势、任务、点亮或分享。
 
 ## 4. Token / 组件映射
 
@@ -121,18 +134,41 @@ Safety 状态完全替代普通旅程，不展示能量、行动、点亮、分�
 - `color/danger-*`
 - `color/safety-*`
 
-页面层命名按 D-002 组件合同对齐：`DE / Button / Primary`、`DE / SectionCard`、`DE / InlineNotice`、`DE / EnergySummary`、`DE / FriendMessage`、`DE / ActionCard`、`DE / StateSelector` 等。
+本轮未修改 `apps/miniapp/design-tokens.json` 的任何 Token 值，也未创建第二套组件系统。
 
-### 4.1 上游组件实例差异（阻断 Accepted）
+### 4.1 D-002 Component production hardening（已解决）
 
-D-002 当前 Figma master components 是“组件目录/证据展示”形态：master 内包含 `03 · Primary`、`11 · DE / SectionCard` 等目录标注，且没有暴露可用于业务页文案/状态替换的 component properties。直接 instantiate 会把目录标注一起带入业务页面。
+D-003 初稿发现 D-002 master components 把目录/证据文字包含在组件本体中，并且没有业务页可编辑的 Component Properties。该差异已在原 17 个 D-002 Component Master 上**原地修复**：
 
-因此本 Draft 当前采用 **canonical D-002 Variables + D-002 component contract layer naming** 构造页面，而没有伪装成已经完成可消费 master instance 的直接复用。
+- 保留既有 Component ID 和名称，不复制一套“Production Components”；
+- `03 · Primary`、`11 · DE / SectionCard`、`SAFETY · 待专业安全评审` 等目录文字已移到 master 外的 documentation 层；
+- AppHeader、Button、ChoiceChip、StateSelector、FriendMessage、EnergySummary、ActionCard、SectionCard、InlineNotice、LoadingSkeleton、OfflineState、RecoverableError、ConfirmSheet、SafetyScreen 已暴露适用的 Text/Boolean Component Properties；
+- `DE / SectionCard` 增加 `BodyVisible`，支持紧凑摘要而无需页面私有 variant；
+- `DE / ChoiceChip` 固定 44px 最小触控高度；Primary/Secondary/Text Button 保持 48px 控件高度；
+- 旧矢量 master 的 31 个颜色 paint 已无损绑定到现有 Default Semantic Variables；
+- 最终机器审计：17 个 master、**0 个内部目录标注泄漏、0 个未绑定 Solid Paint**；
+- `DE / SafetyScreen` 为 420 × 920 全屏生产组件，并复用 D-002 子组件实例。
 
-这属于 D-003 发现的上游设计系统交付差异。在以下任一条件满足前，D-003 **不得标记 Accepted**：
+这属于 D-002 Accepted 资产的生产可消费性 hardening：**未改变 Token 值、视觉方向、逻辑组件清单或既有 Component ID**。
 
-1. D-002 Figma master 调整为可直接消费的业务组件/变体，并在 D-003 页面替换为实际 instances；或
-2. 上游正式审核并明确接受当前“Token + component contract”映射为 D-002 的设计复用合同。
+### 4.2 D-003 Instance audit
+
+最终 D-003 Figma 审计得到 **118 个 D-002 Component Instance**：
+
+| Component | Instance 数 |
+| --- | ---: |
+| PrimaryButton | 22 |
+| SecondaryButton | 8 |
+| ChoiceChip | 17 |
+| FriendMessage | 5 |
+| EnergySummary | 5 |
+| ActionCard | 5 |
+| SectionCard | 30 |
+| InlineNotice | 19 |
+| LoadingSkeleton | 6 |
+| SafetyScreen | 1 |
+
+原先与上述组件同名的 D-003 私有 Frame 数为 **0**；DLY-001 遗留 44px 私有 Chip 数为 **0**；D-003 页面中 D-002 目录标注泄漏数为 **0**。
 
 ## 5. 固定合成内容
 
@@ -153,33 +189,35 @@ D-002 当前 Figma master components 是“组件目录/证据展示”形态：
 - 35 个 Frame 的页面 × 状态矩阵完整性；
 - Frame 命名与 Page ID 对齐；
 - D-003 semantic color token 绑定；
-- DLY-001 三类真实状态选择和非颜色选中提示；
-- DLY-001 为情绪、精力补齐“说不准”；
-- 主按钮 48px 基线；状态选择控件补最小约 44px 高度；
+- 17 个 D-002 master production hardening 和 Component Property 审计；
+- 118 个 D-003 Component Instance 复用审计；
+- DLY-001 三类真实状态选择、“说不准”和非颜色选中提示；
+- 主按钮 48px、ChoiceChip 44px 触控基线；
 - 多行中文自动高度修复，消除 Safety 标题和长正文重叠；
 - DLY-003/REC-002 长内容按实际内容增高，避免裁切；
-- DLY-003 Normal 关键截图人工目检；
-- ENT-001 Normal 关键截图人工目检；
-- DLY-001 Normal 关键截图人工目检；
-- REC-002 Normal 关键截图人工目检；
-- SAFE-001 Safety 关键截图人工目检；
+- DLY-003 五维“1 展开 + 4 摘要”渐进披露；
+- 375px DLY-003 / ENT-001 小屏 QA；
+- DLY-003 125% 大字体 QA；
+- DLY-002 Reduced Motion 静态 QA；
+- DLY-003 Normal、ENT-001 Normal、DLY-001 Normal、REC-002 Normal、SAFE-001 Safety 关键截图人工目检；
+- D-002 Components 页面生产组件布局截图检查；
 - Safety 页面无普通娱乐元素和普通导航；
-- Loading 不使用虚假百分比；Fallback 不暗示重新抽取；Offline 不伪造写入成功。
+- Loading 不使用虚假百分比；Fallback 不暗示重新抽取；Offline 不伪造写入成功；
+- 最终机器审计确认 `35 / 35` 官方 Frame、`4 / 4` QA Frame、`0` catalog chrome leakage、`0` unresolved solid paint bindings。
 
-## 7. 尚未完成 / 平台阻塞
+## 7. 当前状态
 
-2026-08-17 在补充以下设计 QA Frame 时，Figma MCP 返回 Starter plan tool-call limit。失败调用是原子的，没有产生半完成节点。
+2026-08-18 已解除此前所有技术/平台阻塞：
 
-尚需在下一次可用 Figma MCP 会话中完成：
+- Figma MCP 可正常编辑；
+- 五维渐进披露已完成；
+- 375px / 125% Large Text / Reduced Motion QA Frame 已完成并截图检查；
+- D-002 master component 可消费性差异已通过原地 production hardening 关闭；
+- D-003 已使用真实 D-002 Component Instance，不再依赖仅命名映射的页面私有组件结构。
 
-- `DLY-003` 五维区域严格改为“1 项展开 + 4 项摘要/可展开”视觉状态；当前 Frame 已按信息顺序展示五维，但仍需要最后一次渐进展开视觉收口；
-- 375px 小屏 QA Frame；
-- 125% 大字体 QA Frame；
-- DLY-002 Reduced Motion 静态状态 QA Frame；
-- 对上述 QA Frame 再次截图检查安全区和长内容；
-- 组件 master/instance 差异处理与最终组件复用审计。
+当前证据状态为：`DRAFT / FIGMA_IMPLEMENTED / QA_COMPLETE / READY_FOR_OWNER_REVIEW`。
 
-因此当前证据状态为：`DRAFT / FIGMA_IMPLEMENTED / QA_PARTIAL / FIGMA_RATE_LIMIT_BLOCKED`。
+唯一剩余 Gate 是项目负责人在 Figma/PR 上完成最终人工评审。该评审完成前，本文仍保持 Draft，Issue #101 不关闭，D-004 的 D-003 前置仍不解除。
 
 ## 8. Acceptance Gate
 
@@ -190,11 +228,12 @@ D-003 从 Draft 进入 Accepted 前必须同时满足：
 - [x] D-002 semantic tokens 已用于页面视觉；
 - [x] 真实记录 / 娱乐与行动参考 / 朋友表达 / 系统状态有结构和文字双重区分；
 - [x] SAFE-001 替代普通旅程且不内置未经审核资源；
-- [ ] 五维“1 展开 + 4 摘要”最终视觉收口；
-- [ ] 375px 小屏证据；
-- [ ] 125% 大字证据；
-- [ ] Reduced Motion 证据；
-- [ ] D-002 可消费 component instance 复用差异关闭或获上游明确批准；
-- [ ] 项目负责人在 Figma 中完成最终人工评审。
+- [x] 五维“1 展开 + 4 摘要”最终视觉收口；
+- [x] 375px 小屏证据；
+- [x] 125% 大字证据；
+- [x] Reduced Motion 证据；
+- [x] D-002 可消费 component instance 复用差异关闭；
+- [x] D-002 master / D-003 instance / semantic binding 最终审计通过；
+- [ ] 项目负责人在 Figma / PR 中完成最终人工评审。
 
-未满足上述项目时，不得解除 D-004 的 D-003 前置，也不得把本文状态改为 Accepted。
+在项目负责人确认前，不得解除 D-004 的 D-003 前置，也不得把本文状态改为 Accepted。
