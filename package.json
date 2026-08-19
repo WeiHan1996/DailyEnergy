@@ -56,7 +56,7 @@
     "database:evidence": "node tooling/database/check-evidence.mjs && node --test tests/database/evidence.test.mjs",
     "database:check": "node tooling/database/check-migrations.mjs && node tooling/database/check-static.mjs && pnpm run database:evidence",
     "database:test": "node --test tests/database/static.test.mjs",
-    "database:test:integration": "DATABASE_INTEGRATION=1 node --test tests/database/integration.test.mjs tests/database/transactions.test.mjs",
+    "database:test:integration": "DATABASE_INTEGRATION=1 node --test tests/database/integration.test.mjs tests/database/transactions.test.mjs tests/database/auth-identity.test.mjs",
     "database:validate": "pnpm run database:generate && prisma validate && pnpm run database:check && pnpm run database:test && pnpm run database:test:integration",
     "queue:evidence": "node tooling/queue/check-evidence.mjs && node --test tests/queue/evidence.test.mjs",
     "queue:test": "pnpm --filter @daily-energy/server-adapters build && QUEUE_INTEGRATION=1 node --test tests/queue/integration.test.mjs",
