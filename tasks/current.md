@@ -30,14 +30,17 @@ C-001 范围：
 
 ## 2. 当前实现状态
 
-已在 `agent/c-001-wechat-auth` 完成第一轮实现并进行 connector 侧 branch diff 自审：
+已在 `agent/c-001-wechat-auth` 完成实现并进行 connector 侧 branch diff / 权限边界自审：
 
 - `PostgresAuthStore`：provider lookup token 级事务锁、Account / ExternalIdentity 原子建立、session hash 持久化、rotation / revoke；
 - synthetic WeChat adapter：仅 LOCAL / CI / DEV 可用，同一 code 不可重放；STAGING / PRODUCTION / RECOVERY fail closed；
 - AuthService / AuthController / SessionGuard：登录、refresh、logout、session principal；
 - provider exchange 在数据库事务外；provider 失败不留下半账户事实；
+- 登录 code exchange 有进程内短窗口 limiter，临时 key 由进程随机 HMAC 派生，不保存原始地址、不进日志 / analytics；
+- provider timeout 有 3 秒 fail-closed 分支与单测；
 - client-safe 响应不返回 `openid` / `unionid` / provider subject / lookup token / ciphertext / internal accountId；
 - C-001 unit / contract / Nest HTTP E2E / PostgreSQL 18 DB evidence；
+- `database:test:integration` 已接入 `tests/database/auth-identity.test.mjs`；
 - C-001 evidence manifest 已映射 `S19-DB-001/002`、`S20-A01/A02/A06/C04`、`PDM-C01`；
 - 新增 C-001 最小列级 ACL migration：`daily_energy_api` 只读取认证所需非 ciphertext 列，secret-bearing 列继续不可读。
 
@@ -62,7 +65,7 @@ C-001 范围：
 
 ## 5. 已建立的证据
 
-- UNIT：同 subject 并发登录、code replay、session rotation / revoke、provider failure、release synthetic-adapter deny；
+- UNIT：同 subject 并发登录、code replay、session rotation / revoke、provider failure / timeout、server-side auth limiter、release synthetic-adapter deny；
 - CONTRACT：严格 WeChat request、opaque SessionView、稳定 auth/rate-limit error surface；
 - E2E：真实 Nest HTTP login / refresh / logout / expiry / client owner forgery rejection；
 - DB：真实 PostgreSQL 18 + `daily_energy_api` login，验证身份唯一性、lookup token / randomized ciphertext 解耦、列级 ACL 与 ciphertext deny。
@@ -71,12 +74,11 @@ C-001 范围：
 
 由于当前 connector 不能执行本机命令，PR 创建前仍需在用户 checkout 上生成 / 验证以下仓库生成物：
 
-1. 将 `tests/database/auth-identity.test.mjs` 接入现有 `database:test:integration` 命令；
-2. `pnpm format`；
-3. `pnpm registry:write`，生成新的 `tests/registry/coverage-registry.json`；
-4. 在应用 C-001 migration 的真实 PostgreSQL 上重算 `prisma/migrations/catalog-fingerprint.json`；
-5. 执行 C-001 routed validation / targeted validation；
-6. 生成物与验证无误后再创建 Draft PR，避免用 CI 反复试错。
+1. `pnpm format`；
+2. `pnpm registry:write`，生成新的 `tests/registry/coverage-registry.json`；
+3. 在应用 C-001 migration 的真实 PostgreSQL 上重算 `prisma/migrations/catalog-fingerprint.json`；
+4. 执行 C-001 routed / targeted validation；
+5. 生成物与验证无误后再创建 Draft PR，避免用 CI 反复试错。
 
 ## 7. CI 使用原则
 
