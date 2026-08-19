@@ -16,6 +16,10 @@
     {
       "name": "20260802000000_e007_queue_inbox_permissions",
       "sha256": "14b9666631cb4ef69721a58530df9ce7b27471fedd88315baee0761c3dfc468b"
+    },
+    {
+      "name": "20260819000000_c001_auth_column_permissions",
+      "sha256": "6ea3c3a09f30a948b421484d9384c10a26d9980d3aae8a81c399dd66f2f25902"
     }
   ]
 }

@@ -4,12 +4,12 @@
 - **最后更新**：2026-08-19
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-001 — 实现微信身份与安全会话
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **任务 Profile**：`code`
-- **计划分支**：`agent/c-001-wechat-auth`
+- **当前分支**：`agent/c-001-wechat-auth`
 - **当前 Issue**：[C-001 Issue #53](https://github.com/WeiHan1996/DailyEnergy/issues/53)
-- **当前 PR**：无；开始实现后创建一个聚焦 Draft PR
-- **最近完成设计任务**：D-005 已于 2026-08-19 获项目负责人明确接受；PR #146 合并后关闭 Issue #104
+- **当前 PR**：无；本地生成物与验证收口后再创建一个聚焦 Draft PR
+- **最近完成设计任务**：D-005 已接受并随 PR #146 squash 合并，Issue #104 已关闭
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 当前目标
@@ -28,66 +28,56 @@ C-001 范围：
 
 不做手机号登录、社交关系、生产微信凭据或设备指纹。
 
-## 2. 前置状态
+## 2. 当前实现状态
+
+已在 `agent/c-001-wechat-auth` 完成第一轮实现并进行 connector 侧 branch diff 自审：
+
+- `PostgresAuthStore`：provider lookup token 级事务锁、Account / ExternalIdentity 原子建立、session hash 持久化、rotation / revoke；
+- synthetic WeChat adapter：仅 LOCAL / CI / DEV 可用，同一 code 不可重放；STAGING / PRODUCTION / RECOVERY fail closed；
+- AuthService / AuthController / SessionGuard：登录、refresh、logout、session principal；
+- provider exchange 在数据库事务外；provider 失败不留下半账户事实；
+- client-safe 响应不返回 `openid` / `unionid` / provider subject / lookup token / ciphertext / internal accountId；
+- C-001 unit / contract / Nest HTTP E2E / PostgreSQL 18 DB evidence；
+- C-001 evidence manifest 已映射 `S19-DB-001/002`、`S20-A01/A02/A06/C04`、`PDM-C01`；
+- 新增 C-001 最小列级 ACL migration：`daily_energy_api` 只读取认证所需非 ciphertext 列，secret-bearing 列继续不可读。
+
+## 3. 前置与权威状态
 
 - E-014 Phase 1 Gate 已完成，Phase 2 development 为 `CONDITIONAL_GO`；
 - D-001～D-005 正式视觉前置全部 Accepted；
-- D-005 Accepted 只解除 C-012 / C-013 / C-014 的设计前置，不改变 Production / RC `NO_GO`；
-- C-001 Issue #53 的直接前置 E-014 已满足，因此 C-001 现在是唯一 Ready 工程任务。
-
-## 3. 权威输入
-
-开始实现前按 `AGENTS.md` 执行 routed context restore，优先运行：
-
-`pnpm agent:prepare C-001`
-
-若当前 connector 会话不能执行用户本机 checkout，则按 AGENTS fallback 至少读取：
-
-- `docs/agent/PROJECT_CONTEXT.md`
-- `docs/product/mvp.md`
-- `docs/product/state-machine.md`
-- `docs/technical/api.md`
-- `docs/technical/database.md`
-- 相关 Accepted ADR、privacy data map、error codes、OpenAPI / Zod contracts；
-- 现有 auth / session / owner 附近代码和测试；
-- C-001 对应 Accepted Source ID / 测试注册表。
-
-如果权威源冲突或所需决策仍是 Draft，停止实现并报告 blocker，不自行猜测。
+- C-001 Issue #53 的直接前置 E-014 已满足；
+- connector 会话无法执行用户本机 checkout，因此已按 `AGENTS.md` fallback 恢复 `PROJECT_CONTEXT`、authority index、API / database / privacy / testing / OpenAPI / Prisma / nearby code / registry 权威上下文。
 
 ## 4. 必须保持的工程边界
 
 - 同一微信主体并发首次登录只能产生一个有效账户；
 - 客户端和公开 API 不暴露 openid / unionid 或服务端身份密钥；
 - 无效、过期、撤销 session 必须 fail closed；
-- owner guard 不能跨用户读取 / 写入；
+- owner 只能来自服务端 session principal，不能接受客户端 accountId；
 - 微信外部调用必须在数据库事务外；
 - 外部调用失败不能留下半账户事实；
-- 真实 AppID / secret 未获批准时只使用 stub / development configuration；
+- 真实 AppID / secret 未获批准时只使用 synthetic development adapter；
 - 身份标识不得进入普通日志、analytics、错误详情或 client-safe payload；
-- 不降低既有事务、幂等、限流、超时、可观测性和 secret 边界。
+- API runtime 继续使用 `daily_energy_api` 最小数据库角色，不借用 migration / deletion / admin 权限。
 
-## 5. 验收与测试
+## 5. 已建立的证据
 
-至少覆盖：
+- UNIT：同 subject 并发登录、code replay、session rotation / revoke、provider failure、release synthetic-adapter deny；
+- CONTRACT：严格 WeChat request、opaque SessionView、稳定 auth/rate-limit error surface；
+- E2E：真实 Nest HTTP login / refresh / logout / expiry / client owner forgery rejection；
+- DB：真实 PostgreSQL 18 + `daily_energy_api` login，验证身份唯一性、lookup token / randomized ciphertext 解耦、列级 ACL 与 ciphertext deny。
 
-- 并发首次登录；
-- code 重放 / 无效 code；
-- session issuance、rotation、expiry、revoke；
-- owner 越权；
-- 微信外部故障 / timeout；
-- 多端恢复；
-- 敏感身份标识的日志 / client-safe 泄漏负例。
+## 6. 当前剩余本地收口
 
-所有 C-001 覆盖的 Accepted Source ID 必须在测试注册表从 `PLANNED` 更新为 `COVERED`；无法覆盖时只能使用带批准理由的 `NA_WITH_REASON`。
+由于当前 connector 不能执行本机命令，PR 创建前仍需在用户 checkout 上生成 / 验证以下仓库生成物：
 
-## 6. CI 使用原则
+1. 将 `tests/database/auth-identity.test.mjs` 接入现有 `database:test:integration` 命令；
+2. `pnpm format`；
+3. `pnpm registry:write`，生成新的 `tests/registry/coverage-registry.json`；
+4. 在应用 C-001 migration 的真实 PostgreSQL 上重算 `prisma/migrations/catalog-fingerprint.json`；
+5. 执行 C-001 routed validation / targeted validation；
+6. 生成物与验证无误后再创建 Draft PR，避免用 CI 反复试错。
 
-延续项目约束：先在分支完成实现、针对性验证和 branch diff 自审，再创建 Draft PR；不要用反复推送 + CI 代替本地 / 静态分析。首次 PR CI 出现失败时先诊断原因，不自动 rerun。
+## 7. CI 使用原则
 
-## 7. 精确下一动作
-
-1. D-005 PR #146 final-head 合并并关闭 Issue #104；
-2. 从最新 `main` 创建 `agent/c-001-wechat-auth`；
-3. 恢复 C-001 routed context，读取全部权威输入和附近实现；
-4. 先形成实现 / 测试计划并确认范围仍能收敛在一个聚焦 PR；
-5. 开始 C-001 实现。
+延续项目约束：PR 前完成本地格式化、registry / catalog 生成、针对性验证和 branch diff 自审；只在收口后创建一个聚焦 Draft PR。首次 PR CI 失败时先诊断，不自动 rerun。

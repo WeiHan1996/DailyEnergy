@@ -21,7 +21,10 @@ const due = "2028-08-19T10:00:00.000Z";
 const bytes = (value) => Buffer.from(value.padEnd(64, "0").slice(0, 64), "hex");
 
 async function connect(Client, connectionString, applicationName) {
-  const client = new Client({ connectionString, application_name: applicationName });
+  const client = new Client({
+    connectionString,
+    application_name: applicationName,
+  });
   await client.connect();
   await client.query("SET TIME ZONE 'UTC'");
   await client.query("SET search_path TO daily_energy, pg_catalog");
@@ -55,7 +58,7 @@ async function createIdentity(client, suffix, lookupToken, ciphertext) {
 }
 
 test(
-  "C-001 real PostgreSQL identity uniqueness and ciphertext-independent lookup",
+  "C-001 API role enforces identity uniqueness and ciphertext-independent lookup",
   {
     skip: integrationEnabled
       ? false
@@ -72,9 +75,10 @@ test(
         PRISMA_BIN: prismaBin,
       });
       const { Client } = loadPg();
-      const first = await connect(Client, adminUrl, "c001-identity-first");
-      const second = await connect(Client, adminUrl, "c001-identity-second");
-      const observer = await connect(Client, adminUrl, "c001-identity-observer");
+      const first = await connect(Client, loginUrls.api, "c001-api-first");
+      const second = await connect(Client, loginUrls.api, "c001-api-second");
+      const observer = await connect(Client, loginUrls.api, "c001-api-observer");
+      const privileged = await connect(Client, adminUrl, "c001-admin-reencrypt");
       try {
         const lookupToken = bytes("c00101");
         const attempts = await Promise.allSettled([
@@ -89,39 +93,56 @@ test(
         assert.equal(
           attempts.filter((result) => result.status === "rejected").length,
           1,
-          "the competing identity transaction must lose",
+          "the competing identity transaction must lose and roll back",
         );
+
         const mapping = await observer.query(
-          `SELECT e."accountId", e."subjectCiphertext"
+          `SELECT e."accountId", e."providerCode", e."subjectLookupToken"
              FROM app_external_identity e
             WHERE e."providerCode"='WECHAT_MINIAPP' AND e."subjectLookupToken"=$1`,
           [lookupToken],
         );
         assert.equal(mapping.rowCount, 1);
-        const accountCount = await observer.query(
-          `SELECT count(*)::int AS count FROM app_user_account`,
+        const account = await observer.query(
+          `SELECT id, state FROM app_user_account WHERE id=$1`,
+          [mapping.rows[0].accountId],
         );
-        assert.equal(accountCount.rows[0].count, 1);
+        assert.deepEqual(account.rows[0], {
+          id: mapping.rows[0].accountId,
+          state: "ACTIVE",
+        });
+
+        await assert.rejects(
+          observer.query(
+            `SELECT "subjectCiphertext" FROM app_external_identity WHERE "subjectLookupToken"=$1`,
+            [lookupToken],
+          ),
+          /permission denied/iu,
+          "daily_energy_api must never regain ciphertext SELECT",
+        );
 
         const replacementCiphertext = bytes("d099");
-        assert.notDeepEqual(mapping.rows[0].subjectCiphertext, replacementCiphertext);
-        await observer.query(
-          `UPDATE app_external_identity
+        await privileged.query(
+          `UPDATE daily_energy.app_external_identity
               SET "subjectCiphertext"=$1
             WHERE "providerCode"='WECHAT_MINIAPP' AND "subjectLookupToken"=$2`,
           [replacementCiphertext, lookupToken],
         );
         const afterReencrypt = await observer.query(
-          `SELECT "accountId", "subjectCiphertext"
+          `SELECT "accountId"
              FROM app_external_identity
             WHERE "providerCode"='WECHAT_MINIAPP' AND "subjectLookupToken"=$1`,
           [lookupToken],
         );
         assert.equal(afterReencrypt.rowCount, 1);
         assert.equal(afterReencrypt.rows[0].accountId, mapping.rows[0].accountId);
-        assert.deepEqual(afterReencrypt.rows[0].subjectCiphertext, replacementCiphertext);
       } finally {
-        await Promise.all([first.end(), second.end(), observer.end()]);
+        await Promise.all([
+          first.end(),
+          second.end(),
+          observer.end(),
+          privileged.end(),
+        ]);
       }
     } finally {
       await container.stop();
