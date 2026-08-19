@@ -1,200 +1,192 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-18
+- **最后更新**：2026-08-19
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：D-004 — 完成高保真原型、验证与开发交付
+- **当前任务**：D-005 — 完成 Phase 2 剩余页面高保真与开发交付
 - **任务状态**：In Review
 - **任务 Profile**：`design`
-- **任务分支**：`design/d-004-prototype-handoff`
-- **当前 Issue**：[D-004 Issue #102](https://github.com/WeiHan1996/DailyEnergy/issues/102)
-- **当前 PR**：本分支下一动作创建 Draft PR；为遵守“一次 CI”约束，不在 PR 创建后为写回编号追加状态提交
-- **最近完成 PR**：[D-003 PR #144](https://github.com/WeiHan1996/DailyEnergy/pull/144)，merge `db57fbc7aeb7b9ebceddcc69c6d2d90e41722f7f`
+- **任务分支**：`agent/d-005-phase2-handoff`
+- **当前 Issue**：[D-005 Issue #104](https://github.com/WeiHan1996/DailyEnergy/issues/104)
+- **当前 PR**：待创建 Draft PR；为遵守“一次 CI”约束，PR 创建前先完成全部 Figma / 文档 / connector QA
+- **最近完成 PR**：[D-004 PR #145](https://github.com/WeiHan1996/DailyEnergy/pull/145)，merge `4093c3e5ac7ea4dc9bf1ecaf13ff672af62dc369`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 当前目标
 
-D-004 已完成设计侧交付，现进入项目负责人评审：把 D-003 已接受的核心高保真页面连接成可点击、可演练、可由 C-003/C-004/C-009 无歧义实现的首日体验与历史日回看，并固定异常恢复、无障碍、Visual QA 和页面 PR 设计证据合同。
+D-005 已完成设计侧首轮交付并进入项目负责人评审：补齐晚间真实反馈、最近七个产品日期趋势、历史日删除后的趋势失效 / 重建，以及隐私与数据权利、导出、关系数据删除与账户注销的高保真、状态矩阵、Prototype、响应式 / 无障碍 QA 和开发证据合同。
 
-D-004 只做 Prototype / design QA / developer handoff；不实现 C 系列业务页面、真实 API、数据库、微信平台行为或生产视觉回归基础设施。
+D-005 只做正式视觉 / Prototype / design QA / developer handoff；不实现 C-012、C-013、C-014 业务页面、API、数据库、worker、真实微信平台行为或生产视觉回归基础设施。
 
 ## 2. 前置与依赖状态
 
-- D-003 已于 2026-08-18 获项目负责人接受；PR #144 已合并，Issue #101 已关闭；
-- E-004 已 Done；D-004 两个直接前置均满足；
-- D-002 Accepted Token/Component 继续是唯一设计系统来源；
-- D-004 **尚未 Accepted**，因此 C-003、C-004、C-009 继续被依赖 Gate 阻断；
-- D-005 保持 Planned，不提前启动。
+- D-004 已于 2026-08-19 获项目负责人接受并随 PR #145 合并为 `4093c3e5ac7ea4dc9bf1ecaf13ff672af62dc369`；Issue #102 已关闭；
+- D-002 Accepted Token / Component 继续是唯一设计系统来源；
+- D-003 / D-004 Accepted 页面不在本任务重新设计；
+- D-005 **尚未 Accepted**，因此 C-012、C-013、C-014 继续被依赖 Gate 阻断；
+- Safety 继续复用 Accepted SAFE-001 与 SafetyResponsePlan，不复制第二套安全响应。
 
-本 ChatGPT/Figma/GitHub connector 会话不能执行用户本机 checkout 的 `pnpm agent:prepare` / `agent:validate`。已按 AGENTS fallback 实际读取 AGENTS、PROJECT_CONTEXT、D-004 Issue、Accepted design/interaction/state/testing/analytics 源，并直接检查 GitHub/Figma 原始证据。为减少 Actions 消耗，本轮不另造远端验证；唯一一次 PR CI 作为当前分支最终自动化 Gate。
+本 ChatGPT / Figma / GitHub connector 会话不能执行用户本机 checkout 的 `pnpm agent:prepare` / `pnpm validate`。已按 AGENTS fallback 实际读取 AGENTS、PROJECT_CONTEXT、D-005 Issue、Accepted design / schema / retention / privacy 权威源，并直接检查 GitHub / Figma 原始证据。
 
-## 3. Figma 交付
+## 3. Figma Source
 
 Figma file key：`T5HS32Ciz6LZh81KbqhFGo`
 
-### Prototype source
+- Page：`D-005 / Phase 2 Remaining High Fidelity`
+- Page ID：`495:219`
+- 正式 Frame：29 / 29
 
-- Page：`D-003 / Core Flow High Fidelity`
-- Page ID：`220:2`
-- Start Frame：`220:3` — ENT-001 Normal
-- D-003 正式 Frame：35 / 35，ID 全部保持不变
+### EVE-001
 
-首日路径：
+`495:220` Normal · `495:221` Loading · `495:222` Recoverable Error · `495:223` Offline · `495:224` Completed。
 
-`220:3 ENT → 220:7 ONB → 220:11 DLY-001 → 220:16 DLY-002 → 220:20 DLY-003 → 220:25 Completed`
+### REC-001 / REC-002
 
-历史删除：
+- `495:225` Empty
+- `495:226` Points Only · 2 days
+- `495:227` Partial · 4 days
+- `495:228` Complete · 7 days
+- `495:229` Loading
+- `495:230` Recoverable Error
+- `495:231` Offline
+- `495:232` Fallback · Summary
+- `495:233` Rebuilding · Source Invalidated
+- `495:234` REC-002 Delete Confirm · Trend Impact
 
-`220:20/220:25 → 220:27 REC-002 → 295:227 Confirm → 220:34 Deleting → 220:29 Empty`
+REC-002 基础 Normal / Loading / Empty / Error / Offline 继续复用 D-003 `220:27`～`220:31`。
 
-Offline / Recoverable Error / Safety 恢复均已连接，并保持同一逻辑意图语义。
+### SET-004
 
-### D-004 Prototype-only 场景
+`495:235` Normal · `495:236` Loading · `495:237` Error · `495:238` Offline · `495:239` Export Processing · `495:240` Export Failed · `495:241` Export Ready · `495:242` Deleting。
 
-- `295:227` — REC-002 Delete Confirm
-- `303:210` — Template Fallback Silent
-- `303:245` — Personalization Reduced
+### SET-006
 
-完整模板 fallback 与个性化减少已拆分：完整受控模板结构完整时用户侧静默；只有明显缺少个性化时才出现中性提示。两者均保持同一 core result identity。
+`495:243` Normal · `495:244` Verification Loading · `495:245` Disabled / Verify Required · `495:246` Recoverable Error · `495:247` Deleting · `495:248` Completed。
 
-### Visual QA Baseline
+## 4. 关键业务视觉约束
 
-- Page：`D-004 / Visual QA Baseline`
-- Page ID：`303:275`
-- durable raster snapshot：15 个
+### 晚间反馈
 
-覆盖 ENT、ONB、DLY-001、DLY-002 Loading、DLY-003 Normal/Completed/Offline、REC-002、删除确认、Deleting、Safety、Large Text、Reduced Motion、Silent Fallback、Personalization Reduced。
+- 明确为真实记录，不验证“今日能量”是否应验；
+- `未使用` 与 `没帮助` 分离；
+- 任务状态独立，不完成不评价；
+- 可选 0～80 字短句不自动进入长期记忆 / 七天总结；
+- Error 保留已填内容；Offline 不排队补交。
 
-Snapshot 只用于视觉比较；可编辑权威仍是 source Frame + D-002 Component/Token。
+### 趋势
 
-## 4. 已发现并修复的设计缺陷
+- 最近 7 个连续产品日期，不压缩成最近 7 次有记录；
+- 0 天 Empty、1～2 天只看点、3～6 天显式“基于 N 天”、7 天完整回望；
+- 缺失日保持空白并断线；
+- 删除 / 更正后旧 summary 立即失效，重建前不显示 ghost conclusion；
+- 娱乐五维 / 今日整体能量不进入真实状态趋势。
 
-### D004-D01 — Fallback 语义混合
+### 数据权利 / 删除
 
-问题：完整模板 fallback 与个性化减少若共用同一“简洁版本”提示，会违反 Accepted “完整模板静默，明显减少才提示”。
+- SET-004 正面展示数据范围、导出、删除某日、删除关系数据、注销账户；
+- Export Processing / Failed / Ready 与 Delete DataTask 分离；
+- deletion guard 成功创建后普通读取、写入、生成、通知、分享、缓存命中 fail closed；
+- post-guard 失败继续阻断，retry 同一个 DataTask；
+- Completed 只声明在线清理完成并如实展示备份 / 受托副本最迟到期，不声称所有隔离介质瞬间擦除。
 
-处理：
+## 5. Prototype
 
-- 新增 `303:210` Silent Template Fallback；
-- 新增 `303:245` Personalization Reduced；
-- `220:17` DLY-002 Fallback prototype 改连 `303:210`。
+已连接同 Page 关键路径：
 
-状态：RESOLVED。
+- Evening：`495:220 → 495:224`
+- Trend recovery：`495:230 → 495:228`
+- Source invalidated：`495:233 → 495:227`
+- Export：`495:235 → 495:239`；failed retry `495:240 → 495:239`
+- Account：`495:245 → 495:244 → 495:243 → 495:247 → 495:248`
+- Delete day：`495:234 → 495:233`；cancel 使用 `BACK`
 
-### D004-D02 — ConfirmSheet 长文案挤压
+Figma Plugin API 不允许跨 Page `NAVIGATE`，所以 REC-001 点击某日的生产目标继续由文档固定到 D-003 Accepted `REC-002 Normal` `220:27`，不复制权威页面。
 
-问题：`DE / ConfirmSheet` 原 Body 宽度过窄，删除影响文案会和行动区挤压。
+`495:244 → 495:243` 的 0.8s timeout 仅用于 Prototype 演练，不是生产验证 SLA。
 
-处理：在原 D-002 Component ID `190:683` 上 production hardening，不复制组件：
+## 6. Responsive / Accessibility / Visual QA
 
-- Body 可用宽度扩到 254；
-- Body 自然高度；
-- Component 高度调整到 146；
-- 保留 Component ID / Properties；
-- 删除确认实例重新居中；
-- Visual QA baseline `303:284` 已刷新。
+QA Page：`D-005 / Responsive & Visual QA` — `507:2`
 
-状态：RESOLVED。
+- `507:3` — EVE-001 375px
+- `507:4` — REC-001 375px
+- `507:5` — SET-006 125% Large Text
+- `507:6` — EVE-001 Keyboard Safe Area
+- `507:7` — Reduced Motion / DataTask
 
-## 5. 内部 QA 结果
+结果：
 
-Figma bounded audit：
+- 375px 无横向滚动；
+- 选项和 Prototype action target 均不小于 44px；
+- 大字自然增高，不裁切删除范围；
+- 键盘场景可通过滚动保持短句与保存动作可达；
+- Reduced Motion 不依赖 spinner、位移或虚假百分比传达状态；
+- 10 个 durable raster snapshot 已固定在 QA Page。
 
-- official Frame：35 / 35
-- missing official Frame：0
-- reaction node：29
-- broken reaction destination：0
-- ON_CLICK target <44px：0
-- ChoiceChip：17
-- ChoiceChip min height：44px
-- 非颜色 Selected 提示：`✓ 平稳 / ✓ 一般 / ✓ 还可以`
-- Reduced Motion `248:105` reaction count：0
-- Prototype-only Hotspot：5，全部 ≥44px
-- Visual QA snapshot：15
-- Accepted D-003 Frame ID 改写：0
+## 7. 机器审计
 
-内部 scripted walkthrough 已覆盖 20 个场景：首日、重复点击、签到/生成失败、Offline、同任务恢复、Silent Fallback、Personalization Reduced、今日内容恢复、历史回看、删除/取消、Deleting、Safety、Safety 资源失败、Large Text、Reduced Motion、当日重进和跨产品日 implementation note。
+最终 Source audit：
 
-跨产品日的服务端 `product-date-v1`、CAS、数据库唯一约束和删除 SLA 不是 Figma 可证明事项，必须由后续实现/测试 Gate 证明。
+- official Frame：29 / 29
+- raw unbound solid paint：0
+- reaction node：20
+- reaction target <44px：0
+- trend chart：16
+- chart with accessible text summary：16 / 16
+- explicit missing label：30
 
-## 6. 开发交付文档
+最终 QA audit：
 
-Draft：`docs/design/developer-handoff.md`
+- QA editable Frame：5
+- durable raster snapshot：10
+- raw unbound solid paint：0
 
-已记录：
+## 8. 开发交付文档
 
-- Prototype URL / start Frame / flow entries；
-- 35 个正式 Frame + D-004 场景 Frame/Hotspot 索引；
-- 首日/历史删除 Reaction Map；
-- Recovery / Fallback / Safety 行为；
-- D-002 Component/Token/geometry 复用合同；
-- Accepted analytics 触点和数据最小化边界；
-- Accessibility / 375px / Large Text / Reduced Motion；
-- 20 项内部脚本化回归；
-- 15 个 Visual QA baseline；
-- C-003/C-004/C-009 PR 强制 Frame/截图/Token/组件/恢复/测试证据；
-- 设计差异记录和外部研究授权边界。
+Draft：`docs/design/phase2-remaining-handoff.md`
+
+已记录 29 个正式 Frame ID、状态矩阵、趋势样本规则、删除 / 导出状态、Prototype Map、组件 / Token 审计、375px / Large Text / Keyboard / Reduced Motion、10 个 Visual QA snapshot、跨 Page Prototype 工具限制与 C-012/C-013/C-014 页面 PR 证据合同。
 
 项目负责人接受前保持 Draft。
 
-## 7. 项目状态一致性
+## 9. CI / GitHub Actions 使用约束
 
-本分支已经同步：
+项目负责人明确要求：**减少 CI，尽量只做一次 CI**。
 
-- [x] `README.md` — D-003 Done / D-004 In Review / D-005 Planned
-- [x] `docs/INDEX.md` — D-003 Accepted、D-004 Draft 与当前读取顺序
-- [x] `docs/design/README.md` — D-004 Prototype / baseline 导航
-- [x] `tasks/backlog.md` — D-003 Done / D-004 In Review / D-005 Planned
-- [x] `tasks/current.md` — 本交接
+执行策略：
 
-下游 C-003/C-004/C-009 仍保持 Planned；D-004 只有项目负责人明确接受后才会解除前置。
-
-## 8. CI / GitHub Actions 使用约束
-
-项目负责人于 2026-08-18 明确要求：**减少 CI，尽量只做一次 CI**。
-
-仓库 `CI` workflow 在 `pull_request` 和 `push main` 触发；本轮执行策略：
-
-1. 所有 Figma、文档、状态和 connector QA 已在无 PR 分支先收口；
+1. Figma、文档、状态与 connector QA 在 PR 创建前全部收口；
 2. 创建 Draft PR 才触发本任务第一次、也是计划中的唯一一次 PR CI；
-3. 不主动 rerun；只有唯一 CI 暴露真实 blocker 才诊断是否需要最小修复；
-4. 不为写回 PR 编号或 CI 结果追加无业务价值的提交，以免再触发 CI。
+3. 不主动 rerun；只有唯一 CI 暴露真实 blocker 才诊断最小修复；
+4. 不为写回 PR 编号、CI 结果或其它无业务价值元数据追加提交。
 
-## 9. Acceptance Gate
+## 10. Acceptance Gate
 
 已完成：
 
-- [x] D-003 / E-004 前置确认
-- [x] 首日主路径 Prototype
-- [x] 历史回看 / Back / Delete Confirm / Deleting / Empty
-- [x] Offline / Error / Safety 恢复
-- [x] Silent Fallback / Personalization Reduced 分离
-- [x] ConfirmSheet defect 修复
-- [x] 44px / reaction / Frame / ChoiceChip / Reduced Motion 审计
-- [x] 20 项内部 scripted walkthrough
-- [x] 15 个 durable Figma Visual QA baseline
-- [x] `developer-handoff.md` Draft
-- [x] C-003/C-004/C-009 设计证据合同
-- [x] README / INDEX / design README / backlog / current 状态同步
+- [x] D-004 前置确认
+- [x] EVE-001 正式高保真与状态矩阵
+- [x] REC-001 0 / 2 / 4 / 7 天趋势覆盖和恢复状态
+- [x] REC-002 删除后趋势影响确认
+- [x] SET-004 导出 / 删除 / 数据权利状态
+- [x] SET-006 身份验证 / Disabled / Deleting / failure recovery / Completed
+- [x] D-002 Component / Token 复用
+- [x] 29 Frame / paint / reaction target / chart 机器审计
+- [x] 375px / 125% Large Text / Keyboard / Reduced Motion QA
+- [x] 10 个 Visual QA snapshot
+- [x] `phase2-remaining-handoff.md` Draft
 
 待评审：
 
-- [ ] 创建 Draft PR 并完成唯一一次 PR CI
-- [ ] 项目负责人审核 Figma Prototype、Visual QA baseline、developer handoff 和 PR
-- [ ] 明确接受后把文档改为 Accepted、关闭 Issue #102
-- [ ] D-004 Done 后让 D-005 成为唯一 Ready；不提前开始 D-005
-
-## 10. 外部/平台未决边界
-
-- 外部 5～8 人研究未获招募/隐私/联系/补偿授权，不执行；
-- Safety 生产文案与地区资源继续需要独立专业评审；
-- 微信 DevTools / 真机证据按现有平台 Gate 继续处理；
-- Production PostgreSQL restore、on-call、Production identity/legal/region/cross-border 等未决项继续阻止 Production/RC readiness。
+- [ ] 创建 Draft PR 并读取计划中的唯一一次 PR CI
+- [ ] 项目负责人审核 Figma Source / QA / handoff / PR
+- [ ] 项目负责人明确接受后把 D-005 标为 Done / Accepted
+- [ ] D-005 Accepted 后才解除 C-012、C-013、C-014 设计前置
 
 ## 11. 精确下一动作
 
-1. 复核 branch diff 仅包含 D-004 设计/文档/状态内容；
+1. 复核 branch diff 仅包含 D-005 设计 / 文档 / 项目控制内容；
 2. 创建一个 Draft PR，触发计划中的唯一一次 PR CI；
-3. 不主动 rerun；读取该 CI 结果；
-4. 将 Figma Prototype + Visual QA + Draft PR 交项目负责人审核；
-5. 用户明确接受前不把 D-004 标为 Done，不启动 D-005。
+3. 不主动 rerun，读取首次结果；
+4. 将 Figma + Draft PR 交项目负责人审核；
+5. 用户明确接受前不把 D-005 标为 Done。
