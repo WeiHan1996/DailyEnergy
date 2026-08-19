@@ -16,9 +16,10 @@ import {
 import type { Request } from "express";
 import { z } from "zod";
 
+import { AuthAttemptLimiter } from "../../auth/auth-attempt-limiter.js";
 import { AuthService } from "../../auth/auth.service.js";
-import { RUNTIME_CONFIG } from "../../composition/tokens.js";
 import type { RuntimeConfig } from "../../bootstrap/runtime-config.js";
+import { RUNTIME_CONFIG } from "../../composition/tokens.js";
 import { ApiException } from "../common/api-exception.js";
 import { RequestContextStore } from "../common/request-context.js";
 import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
@@ -46,6 +47,7 @@ type LogoutRequest = z.infer<typeof LogoutRequestSchema>;
 export class AuthController {
   public constructor(
     private readonly authService: AuthService,
+    private readonly attemptLimiter: AuthAttemptLimiter,
     private readonly contextStore: RequestContextStore,
     @Inject(RUNTIME_CONFIG) private readonly config: RuntimeConfig,
   ) {}
@@ -53,9 +55,11 @@ export class AuthController {
   @Post("wechat/session")
   @HttpCode(HttpStatus.OK)
   public async createWechatSession(
+    @Req() httpRequest: Request,
     @Body(new ZodValidationPipe(WechatSessionRequestSchema))
     request: WechatSessionRequest,
   ) {
+    this.attemptLimiter.consume(httpRequest.socket.remoteAddress);
     const data = await this.authService.createWechatSession(request);
     return this.#success(data);
   }

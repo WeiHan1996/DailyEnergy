@@ -1,15 +1,18 @@
 import { Module, type DynamicModule, type Provider } from "@nestjs/common";
 
-import { ShutdownObserver } from "../bootstrap/shutdown-observer.js";
+import { AuthAttemptLimiter } from "../auth/auth-attempt-limiter.js";
 import { AuthService } from "../auth/auth.service.js";
 import {
   DevelopmentWechatCodeExchange,
   UNAVAILABLE_AUTH_STORE,
   UNAVAILABLE_WECHAT_CODE_EXCHANGE,
 } from "../auth/contracts.js";
-import { NOOP_TELEMETRY_RUNTIME } from "../observability/api-telemetry.js";
-import { OrdinaryLogger, STANDARD_OUTPUT_LOG_SINK } from "../observability/ordinary-logger.js";
-import { ApiTelemetry } from "../observability/api-telemetry.js";
+import { ShutdownObserver } from "../bootstrap/shutdown-observer.js";
+import { ApiTelemetry, NOOP_TELEMETRY_RUNTIME } from "../observability/api-telemetry.js";
+import {
+  OrdinaryLogger,
+  STANDARD_OUTPUT_LOG_SINK,
+} from "../observability/ordinary-logger.js";
 import { AdminAudienceGuard } from "../transport/admin/admin-audience.guard.js";
 import { AdminController } from "../transport/admin/admin.controller.js";
 import { ApiExceptionFilter } from "../transport/common/api-exception.filter.js";
@@ -99,6 +102,7 @@ export class ApiModule {
       AdminAudienceGuard,
       ApiTelemetry,
       ApiExceptionFilter,
+      AuthAttemptLimiter,
       AuthService,
       HealthService,
       HttpLoggingInterceptor,
