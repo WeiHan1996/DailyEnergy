@@ -30,6 +30,8 @@ function operationFor(method: string, url: string): OperationCode {
     "GET /v1/admin/ops/overview": "ADMIN_OPS_PLACEHOLDER",
     "GET /v1/bootstrap/launch": "PUBLIC_BOOTSTRAP_PLACEHOLDER",
     "POST /v1/auth/wechat/session": "PUBLIC_WECHAT_SESSION_PLACEHOLDER",
+    "POST /v1/auth/session/refresh": "AUTH_SESSION_REFRESH",
+    "POST /v1/auth/session/logout": "AUTH_SESSION_LOGOUT",
   };
   return operations[key] ?? "UNKNOWN_HTTP";
 }

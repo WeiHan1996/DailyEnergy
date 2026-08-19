@@ -43,6 +43,18 @@ export function startApiTelemetry(config: TelemetryTransportConfig) {
   });
 }
 
+export {
+  PostgresAuthStore,
+  type AuthAccountState,
+  type AuthSessionView,
+  type AuthStore,
+  type NewAccountMaterial,
+  type NewSessionMaterial,
+  type PostgresAuthStoreConfig,
+  type ProtectedExternalIdentity,
+  type SessionInspection,
+} from "../auth/postgres-auth-store.js";
+
 export type {
   MetricName,
   TelemetryAttributes,
