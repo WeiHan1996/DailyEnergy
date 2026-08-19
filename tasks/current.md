@@ -3,190 +3,91 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-19
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：D-005 — 完成 Phase 2 剩余页面高保真与开发交付
-- **任务状态**：In Review
-- **任务 Profile**：`design`
-- **任务分支**：`agent/d-005-phase2-handoff`
-- **当前 Issue**：[D-005 Issue #104](https://github.com/WeiHan1996/DailyEnergy/issues/104)
-- **当前 PR**：待创建 Draft PR；为遵守“一次 CI”约束，PR 创建前先完成全部 Figma / 文档 / connector QA
-- **最近完成 PR**：[D-004 PR #145](https://github.com/WeiHan1996/DailyEnergy/pull/145)，merge `4093c3e5ac7ea4dc9bf1ecaf13ff672af62dc369`
+- **当前任务**：C-001 — 实现微信身份与安全会话
+- **任务状态**：Ready
+- **任务 Profile**：`code`
+- **计划分支**：`agent/c-001-wechat-auth`
+- **当前 Issue**：[C-001 Issue #53](https://github.com/WeiHan1996/DailyEnergy/issues/53)
+- **当前 PR**：无；开始实现后创建一个聚焦 Draft PR
+- **最近完成设计任务**：D-005 已于 2026-08-19 获项目负责人明确接受；PR #146 合并后关闭 Issue #104
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 当前目标
 
-D-005 已完成设计侧首轮交付并进入项目负责人评审：补齐晚间真实反馈、最近七个产品日期趋势、历史日删除后的趋势失效 / 重建，以及隐私与数据权利、导出、关系数据删除与账户注销的高保真、状态矩阵、Prototype、响应式 / 无障碍 QA 和开发证据合同。
+建立微信 code 交换、稳定账户身份和可撤销安全会话，客户端永不持有服务端身份密钥。
 
-D-005 只做正式视觉 / Prototype / design QA / developer handoff；不实现 C-012、C-013、C-014 业务页面、API、数据库、worker、真实微信平台行为或生产视觉回归基础设施。
+C-001 范围：
 
-## 2. 前置与依赖状态
+- 微信 auth adapter 与开发 stub；
+- 账户查找 / 创建；
+- session issuance / rotation / revoke；
+- 公开身份 API、session guard、owner 绑定；
+- 重放、限流、超时和微信不可用处理；
+- 只保存允许的微信标识，按隐私数据地图最小化 / 保护，禁止进入日志和 analytics；
+- 登录失败、session 过期和多端恢复。
 
-- D-004 已于 2026-08-19 获项目负责人接受并随 PR #145 合并为 `4093c3e5ac7ea4dc9bf1ecaf13ff672af62dc369`；Issue #102 已关闭；
-- D-002 Accepted Token / Component 继续是唯一设计系统来源；
-- D-003 / D-004 Accepted 页面不在本任务重新设计；
-- D-005 **尚未 Accepted**，因此 C-012、C-013、C-014 继续被依赖 Gate 阻断；
-- Safety 继续复用 Accepted SAFE-001 与 SafetyResponsePlan，不复制第二套安全响应。
+不做手机号登录、社交关系、生产微信凭据或设备指纹。
 
-本 ChatGPT / Figma / GitHub connector 会话不能执行用户本机 checkout 的 `pnpm agent:prepare` / `pnpm validate`。已按 AGENTS fallback 实际读取 AGENTS、PROJECT_CONTEXT、D-005 Issue、Accepted design / schema / retention / privacy 权威源，并直接检查 GitHub / Figma 原始证据。
+## 2. 前置状态
 
-## 3. Figma Source
+- E-014 Phase 1 Gate 已完成，Phase 2 development 为 `CONDITIONAL_GO`；
+- D-001～D-005 正式视觉前置全部 Accepted；
+- D-005 Accepted 只解除 C-012 / C-013 / C-014 的设计前置，不改变 Production / RC `NO_GO`；
+- C-001 Issue #53 的直接前置 E-014 已满足，因此 C-001 现在是唯一 Ready 工程任务。
 
-Figma file key：`T5HS32Ciz6LZh81KbqhFGo`
+## 3. 权威输入
 
-- Page：`D-005 / Phase 2 Remaining High Fidelity`
-- Page ID：`495:219`
-- 正式 Frame：29 / 29
+开始实现前按 `AGENTS.md` 执行 routed context restore，优先运行：
 
-### EVE-001
+`pnpm agent:prepare C-001`
 
-`495:220` Normal · `495:221` Loading · `495:222` Recoverable Error · `495:223` Offline · `495:224` Completed。
+若当前 connector 会话不能执行用户本机 checkout，则按 AGENTS fallback 至少读取：
 
-### REC-001 / REC-002
+- `docs/agent/PROJECT_CONTEXT.md`
+- `docs/product/mvp.md`
+- `docs/product/state-machine.md`
+- `docs/technical/api.md`
+- `docs/technical/database.md`
+- 相关 Accepted ADR、privacy data map、error codes、OpenAPI / Zod contracts；
+- 现有 auth / session / owner 附近代码和测试；
+- C-001 对应 Accepted Source ID / 测试注册表。
 
-- `495:225` Empty
-- `495:226` Points Only · 2 days
-- `495:227` Partial · 4 days
-- `495:228` Complete · 7 days
-- `495:229` Loading
-- `495:230` Recoverable Error
-- `495:231` Offline
-- `495:232` Fallback · Summary
-- `495:233` Rebuilding · Source Invalidated
-- `495:234` REC-002 Delete Confirm · Trend Impact
+如果权威源冲突或所需决策仍是 Draft，停止实现并报告 blocker，不自行猜测。
 
-REC-002 基础 Normal / Loading / Empty / Error / Offline 继续复用 D-003 `220:27`～`220:31`。
+## 4. 必须保持的工程边界
 
-### SET-004
+- 同一微信主体并发首次登录只能产生一个有效账户；
+- 客户端和公开 API 不暴露 openid / unionid 或服务端身份密钥；
+- 无效、过期、撤销 session 必须 fail closed；
+- owner guard 不能跨用户读取 / 写入；
+- 微信外部调用必须在数据库事务外；
+- 外部调用失败不能留下半账户事实；
+- 真实 AppID / secret 未获批准时只使用 stub / development configuration；
+- 身份标识不得进入普通日志、analytics、错误详情或 client-safe payload；
+- 不降低既有事务、幂等、限流、超时、可观测性和 secret 边界。
 
-`495:235` Normal · `495:236` Loading · `495:237` Error · `495:238` Offline · `495:239` Export Processing · `495:240` Export Failed · `495:241` Export Ready · `495:242` Deleting。
+## 5. 验收与测试
 
-### SET-006
+至少覆盖：
 
-`495:243` Normal · `495:244` Verification Loading · `495:245` Disabled / Verify Required · `495:246` Recoverable Error · `495:247` Deleting · `495:248` Completed。
+- 并发首次登录；
+- code 重放 / 无效 code；
+- session issuance、rotation、expiry、revoke；
+- owner 越权；
+- 微信外部故障 / timeout；
+- 多端恢复；
+- 敏感身份标识的日志 / client-safe 泄漏负例。
 
-## 4. 关键业务视觉约束
+所有 C-001 覆盖的 Accepted Source ID 必须在测试注册表从 `PLANNED` 更新为 `COVERED`；无法覆盖时只能使用带批准理由的 `NA_WITH_REASON`。
 
-### 晚间反馈
+## 6. CI 使用原则
 
-- 明确为真实记录，不验证“今日能量”是否应验；
-- `未使用` 与 `没帮助` 分离；
-- 任务状态独立，不完成不评价；
-- 可选 0～80 字短句不自动进入长期记忆 / 七天总结；
-- Error 保留已填内容；Offline 不排队补交。
+延续项目约束：先在分支完成实现、针对性验证和 branch diff 自审，再创建 Draft PR；不要用反复推送 + CI 代替本地 / 静态分析。首次 PR CI 出现失败时先诊断原因，不自动 rerun。
 
-### 趋势
+## 7. 精确下一动作
 
-- 最近 7 个连续产品日期，不压缩成最近 7 次有记录；
-- 0 天 Empty、1～2 天只看点、3～6 天显式“基于 N 天”、7 天完整回望；
-- 缺失日保持空白并断线；
-- 删除 / 更正后旧 summary 立即失效，重建前不显示 ghost conclusion；
-- 娱乐五维 / 今日整体能量不进入真实状态趋势。
-
-### 数据权利 / 删除
-
-- SET-004 正面展示数据范围、导出、删除某日、删除关系数据、注销账户；
-- Export Processing / Failed / Ready 与 Delete DataTask 分离；
-- deletion guard 成功创建后普通读取、写入、生成、通知、分享、缓存命中 fail closed；
-- post-guard 失败继续阻断，retry 同一个 DataTask；
-- Completed 只声明在线清理完成并如实展示备份 / 受托副本最迟到期，不声称所有隔离介质瞬间擦除。
-
-## 5. Prototype
-
-已连接同 Page 关键路径：
-
-- Evening：`495:220 → 495:224`
-- Trend recovery：`495:230 → 495:228`
-- Source invalidated：`495:233 → 495:227`
-- Export：`495:235 → 495:239`；failed retry `495:240 → 495:239`
-- Account：`495:245 → 495:244 → 495:243 → 495:247 → 495:248`
-- Delete day：`495:234 → 495:233`；cancel 使用 `BACK`
-
-Figma Plugin API 不允许跨 Page `NAVIGATE`，所以 REC-001 点击某日的生产目标继续由文档固定到 D-003 Accepted `REC-002 Normal` `220:27`，不复制权威页面。
-
-`495:244 → 495:243` 的 0.8s timeout 仅用于 Prototype 演练，不是生产验证 SLA。
-
-## 6. Responsive / Accessibility / Visual QA
-
-QA Page：`D-005 / Responsive & Visual QA` — `507:2`
-
-- `507:3` — EVE-001 375px
-- `507:4` — REC-001 375px
-- `507:5` — SET-006 125% Large Text
-- `507:6` — EVE-001 Keyboard Safe Area
-- `507:7` — Reduced Motion / DataTask
-
-结果：
-
-- 375px 无横向滚动；
-- 选项和 Prototype action target 均不小于 44px；
-- 大字自然增高，不裁切删除范围；
-- 键盘场景可通过滚动保持短句与保存动作可达；
-- Reduced Motion 不依赖 spinner、位移或虚假百分比传达状态；
-- 10 个 durable raster snapshot 已固定在 QA Page。
-
-## 7. 机器审计
-
-最终 Source audit：
-
-- official Frame：29 / 29
-- raw unbound solid paint：0
-- reaction node：20
-- reaction target <44px：0
-- trend chart：16
-- chart with accessible text summary：16 / 16
-- explicit missing label：30
-
-最终 QA audit：
-
-- QA editable Frame：5
-- durable raster snapshot：10
-- raw unbound solid paint：0
-
-## 8. 开发交付文档
-
-Draft：`docs/design/phase2-remaining-handoff.md`
-
-已记录 29 个正式 Frame ID、状态矩阵、趋势样本规则、删除 / 导出状态、Prototype Map、组件 / Token 审计、375px / Large Text / Keyboard / Reduced Motion、10 个 Visual QA snapshot、跨 Page Prototype 工具限制与 C-012/C-013/C-014 页面 PR 证据合同。
-
-项目负责人接受前保持 Draft。
-
-## 9. CI / GitHub Actions 使用约束
-
-项目负责人明确要求：**减少 CI，尽量只做一次 CI**。
-
-执行策略：
-
-1. Figma、文档、状态与 connector QA 在 PR 创建前全部收口；
-2. 创建 Draft PR 才触发本任务第一次、也是计划中的唯一一次 PR CI；
-3. 不主动 rerun；只有唯一 CI 暴露真实 blocker 才诊断最小修复；
-4. 不为写回 PR 编号、CI 结果或其它无业务价值元数据追加提交。
-
-## 10. Acceptance Gate
-
-已完成：
-
-- [x] D-004 前置确认
-- [x] EVE-001 正式高保真与状态矩阵
-- [x] REC-001 0 / 2 / 4 / 7 天趋势覆盖和恢复状态
-- [x] REC-002 删除后趋势影响确认
-- [x] SET-004 导出 / 删除 / 数据权利状态
-- [x] SET-006 身份验证 / Disabled / Deleting / failure recovery / Completed
-- [x] D-002 Component / Token 复用
-- [x] 29 Frame / paint / reaction target / chart 机器审计
-- [x] 375px / 125% Large Text / Keyboard / Reduced Motion QA
-- [x] 10 个 Visual QA snapshot
-- [x] `phase2-remaining-handoff.md` Draft
-
-待评审：
-
-- [ ] 创建 Draft PR 并读取计划中的唯一一次 PR CI
-- [ ] 项目负责人审核 Figma Source / QA / handoff / PR
-- [ ] 项目负责人明确接受后把 D-005 标为 Done / Accepted
-- [ ] D-005 Accepted 后才解除 C-012、C-013、C-014 设计前置
-
-## 11. 精确下一动作
-
-1. 复核 branch diff 仅包含 D-005 设计 / 文档 / 项目控制内容；
-2. 创建一个 Draft PR，触发计划中的唯一一次 PR CI；
-3. 不主动 rerun，读取首次结果；
-4. 将 Figma + Draft PR 交项目负责人审核；
-5. 用户明确接受前不把 D-005 标为 Done。
+1. D-005 PR #146 final-head 合并并关闭 Issue #104；
+2. 从最新 `main` 创建 `agent/c-001-wechat-auth`；
+3. 恢复 C-001 routed context，读取全部权威输入和附近实现；
+4. 先形成实现 / 测试计划并确认范围仍能收敛在一个聚焦 PR；
+5. 开始 C-001 实现。
