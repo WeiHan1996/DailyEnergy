@@ -3,101 +3,85 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-20
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：C-001 — 实现微信身份与安全会话
-- **任务状态**：In Review
-- **任务 Profile**：`security`（C-001 初始路由为 `code`，认证与数据库权限变更将有效 Profile 提升为 `security`）
-- **当前分支**：`agent/c-001-wechat-auth`
-- **当前 Issue**：[C-001 Issue #53](https://github.com/WeiHan1996/DailyEnergy/issues/53)
-- **当前 PR**：[Draft PR #147](https://github.com/WeiHan1996/DailyEnergy/pull/147)；实现从提交 `4731438` 开始；已合入 E-016 的 `main` 基线，等待新 head 的平台 CI
-- **最近完成设计任务**：D-005 已接受并随 PR #146 squash 合并，Issue #104 已关闭
-- **最近完成工程任务**：E-016 已随 PR #149 squash 合并为 `05969f64e8f2d09a05e6f26d3250bd646bfe8bf0`，Issue #148 已关闭
+- **当前任务**：C-002 — 实现必要同意、用户资料与表达偏好
+- **任务状态**：Ready
+- **任务 Profile**：`code`（隐私、删除、数据库或安全边界变更可将有效 Profile 提升为 `security`）
+- **当前实现分支**：尚未创建；建议 `agent/c-002-consent-profile`
+- **当前状态收尾分支**：`agent/c-001-closeout`
+- **当前 Issue**：[C-002 Issue #54](https://github.com/WeiHan1996/DailyEnergy/issues/54)
+- **当前 PR**：无
+- **最近完成任务**：C-001 已随 PR #147 squash 合并为 `505a926f8830591cf305346219c86280660cd196`，Issue #53 已关闭
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 当前目标
 
-建立微信 code 交换、稳定账户身份和可撤销安全会话，客户端永不持有服务端身份密钥。
+实现必要同意版本、最小用户资料和可修改表达偏好，并让撤回与删除语义可审计。
 
-C-001 范围：
+C-002 范围：
 
-- 微信 auth adapter 与开发 stub；
-- 账户查找 / 创建；
-- session issuance / rotation / revoke；
-- 公开身份 API、session guard、owner 绑定；
-- 重放、限流、超时和微信不可用处理；
-- 只保存允许的微信标识，按隐私数据地图最小化 / 保护，禁止进入日志和 analytics；
-- 登录失败、session 过期和多端恢复。
+- consent / profile / preferences command 与 query；
+- revision / CAS 和当前有效同意版本；
+- 区分必要同意、可选资料及可选通知 / 记忆用途，默认最小化；
+- 支持称呼、表达偏好和允许字段修改，禁止自由扩展画像；
+- 更新用户可见说明、数据地图和 Source ID 实现证据；
+- 注册撤回、导出与删除钩子及期限。
 
-不做手机号登录、社交关系、生产微信凭据或设备指纹。
+不收集通讯录、位置、设备指纹、自动外部数据或画像推断。
 
-## 2. 当前实现状态
+## 2. 前置与完成状态
 
-已在 `agent/c-001-wechat-auth` 完成实现与本轮安全修正：
-
-- `PostgresAuthStore`：provider lookup token 级事务锁、Account / ExternalIdentity 原子建立、session hash 持久化、rotation / revoke；
-- 现有身份登录对 Account 行加锁，refresh / logout 同时锁定 Session 与 Account，阻止并发 `DELETING` 或受限账户继续签发、轮换会话；
-- 连接时复用数据库 runtime 的 closed-factory 角色探针，并保留 raw pool 身份校验，API runtime 只能使用预期最小权限角色；
-- logout 将 command receipt 与 session revoke 放在同一事务，覆盖 `ACCEPTED` / `DUPLICATE` / `CONFLICT`，header / body command ref 不一致返回稳定幂等冲突；
-- synthetic WeChat adapter：仅 LOCAL / CI / DEV 可用，同一 code 不可重放；STAGING / PRODUCTION / RECOVERY fail closed；
-- AuthService / AuthController / SessionGuard：登录、refresh、logout、session principal；
-- provider exchange 在数据库事务外；provider 失败不留下半账户事实；
-- 已按 Accepted 单 Caddy hop 部署边界设置 `trust proxy = 1`；登录 limiter 使用 Express 解析后的客户端 IP，临时 key 由进程随机 HMAC 派生，不保存原始地址、不进日志 / analytics；
-- 限流响应包含 `Retry-After` 与有界 `retry_after_seconds`，并记录低基数 rate-limit decision telemetry；
-- production dependency audit 发现的 `deepmerge-ts <8.0.0` High 已通过最小 pnpm override 修复为 `8.0.0`，Prisma 保持 `7.9.1`；
-- provider timeout 有 3 秒 fail-closed 分支与单测；
-- client-safe 响应不返回 `openid` / `unionid` / provider subject / lookup token / ciphertext / internal accountId；
-- C-001 unit / contract / Nest HTTP E2E，以及生产 `PostgresAuthStore` 的 PostgreSQL 18 集成测试代码；
-- `database:test:integration` 会先构建 server adapter，再执行 `tests/database/auth-identity.test.mjs`；
-- C-001 evidence manifest 已映射 `S19-DB-001/002`、`S20-A01/A02/A06/C04`、`PDM-C01`；
-- 新增 C-001 最小列级 ACL migration：`daily_energy_api` 只读取认证所需非 ciphertext 列，secret-bearing 列继续不可读。
-
-## 3. 前置与权威状态
-
-- E-014 Phase 1 Gate 已完成，Phase 2 development 为 `CONDITIONAL_GO`；
+- C-001 已完成：final PR head `0104b978dfd96e82e4de7ceb1e303c80e246ae61` 的 CI run
+  `32353095120` 同一 run 11/11 SUCCESS，exact-head verifier 通过；
+- C-001 已使用 `--match-head-commit` squash 合并为 `505a926f8830591cf305346219c86280660cd196`，Issue #53 已关闭；
+- C-001 merged-main CI run `32353421328` 在精确 merge SHA 上同一 run 11/11 SUCCESS；
 - E-016 已完成：仓库为 public、保持无 LICENSE，`main` 由无 bypass ruleset 强制 11 个 strict required checks；
-- D-001～D-005 正式视觉前置全部 Accepted；
-- C-001 Issue #53 的直接前置 E-014 已满足；
-- `pnpm agent:prepare C-001 --deep` 已恢复 `PROJECT_CONTEXT`、authority index、API / database / privacy / testing / OpenAPI / Prisma / nearby code / registry 权威上下文，并报告 `READY`；
-- 变更路径命中认证与数据库安全边界，有效 Profile 已从初始 `code` 提升为 `security`，必须执行 full Gate 与人工 threat-boundary review。
+- D-001～D-005 正式视觉前置均已 Accepted；
+- C-002 的直接前置 C-001 已满足，Issue #54 保持 Open；
+- Production / RC 继续 `NO_GO`，本任务不包含生产微信凭据或发布授权。
 
-## 4. 必须保持的工程边界
+## 3. 开始前必须恢复的权威来源
 
-- 同一微信主体并发首次登录只能产生一个有效账户；
-- 客户端和公开 API 不暴露 openid / unionid 或服务端身份密钥；
-- 无效、过期、撤销 session 必须 fail closed；
-- owner 只能来自服务端 session principal，不能接受客户端 accountId；
-- 微信外部调用必须在数据库事务外；
-- 外部调用失败不能留下半账户事实；
-- 真实 AppID / secret 未获批准时只使用 synthetic development adapter；
-- 身份标识不得进入普通日志、analytics、错误详情或 client-safe payload；
-- API runtime 继续使用 `daily_energy_api` 最小数据库角色，不借用 migration / deletion / admin 权限。
+下一位 Agent 必须先运行：
 
-## 5. 已建立的证据与验证
+```text
+pnpm agent:prepare C-002 --remote --deep
+```
 
-- UNIT / CONTRACT / E2E：API 11 files、58 tests；server-adapters 10 files、40 tests；shared schemas 38 tests；miniapp 10 tests及 fixture Gates；worker 10 tests；API client 4 tests；Admin 14 unit tests、6 browser E2E、2 known-fail fixture tests，全部通过；
-- WORKSPACE：`pnpm exec turbo run test` 10 / 10 workspace tasks 通过；`pnpm build`、`pnpm typecheck`、`pnpm lint:eslint`、`pnpm format:check` 通过；
-- CONTRACT / REGISTRY / DB STATIC：Contract Gate 56 error codes / 62 paths；Registry 736 total / 210 covered / 526 planned；`codegen:check`、`registry:check`、`registry:test`、`database:check`、`database:test` 通过；
-- DIFF：`git diff --check` 通过，最终变更只涉及 C-001 认证、契约、测试、证据和项目状态；
-- MANUAL：已完成人工 threat-boundary review，未发现新的代码级阻断；确认身份密钥不进入公开响应 / 普通日志 / analytics，Account 删除状态与会话写入共享行锁，logout 收据与撤销原子提交，release 环境 synthetic adapter fail closed；
-- FULL GATE：已安装本机 `flock 0.4.0` 并通过 deployment 阶段；format、architecture、codegen、contract、agent workflow、typecheck、全部 workspace tests、build、Registry、DB static、Phase Gate 与 dependency audit 均通过；
-- POSTGRESQL 18：`pnpm database:validate` 全部通过；真实 Testcontainers 套件 83 / 83，覆盖生产 `PostgresAuthStore` 角色探针、列级 ACL、身份唯一性、登录 / 删除与 refresh / 删除锁竞争、logout receipt、migration lifecycle 和 TX-01～TX-09；
-- QUEUE：真实 Redis 8、BullMQ 5、PostgreSQL 18 集成套件 7 / 7 通过；
-- CATALOG：已在应用全部 migration 的临时 PostgreSQL 18 上重算并验证 fingerprint；仅总哈希与 `columnAcl` 从 0 条变为 5 条，其他 14 个 section 不变；
-- SUPPLY CHAIN：E-016 已将官方 registry 的 production / development audit 收口为 0，并为精确版本 `@img/sharp-libvips-darwin-arm64@1.3.2` 增加条件许可；C-001 仍需由新 head 的 Linux PR CI 证明最终锁文件、license inventory 与供应链 artifacts；
-- PR CI：旧 run `32333783343` 因 private-Free 账户 Billing / spending limit 未分配 runner；E-016 已通过公开仓库恢复 GitHub-hosted Actions，C-001 合入新 `main` 后必须取得自己 exact head 的同一 run 11/11；
-- MANUAL APPROVAL：用户于 2026-08-20 确认 C-001 审核通过并授权进入下一步。
+并完整读取命令返回的 required sources，至少包括：
 
-安全 Profile 所需 threat-boundary review 与用户审核已完成；生产微信凭据与生产发布不在 C-001 当前授权范围，production authorization 当前不适用。外部 runner 阻塞已经解除，但新 head 的平台 Gate 尚未完成，不得在 Linux 供应链与 11 个 required checks 成功前合并。
+- `docs/product/state-machine.md`；
+- `docs/operations/privacy-data-map.md`；
+- `docs/technical/api.md`；
+- `docs/decisions/ADR-0005-data-retention-and-deletion.md`；
+- `docs/design/screen-inventory.md`；
+- `docs/design/interaction-states.md`；
+- `docs/technical/testing.md`；
+- 相关 Schema、OpenAPI、Prisma、测试、fixtures 与附近代码。
 
-## 6. PR 与精确下一步
+若 Accepted 文档、Schema、API 或删除语义冲突，先停止并回到 ADR / 规范处理，不自行猜测。
 
-1. PR #147 已创建，实现从提交 `4731438` 开始，并正常合入 E-016 的新 `main` 基线；
-2. 推送冲突解决与状态 handoff，使 GitHub 为新的 exact head 启动完整 CI；
-3. 验证 license inventory、供应链 artifacts 与同一 run 的 11 个 required checks；
-4. 若业务 diff 未发生 material change，沿用用户已有的 C-001 审核批准，标记 ready 后运行 exact-head verifier 并 squash merge；
-5. 合并后验证 `main`，把 C-001 更新为 Done，只将 C-002 移动到 Ready。
+## 4. 必须保持的边界
 
-**精确下一步**：完成 `main` 合入提交并推送 PR #147，等待该 exact head 的 11/11 平台 CI。
+- 未接受当前必要同意不能进入普通旅程；拒绝不产生多余资料；
+- 同 revision 并发修改只能一个成功；owner 只能来自服务端 session principal；
+- 只允许明确 allowlist 字段，响应不得泄露内部字段或 provider 身份信息；
+- 偏好修改只影响未来生成，不改写历史结果；
+- 撤回、导出、删除钩子与期限遵循 Accepted ADR-0005 和隐私数据地图；
+- 所有外部输入必须服务端验证，写入必须具备幂等、唯一性和可审核证据；
+- 不降低 Safety、删除、事务、运行 profile、日志脱敏或 client-safe 边界。
 
-## 7. CI 使用原则
+## 5. 验收与证据
 
-延续项目约束：PR 前完成本地格式化、registry / catalog 生成、针对性验证和 branch diff 自审；只在收口后创建一个聚焦 Draft PR。首次 PR CI 失败时先诊断，不自动 rerun。
+- 覆盖同意版本升级、拒绝、撤回、CAS 冲突、字段 allowlist 和 owner 负向测试；
+- 更新本 Issue 覆盖的 Source ID：已实现项转为 `COVERED`，无法覆盖时只允许有批准理由的 `NA_WITH_REASON`；
+- 覆盖 loading、失败、重试、并发和删除相关状态；
+- 提交审核前运行有效 Profile 要求的 full Gate，并取得 PR exact head 的 11/11 平台 CI；
+- security / privacy 人工证据不得由自动化冒充 PASS。
+
+## 6. 精确下一步
+
+1. 合并纯状态收尾 PR，使 `main` 正式记录 C-001 Done 与 C-002 Ready；
+2. 从最新 `main` 创建 `agent/c-002-consent-profile`；
+3. 运行 `pnpm agent:prepare C-002 --remote --deep` 并读取全部 required sources；
+4. 校准 C-002 边界、Requirement-to-Proof Matrix 和聚焦 PR 计划后再开始实现；
+5. 不提前开始 C-003。
