@@ -9,7 +9,7 @@
 - **当前实现分支**：`agent/c-002-consent-profile`
 - **状态收尾**：PR #150 已 squash 合并为 `234f145a24285097cd261bd715e6d45c6022f953`
 - **当前 Issue**：[C-002 Issue #54](https://github.com/WeiHan1996/DailyEnergy/issues/54)
-- **当前 PR**：待创建聚焦 Draft PR
+- **当前 PR**：[Draft PR #152](https://github.com/WeiHan1996/DailyEnergy/pull/152)
 - **最近完成任务**：C-001 已随 PR #147 squash 合并为 `505a926f8830591cf305346219c86280660cd196`，Issue #53 已关闭
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -88,7 +88,7 @@ pnpm agent:prepare C-002 --remote --deep
 
 ## 6. 精确下一步
 
-1. 提交当前聚焦变更并创建 C-002 Draft PR，回填 PR 编号；
-2. 取得 Draft PR exact-head 同一 run 11/11 SUCCESS，并完成 session-owner、称呼 key、数据库列权限、撤回竞态与删除传播的人工 threat-boundary review；
+1. 取得 Draft PR #152 exact-head 同一 run 11/11 SUCCESS；
+2. 完成 session-owner、称呼 key、数据库列权限、撤回竞态与删除传播的人工 threat-boundary review；
 3. 明确确认发布环境称呼 key 文件接线仍随 Production `NO_GO` 延后，或在本 PR 内补充获批的生产 wiring；
 4. 用户审核通过后再标记 ready、合并、关闭 Issue #54，并把 C-002 设为 Done、C-003 设为唯一 Ready；审核前不开始 C-003。
