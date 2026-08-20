@@ -9,6 +9,8 @@ import { API_ERROR_CATALOG } from "../transport/common/api-exception.js";
 export const OPERATION_CODES = [
   "ADMIN_OPS_PLACEHOLDER",
   "API_LIFECYCLE",
+  "AUTH_SESSION_LOGOUT",
+  "AUTH_SESSION_REFRESH",
   "HEALTH_LIVE",
   "HEALTH_READY",
   "HEALTH_STARTUP",

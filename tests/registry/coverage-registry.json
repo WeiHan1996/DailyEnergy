@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 203, "NA_WITH_REASON": 0, "PLANNED": 533 },
+  "counts": { "COVERED": 210, "NA_WITH_REASON": 0, "PLANNED": 526 },
   "entries": [
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
@@ -2526,11 +2526,35 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "login, refresh and rate-limit responses remain on the Accepted stable HTTP/error surface",
+            "SessionView exposes only the opaque session and account-state allowlist, never provider identity or ciphertext fields",
+            "WechatSessionRequest rejects client-supplied owner, openid, unionid and provider fields"
+          ],
+          "file": "apps/api/src/auth/auth.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "closed auth request/session OpenAPI and error contract",
+          "test_id": "T-C001-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "expired and revoked sessions fail closed with stable auth errors",
+            "refresh rotates the token and the old token fails closed",
+            "unknown client account_id is rejected before it can become an owner predicate",
+            "upstream rate limiting maps to the stable retryable 429 response",
+            "wx code exchange returns a closed session response without openid, unionid, lookup token, ciphertext or accountId"
+          ],
+          "file": "apps/api/src/auth.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "real Nest HTTP WeChat login, refresh, logout, expiry and owner-forgery rejection",
+          "test_id": "T-C001-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -3628,22 +3652,48 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ciphertext can change while the provider lookup token continues resolving the same AccountRef",
+            "concurrent DELETING state transitions block both login session issuance and refresh rotation",
+            "concurrent first identity mappings for one provider lookup token commit exactly one account and one ExternalIdentity",
+            "logout writes one command receipt and returns ACCEPTED, DUPLICATE and CONFLICT for the closed replay cases",
+            "the losing account transaction rolls back instead of leaving a half-account fact",
+            "the production PostgresAuthStore passes strict API-role attestation and converges concurrent session establishment"
+          ],
+          "file": "tests/database/auth-identity.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "real PostgreSQL identity uniqueness and ciphertext-independent lookup",
+          "test_id": "T-C001-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-001",
       "source_sets": ["s19-database"]
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ciphertext can change while the provider lookup token continues resolving the same AccountRef",
+            "concurrent DELETING state transitions block both login session issuance and refresh rotation",
+            "concurrent first identity mappings for one provider lookup token commit exactly one account and one ExternalIdentity",
+            "logout writes one command receipt and returns ACCEPTED, DUPLICATE and CONFLICT for the closed replay cases",
+            "the losing account transaction rolls back instead of leaving a half-account fact",
+            "the production PostgresAuthStore passes strict API-role attestation and converges concurrent session establishment"
+          ],
+          "file": "tests/database/auth-identity.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "real PostgreSQL identity uniqueness and ciphertext-independent lookup",
+          "test_id": "T-C001-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-002",
       "source_sets": ["s19-database"]
@@ -4493,22 +4543,70 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "login, refresh and rate-limit responses remain on the Accepted stable HTTP/error surface",
+            "SessionView exposes only the opaque session and account-state allowlist, never provider identity or ciphertext fields",
+            "WechatSessionRequest rejects client-supplied owner, openid, unionid and provider fields"
+          ],
+          "file": "apps/api/src/auth/auth.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "closed auth request/session OpenAPI and error contract",
+          "test_id": "T-C001-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "expired and revoked sessions fail closed with stable auth errors",
+            "refresh rotates the token and the old token fails closed",
+            "unknown client account_id is rejected before it can become an owner predicate",
+            "upstream rate limiting maps to the stable retryable 429 response",
+            "wx code exchange returns a closed session response without openid, unionid, lookup token, ciphertext or accountId"
+          ],
+          "file": "apps/api/src/auth.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "real Nest HTTP WeChat login, refresh, logout, expiry and owner-forgery rejection",
+          "test_id": "T-C001-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-A01",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "login, refresh and rate-limit responses remain on the Accepted stable HTTP/error surface",
+            "SessionView exposes only the opaque session and account-state allowlist, never provider identity or ciphertext fields",
+            "WechatSessionRequest rejects client-supplied owner, openid, unionid and provider fields"
+          ],
+          "file": "apps/api/src/auth/auth.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "closed auth request/session OpenAPI and error contract",
+          "test_id": "T-C001-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "expired and revoked sessions fail closed with stable auth errors",
+            "refresh rotates the token and the old token fails closed",
+            "unknown client account_id is rejected before it can become an owner predicate",
+            "upstream rate limiting maps to the stable retryable 429 response",
+            "wx code exchange returns a closed session response without openid, unionid, lookup token, ciphertext or accountId"
+          ],
+          "file": "apps/api/src/auth.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "real Nest HTTP WeChat login, refresh, logout, expiry and owner-forgery rejection",
+          "test_id": "T-C001-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-A02",
       "source_sets": ["s20-api"]
@@ -4548,11 +4646,35 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "login, refresh and rate-limit responses remain on the Accepted stable HTTP/error surface",
+            "SessionView exposes only the opaque session and account-state allowlist, never provider identity or ciphertext fields",
+            "WechatSessionRequest rejects client-supplied owner, openid, unionid and provider fields"
+          ],
+          "file": "apps/api/src/auth/auth.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "closed auth request/session OpenAPI and error contract",
+          "test_id": "T-C001-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "expired and revoked sessions fail closed with stable auth errors",
+            "refresh rotates the token and the old token fails closed",
+            "unknown client account_id is rejected before it can become an owner predicate",
+            "upstream rate limiting maps to the stable retryable 429 response",
+            "wx code exchange returns a closed session response without openid, unionid, lookup token, ciphertext or accountId"
+          ],
+          "file": "apps/api/src/auth.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "real Nest HTTP WeChat login, refresh, logout, expiry and owner-forgery rejection",
+          "test_id": "T-C001-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-A06",
       "source_sets": ["s20-api"]
@@ -4635,11 +4757,35 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "login, refresh and rate-limit responses remain on the Accepted stable HTTP/error surface",
+            "SessionView exposes only the opaque session and account-state allowlist, never provider identity or ciphertext fields",
+            "WechatSessionRequest rejects client-supplied owner, openid, unionid and provider fields"
+          ],
+          "file": "apps/api/src/auth/auth.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "closed auth request/session OpenAPI and error contract",
+          "test_id": "T-C001-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "expired and revoked sessions fail closed with stable auth errors",
+            "refresh rotates the token and the old token fails closed",
+            "unknown client account_id is rejected before it can become an owner predicate",
+            "upstream rate limiting maps to the stable retryable 429 response",
+            "wx code exchange returns a closed session response without openid, unionid, lookup token, ciphertext or accountId"
+          ],
+          "file": "apps/api/src/auth.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c001-evidence-manifest.json",
+          "selector": "real Nest HTTP WeChat login, refresh, logout, expiry and owner-forgery rejection",
+          "test_id": "T-C001-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-C04",
       "source_sets": ["s20-api"]

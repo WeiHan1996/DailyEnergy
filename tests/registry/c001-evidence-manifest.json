@@ -1,0 +1,95 @@
+{
+  "manifest_version": "c-001-evidence-v1",
+  "scope": "C-001 WeChat identity, secure session lifecycle, owner binding and privacy-safe auth transport",
+  "authority": [
+    "docs/technical/api.md",
+    "docs/technical/database.md",
+    "docs/operations/privacy-data-map.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C001-DB-001": {
+      "file": "tests/database/auth-identity.test.mjs",
+      "selector": "real PostgreSQL identity uniqueness and ciphertext-independent lookup",
+      "level": "DB",
+      "assertions": [
+        "concurrent first identity mappings for one provider lookup token commit exactly one account and one ExternalIdentity",
+        "the losing account transaction rolls back instead of leaving a half-account fact",
+        "ciphertext can change while the provider lookup token continues resolving the same AccountRef",
+        "the production PostgresAuthStore passes strict API-role attestation and converges concurrent session establishment",
+        "concurrent DELETING state transitions block both login session issuance and refresh rotation",
+        "logout writes one command receipt and returns ACCEPTED, DUPLICATE and CONFLICT for the closed replay cases"
+      ]
+    },
+    "T-C001-CONTRACT-001": {
+      "file": "apps/api/src/auth/auth.contract.test.ts",
+      "selector": "closed auth request/session OpenAPI and error contract",
+      "level": "CONTRACT",
+      "assertions": [
+        "WechatSessionRequest rejects client-supplied owner, openid, unionid and provider fields",
+        "SessionView exposes only the opaque session and account-state allowlist, never provider identity or ciphertext fields",
+        "login, refresh and rate-limit responses remain on the Accepted stable HTTP/error surface"
+      ]
+    },
+    "T-C001-E2E-001": {
+      "file": "apps/api/src/auth.e2e.test.ts",
+      "selector": "real Nest HTTP WeChat login, refresh, logout, expiry and owner-forgery rejection",
+      "level": "E2E",
+      "assertions": [
+        "wx code exchange returns a closed session response without openid, unionid, lookup token, ciphertext or accountId",
+        "refresh rotates the token and the old token fails closed",
+        "expired and revoked sessions fail closed with stable auth errors",
+        "upstream rate limiting maps to the stable retryable 429 response",
+        "unknown client account_id is rejected before it can become an owner predicate"
+      ]
+    },
+    "T-C001-UNIT-001": {
+      "file": "apps/api/src/auth/auth.service.test.ts",
+      "selector": "auth service concurrency, replay, rotation/revoke and synthetic provider failure",
+      "level": "UNIT",
+      "assertions": [
+        "two synthetic wx codes for one subject converge to one account while issuing distinct sessions",
+        "the same wx code cannot be replayed",
+        "provider failure occurs before persistence and leaves no account/session fact",
+        "the synthetic WeChat adapter is forbidden in STAGING, PRODUCTION and RECOVERY"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S19-DB-001",
+      "status": "COVERED",
+      "proof_ids": ["T-C001-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-002",
+      "status": "COVERED",
+      "proof_ids": ["T-C001-DB-001"]
+    },
+    {
+      "source_id": "S20-A01",
+      "status": "COVERED",
+      "proof_ids": ["T-C001-CONTRACT-001", "T-C001-E2E-001"]
+    },
+    {
+      "source_id": "S20-A02",
+      "status": "COVERED",
+      "proof_ids": ["T-C001-CONTRACT-001", "T-C001-E2E-001"]
+    },
+    {
+      "source_id": "S20-A06",
+      "status": "COVERED",
+      "proof_ids": ["T-C001-CONTRACT-001", "T-C001-E2E-001"]
+    },
+    {
+      "source_id": "S20-C04",
+      "status": "COVERED",
+      "proof_ids": ["T-C001-CONTRACT-001", "T-C001-E2E-001"]
+    },
+    {
+      "source_id": "PDM-C01",
+      "status": "COVERED",
+      "proof_ids": ["T-C001-CONTRACT-001", "T-C001-E2E-001"]
+    }
+  ]
+}

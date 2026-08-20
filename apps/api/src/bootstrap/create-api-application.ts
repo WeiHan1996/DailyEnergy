@@ -1,6 +1,7 @@
 import type { INestApplication } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import express from "express";
+import type { Express } from "express";
 
 import { ApiModule } from "../composition/app.module.js";
 import type { ApiCompositionOverrides } from "../composition/tokens.js";
@@ -26,6 +27,9 @@ export async function createApiApplication(
       logger: false,
     },
   );
+
+  // The accepted deployment exposes the API through exactly one Caddy hop.
+  (application.getHttpAdapter().getInstance() as Express).set("trust proxy", 1);
 
   application.use(application.get(RequestContextStore).middleware());
   application.use(

@@ -2,7 +2,7 @@
   "version": 1,
   "algorithm": "sha256",
   "schema": "daily_energy",
-  "catalogSha256": "626a96b5838908009a29eb2ef7a52f028974606a56be26d2f8bfa0bfe8cf6870",
+  "catalogSha256": "209ef2587a1cbaf5cf48f9cc9573ce3c5bd42045eb5d31827e6a53180949ba31",
   "sections": {
     "schemas": {
       "count": 1,
@@ -17,8 +17,8 @@
       "sha256": "672cb61266c3ebf644f35fc33cfc80f337d52ef50006ced6fe2b82f4f59406c5"
     },
     "columnAcl": {
-      "count": 0,
-      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      "count": 5,
+      "sha256": "5c6a8f8a826ad6f42d4c32c46623e6aef6a311db83de55d16b26cd9955f89278"
     },
     "enums": {
       "count": 152,

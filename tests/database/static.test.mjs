@@ -84,6 +84,11 @@ test("T-DB-STATIC-003 migration checksum changes on mutation", async () => {
       "20260802000000_e007_queue_inbox_permissions",
     );
     await mkdir(queueDirectory);
+    const authDirectory = path.join(
+      temporaryRoot,
+      "20260819000000_c001_auth_column_permissions",
+    );
+    await mkdir(authDirectory);
     const target = path.join(targetDirectory, "migration.sql");
     await copyFile(migrationFile, target);
     await copyFile(
@@ -106,6 +111,13 @@ test("T-DB-STATIC-003 migration checksum changes on mutation", async () => {
         "prisma/migrations/20260802000000_e007_queue_inbox_permissions/migration.sql",
       ),
       path.join(queueDirectory, "migration.sql"),
+    );
+    await copyFile(
+      path.join(
+        root,
+        "prisma/migrations/20260819000000_c001_auth_column_permissions/migration.sql",
+      ),
+      path.join(authDirectory, "migration.sql"),
     );
     const before = await migrationChecksums(temporaryRoot);
     await writeFile(
@@ -144,6 +156,11 @@ test("T-DB-STATIC-004 checksum manifest gate rejects a changed migration", async
       "20260802000000_e007_queue_inbox_permissions",
     );
     await mkdir(queueDirectory);
+    const authDirectory = path.join(
+      temporaryRoot,
+      "20260819000000_c001_auth_column_permissions",
+    );
+    await mkdir(authDirectory);
     const target = path.join(targetDirectory, "migration.sql");
     await copyFile(migrationFile, target);
     await copyFile(
@@ -166,6 +183,13 @@ test("T-DB-STATIC-004 checksum manifest gate rejects a changed migration", async
         "prisma/migrations/20260802000000_e007_queue_inbox_permissions/migration.sql",
       ),
       path.join(queueDirectory, "migration.sql"),
+    );
+    await copyFile(
+      path.join(
+        root,
+        "prisma/migrations/20260819000000_c001_auth_column_permissions/migration.sql",
+      ),
+      path.join(authDirectory, "migration.sql"),
     );
     const manifestPath = path.join(temporaryRoot, "checksums.json");
     await copyFile(

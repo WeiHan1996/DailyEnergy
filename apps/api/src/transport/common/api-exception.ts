@@ -28,12 +28,47 @@ export const API_ERROR_CATALOG = {
     retryable: false,
     status: HttpStatus.UNAUTHORIZED,
   },
+  AUTH_INVALID: {
+    category: "AUTH",
+    message: "登录状态无效，请重新登录。",
+    messageKey: "error.auth_invalid",
+    retryable: false,
+    status: HttpStatus.UNAUTHORIZED,
+  },
   AUTH_REQUIRED: {
     category: "AUTH",
     message: "请重新登录后继续。",
     messageKey: "error.auth_required",
     retryable: false,
     status: HttpStatus.UNAUTHORIZED,
+  },
+  AUTH_SESSION_EXPIRED: {
+    category: "AUTH",
+    message: "登录状态已过期，请重新登录。",
+    messageKey: "error.auth_session_expired",
+    retryable: false,
+    status: HttpStatus.UNAUTHORIZED,
+  },
+  AUTH_WECHAT_CODE_INVALID: {
+    category: "AUTH",
+    message: "登录凭证已失效，请重新尝试登录。",
+    messageKey: "error.auth_wechat_code_invalid",
+    retryable: false,
+    status: HttpStatus.BAD_REQUEST,
+  },
+  DEPENDENCY_UNAVAILABLE: {
+    category: "TRANSIENT",
+    message: "服务暂时不可用，请稍后再试。",
+    messageKey: "error.dependency_unavailable",
+    retryable: true,
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+  },
+  IDEMPOTENCY_CONFLICT: {
+    category: "CONFLICT",
+    message: "请求标识已用于不同内容，请检查后重试。",
+    messageKey: "error.idempotency_conflict",
+    retryable: false,
+    status: HttpStatus.CONFLICT,
   },
   FEATURE_DISABLED: {
     category: "GUARD",
@@ -63,12 +98,26 @@ export const API_ERROR_CATALOG = {
     retryable: false,
     status: HttpStatus.BAD_REQUEST,
   },
+  RATE_LIMITED: {
+    category: "RATE_LIMIT",
+    message: "请求有点频繁，请稍后再试。",
+    messageKey: "error.rate_limited",
+    retryable: true,
+    status: HttpStatus.TOO_MANY_REQUESTS,
+  },
   RESOURCE_NOT_FOUND: {
     category: "NOT_FOUND",
     message: "没有找到对应内容。",
     messageKey: "error.resource_not_found",
     retryable: false,
     status: HttpStatus.NOT_FOUND,
+  },
+  UPSTREAM_TRANSIENT: {
+    category: "TRANSIENT",
+    message: "连接暂时不稳定，请稍后再试。",
+    messageKey: "error.upstream_transient",
+    retryable: true,
+    status: HttpStatus.SERVICE_UNAVAILABLE,
   },
   VALIDATION_FAILED: {
     category: "VALIDATION",
@@ -96,6 +145,13 @@ const ValidationErrorDetailsSchema = z.strictObject({
 export type ValidationErrorDetails = z.infer<
   typeof ValidationErrorDetailsSchema
 >;
+const RetryAfterErrorDetailsSchema = z.strictObject({
+  retry_after_seconds: z.number().int().min(0).max(86_400),
+});
+export type RetryAfterErrorDetails = z.infer<
+  typeof RetryAfterErrorDetailsSchema
+>;
+export type ApiErrorDetails = ValidationErrorDetails | RetryAfterErrorDetails;
 
 type ApiExceptionOptions = {
   [Code in ApiErrorCode]: Code extends "VALIDATION_FAILED"
@@ -103,10 +159,16 @@ type ApiExceptionOptions = {
         readonly code: Code;
         readonly details?: ValidationErrorDetails;
       }
-    : {
-        readonly code: Code;
-        readonly details?: never;
-      };
+    : Code extends
+          "RATE_LIMITED" | "DEPENDENCY_UNAVAILABLE" | "UPSTREAM_TRANSIENT"
+      ? {
+          readonly code: Code;
+          readonly details?: RetryAfterErrorDetails;
+        }
+      : {
+          readonly code: Code;
+          readonly details?: never;
+        };
 }[ApiErrorCode];
 
 function isApiErrorCode(value: unknown): value is ApiErrorCode {
@@ -119,18 +181,31 @@ function isApiErrorCode(value: unknown): value is ApiErrorCode {
 function projectDetails(
   code: ApiErrorCode,
   details: unknown,
-): ValidationErrorDetails | undefined {
-  if (code !== "VALIDATION_FAILED" || details === undefined) {
+): ApiErrorDetails | undefined {
+  if (details === undefined) {
     return undefined;
   }
-  const result = ValidationErrorDetailsSchema.safeParse(details);
+  const schema =
+    code === "VALIDATION_FAILED"
+      ? ValidationErrorDetailsSchema
+      : [
+            "RATE_LIMITED",
+            "DEPENDENCY_UNAVAILABLE",
+            "UPSTREAM_TRANSIENT",
+          ].includes(code)
+        ? RetryAfterErrorDetailsSchema
+        : undefined;
+  if (schema === undefined) {
+    return undefined;
+  }
+  const result = schema.safeParse(details);
   return result.success ? result.data : undefined;
 }
 
 export class ApiException extends Error {
   public readonly category: ApiErrorCategory;
   public readonly code: ApiErrorCode;
-  public readonly details: ValidationErrorDetails | undefined;
+  public readonly details: ApiErrorDetails | undefined;
   public readonly messageKey: string;
   public readonly retryable: boolean;
   public readonly status: HttpStatus;

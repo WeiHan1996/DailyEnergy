@@ -1,8 +1,11 @@
 import "reflect-metadata";
 
+import { readFile } from "node:fs/promises";
 import type { AddressInfo } from "node:net";
 import {
+  PostgresAuthStore,
   startApiTelemetry,
+  type AuthStore,
   type TelemetryRuntime,
 } from "@daily-energy/server-adapters/api";
 
@@ -46,6 +49,7 @@ function writeStartupFailure(reasonCode: StartupFailureReason): void {
 
 async function main(): Promise<void> {
   let telemetry: TelemetryRuntime | undefined;
+  let authStore: AuthStore | undefined;
   try {
     const config = loadRuntimeConfig(process.env);
     telemetry = startApiTelemetrySafely(startApiTelemetry, {
@@ -67,11 +71,33 @@ async function main(): Promise<void> {
       if ((await databaseReadiness.check()).status !== "UP") {
         throw new ApiStartupError("API_DATABASE_NOT_READY");
       }
+      const connectionString = (
+        await readFile(config.databaseUrlFile, "utf8")
+      ).trim();
+      if (connectionString.length === 0) {
+        throw new ApiStartupError("API_DATABASE_NOT_READY");
+      }
+      try {
+        authStore = await PostgresAuthStore.connect({
+          applicationName: "daily-energy:api:auth",
+          connectionLimit: 4,
+          connectionString,
+          expectedDatabaseRole: "daily_energy_api",
+        });
+      } catch {
+        throw new ApiStartupError("API_DATABASE_NOT_READY");
+      }
       readinessChecks.push(databaseReadiness);
     }
     const application = await createApiApplication(config, {
+      ...(authStore === undefined ? {} : { authStore }),
       readinessChecks,
-      shutdownDrainHooks: [{ drain: () => telemetry?.shutdown() }],
+      shutdownDrainHooks: [
+        ...(authStore === undefined
+          ? []
+          : [{ drain: () => authStore?.close() }]),
+        { drain: () => telemetry?.shutdown() },
+      ],
       telemetryRuntime: telemetry,
     });
     const logger = application.get(OrdinaryLogger);
@@ -86,6 +112,7 @@ async function main(): Promise<void> {
       reason_code: address === null ? "LISTENER_UNKNOWN" : "LISTENER_READY",
     });
   } catch (error) {
+    await authStore?.close().catch(() => undefined);
     await telemetry?.shutdown().catch(() => undefined);
     writeStartupFailure(
       error instanceof RuntimeConfigError
