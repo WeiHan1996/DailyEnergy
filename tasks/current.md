@@ -9,7 +9,7 @@
 - **当前实现分支**：`agent/c-002-consent-profile`
 - **状态收尾**：PR #150 已 squash 合并为 `234f145a24285097cd261bd715e6d45c6022f953`
 - **当前 Issue**：[C-002 Issue #54](https://github.com/WeiHan1996/DailyEnergy/issues/54)
-- **当前 PR**：[Draft PR #152](https://github.com/WeiHan1996/DailyEnergy/pull/152)
+- **当前 PR**：[PR #152](https://github.com/WeiHan1996/DailyEnergy/pull/152)（已获用户批准，待 final-head Gate 后合并）
 - **最近完成任务**：C-001 已随 PR #147 squash 合并为 `505a926f8830591cf305346219c86280660cd196`，Issue #53 已关闭
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -84,11 +84,12 @@ pnpm agent:prepare C-002 --remote --deep
 - 最终 changed Gate：`MANUAL_EVIDENCE_REQUIRED | automated=PASS | profile=security | mode=changed→full`；
 - 最终 C-002 full Gate：`MANUAL_EVIDENCE_REQUIRED | automated=PASS | profile=security | mode=full→full`；
 - 两个 Gate 均使用仓库精确 Node `24.18.0`；本机镜像不提供 audit endpoint，验证命令仅临时忽略用户级镜像并使用 npm 官方 endpoint，结果 critical/high 均为 0；
-- Draft PR #152 的实现与 PR 交接 head `c3a2cff8dfbf5cedadfe1670ace957865e01127c` 对应 CI run `32364714547`，同一 run 11/11 SUCCESS；最终 head 状态以 PR required checks 为准；
-- 待完成：security/privacy 人工 threat-boundary review、适用时的 production authorization；这些证据不得由自动化冒充 `PASS`。
+- Draft PR #152 head `229c1bbc720e95da4f3920fc6f494ce8c8de61b3` 对应 CI run `32365017600`，同一 run 11/11 SUCCESS；
+- 2026-08-20 已完成人工 threat-boundary review：session-owner、称呼 key、数据库列权限、撤回竞态和删除传播均无开发合并阻断；完整导出/物理删除仍由 C-014 承接，不冒充本任务已闭环；
+- 项目所有者已确认 C-002 产品与安全边界，同意生产称呼 key 接线随 Production `NO_GO` 延后，本次不授予生产发布权限，并批准 PR #152 在精确 head 11/11 后 squash merge；`productionAuthorizationWhenApplicable` 因本次不涉及生产发布而明确为不适用，Production / RC 保持 `NO_GO`。
 
 ## 6. 精确下一步
 
-1. 完成 session-owner、称呼 key、数据库列权限、撤回竞态与删除传播的人工 threat-boundary review；
-2. 明确确认发布环境称呼 key 文件接线仍随 Production `NO_GO` 延后，或在本 PR 内补充获批的生产 wiring；
-3. 用户审核通过后再标记 ready、合并、关闭 Issue #54，并把 C-002 设为 Done、C-003 设为唯一 Ready；审核前不开始 C-003。
+1. 提交并推送本次人工证据与用户授权记录，将 PR #152 标记 Ready；
+2. 取得新 final head 的同一 run 11/11 SUCCESS，运行 exact-head verifier 后使用 `--match-head-commit` squash merge；
+3. 验证 merged-main CI、Issue #54 和 `main`，再把 C-002 设为 Done、C-003 设为唯一 Ready；状态收尾前不开始 C-003。
