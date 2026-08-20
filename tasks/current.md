@@ -4,7 +4,7 @@
 - **最后更新**：2026-08-20
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：E-016 — 公开仓库并恢复平台强制 CI Gate
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **任务 Profile**：`security`
 - **当前分支**：`agent/public-repository-controls`
 - **当前 Issue**：[E-016 Issue #148](https://github.com/WeiHan1996/DailyEnergy/issues/148)
@@ -92,15 +92,17 @@ E-016 范围：
   `minimist@0.2.4`、`phin@3.7.1` 和 `jpeg-js@0.4.4`；官方 registry 全依赖审计为 0，
   automator load smoke、小程序 10 项测试和 DevTools result/bundle policy 均通过。该安全收口会形成
   新 final head，`a7c7350` 不作为最终合并 head。
+- 实现 head `6f5a3a70a09a3354c0ceec2207c102552cef01fd` 的 CI run `32350989506` 已同一 run
+  11/11 SUCCESS，包含 production audit、SBOM/provenance、真实数据库、Admin E2E 和 aggregate
+  Gate；下一状态提交只更新任务控制文件，仍需取得自己的 exact-head 11/11 后请求审核。
 
 ## 5. 精确执行顺序
 
-1. 完成本地 full security Gate，提交并推送 dependency/artifact retention 修复；
-2. 只让新的 E-016 exact head 触发一次 CI，并取得同一 run 11/11；
-3. 重跑远端 repository controls 与 exact-head PR verifier；
-4. 将 E-016 更新为 In Review，请用户审核 Draft PR #149；
-5. 用户审核后标记 ready，使用 `--match-head-commit` squash merge 并验证 merged `main`；
-6. 回到 PR #147，更新到新 `main`，只重跑 C-001 当前最终 head 的 CI；若业务 diff 未发生
+1. 提交并推送 In Review 状态收口，取得该 exact head 的同一 run 11/11；
+2. 重跑远端 repository controls，并请用户审核 Draft PR #149；
+3. 用户批准后标记 ready，运行 exact-head PR verifier；
+4. 使用 `--match-head-commit` squash merge 并验证 merged `main`；
+5. 回到 PR #147，更新到新 `main`，只重跑 C-001 当前最终 head 的 CI；若业务 diff 未发生
    material change，可沿用既有 C-001 审核，否则重新请求审核。
 
 ## 6. 下一任务
