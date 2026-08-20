@@ -4,12 +4,13 @@
 - **最后更新**：2026-08-20
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-001 — 实现微信身份与安全会话
-- **任务状态**：Blocked
+- **任务状态**：In Review
 - **任务 Profile**：`security`（C-001 初始路由为 `code`，认证与数据库权限变更将有效 Profile 提升为 `security`）
 - **当前分支**：`agent/c-001-wechat-auth`
 - **当前 Issue**：[C-001 Issue #53](https://github.com/WeiHan1996/DailyEnergy/issues/53)
-- **当前 PR**：[Draft PR #147](https://github.com/WeiHan1996/DailyEnergy/pull/147)；实现从提交 `4731438` 开始；GitHub Actions 因账户 Billing / spending limit 拒绝分配 runner
+- **当前 PR**：[Draft PR #147](https://github.com/WeiHan1996/DailyEnergy/pull/147)；实现从提交 `4731438` 开始；已合入 E-016 的 `main` 基线，等待新 head 的平台 CI
 - **最近完成设计任务**：D-005 已接受并随 PR #146 squash 合并，Issue #104 已关闭
+- **最近完成工程任务**：E-016 已随 PR #149 squash 合并为 `05969f64e8f2d09a05e6f26d3250bd646bfe8bf0`，Issue #148 已关闭
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 当前目标
@@ -52,6 +53,7 @@ C-001 范围：
 ## 3. 前置与权威状态
 
 - E-014 Phase 1 Gate 已完成，Phase 2 development 为 `CONDITIONAL_GO`；
+- E-016 已完成：仓库为 public、保持无 LICENSE，`main` 由无 bypass ruleset 强制 11 个 strict required checks；
 - D-001～D-005 正式视觉前置全部 Accepted；
 - C-001 Issue #53 的直接前置 E-014 已满足；
 - `pnpm agent:prepare C-001 --deep` 已恢复 `PROJECT_CONTEXT`、authority index、API / database / privacy / testing / OpenAPI / Prisma / nearby code / registry 权威上下文，并报告 `READY`；
@@ -80,21 +82,21 @@ C-001 范围：
 - POSTGRESQL 18：`pnpm database:validate` 全部通过；真实 Testcontainers 套件 83 / 83，覆盖生产 `PostgresAuthStore` 角色探针、列级 ACL、身份唯一性、登录 / 删除与 refresh / 删除锁竞争、logout receipt、migration lifecycle 和 TX-01～TX-09；
 - QUEUE：真实 Redis 8、BullMQ 5、PostgreSQL 18 集成套件 7 / 7 通过；
 - CATALOG：已在应用全部 migration 的临时 PostgreSQL 18 上重算并验证 fingerprint；仅总哈希与 `columnAcl` 从 0 条变为 5 条，其他 14 个 section 不变；
-- SUPPLY CHAIN：官方 npm registry production audit 为 Critical 0 / High 0；本机 full Gate 在 license inventory 阶段按策略拒绝 macOS 可选包 `@img/sharp-libvips-darwin-arm64`，而 Accepted policy 只为生产 Linux 包提供条件许可，因此不得在本地放宽，必须由 Linux PR CI 完成该平台证据；
-- PR CI：run `32333783343` 的 11 个 jobs 均在 2～3 秒内以 0 steps 失败；GitHub check annotation 明确报告 `The job was not started because recent account payments have failed or your spending limit needs to be increased`，属于账户级外部阻塞，不是代码或测试失败；
+- SUPPLY CHAIN：E-016 已将官方 registry 的 production / development audit 收口为 0，并为精确版本 `@img/sharp-libvips-darwin-arm64@1.3.2` 增加条件许可；C-001 仍需由新 head 的 Linux PR CI 证明最终锁文件、license inventory 与供应链 artifacts；
+- PR CI：旧 run `32333783343` 因 private-Free 账户 Billing / spending limit 未分配 runner；E-016 已通过公开仓库恢复 GitHub-hosted Actions，C-001 合入新 `main` 后必须取得自己 exact head 的同一 run 11/11；
 - MANUAL APPROVAL：用户于 2026-08-20 确认 C-001 审核通过并授权进入下一步。
 
-安全 Profile 所需 threat-boundary review 与用户审核已完成；生产微信凭据与生产发布不在 C-001 当前授权范围，production authorization 当前不适用。自动化结论为 `EXTERNAL_INFRA_BLOCKED`，不得在 Linux 供应链与 required checks 成功前合并。
+安全 Profile 所需 threat-boundary review 与用户审核已完成；生产微信凭据与生产发布不在 C-001 当前授权范围，production authorization 当前不适用。外部 runner 阻塞已经解除，但新 head 的平台 Gate 尚未完成，不得在 Linux 供应链与 11 个 required checks 成功前合并。
 
 ## 6. PR 与精确下一步
 
-1. Draft PR #147 已创建，实现从提交 `4731438` 开始；
-2. 用户在 GitHub `Billing & plans` 中修复近期付款失败或提高 Actions spending limit，使 `ubuntu-24.04` runner 可以分配；
-3. 外部状态修复后只 rerun PR #147 当前 HEAD 的最新失败 run，验证 license inventory、供应链 artifacts 与全部 required checks；
-4. required checks 全部成功后，按用户已给出的审核批准将 PR 标记 ready，并使用 squash merge；
-5. 合并后切回并同步 `main`，把 C-001 更新为 Done，只将一个后续任务移动到 Ready。
+1. PR #147 已创建，实现从提交 `4731438` 开始，并正常合入 E-016 的新 `main` 基线；
+2. 推送冲突解决与状态 handoff，使 GitHub 为新的 exact head 启动完整 CI；
+3. 验证 license inventory、供应链 artifacts 与同一 run 的 11 个 required checks；
+4. 若业务 diff 未发生 material change，沿用用户已有的 C-001 审核批准，标记 ready 后运行 exact-head verifier 并 squash merge；
+5. 合并后验证 `main`，把 C-001 更新为 Done，只将 C-002 移动到 Ready。
 
-**精确下一步**：用户先解除 GitHub Actions Billing / spending limit 阻塞；确认 runner 可分配后 rerun PR #147 当前 HEAD 的最新失败 run。
+**精确下一步**：完成 `main` 合入提交并推送 PR #147，等待该 exact head 的 11/11 平台 CI。
 
 ## 7. CI 使用原则
 

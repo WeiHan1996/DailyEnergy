@@ -5350,8 +5350,8 @@
             "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "the accepted temporary private-Free merge control verifies one current PR head, all 11 checks from one workflow run, and requires a match-head squash merge",
             "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "the public repository uses an active no-bypass main ruleset while the project verifier still binds the current PR head to all 11 checks from one workflow run and a match-head squash merge",
             "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
@@ -5377,8 +5377,8 @@
             "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "the accepted temporary private-Free merge control verifies one current PR head, all 11 checks from one workflow run, and requires a match-head squash merge",
             "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "the public repository uses an active no-bypass main ruleset while the project verifier still binds the current PR head to all 11 checks from one workflow run and a match-head squash merge",
             "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
@@ -7808,8 +7808,8 @@
             "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "the accepted temporary private-Free merge control verifies one current PR head, all 11 checks from one workflow run, and requires a match-head squash merge",
             "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "the public repository uses an active no-bypass main ruleset while the project verifier still binds the current PR head to all 11 checks from one workflow run and a match-head squash merge",
             "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
@@ -8765,8 +8765,8 @@
             "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "the accepted temporary private-Free merge control verifies one current PR head, all 11 checks from one workflow run, and requires a match-head squash merge",
             "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "the public repository uses an active no-bypass main ruleset while the project verifier still binds the current PR head to all 11 checks from one workflow run and a match-head squash merge",
             "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
@@ -8775,6 +8775,19 @@
           "origin": "tests/registry/e011-evidence-manifest.json",
           "selector": "minimum-permission pinned workflow and known-fail fixtures",
           "test_id": "T-E011-CI-POLICY-001"
+        },
+        {
+          "assertions": [
+            "all 11 required check contexts are bound to the GitHub Actions integration and GitHub approval count remains zero for the single-collaborator repository",
+            "external contributor workflows require approval and secret scanning, push protection, vulnerability alerts, and automated security fixes remain enabled",
+            "main requires pull requests, linear history, resolved review threads, strict GitHub Actions status checks, and prohibits bypass actors, force pushes, and branch deletion",
+            "the repository is public and has no repository license file while only squash merge is enabled"
+          ],
+          "file": "tests/ci/ci-policy.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e011-evidence-manifest.json",
+          "selector": "public repository, ruleset, fork approval, security controls, and no-license known-fail tests",
+          "test_id": "T-E016-CI-CONTROLS-001"
         }
       ],
       "status": "COVERED",
@@ -9105,8 +9118,8 @@
             "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "the accepted temporary private-Free merge control verifies one current PR head, all 11 checks from one workflow run, and requires a match-head squash merge",
             "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "the public repository uses an active no-bypass main ruleset while the project verifier still binds the current PR head to all 11 checks from one workflow run and a match-head squash merge",
             "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],
@@ -10041,8 +10054,8 @@
             "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
             "checkout fetches the complete baseline history required by fail-closed change-scope validation",
             "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-            "the accepted temporary private-Free merge control verifies one current PR head, all 11 checks from one workflow run, and requires a match-head squash merge",
             "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
+            "the public repository uses an active no-bypass main ruleset while the project verifier still binds the current PR head to all 11 checks from one workflow run and a match-head squash merge",
             "untrusted PR workflows recursively reject dot, bracket and wrapped references to the secrets context plus OIDC, environment and pull_request_target paths",
             "workflow uses ubuntu-24.04, exact Node and pnpm, frozen install, immutable action SHAs, bounded timeouts and read-only contents permission"
           ],

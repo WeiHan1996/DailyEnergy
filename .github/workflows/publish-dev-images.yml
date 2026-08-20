@@ -178,4 +178,4 @@ jobs:
           name: dev-deployment-bundle-${{ inputs.release_sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: .artifacts/deployment/dev-bundle
           if-no-files-found: error
-          retention-days: 365
+          retention-days: 90

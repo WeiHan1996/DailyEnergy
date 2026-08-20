@@ -72,10 +72,14 @@ saveWorkspaceProtocol: rolling
 sharedWorkspaceLockfile: true
 
 overrides:
+  "@prisma/config@7.9.1>deepmerge-ts": 8.0.0
+  "@jimp/core@0.6.8>phin": 3.7.1
+  "@jimp/jpeg@0.6.8>jpeg-js": 0.4.4
   "brace-expansion@>=2.0.0 <2.1.4": 2.1.4
   "brace-expansion@>=4.0.0 <5.0.9": 5.0.9
   "deepmerge-ts@<8.0.0": 8.0.0
   "fast-uri@>=3.0.0 <3.1.5": 3.1.5
+  "mkdirp@0.5.1>minimist": 0.2.4
   "nanoid@>=3.0.0 <3.3.18": 3.3.18
 
 minimumReleaseAgeExclude:

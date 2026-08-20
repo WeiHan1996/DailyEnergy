@@ -1,6 +1,7 @@
 {
-  "contract_version": "e-014-phase-gate-v1",
+  "contract_version": "e-014-phase-gate-v2",
   "task_id": "E-014",
+  "last_amended_by": "E-016",
   "profile": "security",
   "decision": {
     "phase_2_development": "CONDITIONAL_GO_FOR_PHASE_2",
@@ -158,11 +159,12 @@
     }
   ],
   "merge_control": {
-    "scope": "DEVELOPMENT_BRANCH_MERGES_ONLY",
-    "platform_enforcement": "UNAVAILABLE_ON_PRIVATE_GITHUB_FREE",
+    "scope": "MAIN_BRANCH_MERGES",
+    "platform_enforcement": "ACTIVE_PUBLIC_REPOSITORY_RULESET",
     "required_checks": 11,
-    "explicit_owner_risk_acceptance_per_merge": true,
-    "production_or_rc_use": "PROHIBITED",
-    "expires_on": "2026-11-02"
+    "strict_required_checks": true,
+    "owner_approval_evidence_per_merge": true,
+    "production_or_rc_admission": "ADDITIONAL_GATES_REQUIRED",
+    "effective_on": "2026-08-20"
   }
 }

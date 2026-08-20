@@ -146,10 +146,14 @@ catalogs:
       version: 4.4.3
 
 overrides:
+  '@prisma/config@7.9.1>deepmerge-ts': 8.0.0
+  '@jimp/core@0.6.8>phin': 3.7.1
+  '@jimp/jpeg@0.6.8>jpeg-js': 0.4.4
   brace-expansion@>=2.0.0 <2.1.4: 2.1.4
   brace-expansion@>=4.0.0 <5.0.9: 5.0.9
   deepmerge-ts@<8.0.0: 8.0.0
   fast-uri@>=3.0.0 <3.1.5: 3.1.5
+  mkdirp@0.5.1>minimist: 0.2.4
   nanoid@>=3.0.0 <3.3.18: 3.3.18
 
 importers:
@@ -3076,8 +3080,8 @@ packages:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
 
-  jpeg-js@0.3.7:
-    resolution: {integrity: sha512-9IXdWudL61npZjvLuVe/ktHiA41iE8qFyLB+4VDTblEsWBzeg8WQTlktdUK4CdncUqtUgUg0bbOmTE2bKBKaBQ==}
+  jpeg-js@0.4.4:
+    resolution: {integrity: sha512-WZzeDOEtTOBK4Mdsar0IqEU5sMr3vSV2RqkAIzUEV2BHnUfKGyswWFPFwK5EeDo93K3FohSHbLAjj0s1Wzd+dg==}
 
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
@@ -3311,8 +3315,8 @@ packages:
     resolution: {integrity: sha512-OBwBN9AL4dqmETlpS2zasx+vTeWclWzkblfZk7KTA5j3jeOONz/tRCnZomUyvNg83wL5Zv9Ss6HMJXAgL8R2Yg==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  minimist@0.0.8:
-    resolution: {integrity: sha512-miQKw5Hv4NS1Psg2517mV4e4dYNaO3++hjAvLOAzKqZ61rH8NS1SK+vbfBWZ5PY/Me/bEWhUwqMghEW5Fb9T7Q==}
+  minimist@0.2.4:
+    resolution: {integrity: sha512-Pkrrm8NjyQ8yVt8Am9M+yUt74zE3iokhzbG1bFVNjLB92vwM71hf40RkEsryg98BujhVOncKm/C1xROxZ030LQ==}
 
   minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
@@ -3536,10 +3540,6 @@ packages:
 
   pgpass@1.0.5:
     resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
-
-  phin@2.9.3:
-    resolution: {integrity: sha512-CzFr90qM24ju5f88quFC/6qohjC144rehe5n6DH900lgXmUe86+xCKc10ev56gRKC4/BkHUoG4uSiQgBiIXwDA==}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   phin@3.7.1:
     resolution: {integrity: sha512-GEazpTWwTZaEQ9RhL7Nyz0WwqilbqgLahDM3D0hxWwmVDI52nXEybHqiN6/elwpkJBhcuj+WbBu+QfT0uhPGfQ==}
@@ -4723,7 +4723,7 @@ snapshots:
       file-type: 9.0.0
       load-bmfont: 1.4.2(debug@4.4.3(supports-color@10.2.2))
       mkdirp: 0.5.1
-      phin: 2.9.3
+      phin: 3.7.1(debug@4.4.3(supports-color@10.2.2))
       pixelmatch: 4.0.2
       tinycolor2: 1.6.0
     transitivePeerDependencies:
@@ -4748,7 +4748,7 @@ snapshots:
       '@jimp/custom': 0.6.8(debug@4.4.3(supports-color@10.2.2))
       '@jimp/utils': 0.6.8
       core-js: 2.5.7
-      jpeg-js: 0.3.7
+      jpeg-js: 0.4.4
 
   '@jimp/plugin-blit@0.6.8(@jimp/custom@0.6.8(debug@4.4.3(supports-color@10.2.2)))':
     dependencies:
@@ -6916,7 +6916,7 @@ snapshots:
 
   jiti@2.7.0: {}
 
-  jpeg-js@0.3.7: {}
+  jpeg-js@0.4.4: {}
 
   js-tokens@10.0.0: {}
 
@@ -7093,7 +7093,7 @@ snapshots:
     dependencies:
       brace-expansion: 2.1.4
 
-  minimist@0.0.8: {}
+  minimist@0.2.4: {}
 
   minimist@1.2.8: {}
 
@@ -7118,7 +7118,7 @@ snapshots:
 
   mkdirp@0.5.1:
     dependencies:
-      minimist: 0.0.8
+      minimist: 0.2.4
 
   mkdirp@3.0.1: {}
 
@@ -7317,8 +7317,6 @@ snapshots:
   pgpass@1.0.5:
     dependencies:
       split2: 4.2.0
-
-  phin@2.9.3: {}
 
   phin@3.7.1(debug@4.4.3(supports-color@10.2.2)):
     dependencies:

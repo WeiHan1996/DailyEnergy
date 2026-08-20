@@ -2,6 +2,31 @@ version: 1
 projectContext: docs/agent/PROJECT_CONTEXT.md
 
 taskRules:
+  - match: E-016
+    profile: security
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Repository, review, public exposure, and destructive-operation rules
+      - path: tasks/current.md
+        required: true
+        reason: Current visibility migration scope, authorization, and C-001 interruption
+      - path: docs/technical/testing.md
+        required: true
+        reason: Accepted required checks and platform-enforcement restoration rule
+      - path: docs/technical/deployment.md
+        required: true
+        reason: Runner, artifact, secret, and public CI trust boundaries
+      - path: docs/reports/phase-1-gate.md
+        required: true
+        reason: Original private-Free exception and exact restoration trigger
+      - path: tests/ci/policy.json
+        required: true
+        reason: Executable CI and merge-gate policy
+      - path: .github/workflows/ci.yml
+        required: true
+        reason: Executable required-check workflow
+
   - match: E-014
     profile: code
     sources:

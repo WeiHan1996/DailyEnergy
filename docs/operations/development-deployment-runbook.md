@@ -47,9 +47,12 @@ TLS proxy 必须保持非 root、`cap_drop: ALL`、`no-new-privileges` 和只读
 2. 构建并 push `admin/migration/proxy/server/stub` 五个 `linux/amd64` image；
 3. 记录 CI run 与 publication run 两组独立编号；
 4. 绑定 BuildKit provenance、SBOM、migration catalog 和 runtime fingerprints；
-5. 生成并保留 365 天的 `dev-deployment-bundle-<sha>-<run>-<attempt>` artifact。
+5. 生成并在 public GitHub Actions 平台保留 90 天的
+   `dev-deployment-bundle-<sha>-<run>-<attempt>` artifact。
 
 Artifact 只含 allowlist 内的 Compose、部署控制脚本和三份无 secret 证据，不含源码树、配置值或凭据。
+90 天是 public development workflow 的平台上限；它不满足 RC/Release 的 365 天证据要求。
+后者在获批归档后端落地前保持 `PENDING_APPROVED_ARCHIVAL`，不得将 DEV bundle 冒充 RC evidence。
 
 ### 3.2 下载并传输
 

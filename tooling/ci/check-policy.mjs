@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 import {
   validateCiPolicy,
+  validateRepositoryLicenseFiles,
   validateTelemetryPolicy,
   validateTurboPolicy,
   validateWorkflow,
@@ -24,6 +25,7 @@ const [
   nodeVersion,
   nvmVersion,
   workflow,
+  rootFileNames,
 ] = await Promise.all([
   readJson("tests/ci/policy.json"),
   readJson("tests/ci/telemetry-policy.json"),
@@ -32,9 +34,11 @@ const [
   readFile(path.resolve(repositoryRoot, ".node-version"), "utf8"),
   readFile(path.resolve(repositoryRoot, ".nvmrc"), "utf8"),
   readFile(path.resolve(repositoryRoot, ".github/workflows/ci.yml"), "utf8"),
+  readdir(repositoryRoot),
 ]);
 
 const laneResult = validateCiPolicy(policy);
+validateRepositoryLicenseFiles(rootFileNames, policy);
 const telemetryResult = validateTelemetryPolicy(telemetry);
 const cacheResult = validateTurboPolicy(turbo);
 validateWorkflow(workflow, policy);

@@ -124,9 +124,10 @@ test("T-E014-GATE-004 rejects silent PLANNED entries and inventory drift", () =>
   );
 });
 
-test("T-E014-GATE-005 rejects merge-control use for Production or RC", () => {
+test("T-E014-GATE-005 keeps platform merge control insufficient for Production or RC", () => {
   const productionControl = structuredClone(contract);
-  productionControl.merge_control.production_or_rc_use = "ALLOWED";
+  productionControl.merge_control.production_or_rc_admission =
+    "PLATFORM_GATE_SUFFICIENT";
   assert.throws(
     () => validatePhaseGateContract(productionControl, dependencies),
     /E014_GATE_MERGE_CONTROL/u,
