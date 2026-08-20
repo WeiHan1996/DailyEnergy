@@ -7,7 +7,7 @@
 - **任务状态**：Ready
 - **任务 Profile**：`code`（隐私、删除、数据库或安全边界变更可将有效 Profile 提升为 `security`）
 - **当前实现分支**：尚未创建；建议 `agent/c-002-consent-profile`
-- **当前状态收尾分支**：`agent/c-001-closeout`
+- **状态收尾**：PR #150 已 squash 合并为 `234f145a24285097cd261bd715e6d45c6022f953`
 - **当前 Issue**：[C-002 Issue #54](https://github.com/WeiHan1996/DailyEnergy/issues/54)
 - **当前 PR**：无
 - **最近完成任务**：C-001 已随 PR #147 squash 合并为 `505a926f8830591cf305346219c86280660cd196`，Issue #53 已关闭
@@ -34,6 +34,7 @@ C-002 范围：
   `32353095120` 同一 run 11/11 SUCCESS，exact-head verifier 通过；
 - C-001 已使用 `--match-head-commit` squash 合并为 `505a926f8830591cf305346219c86280660cd196`，Issue #53 已关闭；
 - C-001 merged-main CI run `32353421328` 在精确 merge SHA 上同一 run 11/11 SUCCESS；
+- 状态收尾 PR #150 的 final head run `32353924573` 与 merged-main run `32354195311` 均为 11/11 SUCCESS；
 - E-016 已完成：仓库为 public、保持无 LICENSE，`main` 由无 bypass ruleset 强制 11 个 strict required checks；
 - D-001～D-005 正式视觉前置均已 Accepted；
 - C-002 的直接前置 C-001 已满足，Issue #54 保持 Open；
@@ -80,8 +81,7 @@ pnpm agent:prepare C-002 --remote --deep
 
 ## 6. 精确下一步
 
-1. 合并纯状态收尾 PR，使 `main` 正式记录 C-001 Done 与 C-002 Ready；
-2. 从最新 `main` 创建 `agent/c-002-consent-profile`；
-3. 运行 `pnpm agent:prepare C-002 --remote --deep` 并读取全部 required sources；
-4. 校准 C-002 边界、Requirement-to-Proof Matrix 和聚焦 PR 计划后再开始实现；
-5. 不提前开始 C-003。
+1. 从最新 `main` 创建 `agent/c-002-consent-profile`；
+2. 运行 `pnpm agent:prepare C-002 --remote --deep` 并读取全部 required sources；
+3. 校准 C-002 边界、Requirement-to-Proof Matrix 和聚焦 PR 计划后再开始实现；
+4. 不提前开始 C-003。
