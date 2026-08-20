@@ -14,8 +14,12 @@ const policy = JSON.parse(
 );
 const repository = policy.merge_gate.repository;
 
-async function ghApi(endpoint) {
-  const result = await runBounded("gh", ["api", endpoint]);
+async function ghApi(endpoint, jqExpression) {
+  const arguments_ = ["api", endpoint];
+  if (jqExpression) {
+    arguments_.push("--jq", jqExpression);
+  }
+  const result = await runBounded("gh", arguments_);
   if (result.code !== 0) {
     throw new Error(
       `CI_REPOSITORY_CONTROL_QUERY_FAILED:${endpoint}:${boundedFailureSummary(result, 8)}`,
@@ -41,13 +45,27 @@ const [
   vulnerabilityAlertsEnabled,
   automatedSecurityFixesEnabled,
 ] = await Promise.all([
-  ghApi(`repos/${repository}`),
-  ghApi(`repos/${repository}/rulesets`),
-  ghApi(`repos/${repository}/actions/permissions`),
-  ghApi(`repos/${repository}/actions/permissions/fork-pr-contributor-approval`),
+  ghApi(
+    `repos/${repository}`,
+    "{allow_auto_merge,allow_merge_commit,allow_rebase_merge,allow_squash_merge,default_branch,full_name,license,private,security_and_analysis:{push_protection_status:.security_and_analysis.secret_scanning_push_protection.status,scanning_status:.security_and_analysis.secret_scanning.status},visibility}",
+  ),
+  ghApi(`repos/${repository}/rulesets`, "[.[] | {enforcement,id,name,target}]"),
+  ghApi(`repos/${repository}/actions/permissions`, "{enabled}"),
+  ghApi(
+    `repos/${repository}/actions/permissions/fork-pr-contributor-approval`,
+    "{approval_policy}",
+  ),
   ghEnabled(`repos/${repository}/vulnerability-alerts`),
   ghEnabled(`repos/${repository}/automated-security-fixes`),
 ]);
+repositoryDocument.security_and_analysis = {
+  secret_scanning: {
+    status: repositoryDocument.security_and_analysis.scanning_status,
+  },
+  secret_scanning_push_protection: {
+    status: repositoryDocument.security_and_analysis.push_protection_status,
+  },
+};
 const rulesetSummary = rulesets.filter(
   ({ name }) => name === policy.repository_controls.ruleset_name,
 );
@@ -58,6 +76,7 @@ if (rulesetSummary.length !== 1) {
 }
 const mainRuleset = await ghApi(
   `repos/${repository}/rulesets/${rulesetSummary[0].id}`,
+  "{bypass_actors,conditions,enforcement,name,rules,source_type,target}",
 );
 
 const result = validateRepositoryControls(

@@ -65,6 +65,11 @@ E-016 范围：
 - security profile 所需 threat-boundary review 已完成，公开授权已由用户明确给出；Production
   authorization 不适用，Production/RC 继续 `NO_GO`；
 - 初始实现提交 `b46715b` 已推送并创建 Draft PR #149。
+- `WeiHan1996/DailyEnergy` 已切换为 public；merge/rebase/auto-merge 已关闭，仓库保持无 LICENSE；
+- active、无 bypass 的 `DailyEnergy main protection` ruleset 已强制 PR、squash-only、linear
+  history、review thread resolution、禁止 force push / 删除及 11 个 strict GitHub Actions checks；
+- 外部贡献者 workflow 审批、secret scanning、push protection、vulnerability alerts 与
+  automated security fixes 已启用；`pnpm ci:verify-repository-controls` 远端逐字段验证通过。
 
 ## 5. 精确执行顺序
 
