@@ -84,11 +84,11 @@ pnpm agent:prepare C-002 --remote --deep
 - 最终 changed Gate：`MANUAL_EVIDENCE_REQUIRED | automated=PASS | profile=security | mode=changed→full`；
 - 最终 C-002 full Gate：`MANUAL_EVIDENCE_REQUIRED | automated=PASS | profile=security | mode=full→full`；
 - 两个 Gate 均使用仓库精确 Node `24.18.0`；本机镜像不提供 audit endpoint，验证命令仅临时忽略用户级镜像并使用 npm 官方 endpoint，结果 critical/high 均为 0；
-- 待完成：security/privacy 人工 threat-boundary review、适用时的 production authorization、Draft PR exact-head 11/11 平台 CI；这些证据不得由自动化冒充 `PASS`。
+- Draft PR #152 的实现与 PR 交接 head `c3a2cff8dfbf5cedadfe1670ace957865e01127c` 对应 CI run `32364714547`，同一 run 11/11 SUCCESS；最终 head 状态以 PR required checks 为准；
+- 待完成：security/privacy 人工 threat-boundary review、适用时的 production authorization；这些证据不得由自动化冒充 `PASS`。
 
 ## 6. 精确下一步
 
-1. 取得 Draft PR #152 exact-head 同一 run 11/11 SUCCESS；
-2. 完成 session-owner、称呼 key、数据库列权限、撤回竞态与删除传播的人工 threat-boundary review；
-3. 明确确认发布环境称呼 key 文件接线仍随 Production `NO_GO` 延后，或在本 PR 内补充获批的生产 wiring；
-4. 用户审核通过后再标记 ready、合并、关闭 Issue #54，并把 C-002 设为 Done、C-003 设为唯一 Ready；审核前不开始 C-003。
+1. 完成 session-owner、称呼 key、数据库列权限、撤回竞态与删除传播的人工 threat-boundary review；
+2. 明确确认发布环境称呼 key 文件接线仍随 Production `NO_GO` 延后，或在本 PR 内补充获批的生产 wiring；
+3. 用户审核通过后再标记 ready、合并、关闭 Issue #54，并把 C-002 设为 Done、C-003 设为唯一 Ready；审核前不开始 C-003。
