@@ -1,8 +1,694 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 210, "NA_WITH_REASON": 0, "PLANNED": 526 },
+  "counts": { "COVERED": 222, "NA_WITH_REASON": 0, "PLANNED": 562 },
   "entries": [
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-D01",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-D02",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-D03",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-D04",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-D05",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-D06",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-G01",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-G02",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-G03",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-G04",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-G05",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-G06",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-I01",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-I02",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "evidence": [
+        {
+          "assertions": [
+            "onboarding commits one profile revision, one completion and defaults-off preference facts; same command replay adds no revision",
+            "only the accepted current notice version unlocks the production session consent guard",
+            "platform permission observation remains separate from defaults-off notification preferences",
+            "preferred-name revision copies expire within 72 hours without preventing later profile updates, and the API role cannot delete C-002 facts or read identity ciphertext",
+            "profile changes preserve onboarding and byte-for-byte historical result facts",
+            "same command and payload returns duplicate while a different payload returns idempotency conflict without a domain write",
+            "same-revision concurrent profile writes have one winner and one current-view conflict",
+            "withdrawal blocks new ordinary profile and platform-permission writes without creating a deletion result"
+          ],
+          "file": "tests/database/c002-consent-profile.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 real PostgreSQL consent/profile/preference invariants",
+          "test_id": "T-C002-DB-001"
+        },
+        {
+          "assertions": [
+            "a second authenticated owner cannot read the first owner's preferred name or profile",
+            "consent withdrawal blocks profile, notification enablement and new platform-permission writes",
+            "granted platform permission leaves morning and evening preferences off",
+            "missing consent blocks onboarding and current consent accept/replay uses accepted/duplicate outcomes",
+            "onboarding without preferred name succeeds and owner injection is rejected before persistence",
+            "one command ref reused for a different operation returns idempotency conflict",
+            "same-revision concurrent profile HTTP writes return one 200 and one 409 with a closed current view"
+          ],
+          "file": "apps/api/src/consent-profile.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile HTTP E2E",
+          "test_id": "T-C002-E2E-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-I03",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "evidence": [
+        {
+          "assertions": [
+            "onboarding commits one profile revision, one completion and defaults-off preference facts; same command replay adds no revision",
+            "only the accepted current notice version unlocks the production session consent guard",
+            "platform permission observation remains separate from defaults-off notification preferences",
+            "preferred-name revision copies expire within 72 hours without preventing later profile updates, and the API role cannot delete C-002 facts or read identity ciphertext",
+            "profile changes preserve onboarding and byte-for-byte historical result facts",
+            "same command and payload returns duplicate while a different payload returns idempotency conflict without a domain write",
+            "same-revision concurrent profile writes have one winner and one current-view conflict",
+            "withdrawal blocks new ordinary profile and platform-permission writes without creating a deletion result"
+          ],
+          "file": "tests/database/c002-consent-profile.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 real PostgreSQL consent/profile/preference invariants",
+          "test_id": "T-C002-DB-001"
+        },
+        {
+          "assertions": [
+            "a second authenticated owner cannot read the first owner's preferred name or profile",
+            "consent withdrawal blocks profile, notification enablement and new platform-permission writes",
+            "granted platform permission leaves morning and evening preferences off",
+            "missing consent blocks onboarding and current consent accept/replay uses accepted/duplicate outcomes",
+            "onboarding without preferred name succeeds and owner injection is rejected before persistence",
+            "one command ref reused for a different operation returns idempotency conflict",
+            "same-revision concurrent profile HTTP writes return one 200 and one 409 with a closed current view"
+          ],
+          "file": "apps/api/src/consent-profile.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile HTTP E2E",
+          "test_id": "T-C002-E2E-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-I04",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-I05",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-I06",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-M01",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-M02",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-M03",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-M04",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-M05",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-M06",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-R01",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-R02",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-R03",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-R04",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-R05",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-R06",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-S01",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-S02",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-S03",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-S04",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-S05",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-S06",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-V01",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-V02",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-V03",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-V04",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-V05",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-V06",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-X01",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-X02",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-X03",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-X04",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-X05",
+      "source_sets": ["s17-domain-model"]
+    },
+    {
+      "authority_paths": ["docs/data/domain-model.md"],
+      "planned": {
+        "owner": "Owning Phase 2-3 domain implementation issue",
+        "reason": "No executable evidence is registered at the mandatory layer yet."
+      },
+      "status": "PLANNED",
+      "required_evidence": [
+        { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
+      ],
+      "source_id": "D17-X06",
+      "source_sets": ["s17-domain-model"]
+    },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
       "planned": {
@@ -2563,11 +3249,56 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all C-002 request schemas are closed and reject client owner fields",
+            "lifecycle metadata registers export allowlists, withdrawal effects, deletion scopes and retention deadlines without claiming worker completion",
+            "OpenAPI keeps every C-002 path authenticated with stable 200, 401 and 403 surfaces",
+            "profile, memory and notification views exclude account, seed, epoch, ciphertext and provider fields",
+            "stable consent, onboarding, revision and idempotency errors remain on the accepted HTTP catalog"
+          ],
+          "file": "apps/api/src/consent-profile/consent-profile.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile transport contract",
+          "test_id": "T-C002-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "onboarding commits one profile revision, one completion and defaults-off preference facts; same command replay adds no revision",
+            "only the accepted current notice version unlocks the production session consent guard",
+            "platform permission observation remains separate from defaults-off notification preferences",
+            "preferred-name revision copies expire within 72 hours without preventing later profile updates, and the API role cannot delete C-002 facts or read identity ciphertext",
+            "profile changes preserve onboarding and byte-for-byte historical result facts",
+            "same command and payload returns duplicate while a different payload returns idempotency conflict without a domain write",
+            "same-revision concurrent profile writes have one winner and one current-view conflict",
+            "withdrawal blocks new ordinary profile and platform-permission writes without creating a deletion result"
+          ],
+          "file": "tests/database/c002-consent-profile.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 real PostgreSQL consent/profile/preference invariants",
+          "test_id": "T-C002-DB-001"
+        },
+        {
+          "assertions": [
+            "a second authenticated owner cannot read the first owner's preferred name or profile",
+            "consent withdrawal blocks profile, notification enablement and new platform-permission writes",
+            "granted platform permission leaves morning and evening preferences off",
+            "missing consent blocks onboarding and current consent accept/replay uses accepted/duplicate outcomes",
+            "onboarding without preferred name succeeds and owner injection is rejected before persistence",
+            "one command ref reused for a different operation returns idempotency conflict",
+            "same-revision concurrent profile HTTP writes return one 200 and one 409 with a closed current view"
+          ],
+          "file": "apps/api/src/consent-profile.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile HTTP E2E",
+          "test_id": "T-C002-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -2758,11 +3489,56 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all C-002 request schemas are closed and reject client owner fields",
+            "lifecycle metadata registers export allowlists, withdrawal effects, deletion scopes and retention deadlines without claiming worker completion",
+            "OpenAPI keeps every C-002 path authenticated with stable 200, 401 and 403 surfaces",
+            "profile, memory and notification views exclude account, seed, epoch, ciphertext and provider fields",
+            "stable consent, onboarding, revision and idempotency errors remain on the accepted HTTP catalog"
+          ],
+          "file": "apps/api/src/consent-profile/consent-profile.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile transport contract",
+          "test_id": "T-C002-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "onboarding commits one profile revision, one completion and defaults-off preference facts; same command replay adds no revision",
+            "only the accepted current notice version unlocks the production session consent guard",
+            "platform permission observation remains separate from defaults-off notification preferences",
+            "preferred-name revision copies expire within 72 hours without preventing later profile updates, and the API role cannot delete C-002 facts or read identity ciphertext",
+            "profile changes preserve onboarding and byte-for-byte historical result facts",
+            "same command and payload returns duplicate while a different payload returns idempotency conflict without a domain write",
+            "same-revision concurrent profile writes have one winner and one current-view conflict",
+            "withdrawal blocks new ordinary profile and platform-permission writes without creating a deletion result"
+          ],
+          "file": "tests/database/c002-consent-profile.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 real PostgreSQL consent/profile/preference invariants",
+          "test_id": "T-C002-DB-001"
+        },
+        {
+          "assertions": [
+            "a second authenticated owner cannot read the first owner's preferred name or profile",
+            "consent withdrawal blocks profile, notification enablement and new platform-permission writes",
+            "granted platform permission leaves morning and evening preferences off",
+            "missing consent blocks onboarding and current consent accept/replay uses accepted/duplicate outcomes",
+            "onboarding without preferred name succeeds and owner injection is rejected before persistence",
+            "one command ref reused for a different operation returns idempotency conflict",
+            "same-revision concurrent profile HTTP writes return one 200 and one 409 with a closed current view"
+          ],
+          "file": "apps/api/src/consent-profile.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile HTTP E2E",
+          "test_id": "T-C002-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -3711,11 +4487,26 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "onboarding commits one profile revision, one completion and defaults-off preference facts; same command replay adds no revision",
+            "only the accepted current notice version unlocks the production session consent guard",
+            "platform permission observation remains separate from defaults-off notification preferences",
+            "preferred-name revision copies expire within 72 hours without preventing later profile updates, and the API role cannot delete C-002 facts or read identity ciphertext",
+            "profile changes preserve onboarding and byte-for-byte historical result facts",
+            "same command and payload returns duplicate while a different payload returns idempotency conflict without a domain write",
+            "same-revision concurrent profile writes have one winner and one current-view conflict",
+            "withdrawal blocks new ordinary profile and platform-permission writes without creating a deletion result"
+          ],
+          "file": "tests/database/c002-consent-profile.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 real PostgreSQL consent/profile/preference invariants",
+          "test_id": "T-C002-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-004",
       "source_sets": ["s19-database"]
@@ -3741,22 +4532,52 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "onboarding commits one profile revision, one completion and defaults-off preference facts; same command replay adds no revision",
+            "only the accepted current notice version unlocks the production session consent guard",
+            "platform permission observation remains separate from defaults-off notification preferences",
+            "preferred-name revision copies expire within 72 hours without preventing later profile updates, and the API role cannot delete C-002 facts or read identity ciphertext",
+            "profile changes preserve onboarding and byte-for-byte historical result facts",
+            "same command and payload returns duplicate while a different payload returns idempotency conflict without a domain write",
+            "same-revision concurrent profile writes have one winner and one current-view conflict",
+            "withdrawal blocks new ordinary profile and platform-permission writes without creating a deletion result"
+          ],
+          "file": "tests/database/c002-consent-profile.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 real PostgreSQL consent/profile/preference invariants",
+          "test_id": "T-C002-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-006",
       "source_sets": ["s19-database"]
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "onboarding commits one profile revision, one completion and defaults-off preference facts; same command replay adds no revision",
+            "only the accepted current notice version unlocks the production session consent guard",
+            "platform permission observation remains separate from defaults-off notification preferences",
+            "preferred-name revision copies expire within 72 hours without preventing later profile updates, and the API role cannot delete C-002 facts or read identity ciphertext",
+            "profile changes preserve onboarding and byte-for-byte historical result facts",
+            "same command and payload returns duplicate while a different payload returns idempotency conflict without a domain write",
+            "same-revision concurrent profile writes have one winner and one current-view conflict",
+            "withdrawal blocks new ordinary profile and platform-permission writes without creating a deletion result"
+          ],
+          "file": "tests/database/c002-consent-profile.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 real PostgreSQL consent/profile/preference invariants",
+          "test_id": "T-C002-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-007",
       "source_sets": ["s19-database"]
@@ -4172,11 +4993,26 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "onboarding commits one profile revision, one completion and defaults-off preference facts; same command replay adds no revision",
+            "only the accepted current notice version unlocks the production session consent guard",
+            "platform permission observation remains separate from defaults-off notification preferences",
+            "preferred-name revision copies expire within 72 hours without preventing later profile updates, and the API role cannot delete C-002 facts or read identity ciphertext",
+            "profile changes preserve onboarding and byte-for-byte historical result facts",
+            "same command and payload returns duplicate while a different payload returns idempotency conflict without a domain write",
+            "same-revision concurrent profile writes have one winner and one current-view conflict",
+            "withdrawal blocks new ordinary profile and platform-permission writes without creating a deletion result"
+          ],
+          "file": "tests/database/c002-consent-profile.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 real PostgreSQL consent/profile/preference invariants",
+          "test_id": "T-C002-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-037",
       "source_sets": ["s19-database"]
@@ -4635,11 +5471,39 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all C-002 request schemas are closed and reject client owner fields",
+            "lifecycle metadata registers export allowlists, withdrawal effects, deletion scopes and retention deadlines without claiming worker completion",
+            "OpenAPI keeps every C-002 path authenticated with stable 200, 401 and 403 surfaces",
+            "profile, memory and notification views exclude account, seed, epoch, ciphertext and provider fields",
+            "stable consent, onboarding, revision and idempotency errors remain on the accepted HTTP catalog"
+          ],
+          "file": "apps/api/src/consent-profile/consent-profile.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile transport contract",
+          "test_id": "T-C002-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a second authenticated owner cannot read the first owner's preferred name or profile",
+            "consent withdrawal blocks profile, notification enablement and new platform-permission writes",
+            "granted platform permission leaves morning and evening preferences off",
+            "missing consent blocks onboarding and current consent accept/replay uses accepted/duplicate outcomes",
+            "onboarding without preferred name succeeds and owner injection is rejected before persistence",
+            "one command ref reused for a different operation returns idempotency conflict",
+            "same-revision concurrent profile HTTP writes return one 200 and one 409 with a closed current view"
+          ],
+          "file": "apps/api/src/consent-profile.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile HTTP E2E",
+          "test_id": "T-C002-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-A05",
       "source_sets": ["s20-api"]
@@ -4703,11 +5567,39 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all C-002 request schemas are closed and reject client owner fields",
+            "lifecycle metadata registers export allowlists, withdrawal effects, deletion scopes and retention deadlines without claiming worker completion",
+            "OpenAPI keeps every C-002 path authenticated with stable 200, 401 and 403 surfaces",
+            "profile, memory and notification views exclude account, seed, epoch, ciphertext and provider fields",
+            "stable consent, onboarding, revision and idempotency errors remain on the accepted HTTP catalog"
+          ],
+          "file": "apps/api/src/consent-profile/consent-profile.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile transport contract",
+          "test_id": "T-C002-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a second authenticated owner cannot read the first owner's preferred name or profile",
+            "consent withdrawal blocks profile, notification enablement and new platform-permission writes",
+            "granted platform permission leaves morning and evening preferences off",
+            "missing consent blocks onboarding and current consent accept/replay uses accepted/duplicate outcomes",
+            "onboarding without preferred name succeeds and owner injection is rejected before persistence",
+            "one command ref reused for a different operation returns idempotency conflict",
+            "same-revision concurrent profile HTTP writes return one 200 and one 409 with a closed current view"
+          ],
+          "file": "apps/api/src/consent-profile.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile HTTP E2E",
+          "test_id": "T-C002-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-C01",
       "source_sets": ["s20-api"]
@@ -4836,22 +5728,78 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all C-002 request schemas are closed and reject client owner fields",
+            "lifecycle metadata registers export allowlists, withdrawal effects, deletion scopes and retention deadlines without claiming worker completion",
+            "OpenAPI keeps every C-002 path authenticated with stable 200, 401 and 403 surfaces",
+            "profile, memory and notification views exclude account, seed, epoch, ciphertext and provider fields",
+            "stable consent, onboarding, revision and idempotency errors remain on the accepted HTTP catalog"
+          ],
+          "file": "apps/api/src/consent-profile/consent-profile.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile transport contract",
+          "test_id": "T-C002-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a second authenticated owner cannot read the first owner's preferred name or profile",
+            "consent withdrawal blocks profile, notification enablement and new platform-permission writes",
+            "granted platform permission leaves morning and evening preferences off",
+            "missing consent blocks onboarding and current consent accept/replay uses accepted/duplicate outcomes",
+            "onboarding without preferred name succeeds and owner injection is rejected before persistence",
+            "one command ref reused for a different operation returns idempotency conflict",
+            "same-revision concurrent profile HTTP writes return one 200 and one 409 with a closed current view"
+          ],
+          "file": "apps/api/src/consent-profile.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile HTTP E2E",
+          "test_id": "T-C002-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-C09",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all C-002 request schemas are closed and reject client owner fields",
+            "lifecycle metadata registers export allowlists, withdrawal effects, deletion scopes and retention deadlines without claiming worker completion",
+            "OpenAPI keeps every C-002 path authenticated with stable 200, 401 and 403 surfaces",
+            "profile, memory and notification views exclude account, seed, epoch, ciphertext and provider fields",
+            "stable consent, onboarding, revision and idempotency errors remain on the accepted HTTP catalog"
+          ],
+          "file": "apps/api/src/consent-profile/consent-profile.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile transport contract",
+          "test_id": "T-C002-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a second authenticated owner cannot read the first owner's preferred name or profile",
+            "consent withdrawal blocks profile, notification enablement and new platform-permission writes",
+            "granted platform permission leaves morning and evening preferences off",
+            "missing consent blocks onboarding and current consent accept/replay uses accepted/duplicate outcomes",
+            "onboarding without preferred name succeeds and owner injection is rejected before persistence",
+            "one command ref reused for a different operation returns idempotency conflict",
+            "same-revision concurrent profile HTTP writes return one 200 and one 409 with a closed current view"
+          ],
+          "file": "apps/api/src/consent-profile.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c002-evidence-manifest.json",
+          "selector": "C-002 consent/profile HTTP E2E",
+          "test_id": "T-C002-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-C10",
       "source_sets": ["s20-api"]

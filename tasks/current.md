@@ -4,12 +4,12 @@
 - **最后更新**：2026-08-20
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-002 — 实现必要同意、用户资料与表达偏好
-- **任务状态**：Ready
-- **任务 Profile**：`code`（隐私、删除、数据库或安全边界变更可将有效 Profile 提升为 `security`）
-- **当前实现分支**：尚未创建；建议 `agent/c-002-consent-profile`
+- **任务状态**：In Review
+- **任务 Profile**：`security`（任务基线为 `code`；因隐私字段保护、同意撤回、删除钩子与数据库权限边界提升）
+- **当前实现分支**：`agent/c-002-consent-profile`
 - **状态收尾**：PR #150 已 squash 合并为 `234f145a24285097cd261bd715e6d45c6022f953`
 - **当前 Issue**：[C-002 Issue #54](https://github.com/WeiHan1996/DailyEnergy/issues/54)
-- **当前 PR**：无
+- **当前 PR**：[PR #152](https://github.com/WeiHan1996/DailyEnergy/pull/152)（已获用户批准，待 final-head Gate 后合并）
 - **最近完成任务**：C-001 已随 PR #147 squash 合并为 `505a926f8830591cf305346219c86280660cd196`，Issue #53 已关闭
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -38,6 +38,11 @@ C-002 范围：
 - E-016 已完成：仓库为 public、保持无 LICENSE，`main` 由无 bypass ruleset 强制 11 个 strict required checks；
 - D-001～D-005 正式视觉前置均已 Accepted；
 - C-002 的直接前置 C-001 已满足，Issue #54 保持 Open；
+- C-002 已实现封闭 consent/profile/preferences Schema、session-owner 绑定 Nest 应用服务、PostgreSQL 事务适配器、当前必要同意版本解析、CAS/幂等/并发、默认关闭偏好和平台权限分离；
+- 称呼使用 AES-256-GCM 版本化 codec；LOCAL/CI/DEV 使用合成开发 key，发布环境未注入批准 key 时 fail closed，Production / RC 继续 `NO_GO`；
+- C-002 migration 已收紧 API 角色列权限和删除/不可变字段权限，历史 profile revision 到期不再阻断当前 Profile 后续修改；
+- 生命周期登记已覆盖导出白名单、同意/偏好撤回效果、删除 scope、称呼 72 小时、结构 revision 30 天和替代同意回执 6 个月期限；
+- Source registry 为 784 项：222 `COVERED`、562 `PLANNED`；S-17 新增 48 项，仅 `D17-I03`、`D17-I04` 由 C-002 覆盖；
 - Production / RC 继续 `NO_GO`，本任务不包含生产微信凭据或发布授权。
 
 ## 3. 开始前必须恢复的权威来源
@@ -73,15 +78,18 @@ pnpm agent:prepare C-002 --remote --deep
 
 ## 5. 验收与证据
 
-- 覆盖同意版本升级、拒绝、撤回、CAS 冲突、字段 allowlist 和 owner 负向测试；
-- 更新本 Issue 覆盖的 Source ID：已实现项转为 `COVERED`，无法覆盖时只允许有批准理由的 `NA_WITH_REASON`；
-- 覆盖 loading、失败、重试、并发和删除相关状态；
-- 提交审核前运行有效 Profile 要求的 full Gate，并取得 PR exact head 的 11/11 平台 CI；
-- security / privacy 人工证据不得由自动化冒充 PASS。
+- Shared schemas 6 files / 41 tests、server adapters 10 files / 40 tests、API 15 files / 71 tests 均通过；C-002 HTTP E2E 4/4 通过；
+- 真实 PostgreSQL C-002 invariant test 通过，覆盖当前同意版本、原子 onboarding、同 revision 并发、跨操作幂等冲突、revision 历史清理、撤回门控、owner 隔离和列权限；
+- C-001 真实 PostgreSQL 身份回归通过；数据库全套 integration 83/83 通过；migration checksum、catalog fingerprint、Source registry 和 Phase Gate 均通过；
+- 最终 changed Gate：`MANUAL_EVIDENCE_REQUIRED | automated=PASS | profile=security | mode=changed→full`；
+- 最终 C-002 full Gate：`MANUAL_EVIDENCE_REQUIRED | automated=PASS | profile=security | mode=full→full`；
+- 两个 Gate 均使用仓库精确 Node `24.18.0`；本机镜像不提供 audit endpoint，验证命令仅临时忽略用户级镜像并使用 npm 官方 endpoint，结果 critical/high 均为 0；
+- Draft PR #152 head `229c1bbc720e95da4f3920fc6f494ce8c8de61b3` 对应 CI run `32365017600`，同一 run 11/11 SUCCESS；
+- 2026-08-20 已完成人工 threat-boundary review：session-owner、称呼 key、数据库列权限、撤回竞态和删除传播均无开发合并阻断；完整导出/物理删除仍由 C-014 承接，不冒充本任务已闭环；
+- 项目所有者已确认 C-002 产品与安全边界，同意生产称呼 key 接线随 Production `NO_GO` 延后，本次不授予生产发布权限，并批准 PR #152 在精确 head 11/11 后 squash merge；`productionAuthorizationWhenApplicable` 因本次不涉及生产发布而明确为不适用，Production / RC 保持 `NO_GO`。
 
 ## 6. 精确下一步
 
-1. 从最新 `main` 创建 `agent/c-002-consent-profile`；
-2. 运行 `pnpm agent:prepare C-002 --remote --deep` 并读取全部 required sources；
-3. 校准 C-002 边界、Requirement-to-Proof Matrix 和聚焦 PR 计划后再开始实现；
-4. 不提前开始 C-003。
+1. 提交并推送本次人工证据与用户授权记录，将 PR #152 标记 Ready；
+2. 取得新 final head 的同一 run 11/11 SUCCESS，运行 exact-head verifier 后使用 `--match-head-commit` squash merge；
+3. 验证 merged-main CI、Issue #54 和 `main`，再把 C-002 设为 Done、C-003 设为唯一 Ready；状态收尾前不开始 C-003。

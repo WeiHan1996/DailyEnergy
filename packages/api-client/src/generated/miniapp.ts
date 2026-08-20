@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:97ffe5ff991f33286b2b355c0a2be6aef9c3df0683cb11149d5be16365a80b6c
+// source-fingerprint: sha256:6ad35944c6bceb6f55769e5cc5f9e3fc4b45e4754a2c4dcb22e9a3d16ec5350e
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:97ffe5ff991f33286b2b355c0a2be6aef9c3df0683cb11149d5be16365a80b6c";
+  "sha256:6ad35944c6bceb6f55769e5cc5f9e3fc4b45e4754a2c4dcb22e9a3d16ec5350e";
 
 export interface paths {
   "/auth/reauth/verify": {

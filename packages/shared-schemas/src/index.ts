@@ -63,8 +63,40 @@ export type {
   WriteWindow,
 } from "./common.js";
 
-export { WechatSessionRequestSchema } from "./public-transport.js";
-export type { WechatSessionRequest } from "./public-transport.js";
+export {
+  ClientContextSchema,
+  CommandReceiptViewSchema,
+  CommandRefSchema,
+  ConsentAcceptRequestSchema,
+  ConsentViewSchema,
+  ConsentWithdrawRequestSchema,
+  MemoryPreferencesUpdateRequestSchema,
+  MemoryPreferencesViewSchema,
+  NotificationPermissionSyncRequestSchema,
+  NotificationSettingsUpdateRequestSchema,
+  NotificationSettingsViewSchema,
+  OnboardingCompleteRequestSchema,
+  ProfileUpdateRequestSchema,
+  ProfileViewSchema,
+  StyleCalibrationRequestSchema,
+  WechatSessionRequestSchema,
+} from "./public-transport.js";
+export type {
+  CommandReceiptView,
+  ConsentAcceptRequest,
+  ConsentView,
+  ConsentWithdrawRequest,
+  MemoryPreferencesUpdateRequest,
+  MemoryPreferencesView,
+  NotificationPermissionSyncRequest,
+  NotificationSettingsUpdateRequest,
+  NotificationSettingsView,
+  OnboardingCompleteRequest,
+  ProfileUpdateRequest,
+  ProfileView,
+  StyleCalibrationRequest,
+  WechatSessionRequest,
+} from "./public-transport.js";
 
 export {
   ClientDailyContentViewSchema,

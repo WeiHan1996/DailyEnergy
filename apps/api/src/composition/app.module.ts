@@ -1,4 +1,5 @@
 import { Module, type DynamicModule, type Provider } from "@nestjs/common";
+import { UNAVAILABLE_CONSENT_PROFILE_STORE } from "@daily-energy/server-adapters/api";
 
 import { AuthAttemptLimiter } from "../auth/auth-attempt-limiter.js";
 import { AuthService } from "../auth/auth.service.js";
@@ -8,6 +9,11 @@ import {
   UNAVAILABLE_WECHAT_CODE_EXCHANGE,
 } from "../auth/contracts.js";
 import { ShutdownObserver } from "../bootstrap/shutdown-observer.js";
+import { ConsentProfileService } from "../consent-profile/consent-profile.service.js";
+import {
+  developmentPreferredNameCodec,
+  UNAVAILABLE_PREFERRED_NAME_CODEC,
+} from "../consent-profile/preferred-name-codec.js";
 import {
   ApiTelemetry,
   NOOP_TELEMETRY_RUNTIME,
@@ -23,6 +29,7 @@ import { HttpLoggingInterceptor } from "../transport/common/http-logging.interce
 import { MaintenanceGuard } from "../transport/common/maintenance.guard.js";
 import { RequestContextStore } from "../transport/common/request-context.js";
 import { AuthController } from "../transport/public/auth.controller.js";
+import { ConsentProfileController } from "../transport/public/consent-profile.controller.js";
 import { HealthController } from "../transport/public/health.controller.js";
 import { HealthService } from "../transport/public/health.service.js";
 import { LaunchAudienceGuard } from "../transport/public/launch-audience.guard.js";
@@ -32,8 +39,10 @@ import { SessionGuard } from "../transport/public/session.guard.js";
 import {
   ADMIN_AUDIENCE_VERIFIER,
   AUTH_STORE,
+  CONSENT_PROFILE_STORE,
   type ApiComposition,
   ORDINARY_LOG_SINK,
+  PREFERRED_NAME_CODEC,
   PUBLIC_AUDIENCE_VERIFIER,
   READINESS_CHECKS,
   RUNTIME_CONFIG,
@@ -55,11 +64,27 @@ export class ApiModule {
     )
       ? new DevelopmentWechatCodeExchange(composition.config.environment)
       : UNAVAILABLE_WECHAT_CODE_EXCHANGE;
+    const developmentProfileCodec = ["LOCAL", "CI", "DEV"].includes(
+      composition.config.environment,
+    )
+      ? developmentPreferredNameCodec()
+      : UNAVAILABLE_PREFERRED_NAME_CODEC;
     const providers: Provider[] = [
       { provide: RUNTIME_CONFIG, useValue: composition.config },
       {
         provide: AUTH_STORE,
         useValue: composition.overrides?.authStore ?? UNAVAILABLE_AUTH_STORE,
+      },
+      {
+        provide: CONSENT_PROFILE_STORE,
+        useValue:
+          composition.overrides?.consentProfileStore ??
+          UNAVAILABLE_CONSENT_PROFILE_STORE,
+      },
+      {
+        provide: PREFERRED_NAME_CODEC,
+        useValue:
+          composition.overrides?.preferredNameCodec ?? developmentProfileCodec,
       },
       {
         provide: WECHAT_CODE_EXCHANGE,
@@ -107,6 +132,7 @@ export class ApiModule {
       ApiExceptionFilter,
       AuthAttemptLimiter,
       AuthService,
+      ConsentProfileService,
       HealthService,
       HttpLoggingInterceptor,
       LaunchAudienceGuard,
@@ -121,6 +147,7 @@ export class ApiModule {
       controllers: [
         AdminController,
         AuthController,
+        ConsentProfileController,
         HealthController,
         PublicController,
       ],

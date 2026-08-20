@@ -152,6 +152,18 @@
       "planned_owner": "E-013 or the owning runtime implementation issue"
     },
     {
+      "set_id": "s17-domain-model",
+      "authority_path": "docs/data/domain-model.md",
+      "extractor": {
+        "kind": "text-regex",
+        "pattern": "D17-[A-Z][0-9]{2}"
+      },
+      "expected_count": 48,
+      "accepted_marker": "\\*\\*文档状态\\*\\*：Accepted",
+      "requirements": [{ "any_of": ["DB", "CONTRACT", "INTEGRATION", "E2E"] }],
+      "planned_owner": "Owning Phase 2-3 domain implementation issue"
+    },
+    {
       "set_id": "s19-database",
       "authority_path": "docs/technical/database.md",
       "extractor": {
@@ -258,6 +270,10 @@
     },
     {
       "path": "tests/registry/c001-evidence-manifest.json",
+      "kind": "proof-map"
+    },
+    {
+      "path": "tests/registry/c002-evidence-manifest.json",
       "kind": "proof-map"
     }
   ],
