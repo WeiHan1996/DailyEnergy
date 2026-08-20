@@ -108,7 +108,7 @@
 | S-34 | Phase 1～3 工程 Issues | Done | 3 个 GitHub Milestones、48 个 Issues                       | S-01～S-33             |
 | S-35 | Phase 0B Gate 评审     | Done | [Phase 0B Gate 评审报告](../docs/reports/phase-0b-gate.md) | S-34                   |
 
-S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。E-001～E-016 已全部完成并进入 Done，Phase 1 已结束。E-016 已将仓库切换为 public、保持无 LICENSE，并以无 bypass `main` ruleset 恢复 11 个 strict required checks；PR #149 已 squash 合并为 `05969f64e8f2d09a05e6f26d3250bd646bfe8bf0`，Issue #148 已关闭，C-001 已恢复。E-014 获项目所有者接受并随 PR #138 squash 合并为 `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`；final-head PR CI 与 merged-main CI 最终均为 11/11 SUCCESS。Phase 2 已开始。项目所有者已接受 D-001 的 A — 温柔自然方向，理由为“清晰自然，排版克制，内容清晰”，且不吸收其它路线元素；Figma 决策文字已同步。D-001 PR #140 已在 exact-head 11/11 后 squash 合并为 `e37009439bce545dd1f19d19f589b209ec178b9e`，Issue #99 已关闭。merged-main run `31720488027` 的 9 个 automated lane 成功，但 supply-chain 因新更新的 `GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.17`；状态收口 PR #141 已把现有精确 override 最小提升到 `3.3.18` 并合并为 `128ee8d`。项目所有者已于 2026-08-15 接受 D-002；PR #142 精确 head `7139cfb` 的 CI run `31888493133` 11/11 SUCCESS，并 squash 合并为 `1fa5922`，Issue #100 已关闭。项目所有者于 2026-08-18 接受 D-003；PR #144 已合并为 `db57fbc7aeb7b9ebceddcc69c6d2d90e41722f7f`，Issue #101 已关闭。D-004 与 D-005 均已完成并获接受；C-001 已进入实现审核收口。
+S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结论为 Accepted `GO`；Phase 0B 已结束。E-001～E-016 已全部完成并进入 Done，Phase 1 已结束。E-016 已将仓库切换为 public、保持无 LICENSE，并以无 bypass `main` ruleset 恢复 11 个 strict required checks；PR #149 已 squash 合并为 `05969f64e8f2d09a05e6f26d3250bd646bfe8bf0`，Issue #148 已关闭。E-014 获项目所有者接受并随 PR #138 squash 合并为 `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`；final-head PR CI 与 merged-main CI 最终均为 11/11 SUCCESS。Phase 2 已开始。项目所有者已接受 D-001 的 A — 温柔自然方向，理由为“清晰自然，排版克制，内容清晰”，且不吸收其它路线元素；Figma 决策文字已同步。D-001 PR #140 已在 exact-head 11/11 后 squash 合并为 `e37009439bce545dd1f19d19f589b209ec178b9e`，Issue #99 已关闭。merged-main run `31720488027` 的 9 个 automated lane 成功，但 supply-chain 因新更新的 `GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.17`；状态收口 PR #141 已把现有精确 override 最小提升到 `3.3.18` 并合并为 `128ee8d`。项目所有者已于 2026-08-15 接受 D-002；PR #142 精确 head `7139cfb` 的 CI run `31888493133` 11/11 SUCCESS，并 squash 合并为 `1fa5922`，Issue #100 已关闭。项目所有者于 2026-08-18 接受 D-003；PR #144 已合并为 `db57fbc7aeb7b9ebceddcc69c6d2d90e41722f7f`，Issue #101 已关闭。D-004 与 D-005 均已完成并获接受；C-001 已随 PR #147 合并为 `505a926f8830591cf305346219c86280660cd196`，C-002 是唯一 Ready 任务。
 
 ## 4. Phase 1：工程基础
 
@@ -202,8 +202,8 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 | ID                                                           | 任务               | 状态    | 主要结果               |
 | ------------------------------------------------------------ | ------------------ | ------- | ---------------------- |
-| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | In Review | 已恢复平台 CI；等待新 head 的 11/11 Gate |
-| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Planned | 最小授权和可修改资料   |
+| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Done | 安全会话与身份边界；PR #147 合并为 `505a926` |
+| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Ready | 最小授权和可修改资料   |
 | [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | Planned | 称呼和表达偏好         |
 | [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | Planned | 情绪、精力和睡眠       |
 | [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | Planned | 用户、日期和版本驱动   |
