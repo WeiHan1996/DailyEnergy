@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`
 - **当前分支**：`agent/public-repository-controls`
 - **当前 Issue**：[E-016 Issue #148](https://github.com/WeiHan1996/DailyEnergy/issues/148)
-- **当前 PR**：待本地 Gate 通过后创建聚焦 Draft PR
+- **当前 PR**：[Draft PR #149](https://github.com/WeiHan1996/DailyEnergy/pull/149)
 - **被中断任务**：C-001 — 实现微信身份与安全会话；分支 `agent/c-001-wechat-auth`，Draft PR #147，精确 head `c5e7cd19edea1a3c62a747fbb24b9e7d6e3d036d`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -55,7 +55,18 @@ E-016 范围：
 - platform Gate 只是 Production / RC 基线，不能解除现有 `NO_GO`；
 - C-001 代码和既有精确 head 保持不变，E-016 使用独立 PR。
 
-## 4. 精确执行顺序
+## 4. 已完成实现与验证
+
+- executable policy 已迁移到 `e-016-ci-policy-v4`，固定 public、无 LICENSE、squash-only、
+  strict 11 checks、无 bypass `main` ruleset、外部贡献者审批与 GitHub 安全控制；
+- 新增只读 `pnpm ci:verify-repository-controls`，保留 exact-head / 同一 run PR verifier；
+- CI policy 27/27、Phase Gate 5/5、registry 736 项均通过；
+- `pnpm agent:validate --mode=task --task=E-016` 在允许本地监听的环境中 automated `PASS`；
+- security profile 所需 threat-boundary review 已完成，公开授权已由用户明确给出；Production
+  authorization 不适用，Production/RC 继续 `NO_GO`；
+- 初始实现提交 `b46715b` 已推送并创建 Draft PR #149。
+
+## 5. 精确执行顺序
 
 1. 在当前分支更新 CI policy、校验器、测试、registry 和状态文档；
 2. 本地执行针对性 Gate，创建 Draft PR 并记录 exact head；
@@ -66,6 +77,6 @@ E-016 范围：
 7. 回到 PR #147，更新到新 `main`，只重跑 C-001 当前最终 head 的 CI；若业务 diff 未发生
    material change，可沿用既有 C-001 审核，否则重新请求审核。
 
-## 5. 下一任务
+## 6. 下一任务
 
 E-016 完成后恢复 C-001；不要提前开始 C-002。
