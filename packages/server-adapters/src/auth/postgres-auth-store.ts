@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 
 import { Pool, type PoolClient } from "pg";
 
+import { commandRefStorageUuid } from "../commands/command-ref.js";
+import { CURRENT_NECESSARY_CONSENT_NOTICE_VERSION } from "../consent-profile/postgres-consent-profile-store.js";
 import { createClosedDatabaseFactory } from "../db/internal/create-closed-database-factory.js";
 import { prismaRuntime } from "../db/internal/prisma-runtime.js";
 
@@ -444,13 +446,14 @@ async function findAccountForIdentity(
   const result = await client.query<AccountRow>(
     `SELECT a.id AS "accountId",
             a.state::text AS "accountState",
-            NOT EXISTS (
-              SELECT 1
+            COALESCE((
+              SELECT c.status::text
                 FROM daily_energy.app_necessary_consent_record c
                WHERE c."accountId" = a.id
-                 AND c.status = 'ACCEPTED'
-                 AND c."withdrawnAt" IS NULL
-            ) AS "consentRequired",
+                 AND c."noticeVersion" = '${CURRENT_NECESSARY_CONSENT_NOTICE_VERSION}'
+               ORDER BY c."createdAt" DESC, c."withdrawnAt" DESC NULLS LAST, c.id DESC
+               LIMIT 1
+            ), 'MISSING') <> 'ACCEPTED' AS "consentRequired",
             NOT EXISTS (
               SELECT 1
                 FROM daily_energy.app_onboarding_completion o
@@ -466,26 +469,17 @@ async function findAccountForIdentity(
   return result.rows[0];
 }
 
-function commandRefStorageUuid(commandRef: string): string {
-  const bytes = createHash("sha256")
-    .update(`${SESSION_LOGOUT_OPERATION}\u0000${commandRef}`, "utf8")
-    .digest()
-    .subarray(0, 16);
-  bytes[6] = (bytes[6]! & 0x0f) | 0x50;
-  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
-  const hex = bytes.toString("hex");
-  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
-}
-
 function sessionSelect(whereClause: string): string {
   return `SELECT s.id AS "sessionId", s."expiresAt", s."revokedAt",
                  a.id AS "accountId", a.state::text AS "accountState",
-                 NOT EXISTS (
-                   SELECT 1 FROM daily_energy.app_necessary_consent_record c
+                 COALESCE((
+                   SELECT c.status::text
+                     FROM daily_energy.app_necessary_consent_record c
                     WHERE c."accountId" = a.id
-                      AND c.status = 'ACCEPTED'
-                      AND c."withdrawnAt" IS NULL
-                 ) AS "consentRequired",
+                      AND c."noticeVersion" = '${CURRENT_NECESSARY_CONSENT_NOTICE_VERSION}'
+                    ORDER BY c."createdAt" DESC, c."withdrawnAt" DESC NULLS LAST, c.id DESC
+                    LIMIT 1
+                 ), 'MISSING') <> 'ACCEPTED' AS "consentRequired",
                  NOT EXISTS (
                    SELECT 1 FROM daily_energy.app_onboarding_completion o
                     WHERE o."accountId" = a.id

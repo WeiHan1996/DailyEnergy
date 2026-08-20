@@ -20,12 +20,23 @@ function cloneRegistry() {
 test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () => {
   assert.deepEqual(await loadAndValidateCoverageRegistry(), {
     counts: {
-      COVERED: 210,
+      COVERED: 222,
       NA_WITH_REASON: 0,
-      PLANNED: 526,
+      PLANNED: 562,
     },
-    total: 736,
+    total: 784,
   });
+
+  const domainEntries = registry.entries.filter(({ source_id: sourceId }) =>
+    sourceId.startsWith("D17-"),
+  );
+  assert.equal(domainEntries.length, 48);
+  assert.deepEqual(
+    domainEntries
+      .filter(({ status }) => status === "COVERED")
+      .map(({ source_id: sourceId }) => sourceId),
+    ["D17-I03", "D17-I04"],
+  );
 });
 
 test("T-E010-REGISTRY-001 rejects unmapped and duplicate Source IDs", () => {

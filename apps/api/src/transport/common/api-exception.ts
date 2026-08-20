@@ -1,4 +1,9 @@
 import { HttpStatus } from "@nestjs/common";
+import {
+  MemoryPreferencesViewSchema,
+  NotificationSettingsViewSchema,
+  ProfileViewSchema,
+} from "@daily-energy/shared-schemas";
 import { z } from "zod";
 
 export type ApiErrorCategory =
@@ -21,6 +26,13 @@ interface ApiErrorDefinition {
 }
 
 export const API_ERROR_CATALOG = {
+  ACCOUNT_RESTRICTED: {
+    category: "GUARD",
+    message: "当前账户状态不允许继续此操作。",
+    messageKey: "error.account_restricted",
+    retryable: false,
+    status: HttpStatus.FORBIDDEN,
+  },
   AUTH_ADMIN_REQUIRED: {
     category: "AUTH",
     message: "当前管理会话无权访问此内容。",
@@ -63,6 +75,13 @@ export const API_ERROR_CATALOG = {
     retryable: true,
     status: HttpStatus.SERVICE_UNAVAILABLE,
   },
+  CONSENT_REQUIRED: {
+    category: "GUARD",
+    message: "请先阅读并确认当前必要告知。",
+    messageKey: "error.consent_required",
+    retryable: false,
+    status: HttpStatus.FORBIDDEN,
+  },
   IDEMPOTENCY_CONFLICT: {
     category: "CONFLICT",
     message: "请求标识已用于不同内容，请检查后重试。",
@@ -91,6 +110,13 @@ export const API_ERROR_CATALOG = {
     retryable: true,
     status: HttpStatus.FORBIDDEN,
   },
+  ONBOARDING_REQUIRED: {
+    category: "GUARD",
+    message: "请先完成首次认识。",
+    messageKey: "error.onboarding_required",
+    retryable: false,
+    status: HttpStatus.FORBIDDEN,
+  },
   PAYLOAD_TOO_LARGE: {
     category: "VALIDATION",
     message: "请求内容过大，请精简后重试。",
@@ -111,6 +137,13 @@ export const API_ERROR_CATALOG = {
     messageKey: "error.resource_not_found",
     retryable: false,
     status: HttpStatus.NOT_FOUND,
+  },
+  REVISION_CONFLICT: {
+    category: "CONFLICT",
+    message: "内容已在别处更新，请查看最新状态后重试。",
+    messageKey: "error.revision_conflict",
+    retryable: false,
+    status: HttpStatus.CONFLICT,
   },
   UPSTREAM_TRANSIENT: {
     category: "TRANSIENT",
@@ -151,7 +184,17 @@ const RetryAfterErrorDetailsSchema = z.strictObject({
 export type RetryAfterErrorDetails = z.infer<
   typeof RetryAfterErrorDetailsSchema
 >;
-export type ApiErrorDetails = ValidationErrorDetails | RetryAfterErrorDetails;
+const RevisionErrorDetailsSchema = z.strictObject({
+  current_revision: z.number().int().positive(),
+  current: z.union([
+    ProfileViewSchema,
+    MemoryPreferencesViewSchema,
+    NotificationSettingsViewSchema,
+  ]),
+});
+export type RevisionErrorDetails = z.infer<typeof RevisionErrorDetailsSchema>;
+export type ApiErrorDetails =
+  ValidationErrorDetails | RetryAfterErrorDetails | RevisionErrorDetails;
 
 type ApiExceptionOptions = {
   [Code in ApiErrorCode]: Code extends "VALIDATION_FAILED"
@@ -159,16 +202,21 @@ type ApiExceptionOptions = {
         readonly code: Code;
         readonly details?: ValidationErrorDetails;
       }
-    : Code extends
-          "RATE_LIMITED" | "DEPENDENCY_UNAVAILABLE" | "UPSTREAM_TRANSIENT"
+    : Code extends "REVISION_CONFLICT"
       ? {
           readonly code: Code;
-          readonly details?: RetryAfterErrorDetails;
+          readonly details?: RevisionErrorDetails;
         }
-      : {
-          readonly code: Code;
-          readonly details?: never;
-        };
+      : Code extends
+            "RATE_LIMITED" | "DEPENDENCY_UNAVAILABLE" | "UPSTREAM_TRANSIENT"
+        ? {
+            readonly code: Code;
+            readonly details?: RetryAfterErrorDetails;
+          }
+        : {
+            readonly code: Code;
+            readonly details?: never;
+          };
 }[ApiErrorCode];
 
 function isApiErrorCode(value: unknown): value is ApiErrorCode {
@@ -194,7 +242,9 @@ function projectDetails(
             "UPSTREAM_TRANSIENT",
           ].includes(code)
         ? RetryAfterErrorDetailsSchema
-        : undefined;
+        : code === "REVISION_CONFLICT"
+          ? RevisionErrorDetailsSchema
+          : undefined;
   if (schema === undefined) {
     return undefined;
   }

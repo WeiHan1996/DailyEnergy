@@ -154,6 +154,17 @@
 
 字段映射原则：API DTO 只能提交 OpenAPI 明确允许的字段；owner、账户 ID、Safety/deletion epoch、seed、ciphertext、provider、内部 fingerprint 和任意 Prisma 字段均由服务端解析或生成。
 
+### 5.1 C-002 实现登记（2026-08-20）
+
+C-002 在 `apps/api/src/consent-profile/lifecycle.ts` 注册 consent、profile、memory preferences 与 notification settings 的导出字段白名单、撤回即时效果、删除 scope 和最长清理期限；生产 command/query 只从 `SessionPrincipal` 解析 owner，称呼经版本化 codec 保护后才进入 PostgreSQL。对应实现保持以下边界：
+
+- 当前必要告知为 `necessary-consent-v1`；旧版本 ACCEPTED 不解除普通旅程门控，撤回立即阻断普通写，但不声称账户或资料已删除；
+- 未填写称呼时不创建昵称；替换后的称呼 revision 最迟 72 小时清除，其他被替换结构 revision 最迟 30 天，当前资料只影响未来表达；
+- memory 与 notification 默认关闭；平台 permission snapshot 只是观察事实，不会修改通知偏好或替代必要同意；
+- `ACCOUNT`、`CONSENT_WITHDRAWAL`、`PROFILE_SOURCE_CLEAR` 和 `PREFERENCE_WITHDRAWAL` scope 已注册给后续权利流程；C-002 不实现或伪造下游导出 artifact、物理删除 step、provider/backup 传播完成结果。
+
+自动化证据登记在 `tests/registry/c002-evidence-manifest.json`；security Profile 仍要求人工核验 session-owner、称呼密钥、数据库列权限、撤回竞态和删除传播边界，自动化不得替代该审核。
+
 ## 6. 处理目的、必要性与禁止用途
 
 | 数据组 | 允许目的 | 必要性/可选性 | 明确禁止 |

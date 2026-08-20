@@ -56,6 +56,22 @@ export {
   type SessionRevocation,
 } from "../auth/postgres-auth-store.js";
 
+export {
+  CURRENT_NECESSARY_CONSENT_NOTICE_VERSION,
+  PostgresConsentProfileStore,
+  UNAVAILABLE_CONSENT_PROFILE_STORE,
+  type ConsentProfileStore,
+  type PostgresConsentProfileStoreConfig,
+  type ProtectedPreferredName,
+  type StoredConsentView,
+  type StoredExpressionStyle,
+  type StoredMemoryPreferencesView,
+  type StoredNotificationSettingsView,
+  type StoredPermission,
+  type StoredProfileView,
+  type StoreMutation,
+} from "../consent-profile/postgres-consent-profile-store.js";
+
 export type {
   MetricName,
   TelemetryAttributes,

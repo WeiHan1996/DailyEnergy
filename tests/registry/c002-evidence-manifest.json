@@ -1,0 +1,136 @@
+{
+  "manifest_version": "c-002-evidence-v1",
+  "scope": "C-002 current necessary consent, minimal profile, optional preferences, owner binding and lifecycle registration",
+  "authority": [
+    "docs/data/domain-model.md",
+    "docs/technical/api.md",
+    "docs/technical/database.md",
+    "docs/operations/privacy-data-map.md",
+    "docs/decisions/ADR-0005-data-retention-and-deletion.md"
+  ],
+  "proofs": {
+    "T-C002-DB-001": {
+      "file": "tests/database/c002-consent-profile.test.mjs",
+      "selector": "C-002 real PostgreSQL consent/profile/preference invariants",
+      "level": "DB",
+      "assertions": [
+        "only the accepted current notice version unlocks the production session consent guard",
+        "onboarding commits one profile revision, one completion and defaults-off preference facts; same command replay adds no revision",
+        "same-revision concurrent profile writes have one winner and one current-view conflict",
+        "same command and payload returns duplicate while a different payload returns idempotency conflict without a domain write",
+        "profile changes preserve onboarding and byte-for-byte historical result facts",
+        "preferred-name revision copies expire within 72 hours without preventing later profile updates, and the API role cannot delete C-002 facts or read identity ciphertext",
+        "platform permission observation remains separate from defaults-off notification preferences",
+        "withdrawal blocks new ordinary profile and platform-permission writes without creating a deletion result"
+      ]
+    },
+    "T-C002-CONTRACT-001": {
+      "file": "apps/api/src/consent-profile/consent-profile.contract.test.ts",
+      "selector": "C-002 consent/profile transport contract",
+      "level": "CONTRACT",
+      "assertions": [
+        "all C-002 request schemas are closed and reject client owner fields",
+        "profile, memory and notification views exclude account, seed, epoch, ciphertext and provider fields",
+        "OpenAPI keeps every C-002 path authenticated with stable 200, 401 and 403 surfaces",
+        "stable consent, onboarding, revision and idempotency errors remain on the accepted HTTP catalog",
+        "lifecycle metadata registers export allowlists, withdrawal effects, deletion scopes and retention deadlines without claiming worker completion"
+      ]
+    },
+    "T-C002-E2E-001": {
+      "file": "apps/api/src/consent-profile.e2e.test.ts",
+      "selector": "C-002 consent/profile HTTP E2E",
+      "level": "E2E",
+      "assertions": [
+        "missing consent blocks onboarding and current consent accept/replay uses accepted/duplicate outcomes",
+        "one command ref reused for a different operation returns idempotency conflict",
+        "onboarding without preferred name succeeds and owner injection is rejected before persistence",
+        "same-revision concurrent profile HTTP writes return one 200 and one 409 with a closed current view",
+        "granted platform permission leaves morning and evening preferences off",
+        "consent withdrawal blocks profile, notification enablement and new platform-permission writes",
+        "a second authenticated owner cannot read the first owner's preferred name or profile"
+      ]
+    },
+    "T-C002-UNIT-001": {
+      "file": "apps/api/src/consent-profile/consent-profile.service.test.ts",
+      "selector": "C-002 consent/profile application service",
+      "level": "UNIT",
+      "assertions": [
+        "SessionPrincipal is the only owner source and stale notice versions fail before persistence",
+        "preferred name is optional and protected before it reaches the store",
+        "revision conflicts project only the current client view",
+        "optional enablement is consent-gated and permission sync is an observation"
+      ]
+    },
+    "T-C002-CRYPTO-001": {
+      "file": "apps/api/src/consent-profile/preferred-name-codec.test.ts",
+      "selector": "C-002 preferred-name protection",
+      "level": "UNIT",
+      "assertions": [
+        "AES-GCM protected bytes do not contain plaintext and decrypt only with the matching key version",
+        "tampered ciphertext, invalid key sizes and unapproved key versions fail closed"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S19-DB-004",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-006",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-007",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-037",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-DB-001"]
+    },
+    {
+      "source_id": "S20-A05",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-CONTRACT-001", "T-C002-E2E-001"]
+    },
+    {
+      "source_id": "S20-C01",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-CONTRACT-001", "T-C002-E2E-001"]
+    },
+    {
+      "source_id": "S20-C09",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-CONTRACT-001", "T-C002-E2E-001"]
+    },
+    {
+      "source_id": "S20-C10",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-CONTRACT-001", "T-C002-E2E-001"]
+    },
+    {
+      "source_id": "PDM-C02",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-DB-001", "T-C002-CONTRACT-001", "T-C002-E2E-001"]
+    },
+    {
+      "source_id": "PDM-D08",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-DB-001", "T-C002-CONTRACT-001", "T-C002-E2E-001"]
+    },
+    {
+      "source_id": "D17-I03",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-DB-001", "T-C002-E2E-001"]
+    },
+    {
+      "source_id": "D17-I04",
+      "status": "COVERED",
+      "proof_ids": ["T-C002-DB-001", "T-C002-E2E-001"]
+    }
+  ]
+}

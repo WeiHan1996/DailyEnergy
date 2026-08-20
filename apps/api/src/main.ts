@@ -4,8 +4,10 @@ import { readFile } from "node:fs/promises";
 import type { AddressInfo } from "node:net";
 import {
   PostgresAuthStore,
+  PostgresConsentProfileStore,
   startApiTelemetry,
   type AuthStore,
+  type ConsentProfileStore,
   type TelemetryRuntime,
 } from "@daily-energy/server-adapters/api";
 
@@ -50,6 +52,7 @@ function writeStartupFailure(reasonCode: StartupFailureReason): void {
 async function main(): Promise<void> {
   let telemetry: TelemetryRuntime | undefined;
   let authStore: AuthStore | undefined;
+  let consentProfileStore: ConsentProfileStore | undefined;
   try {
     const config = loadRuntimeConfig(process.env);
     telemetry = startApiTelemetrySafely(startApiTelemetry, {
@@ -84,6 +87,12 @@ async function main(): Promise<void> {
           connectionString,
           expectedDatabaseRole: "daily_energy_api",
         });
+        consentProfileStore = await PostgresConsentProfileStore.connect({
+          applicationName: "daily-energy:api:consent-profile",
+          connectionLimit: 4,
+          connectionString,
+          expectedDatabaseRole: "daily_energy_api",
+        });
       } catch {
         throw new ApiStartupError("API_DATABASE_NOT_READY");
       }
@@ -91,11 +100,15 @@ async function main(): Promise<void> {
     }
     const application = await createApiApplication(config, {
       ...(authStore === undefined ? {} : { authStore }),
+      ...(consentProfileStore === undefined ? {} : { consentProfileStore }),
       readinessChecks,
       shutdownDrainHooks: [
         ...(authStore === undefined
           ? []
           : [{ drain: () => authStore?.close() }]),
+        ...(consentProfileStore === undefined
+          ? []
+          : [{ drain: () => consentProfileStore?.close() }]),
         { drain: () => telemetry?.shutdown() },
       ],
       telemetryRuntime: telemetry,
@@ -113,6 +126,7 @@ async function main(): Promise<void> {
     });
   } catch (error) {
     await authStore?.close().catch(() => undefined);
+    await consentProfileStore?.close().catch(() => undefined);
     await telemetry?.shutdown().catch(() => undefined);
     writeStartupFailure(
       error instanceof RuntimeConfigError

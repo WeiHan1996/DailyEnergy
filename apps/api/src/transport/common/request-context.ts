@@ -32,6 +32,18 @@ function operationFor(method: string, url: string): OperationCode {
     "POST /v1/auth/wechat/session": "PUBLIC_WECHAT_SESSION_PLACEHOLDER",
     "POST /v1/auth/session/refresh": "AUTH_SESSION_REFRESH",
     "POST /v1/auth/session/logout": "AUTH_SESSION_LOGOUT",
+    "GET /v1/consent/current": "CONSENT_CURRENT",
+    "POST /v1/consent/accept": "CONSENT_ACCEPT",
+    "POST /v1/consent/withdraw": "CONSENT_WITHDRAW",
+    "GET /v1/profile": "PROFILE_READ",
+    "POST /v1/onboarding/complete": "ONBOARDING_COMPLETE",
+    "POST /v1/profile/update": "PROFILE_UPDATE",
+    "POST /v1/profile/style-calibration": "PROFILE_STYLE_CALIBRATION",
+    "GET /v1/memory/preferences": "MEMORY_PREFERENCES_READ",
+    "POST /v1/memory/preferences": "MEMORY_PREFERENCES_UPDATE",
+    "GET /v1/notifications/settings": "NOTIFICATION_SETTINGS_READ",
+    "POST /v1/notifications/settings": "NOTIFICATION_SETTINGS_UPDATE",
+    "POST /v1/notifications/permission-sync": "NOTIFICATION_PERMISSION_SYNC",
   };
   return operations[key] ?? "UNKNOWN_HTTP";
 }

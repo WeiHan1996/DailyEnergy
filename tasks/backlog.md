@@ -1,9 +1,9 @@
 # DailyEnergy 项目 Backlog
 
 - **文档状态**：Active
-- **最后更新**：2026-08-18
+- **最后更新**：2026-08-20
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：[D-004 高保真原型、验证与开发交付](./current.md)（In Review；D-003 已接受并随 PR #144 合并）
+- **当前任务**：[C-002 隐私同意与用户资料](./current.md)（In Review；C-001 已随 PR #147 合并）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -203,7 +203,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | ID                                                           | 任务               | 状态    | 主要结果               |
 | ------------------------------------------------------------ | ------------------ | ------- | ---------------------- |
 | [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Done | 安全会话与身份边界；PR #147 合并为 `505a926` |
-| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Ready | 最小授权和可修改资料   |
+| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | In Review | 最小授权和可修改资料   |
 | [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | Planned | 称呼和表达偏好         |
 | [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | Planned | 情绪、精力和睡眠       |
 | [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | Planned | 用户、日期和版本驱动   |

@@ -89,6 +89,11 @@ test("T-DB-STATIC-003 migration checksum changes on mutation", async () => {
       "20260819000000_c001_auth_column_permissions",
     );
     await mkdir(authDirectory);
+    const consentProfileDirectory = path.join(
+      temporaryRoot,
+      "20260820000000_c002_consent_profile_permissions",
+    );
+    await mkdir(consentProfileDirectory);
     const target = path.join(targetDirectory, "migration.sql");
     await copyFile(migrationFile, target);
     await copyFile(
@@ -118,6 +123,13 @@ test("T-DB-STATIC-003 migration checksum changes on mutation", async () => {
         "prisma/migrations/20260819000000_c001_auth_column_permissions/migration.sql",
       ),
       path.join(authDirectory, "migration.sql"),
+    );
+    await copyFile(
+      path.join(
+        root,
+        "prisma/migrations/20260820000000_c002_consent_profile_permissions/migration.sql",
+      ),
+      path.join(consentProfileDirectory, "migration.sql"),
     );
     const before = await migrationChecksums(temporaryRoot);
     await writeFile(
@@ -161,6 +173,11 @@ test("T-DB-STATIC-004 checksum manifest gate rejects a changed migration", async
       "20260819000000_c001_auth_column_permissions",
     );
     await mkdir(authDirectory);
+    const consentProfileDirectory = path.join(
+      temporaryRoot,
+      "20260820000000_c002_consent_profile_permissions",
+    );
+    await mkdir(consentProfileDirectory);
     const target = path.join(targetDirectory, "migration.sql");
     await copyFile(migrationFile, target);
     await copyFile(
@@ -190,6 +207,13 @@ test("T-DB-STATIC-004 checksum manifest gate rejects a changed migration", async
         "prisma/migrations/20260819000000_c001_auth_column_permissions/migration.sql",
       ),
       path.join(authDirectory, "migration.sql"),
+    );
+    await copyFile(
+      path.join(
+        root,
+        "prisma/migrations/20260820000000_c002_consent_profile_permissions/migration.sql",
+      ),
+      path.join(consentProfileDirectory, "migration.sql"),
     );
     const manifestPath = path.join(temporaryRoot, "checksums.json");
     await copyFile(
