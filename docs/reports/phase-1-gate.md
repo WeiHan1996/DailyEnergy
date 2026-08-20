@@ -89,6 +89,11 @@ post-merge receipt。E-013 合并曾遗漏 `--match-head-commit`，本 Gate 将�
 它最迟于 2026-11-02 到期，平台能力可用、第二位 merge-capable actor 出现或 owner 撤回接受时
 也必须提前停止。
 
+2026-08-20 E-016 后续处置：项目所有者明确授权将仓库设为 public，并接受完整历史、提交者
+邮箱和 Figma 身份信息公开，要求保持无 LICENSE。上述恢复触发已经满足；临时补偿控制由 active、
+无 bypass 的 `main` repository ruleset 取代。11 个 required checks、exact-head verifier、
+用户批准和 `--match-head-commit` receipt 保留；本报告的 Production/RC `NO_GO` 不变。
+
 ## 6. Threat Boundary Review
 
 2026-08-12 已按 `security` profile 完成人工威胁边界复核，结论为：

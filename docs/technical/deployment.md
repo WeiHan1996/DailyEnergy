@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-08-12（E-014 开发准入与 Production/RC 准入分层）
+- **最后更新**：2026-08-20（E-016 公开仓库 CI 信任边界）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0007 临时 DEV 同机例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
@@ -438,6 +438,13 @@ GitHub 官方文档说明 OIDC 可用短期 token 代替长期云 secret，deplo
 - self-hosted runner 若使用，必须 ephemeral/reimaged、无其它项目数据、无常驻生产 secret；
 - workflow log/artifact 在上传前执行 secret/content/path scan。
 
+E-016 将仓库设为 public 后，`main` 必须由 active、无 bypass 的 repository ruleset 保护：只允许
+PR + squash merge，要求 strict 11-check GitHub Actions Gate、linear history 和 review thread
+resolution，并禁止 direct/force push 与分支删除。单 collaborator 仓库的 GitHub approval count
+为 0，项目所有者批准另行记录为流程证据。public fork 的外部贡献者 workflow 必须先批准，且不
+获得 secret、OIDC deployment、environment 或生产网络。secret scanning、push protection、
+vulnerability alerts 与 automated security fixes 必须持续启用；这些控制不解除 Production/RC Gate。
+
 ### 14.2 Artifact 期限
 
 | Artifact                             |                                       默认期限 | 内容边界                                   |
@@ -826,19 +833,19 @@ deletion ledger、真实 alert delivery、真实 backend TTL、独立 Production
 
 ## 27. E-009～E-013 实施交接
 
-| 任务  | S-32 直接输入                                                                                                                                  |
-| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| E-003 | API startup/liveness/readiness、config Schema、profile fingerprint、maintenance response                                                       |
-| E-004 | public build config、环境 API origin、DevTools runner、server compatibility                                                                    |
-| E-005 | Admin 独立 origin/session、production-disabled Gate、bundle/secret scan                                                                        |
-| E-006 | migration owner、expand/backfill/contract、PITR、grants、restore ledger/detector hook                                                          |
-| E-007 | Redis empty rebuild、queue version、drain、graceful shutdown、profile allowlist                                                                |
-| E-009 | common/local/staging-like Compose、production overlay contract、stub/fault/recovery profile                                                    |
-| E-010 | migration/release/rollback/backup/restore 场景注册与 fault hook                                                                                |
-| E-011 | build-once、digest、SBOM/provenance、OIDC/environments、artifact TTL、platform required Gate；能力不可用时仅允许 testing 22.2 的有期限补偿控制 |
-| E-012 | 单 host Compose、reverse proxy/TLS、external PG/Redis/object、release/rollback runbook                                                         |
-| E-013 | S-33 稳定 metrics/alerts、backup/WAL/secret/cert/deploy signals                                                                                |
-| E-014 | clean environment、CI、staging deploy、rollback、PITR/restore、secret/content Gate 证明                                                        |
+| 任务  | S-32 直接输入                                                                                                                        |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| E-003 | API startup/liveness/readiness、config Schema、profile fingerprint、maintenance response                                             |
+| E-004 | public build config、环境 API origin、DevTools runner、server compatibility                                                          |
+| E-005 | Admin 独立 origin/session、production-disabled Gate、bundle/secret scan                                                              |
+| E-006 | migration owner、expand/backfill/contract、PITR、grants、restore ledger/detector hook                                                |
+| E-007 | Redis empty rebuild、queue version、drain、graceful shutdown、profile allowlist                                                      |
+| E-009 | common/local/staging-like Compose、production overlay contract、stub/fault/recovery profile                                          |
+| E-010 | migration/release/rollback/backup/restore 场景注册与 fault hook                                                                      |
+| E-011 | build-once、digest、SBOM/provenance、OIDC/environments、artifact TTL、platform required Gate；E-016 已恢复 public repository ruleset |
+| E-012 | 单 host Compose、reverse proxy/TLS、external PG/Redis/object、release/rollback runbook                                               |
+| E-013 | S-33 稳定 metrics/alerts、backup/WAL/secret/cert/deploy signals                                                                      |
+| E-014 | clean environment、CI、staging deploy、rollback、PITR/restore、secret/content Gate 证明                                              |
 
 E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempotent deployment entry、Release Manifest、锁、preflight、审批、proof、rollback target 和恢复演练。
 
@@ -994,6 +1001,9 @@ E-012 不是“SSH 上去运行几条命令”即可完成。必须交付 idempo
   incident/manual RC 仍为 Production `NO_GO`。testing 22.2 的补偿控制只延续到 development
   merges，进入任一 RC 前必须停止；
 - 2026-08-04 修订：用户明确接受测试策略 22.2 的私有 GitHub Free 临时补偿控制；
+- 2026-08-20 E-016 修订：用户明确授权仓库公开并接受历史、邮箱和 Figma 身份信息公开，要求
+  保持无 LICENSE；public `main` ruleset、外部贡献者 Actions 审批与 GitHub 安全控制取代临时
+  补偿机制，Production/RC `NO_GO` 不变；
 - 内容 PR：[PR #37](https://github.com/WeiHan1996/DailyEnergy/pull/37)；
 - 基线：`main`（S-31 测试策略已随 PR #36 合并并获用户确认）；
 - 已确认范围：环境、单 host Compose、profile 能力、Release Manifest、配置/secret、migration、发布/回滚、backup/PITR、隔离恢复、artifact/供应链与 48 个场景；

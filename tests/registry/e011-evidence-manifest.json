@@ -1,5 +1,6 @@
 {
-  "manifest_version": "e-011-evidence-v1",
+  "manifest_version": "e-011-evidence-v2",
+  "last_amended_by": "E-016",
   "scope": "E-011 GitHub Actions, cache, artifact, telemetry, SBOM, provenance, license, vulnerability, and digest policy evidence",
   "proofs": {
     "T-E011-CI-POLICY-001": {
@@ -13,7 +14,18 @@
         "all 12 Accepted lanes are present, automated lanes retain their authoritative minimum commands, and external lanes prohibit a synthetic PASS",
         "the aggregate Linux E-011 Gate requires every automated matrix lane and the supply-chain job",
         "ordinary evidence uses 14-day retention and supply-chain evidence uses 365-day retention",
-        "the accepted temporary private-Free merge control verifies one current PR head, all 11 checks from one workflow run, and requires a match-head squash merge"
+        "the public repository uses an active no-bypass main ruleset while the project verifier still binds the current PR head to all 11 checks from one workflow run and a match-head squash merge"
+      ]
+    },
+    "T-E016-CI-CONTROLS-001": {
+      "file": "tests/ci/ci-policy.test.mjs",
+      "selector": "public repository, ruleset, fork approval, security controls, and no-license known-fail tests",
+      "level": "STATIC",
+      "assertions": [
+        "the repository is public and has no repository license file while only squash merge is enabled",
+        "main requires pull requests, linear history, resolved review threads, strict GitHub Actions status checks, and prohibits bypass actors, force pushes, and branch deletion",
+        "all 11 required check contexts are bound to the GitHub Actions integration and GitHub approval count remains zero for the single-collaborator repository",
+        "external contributor workflows require approval and secret scanning, push protection, vulnerability alerts, and automated security fixes remain enabled"
       ]
     },
     "T-E011-CI-CACHE-001": {
@@ -97,7 +109,7 @@
     {
       "source_id": "S32-DEPLOY-008",
       "status": "COVERED",
-      "proof_ids": ["T-E011-CI-POLICY-001"]
+      "proof_ids": ["T-E011-CI-POLICY-001", "T-E016-CI-CONTROLS-001"]
     },
     {
       "source_id": "S32-DEPLOY-013",

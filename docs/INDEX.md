@@ -180,13 +180,13 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | [docs/technical/architecture.md](./technical/architecture.md)                                                                                                                                          | Accepted    | 系统上下文、运行时、事务、outbox/inbox、Worker 与故障恢复                                                         | Gateway、database、API、ADR-0006                              |
 | [docs/technical/repository-structure.md](./technical/repository-structure.md)                                                                                                                          | Accepted    | Monorepo 目录、app/package/module、public exports 与依赖 Gate                                                     | architecture、ADR-0006                                        |
-| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted    | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵；私有 Free 临时合并控制                                      | schemas、API、architecture、repository-structure              |
+| [docs/technical/testing.md](./technical/testing.md)                                                                                                                                                    | Accepted    | 静态、单元、数据库、契约、端到端、恢复与 AI 测试矩阵；public `main` 平台强制合并控制                              | schemas、API、architecture、repository-structure              |
 | [docs/technical/deployment.md](./technical/deployment.md)                                                                                                                                              | Accepted    | 环境、Compose、配置/密钥、release 容器与 TLS proxy 能力收敛、current reconciliation、发布、迁移、回滚、备份与恢复 | architecture、repository-structure、testing、privacy          |
 | [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                                          | metrics、Gateway、privacy、incident、architecture、deployment |
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                              | database、testing、deployment、ADR-0005、Issue #44            |
 | [docker/observability/contract.json](../docker/observability/contract.json)                                                                                                                            | Implemented | E-013 vendor-neutral 信号、字段/平面/基数、期限、成本与 Production blocked Gate                                   | observability、privacy、deployment                            |
-| [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011 CI/供应链、E-013 observability 与 E-014 Phase Gate 证据入口                         | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；D-001/D-002/D-003 Done，D-004 In Progress                 | Accepted Phase 0B specs、E-014 Gate、D-001～D-004 #102        |
+| [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011/E-016 CI/仓库控制、E-013 observability 与 E-014 Phase Gate 证据入口                 | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；D-001/D-002/D-003 Done，D-004 In Progress                  | Accepted Phase 0B specs、E-014 Gate、D-001～D-004 #102        |
 
 ### 7.7 Phase Gate
 
@@ -288,9 +288,10 @@ E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squas
 Phase 2；D-001、D-002、D-003 已进入 Done，D-004 为唯一 In Progress，D-005 保持 Planned。D-004 是 C-003、C-004、C-009 的直接前置；D-005 是 C-012、C-013、C-014 的直接前置。
 正式 Source-ID registry 已由 E-010 实现；E-011 已接入 CI、artifact、cache、
 telemetry 与供应链 evidence 且不改变原有证据层级，未实现项继续为 `PLANNED`。
-CI workflow/artifacts 已由 E-011 交付；私有 GitHub Free 的 platform required checks
-暂由 testing 22.2 的有期限补偿控制替代。E-014 将其限定为 development branch merges；进入任一
-RC、平台能力可用、出现第二位 merge-capable actor、owner 撤回接受或 2026-11-02 到期时停止。
+CI workflow/artifacts 已由 E-011 交付；E-016 经项目所有者明确授权把仓库设为 public，并接受
+历史、提交者邮箱与 Figma 身份信息公开且保持无 LICENSE。testing 22.2 的临时补偿控制已迁移为
+active、无 bypass 的 `main` ruleset，11 required checks、exact-head verifier 与用户批准证据保留；
+Production/RC `NO_GO` 不因此解除。
 视觉设计与外部 Production Gate 未被自动解除；E-015 只实现了 P0/P1，没有提前交付 E-010、E-011、
 E-013 或 D 系列能力。E-009 已随 PR #115 squash 合并并进入 Done，Issue #47 已关闭；
 E-010 已随 PR #117 squash 合并并进入 Done；E-011 已随 PR #119 squash 合并为

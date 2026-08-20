@@ -42,30 +42,52 @@ const expectedRequiredMergeChecks = [
 ];
 
 const expectedMergeGate = {
-  control_type: "TEMPORARY_MANUAL_COMPENSATING_CONTROL",
-  reason: "PRIVATE_FREE_BRANCH_PROTECTION_UNAVAILABLE",
-  scope: "DEVELOPMENT_BRANCH_MERGES_ONLY",
+  control_type: "GITHUB_RULESET_PLATFORM_ENFORCED",
+  scope: "MAIN_BRANCH_MERGES",
   repository: "WeiHan1996/DailyEnergy",
   target_branch: "main",
   required_checks: expectedRequiredMergeChecks,
+  strict_required_checks: true,
+  status_check_integration_id: 15368,
   same_workflow_run_required: true,
   head_change_guard: "GH_MATCH_HEAD_COMMIT",
   merge_method: "SQUASH",
+  pull_request: "REQUIRED",
+  required_approving_review_count: 0,
+  review_thread_resolution: "REQUIRED",
+  linear_history: "REQUIRED",
   direct_push: "PROHIBITED",
+  force_push: "PROHIBITED",
+  branch_deletion: "PROHIBITED",
+  bypass_actors: [],
   auto_merge: "PROHIBITED",
   receipt: "PR_COMMENT_AND_POST_MERGE_HANDOFF",
-  risk_owner: "REPOSITORY_OWNER",
-  explicit_owner_risk_acceptance_per_merge: true,
-  production_or_rc_use: "PROHIBITED",
-  accepted_on: "2026-08-12",
-  expires_on: "2026-11-02",
-  restore_platform_enforcement_on: [
-    "CAPABILITY_AVAILABLE",
-    "SECOND_MERGE_CAPABLE_ACTOR",
-    "PHASE_2_RELEASE_CANDIDATE",
-    "PRODUCTION_RELEASE_CANDIDATE",
-    "OWNER_WITHDRAWS_ACCEPTANCE",
-  ],
+  owner_approval_evidence_per_merge: true,
+  platform_enforcement: "ACTIVE",
+  effective_on: "2026-08-20",
+  production_or_rc_admission: "ADDITIONAL_GATES_REQUIRED",
+};
+
+const expectedRepositoryControls = {
+  visibility: "PUBLIC",
+  license: "ABSENT",
+  ruleset_name: "DailyEnergy main protection",
+  merge_methods: {
+    squash: true,
+    merge_commit: false,
+    rebase: false,
+    auto_merge: false,
+  },
+  actions: {
+    enabled: true,
+    fork_pull_request_approval_policy: "all_external_contributors",
+  },
+  security_and_analysis: {
+    secret_scanning: "enabled",
+    secret_scanning_push_protection: "enabled",
+    vulnerability_alerts: "enabled",
+    automated_security_fixes: "enabled",
+  },
 };
 
 const expectedMinimumLaneCommands = new Map([
@@ -268,7 +290,7 @@ function isSha(value) {
 
 export function validateCiPolicy(policy) {
   if (
-    policy?.policy_version !== "e-014-ci-policy-v3" ||
+    policy?.policy_version !== "e-016-ci-policy-v4" ||
     policy.runner !== "ubuntu-24.04" ||
     policy.node_version !== "24.18.0" ||
     policy.pnpm_version !== "11.17.0" ||
@@ -281,10 +303,10 @@ export function validateCiPolicy(policy) {
   }
 
   if (!sameJson(policy.merge_gate, expectedMergeGate)) {
-    fail("CI_POLICY_MERGE_GATE_INVALID", "temporary-control");
+    fail("CI_POLICY_MERGE_GATE_INVALID", "platform-control");
   }
-  if (Date.now() >= Date.parse(`${policy.merge_gate.expires_on}T00:00:00Z`)) {
-    fail("CI_POLICY_MERGE_GATE_EXPIRED", policy.merge_gate.expires_on);
+  if (!sameJson(policy.repository_controls, expectedRepositoryControls)) {
+    fail("CI_POLICY_REPOSITORY_CONTROLS_INVALID", "public-repository");
   }
 
   for (const [action, sha] of Object.entries(policy.actions ?? {})) {
@@ -374,10 +396,10 @@ export function validateCiPolicy(policy) {
   });
 }
 
-export function validateManualMergeGate(pullRequest, policy, expectedHeadSha) {
+export function validatePrMergeGate(pullRequest, policy, expectedHeadSha) {
   validateCiPolicy(policy);
   if (!isSha(expectedHeadSha)) {
-    fail("CI_MANUAL_MERGE_GATE_HEAD_INVALID", expectedHeadSha ?? "missing");
+    fail("CI_PR_MERGE_GATE_HEAD_INVALID", expectedHeadSha ?? "missing");
   }
   if (
     pullRequest?.state !== "OPEN" ||
@@ -386,13 +408,10 @@ export function validateManualMergeGate(pullRequest, policy, expectedHeadSha) {
     pullRequest.mergeStateStatus !== "CLEAN" ||
     pullRequest.baseRefName !== policy.merge_gate.target_branch
   ) {
-    fail("CI_MANUAL_MERGE_GATE_PR_NOT_READY", pullRequest?.number ?? "missing");
+    fail("CI_PR_MERGE_GATE_PR_NOT_READY", pullRequest?.number ?? "missing");
   }
   if (pullRequest.headRefOid !== expectedHeadSha) {
-    fail(
-      "CI_MANUAL_MERGE_GATE_HEAD_CHANGED",
-      pullRequest.headRefOid ?? "missing",
-    );
+    fail("CI_PR_MERGE_GATE_HEAD_CHANGED", pullRequest.headRefOid ?? "missing");
   }
 
   const checks = pullRequest.statusCheckRollup ?? [];
@@ -400,25 +419,25 @@ export function validateManualMergeGate(pullRequest, policy, expectedHeadSha) {
   for (const requiredCheck of policy.merge_gate.required_checks) {
     const matches = checks.filter(({ name }) => name === requiredCheck);
     if (matches.length !== 1) {
-      fail("CI_MANUAL_MERGE_GATE_CHECK_COUNT_INVALID", requiredCheck);
+      fail("CI_PR_MERGE_GATE_CHECK_COUNT_INVALID", requiredCheck);
     }
     const [check] = matches;
     if (check.status !== "COMPLETED" || check.conclusion !== "SUCCESS") {
-      fail("CI_MANUAL_MERGE_GATE_CHECK_NOT_SUCCESSFUL", requiredCheck);
+      fail("CI_PR_MERGE_GATE_CHECK_NOT_SUCCESSFUL", requiredCheck);
     }
     if (check.workflowName !== "CI") {
-      fail("CI_MANUAL_MERGE_GATE_WORKFLOW_INVALID", requiredCheck);
+      fail("CI_PR_MERGE_GATE_WORKFLOW_INVALID", requiredCheck);
     }
     const runId = /\/actions\/runs\/(\d+)(?:\/|$)/u.exec(
       check.detailsUrl ?? "",
     )?.[1];
     if (!runId) {
-      fail("CI_MANUAL_MERGE_GATE_RUN_ID_MISSING", requiredCheck);
+      fail("CI_PR_MERGE_GATE_RUN_ID_MISSING", requiredCheck);
     }
     runIds.add(runId);
   }
   if (policy.merge_gate.same_workflow_run_required && runIds.size !== 1) {
-    fail("CI_MANUAL_MERGE_GATE_RUN_MISMATCH", [...runIds].join(","));
+    fail("CI_PR_MERGE_GATE_RUN_MISMATCH", [...runIds].join(","));
   }
 
   return Object.freeze({
@@ -427,6 +446,142 @@ export function validateManualMergeGate(pullRequest, policy, expectedHeadSha) {
     pullRequest: pullRequest.number,
     runId: [...runIds][0],
   });
+}
+
+function findRule(ruleset, type) {
+  return (ruleset?.rules ?? []).filter((rule) => rule.type === type);
+}
+
+export function validateRepositoryControls(snapshot, policy) {
+  validateCiPolicy(policy);
+  const repository = snapshot?.repository;
+  const controls = policy.repository_controls;
+  if (
+    repository?.full_name !== policy.merge_gate.repository ||
+    repository.visibility !== controls.visibility.toLowerCase() ||
+    repository.private !== false ||
+    repository.default_branch !== policy.merge_gate.target_branch ||
+    repository.license !== null
+  ) {
+    fail(
+      "CI_REPOSITORY_PUBLIC_BASELINE_INVALID",
+      repository?.full_name ?? "missing",
+    );
+  }
+  if (
+    repository.allow_squash_merge !== controls.merge_methods.squash ||
+    repository.allow_merge_commit !== controls.merge_methods.merge_commit ||
+    repository.allow_rebase_merge !== controls.merge_methods.rebase ||
+    repository.allow_auto_merge !== controls.merge_methods.auto_merge
+  ) {
+    fail("CI_REPOSITORY_MERGE_METHOD_INVALID", repository.full_name);
+  }
+  if (
+    repository.security_and_analysis?.secret_scanning?.status !==
+      controls.security_and_analysis.secret_scanning ||
+    repository.security_and_analysis?.secret_scanning_push_protection
+      ?.status !==
+      controls.security_and_analysis.secret_scanning_push_protection ||
+    snapshot.vulnerabilityAlertsEnabled !== true ||
+    snapshot.automatedSecurityFixesEnabled !== true
+  ) {
+    fail("CI_REPOSITORY_SECURITY_CONTROL_INVALID", repository.full_name);
+  }
+  if (
+    snapshot.actionsPermissions?.enabled !== controls.actions.enabled ||
+    snapshot.forkPullRequestApproval?.approval_policy !==
+      controls.actions.fork_pull_request_approval_policy
+  ) {
+    fail("CI_REPOSITORY_ACTIONS_CONTROL_INVALID", repository.full_name);
+  }
+
+  const ruleset = snapshot.mainRuleset;
+  if (
+    ruleset?.name !== controls.ruleset_name ||
+    ruleset.target !== "branch" ||
+    ruleset.enforcement !== "active" ||
+    ruleset.source_type !== "Repository" ||
+    !sameJson(ruleset.bypass_actors, []) ||
+    !sameJson(ruleset.conditions?.ref_name, {
+      exclude: [],
+      include: ["~DEFAULT_BRANCH"],
+    })
+  ) {
+    fail("CI_REPOSITORY_RULESET_BASELINE_INVALID", ruleset?.name ?? "missing");
+  }
+  for (const requiredRule of [
+    "deletion",
+    "non_fast_forward",
+    "required_linear_history",
+    "pull_request",
+    "required_status_checks",
+  ]) {
+    if (findRule(ruleset, requiredRule).length !== 1) {
+      fail("CI_REPOSITORY_RULESET_RULE_COUNT_INVALID", requiredRule);
+    }
+  }
+  if ((ruleset.rules ?? []).length !== 5) {
+    fail("CI_REPOSITORY_RULESET_RULE_COUNT_INVALID", "total");
+  }
+
+  const [pullRequestRule] = findRule(ruleset, "pull_request");
+  const pullRequestParameters = pullRequestRule.parameters ?? {};
+  if (
+    pullRequestParameters.required_approving_review_count !==
+      policy.merge_gate.required_approving_review_count ||
+    pullRequestParameters.required_review_thread_resolution !== true ||
+    pullRequestParameters.dismiss_stale_reviews_on_push !== false ||
+    pullRequestParameters.require_code_owner_review !== false ||
+    pullRequestParameters.require_last_push_approval !== false
+  ) {
+    fail("CI_REPOSITORY_PULL_REQUEST_RULE_INVALID", controls.ruleset_name);
+  }
+
+  const [statusRule] = findRule(ruleset, "required_status_checks");
+  const statusParameters = statusRule.parameters ?? {};
+  const actualChecks = (statusParameters.required_status_checks ?? [])
+    .map(({ context, integration_id: integrationId }) => ({
+      context,
+      integration_id: integrationId,
+    }))
+    .sort((left, right) => left.context.localeCompare(right.context));
+  const expectedChecks = policy.merge_gate.required_checks
+    .map((context) => ({
+      context,
+      integration_id: policy.merge_gate.status_check_integration_id,
+    }))
+    .sort((left, right) => left.context.localeCompare(right.context));
+  if (
+    statusParameters.strict_required_status_checks_policy !== true ||
+    statusParameters.do_not_enforce_on_create !== false ||
+    !sameJson(actualChecks, expectedChecks)
+  ) {
+    fail("CI_REPOSITORY_REQUIRED_CHECKS_INVALID", controls.ruleset_name);
+  }
+
+  return Object.freeze({
+    checks: actualChecks.length,
+    repository: repository.full_name,
+    ruleset: ruleset.name,
+    visibility: repository.visibility,
+  });
+}
+
+export function validateRepositoryLicenseFiles(rootFileNames, policy) {
+  validateCiPolicy(policy);
+  const licenseFiles = (rootFileNames ?? []).filter((fileName) =>
+    /^(?:licen[cs]e|copying)(?:\.|$)/iu.test(fileName),
+  );
+  if (
+    policy.repository_controls.license !== "ABSENT" ||
+    licenseFiles.length !== 0
+  ) {
+    fail(
+      "CI_REPOSITORY_LICENSE_FILE_PROHIBITED",
+      licenseFiles.join(",") || "policy",
+    );
+  }
+  return Object.freeze({ licenseFiles: 0 });
 }
 
 function triggerExists(triggers, trigger) {

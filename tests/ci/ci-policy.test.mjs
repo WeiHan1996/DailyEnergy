@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {
   mkdir,
   mkdtemp,
+  readdir,
   readFile,
   rm,
   symlink,
@@ -19,7 +20,9 @@ import {
   sha256,
   validateCiPolicy,
   validateLicenseInventory,
-  validateManualMergeGate,
+  validatePrMergeGate,
+  validateRepositoryControls,
+  validateRepositoryLicenseFiles,
   validateSupplyChainDocuments,
   validateTelemetryPolicy,
   validateTurboPolicy,
@@ -51,6 +54,7 @@ const [
   workflow,
   artifactContentCanaries,
   lockfileSource,
+  rootFileNames,
 ] = await Promise.all([
   readJson("tests/ci/policy.json"),
   readJson("tests/ci/telemetry-policy.json"),
@@ -60,6 +64,7 @@ const [
   readFile(path.resolve(repositoryRoot, ".github/workflows/ci.yml"), "utf8"),
   readJson("tests/ci/fixtures/artifact-content-canaries.json"),
   readFile(path.resolve(repositoryRoot, "pnpm-lock.yaml"), "utf8"),
+  readdir(repositoryRoot),
 ]);
 const lockfilePackageCoordinates =
   collectLockfilePackageCoordinates(lockfileSource);
@@ -112,6 +117,70 @@ function laneEvidenceDiagnostics(value, laneId = "static") {
   });
 }
 
+function createRepositoryControlSnapshot() {
+  return {
+    repository: {
+      allow_auto_merge: false,
+      allow_merge_commit: false,
+      allow_rebase_merge: false,
+      allow_squash_merge: true,
+      default_branch: "main",
+      full_name: "WeiHan1996/DailyEnergy",
+      license: null,
+      private: false,
+      security_and_analysis: {
+        secret_scanning: { status: "enabled" },
+        secret_scanning_push_protection: { status: "enabled" },
+      },
+      visibility: "public",
+    },
+    actionsPermissions: { enabled: true },
+    automatedSecurityFixesEnabled: true,
+    forkPullRequestApproval: {
+      approval_policy: "all_external_contributors",
+    },
+    mainRuleset: {
+      bypass_actors: [],
+      conditions: {
+        ref_name: { exclude: [], include: ["~DEFAULT_BRANCH"] },
+      },
+      enforcement: "active",
+      name: "DailyEnergy main protection",
+      rules: [
+        { type: "deletion" },
+        { type: "non_fast_forward" },
+        { type: "required_linear_history" },
+        {
+          parameters: {
+            dismiss_stale_reviews_on_push: false,
+            require_code_owner_review: false,
+            require_last_push_approval: false,
+            required_approving_review_count: 0,
+            required_review_thread_resolution: true,
+          },
+          type: "pull_request",
+        },
+        {
+          parameters: {
+            do_not_enforce_on_create: false,
+            required_status_checks: ciPolicy.merge_gate.required_checks.map(
+              (context) => ({
+                context,
+                integration_id: ciPolicy.merge_gate.status_check_integration_id,
+              }),
+            ),
+            strict_required_status_checks_policy: true,
+          },
+          type: "required_status_checks",
+        },
+      ],
+      source_type: "Repository",
+      target: "branch",
+    },
+    vulnerabilityAlertsEnabled: true,
+  };
+}
+
 test("T-E011-CI-POLICY-001 accepts the minimum-permission pinned workflow", () => {
   assert.deepEqual(validateCiPolicy(ciPolicy), {
     automated: 9,
@@ -124,7 +193,7 @@ test("T-E011-CI-POLICY-001 accepts the minimum-permission pinned workflow", () =
   );
 });
 
-test("T-E011-CI-POLICY-001 enforces the temporary manual merge gate", () => {
+test("T-E011-CI-POLICY-001 verifies the exact PR head and one 11-check workflow run", () => {
   const headSha = "a".repeat(40);
   const pullRequest = {
     baseRefName: "main",
@@ -145,7 +214,7 @@ test("T-E011-CI-POLICY-001 enforces the temporary manual merge gate", () => {
     ),
   };
 
-  assert.deepEqual(validateManualMergeGate(pullRequest, ciPolicy, headSha), {
+  assert.deepEqual(validatePrMergeGate(pullRequest, ciPolicy, headSha), {
     checks: 11,
     headSha,
     pullRequest: 119,
@@ -155,30 +224,103 @@ test("T-E011-CI-POLICY-001 enforces the temporary manual merge gate", () => {
   const failedCheck = structuredClone(pullRequest);
   failedCheck.statusCheckRollup[0].conclusion = "FAILURE";
   assert.throws(
-    () => validateManualMergeGate(failedCheck, ciPolicy, headSha),
-    /CI_MANUAL_MERGE_GATE_CHECK_NOT_SUCCESSFUL/u,
+    () => validatePrMergeGate(failedCheck, ciPolicy, headSha),
+    /CI_PR_MERGE_GATE_CHECK_NOT_SUCCESSFUL/u,
   );
 
   const changedHead = structuredClone(pullRequest);
   changedHead.headRefOid = "b".repeat(40);
   assert.throws(
-    () => validateManualMergeGate(changedHead, ciPolicy, headSha),
-    /CI_MANUAL_MERGE_GATE_HEAD_CHANGED/u,
+    () => validatePrMergeGate(changedHead, ciPolicy, headSha),
+    /CI_PR_MERGE_GATE_HEAD_CHANGED/u,
   );
 
   const mixedRun = structuredClone(pullRequest);
   mixedRun.statusCheckRollup[0].detailsUrl =
     "https://github.com/WeiHan1996/DailyEnergy/actions/runs/654321/job/1";
   assert.throws(
-    () => validateManualMergeGate(mixedRun, ciPolicy, headSha),
-    /CI_MANUAL_MERGE_GATE_RUN_MISMATCH/u,
+    () => validatePrMergeGate(mixedRun, ciPolicy, headSha),
+    /CI_PR_MERGE_GATE_RUN_MISMATCH/u,
   );
 
   const driftedPolicy = structuredClone(ciPolicy);
   driftedPolicy.merge_gate.required_checks.pop();
   assert.throws(
-    () => validateManualMergeGate(pullRequest, driftedPolicy, headSha),
+    () => validatePrMergeGate(pullRequest, driftedPolicy, headSha),
     /CI_POLICY_MERGE_GATE_INVALID/u,
+  );
+});
+
+test("T-E016-CI-CONTROLS-001 enforces the public repository controls", () => {
+  const snapshot = createRepositoryControlSnapshot();
+  assert.deepEqual(validateRepositoryControls(snapshot, ciPolicy), {
+    checks: 11,
+    repository: "WeiHan1996/DailyEnergy",
+    ruleset: "DailyEnergy main protection",
+    visibility: "public",
+  });
+
+  const privateRepository = structuredClone(snapshot);
+  privateRepository.repository.private = true;
+  privateRepository.repository.visibility = "private";
+  assert.throws(
+    () => validateRepositoryControls(privateRepository, ciPolicy),
+    /CI_REPOSITORY_PUBLIC_BASELINE_INVALID/u,
+  );
+
+  const bypass = structuredClone(snapshot);
+  bypass.mainRuleset.bypass_actors.push({
+    actor_id: 1,
+    actor_type: "RepositoryRole",
+  });
+  assert.throws(
+    () => validateRepositoryControls(bypass, ciPolicy),
+    /CI_REPOSITORY_RULESET_BASELINE_INVALID/u,
+  );
+
+  const missingCheck = structuredClone(snapshot);
+  missingCheck.mainRuleset.rules
+    .find(({ type }) => type === "required_status_checks")
+    .parameters.required_status_checks.pop();
+  assert.throws(
+    () => validateRepositoryControls(missingCheck, ciPolicy),
+    /CI_REPOSITORY_REQUIRED_CHECKS_INVALID/u,
+  );
+
+  const fabricatedReviewer = structuredClone(snapshot);
+  fabricatedReviewer.mainRuleset.rules.find(
+    ({ type }) => type === "pull_request",
+  ).parameters.required_approving_review_count = 1;
+  assert.throws(
+    () => validateRepositoryControls(fabricatedReviewer, ciPolicy),
+    /CI_REPOSITORY_PULL_REQUEST_RULE_INVALID/u,
+  );
+
+  const unsafeFork = structuredClone(snapshot);
+  unsafeFork.forkPullRequestApproval.approval_policy =
+    "first_time_contributors";
+  assert.throws(
+    () => validateRepositoryControls(unsafeFork, ciPolicy),
+    /CI_REPOSITORY_ACTIONS_CONTROL_INVALID/u,
+  );
+
+  const noPushProtection = structuredClone(snapshot);
+  noPushProtection.repository.security_and_analysis.secret_scanning_push_protection.status =
+    "disabled";
+  assert.throws(
+    () => validateRepositoryControls(noPushProtection, ciPolicy),
+    /CI_REPOSITORY_SECURITY_CONTROL_INVALID/u,
+  );
+});
+
+test("T-E016-CI-CONTROLS-001 keeps the repository without a license file", () => {
+  assert.deepEqual(validateRepositoryLicenseFiles(rootFileNames, ciPolicy), {
+    licenseFiles: 0,
+  });
+  assert.throws(
+    () =>
+      validateRepositoryLicenseFiles([...rootFileNames, "LICENSE"], ciPolicy),
+    /CI_REPOSITORY_LICENSE_FILE_PROHIBITED/u,
   );
 });
 
@@ -224,18 +366,19 @@ test("T-E011-CI-POLICY-001 keeps external lanes pending", () => {
   );
 });
 
-test("T-E014-CI-POLICY-001 restricts the compensating control to development merges", () => {
+test("T-E016-CI-POLICY-001 keeps Production and RC admission separate", () => {
   const productionControl = structuredClone(ciPolicy);
-  productionControl.merge_gate.production_or_rc_use = "ALLOWED";
+  productionControl.merge_gate.production_or_rc_admission =
+    "PLATFORM_GATE_SUFFICIENT";
   assert.throws(
     () => validateCiPolicy(productionControl),
     /CI_POLICY_MERGE_GATE_INVALID/u,
   );
 
-  const missingOwnerAcceptance = structuredClone(ciPolicy);
-  missingOwnerAcceptance.merge_gate.explicit_owner_risk_acceptance_per_merge = false;
+  const missingOwnerApproval = structuredClone(ciPolicy);
+  missingOwnerApproval.merge_gate.owner_approval_evidence_per_merge = false;
   assert.throws(
-    () => validateCiPolicy(missingOwnerAcceptance),
+    () => validateCiPolicy(missingOwnerApproval),
     /CI_POLICY_MERGE_GATE_INVALID/u,
   );
 });
