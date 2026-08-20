@@ -383,6 +383,23 @@ test("T-E016-CI-POLICY-001 keeps Production and RC admission separate", () => {
   );
 });
 
+test("T-E016-CI-POLICY-001 keeps 365-day RC evidence pending approved archival", () => {
+  const shortenedRcRetention = structuredClone(ciPolicy);
+  shortenedRcRetention.artifacts.rc_release_evidence.retention_days = 90;
+  assert.throws(
+    () => validateCiPolicy(shortenedRcRetention),
+    /CI_POLICY_ARTIFACT_RETENTION_INVALID/u,
+  );
+
+  const falseArchivalPass = structuredClone(ciPolicy);
+  falseArchivalPass.artifacts.rc_release_evidence.storage_status =
+    "GITHUB_ACTIONS_PUBLIC";
+  assert.throws(
+    () => validateCiPolicy(falseArchivalPass),
+    /CI_POLICY_ARTIFACT_RETENTION_INVALID/u,
+  );
+});
+
 test("T-E011-CI-POLICY-001 rejects a removed mandatory lane command", () => {
   const altered = structuredClone(ciPolicy);
   const lane = altered.lanes.find(({ id }) => id === "unit-contract");
@@ -516,6 +533,10 @@ test("T-E011-CI-LICENSE-001 fails closed on unknown license expressions", () => 
       {
         "LGPL-3.0-or-later": [
           {
+            name: "@img/sharp-libvips-darwin-arm64",
+            versions: ["1.3.2"],
+          },
+          {
             name: "@img/sharp-libvips-linux-x64",
             versions: ["1.3.2"],
           },
@@ -524,6 +545,11 @@ test("T-E011-CI-LICENSE-001 fails closed on unknown license expressions", () => 
       licensePolicy,
     ),
     [
+      {
+        license: "LGPL-3.0-or-later",
+        name: "@img/sharp-libvips-darwin-arm64",
+        version: "1.3.2",
+      },
       {
         license: "LGPL-3.0-or-later",
         name: "@img/sharp-libvips-linux-x64",

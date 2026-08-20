@@ -1,5 +1,5 @@
 {
-  "policy_version": "e-016-ci-policy-v4",
+  "policy_version": "e-016-ci-policy-v5",
   "runner": "ubuntu-24.04",
   "node_version": "24.18.0",
   "pnpm_version": "11.17.0",
@@ -80,8 +80,14 @@
       "synthetic_only": true
     },
     "supply_chain_evidence": {
-      "retention_days": 365,
+      "retention_days": 90,
+      "scope": "PUBLIC_DEVELOPMENT_CI",
       "synthetic_only": true
+    },
+    "rc_release_evidence": {
+      "retention_days": 365,
+      "storage_status": "PENDING_APPROVED_ARCHIVAL",
+      "pass_claim": "PROHIBITED"
     }
   },
   "lanes": [

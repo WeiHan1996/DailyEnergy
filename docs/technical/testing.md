@@ -727,6 +727,9 @@ repository ruleset 作为平台强制控制：
 7. secret scanning、push protection、vulnerability alerts 和 automated security fixes 必须启用；
 8. `tests/ci/policy.json`、`pnpm ci:verify-repository-controls` 和
    `pnpm ci:verify-pr-merge-gate -- <PR> <HEAD_SHA>` 固定上述规则并 fail closed。
+9. public GitHub Actions 的 development supply-chain evidence 与 DEV deployment bundle 最多保留
+   90 天；Accepted 的 RC/Release 365 天要求不降低，在获批归档后端落地前保持
+   `PENDING_APPROVED_ARCHIVAL / pass_claim=PROHIBITED`，不得据此宣称 RC 或 Production 可发布。
 
 平台 ruleset 解决 E-014 记录的 private-Free 绕过风险，但不豁免任何 Safety、删除、owner、
 SQL/TX、capability、secret、contract drift 或其它强制 Gate。它只是开发合并和后续 RC 的基础
@@ -983,7 +986,8 @@ E-010 不需要一次实现全部业务场景，但必须建立 registry，使�
   或 Production，也不能把外部、真机或人工证据冒充 PASS；
 - 2026-08-20 E-016 修订：用户明确授权仓库公开，接受历史、提交者邮箱与 Figma 身份信息公开，
   并要求保持无 LICENSE；private-Free 临时补偿控制由无 bypass 的 public `main` ruleset 取代，
-  11 个 checks、exact-head verifier、用户批准和 Production/RC `NO_GO` 均保留；
+  11 个 checks、exact-head verifier、用户批准和 Production/RC `NO_GO` 均保留；public Actions
+  development artifact 使用平台允许的 90 天，RC/Release 365 天要求等待获批归档后端；
 - 内容 PR：[PR #36](https://github.com/WeiHan1996/DailyEnergy/pull/36)；
 - 基线：`main`（S-30 仓库结构与模块边界已随 PR #35 合并并获用户确认）；
 - 已确认范围：测试层级/工具、真实依赖与替身边界、source-ID registry、DB/TX/queue/profile/客户端/AI/恢复矩阵、CI/flaky/artifact 和 48 个场景；

@@ -291,7 +291,8 @@ telemetry 与供应链 evidence 且不改变原有证据层级，未实现项继
 CI workflow/artifacts 已由 E-011 交付；E-016 经项目所有者明确授权把仓库设为 public，并接受
 历史、提交者邮箱与 Figma 身份信息公开且保持无 LICENSE。testing 22.2 的临时补偿控制已迁移为
 active、无 bypass 的 `main` ruleset，11 required checks、exact-head verifier 与用户批准证据保留；
-Production/RC `NO_GO` 不因此解除。
+public development artifact 按 GitHub 平台上限保留 90 天，RC/Release 365 天证据等待获批归档
+后端；Production/RC `NO_GO` 不因此解除。
 视觉设计与外部 Production Gate 未被自动解除；E-015 只实现了 P0/P1，没有提前交付 E-010、E-011、
 E-013 或 D 系列能力。E-009 已随 PR #115 squash 合并并进入 Done，Issue #47 已关闭；
 E-010 已随 PR #117 squash 合并并进入 Done；E-011 已随 PR #119 squash 合并为

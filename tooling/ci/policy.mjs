@@ -290,7 +290,7 @@ function isSha(value) {
 
 export function validateCiPolicy(policy) {
   if (
-    policy?.policy_version !== "e-016-ci-policy-v4" ||
+    policy?.policy_version !== "e-016-ci-policy-v5" ||
     policy.runner !== "ubuntu-24.04" ||
     policy.node_version !== "24.18.0" ||
     policy.pnpm_version !== "11.17.0" ||
@@ -327,10 +327,15 @@ export function validateCiPolicy(policy) {
   if (
     policy.artifacts?.synthetic_reports?.retention_days !== 14 ||
     policy.artifacts.synthetic_reports.synthetic_only !== true ||
-    policy.artifacts?.supply_chain_evidence?.retention_days !== 365 ||
-    policy.artifacts.supply_chain_evidence.synthetic_only !== true
+    policy.artifacts?.supply_chain_evidence?.retention_days !== 90 ||
+    policy.artifacts.supply_chain_evidence.scope !== "PUBLIC_DEVELOPMENT_CI" ||
+    policy.artifacts.supply_chain_evidence.synthetic_only !== true ||
+    policy.artifacts?.rc_release_evidence?.retention_days !== 365 ||
+    policy.artifacts.rc_release_evidence.storage_status !==
+      "PENDING_APPROVED_ARCHIVAL" ||
+    policy.artifacts.rc_release_evidence.pass_claim !== "PROHIBITED"
   ) {
-    fail("CI_POLICY_ARTIFACT_RETENTION_INVALID", "14/365");
+    fail("CI_POLICY_ARTIFACT_RETENTION_INVALID", "14/90/365-pending");
   }
 
   const lanes = policy.lanes ?? [];

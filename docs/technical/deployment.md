@@ -91,7 +91,7 @@
 | 备份         | PostgreSQL 目标 RPO ≤15 分钟、Beta 工程 RTO ≤4 小时；最长 35 天；Redis 不恢复                                          |
 | 恢复         | 只在隔离 RECOVERY 环境恢复，先重放 restore-deny/删除/TTL/source invalidation，再运行 detector 和 Gate                  |
 | remote cache | v1 禁用第三方 Turbo remote cache；CI job-local cache 可删除且不含 secret/内容                                          |
-| CI artifact  | 普通合成测试 14 天；RC/Release evidence 365 天；真实内容或 secret 一经发现立即隔离并按事件流程处理                     |
+| CI artifact  | 普通合成测试 14 天；public development 供应链与部署 bundle 90 天；RC/Release evidence 仍要求 365 天和获批归档后端      |
 
 RPO/RTO 是 Phase 1/Beta 的工程准备目标，不是对用户的公开承诺。真实规模、区域与服务商确定后，S-33/A-008 必须用演练结果校准。
 
@@ -447,19 +447,26 @@ vulnerability alerts 与 automated security fixes 必须持续启用；这些控
 
 ### 14.2 Artifact 期限
 
-| Artifact                             |                                       默认期限 | 内容边界                                   |
-| ------------------------------------ | ---------------------------------------------: | ------------------------------------------ |
-| PR/main test report、coverage、trace |                                          14 天 | 只含合成数据、stable codes、source IDs     |
-| failed test diagnostic               |                                          14 天 | 不含 request/response body、Prompt、secret |
-| RC/Release Gate evidence             |                                         365 天 | manifest、digest、无内容结果与审批         |
-| SBOM/provenance/signature            |                  365 天且不短于 image 可部署期 | 无用户数据                                 |
-| production image                     | 365 天；至少保留 current + previous 2 Accepted | 只读代码/运行时，无数据                    |
-| server source map                    |             image 内或受限 artifact 最长 30 天 | 不公开上传，不含 secret                    |
-| client source map                    |                                      v1 不外传 | 如需服务商须先隐私/区域/TTL评审            |
+| Artifact                                   |                                       默认期限 | 内容边界                                     |
+| ------------------------------------------ | ---------------------------------------------: | -------------------------------------------- |
+| PR/main test report、coverage、trace       |                                          14 天 | 只含合成数据、stable codes、source IDs       |
+| failed test diagnostic                     |                                          14 天 | 不含 request/response body、Prompt、secret   |
+| public development supply-chain/DEV bundle |                                          90 天 | GitHub public Actions 平台上限；只含合成证据 |
+| RC/Release Gate evidence                   |                                         365 天 | manifest、digest、无内容结果与审批           |
+| SBOM/provenance/signature                  |                  365 天且不短于 image 可部署期 | 无用户数据                                   |
+| production image                           | 365 天；至少保留 current + previous 2 Accepted | 只读代码/运行时，无数据                      |
+| server source map                          |             image 内或受限 artifact 最长 30 天 | 不公开上传，不含 secret                      |
+| client source map                          |                                      v1 不外传 | 如需服务商须先隐私/区域/TTL评审              |
 
 GitHub artifact 可以为每个上传项配置 `retention-days` 并提供 digest 校验；项目必须显式设置期限，不能依赖组织默认值：
 
 - https://docs.github.com/en/actions/tutorials/store-and-share-data
+
+E-016 转为 public 后，GitHub 将仓库 Actions artifact 最大期限限制为 90 天。因此普通 public
+development CI 的 supply-chain evidence 和 DEV deployment bundle 固定为 90 天，不再声明平台实际
+保留 365 天。RC/Release 的 365 天要求没有降低；在选择并批准可验证的归档后端、访问控制、digest
+绑定与删除流程前，RC/Release evidence 状态为 `PENDING_APPROVED_ARCHIVAL`，`pass_claim=PROHIBITED`，
+Production/RC 继续 `NO_GO`。
 
 remote Turbo cache 在 v1 继续禁用。job-local cache 只含可重建依赖/构建结果，key 包含 lockfile、toolchain、source、config inputs；不得缓存 migration、restore、provider、真机、人工或外部副作用 PASS。
 

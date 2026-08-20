@@ -36,7 +36,9 @@ PostgreSQL/Redis/BullMQ。
 
 普通 PR 自动执行 9 个可用 lane；`miniapp-conformance`、
 `ai-model-load-human` 与 `manual-rc` 保持显式 pending/blocked，不能由普通 GitHub
-job 冒充 PASS。普通合成报告保留 14 天，SBOM/provenance 等供应链证据保留 365 天。
+job 冒充 PASS。普通合成报告保留 14 天；public development CI 的 SBOM/provenance 和 DEV
+deployment bundle 按 GitHub 平台上限保留 90 天。RC/Release 仍要求 365 天，在获批归档后端
+落地前保持 `PENDING_APPROVED_ARCHIVAL`，不能冒充发布 Gate PASS。
 E-016 将仓库转为 public 后，active、无 bypass 的 `main` ruleset 平台强制 PR、squash-only、
 strict 11 checks、linear history、review thread resolution、禁止 force push/删除；外部贡献者
 workflow 需批准，secret scanning/push protection 等安全控制必须启用。GitHub approval count

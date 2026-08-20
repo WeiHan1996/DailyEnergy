@@ -57,7 +57,7 @@ E-016 范围：
 
 ## 4. 已完成实现与验证
 
-- executable policy 已迁移到 `e-016-ci-policy-v4`，固定 public、无 LICENSE、squash-only、
+- executable policy 已迁移到 `e-016-ci-policy-v5`，固定 public、无 LICENSE、squash-only、
   strict 11 checks、无 bypass `main` ruleset、外部贡献者审批与 GitHub 安全控制；
 - 新增只读 `pnpm ci:verify-repository-controls`，保留 exact-head / 同一 run PR verifier；
 - CI policy 27/27、Phase Gate 5/5、registry 736 项均通过；
@@ -70,16 +70,31 @@ E-016 范围：
   history、review thread resolution、禁止 force push / 删除及 11 个 strict GitHub Actions checks；
 - 外部贡献者 workflow 审批、secret scanning、push protection、vulnerability alerts 与
   automated security fixes 已启用；`pnpm ci:verify-repository-controls` 远端逐字段验证通过。
+- PR head `8f920724728c450fd164b5e96e14b6688f29babc` 的 CI run `32348461490` 中 9 个 automated
+  lane 全部成功；`supply-chain` 因 `GHSA-ggr8-5vv4-36mx` 拒绝 Prisma 7.9.1 依赖的
+  `deepmerge-ts@7.1.5`，aggregate Gate 随之失败，该 run 不重跑、不算 final-head PASS；
+- Prisma 7.9.1 已是当前官方最新版且 `@prisma/config` 尚未发布修复；使用仅作用于
+  `@prisma/config@7.9.1` 的 override 升级到 `deepmerge-ts@8.0.0`。npm 官方 registry production
+  audit 为 `critical=0/high=0`，Prisma generate/validate 与真实 PostgreSQL 18 数据库 Gate
+  `82/82` 通过；license policy 只新增同版本 `@img/sharp-libvips-darwin-arm64@1.3.2` 的精确
+  条件允许，仍拒绝其它 LGPL package；
+- public GitHub Actions 将仓库 artifact 上限固定为 90 天，因此 development supply-chain
+  evidence 与 DEV deployment bundle 改为 90 天。Accepted RC/Release 365 天要求不降低；在获批
+  归档后端落地前保持 `PENDING_APPROVED_ARCHIVAL / pass_claim=PROHIBITED`，Production/RC
+  继续 `NO_GO`。
+- 使用 nodejs.org 官方 SHA-256 核验的 Node 24.18.0 执行 E-016 full security Gate：
+  `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；公开授权与 threat-boundary review 已满足，
+  Production authorization 不适用。变更后远端 controls verifier 再次确认 public、无 LICENSE、
+  active ruleset、11 checks、fork 审批和安全控制全部通过。
 
 ## 5. 精确执行顺序
 
-1. 在当前分支更新 CI policy、校验器、测试、registry 和状态文档；
-2. 本地执行针对性 Gate，创建 Draft PR 并记录 exact head；
-3. 将精确仓库设为 `PUBLIC`，立即限制为 squash-only 并创建 active `main` ruleset；
-4. 启用 secret scanning / push protection / vulnerability controls 与外部贡献者 Actions 审批；
-5. 运行远端配置 verifier，并在 E-016 exact head 上取得 11/11 CI；
-6. 用户审核后 squash merge E-016，验证 merged `main`；
-7. 回到 PR #147，更新到新 `main`，只重跑 C-001 当前最终 head 的 CI；若业务 diff 未发生
+1. 完成本地 full security Gate，提交并推送 dependency/artifact retention 修复；
+2. 只让新的 E-016 exact head 触发一次 CI，并取得同一 run 11/11；
+3. 重跑远端 repository controls 与 exact-head PR verifier；
+4. 将 E-016 更新为 In Review，请用户审核 Draft PR #149；
+5. 用户审核后标记 ready，使用 `--match-head-commit` squash merge 并验证 merged `main`；
+6. 回到 PR #147，更新到新 `main`，只重跑 C-001 当前最终 head 的 CI；若业务 diff 未发生
    material change，可沿用既有 C-001 审核，否则重新请求审核。
 
 ## 6. 下一任务
