@@ -1,4 +1,9 @@
+import { createHash } from "node:crypto";
+
 import { Pool, type PoolClient } from "pg";
+
+import { createClosedDatabaseFactory } from "../db/internal/create-closed-database-factory.js";
+import { prismaRuntime } from "../db/internal/prisma-runtime.js";
 
 export type AuthAccountState = "ACTIVE" | "RESTRICTED" | "DELETING" | "DELETED";
 
@@ -33,12 +38,11 @@ export interface AuthSessionView {
 export type SessionInspection =
   | { readonly status: "ACTIVE"; readonly session: AuthSessionView }
   | {
-      readonly status:
-        | "INVALID"
-        | "EXPIRED"
-        | "REVOKED"
-        | "ACCOUNT_BLOCKED";
+      readonly status: "INVALID" | "EXPIRED" | "REVOKED" | "ACCOUNT_BLOCKED";
     };
+
+export type SessionRevocation =
+  "ACCEPTED" | "DUPLICATE" | "CONFLICT" | "INVALID" | "EXPIRED";
 
 export interface AuthStore {
   establishSession(input: {
@@ -53,7 +57,12 @@ export interface AuthStore {
     readonly now: Date;
     readonly sessionId: string;
   }): Promise<SessionInspection>;
-  revokeSession(tokenHash: Buffer, now: Date): Promise<boolean>;
+  revokeSession(input: {
+    readonly commandRef: string;
+    readonly normalizedPayloadFingerprint: Buffer;
+    readonly now: Date;
+    readonly tokenHash: Buffer;
+  }): Promise<SessionRevocation>;
   close(): Promise<void>;
 }
 
@@ -77,8 +86,16 @@ interface SessionRow extends AccountRow {
   readonly sessionId: string;
 }
 
+interface CommandReceiptRow {
+  readonly normalizedPayloadFingerprint: Buffer;
+  readonly operationCode: string;
+  readonly targetKey: string;
+}
+
 const RETENTION_POLICY_VERSION = "retention-policy-v1";
 const AUTH_LOCK_SEED = 10_001;
+const COMMAND_RECEIPT_TTL_DAYS = 7;
+const SESSION_LOGOUT_OPERATION = "SESSION_LOGOUT";
 
 export class PostgresAuthStore implements AuthStore {
   readonly #pool: Pool;
@@ -91,6 +108,21 @@ export class PostgresAuthStore implements AuthStore {
   public static async connect(
     config: PostgresAuthStoreConfig,
   ): Promise<PostgresAuthStore> {
+    const roleProbe = createClosedDatabaseFactory(
+      {
+        databaseRole: config.expectedDatabaseRole,
+        defaultConnectionLimit: 1,
+        profile: "api",
+      },
+      prismaRuntime,
+    );
+    const verifiedConnection = await roleProbe.connect({
+      applicationName: `${config.applicationName}:role-probe`,
+      connectionLimit: 1,
+      connectionString: config.connectionString,
+    });
+    await verifiedConnection.disconnect();
+
     const pool = new Pool({
       application_name: config.applicationName,
       connectionString: config.connectionString,
@@ -153,8 +185,9 @@ export class PostgresAuthStore implements AuthStore {
               "inactivityDeletionDueAt", "retentionPolicyVersion",
               "retentionScope", "retentionAnchorAt", "createdAt", "updatedAt")
            VALUES
-             (gen_random_uuid(), $1, $2, $3, 'ACTIVE', 1, $4,
-              $4 + interval '24 months', $5, 'ACCOUNT', $4, $4, $4)
+             (gen_random_uuid(), $1, $2, $3, 'ACTIVE', 1, $4::timestamptz,
+              $4::timestamptz + interval '24 months', $5, 'ACCOUNT',
+              $4::timestamptz, $4::timestamptz, $4::timestamptz)
            RETURNING id AS "accountId"`,
           [
             input.newAccount.ownerScopeToken,
@@ -192,6 +225,10 @@ export class PostgresAuthStore implements AuthStore {
           onboardingRequired: true,
         };
       } else {
+        if (account.accountState !== "ACTIVE") {
+          await client.query("ROLLBACK");
+          return { status: "ACCOUNT_BLOCKED" };
+        }
         await client.query(
           `UPDATE daily_energy.app_external_identity
               SET "lastSeenAt" = $1
@@ -204,9 +241,9 @@ export class PostgresAuthStore implements AuthStore {
         );
         await client.query(
           `UPDATE daily_energy.app_user_account
-              SET "lastActiveUseAt" = $1,
-                  "inactivityDeletionDueAt" = $1 + interval '24 months',
-                  "updatedAt" = $1
+              SET "lastActiveUseAt" = $1::timestamptz,
+                  "inactivityDeletionDueAt" = $1::timestamptz + interval '24 months',
+                  "updatedAt" = $1::timestamptz
             WHERE id = $2`,
           [input.now, account.accountId],
         );
@@ -217,7 +254,11 @@ export class PostgresAuthStore implements AuthStore {
         return { status: "ACCOUNT_BLOCKED" };
       }
 
-      const sessionId = await insertSession(client, account.accountId, input.session);
+      const sessionId = await insertSession(
+        client,
+        account.accountId,
+        input.session,
+      );
       await client.query("COMMIT");
       return {
         status: "ACTIVE",
@@ -257,7 +298,7 @@ export class PostgresAuthStore implements AuthStore {
     try {
       await client.query("BEGIN");
       const result = await client.query<SessionRow>(
-        `${sessionSelect("WHERE s.id = $1")} FOR UPDATE OF s`,
+        `${sessionSelect("WHERE s.id = $1")} FOR UPDATE OF s, a`,
         [input.sessionId],
       );
       const inspected = inspectRow(result.rows[0], input.now);
@@ -293,16 +334,91 @@ export class PostgresAuthStore implements AuthStore {
     }
   }
 
-  public async revokeSession(tokenHash: Buffer, now: Date): Promise<boolean> {
+  public async revokeSession(input: {
+    readonly commandRef: string;
+    readonly normalizedPayloadFingerprint: Buffer;
+    readonly now: Date;
+    readonly tokenHash: Buffer;
+  }): Promise<SessionRevocation> {
     this.#assertOpen();
-    const result = await this.#pool.query(
-      `UPDATE daily_energy.app_session_credential
-          SET "revokedAt" = COALESCE("revokedAt", $1)
-        WHERE "tokenHash" = $2 AND "expiresAt" > $1
-        RETURNING id`,
-      [now, tokenHash],
-    );
-    return result.rowCount === 1;
+    const client = await this.#pool.connect();
+    try {
+      await client.query("BEGIN");
+      const sessionResult = await client.query<SessionRow>(
+        `${sessionSelect('WHERE s."tokenHash" = $1')} FOR UPDATE OF s, a`,
+        [input.tokenHash],
+      );
+      const session = sessionResult.rows[0];
+      if (session === undefined) {
+        await client.query("ROLLBACK");
+        return "INVALID";
+      }
+
+      const storedCommandRef = commandRefStorageUuid(input.commandRef);
+      const inserted = await client.query(
+        `INSERT INTO daily_energy.runtime_command_receipt
+           (id, "accountId", "commandRef", "operationCode", "targetScope",
+            "targetKey", "normalizedPayloadFingerprint", "acceptedAt", "terminalAt",
+            "retentionPolicyVersion", "retentionScope", "retentionAnchorAt", "expiresAt")
+         SELECT gen_random_uuid(), $1, $2, $3, 'SESSION', $4, $5,
+                $6::timestamptz, $6::timestamptz, $7, 'RUNTIME',
+                $6::timestamptz, $6::timestamptz + make_interval(days => $8)
+          WHERE $9::timestamptz > $6
+            AND $10::timestamptz IS NULL
+         ON CONFLICT ("accountId", "commandRef") DO NOTHING
+         RETURNING id`,
+        [
+          session.accountId,
+          storedCommandRef,
+          SESSION_LOGOUT_OPERATION,
+          session.sessionId,
+          input.normalizedPayloadFingerprint,
+          input.now,
+          RETENTION_POLICY_VERSION,
+          COMMAND_RECEIPT_TTL_DAYS,
+          session.expiresAt,
+          session.revokedAt,
+        ],
+      );
+      if (inserted.rowCount === 0) {
+        const existing = await client.query<CommandReceiptRow>(
+          `SELECT "operationCode", "targetKey", "normalizedPayloadFingerprint"
+             FROM daily_energy.runtime_command_receipt
+            WHERE "accountId" = $1 AND "commandRef" = $2
+            FOR UPDATE`,
+          [session.accountId, storedCommandRef],
+        );
+        const receipt = existing.rows[0];
+        if (receipt !== undefined) {
+          const duplicate =
+            receipt.operationCode === SESSION_LOGOUT_OPERATION &&
+            receipt.targetKey === session.sessionId &&
+            receipt.normalizedPayloadFingerprint.equals(
+              input.normalizedPayloadFingerprint,
+            );
+          await client.query("COMMIT");
+          return duplicate ? "DUPLICATE" : "CONFLICT";
+        }
+        await client.query("ROLLBACK");
+        return session.expiresAt.getTime() <= input.now.getTime()
+          ? "EXPIRED"
+          : "INVALID";
+      }
+
+      await client.query(
+        `UPDATE daily_energy.app_session_credential
+            SET "revokedAt" = $1
+          WHERE id = $2`,
+        [input.now, session.sessionId],
+      );
+      await client.query("COMMIT");
+      return "ACCEPTED";
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   public async close(): Promise<void> {
@@ -343,10 +459,22 @@ async function findAccountForIdentity(
        FROM daily_energy.app_external_identity e
        JOIN daily_energy.app_user_account a ON a.id = e."accountId"
       WHERE e."providerCode" = $1 AND e."subjectLookupToken" = $2
-      LIMIT 1`,
+      LIMIT 1
+      FOR UPDATE OF a`,
     [providerCode, subjectLookupToken],
   );
   return result.rows[0];
+}
+
+function commandRefStorageUuid(commandRef: string): string {
+  const bytes = createHash("sha256")
+    .update(`${SESSION_LOGOUT_OPERATION}\u0000${commandRef}`, "utf8")
+    .digest()
+    .subarray(0, 16);
+  bytes[6] = (bytes[6]! & 0x0f) | 0x50;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+  const hex = bytes.toString("hex");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
 function sessionSelect(whereClause: string): string {
@@ -368,10 +496,7 @@ function sessionSelect(whereClause: string): string {
             LIMIT 1`;
 }
 
-function inspectRow(
-  row: SessionRow | undefined,
-  now: Date,
-): SessionInspection {
+function inspectRow(row: SessionRow | undefined, now: Date): SessionInspection {
   if (row === undefined) {
     return { status: "INVALID" };
   }

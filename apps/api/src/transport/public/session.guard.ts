@@ -20,9 +20,7 @@ export class SessionGuard implements CanActivate {
   public constructor(private readonly authService: AuthService) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context
-      .switchToHttp()
-      .getRequest<AuthenticatedRequest>();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const resolved = await this.authService.resolveAuthorization(
       request.headers.authorization,
     );
@@ -39,7 +37,9 @@ export class SessionGuard implements CanActivate {
   }
 }
 
-export function sessionPrincipalFromRequest(request: Request): SessionPrincipal {
+export function sessionPrincipalFromRequest(
+  request: Request,
+): SessionPrincipal {
   const principal = (request as AuthenticatedRequest)[SESSION_PRINCIPAL];
   if (principal === undefined) {
     throw new ApiException({ code: "AUTH_REQUIRED" });

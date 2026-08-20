@@ -24,10 +24,18 @@ describe("C-001 auth transport contract", () => {
 
   it("locks the OpenAPI session surface to opaque tokens and stable auth failures", async () => {
     const document = parse(
-      await readFile(resolve(import.meta.dirname, "../../../openapi/openapi.yaml"), "utf8"),
+      await readFile(
+        resolve(import.meta.dirname, "../../../../openapi/openapi.yaml"),
+        "utf8",
+      ),
     ) as {
-      paths: Record<string, Record<string, { responses: Record<string, unknown> }>>;
-      components: { schemas: Record<string, { properties?: Record<string, unknown> }> };
+      paths: Record<
+        string,
+        Record<string, { responses: Record<string, unknown> }>
+      >;
+      components: {
+        schemas: Record<string, { properties?: Record<string, unknown> }>;
+      };
     };
 
     const sessionProperties = Object.keys(
@@ -49,7 +57,12 @@ describe("C-001 auth transport contract", () => {
 
     expect(
       document.paths["/auth/wechat/session"]?.post?.responses,
-    ).toMatchObject({ "200": expect.anything(), "400": expect.anything(), "429": expect.anything(), "503": expect.anything() });
+    ).toMatchObject({
+      "200": expect.anything(),
+      "400": expect.anything(),
+      "429": expect.anything(),
+      "503": expect.anything(),
+    });
     expect(
       document.paths["/auth/session/refresh"]?.post?.responses,
     ).toMatchObject({ "200": expect.anything(), "401": expect.anything() });

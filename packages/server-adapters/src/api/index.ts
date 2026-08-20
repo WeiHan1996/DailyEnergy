@@ -53,6 +53,7 @@ export {
   type PostgresAuthStoreConfig,
   type ProtectedExternalIdentity,
   type SessionInspection,
+  type SessionRevocation,
 } from "../auth/postgres-auth-store.js";
 
 export type {

@@ -37,8 +37,8 @@ class EmptyStore implements AuthStore {
   public async rotateSession(): Promise<SessionInspection> {
     return { status: "INVALID" };
   }
-  public async revokeSession(): Promise<boolean> {
-    return false;
+  public async revokeSession(): Promise<"INVALID"> {
+    return "INVALID";
   }
   public async close(): Promise<void> {}
 }
@@ -56,12 +56,14 @@ describe("C-001 WeChat provider timeout", () => {
     };
     const service = new AuthService(store, exchange);
 
-    const request = service.createWechatSession({ code: "opaque-timeout-code" });
-    await vi.advanceTimersByTimeAsync(3_000);
-    await expect(request).rejects.toMatchObject({
+    const request = expect(
+      service.createWechatSession({ code: "opaque-timeout-code" }),
+    ).rejects.toMatchObject({
       code: "UPSTREAM_TRANSIENT",
       retryable: true,
     });
+    await vi.advanceTimersByTimeAsync(3_000);
+    await request;
     expect(store.writes).toBe(0);
   });
 });

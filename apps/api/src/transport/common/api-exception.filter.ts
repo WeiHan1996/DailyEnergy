@@ -13,17 +13,17 @@ import type { Response } from "express";
 import { OrdinaryLogger } from "../../observability/ordinary-logger.js";
 import { ApiTelemetry } from "../../observability/api-telemetry.js";
 import {
+  type ApiErrorDetails,
   ApiException,
   type ApiErrorCategory,
   type ApiErrorCode,
-  type ValidationErrorDetails,
 } from "./api-exception.js";
 import { RequestContextStore } from "./request-context.js";
 
 interface NormalizedApiError {
   readonly category: ApiErrorCategory;
   readonly code: ApiErrorCode;
-  readonly details?: ValidationErrorDetails;
+  readonly details?: ApiErrorDetails;
   readonly message: string;
   readonly messageKey: string;
   readonly retryable: boolean;
@@ -113,6 +113,15 @@ export class ApiExceptionFilter implements ExceptionFilter {
           };
 
     response.setHeader("X-Request-Id", context.requestId);
+    if (
+      normalized.details !== undefined &&
+      "retry_after_seconds" in normalized.details
+    ) {
+      response.setHeader(
+        "Retry-After",
+        String(normalized.details.retry_after_seconds),
+      );
+    }
     response.status(normalized.status).json({
       ok: false,
       request_id: context.requestId,

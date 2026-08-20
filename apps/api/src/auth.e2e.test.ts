@@ -25,6 +25,10 @@ interface MutableSession extends AuthSessionView {
 
 class HttpAuthStore implements AuthStore {
   readonly #accounts = new Map<string, string>();
+  readonly #logoutReceipts = new Map<
+    string,
+    { fingerprint: Buffer; sessionId: string }
+  >();
   readonly #sessions = new Map<string, MutableSession>();
 
   public async establishSession(input: {
@@ -58,8 +62,12 @@ class HttpAuthStore implements AuthStore {
     now: Date,
   ): Promise<SessionInspection> {
     const session = this.#sessions.get(tokenHash.toString("hex"));
-    if (session === undefined) return { status: "INVALID" };
-    if (session.revoked) return { status: "REVOKED" };
+    if (session === undefined) {
+      return { status: "INVALID" };
+    }
+    if (session.revoked) {
+      return { status: "REVOKED" };
+    }
     if (session.expired || session.expiresAt.getTime() <= now.getTime()) {
       return { status: "EXPIRED" };
     }
@@ -74,8 +82,12 @@ class HttpAuthStore implements AuthStore {
     const current = [...this.#sessions.values()].find(
       (session) => session.sessionId === input.sessionId,
     );
-    if (current === undefined) return { status: "INVALID" };
-    if (current.revoked) return { status: "REVOKED" };
+    if (current === undefined) {
+      return { status: "INVALID" };
+    }
+    if (current.revoked) {
+      return { status: "REVOKED" };
+    }
     if (current.expired || current.expiresAt.getTime() <= input.now.getTime()) {
       return { status: "EXPIRED" };
     }
@@ -94,17 +106,31 @@ class HttpAuthStore implements AuthStore {
     return { status: "ACTIVE", session: view };
   }
 
-  public async revokeSession(tokenHash: Buffer, now: Date): Promise<boolean> {
-    const session = this.#sessions.get(tokenHash.toString("hex"));
+  public async revokeSession(input: Parameters<AuthStore["revokeSession"]>[0]) {
+    const session = this.#sessions.get(input.tokenHash.toString("hex"));
     if (
       session === undefined ||
       session.expired ||
-      session.expiresAt.getTime() <= now.getTime()
+      session.expiresAt.getTime() <= input.now.getTime()
     ) {
-      return false;
+      return "INVALID" as const;
     }
+    const receipt = this.#logoutReceipts.get(input.commandRef);
+    if (receipt !== undefined) {
+      return receipt.sessionId === session.sessionId &&
+        receipt.fingerprint.equals(input.normalizedPayloadFingerprint)
+        ? ("DUPLICATE" as const)
+        : ("CONFLICT" as const);
+    }
+    if (session.revoked) {
+      return "INVALID" as const;
+    }
+    this.#logoutReceipts.set(input.commandRef, {
+      fingerprint: input.normalizedPayloadFingerprint,
+      sessionId: session.sessionId,
+    });
     session.revoked = true;
-    return true;
+    return "ACCEPTED" as const;
   }
 
   public expireAll(): void {
@@ -220,6 +246,35 @@ describe("C-001 auth HTTP E2E", () => {
       });
   });
 
+  it("limits the trusted forwarded client address without throttling another client", async () => {
+    const { app } = await setup();
+    const server = app.getHttpServer();
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      await request(server)
+        .post("/v1/auth/wechat/session")
+        .set("X-Forwarded-For", "203.0.113.10")
+        .send({ code: `invalid-code-${attempt}` })
+        .expect(400);
+    }
+    await request(server)
+      .post("/v1/auth/wechat/session")
+      .set("X-Forwarded-For", "203.0.113.10")
+      .send({ code: "invalid-code-blocked" })
+      .expect(429)
+      .expect("Retry-After", /\d+/u)
+      .expect((response) => {
+        expect(response.body.error).toMatchObject({
+          code: "RATE_LIMITED",
+          details: { retry_after_seconds: expect.any(Number) },
+        });
+      });
+    await request(server)
+      .post("/v1/auth/wechat/session")
+      .set("X-Forwarded-For", "203.0.113.11")
+      .send({ code: "invalid-code-other-client" })
+      .expect(400);
+  });
+
   it("fails refresh closed after expiry and after idempotent logout", async () => {
     const { app, store } = await setup();
     const server = app.getHttpServer();
@@ -243,14 +298,36 @@ describe("C-001 auth HTTP E2E", () => {
       .expect(200);
     const token = second.body.data.session_token as string;
     const command = "logout-command-0001";
-    for (let attempt = 0; attempt < 2; attempt += 1) {
-      await request(server)
-        .post("/v1/auth/session/logout")
-        .set("Authorization", `Bearer ${token}`)
-        .set("Idempotency-Key", command)
-        .send({ command_ref: command })
-        .expect(200);
-    }
+    await request(server)
+      .post("/v1/auth/session/logout")
+      .set("Authorization", `Bearer ${token}`)
+      .set("Idempotency-Key", command)
+      .send({ command_ref: command })
+      .expect(200)
+      .expect((response) => {
+        expect(response.body.data.outcome).toBe("ACCEPTED");
+      });
+    await request(server)
+      .post("/v1/auth/session/logout")
+      .set("Authorization", `Bearer ${token}`)
+      .set("Idempotency-Key", command)
+      .send({ command_ref: command })
+      .expect(200)
+      .expect((response) => {
+        expect(response.body.data.outcome).toBe("DUPLICATE");
+      });
+    await request(server)
+      .post("/v1/auth/session/logout")
+      .set("Authorization", `Bearer ${token}`)
+      .set("Idempotency-Key", command)
+      .send({
+        client_context: { scene: "different-payload" },
+        command_ref: command,
+      })
+      .expect(409)
+      .expect((response) => {
+        expect(response.body.error.code).toBe("IDEMPOTENCY_CONFLICT");
+      });
     await request(server)
       .post("/v1/auth/session/refresh")
       .set("Authorization", `Bearer ${token}`)

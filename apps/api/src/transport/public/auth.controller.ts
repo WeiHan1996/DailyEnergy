@@ -23,10 +23,7 @@ import { RUNTIME_CONFIG } from "../../composition/tokens.js";
 import { ApiException } from "../common/api-exception.js";
 import { RequestContextStore } from "../common/request-context.js";
 import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
-import {
-  SessionGuard,
-  sessionPrincipalFromRequest,
-} from "./session.guard.js";
+import { SessionGuard, sessionPrincipalFromRequest } from "./session.guard.js";
 
 const COMMAND_REF = /^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$/u;
 const LogoutRequestSchema = z
@@ -59,7 +56,7 @@ export class AuthController {
     @Body(new ZodValidationPipe(WechatSessionRequestSchema))
     request: WechatSessionRequest,
   ) {
-    this.attemptLimiter.consume(httpRequest.socket.remoteAddress);
+    this.attemptLimiter.consume(httpRequest.ip);
     const data = await this.authService.createWechatSession(request);
     return this.#success(data);
   }
@@ -83,22 +80,22 @@ export class AuthController {
   ) {
     if (idempotencyKey === undefined || idempotencyKey !== body.command_ref) {
       throw new ApiException({
-        code: "VALIDATION_FAILED",
-        details: {
-          fields: [
-            {
-              field: "Idempotency-Key",
-              reason: "idempotency_key_mismatch",
-            },
-          ],
-        },
+        code: "IDEMPOTENCY_CONFLICT",
       });
     }
-    await this.authService.logout(request.headers.authorization);
+    const outcome = await this.authService.logout(
+      request.headers.authorization,
+      {
+        ...(body.client_context === undefined
+          ? {}
+          : { clientContext: body.client_context }),
+        commandRef: body.command_ref,
+      },
+    );
     return this.#success({
       command_ref: body.command_ref,
       operation: "SESSION_LOGOUT",
-      outcome: "ACCEPTED",
+      outcome,
     });
   }
 

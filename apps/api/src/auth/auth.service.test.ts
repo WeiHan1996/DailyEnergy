@@ -18,6 +18,10 @@ import {
 
 class InMemoryAuthStore implements AuthStore {
   readonly accounts = new Map<string, string>();
+  readonly logoutReceipts = new Map<
+    string,
+    { fingerprint: Buffer; sessionId: string }
+  >();
   readonly sessions = new Map<string, AuthSessionView & { revoked: boolean }>();
   #lock = Promise.resolve();
 
@@ -50,11 +54,20 @@ class InMemoryAuthStore implements AuthStore {
     });
   }
 
-  public async inspectSession(tokenHash: Buffer, now: Date): Promise<SessionInspection> {
+  public async inspectSession(
+    tokenHash: Buffer,
+    now: Date,
+  ): Promise<SessionInspection> {
     const session = this.sessions.get(tokenHash.toString("hex"));
-    if (session === undefined) return { status: "INVALID" };
-    if (session.revoked) return { status: "REVOKED" };
-    if (session.expiresAt.getTime() <= now.getTime()) return { status: "EXPIRED" };
+    if (session === undefined) {
+      return { status: "INVALID" };
+    }
+    if (session.revoked) {
+      return { status: "REVOKED" };
+    }
+    if (session.expiresAt.getTime() <= now.getTime()) {
+      return { status: "EXPIRED" };
+    }
     return { status: "ACTIVE", session };
   }
 
@@ -66,9 +79,15 @@ class InMemoryAuthStore implements AuthStore {
     const current = [...this.sessions.values()].find(
       (session) => session.sessionId === input.sessionId,
     );
-    if (current === undefined) return { status: "INVALID" };
-    if (current.revoked) return { status: "REVOKED" };
-    if (current.expiresAt.getTime() <= input.now.getTime()) return { status: "EXPIRED" };
+    if (current === undefined) {
+      return { status: "INVALID" };
+    }
+    if (current.revoked) {
+      return { status: "REVOKED" };
+    }
+    if (current.expiresAt.getTime() <= input.now.getTime()) {
+      return { status: "EXPIRED" };
+    }
     current.revoked = true;
     const view: AuthSessionView = {
       accountId: current.accountId,
@@ -85,13 +104,30 @@ class InMemoryAuthStore implements AuthStore {
     return { status: "ACTIVE", session: view };
   }
 
-  public async revokeSession(tokenHash: Buffer, now: Date): Promise<boolean> {
-    const session = this.sessions.get(tokenHash.toString("hex"));
-    if (session === undefined || session.expiresAt.getTime() <= now.getTime()) {
-      return false;
+  public async revokeSession(input: Parameters<AuthStore["revokeSession"]>[0]) {
+    const session = this.sessions.get(input.tokenHash.toString("hex"));
+    if (session === undefined) {
+      return "INVALID" as const;
     }
+    const receipt = this.logoutReceipts.get(input.commandRef);
+    if (receipt !== undefined) {
+      return receipt.sessionId === session.sessionId &&
+        receipt.fingerprint.equals(input.normalizedPayloadFingerprint)
+        ? ("DUPLICATE" as const)
+        : ("CONFLICT" as const);
+    }
+    if (session.expiresAt.getTime() <= input.now.getTime()) {
+      return "EXPIRED" as const;
+    }
+    if (session.revoked) {
+      return "INVALID" as const;
+    }
+    this.logoutReceipts.set(input.commandRef, {
+      fingerprint: input.normalizedPayloadFingerprint,
+      sessionId: session.sessionId,
+    });
     session.revoked = true;
-    return true;
+    return "ACCEPTED" as const;
   }
 
   public async close(): Promise<void> {}
@@ -124,7 +160,10 @@ function codeExchangeFailure(
 describe("C-001 auth service", () => {
   it("converges concurrent first logins for one synthetic WeChat subject to one account", async () => {
     const store = new InMemoryAuthStore();
-    const service = new AuthService(store, new DevelopmentWechatCodeExchange("CI"));
+    const service = new AuthService(
+      store,
+      new DevelopmentWechatCodeExchange("CI"),
+    );
 
     const [first, second] = await Promise.all([
       service.createWechatSession({ code: "dev:alice:code-a" }),
@@ -138,12 +177,17 @@ describe("C-001 auth service", () => {
       consent_required: true,
       onboarding_required: true,
     });
-    expect(JSON.stringify(first)).not.toMatch(/openid|unionid|ciphertext|subject/iu);
+    expect(JSON.stringify(first)).not.toMatch(
+      /openid|unionid|ciphertext|subject/iu,
+    );
   });
 
   it("rejects replay of the same wx code without creating another account", async () => {
     const store = new InMemoryAuthStore();
-    const service = new AuthService(store, new DevelopmentWechatCodeExchange("CI"));
+    const service = new AuthService(
+      store,
+      new DevelopmentWechatCodeExchange("CI"),
+    );
 
     await service.createWechatSession({ code: "dev:alice:one-time" });
     await expect(
@@ -154,11 +198,20 @@ describe("C-001 auth service", () => {
 
   it("rotates and revokes sessions without accepting the old token", async () => {
     const store = new InMemoryAuthStore();
-    const service = new AuthService(store, new DevelopmentWechatCodeExchange("CI"));
-    const created = await service.createWechatSession({ code: "dev:bob:initial" });
-    const resolved = await service.resolveAuthorization(`Bearer ${created.session_token}`);
+    const service = new AuthService(
+      store,
+      new DevelopmentWechatCodeExchange("CI"),
+    );
+    const created = await service.createWechatSession({
+      code: "dev:bob:initial",
+    });
+    const resolved = await service.resolveAuthorization(
+      `Bearer ${created.session_token}`,
+    );
     expect(resolved.status).toBe("ACTIVE");
-    if (resolved.status !== "ACTIVE") throw new Error("expected active session");
+    if (resolved.status !== "ACTIVE") {
+      throw new Error("expected active session");
+    }
 
     const refreshed = await service.refresh(resolved.principal);
     expect(refreshed.session_token).not.toBe(created.session_token);
@@ -166,15 +219,24 @@ describe("C-001 auth service", () => {
       service.resolveAuthorization(`Bearer ${created.session_token}`),
     ).resolves.toEqual({ status: "INVALID" });
 
-    await service.logout(`Bearer ${refreshed.session_token}`);
-    await service.logout(`Bearer ${refreshed.session_token}`);
+    const command = { commandRef: "logout-command-0001" };
+    await expect(
+      service.logout(`Bearer ${refreshed.session_token}`, command),
+    ).resolves.toBe("ACCEPTED");
+    await expect(
+      service.logout(`Bearer ${refreshed.session_token}`, command),
+    ).resolves.toBe("DUPLICATE");
     await expect(
       service.resolveAuthorization(`Bearer ${refreshed.session_token}`),
     ).resolves.toEqual({ status: "INVALID" });
   });
 
   it("leaves no account fact when WeChat exchange fails before persistence", async () => {
-    for (const reason of ["INVALID_CODE", "RATE_LIMITED", "UPSTREAM_UNAVAILABLE"] as const) {
+    for (const reason of [
+      "INVALID_CODE",
+      "RATE_LIMITED",
+      "UPSTREAM_UNAVAILABLE",
+    ] as const) {
       const store = new InMemoryAuthStore();
       const service = new AuthService(store, codeExchangeFailure(reason));
       await expect(

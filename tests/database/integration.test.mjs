@@ -1923,7 +1923,7 @@ test(
           const retention = await client.query(
             `SELECT count(*)::int AS count FROM ${schema}.system_retention_policy_entry WHERE "policyVersion"='retention-policy-v1' AND "dataTypeCode"='SYNTHETIC_RUNTIME'`,
           );
-          assert.equal(migrations.rows[0].count, 4);
+          assert.equal(migrations.rows[0].count, 5);
           assert.equal(versions.rows[0].count, 1);
           assert.equal(retention.rows[0].count, 1);
         } finally {
@@ -2002,6 +2002,7 @@ test(
                 "20260731000000_owner_upgrade_probe",
                 "20260731000001_security_fixes_sql007_sql013_roles",
                 "20260802000000_e007_queue_inbox_permissions",
+                "20260819000000_c001_auth_column_permissions",
               ],
             );
           } finally {

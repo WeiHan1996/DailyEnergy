@@ -44,6 +44,16 @@ export interface SessionResponse {
   readonly session_token: string;
 }
 
+export interface LogoutCommand {
+  readonly clientContext?: {
+    readonly app_version?: string | undefined;
+    readonly scene?: string | undefined;
+  };
+  readonly commandRef: string;
+}
+
+export type LogoutOutcome = "ACCEPTED" | "DUPLICATE";
+
 @Injectable()
 export class AuthService implements SessionResolver {
   public constructor(
@@ -99,17 +109,32 @@ export class AuthService implements SessionResolver {
     return sessionResponse(token, now, result.session);
   }
 
-  public async logout(authorization: string | undefined): Promise<void> {
+  public async logout(
+    authorization: string | undefined,
+    command: LogoutCommand,
+  ): Promise<LogoutOutcome> {
     const token = bearerToken(authorization);
     if (token === undefined) {
       throw new ApiException({ code: "AUTH_REQUIRED" });
     }
     const revoked = await this.#storeCall(() =>
-      this.store.revokeSession(sessionTokenHash(token), new Date()),
+      this.store.revokeSession({
+        commandRef: command.commandRef,
+        normalizedPayloadFingerprint: logoutPayloadFingerprint(command),
+        now: new Date(),
+        tokenHash: sessionTokenHash(token),
+      }),
     );
-    if (!revoked) {
+    if (revoked === "CONFLICT") {
+      throw new ApiException({ code: "IDEMPOTENCY_CONFLICT" });
+    }
+    if (revoked === "EXPIRED") {
+      throw new ApiException({ code: "AUTH_SESSION_EXPIRED" });
+    }
+    if (revoked === "INVALID") {
       throw new ApiException({ code: "AUTH_INVALID" });
     }
+    return revoked;
   }
 
   public async resolveAuthorization(
@@ -143,7 +168,10 @@ export class AuthService implements SessionResolver {
 
   async #exchangeWechatCode(code: string) {
     try {
-      return await withTimeout(this.wechat.exchange(code), WECHAT_EXCHANGE_TIMEOUT_MS);
+      return await withTimeout(
+        this.wechat.exchange(code),
+        WECHAT_EXCHANGE_TIMEOUT_MS,
+      );
     } catch (error) {
       if (error instanceof WechatExchangeError) {
         if (error.reason === "INVALID_CODE") {
@@ -183,6 +211,27 @@ function sessionMaterial(token: string, now: Date): NewSessionMaterial {
     issuedAt: now,
     tokenHash: sessionTokenHash(token),
   };
+}
+
+function logoutPayloadFingerprint(command: LogoutCommand): Buffer {
+  const context = command.clientContext;
+  const normalizedContext =
+    context === undefined ||
+    (context.app_version === undefined && context.scene === undefined)
+      ? null
+      : {
+          app_version: context.app_version ?? null,
+          scene: context.scene ?? null,
+        };
+  return createHash("sha256")
+    .update(
+      JSON.stringify({
+        client_context: normalizedContext,
+        operation: "SESSION_LOGOUT",
+      }),
+      "utf8",
+    )
+    .digest();
 }
 
 function sessionResponse(
@@ -233,7 +282,10 @@ function encryptSyntheticSubject(subject: string): Buffer {
 
 class ExchangeTimeoutError extends Error {}
 
-async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+): Promise<T> {
   let timer: NodeJS.Timeout | undefined;
   try {
     return await Promise.race([

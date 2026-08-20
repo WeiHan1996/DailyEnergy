@@ -10,9 +10,7 @@ export interface WechatIdentity {
 }
 
 export type WechatExchangeFailure =
-  | "INVALID_CODE"
-  | "RATE_LIMITED"
-  | "UPSTREAM_UNAVAILABLE";
+  "INVALID_CODE" | "RATE_LIMITED" | "UPSTREAM_UNAVAILABLE";
 
 export class WechatExchangeError extends Error {
   public constructor(public readonly reason: WechatExchangeFailure) {
@@ -37,7 +35,9 @@ export type SessionResolution =
   | { readonly status: "ACTIVE"; readonly principal: SessionPrincipal };
 
 export interface SessionResolver {
-  resolveAuthorization(authorization: string | undefined): Promise<SessionResolution>;
+  resolveAuthorization(
+    authorization: string | undefined,
+  ): Promise<SessionResolution>;
 }
 
 export interface AuthDependencies {
@@ -89,11 +89,13 @@ export const UNAVAILABLE_AUTH_STORE: AuthStore = {
   rotateSession: async () => {
     throw new Error("AUTH_STORE_UNAVAILABLE");
   },
-  revokeSession: async () => false,
+  revokeSession: async () => "INVALID",
   close: async () => undefined,
 };
 
-export function bearerToken(authorization: string | undefined): string | undefined {
+export function bearerToken(
+  authorization: string | undefined,
+): string | undefined {
   if (authorization === undefined) {
     return undefined;
   }

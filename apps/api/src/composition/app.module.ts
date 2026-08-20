@@ -8,7 +8,10 @@ import {
   UNAVAILABLE_WECHAT_CODE_EXCHANGE,
 } from "../auth/contracts.js";
 import { ShutdownObserver } from "../bootstrap/shutdown-observer.js";
-import { ApiTelemetry, NOOP_TELEMETRY_RUNTIME } from "../observability/api-telemetry.js";
+import {
+  ApiTelemetry,
+  NOOP_TELEMETRY_RUNTIME,
+} from "../observability/api-telemetry.js";
 import {
   OrdinaryLogger,
   STANDARD_OUTPUT_LOG_SINK,

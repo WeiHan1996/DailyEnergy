@@ -15,7 +15,10 @@
       "assertions": [
         "concurrent first identity mappings for one provider lookup token commit exactly one account and one ExternalIdentity",
         "the losing account transaction rolls back instead of leaving a half-account fact",
-        "ciphertext can change while the provider lookup token continues resolving the same AccountRef"
+        "ciphertext can change while the provider lookup token continues resolving the same AccountRef",
+        "the production PostgresAuthStore passes strict API-role attestation and converges concurrent session establishment",
+        "concurrent DELETING state transitions block both login session issuance and refresh rotation",
+        "logout writes one command receipt and returns ACCEPTED, DUPLICATE and CONFLICT for the closed replay cases"
       ]
     },
     "T-C001-CONTRACT-001": {

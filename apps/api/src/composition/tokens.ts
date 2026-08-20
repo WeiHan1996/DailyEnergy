@@ -1,4 +1,7 @@
-import type { AuthStore, TelemetryRuntime } from "@daily-energy/server-adapters/api";
+import type {
+  AuthStore,
+  TelemetryRuntime,
+} from "@daily-energy/server-adapters/api";
 
 import type { RuntimeConfig } from "../bootstrap/runtime-config.js";
 import type { WechatCodeExchange } from "../auth/contracts.js";
