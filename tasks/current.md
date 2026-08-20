@@ -90,11 +90,11 @@ C-001 范围：
 
 1. Draft PR #147 已创建，实现从提交 `4731438` 开始；
 2. 用户在 GitHub `Billing & plans` 中修复近期付款失败或提高 Actions spending limit，使 `ubuntu-24.04` runner 可以分配；
-3. 外部状态修复后只 rerun PR #147 的 run `32333783343`，验证 license inventory、供应链 artifacts 与全部 required checks；
+3. 外部状态修复后只 rerun PR #147 当前 HEAD 的最新失败 run，验证 license inventory、供应链 artifacts 与全部 required checks；
 4. required checks 全部成功后，按用户已给出的审核批准将 PR 标记 ready，并使用 squash merge；
 5. 合并后切回并同步 `main`，把 C-001 更新为 Done，只将一个后续任务移动到 Ready。
 
-**精确下一步**：用户先解除 GitHub Actions Billing / spending limit 阻塞；确认 runner 可分配后 rerun PR #147 的 run `32333783343`。
+**精确下一步**：用户先解除 GitHub Actions Billing / spending limit 阻塞；确认 runner 可分配后 rerun PR #147 当前 HEAD 的最新失败 run。
 
 ## 7. CI 使用原则
 
