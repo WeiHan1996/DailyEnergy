@@ -201,7 +201,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 | ID                                                           | 任务               | 状态        | 主要结果               |
 | ------------------------------------------------------------ | ------------------ | ----------- | ---------------------- |
-| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | In Review   | 唯一用户和安全会话     |
+| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Blocked     | 唯一用户和安全会话     |
 | [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Planned     | 最小授权和可修改资料   |
 | [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | Planned     | 称呼和表达偏好         |
 | [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | Planned     | 情绪、精力和睡眠       |

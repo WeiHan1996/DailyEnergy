@@ -4,11 +4,11 @@
 - **最后更新**：2026-08-20
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-001 — 实现微信身份与安全会话
-- **任务状态**：In Review
+- **任务状态**：Blocked
 - **任务 Profile**：`security`（C-001 初始路由为 `code`，认证与数据库权限变更将有效 Profile 提升为 `security`）
 - **当前分支**：`agent/c-001-wechat-auth`
 - **当前 Issue**：[C-001 Issue #53](https://github.com/WeiHan1996/DailyEnergy/issues/53)
-- **当前 PR**：[Draft PR #147](https://github.com/WeiHan1996/DailyEnergy/pull/147)；当前实现提交 `4731438`，由 Linux CI 完成平台限定的供应链 Gate
+- **当前 PR**：[Draft PR #147](https://github.com/WeiHan1996/DailyEnergy/pull/147)；实现从提交 `4731438` 开始；GitHub Actions 因账户 Billing / spending limit 拒绝分配 runner
 - **最近完成设计任务**：D-005 已接受并随 PR #146 squash 合并，Issue #104 已关闭
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -81,18 +81,20 @@ C-001 范围：
 - QUEUE：真实 Redis 8、BullMQ 5、PostgreSQL 18 集成套件 7 / 7 通过；
 - CATALOG：已在应用全部 migration 的临时 PostgreSQL 18 上重算并验证 fingerprint；仅总哈希与 `columnAcl` 从 0 条变为 5 条，其他 14 个 section 不变；
 - SUPPLY CHAIN：官方 npm registry production audit 为 Critical 0 / High 0；本机 full Gate 在 license inventory 阶段按策略拒绝 macOS 可选包 `@img/sharp-libvips-darwin-arm64`，而 Accepted policy 只为生产 Linux 包提供条件许可，因此不得在本地放宽，必须由 Linux PR CI 完成该平台证据；
+- PR CI：run `32333783343` 的 11 个 jobs 均在 2～3 秒内以 0 steps 失败；GitHub check annotation 明确报告 `The job was not started because recent account payments have failed or your spending limit needs to be increased`，属于账户级外部阻塞，不是代码或测试失败；
 - MANUAL APPROVAL：用户于 2026-08-20 确认 C-001 审核通过并授权进入下一步。
 
-安全 Profile 所需 threat-boundary review 与用户审核已完成；生产微信凭据与生产发布不在 C-001 当前授权范围，production authorization 当前不适用。自动化结论为 `LINUX_CI_PENDING`，不得在 Linux 供应链与 required checks 成功前合并。
+安全 Profile 所需 threat-boundary review 与用户审核已完成；生产微信凭据与生产发布不在 C-001 当前授权范围，production authorization 当前不适用。自动化结论为 `EXTERNAL_INFRA_BLOCKED`，不得在 Linux 供应链与 required checks 成功前合并。
 
 ## 6. PR 与精确下一步
 
-1. Draft PR #147 已创建，当前实现提交为 `4731438`；
-2. 等待 Linux PR CI 验证 license inventory、供应链 artifacts 与全部 required checks；
-3. required checks 全部成功后，按用户已给出的审核批准将 PR 标记 ready，并使用 squash merge；
-4. 合并后切回并同步 `main`，把 C-001 更新为 Done，只将一个后续任务移动到 Ready。
+1. Draft PR #147 已创建，实现从提交 `4731438` 开始；
+2. 用户在 GitHub `Billing & plans` 中修复近期付款失败或提高 Actions spending limit，使 `ubuntu-24.04` runner 可以分配；
+3. 外部状态修复后只 rerun PR #147 的 run `32333783343`，验证 license inventory、供应链 artifacts 与全部 required checks；
+4. required checks 全部成功后，按用户已给出的审核批准将 PR 标记 ready，并使用 squash merge；
+5. 合并后切回并同步 `main`，把 C-001 更新为 Done，只将一个后续任务移动到 Ready。
 
-**精确下一步**：等待 Draft PR #147 的 Linux CI 结果并处理任何失败；全部成功后标记 ready 并 squash merge。
+**精确下一步**：用户先解除 GitHub Actions Billing / spending limit 阻塞；确认 runner 可分配后 rerun PR #147 的 run `32333783343`。
 
 ## 7. CI 使用原则
 
