@@ -129,7 +129,7 @@ jobs:
           name: ci-supply-chain-evidence
           path: .artifacts/ci/supply-chain
           if-no-files-found: error
-          retention-days: 365
+          retention-days: 90
 
   e011-full-gate:
     name: E-011 automated full Gate

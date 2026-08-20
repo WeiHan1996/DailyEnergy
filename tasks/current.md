@@ -1,93 +1,110 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-19
+- **最后更新**：2026-08-20
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：C-001 — 实现微信身份与安全会话
-- **任务状态**：Ready
-- **任务 Profile**：`code`
-- **计划分支**：`agent/c-001-wechat-auth`
-- **当前 Issue**：[C-001 Issue #53](https://github.com/WeiHan1996/DailyEnergy/issues/53)
-- **当前 PR**：无；开始实现后创建一个聚焦 Draft PR
-- **最近完成设计任务**：D-005 已于 2026-08-19 获项目负责人明确接受；PR #146 合并后关闭 Issue #104
+- **当前任务**：E-016 — 公开仓库并恢复平台强制 CI Gate
+- **任务状态**：In Review
+- **任务 Profile**：`security`
+- **当前分支**：`agent/public-repository-controls`
+- **当前 Issue**：[E-016 Issue #148](https://github.com/WeiHan1996/DailyEnergy/issues/148)
+- **当前 PR**：[Draft PR #149](https://github.com/WeiHan1996/DailyEnergy/pull/149)
+- **被中断任务**：C-001 — 实现微信身份与安全会话；分支 `agent/c-001-wechat-auth`，Draft PR #147，精确 head `c5e7cd19edea1a3c62a747fbb24b9e7d6e3d036d`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 当前目标
 
-建立微信 code 交换、稳定账户身份和可撤销安全会话，客户端永不持有服务端身份密钥。
+将 `WeiHan1996/DailyEnergy` 从 private GitHub Free 转为 public，在不增加 LICENSE、
+不重写历史、不暴露生产 secret 的前提下恢复免费 GitHub-hosted Actions，并把 testing 22.2
+的临时人工补偿控制迁移为 GitHub 平台强制的 `main` 保护。
 
-C-001 范围：
+E-016 范围：
 
-- 微信 auth adapter 与开发 stub；
-- 账户查找 / 创建；
-- session issuance / rotation / revoke；
-- 公开身份 API、session guard、owner 绑定；
-- 重放、限流、超时和微信不可用处理；
-- 只保存允许的微信标识，按隐私数据地图最小化 / 保护，禁止进入日志和 analytics；
-- 登录失败、session 过期和多端恢复。
+- 公开前扫描 Git 历史、Issue / PR / 评论、Actions 日志、artifact 元数据和设计截图；
+- 用户明确接受公开历史、提交者邮箱和 Figma 身份信息，仓库保持无 LICENSE；
+- 可见性切换后立即启用无 bypass 的 `main` ruleset；
+- 只允许 PR 和 squash merge，禁止 direct / force push 与 `main` 删除；
+- 强制 strict、同一 CI workflow 的 11 个 required checks；
+- 启用 secret scanning、push protection 与外部贡献者 Actions 审批；
+- 更新 executable CI policy、测试、registry、Accepted 当前状态和 durable handoff；
+- E-016 合并并验证后恢复 C-001，不修改其业务代码。
 
-不做手机号登录、社交关系、生产微信凭据或设备指纹。
+不做开源许可证选择、Git 历史重写、历史分支 / Issue / PR / Actions 删除、生产凭据、部署或发布。
 
-## 2. 前置状态
+## 2. 授权与公开前证据
 
-- E-014 Phase 1 Gate 已完成，Phase 2 development 为 `CONDITIONAL_GO`；
-- D-001～D-005 正式视觉前置全部 Accepted；
-- D-005 Accepted 只解除 C-012 / C-013 / C-014 的设计前置，不改变 Production / RC `NO_GO`；
-- C-001 Issue #53 的直接前置 E-014 已满足，因此 C-001 现在是唯一 Ready 工程任务。
+- 用户于 2026-08-20 明确授权将目标仓库设为 `PUBLIC`；
+- 用户接受 92 个远端分支、54 个 Issue、93 个 PR、143 次 Actions 历史、提交者邮箱和
+  Figma 截图中的 `han wei` 身份信息公开；
+- 用户要求保持无 LICENSE；
+- 仓库无 Actions secrets / variables；1,107 个 artifact 合计约 25.75 MiB；
+- 高置信格式扫描覆盖 4,493 个远端对象 / 2,024 个 blob、全部 Issue / PR / 评论和
+  143 次 Actions 日志，未发现真实 provider token、有效私钥或本机路径泄漏；
+- 命中项均为合成测试、localhost credential URL、环境变量名、secret 文件路径或脱敏负例；
+- 官方 Gitleaks 二进制的两次下载校验失败、Docker registry 返回 EOF，未执行不可验证程序；
+  这是已披露残余风险，公开后必须立即启用 GitHub secret scanning / push protection。
 
-## 3. 权威输入
+## 3. 必须保持的边界
 
-开始实现前按 `AGENTS.md` 执行 routed context restore，优先运行：
+- GitHub 可见性改变会公开完整历史与 Actions 日志，执行前后必须核对精确仓库；
+- visibility 改为 public 会禁用既有 push rulesets，转换后必须立即建立并验证新 ruleset；
+- required checks 不得少于现有 11 项，aggregate Gate 不替代各 lane 的独立 required 状态；
+- ruleset 不允许 bypass actor；独立 owner 的聊天批准继续是项目流程证据，但单人仓库不伪造
+  GitHub reviewer；
+- public fork PR 不获得 secret、OIDC、environment 或生产网络；外部贡献者 workflow 运行需批准；
+- platform Gate 只是 Production / RC 基线，不能解除现有 `NO_GO`；
+- C-001 代码和既有精确 head 保持不变，E-016 使用独立 PR。
 
-`pnpm agent:prepare C-001`
+## 4. 已完成实现与验证
 
-若当前 connector 会话不能执行用户本机 checkout，则按 AGENTS fallback 至少读取：
+- executable policy 已迁移到 `e-016-ci-policy-v5`，固定 public、无 LICENSE、squash-only、
+  strict 11 checks、无 bypass `main` ruleset、外部贡献者审批与 GitHub 安全控制；
+- 新增只读 `pnpm ci:verify-repository-controls`，保留 exact-head / 同一 run PR verifier；
+- CI policy 27/27、Phase Gate 5/5、registry 736 项均通过；
+- `pnpm agent:validate --mode=task --task=E-016` 在允许本地监听的环境中 automated `PASS`；
+- security profile 所需 threat-boundary review 已完成，公开授权已由用户明确给出；Production
+  authorization 不适用，Production/RC 继续 `NO_GO`；
+- 初始实现提交 `b46715b` 已推送并创建 Draft PR #149。
+- `WeiHan1996/DailyEnergy` 已切换为 public；merge/rebase/auto-merge 已关闭，仓库保持无 LICENSE；
+- active、无 bypass 的 `DailyEnergy main protection` ruleset 已强制 PR、squash-only、linear
+  history、review thread resolution、禁止 force push / 删除及 11 个 strict GitHub Actions checks；
+- 外部贡献者 workflow 审批、secret scanning、push protection、vulnerability alerts 与
+  automated security fixes 已启用；`pnpm ci:verify-repository-controls` 远端逐字段验证通过。
+- PR head `8f920724728c450fd164b5e96e14b6688f29babc` 的 CI run `32348461490` 中 9 个 automated
+  lane 全部成功；`supply-chain` 因 `GHSA-ggr8-5vv4-36mx` 拒绝 Prisma 7.9.1 依赖的
+  `deepmerge-ts@7.1.5`，aggregate Gate 随之失败，该 run 不重跑、不算 final-head PASS；
+- Prisma 7.9.1 已是当前官方最新版且 `@prisma/config` 尚未发布修复；使用仅作用于
+  `@prisma/config@7.9.1` 的 override 升级到 `deepmerge-ts@8.0.0`。npm 官方 registry production
+  audit 为 `critical=0/high=0`，Prisma generate/validate 与真实 PostgreSQL 18 数据库 Gate
+  `82/82` 通过；license policy 只新增同版本 `@img/sharp-libvips-darwin-arm64@1.3.2` 的精确
+  条件允许，仍拒绝其它 LGPL package；
+- public GitHub Actions 将仓库 artifact 上限固定为 90 天，因此 development supply-chain
+  evidence 与 DEV deployment bundle 改为 90 天。Accepted RC/Release 365 天要求不降低；在获批
+  归档后端落地前保持 `PENDING_APPROVED_ARCHIVAL / pass_claim=PROHIBITED`，Production/RC
+  继续 `NO_GO`。
+- 使用 nodejs.org 官方 SHA-256 核验的 Node 24.18.0 执行 E-016 full security Gate：
+  `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；公开授权与 threat-boundary review 已满足，
+  Production authorization 不适用。变更后远端 controls verifier 再次确认 public、无 LICENSE、
+  active ruleset、11 checks、fork 审批和安全控制全部通过。
+- 中间 head `a7c73509e0d3580a1798bfb1a3fdbabf9d65141a` 的 CI run `32350423137` 已同一 run
+  11/11 SUCCESS；它同时暴露默认分支 3 个 Dependabot 开发依赖告警。完整开发依赖审计定位到
+  `miniprogram-automator@0.12.1` 的旧 Jimp 链，并以父包+子包精确 override 修复
+  `minimist@0.2.4`、`phin@3.7.1` 和 `jpeg-js@0.4.4`；官方 registry 全依赖审计为 0，
+  automator load smoke、小程序 10 项测试和 DevTools result/bundle policy 均通过。该安全收口会形成
+  新 final head，`a7c7350` 不作为最终合并 head。
+- 实现 head `6f5a3a70a09a3354c0ceec2207c102552cef01fd` 的 CI run `32350989506` 已同一 run
+  11/11 SUCCESS，包含 production audit、SBOM/provenance、真实数据库、Admin E2E 和 aggregate
+  Gate；下一状态提交只更新任务控制文件，仍需取得自己的 exact-head 11/11 后请求审核。
 
-- `docs/agent/PROJECT_CONTEXT.md`
-- `docs/product/mvp.md`
-- `docs/product/state-machine.md`
-- `docs/technical/api.md`
-- `docs/technical/database.md`
-- 相关 Accepted ADR、privacy data map、error codes、OpenAPI / Zod contracts；
-- 现有 auth / session / owner 附近代码和测试；
-- C-001 对应 Accepted Source ID / 测试注册表。
+## 5. 精确执行顺序
 
-如果权威源冲突或所需决策仍是 Draft，停止实现并报告 blocker，不自行猜测。
+1. 提交并推送 In Review 状态收口，取得该 exact head 的同一 run 11/11；
+2. 重跑远端 repository controls，并请用户审核 Draft PR #149；
+3. 用户批准后标记 ready，运行 exact-head PR verifier；
+4. 使用 `--match-head-commit` squash merge 并验证 merged `main`；
+5. 回到 PR #147，更新到新 `main`，只重跑 C-001 当前最终 head 的 CI；若业务 diff 未发生
+   material change，可沿用既有 C-001 审核，否则重新请求审核。
 
-## 4. 必须保持的工程边界
+## 6. 下一任务
 
-- 同一微信主体并发首次登录只能产生一个有效账户；
-- 客户端和公开 API 不暴露 openid / unionid 或服务端身份密钥；
-- 无效、过期、撤销 session 必须 fail closed；
-- owner guard 不能跨用户读取 / 写入；
-- 微信外部调用必须在数据库事务外；
-- 外部调用失败不能留下半账户事实；
-- 真实 AppID / secret 未获批准时只使用 stub / development configuration；
-- 身份标识不得进入普通日志、analytics、错误详情或 client-safe payload；
-- 不降低既有事务、幂等、限流、超时、可观测性和 secret 边界。
-
-## 5. 验收与测试
-
-至少覆盖：
-
-- 并发首次登录；
-- code 重放 / 无效 code；
-- session issuance、rotation、expiry、revoke；
-- owner 越权；
-- 微信外部故障 / timeout；
-- 多端恢复；
-- 敏感身份标识的日志 / client-safe 泄漏负例。
-
-所有 C-001 覆盖的 Accepted Source ID 必须在测试注册表从 `PLANNED` 更新为 `COVERED`；无法覆盖时只能使用带批准理由的 `NA_WITH_REASON`。
-
-## 6. CI 使用原则
-
-延续项目约束：先在分支完成实现、针对性验证和 branch diff 自审，再创建 Draft PR；不要用反复推送 + CI 代替本地 / 静态分析。首次 PR CI 出现失败时先诊断原因，不自动 rerun。
-
-## 7. 精确下一动作
-
-1. D-005 PR #146 final-head 合并并关闭 Issue #104；
-2. 从最新 `main` 创建 `agent/c-001-wechat-auth`；
-3. 恢复 C-001 routed context，读取全部权威输入和附近实现；
-4. 先形成实现 / 测试计划并确认范围仍能收敛在一个聚焦 PR；
-5. 开始 C-001 实现。
+E-016 完成后恢复 C-001；不要提前开始 C-002。

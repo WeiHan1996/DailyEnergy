@@ -29,17 +29,21 @@ PostgreSQL/Redis/BullMQ。
 | ------------------------------------------------- | --------------------------------------------------------------------- |
 | `pnpm ci:check`                                   | 12 个 lane、最小权限、immutable action、TTL 与外部 pending 边界       |
 | `pnpm ci:test`                                    | action/权限/fork secret/cache/artifact/cardinality/digest 负例        |
-| `pnpm ci:verify-pr-merge-gate -- <PR> <HEAD_SHA>` | 私有 Free 临时控制：最新 head 的 11 个 checks 来自同一 run 且全部成功 |
+| `pnpm ci:verify-repository-controls`              | public、无 LICENSE、merge settings、main ruleset、fork 审批与安全控制 |
+| `pnpm ci:verify-pr-merge-gate -- <PR> <HEAD_SHA>` | 最新 head 的 11 个 checks 来自同一 run 且全部成功                     |
 | `pnpm ci:audit`                                   | production dependency high/critical vulnerability fail-closed Gate    |
 | `pnpm ci:supply-chain:evidence`                   | SPDX SBOM、license、build digest 与 unsigned provenance 生成和扫描    |
 
 普通 PR 自动执行 9 个可用 lane；`miniapp-conformance`、
 `ai-model-load-human` 与 `manual-rc` 保持显式 pending/blocked，不能由普通 GitHub
-job 冒充 PASS。普通合成报告保留 14 天，SBOM/provenance 等供应链证据保留 365 天。
-当前私有 GitHub Free 仓库无法启用 branch protection；该临时控制只允许 development branch
-merge。到 2026-11-02、任一 RC 开始、出现第二位可合并协作者、owner 撤回接受或平台能力可用前，
-合并必须先执行上述只读 Gate，再使用
-`gh pr merge --squash --match-head-commit <HEAD_SHA>`。该控制不豁免任何失败或缺失 lane。
+job 冒充 PASS。普通合成报告保留 14 天；public development CI 的 SBOM/provenance 和 DEV
+deployment bundle 按 GitHub 平台上限保留 90 天。RC/Release 仍要求 365 天，在获批归档后端
+落地前保持 `PENDING_APPROVED_ARCHIVAL`，不能冒充发布 Gate PASS。
+E-016 将仓库转为 public 后，active、无 bypass 的 `main` ruleset 平台强制 PR、squash-only、
+strict 11 checks、linear history、review thread resolution、禁止 force push/删除；外部贡献者
+workflow 需批准，secret scanning/push protection 等安全控制必须启用。GitHub approval count
+保持 0，用户批准继续作为项目流程证据。合并前仍执行 exact-head Gate，再使用
+`gh pr merge --squash --match-head-commit <HEAD_SHA>`；Production/RC `NO_GO` 不因此解除。
 
 ## E-013 可观测性入口
 

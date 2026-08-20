@@ -138,8 +138,9 @@ export function validateSourceInventory(inventory, configuration, registry) {
 
 export function validatePhaseGateContract(contract, dependencies) {
   if (
-    contract?.contract_version !== "e-014-phase-gate-v1" ||
+    contract?.contract_version !== "e-014-phase-gate-v2" ||
     contract.task_id !== "E-014" ||
+    contract.last_amended_by !== "E-016" ||
     contract.profile !== "security"
   ) {
     fail("E014_GATE_CONTRACT_VERSION", contract?.contract_version ?? "missing");
@@ -212,13 +213,15 @@ export function validatePhaseGateContract(contract, dependencies) {
   }
 
   if (
-    contract.merge_control?.scope !== "DEVELOPMENT_BRANCH_MERGES_ONLY" ||
+    contract.merge_control?.scope !== "MAIN_BRANCH_MERGES" ||
     contract.merge_control?.platform_enforcement !==
-      "UNAVAILABLE_ON_PRIVATE_GITHUB_FREE" ||
+      "ACTIVE_PUBLIC_REPOSITORY_RULESET" ||
     contract.merge_control?.required_checks !== 11 ||
-    contract.merge_control?.explicit_owner_risk_acceptance_per_merge !== true ||
-    contract.merge_control?.production_or_rc_use !== "PROHIBITED" ||
-    contract.merge_control?.expires_on !== "2026-11-02"
+    contract.merge_control?.strict_required_checks !== true ||
+    contract.merge_control?.owner_approval_evidence_per_merge !== true ||
+    contract.merge_control?.production_or_rc_admission !==
+      "ADDITIONAL_GATES_REQUIRED" ||
+    contract.merge_control?.effective_on !== "2026-08-20"
   ) {
     fail("E014_GATE_MERGE_CONTROL", "scope-or-expiry");
   }
@@ -228,8 +231,10 @@ export function validatePhaseGateContract(contract, dependencies) {
     ciPolicy?.merge_gate?.scope !== contract.merge_control.scope ||
     ciPolicy.merge_gate.required_checks.length !==
       contract.merge_control.required_checks ||
-    ciPolicy.merge_gate.explicit_owner_risk_acceptance_per_merge !== true ||
-    ciPolicy.merge_gate.production_or_rc_use !== "PROHIBITED"
+    ciPolicy.merge_gate.strict_required_checks !== true ||
+    ciPolicy.merge_gate.owner_approval_evidence_per_merge !== true ||
+    ciPolicy.merge_gate.production_or_rc_admission !==
+      contract.merge_control.production_or_rc_admission
   ) {
     fail("E014_GATE_CI_POLICY_DRIFT", "merge-control");
   }

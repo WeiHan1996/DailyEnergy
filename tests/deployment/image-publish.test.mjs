@@ -822,6 +822,6 @@ test("T-E012-IMAGE-001 keeps image publication manual, main-bound and non-deploy
     upload.if,
     "always() && steps.image_set_scan.outcome == 'success'",
   );
-  assert.equal(upload.with["retention-days"], 365);
+  assert.equal(upload.with["retention-days"], 90);
   assert.equal(upload.with["if-no-files-found"], "error");
 });

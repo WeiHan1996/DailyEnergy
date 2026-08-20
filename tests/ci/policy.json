@@ -1,5 +1,5 @@
 {
-  "policy_version": "e-014-ci-policy-v3",
+  "policy_version": "e-016-ci-policy-v5",
   "runner": "ubuntu-24.04",
   "node_version": "24.18.0",
   "pnpm_version": "11.17.0",
@@ -11,9 +11,8 @@
   "production_secrets": "PROHIBITED",
   "oidc_deployment_permission": "PROHIBITED",
   "merge_gate": {
-    "control_type": "TEMPORARY_MANUAL_COMPENSATING_CONTROL",
-    "reason": "PRIVATE_FREE_BRANCH_PROTECTION_UNAVAILABLE",
-    "scope": "DEVELOPMENT_BRANCH_MERGES_ONLY",
+    "control_type": "GITHUB_RULESET_PLATFORM_ENFORCED",
+    "scope": "MAIN_BRANCH_MERGES",
     "repository": "WeiHan1996/DailyEnergy",
     "target_branch": "main",
     "required_checks": [
@@ -29,24 +28,46 @@
       "supply-chain",
       "E-011 automated full Gate"
     ],
+    "strict_required_checks": true,
+    "status_check_integration_id": 15368,
     "same_workflow_run_required": true,
     "head_change_guard": "GH_MATCH_HEAD_COMMIT",
     "merge_method": "SQUASH",
+    "pull_request": "REQUIRED",
+    "required_approving_review_count": 0,
+    "review_thread_resolution": "REQUIRED",
+    "linear_history": "REQUIRED",
     "direct_push": "PROHIBITED",
+    "force_push": "PROHIBITED",
+    "branch_deletion": "PROHIBITED",
+    "bypass_actors": [],
     "auto_merge": "PROHIBITED",
     "receipt": "PR_COMMENT_AND_POST_MERGE_HANDOFF",
-    "risk_owner": "REPOSITORY_OWNER",
-    "explicit_owner_risk_acceptance_per_merge": true,
-    "production_or_rc_use": "PROHIBITED",
-    "accepted_on": "2026-08-12",
-    "expires_on": "2026-11-02",
-    "restore_platform_enforcement_on": [
-      "CAPABILITY_AVAILABLE",
-      "SECOND_MERGE_CAPABLE_ACTOR",
-      "PHASE_2_RELEASE_CANDIDATE",
-      "PRODUCTION_RELEASE_CANDIDATE",
-      "OWNER_WITHDRAWS_ACCEPTANCE"
-    ]
+    "owner_approval_evidence_per_merge": true,
+    "platform_enforcement": "ACTIVE",
+    "effective_on": "2026-08-20",
+    "production_or_rc_admission": "ADDITIONAL_GATES_REQUIRED"
+  },
+  "repository_controls": {
+    "visibility": "PUBLIC",
+    "license": "ABSENT",
+    "ruleset_name": "DailyEnergy main protection",
+    "merge_methods": {
+      "squash": true,
+      "merge_commit": false,
+      "rebase": false,
+      "auto_merge": false
+    },
+    "actions": {
+      "enabled": true,
+      "fork_pull_request_approval_policy": "all_external_contributors"
+    },
+    "security_and_analysis": {
+      "secret_scanning": "enabled",
+      "secret_scanning_push_protection": "enabled",
+      "vulnerability_alerts": "enabled",
+      "automated_security_fixes": "enabled"
+    }
   },
   "actions": {
     "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
@@ -59,8 +80,14 @@
       "synthetic_only": true
     },
     "supply_chain_evidence": {
-      "retention_days": 365,
+      "retention_days": 90,
+      "scope": "PUBLIC_DEVELOPMENT_CI",
       "synthetic_only": true
+    },
+    "rc_release_evidence": {
+      "retention_days": 365,
+      "storage_status": "PENDING_APPROVED_ARCHIVAL",
+      "pass_claim": "PROHIBITED"
     }
   },
   "lanes": [
