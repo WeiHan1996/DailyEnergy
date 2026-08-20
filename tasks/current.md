@@ -86,6 +86,12 @@ E-016 范围：
   `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；公开授权与 threat-boundary review 已满足，
   Production authorization 不适用。变更后远端 controls verifier 再次确认 public、无 LICENSE、
   active ruleset、11 checks、fork 审批和安全控制全部通过。
+- 中间 head `a7c73509e0d3580a1798bfb1a3fdbabf9d65141a` 的 CI run `32350423137` 已同一 run
+  11/11 SUCCESS；它同时暴露默认分支 3 个 Dependabot 开发依赖告警。完整开发依赖审计定位到
+  `miniprogram-automator@0.12.1` 的旧 Jimp 链，并以父包+子包精确 override 修复
+  `minimist@0.2.4`、`phin@3.7.1` 和 `jpeg-js@0.4.4`；官方 registry 全依赖审计为 0，
+  automator load smoke、小程序 10 项测试和 DevTools result/bundle policy 均通过。该安全收口会形成
+  新 final head，`a7c7350` 不作为最终合并 head。
 
 ## 5. 精确执行顺序
 
