@@ -3,93 +3,89 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-20
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：C-002 — 实现必要同意、用户资料与表达偏好
-- **任务状态**：In Review
-- **任务 Profile**：`security`（任务基线为 `code`；因隐私字段保护、同意撤回、删除钩子与数据库权限边界提升）
-- **当前实现分支**：`agent/c-002-consent-profile`
-- **状态收尾**：PR #150 已 squash 合并为 `234f145a24285097cd261bd715e6d45c6022f953`
-- **当前 Issue**：[C-002 Issue #54](https://github.com/WeiHan1996/DailyEnergy/issues/54)
-- **当前 PR**：[PR #152](https://github.com/WeiHan1996/DailyEnergy/pull/152)（已获用户批准，待 final-head Gate 后合并）
-- **最近完成任务**：C-001 已随 PR #147 squash 合并为 `505a926f8830591cf305346219c86280660cd196`，Issue #53 已关闭
+- **当前任务**：C-003 — 实现“第一次认识”流程
+- **任务状态**：Ready
+- **任务 Profile**：`code`（正式页面实现必须补充 D-004 原始 Frame 与人工视觉证据；变更路径可将有效 Profile 提升为 `hybrid` 或 `security`）
+- **当前实现分支**：尚未创建；建议 `agent/c-003-onboarding`
+- **当前状态收尾分支**：`agent/c-002-closeout`
+- **当前 Issue**：[C-003 Issue #55](https://github.com/WeiHan1996/DailyEnergy/issues/55)
+- **当前 PR**：无
+- **最近完成任务**：C-002 已随 PR #152 squash 合并为 `56695b5f7e8e08fedd1cc0b19dc3bd380ecb1d41`，Issue #54 已关闭
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 当前目标
 
-实现必要同意版本、最小用户资料和可修改表达偏好，并让撤回与删除语义可审计。
+打通承接边界说明到首次认识完成的最小流程，并支持中断草稿恢复。
 
-C-002 范围：
+C-003 范围：
 
-- consent / profile / preferences command 与 query；
-- revision / CAS 和当前有效同意版本；
-- 区分必要同意、可选资料及可选通知 / 记忆用途，默认最小化；
-- 支持称呼、表达偏好和允许字段修改，禁止自由扩展画像；
-- 更新用户可见说明、数据地图和 Source ID 实现证据；
-- 注册撤回、导出与删除钩子及期限。
+- 实现 ENT-001 / ONB-001 页面与 C-002 资料、偏好 API 编排；
+- 只询问可选称呼与封闭表达偏好，并允许明确跳过；最近状态由后续 DLY-001 / C-004 承接；
+- 实现本地短期草稿、服务端完成事实、重复提交幂等与返回路由；
+- 覆盖 loading、offline、error、permission、Safety 与跨日 UI 状态；
+- 匹配 D-004 已接受 Frame，复用 D-002 语义 Token 与组件，并登记 Source ID 证据。
 
-不收集通讯录、位置、设备指纹、自动外部数据或画像推断。
+不实现长问卷、人格角色选择、AI 对话、每日签到、渠道投放或新的资料字段。
 
 ## 2. 前置与完成状态
 
-- C-001 已完成：final PR head `0104b978dfd96e82e4de7ceb1e303c80e246ae61` 的 CI run
-  `32353095120` 同一 run 11/11 SUCCESS，exact-head verifier 通过；
-- C-001 已使用 `--match-head-commit` squash 合并为 `505a926f8830591cf305346219c86280660cd196`，Issue #53 已关闭；
-- C-001 merged-main CI run `32353421328` 在精确 merge SHA 上同一 run 11/11 SUCCESS；
-- 状态收尾 PR #150 的 final head run `32353924573` 与 merged-main run `32354195311` 均为 11/11 SUCCESS；
+- C-002 final head `07a14273100f82b12cd71195e7d3423c2fc15f24` 的 CI run `32375703841`
+  同一 run 11/11 SUCCESS，exact-head verifier 通过；
+- C-002 已使用 `--match-head-commit` squash 合并为 `56695b5f7e8e08fedd1cc0b19dc3bd380ecb1d41`，Issue #54 已关闭；
+- C-002 merged-main CI run `32376084255` 在精确 merge SHA 上同一 run 11/11 SUCCESS；
+- C-002 人工 threat-boundary review 与项目所有者产品/安全边界确认已完成；生产称呼 key
+  接线随 Production `NO_GO` 延后，本次未授予 Production / RC 发布权限；
 - E-016 已完成：仓库为 public、保持无 LICENSE，`main` 由无 bypass ruleset 强制 11 个 strict required checks；
-- D-001～D-005 正式视觉前置均已 Accepted；
-- C-002 的直接前置 C-001 已满足，Issue #54 保持 Open；
-- C-002 已实现封闭 consent/profile/preferences Schema、session-owner 绑定 Nest 应用服务、PostgreSQL 事务适配器、当前必要同意版本解析、CAS/幂等/并发、默认关闭偏好和平台权限分离；
-- 称呼使用 AES-256-GCM 版本化 codec；LOCAL/CI/DEV 使用合成开发 key，发布环境未注入批准 key 时 fail closed，Production / RC 继续 `NO_GO`；
-- C-002 migration 已收紧 API 角色列权限和删除/不可变字段权限，历史 profile revision 到期不再阻断当前 Profile 后续修改；
-- 生命周期登记已覆盖导出白名单、同意/偏好撤回效果、删除 scope、称呼 72 小时、结构 revision 30 天和替代同意回执 6 个月期限；
-- Source registry 为 784 项：222 `COVERED`、562 `PLANNED`；S-17 新增 48 项，仅 `D17-I03`、`D17-I04` 由 C-002 覆盖；
-- Production / RC 继续 `NO_GO`，本任务不包含生产微信凭据或发布授权。
+- E-004 微信小程序骨架与 D-004 已接受高保真开发交付均完成；
+- C-003 的直接前置 C-002、E-004、D-004 已满足，Issue #55 保持 Open；
+- C-002 已提供封闭 consent/profile/preferences Schema、session-owner 服务端绑定、CAS/幂等、
+  默认关闭偏好、平台权限分离与 AES-256-GCM 称呼保护，C-003 必须复用这些边界；
+- Production / RC 继续 `NO_GO`，C-003 不包含生产微信凭据或发布授权。
 
 ## 3. 开始前必须恢复的权威来源
 
 下一位 Agent 必须先运行：
 
 ```text
-pnpm agent:prepare C-002 --remote --deep
+pnpm agent:prepare C-003 --remote --deep
 ```
 
 并完整读取命令返回的 required sources，至少包括：
 
+- `docs/product/journey.md`；
 - `docs/product/state-machine.md`；
-- `docs/operations/privacy-data-map.md`；
-- `docs/technical/api.md`；
-- `docs/decisions/ADR-0005-data-retention-and-deletion.md`；
-- `docs/design/screen-inventory.md`；
-- `docs/design/interaction-states.md`；
-- `docs/technical/testing.md`；
-- 相关 Schema、OpenAPI、Prisma、测试、fixtures 与附近代码。
+- `docs/design/screen-specs.md`；
+- `docs/design/content-layout.md`；
+- `docs/design/design-system.md`；
+- `docs/design/developer-handoff.md`；
+- `docs/design/screen-inventory.md` 与 `docs/design/interaction-states.md`；
+- `docs/technical/api.md`、C-002 Schema / API client / 测试、Source fixtures 与附近小程序代码。
 
-若 Accepted 文档、Schema、API 或删除语义冲突，先停止并回到 ADR / 规范处理，不自行猜测。
+若 Accepted Frame、状态机、Schema、API、隐私或 Safety 边界冲突，先停止并回到上游处理，不自行猜测。
 
 ## 4. 必须保持的边界
 
-- 未接受当前必要同意不能进入普通旅程；拒绝不产生多余资料；
-- 同 revision 并发修改只能一个成功；owner 只能来自服务端 session principal；
-- 只允许明确 allowlist 字段，响应不得泄露内部字段或 provider 身份信息；
-- 偏好修改只影响未来生成，不改写历史结果；
-- 撤回、导出、删除钩子与期限遵循 Accepted ADR-0005 和隐私数据地图；
-- 所有外部输入必须服务端验证，写入必须具备幂等、唯一性和可审核证据；
-- 不降低 Safety、删除、事务、运行 profile、日志脱敏或 client-safe 边界。
+- 未接受当前必要同意不能进入 ONB-001；离线页不能伪造同意或完成事实；
+- 称呼为可选且可留空，表达偏好使用封闭枚举，不新增自由画像或强制资料；
+- owner 只能来自服务端 session principal；重复、中断、多端提交不得创建第二份 profile 或完成事实；
+- 本地草稿必须短期、最小、可清理；服务端权威状态决定恢复与跳过，不由客户端猜测；
+- Safety、删除、撤回和权限状态优先；错误、重试与跨日恢复保持同一逻辑意图；
+- 匹配 ENT-001 `220:3-6`、ONB-001 `220:7-10`，视觉差异必须在 PR 中说明并人工审核；
+- C-003 完成后只路由到 DLY-001，不在本任务实现 C-004 每日签到。
 
 ## 5. 验收与证据
 
-- Shared schemas 6 files / 41 tests、server adapters 10 files / 40 tests、API 15 files / 71 tests 均通过；C-002 HTTP E2E 4/4 通过；
-- 真实 PostgreSQL C-002 invariant test 通过，覆盖当前同意版本、原子 onboarding、同 revision 并发、跨操作幂等冲突、revision 历史清理、撤回门控、owner 隔离和列权限；
-- C-001 真实 PostgreSQL 身份回归通过；数据库全套 integration 83/83 通过；migration checksum、catalog fingerprint、Source registry 和 Phase Gate 均通过；
-- 最终 changed Gate：`MANUAL_EVIDENCE_REQUIRED | automated=PASS | profile=security | mode=changed→full`；
-- 最终 C-002 full Gate：`MANUAL_EVIDENCE_REQUIRED | automated=PASS | profile=security | mode=full→full`；
-- 两个 Gate 均使用仓库精确 Node `24.18.0`；本机镜像不提供 audit endpoint，验证命令仅临时忽略用户级镜像并使用 npm 官方 endpoint，结果 critical/high 均为 0；
-- Draft PR #152 head `229c1bbc720e95da4f3920fc6f494ce8c8de61b3` 对应 CI run `32365017600`，同一 run 11/11 SUCCESS；
-- 2026-08-20 已完成人工 threat-boundary review：session-owner、称呼 key、数据库列权限、撤回竞态和删除传播均无开发合并阻断；完整导出/物理删除仍由 C-014 承接，不冒充本任务已闭环；
-- 项目所有者已确认 C-002 产品与安全边界，同意生产称呼 key 接线随 Production `NO_GO` 延后，本次不授予生产发布权限，并批准 PR #152 在精确 head 11/11 后 squash merge；`productionAuthorizationWhenApplicable` 因本次不涉及生产发布而明确为不适用，Production / RC 保持 `NO_GO`。
+- 覆盖首次、跳过、中断、重复、离线、失败、跨日和多端 E2E 与页面状态；
+- 证明中断恢复不重复创建 profile / onboarding completed，同日重进跳过已完成步骤；
+- 提供 D-004 Frame ID、正常与异常状态实现截图、Token / 组件复用和可访问性证据；
+- 本 Issue 覆盖的 Accepted Source ID 从 `PLANNED` 更新为 `COVERED`；无法覆盖时只允许有批准理由的 `NA_WITH_REASON`；
+- 提交审核前运行有效 Profile 要求的 full Gate，并取得 PR exact head 的同一 run 11/11 平台 CI；
+- 自动化不得冒充原始 Frame 对照、截图视觉 QA、真机 / DevTools 检查或用户决定。
 
 ## 6. 精确下一步
 
-1. 提交并推送本次人工证据与用户授权记录，将 PR #152 标记 Ready；
-2. 取得新 final head 的同一 run 11/11 SUCCESS，运行 exact-head verifier 后使用 `--match-head-commit` squash merge；
-3. 验证 merged-main CI、Issue #54 和 `main`，再把 C-002 设为 Done、C-003 设为唯一 Ready；状态收尾前不开始 C-003。
+1. 审核并合并纯状态收尾 PR，使 `main` 正式记录 C-002 Done 与 C-003 Ready；
+2. 从最新 `main` 创建 `agent/c-003-onboarding`；
+3. 运行 `pnpm agent:prepare C-003 --remote --deep` 并完整读取全部 required sources；
+4. 对照 D-004 Frame、C-002 可执行契约和现有小程序代码，校准 Requirement-to-Proof Matrix 与聚焦 PR 计划后再实现；
+5. 不提前开始 C-004，也不取得或推断 Production / RC 发布权限。
