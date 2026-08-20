@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（C-001 初始路由为 `code`，认证与数据库权限变更将有效 Profile 提升为 `security`）
 - **当前分支**：`agent/c-001-wechat-auth`
 - **当前 Issue**：[C-001 Issue #53](https://github.com/WeiHan1996/DailyEnergy/issues/53)
-- **当前 PR**：待创建；本轮提交推送后创建聚焦 Draft PR，并由 Linux CI 完成平台限定的供应链 Gate
+- **当前 PR**：[Draft PR #147](https://github.com/WeiHan1996/DailyEnergy/pull/147)；当前实现提交 `4731438`，由 Linux CI 完成平台限定的供应链 Gate
 - **最近完成设计任务**：D-005 已接受并随 PR #146 squash 合并，Issue #104 已关闭
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -87,12 +87,12 @@ C-001 范围：
 
 ## 6. PR 与精确下一步
 
-1. 提交并推送当前聚焦变更，创建 C-001 Draft PR；
-2. 由 Linux PR CI 验证 license inventory、供应链 artifacts 与全部 required checks；
+1. Draft PR #147 已创建，当前实现提交为 `4731438`；
+2. 等待 Linux PR CI 验证 license inventory、供应链 artifacts 与全部 required checks；
 3. required checks 全部成功后，按用户已给出的审核批准将 PR 标记 ready，并使用 squash merge；
 4. 合并后切回并同步 `main`，把 C-001 更新为 Done，只将一个后续任务移动到 Ready。
 
-**精确下一步**：提交、推送并创建 C-001 Draft PR，等待 Linux CI 结果。
+**精确下一步**：等待 Draft PR #147 的 Linux CI 结果并处理任何失败；全部成功后标记 ready 并 squash merge。
 
 ## 7. CI 使用原则
 
