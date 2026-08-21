@@ -14,6 +14,7 @@ import {
   evaluateWriteWindow,
   invalidateViewContinuationGrant,
   isGenerationCompletionEligible,
+  validateViewContinuationGrant,
 } from "./continuation.js";
 
 interface Fixture {
@@ -34,7 +35,10 @@ let fixture: Fixture;
 beforeAll(async () => {
   fixture = JSON.parse(
     await readFile(
-      resolve(process.cwd(), "../../docs/decisions/adr-0002-test-vectors.json"),
+      resolve(
+        import.meta.dirname,
+        "../../../../../../docs/decisions/adr-0002-test-vectors.json",
+      ),
       "utf8",
     ),
   ) as Fixture;
@@ -159,6 +163,13 @@ describe("C-005 continuation and generation windows", () => {
     ).toBe("CLOSED");
     const invalidated = invalidateViewContinuationGrant(grant, now);
     expect(invalidated.revision).toBe(2);
+    expect(validateViewContinuationGrant(invalidated)).toEqual(invalidated);
+    expect(invalidateViewContinuationGrant(invalidated, now)).toBe(invalidated);
+    expect(() =>
+      invalidateViewContinuationGrant(grant, new Date(Number.NaN)),
+    ).toThrowError(
+      expect.objectContaining({ code: "CONTINUATION_GRANT_INVALID" }),
+    );
     expect(
       evaluateWriteWindow({
         grant: invalidated,

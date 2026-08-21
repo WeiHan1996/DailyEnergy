@@ -26,13 +26,15 @@
     "format:check": "prettier --check README.md package.json tsconfig*.json src",
     "lint": "eslint --max-warnings=0 src",
     "prebuild": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist', { force: true, recursive: true }))\"",
-    "pretest": "pnpm run build",
     "test": "vitest run src",
     "typecheck": "node ../../tooling/typecheck-workspace.mjs"
   },
   "dailyEnergy": {
     "kind": "package",
     "runtime": "server-core"
+  },
+  "dependencies": {
+    "@daily-energy/shared-schemas": "workspace:*"
   },
   "devDependencies": {
     "@daily-energy/typescript-config": "workspace:*",

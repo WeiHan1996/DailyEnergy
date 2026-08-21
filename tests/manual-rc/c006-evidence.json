@@ -1,0 +1,31 @@
+{
+  "evidence_version": "c-006-manual-evidence-v1",
+  "task_id": "C-006",
+  "execution_status": "MANUAL_EVIDENCE_PENDING",
+  "pass_claim": "PROHIBITED",
+  "synthetic_accounts_only": true,
+  "security_review": {
+    "status": "OWNER_REVIEW_PENDING",
+    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "reviewed_boundaries": [
+      "daily-rules-v1 reads only a strict frozen snapshot, verified manifest closure and matching 32-byte root seed",
+      "the pure rule path imports no database, network, environment, system clock, provider, Prompt or client runtime",
+      "all scoring uses fixed signed integers and all discrete decisions use isolated choice-v1 namespaces",
+      "RuleFacts pass the shared strict Schema plus score-band, action-task, display-order and catalog invariants",
+      "ControlledExpressionPlanV1 carries bands and selected facts but no raw score, root seed, stable subject, manifest fingerprint or choice trace",
+      "the public server-only choice trace is limited to namespace, candidate count, counter, index and hashed state",
+      "all 180 legal check-in combinations terminate with one to three low-consequence actions and monotonic scores",
+      "unregistered product compatibility, unknown fields/styles, catalog corruption and all binding mismatches fail closed",
+      "S-11 weekly aggregation remains owned by C-013 and no C-008 intent/publication uniqueness is claimed"
+    ],
+    "residual_evidence": [
+      "project owner threat-boundary review during the unified C-004 through C-015 audit",
+      "C-007 must separately prove complete controlled template text, character budgets and content/Safety constraints",
+      "C-008 must separately prove live guards, intent uniqueness, atomic publication, cache and late-result rejection",
+      "Production credentials, provider evaluation and deployment authorization remain outside C-006"
+    ],
+    "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
+  },
+  "reviewer": null,
+  "reviewed_at_utc": null
+}

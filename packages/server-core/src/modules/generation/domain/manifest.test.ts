@@ -7,6 +7,7 @@ import {
   DAILY_V1_GENERATION_MANIFEST,
   generationManifestFingerprintHex,
   parseGenerationManifest,
+  parseManifestFingerprint,
   type GenerationManifest,
   type GenerationManifestRecord,
 } from "./manifest.js";
@@ -36,10 +37,19 @@ function store(
 }
 
 describe("C-005 GenerationManifest", () => {
+  it("rejects a non-SHA256 manifest fingerprint byte sequence", () => {
+    expect(() => parseManifestFingerprint(new Uint8Array(31))).toThrowError(
+      expect.objectContaining({ code: "MANIFEST_INVALID" }),
+    );
+  });
+
   it("matches the Accepted S-11 daily-v1 manifest exactly", async () => {
     const fixture = JSON.parse(
       await readFile(
-        resolve(process.cwd(), "../../docs/ai/s11-test-vectors.json"),
+        resolve(
+          import.meta.dirname,
+          "../../../../../../docs/ai/s11-test-vectors.json",
+        ),
         "utf8",
       ),
     ) as { manifest: unknown };
