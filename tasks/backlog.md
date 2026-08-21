@@ -200,25 +200,25 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 ### 5.2 确定性核心实现
 
-| ID                                                           | 任务               | 状态    | 主要结果                                       |
-| ------------------------------------------------------------ | ------------------ | ------- | ---------------------------------------------- |
-| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Done    | 安全会话与身份边界；PR #147 合并为 `505a926`   |
-| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Done    | 最小授权和可修改资料；PR #152 合并为 `56695b5` |
-| [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | Done    | 称呼和表达偏好；PR #154 合并为 `bd00fbe`       |
-| [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | In Review | 情绪、精力和睡眠；等待 C-015 后统一审核       |
-| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | Planned | 用户、日期和版本驱动                           |
-| [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎           | Planned | 五维状态和行动候选                             |
-| [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容       | Planned | 无 AI 完整今日结果                             |
-| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | Planned | 并发唯一、重复读取                             |
-| [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面       | Planned | 结构化展示和回看                               |
-| [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务           | Planned | 一个主要行动和可选任务                         |
-| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | Planned | 幂等、不惩罚中断                               |
-| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈           | Planned | 真实状态和帮助度                               |
-| [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势           | Planned | 真实数据和缺失处理                             |
-| [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | Planned | 用户权利闭环                                   |
-| [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 核心埋点           | Planned | D1/D3/D7 可计算                                |
-| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Planned | 首次到七天全路径                               |
-| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | Planned | 不依赖 AI 完成核心闭环                         |
+| ID                                                           | 任务               | 状态      | 主要结果                                                                                   |
+| ------------------------------------------------------------ | ------------------ | --------- | ------------------------------------------------------------------------------------------ |
+| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Done      | 安全会话与身份边界；PR #147 合并为 `505a926`                                               |
+| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Done      | 最小授权和可修改资料；PR #152 合并为 `56695b5`                                             |
+| [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | Done      | 称呼和表达偏好；PR #154 合并为 `bd00fbe`                                                   |
+| [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | In Review | [Draft PR #157](https://github.com/WeiHan1996/DailyEnergy/pull/157)；等待 C-015 后统一审核 |
+| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | Planned   | 用户、日期和版本驱动                                                                       |
+| [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎           | Planned   | 五维状态和行动候选                                                                         |
+| [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容       | Planned   | 无 AI 完整今日结果                                                                         |
+| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | Planned   | 并发唯一、重复读取                                                                         |
+| [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面       | Planned   | 结构化展示和回看                                                                           |
+| [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务           | Planned   | 一个主要行动和可选任务                                                                     |
+| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | Planned   | 幂等、不惩罚中断                                                                           |
+| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈           | Planned   | 真实状态和帮助度                                                                           |
+| [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势           | Planned   | 真实数据和缺失处理                                                                         |
+| [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | Planned   | 用户权利闭环                                                                               |
+| [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 核心埋点           | Planned   | D1/D3/D7 可计算                                                                            |
+| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Planned   | 首次到七天全路径                                                                           |
+| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | Planned   | 不依赖 AI 完成核心闭环                                                                     |
 
 ## 6. Phase 3：AI 陪伴层
 

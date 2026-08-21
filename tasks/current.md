@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（C-004 `code` + contract/database/security 路径升级）
 - **工作分支**：`agent/c004-daily-checkin`
 - **任务 Issue**：[C-004 Issue #56](https://github.com/WeiHan1996/DailyEnergy/issues/56)
-- **Draft PR**：待本分支提交并创建
+- **Draft PR**：[PR #157](https://github.com/WeiHan1996/DailyEnergy/pull/157)
 - **下一候选任务**：C-005 — 稳定种子（Planned；C-004 Draft PR 建立后在 stacked branch 启动）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -49,9 +49,9 @@
 
 ## 5. 精确下一动作
 
-1. 提交并推送 `agent/c004-daily-checkin`，创建聚焦 Draft PR；
-2. 把 Draft PR 编号回写本文件并推送；
-3. 从 C-004 final head 创建 stacked `agent/c005-stable-seed`；
+1. 推送 PR #157 编号回写提交并等待 final-head CI；
+2. 在同一 final head 取得 11/11 SUCCESS 后运行 exact-head verifier；
+3. 从 C-004 verified final head 创建 stacked `agent/c005-stable-seed`；
 4. 在 stacked branch 把 C-005 移为唯一 Ready，运行 `pnpm agent:prepare C-005 --remote --deep`；
 5. 按 C-005 权威来源和 Gate 实现，不请求 C-004 逐项审核。
 
