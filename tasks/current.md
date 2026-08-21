@@ -6,10 +6,9 @@
 - **当前任务**：C-003 — 实现“第一次认识”流程（已完成；后续开发暂停）
 - **任务状态**：Done
 - **任务 Profile**：`hybrid`（代码完整 Gate + D-004 原始 Frame 与人工视觉/交互证据）
-- **当前状态收尾分支**：`agent/c-003-closeout`
 - **已关闭 Issue**：[C-003 Issue #55](https://github.com/WeiHan1996/DailyEnergy/issues/55)
 - **已合并实现 PR**：[PR #154](https://github.com/WeiHan1996/DailyEnergy/pull/154)，squash merge `bd00fbe5911b64b643071294f77d0957725e954d`
-- **当前状态收尾 PR**：[Draft PR #155](https://github.com/WeiHan1996/DailyEnergy/pull/155)（纯状态收尾）
+- **状态收尾**：[PR #155](https://github.com/WeiHan1996/DailyEnergy/pull/155)已 squash 合并为 `bf99dcfada2f475acf44018a55c3b9d7c7cff2ba`
 - **下一候选任务**：C-004 — 每日签到（Planned；未授权开始）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -21,6 +20,9 @@
 - PR #154 已使用 `--match-head-commit` squash 合并为
   `bd00fbe5911b64b643071294f77d0957725e954d`，Issue #55 已关闭；
 - merged-main CI run `32442925521` 已在精确 merge SHA 上取得 11/11 SUCCESS；
+- 状态收尾 PR #155 final head `c5b980301344b2f108b426c5a41f2df2a2f4e51f` 的 CI run
+  `32443833269` 取得 11/11 SUCCESS，exact-head verifier 通过；PR 已使用
+  `--match-head-commit` 合并，merged-main CI run `32444067687` 取得 11/11 SUCCESS；
 - ENT-001 / ONB-001、必要同意、可选称呼、四种封闭表达风格、短期草稿、跨产品日清理、
   Unknown outcome 原命令恢复、Safety / 账户恢复优先路由与 DLY-001 handoff 均已落地；
 - Mini Program 为 7 files / 23 tests，API 为 15 files / 71 tests，Source registry 为
