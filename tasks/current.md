@@ -3,97 +3,55 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-21
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：C-003 — 实现“第一次认识”流程
-- **任务状态**：In Review
-- **任务 Profile**：`hybrid`（代码完整 Gate + D-004 原始 Frame 与人工视觉/交互证据；自动化不能替代用户接受）
-- **当前实现分支**：`agent/c-003-onboarding`
-- **当前 Issue**：[C-003 Issue #55](https://github.com/WeiHan1996/DailyEnergy/issues/55)
-- **当前 PR**：[Draft PR #154](https://github.com/WeiHan1996/DailyEnergy/pull/154)
-- **最近完成任务**：C-002 状态收尾已随 PR #153 squash 合并为 `ea4c1c3bddb7eddecc346e2e920ab066626cccf6`；实现 PR #152 合并为 `56695b5f7e8e08fedd1cc0b19dc3bd380ecb1d41`，Issue #54 已关闭
+- **当前任务**：C-003 — 实现“第一次认识”流程（已完成；后续开发暂停）
+- **任务状态**：Done
+- **任务 Profile**：`hybrid`（代码完整 Gate + D-004 原始 Frame 与人工视觉/交互证据）
+- **当前状态收尾分支**：`agent/c-003-closeout`
+- **已关闭 Issue**：[C-003 Issue #55](https://github.com/WeiHan1996/DailyEnergy/issues/55)
+- **已合并实现 PR**：[PR #154](https://github.com/WeiHan1996/DailyEnergy/pull/154)，squash merge `bd00fbe5911b64b643071294f77d0957725e954d`
+- **当前状态收尾 PR**：[Draft PR #155](https://github.com/WeiHan1996/DailyEnergy/pull/155)（纯状态收尾）
+- **下一候选任务**：C-004 — 每日签到（Planned；未授权开始）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
-## 1. 当前目标
+## 1. 完成结论
 
-打通承接边界说明到首次认识完成的最小流程，并支持中断草稿恢复。
+- 项目所有者于 2026-08-21 审核通过 C-003，并明确要求合并 PR 后收尾；
+- PR #154 final head `15e605f359a2ed0c08e4f0d6a610382fe8338fa7` 的 CI run
+  `32441431926` 在同一 run 取得 11/11 SUCCESS，exact-head verifier 通过；
+- PR #154 已使用 `--match-head-commit` squash 合并为
+  `bd00fbe5911b64b643071294f77d0957725e954d`，Issue #55 已关闭；
+- merged-main CI run `32442925521` 已在精确 merge SHA 上取得 11/11 SUCCESS；
+- ENT-001 / ONB-001、必要同意、可选称呼、四种封闭表达风格、短期草稿、跨产品日清理、
+  Unknown outcome 原命令恢复、Safety / 账户恢复优先路由与 DLY-001 handoff 均已落地；
+- Mini Program 为 7 files / 23 tests，API 为 15 files / 71 tests，Source registry 为
+  226 `COVERED` / 558 `PLANNED` / 0 `NA_WITH_REASON`。
 
-C-003 范围：
+## 2. 证据边界
 
-- 实现 ENT-001 / ONB-001 页面与 C-002 资料、偏好 API 编排；
-- 只询问可选称呼与封闭表达偏好，并允许明确跳过；最近状态由后续 DLY-001 / C-004 承接；
-- 实现本地短期草稿、服务端完成事实、重复提交幂等与返回路由；
-- 覆盖 loading、offline、error、permission、Safety 与跨日 UI 状态；
-- 匹配 D-004 已接受 Frame，复用 D-002 语义 Token 与组件，并登记 Source ID 证据。
+- [C-003 人工证据](../tests/manual-rc/c003-evidence.json)继续如实保留 DevTools CLI 缺失导致的
+  `INFRA_BLOCKED / MINIAPP_DEVTOOLS_CLI_PATH_MISSING`；
+- 正常、Loading、Error、Offline、Safety 截图，Large Text、Reduced Motion 以及 iOS / Android
+  真机证据没有被自动化或本次用户接受改写为平台 conformance PASS；
+- 本次接受只授权 Phase 2 development merge，不授予 RC / Production 发布、微信生产凭据、
+  Production 称呼 key、外部归档后端或真实用户数据权限；
+- Production / RC 继续 `NO_GO`，`pass_claim=PROHIBITED`。
 
-不实现长问卷、人格角色选择、AI 对话、每日签到、渠道投放或新的资料字段。
+## 3. 暂停状态
 
-## 2. 前置与完成状态
+- 当前没有 Ready、In Progress 或 In Review 的功能任务；
+- 项目所有者已撤回连续推进 C-003～C-015 的安排，并要求 C-003 完成后停止；
+- C-004 及后续任务继续保持 Planned，不创建实现分支、不修改代码、不创建开发 PR；
+- 该显式暂停指令优先于通常“完成后移动一个下一任务到 Ready”的默认收尾动作；
+- 恢复开发必须由项目所有者另行明确授权，不能从依赖已满足或聊天历史推断。
 
-- C-002 final head `07a14273100f82b12cd71195e7d3423c2fc15f24` 的 CI run `32375703841`
-  同一 run 11/11 SUCCESS，exact-head verifier 通过；
-- C-002 已使用 `--match-head-commit` squash 合并为 `56695b5f7e8e08fedd1cc0b19dc3bd380ecb1d41`，Issue #54 已关闭；
-- C-002 merged-main CI run `32376084255` 在精确 merge SHA 上同一 run 11/11 SUCCESS；
-- C-002 人工 threat-boundary review 与项目所有者产品/安全边界确认已完成；生产称呼 key
-  接线随 Production `NO_GO` 延后，本次未授予 Production / RC 发布权限；
-- E-016 已完成：仓库为 public、保持无 LICENSE，`main` 由无 bypass ruleset 强制 11 个 strict required checks；
-- E-004 微信小程序骨架与 D-004 已接受高保真开发交付均完成；
-- C-003 的直接前置 C-002、E-004、D-004 已满足，Issue #55 保持 Open；
-- C-003 实现 head `edb98fb8f5b0e4b6c0c6a40a8dbf00b8482b233b` 的 CI run
-  `32441148154` 已在同一 run 取得 11/11 SUCCESS，包含 audit 与 supply-chain evidence；
-- C-002 已提供封闭 consent/profile/preferences Schema、session-owner 服务端绑定、CAS/幂等、
-  默认关闭偏好、平台权限分离与 AES-256-GCM 称呼保护，C-003 必须复用这些边界；
-- Production / RC 继续 `NO_GO`，C-003 不包含生产微信凭据或发布授权。
-- 项目所有者已撤回连续推进 C-003～C-015 的安排：本轮只完成 C-003 并提交审核，C-004
-  及后续任务继续保持 Planned，不开始实现；该调整不授予 Production / RC 发布权限。
+## 4. 恢复开发时的精确动作
 
-## 3. 开始前必须恢复的权威来源
+项目所有者明确恢复 C-004 后，下一位 Agent 才可以：
 
-下一位 Agent 必须先运行：
+1. 把 C-004 从 Planned 更新为唯一 Ready；
+2. 运行 `pnpm agent:prepare C-004 --remote --deep`；
+3. 完整读取命令返回的 required sources、Accepted D-004 Frame、Schema/API、测试和附近代码；
+4. 重新确认 Requirement-to-Proof Matrix、人工证据与 Production / RC `NO_GO` 边界；
+5. 从最新 `main` 创建聚焦分支后开始实现。
 
-```text
-pnpm agent:prepare C-003 --remote --deep
-```
-
-并完整读取命令返回的 required sources，至少包括：
-
-- `docs/product/journey.md`；
-- `docs/product/state-machine.md`；
-- `docs/design/screen-specs.md`；
-- `docs/design/content-layout.md`；
-- `docs/design/design-system.md`；
-- `docs/design/developer-handoff.md`；
-- `docs/design/screen-inventory.md` 与 `docs/design/interaction-states.md`；
-- `docs/technical/api.md`、C-002 Schema / API client / 测试、Source fixtures 与附近小程序代码。
-
-若 Accepted Frame、状态机、Schema、API、隐私或 Safety 边界冲突，先停止并回到上游处理，不自行猜测。
-
-## 4. 必须保持的边界
-
-- 未接受当前必要同意不能进入 ONB-001；离线页不能伪造同意或完成事实；
-- 称呼为可选且可留空，表达偏好使用封闭枚举，不新增自由画像或强制资料；
-- owner 只能来自服务端 session principal；重复、中断、多端提交不得创建第二份 profile 或完成事实；
-- 本地草稿必须短期、最小、可清理；服务端权威状态决定恢复与跳过，不由客户端猜测；
-- Safety、删除、撤回和权限状态优先；错误、重试与跨日恢复保持同一逻辑意图；
-- 匹配 ENT-001 `220:3-6`、ONB-001 `220:7-10`，视觉差异必须在 PR 中说明并人工审核；
-- C-003 完成后只路由到 DLY-001，不在本任务实现 C-004 每日签到。
-
-## 5. 验收与证据
-
-- 覆盖首次、跳过、中断、重复、离线、失败、跨日和多端 E2E 与页面状态；
-- 证明中断恢复不重复创建 profile / onboarding completed，同日重进跳过已完成步骤；
-- 提供 D-004 Frame ID、正常与异常状态实现截图、Token / 组件复用和可访问性证据；
-- 本 Issue 覆盖的 Accepted Source ID 从 `PLANNED` 更新为 `COVERED`；无法覆盖时只允许有批准理由的 `NA_WITH_REASON`；
-- 提交审核前运行有效 Profile 要求的 full Gate，并取得 PR exact head 的同一 run 11/11 平台 CI；
-- 自动化不得冒充原始 Frame 对照、截图视觉 QA、真机 / DevTools 检查或用户决定。
-
-## 6. 精确下一步
-
-1. C-003 实现已完成：ENT-001 / ONB-001、必要同意、可选称呼、四种封闭表达风格、
-   短期草稿、跨产品日清理、原命令恢复、Safety / 恢复路由和 DLY-001 handoff 均已落地；
-2. 本地全仓测试已在允许监听本机端口的环境中通过；Mini Program 为 7 files / 23 tests，
-   API 为 15 files / 71 tests，registry 为 226 COVERED / 558 PLANNED；
-3. 本地 full 聚合 Gate 的供应链步骤受外部 metadata 授权与 pnpm package index 环境限制；
-   Draft PR #154 的 clean runner 已为实现 head 提供 audit / supply-chain 与同一 run 11/11 证据；
-4. `tests/manual-rc/c003-evidence.json` 如实保留 DevTools CLI 缺失导致的 `INFRA_BLOCKED`，
-   正常/异常截图、Large Text、Reduced Motion 和 iOS/Android 真机证据等待人工审核；
-5. 状态收口提交取得 exact-head CI 后，交由项目所有者审核 Draft PR #154 与人工待审项；
-   审核期间和审核后均不开始 C-004，除非项目所有者另行明确恢复开发。
+在获得该授权前，精确下一动作为停止开发并保持仓库状态不变。
