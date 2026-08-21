@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-21
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：[C-003 第一次认识](./current.md)（In Progress；分支 `agent/c-003-onboarding`）
+- **当前任务**：[C-003 第一次认识](./current.md)（In Review；Draft PR #154）
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -112,23 +112,23 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 
 ## 4. Phase 1：工程基础
 
-| ID                                                            | 任务                                       | 状态 | 主要结果                                              |
-| ------------------------------------------------------------- | ------------------------------------------ | ---- | ----------------------------------------------------- |
-| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)  | 初始化 TypeScript Monorepo                 | Done | Workspace、包管理和统一脚本                           |
-| [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)  | 代码质量基线                               | Done | TypeScript、ESLint、Prettier、提交规范                |
-| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)  | NestJS API 骨架                            | Done | 配置、错误、健康检查和日志                            |
-| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)  | 微信小程序骨架                             | Done | 原生小程序、TypeScript、路由和环境                    |
-| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)  | Next.js 管理后台骨架                       | Done | 登录外壳和基础布局                                    |
-| [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)  | PostgreSQL 与 Prisma                       | Done | 初始 Schema、迁移和测试数据；PR #108 安全返工         |
-| [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45)  | Redis 与 BullMQ                            | Done | 缓存、队列和连接管理                                  |
-| [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)  | 统一 Zod Schema、OpenAPI 与生成 API Client | Done | client-safe Schema、OpenAPI、生成客户端与 drift Gate  |
-| [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done | 可重复本地环境                                        |
-| [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done | 单元、集成、契约和端到端                              |
-| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done | 11/11 Gate、365 天 retention 与临时合并控制           |
-| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | Done | 固定 DEV、不可变发布、回滚、reconciliation 与真实演练 |
-| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Done | OTel、SLO、告警、Dashboard、Runbook 与成本预算        |
-| [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Done | Phase 2 development 条件放行；Production/RC NO-GO     |
-| [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done | P0/P1 上下文路由、任务 Profile 与安静验证             |
+| ID                                                            | 任务                                       | 状态 | 主要结果                                                |
+| ------------------------------------------------------------- | ------------------------------------------ | ---- | ------------------------------------------------------- |
+| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)  | 初始化 TypeScript Monorepo                 | Done | Workspace、包管理和统一脚本                             |
+| [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)  | 代码质量基线                               | Done | TypeScript、ESLint、Prettier、提交规范                  |
+| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)  | NestJS API 骨架                            | Done | 配置、错误、健康检查和日志                              |
+| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)  | 微信小程序骨架                             | Done | 原生小程序、TypeScript、路由和环境                      |
+| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)  | Next.js 管理后台骨架                       | Done | 登录外壳和基础布局                                      |
+| [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)  | PostgreSQL 与 Prisma                       | Done | 初始 Schema、迁移和测试数据；PR #108 安全返工           |
+| [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45)  | Redis 与 BullMQ                            | Done | 缓存、队列和连接管理                                    |
+| [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)  | 统一 Zod Schema、OpenAPI 与生成 API Client | Done | client-safe Schema、OpenAPI、生成客户端与 drift Gate    |
+| [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done | 可重复本地环境                                          |
+| [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done | 单元、集成、契约和端到端                                |
+| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done | 11/11 Gate、365 天 retention 与临时合并控制             |
+| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | Done | 固定 DEV、不可变发布、回滚、reconciliation 与真实演练   |
+| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Done | OTel、SLO、告警、Dashboard、Runbook 与成本预算          |
+| [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Done | Phase 2 development 条件放行；Production/RC NO-GO       |
+| [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done | P0/P1 上下文路由、任务 Profile 与安静验证               |
 | [E-016](https://github.com/WeiHan1996/DailyEnergy/issues/148) | 公开仓库与平台强制 CI Gate                 | Done | PUBLIC、main ruleset、11 required checks 与安全公开审计 |
 
 E-004 已随 PR #96 合并，E-008 已随 PR #97 squash 合并，E-005 已随 PR #98
@@ -179,11 +179,11 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 ### 5.1 正式视觉设计前置
 
-| ID                                                            | 任务                                  | 状态      | 主要结果                                   |
-| ------------------------------------------------------------- | ------------------------------------- | --------- | ------------------------------------------ |
-| [D-001](https://github.com/WeiHan1996/DailyEnergy/issues/99)  | 确定品牌与视觉方向                    | Done      | 五套方向板、最终方向和视觉反模式           |
-| [D-002](https://github.com/WeiHan1996/DailyEnergy/issues/100) | 建立设计系统与 Design Tokens          | Done      | Figma Variables、组件库和代码 Token 交付   |
-| [D-003](https://github.com/WeiHan1996/DailyEnergy/issues/101) | 完成核心流程高保真设计                | Done      | 核心流程八页及关键状态                     |
+| ID                                                            | 任务                                  | 状态 | 主要结果                                   |
+| ------------------------------------------------------------- | ------------------------------------- | ---- | ------------------------------------------ |
+| [D-001](https://github.com/WeiHan1996/DailyEnergy/issues/99)  | 确定品牌与视觉方向                    | Done | 五套方向板、最终方向和视觉反模式           |
+| [D-002](https://github.com/WeiHan1996/DailyEnergy/issues/100) | 建立设计系统与 Design Tokens          | Done | Figma Variables、组件库和代码 Token 交付   |
+| [D-003](https://github.com/WeiHan1996/DailyEnergy/issues/101) | 完成核心流程高保真设计                | Done | 核心流程八页及关键状态                     |
 | [D-004](https://github.com/WeiHan1996/DailyEnergy/issues/102) | 完成高保真原型、验证与开发交付        | Done | 核心原型回归、Frame ID、视觉 QA 和开发交付 |
 | [D-005](https://github.com/WeiHan1996/DailyEnergy/issues/104) | 完成 Phase 2 剩余页面高保真与开发交付 | Done | 晚间、趋势、数据权利页面与状态开发交付     |
 
@@ -200,25 +200,25 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 ### 5.2 确定性核心实现
 
-| ID                                                           | 任务               | 状态    | 主要结果               |
-| ------------------------------------------------------------ | ------------------ | ------- | ---------------------- |
-| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Done | 安全会话与身份边界；PR #147 合并为 `505a926` |
-| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Done | 最小授权和可修改资料；PR #152 合并为 `56695b5` |
-| [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | In Progress | 称呼和表达偏好         |
-| [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | Planned | 情绪、精力和睡眠       |
-| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | Planned | 用户、日期和版本驱动   |
-| [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎           | Planned | 五维状态和行动候选     |
-| [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容       | Planned | 无 AI 完整今日结果     |
-| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | Planned | 并发唯一、重复读取     |
-| [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面       | Planned | 结构化展示和回看       |
-| [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务           | Planned | 一个主要行动和可选任务 |
-| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | Planned | 幂等、不惩罚中断       |
-| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈           | Planned | 真实状态和帮助度       |
-| [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势           | Planned | 真实数据和缺失处理     |
-| [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | Planned | 用户权利闭环           |
-| [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 核心埋点           | Planned | D1/D3/D7 可计算        |
-| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Planned | 首次到七天全路径       |
-| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | Planned | 不依赖 AI 完成核心闭环 |
+| ID                                                           | 任务               | 状态      | 主要结果                                       |
+| ------------------------------------------------------------ | ------------------ | --------- | ---------------------------------------------- |
+| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Done      | 安全会话与身份边界；PR #147 合并为 `505a926`   |
+| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Done      | 最小授权和可修改资料；PR #152 合并为 `56695b5` |
+| [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | In Review | 称呼和表达偏好；Draft PR #154                  |
+| [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | Planned   | 情绪、精力和睡眠                               |
+| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | Planned   | 用户、日期和版本驱动                           |
+| [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎           | Planned   | 五维状态和行动候选                             |
+| [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容       | Planned   | 无 AI 完整今日结果                             |
+| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | Planned   | 并发唯一、重复读取                             |
+| [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面       | Planned   | 结构化展示和回看                               |
+| [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务           | Planned   | 一个主要行动和可选任务                         |
+| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | Planned   | 幂等、不惩罚中断                               |
+| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈           | Planned   | 真实状态和帮助度                               |
+| [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势           | Planned   | 真实数据和缺失处理                             |
+| [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | Planned   | 用户权利闭环                                   |
+| [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 核心埋点           | Planned   | D1/D3/D7 可计算                                |
+| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Planned   | 首次到七天全路径                               |
+| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | Planned   | 不依赖 AI 完成核心闭环                         |
 
 ## 6. Phase 3：AI 陪伴层
 
