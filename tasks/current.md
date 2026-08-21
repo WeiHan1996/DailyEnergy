@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c005-stable-seed`
 - **Stacked base**：[C-004 Draft PR #157](https://github.com/WeiHan1996/DailyEnergy/pull/157)，verified head `9a902a5d2d5b666be33f9c90faa92dffafce0037`
 - **任务 Issue**：[C-005 Issue #57](https://github.com/WeiHan1996/DailyEnergy/issues/57)
-- **Draft PR**：待首次推送后创建；base 必须为 `agent/c004-daily-checkin`
+- **Draft PR**：[PR #158](https://github.com/WeiHan1996/DailyEnergy/pull/158)；base=`agent/c004-daily-checkin`
 - **下一候选任务**：C-006 — 规则引擎（Planned；C-005 final-head CI 验证后启动）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -59,8 +59,8 @@
 
 ## 6. 精确下一动作
 
-1. 提交并推送 `agent/c005-stable-seed`，创建 base=`agent/c004-daily-checkin` 的 Draft PR；
-2. 回写 PR 编号和提交 final head，推送后等待同一 final head 的 11/11 CI SUCCESS；
+1. 提交 PR #158 编号回写并推送，记录新的 remote final head；
+2. 等待同一 final head 的 11/11 CI SUCCESS；
 3. 保持 C-005 In Review、Issue #57 Open、PR Draft，不运行 exact-head merge verifier；
 4. 从 verified C-005 final head 创建 `agent/c006-rule-engine`；
 5. 把 C-006 设为唯一 In Progress，运行 `pnpm agent:prepare C-006 --remote --deep` 后按返回来源继续。
