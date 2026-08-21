@@ -1,5 +1,7 @@
 import { posix } from "node:path";
 
+import { importsForSource } from "./source-imports.mjs";
+
 const allowedRuntimes = new Set([
   "client-safe",
   "server-core",
@@ -14,8 +16,6 @@ const productionDependencyFields = [
 ];
 const allDependencyFields = [...productionDependencyFields, "devDependencies"];
 const sourceExtensions = /\.(?:c|m)?(?:j|t)sx?$/u;
-const importPattern =
-  /(?:\bfrom\s*|\bimport\s*(?:\(\s*)?|\brequire\s*\(\s*)["']([^"']+)["']/gu;
 const providerPackages = new Set([
   "@anthropic-ai/sdk",
   "@google/generative-ai",
@@ -85,7 +85,7 @@ function importsFor(file) {
   if (!sourceExtensions.test(file.path)) {
     return [];
   }
-  return [...file.content.matchAll(importPattern)].map((match) => match[1]);
+  return importsForSource(file.content, file.path);
 }
 
 function packageNameFromSpecifier(specifier) {

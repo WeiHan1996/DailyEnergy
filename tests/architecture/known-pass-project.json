@@ -65,6 +65,10 @@
       {
         "path": "packages/core/src/index.ts",
         "content": "import { sharedValue } from \"@daily-energy/shared\";\nexport const coreValue = sharedValue;\n"
+      },
+      {
+        "path": "packages/core/src/import-attribute.ts",
+        "content": "import type { SharedValue } from \"@daily-energy/shared\" with { \"resolution-mode\": \"import\" };\nexport type ImportedWithResolutionMode = SharedValue;\n"
       }
     ]
   }

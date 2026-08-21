@@ -1,6 +1,7 @@
 # D-004 高保真原型、验证与开发交付
 
-- **文档状态**：Draft / In Progress
+- **文档状态**：Accepted
+- **接受日期**：2026-08-19
 - **所属任务**：D-004 — 完成高保真原型、验证与开发交付（Issue #102）
 - **设计基线**：D-003 Accepted（PR #144 已合并）
 - **设计系统基线**：D-002 Accepted + production hardening
@@ -8,10 +9,11 @@
 - **原型页面**：`D-003 / Core Flow High Fidelity`（Page ID `220:2`）
 - **Visual QA 页面**：`D-004 / Visual QA Baseline`（Page ID `303:275`）
 - **工作分支**：`design/d-004-prototype-handoff`
-- **最后更新**：2026-08-18
-- **项目负责人接受**：`PENDING`
+- **最后更新**：2026-08-21
+- **项目负责人接受**：`ACCEPTED`
 
-> 本文在项目负责人明确确认前保持 Draft。D-004 未 Accepted 前，不解除 C-003、C-004、C-009 的 D-004 前置。
+> 项目负责人已在 PR #145 明确确认“审核通过”，D-004 的设计前置已经满足。该接受不替代微信
+> DevTools、真机、专业 Safety 或 Production / RC 证据。
 
 ## 1. 目的与边界
 
@@ -447,7 +449,7 @@ S-04 的 5～8 人计划只作为未来研究脚本。实际招募前必须另�
 - 不收真实私人内容；
 - 不把内部走查写成“5/8 用户通过”。
 
-## 16. 当前 Acceptance Gate
+## 16. Acceptance 记录
 
 已完成：
 
@@ -463,11 +465,11 @@ S-04 的 5～8 人计划只作为未来研究脚本。实际招募前必须另�
 - [x] C-003/C-004/C-009 页面 PR 设计证据合同；
 - [x] Figma Prototype URL / start Frame 交付记录。
 
-仍需：
+- [x] 项目负责人审核 Prototype、Visual QA baseline、本文与 PR；
+- [x] 项目负责人于 2026-08-19 明确确认“审核通过”，D-004 正式 Accepted；
+- [x] PR #145 squash 合并为 `4093c3e5ac7ea4dc9bf1ecaf13ff672af62dc369`，Issue #102 已关闭；
+- [x] D-005 随后完成并获接受，C-003、C-004、C-009 的 D-004 设计前置已满足；
+- [ ] PR CI run `32129322033` 的 11 个 jobs 未进入 step 且无可用日志，保留为
+  `INFRA/BILLING/RUNNER STARTUP BLOCKED`，不改写为自动化 PASS。
 
-- [ ] 仓库文档/项目状态收口并执行最终验证；
-- [ ] 只在内容完全收口后创建 Draft PR，触发一次必要 CI；
-- [ ] 项目负责人审核 Prototype、Visual QA baseline、本文与 PR；
-- [ ] 明确接受后才能把本文改为 Accepted、关闭 Issue #102，并让 D-005 成为唯一 Ready。
-
-本轮不因设计 Draft 完成而声称微信平台、Safety 专业资源或 Production/RC readiness。
+D-004 的人工设计接受不声称微信平台、Safety 专业资源或 Production / RC readiness。

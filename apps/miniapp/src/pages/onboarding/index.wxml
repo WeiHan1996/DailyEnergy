@@ -1,0 +1,108 @@
+<de-page-shell labelled-by="onboarding-title">
+  <view slot="header" class="onboarding__eyebrow">第一次认识</view>
+
+  <view class="onboarding" data-screen-id="{{screenId}}">
+    <view class="onboarding__intro">
+      <view id="onboarding-title" class="onboarding__title">我怎样陪你更合适？</view>
+      <view class="onboarding__subtitle">只要一个可选称呼和一种表达方式，之后都能修改。</view>
+    </view>
+
+    <de-loading-skeleton
+      wx:if="{{loading}}"
+      label="正在读取第一次认识草稿"
+      lines="4"
+      variant="card"
+    ></de-loading-skeleton>
+
+    <block wx:else>
+      <de-offline-state
+        wx:if="{{offline}}"
+        message="本地选择仍在，恢复网络后才能完成第一次认识。"
+        bind:retry="retry"
+      ></de-offline-state>
+
+      <de-recoverable-error
+        wx:elif="{{error}}"
+        message="刚才没有完成，称呼和表达选择仍然保留。重试会继续同一次操作。"
+        bind:retry="retry"
+      ></de-recoverable-error>
+
+      <de-inline-notice
+        wx:if="{{dateChanged}}"
+        title="新的一天已经开始"
+        message="上一产品日未提交的选择已清理，请按现在的偏好继续。"
+      ></de-inline-notice>
+
+      <de-section-card heading="怎样称呼你">
+        <input
+          class="onboarding__input {{inputError ? 'onboarding__input--error' : ''}}"
+          aria-describedby="preferred-name-help"
+          maxlength="24"
+          placeholder="留空也可以"
+          value="{{preferredName}}"
+          bindinput="inputName"
+        />
+        <view id="preferred-name-help" class="onboarding__help {{inputError ? 'onboarding__help--error' : ''}}">
+          {{inputError ? '称呼请保持在 24 个字以内，且不要换行。' : '只用于之后称呼你，不填写也能继续。'}}
+        </view>
+        <de-action-button
+          wx:if="{{preferredName}}"
+          label="清空称呼"
+          variant="text"
+          bind:press="clearName"
+        ></de-action-button>
+      </de-section-card>
+
+      <view class="onboarding__style-section" aria-label="表达偏好" aria-role="radiogroup">
+        <view class="onboarding__section-title">我怎样说话更合适</view>
+        <button
+          class="onboarding__default {{selectedStyle === 'BALANCED' ? 'onboarding__style--selected' : ''}}"
+          aria-checked="{{selectedStyle === 'BALANCED'}}"
+          aria-role="radio"
+          data-style="BALANCED"
+          bindtap="selectStyle"
+        >
+          <text>{{selectedStyle === 'BALANCED' ? '✓ ' : ''}}默认平衡</text>
+          <text class="onboarding__style-state">{{selectedStyle === 'BALANCED' ? '已选' : '可选'}}</text>
+        </button>
+
+        <button
+          wx:for="{{styleOptions}}"
+          wx:key="value"
+          class="onboarding__style {{selectedStyle === item.value ? 'onboarding__style--selected' : ''}}"
+          aria-checked="{{selectedStyle === item.value}}"
+          aria-label="{{item.label}}。{{item.example}}"
+          aria-role="radio"
+          data-style="{{item.value}}"
+          bindtap="selectStyle"
+        >
+          <view class="onboarding__style-heading">
+            <text>{{selectedStyle === item.value ? '✓ ' : ''}}{{item.label}}</text>
+            <text class="onboarding__style-state">{{selectedStyle === item.value ? '已选' : '选择'}}</text>
+          </view>
+          <view class="onboarding__style-example">{{item.example}}</view>
+        </button>
+      </view>
+
+      <de-inline-notice
+        message="三种示例使用同一个事实和同一条建议，只改变表达方式；它们仍是同一个数字朋友。"
+      ></de-inline-notice>
+
+      <de-action-button
+        block="{{true}}"
+        disabled="{{inputError || offline}}"
+        label="继续看今天"
+        loading="{{busy}}"
+        loading-label="正在保存"
+        bind:press="complete"
+      ></de-action-button>
+
+      <de-action-button
+        wx:if="{{selectedStyle !== 'BALANCED'}}"
+        label="恢复默认表达"
+        variant="text"
+        bind:press="resetStyle"
+      ></de-action-button>
+    </block>
+  </view>
+</de-page-shell>

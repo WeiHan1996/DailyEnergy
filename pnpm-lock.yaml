@@ -320,6 +320,10 @@ importers:
         version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(@vitest/coverage-v8@4.1.10)(vite@8.1.5(@types/node@24.13.3)(jiti@2.7.0)(tsx@4.20.6)(yaml@2.9.0))
 
   apps/miniapp:
+    dependencies:
+      '@daily-energy/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
     devDependencies:
       '@daily-energy/typescript-config':
         specifier: workspace:*

@@ -12,6 +12,44 @@ const repositoryRoot = resolve(import.meta.dirname, "..");
 const projectPath = resolve(repositoryRoot, "apps/miniapp");
 const cliPath = process.env.WECHAT_DEVTOOLS_CLI_PATH;
 const launchTimeoutMs = 25_000;
+const smokeCases = Object.freeze([
+  {
+    expectedPath: "pages/recovery/index",
+    expectedScreenId: "SYS-003",
+    label: "SYS-001 startup route",
+    url: "/pages/launch/index?recovery=1",
+  },
+  {
+    expectedPath: "pages/recovery/index",
+    expectedScreenId: "SYS-003",
+    label: "SYS-003",
+    url: "/pages/recovery/index",
+  },
+  {
+    expectedPath: "pages/landing/index",
+    expectedScreenId: "ENT-001",
+    label: "ENT-001",
+    url: "/pages/landing/index",
+  },
+  {
+    expectedPath: "pages/onboarding/index",
+    expectedScreenId: "ONB-001",
+    label: "ONB-001",
+    url: "/pages/onboarding/index",
+  },
+  {
+    expectedPath: "pages/checkin-handoff/index",
+    expectedScreenId: "DLY-001",
+    label: "DLY-001 handoff",
+    url: "/pages/checkin-handoff/index",
+  },
+  {
+    expectedPath: "pages/safety/index",
+    expectedScreenId: "SAFE-001",
+    label: "SAFE-001",
+    url: "/pages/safety/index",
+  },
+]);
 
 async function withTimeout(promise, reasonCode) {
   let timeout;
@@ -73,18 +111,15 @@ async function main() {
 
   let smokeError;
   try {
-    const launchPage = await miniProgram.reLaunch("/pages/launch/index");
-    await launchPage.waitFor(300);
-    const launchData = await launchPage.data();
-    if (launchData.screenId !== "SYS-001") {
-      throw new Error("MINIAPP_DEVTOOLS_LAUNCH_SCREEN_MISMATCH");
-    }
-
-    const recoveryPage = await miniProgram.reLaunch("/pages/recovery/index");
-    await recoveryPage.waitFor(300);
-    const recoveryData = await recoveryPage.data();
-    if (recoveryData.screenId !== "SYS-003") {
-      throw new Error("MINIAPP_DEVTOOLS_RECOVERY_SCREEN_MISMATCH");
+    for (const smokeCase of smokeCases) {
+      const page = await miniProgram.reLaunch(smokeCase.url);
+      if (page === undefined || page.path !== smokeCase.expectedPath) {
+        throw new Error("MINIAPP_DEVTOOLS_ROUTE_MISMATCH");
+      }
+      const data = await page.data();
+      if (data.screenId !== smokeCase.expectedScreenId) {
+        throw new Error("MINIAPP_DEVTOOLS_SCREEN_MISMATCH");
+      }
     }
   } catch (error) {
     smokeError = error;
@@ -106,7 +141,9 @@ async function main() {
     return;
   }
 
-  console.log("Miniapp DevTools smoke passed for SYS-001 and SYS-003.");
+  console.log(
+    `Miniapp DevTools smoke passed ${smokeCases.length} C-003 page and route cases.`,
+  );
 }
 
 await main();

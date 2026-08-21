@@ -1,0 +1,54 @@
+{
+  "manifest_version": "c-003-evidence-v1",
+  "scope": "C-003 miniapp landing, necessary-consent orchestration, onboarding draft recovery, authoritative completion routing and client boundary",
+  "authority": [
+    "docs/design/developer-handoff.md",
+    "docs/design/interaction-states.md",
+    "docs/technical/repository-structure.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C003-STATIC-001": {
+      "file": "tooling/lib/miniapp-bundle-check.mjs",
+      "selector": "compiled C-003 miniapp page registry and client bundle boundary",
+      "level": "STATIC",
+      "assertions": [
+        "the compiled bundle contains the ordered six-page C-003 boundary and every registered page has JavaScript, JSON, WXML and WXSS output",
+        "the Mini Program bundle rejects Node, Nest, Prisma, server, provider and Prompt imports",
+        "the Mini Program bundle rejects provider, database and Redis secret identifiers",
+        "the bundle fixture has one known-pass bundle and minimum known-fail mutations for missing pages, forbidden imports and secret identifiers"
+      ]
+    },
+    "T-C003-STATIC-002": {
+      "file": "tests/architecture/boundary-cases.json",
+      "selector": "miniapp source cannot import the Admin API client",
+      "level": "STATIC",
+      "assertions": [
+        "a type-only @daily-energy/api-client/admin import from apps/miniapp fails with BOUNDARY_CLIENT_WORKSPACE_IMPORT",
+        "C-003 production source imports only the Mini Program API client surface"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S30-REPO-017",
+      "status": "COVERED",
+      "proof_ids": ["T-C003-STATIC-001"]
+    },
+    {
+      "source_id": "S30-REPO-018",
+      "status": "COVERED",
+      "proof_ids": ["T-C003-STATIC-002"]
+    },
+    {
+      "source_id": "S30-REPO-023",
+      "status": "COVERED",
+      "proof_ids": ["T-C003-STATIC-001"]
+    },
+    {
+      "source_id": "S31-TEST-013",
+      "status": "COVERED",
+      "proof_ids": ["T-C003-STATIC-001"]
+    }
+  ]
+}

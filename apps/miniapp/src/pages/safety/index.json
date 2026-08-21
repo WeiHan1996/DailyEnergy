@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "现实帮助",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "de-safety-screen": "../../components/safety-screen/index"
+  }
+}

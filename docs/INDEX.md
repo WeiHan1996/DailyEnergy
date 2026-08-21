@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-08-18
+- **最后更新**：2026-08-21
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -119,8 +119,8 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/design/design-system.md](./design/design-system.md)                             | Accepted | D-002 已接受并随 PR #142 合并；D-003 的唯一 Token/组件基础             | D-001、E-004                         |
 | [docs/design/assets/d002/evidence/README.md](./design/assets/d002/evidence/README.md) | Active   | D-002 本地/Figma 截图、节点、复用和人工证据索引                        | design-system、interaction-states    |
 | [docs/design/core-flow-high-fidelity.md](./design/core-flow-high-fidelity.md)         | Accepted | D-003 核心流程 35 Frame、高保真与 QA 索引                              | D-002                                |
-| [docs/design/developer-handoff.md](./design/developer-handoff.md)                     | Draft    | D-004 Prototype、验证结果、Frame ID 与视觉 QA/开发交付                 | D-003、prototype-validation          |
-| docs/design/phase2-remaining-handoff.md                                               | Planned  | D-005 晚间、趋势、数据权利页面高保真、状态矩阵和开发交付               | D-004                                |
+| [docs/design/developer-handoff.md](./design/developer-handoff.md)                     | Accepted | D-004 Prototype、验证结果、Frame ID 与视觉 QA/开发交付；PR #145        | D-003、prototype-validation          |
+| [docs/design/phase2-remaining-handoff.md](./design/phase2-remaining-handoff.md)       | Accepted | D-005 晚间、趋势、数据权利页面高保真、状态矩阵和开发交付；PR #146      | D-004                                |
 
 ### 7.2 产品状态与 Schema
 
@@ -186,7 +186,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                              | database、testing、deployment、ADR-0005、Issue #44            |
 | [docker/observability/contract.json](../docker/observability/contract.json)                                                                                                                            | Implemented | E-013 vendor-neutral 信号、字段/平面/基数、期限、成本与 Production blocked Gate                                   | observability、privacy、deployment                            |
 | [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011/E-016 CI/仓库控制、E-013 observability 与 E-014 Phase Gate 证据入口                 | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；D-001/D-002/D-003 Done，D-004 In Progress                  | Accepted Phase 0B specs、E-014 Gate、D-001～D-004 #102        |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；D-001～D-005 Done，C-003 In Progress                       | Accepted Phase 0B specs、E-014 Gate、C-003 #55                |
 
 ### 7.7 Phase Gate
 
@@ -253,17 +253,17 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-015、D-001～D-003 已完成；A — 温柔自然、Accepted D-002 设计系统与 Accepted D-003 核心高保真是当前唯一设计基础，D-004 为唯一 In Progress。读取顺序：
+S-35 已获用户确认，[Phase 0B Gate](./reports/phase-0b-gate.md) 于 2026-07-27 进入 Accepted；Phase 0B 已结束。E-001～E-016、D-001～D-005 已完成；A — 温柔自然、Accepted D-002 设计系统、Accepted D-003 核心高保真与 Accepted D-004/D-005 开发交付是当前唯一设计基础。C-003 为唯一 In Progress。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
 3. ROADMAP.md；
 4. 本文；
 5. tasks/current.md；
-6. [D-004 Issue #102](https://github.com/WeiHan1996/DailyEnergy/issues/102)；
+6. [C-003 Issue #55](https://github.com/WeiHan1996/DailyEnergy/issues/55)；
 7. `docs/agent/PROJECT_CONTEXT.md`、Agent 工作流规范与
-   `pnpm agent:prepare D-004 --remote` 返回的全部 required sources；
-8. [D-003 Accepted 高保真](./design/core-flow-high-fidelity.md)、[D-004 Developer Handoff Draft](./design/developer-handoff.md)、
+   `pnpm agent:prepare C-003 --remote --deep` 返回的全部 required sources；
+8. [D-003 Accepted 高保真](./design/core-flow-high-fidelity.md)、[D-004 Accepted Developer Handoff](./design/developer-handoff.md)、
    [页面与路由清单](./design/screen-inventory.md)、[页面详细规格](./design/screen-specs.md)、
    [交互状态](./design/interaction-states.md)、[内容布局](./design/content-layout.md)与 [S-04 Prototype Validation](./design/prototype-validation.md)；
 9. [测试策略](./technical/testing.md)、`apps/miniapp/README.md`、Accepted analytics/隐私/Safety 规范及相关实现边界；
@@ -285,7 +285,7 @@ E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squas
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
 [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
 [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 已纳入
-Phase 2；D-001、D-002、D-003 已进入 Done，D-004 为唯一 In Progress，D-005 保持 Planned。D-004 是 C-003、C-004、C-009 的直接前置；D-005 是 C-012、C-013、C-014 的直接前置。
+Phase 2；D-001～D-005 已进入 Done，C-003 为唯一 In Progress。D-004 是 C-003、C-004、C-009 的直接前置；D-005 是 C-012、C-013、C-014 的直接前置，相关设计前置均已满足。
 正式 Source-ID registry 已由 E-010 实现；E-011 已接入 CI、artifact、cache、
 telemetry 与供应链 evidence 且不改变原有证据层级，未实现项继续为 `PLANNED`。
 CI workflow/artifacts 已由 E-011 交付；E-016 经项目所有者明确授权把仓库设为 public，并接受
@@ -314,6 +314,6 @@ Issue #99 已关闭。merged-main run `31720488027` 的 9 个 automated lane 成
 `GHSA-2v37-7h3g-55p8` 拒绝 `nanoid 3.3.17`；状态收口 PR #141 已把现有精确 override 最小提升到
 `3.3.18` 并合并为 `128ee8d`。项目所有者于 2026-08-15 接受 D-002；PR #142 精确 head `7139cfb`
 的 CI run `31888493133` 11/11 SUCCESS，并 squash 合并为 `1fa5922`，Issue #100 已关闭。D-002 进入
-Done。项目所有者于 2026-08-18 接受 D-003；PR #144 已合并为 `db57fbc7aeb7b9ebceddcc69c6d2d90e41722f7f`，Issue #101 已关闭；D-004 随后进入 In Progress。
+Done。项目所有者于 2026-08-18 接受 D-003；PR #144 已合并为 `db57fbc7aeb7b9ebceddcc69c6d2d90e41722f7f`，Issue #101 已关闭。项目所有者于 2026-08-19 接受 D-004 与 D-005；PR #145、#146 已分别合并，相关 Issue 已关闭。
 公网固定 TLS 地址仍等待 ICP 备案、DNS 与证书授权，STAGING/PRODUCTION 独立状态服务 Gate 不变。
 当前 Gate 与交接见 tasks/current.md。

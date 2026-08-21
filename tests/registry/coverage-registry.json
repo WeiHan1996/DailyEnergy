@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 222, "NA_WITH_REASON": 0, "PLANNED": 562 },
+  "counts": { "COVERED": 226, "NA_WITH_REASON": 0, "PLANNED": 558 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -8041,11 +8041,22 @@
     },
     {
       "authority_paths": ["docs/technical/repository-structure.md"],
-      "planned": {
-        "owner": "E-010 or E-011 according to the missing runner or Gate",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "the bundle fixture has one known-pass bundle and minimum known-fail mutations for missing pages, forbidden imports and secret identifiers",
+            "the compiled bundle contains the ordered six-page C-003 boundary and every registered page has JavaScript, JSON, WXML and WXSS output",
+            "the Mini Program bundle rejects Node, Nest, Prisma, server, provider and Prompt imports",
+            "the Mini Program bundle rejects provider, database and Redis secret identifiers"
+          ],
+          "file": "tooling/lib/miniapp-bundle-check.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/c003-evidence-manifest.json",
+          "selector": "compiled C-003 miniapp page registry and client bundle boundary",
+          "test_id": "T-C003-STATIC-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "STATIC"] }
       ],
@@ -8054,11 +8065,20 @@
     },
     {
       "authority_paths": ["docs/technical/repository-structure.md"],
-      "planned": {
-        "owner": "E-010 or E-011 according to the missing runner or Gate",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a type-only @daily-energy/api-client/admin import from apps/miniapp fails with BOUNDARY_CLIENT_WORKSPACE_IMPORT",
+            "C-003 production source imports only the Mini Program API client surface"
+          ],
+          "file": "tests/architecture/boundary-cases.json",
+          "level": "STATIC",
+          "origin": "tests/registry/c003-evidence-manifest.json",
+          "selector": "miniapp source cannot import the Admin API client",
+          "test_id": "T-C003-STATIC-002"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "STATIC"] }
       ],
@@ -8119,11 +8139,22 @@
     },
     {
       "authority_paths": ["docs/technical/repository-structure.md"],
-      "planned": {
-        "owner": "E-010 or E-011 according to the missing runner or Gate",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "the bundle fixture has one known-pass bundle and minimum known-fail mutations for missing pages, forbidden imports and secret identifiers",
+            "the compiled bundle contains the ordered six-page C-003 boundary and every registered page has JavaScript, JSON, WXML and WXSS output",
+            "the Mini Program bundle rejects Node, Nest, Prisma, server, provider and Prompt imports",
+            "the Mini Program bundle rejects provider, database and Redis secret identifiers"
+          ],
+          "file": "tooling/lib/miniapp-bundle-check.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/c003-evidence-manifest.json",
+          "selector": "compiled C-003 miniapp page registry and client bundle boundary",
+          "test_id": "T-C003-STATIC-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "STATIC"] }
       ],
@@ -8819,11 +8850,22 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "the bundle fixture has one known-pass bundle and minimum known-fail mutations for missing pages, forbidden imports and secret identifiers",
+            "the compiled bundle contains the ordered six-page C-003 boundary and every registered page has JavaScript, JSON, WXML and WXSS output",
+            "the Mini Program bundle rejects Node, Nest, Prisma, server, provider and Prompt imports",
+            "the Mini Program bundle rejects provider, database and Redis secret identifiers"
+          ],
+          "file": "tooling/lib/miniapp-bundle-check.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/c003-evidence-manifest.json",
+          "selector": "compiled C-003 miniapp page registry and client bundle boundary",
+          "test_id": "T-C003-STATIC-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT", "STATIC"] }],
       "source_id": "S31-TEST-013",
       "source_sets": ["s31-testing"]

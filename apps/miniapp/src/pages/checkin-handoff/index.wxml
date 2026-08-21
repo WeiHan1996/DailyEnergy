@@ -1,0 +1,10 @@
+<de-page-shell labelled-by="checkin-handoff-title">
+  <view class="checkin-handoff" data-screen-id="{{screenId}}">
+    <view id="checkin-handoff-title" class="checkin-handoff__title">正在读取今天的状态</view>
+    <de-loading-skeleton
+      label="正在进入今日签到"
+      lines="4"
+      variant="card"
+    ></de-loading-skeleton>
+  </view>
+</de-page-shell>

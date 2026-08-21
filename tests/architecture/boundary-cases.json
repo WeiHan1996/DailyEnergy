@@ -381,6 +381,19 @@
       }
     },
     {
+      "case_id": "miniapp-admin-client-import",
+      "gate": "client",
+      "expected_rule_id": "BOUNDARY_CLIENT_WORKSPACE_IMPORT",
+      "project": {
+        "files": [
+          {
+            "path": "apps/miniapp/src/unsafe-admin-client.ts",
+            "content": "import type { paths } from \"@daily-energy/api-client/admin\";\nexport type UnsafeAdminPaths = paths;\n"
+          }
+        ]
+      }
+    },
+    {
       "case_id": "api-ai-capability",
       "gate": "capability",
       "expected_rule_id": "BOUNDARY_CAPABILITY_API",

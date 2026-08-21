@@ -1,0 +1,20 @@
+<view data-screen-id="{{screenId}}">
+  <de-safety-screen
+    accessible-label="现实帮助优先"
+    action-loading-label="正在打开系统操作"
+    emergency-action-accessible-label="联系现实中的紧急帮助"
+    emergency-action-label="{{emergencyActionLabel}}"
+    eyebrow="现实帮助优先"
+    immediate-label="{{immediateLabel}}"
+    message="{{message}}"
+    resources="{{resourceLabels}}"
+    resources-title="可用的现实资源"
+    resources-unavailable="{{resourcesUnavailable}}"
+    resources-unavailable-label="资源暂时无法读取时，请使用所在地紧急服务或前往最近急诊。"
+    title="{{title}}"
+    trusted-person-accessible-label="联系一位现实中可信任的人"
+    trusted-person-label="{{trustedPersonLabel}}"
+    bind:emergency="emergency"
+    bind:trustedperson="trustedPerson"
+  ></de-safety-screen>
+</view>

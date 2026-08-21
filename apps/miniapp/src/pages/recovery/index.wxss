@@ -1,10 +1,8 @@
 .recovery {
-  box-sizing: border-box;
   display: flex;
-  min-height: var(--de-layout-page-min-height);
-  padding: var(--de-layout-section-gap) var(--de-layout-page-gutter-wide);
-  align-items: flex-start;
+  padding-top: var(--de-layout-content-gap);
   flex-direction: column;
+  gap: var(--de-layout-content-gap);
 }
 
 .recovery__eyebrow {
@@ -26,18 +24,4 @@
   color: var(--de-color-text-secondary);
   font-size: var(--de-font-body-size);
   line-height: var(--de-font-line-relaxed);
-}
-
-.recovery__button {
-  width: 100%;
-  margin-top: var(--de-layout-section-gap);
-  background: var(--de-color-brand-primary);
-  color: var(--de-color-text-inverse);
-  font-size: var(--de-font-body-size);
-}
-
-.recovery__reason {
-  margin-top: auto;
-  color: var(--de-color-text-muted);
-  font-size: var(--de-font-meta-size);
 }

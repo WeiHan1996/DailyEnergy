@@ -4,8 +4,8 @@
   "snapshot_base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
   "counts": {
     "total": 784,
-    "COVERED": 222,
-    "PLANNED": 562,
+    "COVERED": 226,
+    "PLANNED": 558,
     "NA_WITH_REASON": 0
   },
   "planned_policy": {
@@ -31,13 +31,13 @@
       "set_id": "s30-repository",
       "authority_path": "docs/technical/repository-structure.md",
       "owner": "E-010 or E-011 according to the missing runner or Gate",
-      "counts": { "COVERED": 8, "PLANNED": 40, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 11, "PLANNED": 37, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s31-testing",
       "authority_path": "docs/technical/testing.md",
       "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-      "counts": { "COVERED": 24, "PLANNED": 24, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 25, "PLANNED": 23, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s32-deployment",

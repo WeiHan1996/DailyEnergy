@@ -1,5 +1,12 @@
 {
-  "pages": ["pages/launch/index", "pages/recovery/index"],
+  "pages": [
+    "pages/launch/index",
+    "pages/landing/index",
+    "pages/onboarding/index",
+    "pages/checkin-handoff/index",
+    "pages/safety/index",
+    "pages/recovery/index"
+  ],
   "sitemapLocation": "sitemap.json",
   "window": {
     "backgroundColor": "#f6f3ee",

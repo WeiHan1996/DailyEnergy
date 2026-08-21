@@ -1,9 +1,15 @@
-<view class="recovery" data-screen-id="{{screenId}}">
-  <view class="recovery__eyebrow">先停一下</view>
-  <view class="recovery__title">这一分钟还没准备好</view>
-  <view class="recovery__message">
-    可能只是短暂的连接问题。你可以再试一次，也可以晚点回来。
+<de-page-shell labelled-by="recovery-title">
+  <view class="recovery" data-screen-id="{{screenId}}">
+    <view class="recovery__eyebrow">先停一下</view>
+    <view id="recovery-title" class="recovery__title">这一分钟还没准备好</view>
+    <view class="recovery__message">
+      可能只是短暂的连接或账户状态问题。不会因为重试而重复创建资料。
+    </view>
+    <de-recoverable-error
+      message="你可以重新检查服务端状态，也可以稍后再回来。"
+      title="可以再试一次"
+      variant="page"
+      bind:retry="retry"
+    ></de-recoverable-error>
   </view>
-  <button class="recovery__button" bindtap="retry">重新连接</button>
-  <view class="recovery__reason">参考：{{reasonCode}}</view>
-</view>
+</de-page-shell>
