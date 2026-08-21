@@ -1,0 +1,13 @@
+.checkin-handoff {
+  display: flex;
+  padding-top: var(--de-layout-section-gap);
+  flex-direction: column;
+  gap: var(--de-layout-section-gap);
+}
+
+.checkin-handoff__title {
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-section-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}

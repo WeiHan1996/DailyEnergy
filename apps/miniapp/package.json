@@ -15,6 +15,9 @@
     "kind": "app",
     "runtime": "client-safe"
   },
+  "dependencies": {
+    "@daily-energy/api-client": "workspace:*"
+  },
   "devDependencies": {
     "@daily-energy/typescript-config": "workspace:*",
     "miniprogram-api-typings": "catalog:",

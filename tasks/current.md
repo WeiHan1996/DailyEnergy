@@ -1,16 +1,15 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-20
+- **最后更新**：2026-08-21
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-003 — 实现“第一次认识”流程
-- **任务状态**：Ready
-- **任务 Profile**：`code`（正式页面实现必须补充 D-004 原始 Frame 与人工视觉证据；变更路径可将有效 Profile 提升为 `hybrid` 或 `security`）
-- **当前实现分支**：尚未创建；建议 `agent/c-003-onboarding`
-- **当前状态收尾分支**：`agent/c-002-closeout`
+- **任务状态**：In Review
+- **任务 Profile**：`hybrid`（代码完整 Gate + D-004 原始 Frame 与人工视觉/交互证据；自动化不能替代用户接受）
+- **当前实现分支**：`agent/c-003-onboarding`
 - **当前 Issue**：[C-003 Issue #55](https://github.com/WeiHan1996/DailyEnergy/issues/55)
-- **当前 PR**：[Draft PR #153](https://github.com/WeiHan1996/DailyEnergy/pull/153)（纯状态收尾，待单独审核批准）
-- **最近完成任务**：C-002 已随 PR #152 squash 合并为 `56695b5f7e8e08fedd1cc0b19dc3bd380ecb1d41`，Issue #54 已关闭
+- **当前 PR**：[Draft PR #154](https://github.com/WeiHan1996/DailyEnergy/pull/154)
+- **最近完成任务**：C-002 状态收尾已随 PR #153 squash 合并为 `ea4c1c3bddb7eddecc346e2e920ab066626cccf6`；实现 PR #152 合并为 `56695b5f7e8e08fedd1cc0b19dc3bd380ecb1d41`，Issue #54 已关闭
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 当前目标
@@ -38,9 +37,13 @@ C-003 范围：
 - E-016 已完成：仓库为 public、保持无 LICENSE，`main` 由无 bypass ruleset 强制 11 个 strict required checks；
 - E-004 微信小程序骨架与 D-004 已接受高保真开发交付均完成；
 - C-003 的直接前置 C-002、E-004、D-004 已满足，Issue #55 保持 Open；
+- C-003 实现 head `edb98fb8f5b0e4b6c0c6a40a8dbf00b8482b233b` 的 CI run
+  `32441148154` 已在同一 run 取得 11/11 SUCCESS，包含 audit 与 supply-chain evidence；
 - C-002 已提供封闭 consent/profile/preferences Schema、session-owner 服务端绑定、CAS/幂等、
   默认关闭偏好、平台权限分离与 AES-256-GCM 称呼保护，C-003 必须复用这些边界；
 - Production / RC 继续 `NO_GO`，C-003 不包含生产微信凭据或发布授权。
+- 项目所有者已撤回连续推进 C-003～C-015 的安排：本轮只完成 C-003 并提交审核，C-004
+  及后续任务继续保持 Planned，不开始实现；该调整不授予 Production / RC 发布权限。
 
 ## 3. 开始前必须恢复的权威来源
 
@@ -84,8 +87,13 @@ pnpm agent:prepare C-003 --remote --deep
 
 ## 6. 精确下一步
 
-1. 审核并合并纯状态收尾 PR，使 `main` 正式记录 C-002 Done 与 C-003 Ready；
-2. 从最新 `main` 创建 `agent/c-003-onboarding`；
-3. 运行 `pnpm agent:prepare C-003 --remote --deep` 并完整读取全部 required sources；
-4. 对照 D-004 Frame、C-002 可执行契约和现有小程序代码，校准 Requirement-to-Proof Matrix 与聚焦 PR 计划后再实现；
-5. 不提前开始 C-004，也不取得或推断 Production / RC 发布权限。
+1. C-003 实现已完成：ENT-001 / ONB-001、必要同意、可选称呼、四种封闭表达风格、
+   短期草稿、跨产品日清理、原命令恢复、Safety / 恢复路由和 DLY-001 handoff 均已落地；
+2. 本地全仓测试已在允许监听本机端口的环境中通过；Mini Program 为 7 files / 23 tests，
+   API 为 15 files / 71 tests，registry 为 226 COVERED / 558 PLANNED；
+3. 本地 full 聚合 Gate 的供应链步骤受外部 metadata 授权与 pnpm package index 环境限制；
+   Draft PR #154 的 clean runner 已为实现 head 提供 audit / supply-chain 与同一 run 11/11 证据；
+4. `tests/manual-rc/c003-evidence.json` 如实保留 DevTools CLI 缺失导致的 `INFRA_BLOCKED`，
+   正常/异常截图、Large Text、Reduced Motion 和 iOS/Android 真机证据等待人工审核；
+5. 状态收口提交取得 exact-head CI 后，交由项目所有者审核 Draft PR #154 与人工待审项；
+   审核期间和审核后均不开始 C-004，除非项目所有者另行明确恢复开发。

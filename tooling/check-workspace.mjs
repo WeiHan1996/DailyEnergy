@@ -4,6 +4,8 @@ import { dirname, relative, resolve, sep } from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 
+import { importsForSource } from "./lib/source-imports.mjs";
+
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const executeFile = promisify(execFile);
 const expectedWorkspaceDirectories = [
@@ -304,8 +306,6 @@ if (lockfiles.length !== 1 || lockfiles[0] !== "pnpm-lock.yaml") {
   );
 }
 
-const importPattern =
-  /(?:\bfrom\s*|\bimport\s*(?:\(\s*)?|\brequire\s*\(\s*)["']([^"']+)["']/gu;
 for (const sourceRoot of ["apps", "packages"]) {
   await walk(resolve(repositoryRoot, sourceRoot), async (path) => {
     if (!sourceExtensions.test(path)) {
@@ -319,8 +319,7 @@ for (const sourceRoot of ["apps", "packages"]) {
       sourceArea === "apps"
         ? clientWorkspaceImportAllowlist.get(sourceApp)
         : undefined;
-    for (const match of source.matchAll(importPattern)) {
-      const specifier = match[1];
+    for (const specifier of importsForSource(source, path)) {
       if (
         specifier.startsWith("@daily-energy/") &&
         specifier.includes("/src/")

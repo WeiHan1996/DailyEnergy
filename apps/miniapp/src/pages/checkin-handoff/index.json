@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "今天",
+  "usingComponents": {
+    "de-loading-skeleton": "../../components/loading-skeleton/index",
+    "de-page-shell": "../../components/page-shell/index"
+  }
+}

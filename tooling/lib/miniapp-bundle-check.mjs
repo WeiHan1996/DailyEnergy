@@ -1,19 +1,25 @@
 import { readdir, readFile } from "node:fs/promises";
 import { extname, relative, resolve } from "node:path";
 
+export const MINIAPP_PAGE_REGISTRY = Object.freeze([
+  "pages/launch/index",
+  "pages/landing/index",
+  "pages/onboarding/index",
+  "pages/checkin-handoff/index",
+  "pages/safety/index",
+  "pages/recovery/index",
+]);
+
 const requiredFiles = [
   "app.js",
   "app.json",
   "app.wxss",
   "generated/public-build-config.js",
-  "pages/launch/index.js",
-  "pages/launch/index.json",
-  "pages/launch/index.wxml",
-  "pages/launch/index.wxss",
-  "pages/recovery/index.js",
-  "pages/recovery/index.json",
-  "pages/recovery/index.wxml",
-  "pages/recovery/index.wxss",
+  ...MINIAPP_PAGE_REGISTRY.flatMap((pagePath) =>
+    ["js", "json", "wxml", "wxss"].map(
+      (extension) => `${pagePath}.${extension}`,
+    ),
+  ),
   "sitemap.json",
 ];
 const forbiddenImportPattern =
@@ -57,22 +63,21 @@ function parseAppConfig(entry, diagnostics) {
       diagnostic(
         "MINIAPP_BUNDLE_TABBAR_FORBIDDEN",
         entry.path,
-        "E-004 app.json cannot define a tabBar",
+        "the current bounded miniapp journey cannot define a tabBar",
       ),
     );
   }
   const pages = config.pages;
   if (
     !Array.isArray(pages) ||
-    pages.length !== 2 ||
-    pages[0] !== "pages/launch/index" ||
-    pages[1] !== "pages/recovery/index"
+    pages.length !== MINIAPP_PAGE_REGISTRY.length ||
+    pages.some((page, index) => page !== MINIAPP_PAGE_REGISTRY[index])
   ) {
     diagnostics.push(
       diagnostic(
         "MINIAPP_BUNDLE_PAGE_REGISTRY",
         entry.path,
-        "app.json must register only SYS-001 and SYS-003 placeholders",
+        "app.json must register the ordered, approved miniapp page boundary",
       ),
     );
   }

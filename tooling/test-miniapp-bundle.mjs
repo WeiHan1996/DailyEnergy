@@ -1,5 +1,6 @@
 import {
   MINIAPP_BUNDLE_RULE_IDS,
+  MINIAPP_PAGE_REGISTRY,
   scanMiniappBundleEntries,
 } from "./lib/miniapp-bundle-check.mjs";
 
@@ -8,14 +9,11 @@ const requiredPaths = [
   "app.json",
   "app.wxss",
   "generated/public-build-config.js",
-  "pages/launch/index.js",
-  "pages/launch/index.json",
-  "pages/launch/index.wxml",
-  "pages/launch/index.wxss",
-  "pages/recovery/index.js",
-  "pages/recovery/index.json",
-  "pages/recovery/index.wxml",
-  "pages/recovery/index.wxss",
+  ...MINIAPP_PAGE_REGISTRY.flatMap((pagePath) =>
+    ["js", "json", "wxml", "wxss"].map(
+      (extension) => `${pagePath}.${extension}`,
+    ),
+  ),
   "sitemap.json",
 ];
 const componentPaths = ["action-button", "page-shell"];
@@ -34,7 +32,7 @@ const validEntries = [...requiredPaths, ...requiredComponentPaths].map(
     content:
       path === "app.json"
         ? JSON.stringify({
-            pages: ["pages/launch/index", "pages/recovery/index"],
+            pages: MINIAPP_PAGE_REGISTRY,
           })
         : path === "generated/public-build-config.js"
           ? generatedHeader
@@ -105,7 +103,7 @@ const cases = [
         entries,
         "app.json",
         JSON.stringify({
-          pages: ["pages/launch/index", "pages/recovery/index"],
+          pages: MINIAPP_PAGE_REGISTRY,
           tabBar: {},
         }),
       ),

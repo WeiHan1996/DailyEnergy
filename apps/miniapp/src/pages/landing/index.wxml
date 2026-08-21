@@ -1,0 +1,70 @@
+<de-page-shell labelled-by="landing-title">
+  <view slot="header" class="landing__brand" aria-label="DailyEnergy">DE</view>
+
+  <view class="landing" data-screen-id="{{screenId}}">
+    <view class="landing__hero">
+      <view class="landing__eyebrow">每天约一分钟</view>
+      <view id="landing-title" class="landing__title">今天，先留一分钟给自己</view>
+      <view class="landing__subtitle">一个轻量的数字朋友，陪你看见当下，再做一件小事。</view>
+    </view>
+
+    <view class="landing__steps" aria-label="每日体验的三个步骤">
+      <view class="landing__step"><text class="landing__step-index">1</text><text>选状态</text></view>
+      <view class="landing__step"><text class="landing__step-index">2</text><text>听一句</text></view>
+      <view class="landing__step"><text class="landing__step-index">3</text><text>做一件</text></view>
+    </view>
+
+    <de-offline-state
+      wx:if="{{offline}}"
+      message="介绍仍可阅读，恢复网络后才能确认必要告知并开始。"
+      bind:retry="retry"
+    ></de-offline-state>
+
+    <de-recoverable-error
+      wx:elif="{{error}}"
+      message="刚才的确认没有完成，已保留同一次操作，可以重新连接后再试。"
+      bind:retry="retry"
+    ></de-recoverable-error>
+
+    <de-section-card wx:if="{{consentExpanded}}" heading="开始前，请确认必要告知" variant="subtle">
+      <view class="landing__consent-copy">
+        DailyEnergy 提供娱乐与自我反思，不预测未来，也不替代医疗、心理、法律或投资等专业建议。
+      </view>
+      <view
+        class="landing__consent-check"
+        aria-checked="{{consentChecked}}"
+        aria-role="checkbox"
+        bindtap="toggleConsent"
+      >
+        <view class="landing__checkbox" aria-hidden="true">{{consentChecked ? '✓' : ''}}</view>
+        <text>我已阅读并同意当前必要告知</text>
+      </view>
+      <de-action-button
+        block="{{true}}"
+        disabled="{{!consentChecked || offline}}"
+        label="确认并开始"
+        loading="{{busy}}"
+        loading-label="正在确认"
+        bind:press="confirmConsent"
+      ></de-action-button>
+    </de-section-card>
+
+    <de-action-button
+      wx:else
+      block="{{true}}"
+      disabled="{{offline}}"
+      label="开始今天的一分钟"
+      bind:press="begin"
+    ></de-action-button>
+
+    <de-inline-notice
+      title="轻量陪伴，不是预测"
+      message="幸运元素只用于娱乐和反思；遇到现实风险或专业问题，请优先寻求现实帮助。"
+    ></de-inline-notice>
+
+    <view class="landing__links">
+      <button class="landing__link" bindtap="showAbout">它是什么</button>
+      <button class="landing__link" bindtap="showPrivacy">隐私说明</button>
+    </view>
+  </view>
+</de-page-shell>

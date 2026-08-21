@@ -43,9 +43,3 @@
   font-size: var(--de-font-body-size);
   line-height: var(--de-font-line-body);
 }
-
-.launch__environment {
-  margin-top: auto;
-  color: var(--de-color-text-muted);
-  font-size: var(--de-font-meta-size);
-}
