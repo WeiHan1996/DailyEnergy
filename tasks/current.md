@@ -9,7 +9,7 @@
 - **当前状态收尾分支**：`agent/c-003-closeout`
 - **已关闭 Issue**：[C-003 Issue #55](https://github.com/WeiHan1996/DailyEnergy/issues/55)
 - **已合并实现 PR**：[PR #154](https://github.com/WeiHan1996/DailyEnergy/pull/154)，squash merge `bd00fbe5911b64b643071294f77d0957725e954d`
-- **当前状态收尾 PR**：尚未创建
+- **当前状态收尾 PR**：[Draft PR #155](https://github.com/WeiHan1996/DailyEnergy/pull/155)（纯状态收尾）
 - **下一候选任务**：C-004 — 每日签到（Planned；未授权开始）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
