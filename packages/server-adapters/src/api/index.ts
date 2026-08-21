@@ -57,6 +57,11 @@ export {
 } from "../auth/postgres-auth-store.js";
 
 export {
+  PostgresProductTimeStore,
+  type PostgresProductTimeStoreConfig,
+} from "../product-time/postgres-product-time-store.js";
+
+export {
   PostgresCheckinStore,
   UNAVAILABLE_CHECKIN_STORE,
   type CheckinGuardFailure,

@@ -472,8 +472,10 @@ function checkModuleGraph(input) {
     }
     const edges = new Set();
     for (const specifier of importsFor(file)) {
+      let relativeTargetPath;
       if (specifier.startsWith(".")) {
         const targetPath = normalizeRelativeImportTarget(file.path, specifier);
+        relativeTargetPath = targetPath;
         const sourceWorkspace = workspaceForFile(project, file.path);
         const targetWorkspace = workspaceForFile(project, targetPath);
         if (
@@ -496,8 +498,12 @@ function checkModuleGraph(input) {
       }
       if (
         file.path.startsWith("packages/server-core/src/modules/") &&
-        specifier.startsWith("../") &&
-        /\/(domain|internal|spi)(\/|$)/u.test(specifier)
+        relativeTargetPath !== undefined &&
+        /\/modules\/[^/]+\/(?:domain|internal|spi)(?:\/|$)/u.test(
+          relativeTargetPath,
+        ) &&
+        file.path.match(/\/modules\/([^/]+)\//u)?.[1] !==
+          relativeTargetPath.match(/\/modules\/([^/]+)\//u)?.[1]
       ) {
         errors.push(
           diagnostic(

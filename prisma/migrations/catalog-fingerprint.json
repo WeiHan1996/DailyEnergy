@@ -2,7 +2,7 @@
   "version": 1,
   "algorithm": "sha256",
   "schema": "daily_energy",
-  "catalogSha256": "b44c470b845f8dae6a1fe7666e929621c8427b7f046432594f1119e04f45ccdf",
+  "catalogSha256": "78638b19820932d56c38b5a4fa4f1f2818d9a48b9b4308c7f6c2be7bf1a6ba10",
   "sections": {
     "schemas": {
       "count": 1,
@@ -13,44 +13,44 @@
       "sha256": "e64152bdb1db6d29066ba5cbe63662237d04a3eac135f03b4cb9ed74bbdda466"
     },
     "columns": {
-      "count": 954,
-      "sha256": "672cb61266c3ebf644f35fc33cfc80f337d52ef50006ced6fe2b82f4f59406c5"
+      "count": 955,
+      "sha256": "ea6e66e7357259b5f6b80ed068a51c0e16f244f12a29d04f5904b1efd593b60f"
     },
     "columnAcl": {
-      "count": 27,
-      "sha256": "dfabfdc3c96e3718ce1763226abefd92a4b79813927fe144216b1c403f734f55"
+      "count": 29,
+      "sha256": "19943eb050fb6dbaa646271c8a7ca38e49f9ca0ec6f82a742ec43182acda7be0"
     },
     "enums": {
       "count": 152,
       "sha256": "28462b347c05b78b4b93cf213dad9b769ea525d0085d4c5a879b380dea37b9d7"
     },
     "constraints": {
-      "count": 1068,
-      "sha256": "b1d46edcbe8ccc7d9e599ed4b6d53df98c2039bd9f52aa7a0f9fbee2881525e2"
+      "count": 1070,
+      "sha256": "438d38342239e8447bf8de7f11f614568190cd794ffca9c93eb107b7a9828f73"
     },
     "indexes": {
       "count": 255,
       "sha256": "3b676d3489d17fe25eb41d60fcdd2d780fcf8074a9edb34366291fdb8642c6e4"
     },
     "triggers": {
-      "count": 25,
-      "sha256": "b5908c5b9e93a0c1567367154be99ae3c3dd43064c447545cb4b22d459cd8aaa"
+      "count": 31,
+      "sha256": "8ee85c18005aa5c9da711f5e78dca11f4fae4011bc8a8773dc14156c9afc8fab"
     },
     "functions": {
-      "count": 20,
-      "sha256": "e431f54a0358726b87206b9ebe556a53b92ba06990c9a4385985faf460c8a23c"
+      "count": 29,
+      "sha256": "1be03fc003f91b272f6369db94f53311f68dac5ff0630df335210957ee4c5c2f"
     },
     "schemaAcl": {
       "count": 9,
       "sha256": "492815ca1e728968e5e46129b8d3bc08803a4a4f7b354755bd42ac1d832e7fa4"
     },
     "relationAcl": {
-      "count": 1605,
-      "sha256": "4fd266b5e1d937e557fa761d47714f2780f2469c41f927e05afc5c7c5107c777"
+      "count": 1603,
+      "sha256": "8b1de950f79128543dec01c1848282e1e9016bbf080b8bc3a858bfd38414dced"
     },
     "functionAcl": {
-      "count": 47,
-      "sha256": "64e766e379e351a6d439d27cae726b86e56c7ed4cc42122110b179ab02428d1b"
+      "count": 56,
+      "sha256": "95e1c27418e5d74b702559ce671ac06bd2843d0a218618ac890118debc765995"
     },
     "defaultPrivileges": {
       "count": 0,

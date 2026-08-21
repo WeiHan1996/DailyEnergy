@@ -3,13 +3,13 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-21
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：[C-004 每日签到](./current.md)已完成自动 Gate 并进入统一审核批次；建立 Draft PR 后从 stacked branch 启动 C-005
+- **当前任务**：[C-005 稳定种子](./current.md)完成自动 Gate 并进入统一审核批次；首次推送后创建 stacked Draft PR，随后启动 C-006
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
 
 - 本文件保存有序候选任务，不表示所有任务已经承诺；
-- 同一时间只有 tasks/current.md 中一个任务可以是 Ready、In Progress 或 In Review；
+- 同一时间只有 tasks/current.md 中一个任务可以是 Ready 或 In Progress；项目所有者明确授权的统一审核批次可保留多个各有 Draft PR/Gate 证据的 In Review 任务；
 - 任务进入执行前必须确认依赖和上游文档；
 - 每个任务应能在一个主要 PR 中验收；
 - 发现任务过大时先拆分，再开始编码；
@@ -206,7 +206,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Done      | 最小授权和可修改资料；PR #152 合并为 `56695b5`                                             |
 | [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | Done      | 称呼和表达偏好；PR #154 合并为 `bd00fbe`                                                   |
 | [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | In Review | [Draft PR #157](https://github.com/WeiHan1996/DailyEnergy/pull/157)；等待 C-015 后统一审核 |
-| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | Planned   | 用户、日期和版本驱动                                                                       |
+| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | In Review | 用户、日期和版本驱动；等待 C-015 后统一审核                                             |
 | [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎           | Planned   | 五维状态和行动候选                                                                         |
 | [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容       | Planned   | 无 AI 完整今日结果                                                                         |
 | [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | Planned   | 并发唯一、重复读取                                                                         |

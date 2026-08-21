@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@daily-energy/server-adapters": "workspace:*",
+    "@daily-energy/server-core": "workspace:*",
     "@daily-energy/shared-schemas": "workspace:*",
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",

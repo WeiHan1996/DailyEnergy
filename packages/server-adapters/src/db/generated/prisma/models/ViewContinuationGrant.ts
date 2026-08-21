@@ -42,6 +42,7 @@ export type ViewContinuationGrantMinAggregateOutputType = {
   sessionId: string | null
   surfaceCode: string | null
   productDate: Date | null
+  productDatePolicyVersion: string | null
   resultRef: string | null
   feedbackRevision: number | null
   boundaryAt: Date | null
@@ -60,6 +61,7 @@ export type ViewContinuationGrantMaxAggregateOutputType = {
   sessionId: string | null
   surfaceCode: string | null
   productDate: Date | null
+  productDatePolicyVersion: string | null
   resultRef: string | null
   feedbackRevision: number | null
   boundaryAt: Date | null
@@ -78,6 +80,7 @@ export type ViewContinuationGrantCountAggregateOutputType = {
   sessionId: number
   surfaceCode: number
   productDate: number
+  productDatePolicyVersion: number
   resultRef: number
   feedbackRevision: number
   boundaryAt: number
@@ -109,6 +112,7 @@ export type ViewContinuationGrantMinAggregateInputType = {
   sessionId?: true
   surfaceCode?: true
   productDate?: true
+  productDatePolicyVersion?: true
   resultRef?: true
   feedbackRevision?: true
   boundaryAt?: true
@@ -127,6 +131,7 @@ export type ViewContinuationGrantMaxAggregateInputType = {
   sessionId?: true
   surfaceCode?: true
   productDate?: true
+  productDatePolicyVersion?: true
   resultRef?: true
   feedbackRevision?: true
   boundaryAt?: true
@@ -145,6 +150,7 @@ export type ViewContinuationGrantCountAggregateInputType = {
   sessionId?: true
   surfaceCode?: true
   productDate?: true
+  productDatePolicyVersion?: true
   resultRef?: true
   feedbackRevision?: true
   boundaryAt?: true
@@ -251,6 +257,7 @@ export type ViewContinuationGrantGroupByOutputType = {
   sessionId: string
   surfaceCode: string
   productDate: Date
+  productDatePolicyVersion: string
   resultRef: string | null
   feedbackRevision: number | null
   boundaryAt: Date
@@ -293,6 +300,7 @@ export type ViewContinuationGrantWhereInput = {
   sessionId?: Prisma.UuidFilter<"ViewContinuationGrant"> | string
   surfaceCode?: Prisma.StringFilter<"ViewContinuationGrant"> | string
   productDate?: Prisma.DateTimeFilter<"ViewContinuationGrant"> | Date | string
+  productDatePolicyVersion?: Prisma.StringFilter<"ViewContinuationGrant"> | string
   resultRef?: Prisma.UuidNullableFilter<"ViewContinuationGrant"> | string | null
   feedbackRevision?: Prisma.IntNullableFilter<"ViewContinuationGrant"> | number | null
   boundaryAt?: Prisma.DateTimeFilter<"ViewContinuationGrant"> | Date | string
@@ -314,6 +322,7 @@ export type ViewContinuationGrantOrderByWithRelationInput = {
   sessionId?: Prisma.SortOrder
   surfaceCode?: Prisma.SortOrder
   productDate?: Prisma.SortOrder
+  productDatePolicyVersion?: Prisma.SortOrder
   resultRef?: Prisma.SortOrderInput | Prisma.SortOrder
   feedbackRevision?: Prisma.SortOrderInput | Prisma.SortOrder
   boundaryAt?: Prisma.SortOrder
@@ -338,6 +347,7 @@ export type ViewContinuationGrantWhereUniqueInput = Prisma.AtLeast<{
   sessionId?: Prisma.UuidFilter<"ViewContinuationGrant"> | string
   surfaceCode?: Prisma.StringFilter<"ViewContinuationGrant"> | string
   productDate?: Prisma.DateTimeFilter<"ViewContinuationGrant"> | Date | string
+  productDatePolicyVersion?: Prisma.StringFilter<"ViewContinuationGrant"> | string
   resultRef?: Prisma.UuidNullableFilter<"ViewContinuationGrant"> | string | null
   feedbackRevision?: Prisma.IntNullableFilter<"ViewContinuationGrant"> | number | null
   boundaryAt?: Prisma.DateTimeFilter<"ViewContinuationGrant"> | Date | string
@@ -359,6 +369,7 @@ export type ViewContinuationGrantOrderByWithAggregationInput = {
   sessionId?: Prisma.SortOrder
   surfaceCode?: Prisma.SortOrder
   productDate?: Prisma.SortOrder
+  productDatePolicyVersion?: Prisma.SortOrder
   resultRef?: Prisma.SortOrderInput | Prisma.SortOrder
   feedbackRevision?: Prisma.SortOrderInput | Prisma.SortOrder
   boundaryAt?: Prisma.SortOrder
@@ -386,6 +397,7 @@ export type ViewContinuationGrantScalarWhereWithAggregatesInput = {
   sessionId?: Prisma.UuidWithAggregatesFilter<"ViewContinuationGrant"> | string
   surfaceCode?: Prisma.StringWithAggregatesFilter<"ViewContinuationGrant"> | string
   productDate?: Prisma.DateTimeWithAggregatesFilter<"ViewContinuationGrant"> | Date | string
+  productDatePolicyVersion?: Prisma.StringWithAggregatesFilter<"ViewContinuationGrant"> | string
   resultRef?: Prisma.UuidNullableWithAggregatesFilter<"ViewContinuationGrant"> | string | null
   feedbackRevision?: Prisma.IntNullableWithAggregatesFilter<"ViewContinuationGrant"> | number | null
   boundaryAt?: Prisma.DateTimeWithAggregatesFilter<"ViewContinuationGrant"> | Date | string
@@ -403,6 +415,7 @@ export type ViewContinuationGrantCreateInput = {
   id?: string
   surfaceCode: string
   productDate: Date | string
+  productDatePolicyVersion: string
   resultRef?: string | null
   feedbackRevision?: number | null
   boundaryAt: Date | string
@@ -424,6 +437,7 @@ export type ViewContinuationGrantUncheckedCreateInput = {
   sessionId: string
   surfaceCode: string
   productDate: Date | string
+  productDatePolicyVersion: string
   resultRef?: string | null
   feedbackRevision?: number | null
   boundaryAt: Date | string
@@ -441,6 +455,7 @@ export type ViewContinuationGrantUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   surfaceCode?: Prisma.StringFieldUpdateOperationsInput | string
   productDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productDatePolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
   resultRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   feedbackRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   boundaryAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -462,6 +477,7 @@ export type ViewContinuationGrantUncheckedUpdateInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   surfaceCode?: Prisma.StringFieldUpdateOperationsInput | string
   productDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productDatePolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
   resultRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   feedbackRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   boundaryAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -481,6 +497,7 @@ export type ViewContinuationGrantCreateManyInput = {
   sessionId: string
   surfaceCode: string
   productDate: Date | string
+  productDatePolicyVersion: string
   resultRef?: string | null
   feedbackRevision?: number | null
   boundaryAt: Date | string
@@ -498,6 +515,7 @@ export type ViewContinuationGrantUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   surfaceCode?: Prisma.StringFieldUpdateOperationsInput | string
   productDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productDatePolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
   resultRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   feedbackRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   boundaryAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -517,6 +535,7 @@ export type ViewContinuationGrantUncheckedUpdateManyInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   surfaceCode?: Prisma.StringFieldUpdateOperationsInput | string
   productDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productDatePolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
   resultRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   feedbackRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   boundaryAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -546,6 +565,7 @@ export type ViewContinuationGrantCountOrderByAggregateInput = {
   sessionId?: Prisma.SortOrder
   surfaceCode?: Prisma.SortOrder
   productDate?: Prisma.SortOrder
+  productDatePolicyVersion?: Prisma.SortOrder
   resultRef?: Prisma.SortOrder
   feedbackRevision?: Prisma.SortOrder
   boundaryAt?: Prisma.SortOrder
@@ -570,6 +590,7 @@ export type ViewContinuationGrantMaxOrderByAggregateInput = {
   sessionId?: Prisma.SortOrder
   surfaceCode?: Prisma.SortOrder
   productDate?: Prisma.SortOrder
+  productDatePolicyVersion?: Prisma.SortOrder
   resultRef?: Prisma.SortOrder
   feedbackRevision?: Prisma.SortOrder
   boundaryAt?: Prisma.SortOrder
@@ -588,6 +609,7 @@ export type ViewContinuationGrantMinOrderByAggregateInput = {
   sessionId?: Prisma.SortOrder
   surfaceCode?: Prisma.SortOrder
   productDate?: Prisma.SortOrder
+  productDatePolicyVersion?: Prisma.SortOrder
   resultRef?: Prisma.SortOrder
   feedbackRevision?: Prisma.SortOrder
   boundaryAt?: Prisma.SortOrder
@@ -710,6 +732,7 @@ export type ViewContinuationGrantCreateWithoutAccountInput = {
   id?: string
   surfaceCode: string
   productDate: Date | string
+  productDatePolicyVersion: string
   resultRef?: string | null
   feedbackRevision?: number | null
   boundaryAt: Date | string
@@ -729,6 +752,7 @@ export type ViewContinuationGrantUncheckedCreateWithoutAccountInput = {
   sessionId: string
   surfaceCode: string
   productDate: Date | string
+  productDatePolicyVersion: string
   resultRef?: string | null
   feedbackRevision?: number | null
   boundaryAt: Date | string
@@ -777,6 +801,7 @@ export type ViewContinuationGrantScalarWhereInput = {
   sessionId?: Prisma.UuidFilter<"ViewContinuationGrant"> | string
   surfaceCode?: Prisma.StringFilter<"ViewContinuationGrant"> | string
   productDate?: Prisma.DateTimeFilter<"ViewContinuationGrant"> | Date | string
+  productDatePolicyVersion?: Prisma.StringFilter<"ViewContinuationGrant"> | string
   resultRef?: Prisma.UuidNullableFilter<"ViewContinuationGrant"> | string | null
   feedbackRevision?: Prisma.IntNullableFilter<"ViewContinuationGrant"> | number | null
   boundaryAt?: Prisma.DateTimeFilter<"ViewContinuationGrant"> | Date | string
@@ -794,6 +819,7 @@ export type ViewContinuationGrantCreateWithoutSessionInput = {
   id?: string
   surfaceCode: string
   productDate: Date | string
+  productDatePolicyVersion: string
   resultRef?: string | null
   feedbackRevision?: number | null
   boundaryAt: Date | string
@@ -813,6 +839,7 @@ export type ViewContinuationGrantUncheckedCreateWithoutSessionInput = {
   accountId: string
   surfaceCode: string
   productDate: Date | string
+  productDatePolicyVersion: string
   resultRef?: string | null
   feedbackRevision?: number | null
   boundaryAt: Date | string
@@ -857,6 +884,7 @@ export type ViewContinuationGrantCreateManyAccountInput = {
   sessionId: string
   surfaceCode: string
   productDate: Date | string
+  productDatePolicyVersion: string
   resultRef?: string | null
   feedbackRevision?: number | null
   boundaryAt: Date | string
@@ -874,6 +902,7 @@ export type ViewContinuationGrantUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   surfaceCode?: Prisma.StringFieldUpdateOperationsInput | string
   productDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productDatePolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
   resultRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   feedbackRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   boundaryAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -893,6 +922,7 @@ export type ViewContinuationGrantUncheckedUpdateWithoutAccountInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   surfaceCode?: Prisma.StringFieldUpdateOperationsInput | string
   productDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productDatePolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
   resultRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   feedbackRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   boundaryAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -911,6 +941,7 @@ export type ViewContinuationGrantUncheckedUpdateManyWithoutAccountInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   surfaceCode?: Prisma.StringFieldUpdateOperationsInput | string
   productDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productDatePolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
   resultRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   feedbackRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   boundaryAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -929,6 +960,7 @@ export type ViewContinuationGrantCreateManySessionInput = {
   accountId: string
   surfaceCode: string
   productDate: Date | string
+  productDatePolicyVersion: string
   resultRef?: string | null
   feedbackRevision?: number | null
   boundaryAt: Date | string
@@ -946,6 +978,7 @@ export type ViewContinuationGrantUpdateWithoutSessionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   surfaceCode?: Prisma.StringFieldUpdateOperationsInput | string
   productDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productDatePolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
   resultRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   feedbackRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   boundaryAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -965,6 +998,7 @@ export type ViewContinuationGrantUncheckedUpdateWithoutSessionInput = {
   accountId?: Prisma.StringFieldUpdateOperationsInput | string
   surfaceCode?: Prisma.StringFieldUpdateOperationsInput | string
   productDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productDatePolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
   resultRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   feedbackRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   boundaryAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -983,6 +1017,7 @@ export type ViewContinuationGrantUncheckedUpdateManyWithoutSessionInput = {
   accountId?: Prisma.StringFieldUpdateOperationsInput | string
   surfaceCode?: Prisma.StringFieldUpdateOperationsInput | string
   productDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  productDatePolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
   resultRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   feedbackRevision?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   boundaryAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1004,6 +1039,7 @@ export type ViewContinuationGrantSelect<ExtArgs extends runtime.Types.Extensions
   sessionId?: boolean
   surfaceCode?: boolean
   productDate?: boolean
+  productDatePolicyVersion?: boolean
   resultRef?: boolean
   feedbackRevision?: boolean
   boundaryAt?: boolean
@@ -1025,6 +1061,7 @@ export type ViewContinuationGrantSelectCreateManyAndReturn<ExtArgs extends runti
   sessionId?: boolean
   surfaceCode?: boolean
   productDate?: boolean
+  productDatePolicyVersion?: boolean
   resultRef?: boolean
   feedbackRevision?: boolean
   boundaryAt?: boolean
@@ -1046,6 +1083,7 @@ export type ViewContinuationGrantSelectUpdateManyAndReturn<ExtArgs extends runti
   sessionId?: boolean
   surfaceCode?: boolean
   productDate?: boolean
+  productDatePolicyVersion?: boolean
   resultRef?: boolean
   feedbackRevision?: boolean
   boundaryAt?: boolean
@@ -1067,6 +1105,7 @@ export type ViewContinuationGrantSelectScalar = {
   sessionId?: boolean
   surfaceCode?: boolean
   productDate?: boolean
+  productDatePolicyVersion?: boolean
   resultRef?: boolean
   feedbackRevision?: boolean
   boundaryAt?: boolean
@@ -1080,7 +1119,7 @@ export type ViewContinuationGrantSelectScalar = {
   retentionAnchorAt?: boolean
 }
 
-export type ViewContinuationGrantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "sessionId" | "surfaceCode" | "productDate" | "resultRef" | "feedbackRevision" | "boundaryAt" | "allowedOperations" | "revision" | "expiresAt" | "invalidatedAt" | "createdAt" | "retentionPolicyVersion" | "retentionScope" | "retentionAnchorAt", ExtArgs["result"]["viewContinuationGrant"]>
+export type ViewContinuationGrantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accountId" | "sessionId" | "surfaceCode" | "productDate" | "productDatePolicyVersion" | "resultRef" | "feedbackRevision" | "boundaryAt" | "allowedOperations" | "revision" | "expiresAt" | "invalidatedAt" | "createdAt" | "retentionPolicyVersion" | "retentionScope" | "retentionAnchorAt", ExtArgs["result"]["viewContinuationGrant"]>
 export type ViewContinuationGrantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   account?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   session?: boolean | Prisma.SessionCredentialDefaultArgs<ExtArgs>
@@ -1106,6 +1145,7 @@ export type $ViewContinuationGrantPayload<ExtArgs extends runtime.Types.Extensio
     sessionId: string
     surfaceCode: string
     productDate: Date
+    productDatePolicyVersion: string
     resultRef: string | null
     feedbackRevision: number | null
     boundaryAt: Date
@@ -1547,6 +1587,7 @@ export interface ViewContinuationGrantFieldRefs {
   readonly sessionId: Prisma.FieldRef<"ViewContinuationGrant", 'String'>
   readonly surfaceCode: Prisma.FieldRef<"ViewContinuationGrant", 'String'>
   readonly productDate: Prisma.FieldRef<"ViewContinuationGrant", 'DateTime'>
+  readonly productDatePolicyVersion: Prisma.FieldRef<"ViewContinuationGrant", 'String'>
   readonly resultRef: Prisma.FieldRef<"ViewContinuationGrant", 'String'>
   readonly feedbackRevision: Prisma.FieldRef<"ViewContinuationGrant", 'Int'>
   readonly boundaryAt: Prisma.FieldRef<"ViewContinuationGrant", 'DateTime'>

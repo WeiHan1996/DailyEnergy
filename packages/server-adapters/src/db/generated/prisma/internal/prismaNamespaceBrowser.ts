@@ -274,6 +274,7 @@ export const ViewContinuationGrantScalarFieldEnum = {
   sessionId: 'sessionId',
   surfaceCode: 'surfaceCode',
   productDate: 'productDate',
+  productDatePolicyVersion: 'productDatePolicyVersion',
   resultRef: 'resultRef',
   feedbackRevision: 'feedbackRevision',
   boundaryAt: 'boundaryAt',

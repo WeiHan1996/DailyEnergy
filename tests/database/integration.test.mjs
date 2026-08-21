@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
-import { chmod, copyFile, mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import {
+  chmod,
+  copyFile,
+  mkdir,
+  mkdtemp,
+  readFile,
+  writeFile,
+} from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -23,6 +30,12 @@ const repositoryRoot = path.resolve(
 );
 const prismaBin = path.join(repositoryRoot, "node_modules/.bin/prisma");
 const tsxBin = path.join(repositoryRoot, "node_modules/.bin/tsx");
+const expectedMigrationNames = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, "prisma/migrations/checksums.json"),
+    "utf8",
+  ),
+).migrations.map(({ name }) => name);
 
 async function createInitialMigrationProject(temporaryRoot) {
   const prismaDirectory = path.join(temporaryRoot, "initial-prisma");
@@ -1923,7 +1936,7 @@ test(
           const retention = await client.query(
             `SELECT count(*)::int AS count FROM ${schema}.system_retention_policy_entry WHERE "policyVersion"='retention-policy-v1' AND "dataTypeCode"='SYNTHETIC_RUNTIME'`,
           );
-          assert.equal(migrations.rows[0].count, 7);
+          assert.equal(migrations.rows[0].count, expectedMigrationNames.length);
           assert.equal(versions.rows[0].count, 1);
           assert.equal(retention.rows[0].count, 1);
         } finally {
@@ -1992,20 +2005,14 @@ test(
               `SELECT count(*)::int AS count FROM ${schema}.system_version_catalog_entry WHERE "catalogType"='SYNTHETIC_RELEASE' AND version='old-code-v1'`,
             );
             const history = await verify.query(
-              `SELECT migration_name FROM ${schema}._prisma_migrations WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL`,
+              `SELECT migration_name FROM ${schema}._prisma_migrations
+                WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL
+                ORDER BY migration_name`,
             );
             assert.equal(oldCodeFact.rows[0].count, 1);
             assert.deepEqual(
               history.rows.map((row) => row.migration_name),
-              [
-                "20260730000000_initial_application_schema",
-                "20260731000000_owner_upgrade_probe",
-                "20260731000001_security_fixes_sql007_sql013_roles",
-                "20260802000000_e007_queue_inbox_permissions",
-                "20260819000000_c001_auth_column_permissions",
-                "20260820000000_c002_consent_profile_permissions",
-                "20260821000000_c004_checkin_guard",
-              ],
+              expectedMigrationNames,
             );
           } finally {
             await verify.end();

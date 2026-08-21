@@ -457,22 +457,23 @@ model OnboardingCompletion {
 }
 
 model ViewContinuationGrant {
-  id                     String         @id @default(uuid()) @db.Uuid
-  accountId              String         @db.Uuid
-  sessionId              String         @db.Uuid
-  surfaceCode            String         @db.VarChar(32)
-  productDate            DateTime       @db.Date
-  resultRef              String?        @db.Uuid
-  feedbackRevision       Int?
-  boundaryAt             DateTime       @db.Timestamptz(3)
-  allowedOperations      String[]
-  revision               Int            @default(1)
-  expiresAt              DateTime       @db.Timestamptz(3)
-  invalidatedAt          DateTime?      @db.Timestamptz(3)
-  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
-  retentionPolicyVersion String         @db.VarChar(64)
-  retentionScope         RetentionScope @default(DAY)
-  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+  id                       String         @id @default(uuid()) @db.Uuid
+  accountId                String         @db.Uuid
+  sessionId                String         @db.Uuid
+  surfaceCode              String         @db.VarChar(32)
+  productDate              DateTime       @db.Date
+  productDatePolicyVersion String         @db.VarChar(64)
+  resultRef                String?        @db.Uuid
+  feedbackRevision         Int?
+  boundaryAt               DateTime       @db.Timestamptz(3)
+  allowedOperations        String[]
+  revision                 Int            @default(1)
+  expiresAt                DateTime       @db.Timestamptz(3)
+  invalidatedAt            DateTime?      @db.Timestamptz(3)
+  createdAt                DateTime       @default(now()) @db.Timestamptz(3)
+  retentionPolicyVersion   String         @db.VarChar(64)
+  retentionScope           RetentionScope @default(DAY)
+  retentionAnchorAt        DateTime       @db.Timestamptz(3)
 
   account UserAccount       @relation(fields: [accountId], references: [id], onDelete: Restrict)
   session SessionCredential @relation(fields: [sessionId], references: [id], onDelete: Restrict)

@@ -69,6 +69,14 @@
       {
         "path": "packages/core/src/import-attribute.ts",
         "content": "import type { SharedValue } from \"@daily-energy/shared\" with { \"resolution-mode\": \"import\" };\nexport type ImportedWithResolutionMode = SharedValue;\n"
+      },
+      {
+        "path": "packages/server-core/src/modules/product-time/public/index.ts",
+        "content": "export { productDate } from \"../domain/product-date.js\";\n"
+      },
+      {
+        "path": "packages/server-core/src/modules/product-time/domain/product-date.ts",
+        "content": "export const productDate = \"2026-08-21\";\n"
       }
     ]
   }

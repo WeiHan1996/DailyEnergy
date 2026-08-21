@@ -16,6 +16,7 @@ import {
   assertNoDbPush,
   assertSqlIdCoverage,
   expectedSchemaObjects,
+  listMigrations,
   migrationChecksums,
 } from "../../tooling/database/lib.mjs";
 
@@ -25,6 +26,17 @@ const migrationFile = path.join(
   "prisma/migrations/20260730000000_initial_application_schema/migration.sql",
 );
 const bootstrapFile = path.join(root, "tooling/database/bootstrap.mjs");
+
+async function copyMigrationHistory(targetRoot) {
+  const sourceRoot = path.join(root, "prisma/migrations");
+  const migrations = await listMigrations(sourceRoot);
+  for (const migration of migrations) {
+    const targetDirectory = path.join(targetRoot, migration.name);
+    await mkdir(targetDirectory);
+    await copyFile(migration.file, path.join(targetDirectory, "migration.sql"));
+  }
+  return path.join(targetRoot, migrations[0].name, "migration.sql");
+}
 
 test("T-DB-STATIC-001 initial migration covers the accepted structure and SQL IDs", async () => {
   const sql = await readFile(migrationFile, "utf8");
@@ -64,85 +76,7 @@ test("T-DB-STATIC-003 migration checksum changes on mutation", async () => {
     path.join(os.tmpdir(), "daily-energy-migration-"),
   );
   try {
-    const targetDirectory = path.join(
-      temporaryRoot,
-      "20260730000000_initial_application_schema",
-    );
-    await mkdir(targetDirectory);
-    const upgradeDirectory = path.join(
-      temporaryRoot,
-      "20260731000000_owner_upgrade_probe",
-    );
-    await mkdir(upgradeDirectory);
-    const securityDirectory = path.join(
-      temporaryRoot,
-      "20260731000001_security_fixes_sql007_sql013_roles",
-    );
-    await mkdir(securityDirectory);
-    const queueDirectory = path.join(
-      temporaryRoot,
-      "20260802000000_e007_queue_inbox_permissions",
-    );
-    await mkdir(queueDirectory);
-    const authDirectory = path.join(
-      temporaryRoot,
-      "20260819000000_c001_auth_column_permissions",
-    );
-    await mkdir(authDirectory);
-    const consentProfileDirectory = path.join(
-      temporaryRoot,
-      "20260820000000_c002_consent_profile_permissions",
-    );
-    await mkdir(consentProfileDirectory);
-    const checkinDirectory = path.join(
-      temporaryRoot,
-      "20260821000000_c004_checkin_guard",
-    );
-    await mkdir(checkinDirectory);
-    const target = path.join(targetDirectory, "migration.sql");
-    await copyFile(migrationFile, target);
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260731000000_owner_upgrade_probe/migration.sql",
-      ),
-      path.join(upgradeDirectory, "migration.sql"),
-    );
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260731000001_security_fixes_sql007_sql013_roles/migration.sql",
-      ),
-      path.join(securityDirectory, "migration.sql"),
-    );
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260802000000_e007_queue_inbox_permissions/migration.sql",
-      ),
-      path.join(queueDirectory, "migration.sql"),
-    );
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260819000000_c001_auth_column_permissions/migration.sql",
-      ),
-      path.join(authDirectory, "migration.sql"),
-    );
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260820000000_c002_consent_profile_permissions/migration.sql",
-      ),
-      path.join(consentProfileDirectory, "migration.sql"),
-    );
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260821000000_c004_checkin_guard/migration.sql",
-      ),
-      path.join(checkinDirectory, "migration.sql"),
-    );
+    const target = await copyMigrationHistory(temporaryRoot);
     const before = await migrationChecksums(temporaryRoot);
     await writeFile(
       target,
@@ -160,85 +94,7 @@ test("T-DB-STATIC-004 checksum manifest gate rejects a changed migration", async
     path.join(os.tmpdir(), "daily-energy-checksum-gate-"),
   );
   try {
-    const targetDirectory = path.join(
-      temporaryRoot,
-      "20260730000000_initial_application_schema",
-    );
-    await mkdir(targetDirectory);
-    const upgradeDirectory = path.join(
-      temporaryRoot,
-      "20260731000000_owner_upgrade_probe",
-    );
-    await mkdir(upgradeDirectory);
-    const securityDirectory = path.join(
-      temporaryRoot,
-      "20260731000001_security_fixes_sql007_sql013_roles",
-    );
-    await mkdir(securityDirectory);
-    const queueDirectory = path.join(
-      temporaryRoot,
-      "20260802000000_e007_queue_inbox_permissions",
-    );
-    await mkdir(queueDirectory);
-    const authDirectory = path.join(
-      temporaryRoot,
-      "20260819000000_c001_auth_column_permissions",
-    );
-    await mkdir(authDirectory);
-    const consentProfileDirectory = path.join(
-      temporaryRoot,
-      "20260820000000_c002_consent_profile_permissions",
-    );
-    await mkdir(consentProfileDirectory);
-    const checkinDirectory = path.join(
-      temporaryRoot,
-      "20260821000000_c004_checkin_guard",
-    );
-    await mkdir(checkinDirectory);
-    const target = path.join(targetDirectory, "migration.sql");
-    await copyFile(migrationFile, target);
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260731000000_owner_upgrade_probe/migration.sql",
-      ),
-      path.join(upgradeDirectory, "migration.sql"),
-    );
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260731000001_security_fixes_sql007_sql013_roles/migration.sql",
-      ),
-      path.join(securityDirectory, "migration.sql"),
-    );
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260802000000_e007_queue_inbox_permissions/migration.sql",
-      ),
-      path.join(queueDirectory, "migration.sql"),
-    );
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260819000000_c001_auth_column_permissions/migration.sql",
-      ),
-      path.join(authDirectory, "migration.sql"),
-    );
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260820000000_c002_consent_profile_permissions/migration.sql",
-      ),
-      path.join(consentProfileDirectory, "migration.sql"),
-    );
-    await copyFile(
-      path.join(
-        root,
-        "prisma/migrations/20260821000000_c004_checkin_guard/migration.sql",
-      ),
-      path.join(checkinDirectory, "migration.sql"),
-    );
+    const target = await copyMigrationHistory(temporaryRoot);
     const manifestPath = path.join(temporaryRoot, "checksums.json");
     await copyFile(
       path.join(root, "prisma/migrations/checksums.json"),

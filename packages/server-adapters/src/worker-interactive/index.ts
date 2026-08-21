@@ -96,3 +96,8 @@ export type {
   TelemetryRuntime,
   TelemetryTransportConfig,
 } from "../telemetry/runtime.js";
+
+export {
+  PostgresGenerationManifestStore,
+  type PostgresGenerationManifestStoreConfig,
+} from "../generation/postgres-generation-manifest-store.js";

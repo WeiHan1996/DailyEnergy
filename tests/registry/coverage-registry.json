@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 242, "NA_WITH_REASON": 0, "PLANNED": 545 },
+  "counts": { "COVERED": 244, "NA_WITH_REASON": 0, "PLANNED": 543 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -432,11 +432,23 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a real PostgreSQL 18 migration enforces exact grant policy, expiry, operation and immutable-column ACL constraints",
+            "a stored manifest whose canonical bytes disagree with its fingerprint fails closed with MANIFEST_FINGERPRINT_MISMATCH",
+            "account-level advisory, session-row and result-visibility fences serialize grant creation with Safety, logout, DAY deletion, consent withdrawal and result blocking",
+            "active manifest selection is deterministic at the activation instant while exact historical selection keeps the original ref and fingerprint",
+            "go-today CAS invalidation and database triggers make existing grants unusable without rewriting them to a new product date"
+          ],
+          "file": "tests/database/c005-product-time-seed.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c005-evidence-manifest.json",
+          "selector": "C-005 real PostgreSQL continuation fences and immutable manifest selection",
+          "test_id": "T-C005-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -679,11 +691,23 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a real PostgreSQL 18 migration enforces exact grant policy, expiry, operation and immutable-column ACL constraints",
+            "a stored manifest whose canonical bytes disagree with its fingerprint fails closed with MANIFEST_FINGERPRINT_MISMATCH",
+            "account-level advisory, session-row and result-visibility fences serialize grant creation with Safety, logout, DAY deletion, consent withdrawal and result blocking",
+            "active manifest selection is deterministic at the activation instant while exact historical selection keeps the original ref and fingerprint",
+            "go-today CAS invalidation and database triggers make existing grants unusable without rewriting them to a new product date"
+          ],
+          "file": "tests/database/c005-product-time-seed.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c005-evidence-manifest.json",
+          "selector": "C-005 real PostgreSQL continuation fences and immutable manifest selection",
+          "test_id": "T-C005-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
