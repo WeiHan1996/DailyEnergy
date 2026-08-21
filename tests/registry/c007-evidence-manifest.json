@@ -1,0 +1,189 @@
+{
+  "manifest_version": "c-007-evidence-v1",
+  "scope": "C-007 daily-template-v1 immutable registry, strict ControlledExpressionPlanV1 consumption, deterministic complete rendering and content/Safety preflight",
+  "authority": [
+    "docs/ai/daily-content-schema.md",
+    "docs/ai/personality.md",
+    "docs/ai/prompt-spec.md",
+    "docs/ai/safety.md",
+    "docs/ai/generation-engine.md",
+    "docs/ai/scoring-rules.md",
+    "packages/shared-schemas/src/daily-content.ts",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C007-TEMPLATE-001": {
+      "file": "packages/prompt-library/src/render-daily-template.test.ts",
+      "selector": "C-007 controlled daily template AI_EVAL",
+      "level": "AI_EVAL",
+      "assertions": [
+        "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+        "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+        "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+        "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+        "HIGH only states limited action room and never promises success, reward or luck",
+        "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+      ]
+    },
+    "T-C007-SAFETY-001": {
+      "file": "packages/prompt-library/src/render-daily-template.test.ts",
+      "selector": "C-007 fail-closed and Safety boundaries",
+      "level": "AI_EVAL",
+      "assertions": [
+        "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+        "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+        "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations",
+        "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+        "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+        "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens"
+      ]
+    },
+    "T-C007-INTEGRATION-001": {
+      "file": "packages/server-adapters/src/ai/c007-controlled-template.contract.test.ts",
+      "selector": "C-007 C-006 plan to controlled template contract",
+      "level": "AI_EVAL",
+      "assertions": [
+        "five representative real C-006 derived plans render directly without a mapper, provider or second fact source",
+        "rendered primary action, optional task and ritual keys remain exactly bound to C-006 RuleFacts",
+        "all resulting candidates pass the strict candidate and ExpressionPayload Schemas"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "P13-C03",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-SAFETY-001"]
+    },
+    {
+      "source_id": "P13-C06",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-SAFETY-001"]
+    },
+    {
+      "source_id": "P13-C07",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-SAFETY-001"]
+    },
+    {
+      "source_id": "P13-D01",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D02",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D03",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D04",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D05",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D06",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D07",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D08",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D09",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D10",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D11",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D12",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D13",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001", "T-C007-INTEGRATION-001"]
+    },
+    {
+      "source_id": "P13-D14",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001", "T-C007-INTEGRATION-001"]
+    },
+    {
+      "source_id": "P13-D15",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D16",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001", "T-C007-INTEGRATION-001"]
+    },
+    {
+      "source_id": "P13-D17",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-SAFETY-001"]
+    },
+    {
+      "source_id": "P13-D18",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-SAFETY-001"]
+    },
+    {
+      "source_id": "P13-D19",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-SAFETY-001"]
+    },
+    {
+      "source_id": "P13-D20",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-TEMPLATE-001"]
+    },
+    {
+      "source_id": "P13-D21",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-SAFETY-001"]
+    },
+    {
+      "source_id": "P13-D22",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-SAFETY-001"]
+    },
+    {
+      "source_id": "P13-D23",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-SAFETY-001"]
+    },
+    {
+      "source_id": "P13-D24",
+      "status": "COVERED",
+      "proof_ids": ["T-C007-SAFETY-001"]
+    }
+  ]
+}

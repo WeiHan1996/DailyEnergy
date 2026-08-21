@@ -463,6 +463,19 @@
       }
     },
     {
+      "case_id": "prompt-library-from-miniapp",
+      "gate": "provider",
+      "expected_rule_id": "BOUNDARY_PROVIDER_PROMPT_LOCATION",
+      "project": {
+        "files": [
+          {
+            "path": "apps/miniapp/src/services/unsafe-template.ts",
+            "content": "import { renderControlledDailyTemplateV1 } from \"@daily-energy/prompt-library\";\nvoid renderControlledDailyTemplateV1;\n"
+          }
+        ]
+      }
+    },
+    {
       "case_id": "restricted-from-background",
       "gate": "restricted",
       "expected_rule_id": "BOUNDARY_RESTRICTED_LOCATION",

@@ -20,9 +20,9 @@ function cloneRegistry() {
 test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () => {
   assert.deepEqual(await loadAndValidateCoverageRegistry(), {
     counts: {
-      COVERED: 244,
+      COVERED: 271,
       NA_WITH_REASON: 0,
-      PLANNED: 543,
+      PLANNED: 516,
     },
     total: 787,
   });
@@ -47,6 +47,44 @@ test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () =>
       "D17-I05",
       "D17-I06",
       "D17-V01",
+    ],
+  );
+
+  const c007Entries = registry.entries.filter(({ evidence }) =>
+    evidence?.some(
+      ({ origin }) => origin === "tests/registry/c007-evidence-manifest.json",
+    ),
+  );
+  assert.deepEqual(
+    c007Entries.map(({ source_id: sourceId }) => sourceId),
+    [
+      "P13-C03",
+      "P13-C06",
+      "P13-C07",
+      "P13-D01",
+      "P13-D02",
+      "P13-D03",
+      "P13-D04",
+      "P13-D05",
+      "P13-D06",
+      "P13-D07",
+      "P13-D08",
+      "P13-D09",
+      "P13-D10",
+      "P13-D11",
+      "P13-D12",
+      "P13-D13",
+      "P13-D14",
+      "P13-D15",
+      "P13-D16",
+      "P13-D17",
+      "P13-D18",
+      "P13-D19",
+      "P13-D20",
+      "P13-D21",
+      "P13-D22",
+      "P13-D23",
+      "P13-D24",
     ],
   );
 });

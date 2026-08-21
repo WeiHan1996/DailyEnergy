@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 244, "NA_WITH_REASON": 0, "PLANNED": 543 },
+  "counts": { "COVERED": 271, "NA_WITH_REASON": 0, "PLANNED": 516 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -2830,11 +2830,24 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+            "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
+            "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+            "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+            "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+            "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 fail-closed and Safety boundaries",
+          "test_id": "T-C007-SAFETY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-C03",
       "source_sets": ["s16-ai-corpus"]
@@ -2863,22 +2876,48 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+            "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
+            "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+            "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+            "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+            "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 fail-closed and Safety boundaries",
+          "test_id": "T-C007-SAFETY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-C06",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+            "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
+            "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+            "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+            "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+            "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 fail-closed and Safety boundaries",
+          "test_id": "T-C007-SAFETY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-C07",
       "source_sets": ["s16-ai-corpus"]
@@ -2918,264 +2957,612 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D01",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D02",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D03",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D04",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D05",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D06",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D07",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D08",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D09",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D10",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D11",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D12",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all resulting candidates pass the strict candidate and ExpressionPayload Schemas",
+            "five representative real C-006 derived plans render directly without a mapper, provider or second fact source",
+            "rendered primary action, optional task and ritual keys remain exactly bound to C-006 RuleFacts"
+          ],
+          "file": "packages/server-adapters/src/ai/c007-controlled-template.contract.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 C-006 plan to controlled template contract",
+          "test_id": "T-C007-INTEGRATION-001"
+        },
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D13",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all resulting candidates pass the strict candidate and ExpressionPayload Schemas",
+            "five representative real C-006 derived plans render directly without a mapper, provider or second fact source",
+            "rendered primary action, optional task and ritual keys remain exactly bound to C-006 RuleFacts"
+          ],
+          "file": "packages/server-adapters/src/ai/c007-controlled-template.contract.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 C-006 plan to controlled template contract",
+          "test_id": "T-C007-INTEGRATION-001"
+        },
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D14",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D15",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all resulting candidates pass the strict candidate and ExpressionPayload Schemas",
+            "five representative real C-006 derived plans render directly without a mapper, provider or second fact source",
+            "rendered primary action, optional task and ritual keys remain exactly bound to C-006 RuleFacts"
+          ],
+          "file": "packages/server-adapters/src/ai/c007-controlled-template.contract.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 C-006 plan to controlled template contract",
+          "test_id": "T-C007-INTEGRATION-001"
+        },
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D16",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+            "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
+            "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+            "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+            "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+            "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 fail-closed and Safety boundaries",
+          "test_id": "T-C007-SAFETY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D17",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+            "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
+            "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+            "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+            "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+            "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 fail-closed and Safety boundaries",
+          "test_id": "T-C007-SAFETY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D18",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+            "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
+            "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+            "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+            "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+            "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 fail-closed and Safety boundaries",
+          "test_id": "T-C007-SAFETY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D19",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
+            "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
+            "HIGH only states limited action room and never promises success, reward or luck",
+            "LOW_ASSERTION, PARTIAL_ASSERTION, STANDARD and mood/energy/sleep care-first cases preserve known and uncertain evidence ceilings",
+            "repeated rendering is byte-stable and candidates carry CONTROLLED_TEMPLATE with empty source dependencies"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-C007-TEMPLATE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D20",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+            "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
+            "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+            "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+            "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+            "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 fail-closed and Safety boundaries",
+          "test_id": "T-C007-SAFETY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D21",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+            "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
+            "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+            "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+            "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+            "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 fail-closed and Safety boundaries",
+          "test_id": "T-C007-SAFETY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D22",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+            "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
+            "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+            "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+            "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+            "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 fail-closed and Safety boundaries",
+          "test_id": "T-C007-SAFETY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D23",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
+            "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
+            "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
+            "unknown, null, empty, URL, Markdown and emoji output is rejected without repair",
+            "unsafe or injection-shaped preferred names are omitted before concatenation and safe names can appear only once in greeting",
+            "whole candidates are rejected for investment, diagnosis, relationship, dependency, fear, internal-token and ID-binding violations"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/c007-evidence-manifest.json",
+          "selector": "C-007 fail-closed and Safety boundaries",
+          "test_id": "T-C007-SAFETY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-D24",
       "source_sets": ["s16-ai-corpus"]

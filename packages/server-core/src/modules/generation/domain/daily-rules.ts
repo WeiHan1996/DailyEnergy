@@ -1,6 +1,8 @@
 import {
+  ControlledExpressionPlanV1Schema,
   RuleFactsSchema,
   type Band,
+  type ControlledExpressionPlanV1,
   type Energy,
   type ExpressionStyle,
   type GenerationInputSnapshot,
@@ -47,52 +49,6 @@ export interface DailyChoiceTrace {
   readonly hashed: boolean;
   readonly index: number;
   readonly namespace: ChoiceNamespaceV1;
-}
-
-export interface ControlledExpressionPlanV1 {
-  readonly expression_contract_version: "daily-expression-v1";
-  readonly output_schema_version: "1.0.0";
-  readonly template_compatibility_version: "daily-template-v1";
-  readonly result_version: "daily-v1";
-  readonly template_variant_id: string;
-  readonly assertion_mode: "LOW_ASSERTION" | "PARTIAL_ASSERTION" | "STANDARD";
-  readonly required_sections: readonly string[];
-  readonly semantic_slots: {
-    readonly overall: {
-      readonly band: Band;
-      readonly label_token: RuleFacts["overall"]["label_token"];
-    };
-    readonly dimensions: readonly {
-      readonly id: StableDimensionId;
-      readonly band: Band;
-    }[];
-    readonly focus_dimension_id: StableDimensionId;
-    readonly supporting_dimension_id?: StableDimensionId;
-    readonly care_dimension_id?: StableDimensionId;
-    readonly selected_action: ActionCandidate;
-    readonly optional_task: RuleFacts["optional_task_plan"];
-    readonly rituals: readonly RitualFact[];
-    readonly explanation_basis_codes: readonly string[];
-  };
-  readonly known_checkin_fields: readonly CheckinField[];
-  readonly uncertain_checkin_fields: readonly CheckinField[];
-  readonly allowed_state_assertion_basis_codes: readonly string[];
-  readonly requested_expression_style: ExpressionStyle;
-  readonly effective_expression_constraints: {
-    readonly humor_ceiling: "NONE" | "LIGHT";
-    readonly pressure_ceiling: "VERY_LOW" | "LIGHT";
-    readonly opening_requirement:
-      "UNCERTAINTY_FIRST" | "CARE_FIRST" | "FACT_FIRST";
-    readonly dimension_explanation_mode:
-      "NON_ASSERTIVE" | "KNOWN_SIGNALS_ONLY" | "BAND_GUIDANCE";
-  };
-  readonly greeting_context: {
-    readonly preferred_name?: string;
-    readonly relationship_mode: "GENERIC";
-  };
-  readonly resolved_context_slots: readonly [];
-  readonly source_dependency_requirements: readonly [];
-  readonly prohibited_claim_classes: readonly string[];
 }
 
 export interface DailyRuleDerivation {
@@ -171,7 +127,7 @@ const REQUIRED_SECTIONS = Object.freeze([
   "optional_task",
   "ritual_notes",
   "closing",
-]);
+] as const);
 const PROHIBITED_CLAIM_CLASSES = Object.freeze([
   "FUTURE_PREDICTION",
   "DIAGNOSIS_OR_TREATMENT",
@@ -182,7 +138,7 @@ const PROHIBITED_CLAIM_CLASSES = Object.freeze([
   "TASK_PUNISHMENT_OR_SHAME",
   "EXCLUSIVE_DEPENDENCY_OR_FABRICATED_INTIMACY",
   "FABRICATED_MEMORY_OR_REAL_WORLD_EXPERIENCE",
-]);
+] as const);
 const CHECKIN_FIELDS = Object.freeze([
   "mood",
   "energy",
@@ -319,14 +275,14 @@ export function deriveControlledExpressionPlanV1(
   rootSeed: Uint8Array,
   catalogs: DailyRuleCatalogsV1 = DAILY_RULE_CATALOGS_V1,
 ): ExpressionPlanDerivation {
-  const templateIds = [
+  const templateIds: ControlledExpressionPlanV1["template_variant_id"][] = [
     "template.focus-first.v1",
-    ...(ruleFacts.care_dimension_id === undefined
-      ? ruleFacts.supporting_dimension_id === undefined
-        ? []
-        : ["template.support-then-focus.v1"]
-      : ["template.care-then-step.v1"]),
   ];
+  if (ruleFacts.care_dimension_id !== undefined) {
+    templateIds.push("template.care-then-step.v1");
+  } else if (ruleFacts.supporting_dimension_id !== undefined) {
+    templateIds.push("template.support-then-focus.v1");
+  }
   const templates = canonicalDefinitionsById(
     catalogs.templates,
     templateIds,
@@ -337,6 +293,16 @@ export function deriveControlledExpressionPlanV1(
     "template.variant.v1",
     rootSeed,
   );
+  if (
+    !templateIds.includes(
+      templateSelection.candidate
+        .id as ControlledExpressionPlanV1["template_variant_id"],
+    )
+  ) {
+    throw new DeterministicGenerationError("CATALOG_NOT_FOUND");
+  }
+  const templateVariantId = templateSelection.candidate
+    .id as ControlledExpressionPlanV1["template_variant_id"];
   const selectedAction = ruleFacts.action_candidates.find(
     ({ action_id }) => action_id === ruleFacts.selected_action_id,
   );
@@ -376,9 +342,9 @@ export function deriveControlledExpressionPlanV1(
     output_schema_version: "1.0.0",
     template_compatibility_version: "daily-template-v1",
     result_version: "daily-v1",
-    template_variant_id: templateSelection.candidate.id,
+    template_variant_id: templateVariantId,
     assertion_mode: assertionMode,
-    required_sections: REQUIRED_SECTIONS,
+    required_sections: [...REQUIRED_SECTIONS],
     semantic_slots: {
       overall: {
         band: ruleFacts.overall.band,
@@ -425,7 +391,7 @@ export function deriveControlledExpressionPlanV1(
     },
     resolved_context_slots: [],
     source_dependency_requirements: [],
-    prohibited_claim_classes: PROHIBITED_CLAIM_CLASSES,
+    prohibited_claim_classes: [...PROHIBITED_CLAIM_CLASSES],
   };
   validateExpressionPlanV1(plan, snapshot, ruleFacts);
   return deepFreeze({
@@ -790,10 +756,12 @@ function validateExpressionPlanV1(
   snapshot: DailyRuleSnapshot,
   facts: RuleFacts,
 ): void {
+  const parsed = ControlledExpressionPlanV1Schema.safeParse(plan);
   const expectedAction = facts.action_candidates.find(
     ({ action_id }) => action_id === facts.selected_action_id,
   );
   if (
+    !parsed.success ||
     expectedAction === undefined ||
     JSON.stringify(plan.required_sections) !==
       JSON.stringify(REQUIRED_SECTIONS) ||

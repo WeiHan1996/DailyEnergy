@@ -5,6 +5,7 @@ import {
   BandSchema,
   EffortSchema,
   EnergySchema,
+  ExpressionStyleSchema,
   GenerationModeSchema,
   MoodSchema,
   OpaqueIdSchema,
@@ -260,6 +261,300 @@ export const RuleFactsSchema = z
     }
   });
 export type RuleFacts = z.infer<typeof RuleFactsSchema>;
+
+export const DailyExpressionRequiredSectionValues = [
+  "greeting",
+  "state_response",
+  "overall_summary",
+  "core_tip",
+  "explanation_paragraphs",
+  "dimension_explanations",
+  "primary_action",
+  "optional_task",
+  "ritual_notes",
+  "closing",
+] as const;
+
+export const DailyProhibitedClaimClassValues = [
+  "FUTURE_PREDICTION",
+  "DIAGNOSIS_OR_TREATMENT",
+  "FINANCIAL_OR_LEGAL_ADVICE",
+  "OTHER_PERSON_MIND_OR_RELATIONSHIP_OUTCOME",
+  "RESULT_GUARANTEE",
+  "RITUAL_CAUSALITY_OR_GAMBLING",
+  "TASK_PUNISHMENT_OR_SHAME",
+  "EXCLUSIVE_DEPENDENCY_OR_FABRICATED_INTIMACY",
+  "FABRICATED_MEMORY_OR_REAL_WORLD_EXPERIENCE",
+] as const;
+
+const CheckinFieldSchema = z.enum(["mood", "energy", "sleep"]);
+const AssertionModeSchema = z.enum([
+  "LOW_ASSERTION",
+  "PARTIAL_ASSERTION",
+  "STANDARD",
+]);
+const TemplateVariantIdSchema = z.enum([
+  "template.focus-first.v1",
+  "template.care-then-step.v1",
+  "template.support-then-focus.v1",
+]);
+
+export const ControlledExpressionPlanV1Schema = z
+  .object({
+    expression_contract_version: z.literal("daily-expression-v1"),
+    output_schema_version: z.literal("1.0.0"),
+    template_compatibility_version: z.literal("daily-template-v1"),
+    result_version: z.literal("daily-v1"),
+    template_variant_id: TemplateVariantIdSchema,
+    assertion_mode: AssertionModeSchema,
+    required_sections: z.tuple([
+      z.literal("greeting"),
+      z.literal("state_response"),
+      z.literal("overall_summary"),
+      z.literal("core_tip"),
+      z.literal("explanation_paragraphs"),
+      z.literal("dimension_explanations"),
+      z.literal("primary_action"),
+      z.literal("optional_task"),
+      z.literal("ritual_notes"),
+      z.literal("closing"),
+    ]),
+    semantic_slots: z
+      .object({
+        overall: z
+          .object({
+            band: BandSchema,
+            label_token: OverallLabelTokenSchema,
+          })
+          .strict(),
+        dimensions: z
+          .array(
+            z
+              .object({ id: StableDimensionIdSchema, band: BandSchema })
+              .strict(),
+          )
+          .length(5),
+        focus_dimension_id: StableDimensionIdSchema,
+        supporting_dimension_id: StableDimensionIdSchema.optional(),
+        care_dimension_id: StableDimensionIdSchema.optional(),
+        selected_action: ActionCandidateSchema,
+        optional_task: OptionalTaskPlanSchema,
+        rituals: z.array(RitualFactSchema).max(2),
+        explanation_basis_codes: z.array(VersionTokenSchema).min(3).max(5),
+      })
+      .strict(),
+    known_checkin_fields: z.array(CheckinFieldSchema).max(3),
+    uncertain_checkin_fields: z.array(CheckinFieldSchema).max(3),
+    allowed_state_assertion_basis_codes: z.array(VersionTokenSchema).max(5),
+    requested_expression_style: ExpressionStyleSchema,
+    effective_expression_constraints: z
+      .object({
+        humor_ceiling: z.enum(["NONE", "LIGHT"]),
+        pressure_ceiling: z.enum(["VERY_LOW", "LIGHT"]),
+        opening_requirement: z.enum([
+          "UNCERTAINTY_FIRST",
+          "CARE_FIRST",
+          "FACT_FIRST",
+        ]),
+        dimension_explanation_mode: z.enum([
+          "NON_ASSERTIVE",
+          "KNOWN_SIGNALS_ONLY",
+          "BAND_GUIDANCE",
+        ]),
+      })
+      .strict(),
+    greeting_context: z
+      .object({
+        preferred_name: generatedTextSchema(1, 20).optional(),
+        relationship_mode: z.literal("GENERIC"),
+      })
+      .strict(),
+    resolved_context_slots: z.tuple([]),
+    source_dependency_requirements: z.tuple([]),
+    prohibited_claim_classes: z.tuple([
+      z.literal("FUTURE_PREDICTION"),
+      z.literal("DIAGNOSIS_OR_TREATMENT"),
+      z.literal("FINANCIAL_OR_LEGAL_ADVICE"),
+      z.literal("OTHER_PERSON_MIND_OR_RELATIONSHIP_OUTCOME"),
+      z.literal("RESULT_GUARANTEE"),
+      z.literal("RITUAL_CAUSALITY_OR_GAMBLING"),
+      z.literal("TASK_PUNISHMENT_OR_SHAME"),
+      z.literal("EXCLUSIVE_DEPENDENCY_OR_FABRICATED_INTIMACY"),
+      z.literal("FABRICATED_MEMORY_OR_REAL_WORLD_EXPERIENCE"),
+    ]),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const slots = value.semantic_slots;
+    if (
+      slots.overall.label_token !== EXPECTED_LABEL_BY_BAND[slots.overall.band]
+    ) {
+      addCustomIssue(
+        context,
+        ["semantic_slots", "overall", "label_token"],
+        `must be ${EXPECTED_LABEL_BY_BAND[slots.overall.band]} for ${slots.overall.band}`,
+      );
+    }
+    const dimensionIds = slots.dimensions.map(({ id }) => id);
+    if (
+      !StableDimensionIdValues.every((id, index) => dimensionIds[index] === id)
+    ) {
+      addCustomIssue(
+        context,
+        ["semantic_slots", "dimensions"],
+        "must contain the five dimensions once in canonical order",
+      );
+    }
+    if (
+      slots.care_dimension_id !== undefined &&
+      slots.care_dimension_id !== slots.focus_dimension_id
+    ) {
+      addCustomIssue(
+        context,
+        ["semantic_slots", "care_dimension_id"],
+        "must equal focus_dimension_id",
+      );
+    }
+    if (
+      slots.supporting_dimension_id !== undefined &&
+      slots.supporting_dimension_id === slots.focus_dimension_id
+    ) {
+      addCustomIssue(
+        context,
+        ["semantic_slots", "supporting_dimension_id"],
+        "must differ from focus_dimension_id",
+      );
+    }
+    if (slots.optional_task.kind !== slots.selected_action.kind) {
+      addCustomIssue(
+        context,
+        ["semantic_slots", "optional_task", "kind"],
+        "must match selected_action.kind",
+      );
+    }
+    const ritualIds = slots.rituals.map(({ ritual_id }) => ritual_id);
+    const ritualKinds = slots.rituals.map(({ kind }) => kind);
+    if (
+      new Set(ritualIds).size !== ritualIds.length ||
+      new Set(ritualKinds).size !== ritualKinds.length
+    ) {
+      addCustomIssue(
+        context,
+        ["semantic_slots", "rituals"],
+        "ritual ids and kinds must be unique",
+      );
+    }
+
+    const known = value.known_checkin_fields;
+    const uncertain = value.uncertain_checkin_fields;
+    const partition = [...known, ...uncertain];
+    if (
+      new Set(known).size !== known.length ||
+      new Set(uncertain).size !== uncertain.length ||
+      new Set(partition).size !== 3 ||
+      !["mood", "energy", "sleep"].every((field) =>
+        partition.includes(field as (typeof partition)[number]),
+      )
+    ) {
+      addCustomIssue(
+        context,
+        ["known_checkin_fields"],
+        "known and uncertain fields must partition mood, energy, and sleep",
+      );
+    }
+    const expectedAssertionMode =
+      uncertain.length === 3
+        ? "LOW_ASSERTION"
+        : uncertain.length > 0
+          ? "PARTIAL_ASSERTION"
+          : "STANDARD";
+    if (value.assertion_mode !== expectedAssertionMode) {
+      addCustomIssue(
+        context,
+        ["assertion_mode"],
+        `must be ${expectedAssertionMode} for the check-in field partition`,
+      );
+    }
+    if (
+      value.assertion_mode === "LOW_ASSERTION" &&
+      value.allowed_state_assertion_basis_codes.length !== 0
+    ) {
+      addCustomIssue(
+        context,
+        ["allowed_state_assertion_basis_codes"],
+        "must be empty for LOW_ASSERTION",
+      );
+    }
+    if (
+      value.assertion_mode === "PARTIAL_ASSERTION" &&
+      value.allowed_state_assertion_basis_codes.some(
+        (code) => !known.some((field) => code.startsWith(`checkin.${field}.`)),
+      )
+    ) {
+      addCustomIssue(
+        context,
+        ["allowed_state_assertion_basis_codes"],
+        "must only reference known check-in fields for PARTIAL_ASSERTION",
+      );
+    }
+
+    const constrained =
+      slots.care_dimension_id !== undefined ||
+      value.assertion_mode === "LOW_ASSERTION";
+    const constraints = value.effective_expression_constraints;
+    if (
+      constraints.humor_ceiling !== (constrained ? "NONE" : "LIGHT") ||
+      constraints.pressure_ceiling !== (constrained ? "VERY_LOW" : "LIGHT")
+    ) {
+      addCustomIssue(
+        context,
+        ["effective_expression_constraints"],
+        "humor and pressure ceilings must match care and assertion mode",
+      );
+    }
+    const expectedOpening =
+      slots.care_dimension_id !== undefined
+        ? "CARE_FIRST"
+        : value.assertion_mode === "STANDARD"
+          ? "FACT_FIRST"
+          : "UNCERTAINTY_FIRST";
+    if (constraints.opening_requirement !== expectedOpening) {
+      addCustomIssue(
+        context,
+        ["effective_expression_constraints", "opening_requirement"],
+        `must be ${expectedOpening}`,
+      );
+    }
+    const expectedDimensionMode =
+      value.assertion_mode === "LOW_ASSERTION"
+        ? "NON_ASSERTIVE"
+        : value.assertion_mode === "PARTIAL_ASSERTION"
+          ? "KNOWN_SIGNALS_ONLY"
+          : "BAND_GUIDANCE";
+    if (constraints.dimension_explanation_mode !== expectedDimensionMode) {
+      addCustomIssue(
+        context,
+        ["effective_expression_constraints", "dimension_explanation_mode"],
+        `must be ${expectedDimensionMode}`,
+      );
+    }
+    if (
+      (value.template_variant_id === "template.care-then-step.v1" &&
+        slots.care_dimension_id === undefined) ||
+      (value.template_variant_id === "template.support-then-focus.v1" &&
+        (slots.supporting_dimension_id === undefined ||
+          slots.care_dimension_id !== undefined))
+    ) {
+      addCustomIssue(
+        context,
+        ["template_variant_id"],
+        "is not eligible for the plan's care/supporting roles",
+      );
+    }
+  });
+export type ControlledExpressionPlanV1 = z.infer<
+  typeof ControlledExpressionPlanV1Schema
+>;
 
 const DimensionExplanationsSchema = z
   .object({
