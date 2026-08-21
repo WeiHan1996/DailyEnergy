@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c006-rule-engine`
 - **Stacked base**：[C-005 Draft PR #158](https://github.com/WeiHan1996/DailyEnergy/pull/158)，verified head `e0383934f2d224e1d3e1636ab24311656f7b2604`
 - **任务 Issue**：[C-006 Issue #58](https://github.com/WeiHan1996/DailyEnergy/issues/58)
-- **Draft PR**：待首次推送后创建；base 必须为 `agent/c005-stable-seed`
+- **Draft PR**：[PR #159](https://github.com/WeiHan1996/DailyEnergy/pull/159)；base=`agent/c005-stable-seed`
 - **下一候选任务**：C-007 — 本地模板内容（Planned；C-006 final-head CI 验证后启动）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -61,9 +61,9 @@
 
 ## 6. 精确下一动作
 
-1. 提交并推送 `agent/c006-rule-engine`，创建 base=`agent/c005-stable-seed` 的 Draft PR；
-2. 回写 PR 编号并推送，记录新的 remote final head；
-3. 等待同一 final head 的 11/11 CI SUCCESS，保持 Issue #58 Open、PR Draft，不运行 exact-head merge verifier；
+1. 提交 PR #159 编号回写并推送，记录新的 remote final head；
+2. 等待同一 final head 的 11/11 CI SUCCESS；
+3. 保持 Issue #58 Open、PR Draft，不运行 exact-head merge verifier；
 4. 从 verified C-006 final head 创建 `agent/c007-local-templates`；
 5. 把 C-007 设为唯一 In Progress，运行 `pnpm agent:prepare C-007 --remote --deep` 后按返回来源继续。
 
