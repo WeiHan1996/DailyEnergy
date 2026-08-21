@@ -1,10 +1,11 @@
 # DailyEnergy API
 
-E-003 establishes a thin NestJS 11 + Express 5 composition root. It contains
-transport, runtime configuration, health, error-envelope, request-context,
-redacted logging, audience-boundary, and graceful-shutdown infrastructure only.
-It does not implement product use cases, persistence, queues, providers, or real
-identity.
+E-003 established the NestJS 11 + Express 5 composition root. C-001 through
+C-004 now add WeChat session persistence, consent/profile/onboarding and the
+daily check-in command/query surface. Check-in ownership and ProductDate are
+server-derived; command receipts, owner/date uniqueness, revision CAS and the
+restricted Safety/deletion guard are persisted in PostgreSQL. Generation,
+rules, AI and daily result publication remain separate downstream capabilities.
 
 ## Local synthetic start
 

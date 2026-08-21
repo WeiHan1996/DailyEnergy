@@ -3,9 +3,9 @@
   "registry_version": "e-010-source-registry-v1",
   "snapshot_base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
   "counts": {
-    "total": 784,
-    "COVERED": 226,
-    "PLANNED": 558,
+    "total": 787,
+    "COVERED": 242,
+    "PLANNED": 545,
     "NA_WITH_REASON": 0
   },
   "planned_policy": {
@@ -37,7 +37,7 @@
       "set_id": "s31-testing",
       "authority_path": "docs/technical/testing.md",
       "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-      "counts": { "COVERED": 25, "PLANNED": 23, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 26, "PLANNED": 22, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s32-deployment",
@@ -55,19 +55,19 @@
       "set_id": "s17-domain-model",
       "authority_path": "docs/data/domain-model.md",
       "owner": "Owning Phase 2-3 domain implementation issue",
-      "counts": { "COVERED": 2, "PLANNED": 46, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 9, "PLANNED": 39, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s19-database",
       "authority_path": "docs/technical/database.md",
       "owner": "Owning database or business implementation issue",
-      "counts": { "COVERED": 55, "PLANNED": 38, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 56, "PLANNED": 37, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s20-api",
       "authority_path": "docs/technical/api.md",
       "owner": "Owning API or business implementation issue",
-      "counts": { "COVERED": 9, "PLANNED": 39, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 11, "PLANNED": 37, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s12-gateway",
@@ -85,13 +85,13 @@
       "set_id": "s21-privacy",
       "authority_path": "docs/operations/privacy-data-map.md",
       "owner": "Owning privacy, data-rights, or business implementation issue",
-      "counts": { "COVERED": 3, "PLANNED": 31, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 5, "PLANNED": 29, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "shared-schemas",
       "authority_path": "packages/shared-schemas/src/json-schema.ts",
       "owner": "E-008 contract maintenance",
-      "counts": { "COVERED": 20, "PLANNED": 0, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 23, "PLANNED": 0, "NA_WITH_REASON": 0 }
     }
   ]
 }

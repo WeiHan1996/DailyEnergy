@@ -65,6 +65,9 @@ export type {
 
 export {
   ClientContextSchema,
+  CheckinCorrectRequestSchema,
+  CheckinSubmitRequestSchema,
+  CheckinViewSchema,
   CommandReceiptViewSchema,
   CommandRefSchema,
   ConsentAcceptRequestSchema,
@@ -82,6 +85,9 @@ export {
   WechatSessionRequestSchema,
 } from "./public-transport.js";
 export type {
+  CheckinCorrectRequest,
+  CheckinSubmitRequest,
+  CheckinView,
   CommandReceiptView,
   ConsentAcceptRequest,
   ConsentView,

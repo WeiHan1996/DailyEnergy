@@ -2,7 +2,7 @@
   "version": 1,
   "algorithm": "sha256",
   "schema": "daily_energy",
-  "catalogSha256": "01f3e678f3207754f4bed9a2b5f5d31091d1c9d8736d961d94d333150bc71086",
+  "catalogSha256": "b44c470b845f8dae6a1fe7666e929621c8427b7f046432594f1119e04f45ccdf",
   "sections": {
     "schemas": {
       "count": 1,
@@ -17,8 +17,8 @@
       "sha256": "672cb61266c3ebf644f35fc33cfc80f337d52ef50006ced6fe2b82f4f59406c5"
     },
     "columnAcl": {
-      "count": 22,
-      "sha256": "88dd420b599723696453e56154c1cd3167c37dffc36b6ccd525e2a6d3c3d563f"
+      "count": 27,
+      "sha256": "dfabfdc3c96e3718ce1763226abefd92a4b79813927fe144216b1c403f734f55"
     },
     "enums": {
       "count": 152,
@@ -33,24 +33,24 @@
       "sha256": "3b676d3489d17fe25eb41d60fcdd2d780fcf8074a9edb34366291fdb8642c6e4"
     },
     "triggers": {
-      "count": 20,
-      "sha256": "e2354cd2c8e747e6f70d55d52b52622b08e366af19ed45316671552941cf15e4"
+      "count": 25,
+      "sha256": "b5908c5b9e93a0c1567367154be99ae3c3dd43064c447545cb4b22d459cd8aaa"
     },
     "functions": {
-      "count": 17,
-      "sha256": "274b7674bb0b752b59dfa9a764805024071401b1a14e38b7105a9842fbc55bde"
+      "count": 20,
+      "sha256": "e431f54a0358726b87206b9ebe556a53b92ba06990c9a4385985faf460c8a23c"
     },
     "schemaAcl": {
       "count": 9,
       "sha256": "492815ca1e728968e5e46129b8d3bc08803a4a4f7b354755bd42ac1d832e7fa4"
     },
     "relationAcl": {
-      "count": 1609,
-      "sha256": "9cdf1430c320e4c67fe8ea7e706c7ec596084d56d33c2bb0e1e382ff448f1999"
+      "count": 1605,
+      "sha256": "4fd266b5e1d937e557fa761d47714f2780f2469c41f927e05afc5c7c5107c777"
     },
     "functionAcl": {
-      "count": 42,
-      "sha256": "ebc3b66b11b3800359d21f5beb2d098e8a5214b5348a98d5475965c516d24a8f"
+      "count": 47,
+      "sha256": "64e766e379e351a6d439d27cae726b86e56c7ed4cc42122110b179ab02428d1b"
     },
     "defaultPrivileges": {
       "count": 0,

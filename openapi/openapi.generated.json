@@ -1939,32 +1939,74 @@
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "energy": {
-            "$ref": "#/components/schemas/Energy"
+            "enum": [
+              "EMPTY",
+              "LOW",
+              "STEADY",
+              "HIGH",
+              "FULL",
+              "UNSURE"
+            ],
+            "type": "string"
           },
           "expected_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "mood": {
-            "$ref": "#/components/schemas/Mood"
+            "enum": [
+              "VERY_LOW",
+              "LOW",
+              "STEADY",
+              "GOOD",
+              "LIGHT",
+              "UNSURE"
+            ],
+            "type": "string"
           },
           "sleep": {
-            "$ref": "#/components/schemas/Sleep"
+            "enum": [
+              "POOR",
+              "LOW",
+              "OKAY",
+              "GOOD",
+              "UNSURE"
+            ],
+            "type": "string"
           }
         },
         "required": [
           "command_ref",
           "expected_revision",
-          "mood",
           "energy",
+          "mood",
           "sleep"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "CheckinCorrectRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "CheckinRebuildRequest": {
         "additionalProperties": false,
@@ -2019,76 +2061,151 @@
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "energy": {
-            "$ref": "#/components/schemas/Energy"
+            "enum": [
+              "EMPTY",
+              "LOW",
+              "STEADY",
+              "HIGH",
+              "FULL",
+              "UNSURE"
+            ],
+            "type": "string"
           },
           "expected_revision": {
             "enum": [
               0
             ],
-            "type": "integer"
+            "type": "number"
           },
           "mood": {
-            "$ref": "#/components/schemas/Mood"
+            "enum": [
+              "VERY_LOW",
+              "LOW",
+              "STEADY",
+              "GOOD",
+              "LIGHT",
+              "UNSURE"
+            ],
+            "type": "string"
           },
           "sleep": {
-            "$ref": "#/components/schemas/Sleep"
+            "enum": [
+              "POOR",
+              "LOW",
+              "OKAY",
+              "GOOD",
+              "UNSURE"
+            ],
+            "type": "string"
           }
         },
         "required": [
           "command_ref",
           "expected_revision",
-          "mood",
           "energy",
+          "mood",
           "sleep"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "CheckinSubmitRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "CheckinView": {
         "additionalProperties": false,
         "properties": {
           "checkin_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            "type": "string"
           },
           "energy": {
-            "$ref": "#/components/schemas/Energy"
+            "enum": [
+              "EMPTY",
+              "LOW",
+              "STEADY",
+              "HIGH",
+              "FULL",
+              "UNSURE"
+            ],
+            "type": "string"
           },
           "mood": {
-            "$ref": "#/components/schemas/Mood"
+            "enum": [
+              "VERY_LOW",
+              "LOW",
+              "STEADY",
+              "GOOD",
+              "LIGHT",
+              "UNSURE"
+            ],
+            "type": "string"
           },
           "product_date": {
-            "$ref": "#/components/schemas/ProductDate"
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           },
           "revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "sleep": {
-            "$ref": "#/components/schemas/Sleep"
+            "enum": [
+              "POOR",
+              "LOW",
+              "OKAY",
+              "GOOD",
+              "UNSURE"
+            ],
+            "type": "string"
           },
           "updated_at": {
-            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
             "type": "string"
           },
           "write_window": {
-            "$ref": "#/components/schemas/WriteWindow"
+            "enum": [
+              "OPEN",
+              "CONTINUATION_ONLY",
+              "CLOSED"
+            ],
+            "type": "string"
           }
         },
         "required": [
           "checkin_ref",
           "product_date",
           "revision",
-          "mood",
           "energy",
+          "mood",
           "sleep",
           "write_window",
           "updated_at"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "CheckinViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "ClientContext": {
         "additionalProperties": false,
@@ -9217,6 +9334,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:6ad35944c6bceb6f55769e5cc5f9e3fc4b45e4754a2c4dcb22e9a3d16ec5350e"
+    "source-fingerprint": "sha256:28397a2acd043bad4ffc8adacc810edded6b6df749234d647f32ba0ee15d6cf5"
   }
 }

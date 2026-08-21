@@ -49,8 +49,18 @@ export type {
   WriteWindow,
 } from "./common.js";
 
-export { WechatSessionRequestSchema } from "./public-transport.js";
-export type { WechatSessionRequest } from "./public-transport.js";
+export {
+  CheckinCorrectRequestSchema,
+  CheckinSubmitRequestSchema,
+  CheckinViewSchema,
+  WechatSessionRequestSchema,
+} from "./public-transport.js";
+export type {
+  CheckinCorrectRequest,
+  CheckinSubmitRequest,
+  CheckinView,
+  WechatSessionRequest,
+} from "./public-transport.js";
 
 export {
   ClientDailyContentViewSchema,

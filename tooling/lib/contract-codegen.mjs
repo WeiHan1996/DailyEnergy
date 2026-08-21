@@ -108,6 +108,17 @@ const SCHEMA_EXPORTS = [
     "WechatSessionRequestSchema",
     "wechat-session-request",
   ],
+  [
+    "checkinSubmitRequest",
+    "CheckinSubmitRequestSchema",
+    "checkin-submit-request",
+  ],
+  [
+    "checkinCorrectRequest",
+    "CheckinCorrectRequestSchema",
+    "checkin-correct-request",
+  ],
+  ["checkinView", "CheckinViewSchema", "checkin-view"],
 ];
 
 const SCHEMA_SOURCE_PATHS = [

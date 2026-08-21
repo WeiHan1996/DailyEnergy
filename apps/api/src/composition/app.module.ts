@@ -1,5 +1,8 @@
 import { Module, type DynamicModule, type Provider } from "@nestjs/common";
-import { UNAVAILABLE_CONSENT_PROFILE_STORE } from "@daily-energy/server-adapters/api";
+import {
+  UNAVAILABLE_CHECKIN_STORE,
+  UNAVAILABLE_CONSENT_PROFILE_STORE,
+} from "@daily-energy/server-adapters/api";
 
 import { AuthAttemptLimiter } from "../auth/auth-attempt-limiter.js";
 import { AuthService } from "../auth/auth.service.js";
@@ -9,6 +12,7 @@ import {
   UNAVAILABLE_WECHAT_CODE_EXCHANGE,
 } from "../auth/contracts.js";
 import { ShutdownObserver } from "../bootstrap/shutdown-observer.js";
+import { CheckinService } from "../checkin/checkin.service.js";
 import { ConsentProfileService } from "../consent-profile/consent-profile.service.js";
 import {
   developmentPreferredNameCodec,
@@ -22,6 +26,7 @@ import {
   OrdinaryLogger,
   STANDARD_OUTPUT_LOG_SINK,
 } from "../observability/ordinary-logger.js";
+import { SYSTEM_PRODUCT_DATE_CLOCK } from "../product-date/product-date.js";
 import { AdminAudienceGuard } from "../transport/admin/admin-audience.guard.js";
 import { AdminController } from "../transport/admin/admin.controller.js";
 import { ApiExceptionFilter } from "../transport/common/api-exception.filter.js";
@@ -29,6 +34,7 @@ import { HttpLoggingInterceptor } from "../transport/common/http-logging.interce
 import { MaintenanceGuard } from "../transport/common/maintenance.guard.js";
 import { RequestContextStore } from "../transport/common/request-context.js";
 import { AuthController } from "../transport/public/auth.controller.js";
+import { CheckinController } from "../transport/public/checkin.controller.js";
 import { ConsentProfileController } from "../transport/public/consent-profile.controller.js";
 import { HealthController } from "../transport/public/health.controller.js";
 import { HealthService } from "../transport/public/health.service.js";
@@ -39,10 +45,12 @@ import { SessionGuard } from "../transport/public/session.guard.js";
 import {
   ADMIN_AUDIENCE_VERIFIER,
   AUTH_STORE,
+  CHECKIN_STORE,
   CONSENT_PROFILE_STORE,
   type ApiComposition,
   ORDINARY_LOG_SINK,
   PREFERRED_NAME_CODEC,
+  PRODUCT_DATE_CLOCK,
   PUBLIC_AUDIENCE_VERIFIER,
   READINESS_CHECKS,
   RUNTIME_CONFIG,
@@ -82,9 +90,19 @@ export class ApiModule {
           UNAVAILABLE_CONSENT_PROFILE_STORE,
       },
       {
+        provide: CHECKIN_STORE,
+        useValue:
+          composition.overrides?.checkinStore ?? UNAVAILABLE_CHECKIN_STORE,
+      },
+      {
         provide: PREFERRED_NAME_CODEC,
         useValue:
           composition.overrides?.preferredNameCodec ?? developmentProfileCodec,
+      },
+      {
+        provide: PRODUCT_DATE_CLOCK,
+        useValue:
+          composition.overrides?.productDateClock ?? SYSTEM_PRODUCT_DATE_CLOCK,
       },
       {
         provide: WECHAT_CODE_EXCHANGE,
@@ -132,6 +150,7 @@ export class ApiModule {
       ApiExceptionFilter,
       AuthAttemptLimiter,
       AuthService,
+      CheckinService,
       ConsentProfileService,
       HealthService,
       HttpLoggingInterceptor,
@@ -147,6 +166,7 @@ export class ApiModule {
       controllers: [
         AdminController,
         AuthController,
+        CheckinController,
         ConsentProfileController,
         HealthController,
         PublicController,

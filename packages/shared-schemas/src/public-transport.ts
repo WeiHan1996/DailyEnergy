@@ -1,10 +1,15 @@
 import * as z from "zod";
 
 import {
+  EnergySchema,
   ExpressionStyleSchema,
+  MoodSchema,
   PositiveRevisionSchema,
+  ProductDateSchema,
   Rfc3339TimestampSchema,
+  SleepSchema,
   VersionTokenSchema,
+  WriteWindowSchema,
   singleLineTextSchema,
 } from "./common.js";
 
@@ -92,6 +97,28 @@ export const StyleCalibrationRequestSchema = z
   })
   .strict();
 
+const CheckinValuesShape = {
+  energy: EnergySchema,
+  mood: MoodSchema,
+  sleep: SleepSchema,
+} as const;
+
+export const CheckinSubmitRequestSchema = z
+  .object({
+    ...CommandShape,
+    expected_revision: z.literal(0),
+    ...CheckinValuesShape,
+  })
+  .strict();
+
+export const CheckinCorrectRequestSchema = z
+  .object({
+    ...CommandShape,
+    expected_revision: PositiveRevisionSchema,
+    ...CheckinValuesShape,
+  })
+  .strict();
+
 export const MemoryPreferencesUpdateRequestSchema = z
   .object({
     ...CommandShape,
@@ -145,6 +172,17 @@ export const ProfileViewSchema = z
   })
   .strict();
 
+export const CheckinViewSchema = z
+  .object({
+    checkin_ref: z.string().uuid(),
+    product_date: ProductDateSchema,
+    revision: PositiveRevisionSchema,
+    ...CheckinValuesShape,
+    write_window: WriteWindowSchema,
+    updated_at: Rfc3339TimestampSchema,
+  })
+  .strict();
+
 export const MemoryPreferencesViewSchema = z
   .object({
     revision: PositiveRevisionSchema,
@@ -176,6 +214,8 @@ export type ProfileUpdateRequest = z.infer<typeof ProfileUpdateRequestSchema>;
 export type StyleCalibrationRequest = z.infer<
   typeof StyleCalibrationRequestSchema
 >;
+export type CheckinSubmitRequest = z.infer<typeof CheckinSubmitRequestSchema>;
+export type CheckinCorrectRequest = z.infer<typeof CheckinCorrectRequestSchema>;
 export type MemoryPreferencesUpdateRequest = z.infer<
   typeof MemoryPreferencesUpdateRequestSchema
 >;
@@ -188,6 +228,7 @@ export type NotificationPermissionSyncRequest = z.infer<
 export type CommandReceiptView = z.infer<typeof CommandReceiptViewSchema>;
 export type ConsentView = z.infer<typeof ConsentViewSchema>;
 export type ProfileView = z.infer<typeof ProfileViewSchema>;
+export type CheckinView = z.infer<typeof CheckinViewSchema>;
 export type MemoryPreferencesView = z.infer<typeof MemoryPreferencesViewSchema>;
 export type NotificationSettingsView = z.infer<
   typeof NotificationSettingsViewSchema

@@ -47,7 +47,7 @@ Page({
     trustedPersonLabel: "联系一位你信任的人",
   },
   onLoad() {
-    const safetyView = getMiniappAppContext().onboarding.getSafetyView();
+    const safetyView = getMiniappAppContext().getSafetyView();
     const overlay =
       safetyView?.state === "ACTIVE" || safetyView?.state === "RECOVERY_PENDING"
         ? safetyView
@@ -68,7 +68,7 @@ Page({
     });
   },
   emergency() {
-    const safetyView = getMiniappAppContext().onboarding.getSafetyView();
+    const safetyView = getMiniappAppContext().getSafetyView();
     const overlay =
       safetyView?.state === "ACTIVE" || safetyView?.state === "RECOVERY_PENDING"
         ? safetyView

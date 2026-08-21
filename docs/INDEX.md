@@ -286,7 +286,7 @@ E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squas
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
 [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
 [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 已纳入
-Phase 2；D-001～D-005 与 C-003 已进入 Done；C-003 已随 PR #154 squash 合并为 `bd00fbe5911b64b643071294f77d0957725e954d`，Issue #55 已关闭。项目所有者要求后续暂停，C-004 及后续任务保持 Planned 且暂不开发。D-004 是 C-003、C-004、C-009 的直接前置；D-005 是 C-012、C-013、C-014 的直接前置，相关设计前置均已满足。
+Phase 2；D-001～D-005 与 C-003 已进入 Done；C-003 已随 PR #154 squash 合并为 `bd00fbe5911b64b643071294f77d0957725e954d`，Issue #55 已关闭。项目所有者于 2026-08-21 授权按依赖顺序连续完成 C-004～C-015、逐项执行任务 Gate，并在 C-015 后统一审核；C-004 已完成自动 Gate 并进入统一审核批次，后续任务使用 stacked branch/PR。D-004 是 C-003、C-004、C-009 的直接前置；D-005 是 C-012、C-013、C-014 的直接前置，相关设计前置均已满足。
 正式 Source-ID registry 已由 E-010 实现；E-011 已接入 CI、artifact、cache、
 telemetry 与供应链 evidence 且不改变原有证据层级，未实现项继续为 `PLANNED`。
 CI workflow/artifacts 已由 E-011 交付；E-016 经项目所有者明确授权把仓库设为 public，并接受

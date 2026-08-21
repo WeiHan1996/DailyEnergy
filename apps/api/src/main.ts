@@ -4,9 +4,11 @@ import { readFile } from "node:fs/promises";
 import type { AddressInfo } from "node:net";
 import {
   PostgresAuthStore,
+  PostgresCheckinStore,
   PostgresConsentProfileStore,
   startApiTelemetry,
   type AuthStore,
+  type CheckinStore,
   type ConsentProfileStore,
   type TelemetryRuntime,
 } from "@daily-energy/server-adapters/api";
@@ -52,6 +54,7 @@ function writeStartupFailure(reasonCode: StartupFailureReason): void {
 async function main(): Promise<void> {
   let telemetry: TelemetryRuntime | undefined;
   let authStore: AuthStore | undefined;
+  let checkinStore: CheckinStore | undefined;
   let consentProfileStore: ConsentProfileStore | undefined;
   try {
     const config = loadRuntimeConfig(process.env);
@@ -93,6 +96,12 @@ async function main(): Promise<void> {
           connectionString,
           expectedDatabaseRole: "daily_energy_api",
         });
+        checkinStore = await PostgresCheckinStore.connect({
+          applicationName: "daily-energy:api:checkin",
+          connectionLimit: 4,
+          connectionString,
+          expectedDatabaseRole: "daily_energy_api",
+        });
       } catch {
         throw new ApiStartupError("API_DATABASE_NOT_READY");
       }
@@ -100,6 +109,7 @@ async function main(): Promise<void> {
     }
     const application = await createApiApplication(config, {
       ...(authStore === undefined ? {} : { authStore }),
+      ...(checkinStore === undefined ? {} : { checkinStore }),
       ...(consentProfileStore === undefined ? {} : { consentProfileStore }),
       readinessChecks,
       shutdownDrainHooks: [
@@ -109,6 +119,9 @@ async function main(): Promise<void> {
         ...(consentProfileStore === undefined
           ? []
           : [{ drain: () => consentProfileStore?.close() }]),
+        ...(checkinStore === undefined
+          ? []
+          : [{ drain: () => checkinStore?.close() }]),
         { drain: () => telemetry?.shutdown() },
       ],
       telemetryRuntime: telemetry,
@@ -126,6 +139,7 @@ async function main(): Promise<void> {
     });
   } catch (error) {
     await authStore?.close().catch(() => undefined);
+    await checkinStore?.close().catch(() => undefined);
     await consentProfileStore?.close().catch(() => undefined);
     await telemetry?.shutdown().catch(() => undefined);
     writeStartupFailure(

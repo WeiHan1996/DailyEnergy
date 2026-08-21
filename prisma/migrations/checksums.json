@@ -24,6 +24,10 @@
     {
       "name": "20260820000000_c002_consent_profile_permissions",
       "sha256": "6c4f0c21606878ecf7cbcc7121e1def101c265cc3c20003ca23e764f4b0eb9e7"
+    },
+    {
+      "name": "20260821000000_c004_checkin_guard",
+      "sha256": "0f4503836a124cf0a3ba6f000dc2911523530f8a92efe0b1f153930535aae4e1"
     }
   ]
 }

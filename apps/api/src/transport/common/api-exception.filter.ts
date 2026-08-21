@@ -10,6 +10,7 @@ import {
 } from "@nestjs/common";
 import type { Response } from "express";
 
+import { resolveProductDate } from "../../product-date/product-date.js";
 import { OrdinaryLogger } from "../../observability/ordinary-logger.js";
 import { ApiTelemetry } from "../../observability/api-telemetry.js";
 import {
@@ -26,7 +27,9 @@ interface NormalizedApiError {
   readonly details?: ApiErrorDetails;
   readonly message: string;
   readonly messageKey: string;
+  readonly productDate?: string;
   readonly retryable: boolean;
+  readonly serverNow?: Date;
   readonly status: number;
 }
 
@@ -87,7 +90,13 @@ function normalizeException(exception: unknown): NormalizedApiError {
       : { details: normalized.details }),
     message: normalized.message,
     messageKey: normalized.messageKey,
+    ...(normalized.productDate === undefined
+      ? {}
+      : { productDate: normalized.productDate }),
     retryable: normalized.retryable,
+    ...(normalized.serverNow === undefined
+      ? {}
+      : { serverNow: normalized.serverNow }),
     status: normalized.status,
   };
 }
@@ -111,6 +120,15 @@ export class ApiExceptionFilter implements ExceptionFilter {
         : {
             details: normalized.details,
           };
+    const responseNow = normalized.serverNow ?? new Date();
+    let productDate = normalized.productDate;
+    if (productDate === undefined) {
+      try {
+        productDate = resolveProductDate(responseNow).productDate;
+      } catch {
+        productDate = undefined;
+      }
+    }
 
     response.setHeader("X-Request-Id", context.requestId);
     if (
@@ -125,7 +143,8 @@ export class ApiExceptionFilter implements ExceptionFilter {
     response.status(normalized.status).json({
       ok: false,
       request_id: context.requestId,
-      server_now: new Date().toISOString(),
+      server_now: responseNow.toISOString(),
+      ...(productDate === undefined ? {} : { product_date: productDate }),
       error: {
         code: normalized.code,
         category: normalized.category,

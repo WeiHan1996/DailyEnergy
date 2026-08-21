@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:f8b463f030111a9949c151c62335e8e642d41fa47e50194a9da01a979492fc12
+// source-fingerprint: sha256:d909189d5fa5e56665344f5ed89004f633439adb2e9c04e484ee12eebed88c66
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:f8b463f030111a9949c151c62335e8e642d41fa47e50194a9da01a979492fc12";
+  "sha256:d909189d5fa5e56665344f5ed89004f633439adb2e9c04e484ee12eebed88c66";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -36,6 +36,9 @@ export const JSON_SCHEMA_IDS = {
   clientWeeklySummaryView:
     "urn:dailyenergy:schema:client-weekly-summary-view:1.0.0",
   wechatSessionRequest: "urn:dailyenergy:schema:wechat-session-request:1.0.0",
+  checkinSubmitRequest: "urn:dailyenergy:schema:checkin-submit-request:1.0.0",
+  checkinCorrectRequest: "urn:dailyenergy:schema:checkin-correct-request:1.0.0",
+  checkinView: "urn:dailyenergy:schema:checkin-view:1.0.0",
 } as const;
 
 export const jsonSchemas = {
@@ -3936,6 +3939,151 @@ export const jsonSchemas = {
       },
     },
     required: ["code"],
+    type: "object",
+  },
+  checkinSubmitRequest: {
+    $id: "urn:dailyenergy:schema:checkin-submit-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      energy: {
+        enum: ["EMPTY", "LOW", "STEADY", "HIGH", "FULL", "UNSURE"],
+        type: "string",
+      },
+      expected_revision: {
+        const: 0,
+        type: "number",
+      },
+      mood: {
+        enum: ["VERY_LOW", "LOW", "STEADY", "GOOD", "LIGHT", "UNSURE"],
+        type: "string",
+      },
+      sleep: {
+        enum: ["POOR", "LOW", "OKAY", "GOOD", "UNSURE"],
+        type: "string",
+      },
+    },
+    required: ["command_ref", "expected_revision", "energy", "mood", "sleep"],
+    type: "object",
+  },
+  checkinCorrectRequest: {
+    $id: "urn:dailyenergy:schema:checkin-correct-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      energy: {
+        enum: ["EMPTY", "LOW", "STEADY", "HIGH", "FULL", "UNSURE"],
+        type: "string",
+      },
+      expected_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      mood: {
+        enum: ["VERY_LOW", "LOW", "STEADY", "GOOD", "LIGHT", "UNSURE"],
+        type: "string",
+      },
+      sleep: {
+        enum: ["POOR", "LOW", "OKAY", "GOOD", "UNSURE"],
+        type: "string",
+      },
+    },
+    required: ["command_ref", "expected_revision", "energy", "mood", "sleep"],
+    type: "object",
+  },
+  checkinView: {
+    $id: "urn:dailyenergy:schema:checkin-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      checkin_ref: {
+        format: "uuid",
+        pattern:
+          "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+        type: "string",
+      },
+      energy: {
+        enum: ["EMPTY", "LOW", "STEADY", "HIGH", "FULL", "UNSURE"],
+        type: "string",
+      },
+      mood: {
+        enum: ["VERY_LOW", "LOW", "STEADY", "GOOD", "LIGHT", "UNSURE"],
+        type: "string",
+      },
+      product_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+      revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      sleep: {
+        enum: ["POOR", "LOW", "OKAY", "GOOD", "UNSURE"],
+        type: "string",
+      },
+      updated_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      write_window: {
+        enum: ["OPEN", "CONTINUATION_ONLY", "CLOSED"],
+        type: "string",
+      },
+    },
+    required: [
+      "checkin_ref",
+      "product_date",
+      "revision",
+      "energy",
+      "mood",
+      "sleep",
+      "write_window",
+      "updated_at",
+    ],
     type: "object",
   },
 } as const;

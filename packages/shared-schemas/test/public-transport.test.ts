@@ -1,4 +1,7 @@
 import {
+  CheckinCorrectRequestSchema,
+  CheckinSubmitRequestSchema,
+  CheckinViewSchema,
   ConsentAcceptRequestSchema,
   MemoryPreferencesUpdateRequestSchema,
   NotificationPermissionSyncRequestSchema,
@@ -86,6 +89,72 @@ describe("C-002 public transport schemas", () => {
         observed_at: "not-a-date",
         observed_permission: "GRANTED",
       }).success,
+    ).toBe(false);
+  });
+});
+
+describe("C-004 check-in transport schemas", () => {
+  const command_ref = "01JABCDEFGHJKMNPQRSTVWXYZ";
+  const values = {
+    energy: "UNSURE" as const,
+    mood: "UNSURE" as const,
+    sleep: "UNSURE" as const,
+  };
+
+  it("accepts all three explicit values, including UNSURE", () => {
+    expect(
+      CheckinSubmitRequestSchema.safeParse({
+        command_ref,
+        expected_revision: 0,
+        ...values,
+      }).success,
+    ).toBe(true);
+    expect(
+      CheckinCorrectRequestSchema.safeParse({
+        command_ref,
+        expected_revision: 1,
+        ...values,
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects missing, forged owner/date and invalid revision fields", () => {
+    for (const input of [
+      { command_ref, expected_revision: 0, mood: "STEADY", sleep: "OKAY" },
+      {
+        account_id: "forged-owner",
+        command_ref,
+        expected_revision: 0,
+        product_date: "2026-08-21",
+        ...values,
+      },
+      { command_ref, expected_revision: 1, ...values },
+    ]) {
+      expect(CheckinSubmitRequestSchema.safeParse(input).success).toBe(false);
+    }
+    expect(
+      CheckinCorrectRequestSchema.safeParse({
+        command_ref,
+        expected_revision: 0,
+        ...values,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("keeps the check-in client view closed and date-bound", () => {
+    const view = {
+      checkin_ref: "11111111-1111-4111-8111-111111111111",
+      energy: "STEADY" as const,
+      mood: "GOOD" as const,
+      product_date: "2026-08-21",
+      revision: 2,
+      sleep: "OKAY" as const,
+      updated_at: "2026-08-21T01:00:00.000Z",
+      write_window: "OPEN" as const,
+    };
+    expect(CheckinViewSchema.safeParse(view).success).toBe(true);
+    expect(
+      CheckinViewSchema.safeParse({ ...view, account_id: "internal" }).success,
     ).toBe(false);
   });
 });
