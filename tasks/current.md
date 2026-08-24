@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c011-day-lighting`
 - **Stacked base**：[C-010 Draft PR #163](https://github.com/WeiHan1996/DailyEnergy/pull/163)，verified head `e6dc3717ad94799ab821e6d5c983dec6dd568043`
 - **任务 Issue**：[C-011 Issue #63](https://github.com/WeiHan1996/DailyEnergy/issues/63)
-- **Draft PR**：待创建；base=`agent/c010-action-task`
+- **Draft PR**：[PR #164](https://github.com/WeiHan1996/DailyEnergy/pull/164)；base=`agent/c010-action-task`
 - **下一候选任务**：C-012 — 晚间反馈（Planned；C-011 final-head CI 验证后启动）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -70,8 +70,8 @@
 
 ## 6. 精确下一动作
 
-1. 提交 C-011、推送 `agent/c011-day-lighting`，创建 base=`agent/c010-action-task` 的 stacked Draft PR；
-2. 回填 PR、final head 与 CI run，等待精确 final head 11/11 SUCCESS；
+1. 推送 PR #164 handoff 回填，确认 base、Draft、Issue 与 remote head 一致；
+2. 等待精确 final head 的 11/11 CI SUCCESS；
 3. 从 verified C-011 final head 创建 `agent/c012-evening-feedback` 并切换 durable current task；
 4. C-011 PR/Issue 保持 Draft/Open，manual evidence 等待 C-015 后统一审核。
 
