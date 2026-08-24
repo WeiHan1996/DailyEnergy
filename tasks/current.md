@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c012-evening-feedback`
 - **Stacked base**：[C-011 Draft PR #164](https://github.com/WeiHan1996/DailyEnergy/pull/164)，verified head `3ca1105b676cc01b6af1d9d6b4f1bf28e84d7589`
 - **任务 Issue**：[C-012 Issue #64](https://github.com/WeiHan1996/DailyEnergy/issues/64)
-- **Draft PR**：待创建；base=`agent/c011-day-lighting`
+- **Draft PR**：[PR #165](https://github.com/WeiHan1996/DailyEnergy/pull/165)；base=`agent/c011-day-lighting`
 - **下一候选任务**：C-013 — 七天趋势（Planned；C-012 final-head CI 验证后启动）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -67,8 +67,8 @@
 
 ## 6. 精确下一动作
 
-1. 提交 C-012、推送 `agent/c012-evening-feedback`，创建 base=`agent/c011-day-lighting` 的 stacked Draft PR；
-2. 回填 PR 并等待精确 final head 的 11/11 CI SUCCESS；
+1. 推送 PR #165 handoff 回填，确认 base、Draft、Issue 与 remote head 一致；
+2. 等待精确 final head 的 11/11 CI SUCCESS；
 3. 从 verified C-012 final head 创建 `agent/c013-seven-day-trends` 并切换 durable current task；
 4. C-012 PR/Issue 保持 Draft/Open，manual evidence 等待 C-015 后统一审核。
 
