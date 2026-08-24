@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c010-action-task`
 - **Stacked base**：[C-009 Draft PR #162](https://github.com/WeiHan1996/DailyEnergy/pull/162)，verified head `941c302995935b763dae3b45c5a56fddf68bdae2`
 - **任务 Issue**：[C-010 Issue #61](https://github.com/WeiHan1996/DailyEnergy/issues/61)
-- **Draft PR**：待创建；计划 base=`agent/c009-today-content-page`
+- **Draft PR**：[PR #163](https://github.com/WeiHan1996/DailyEnergy/pull/163)；base=`agent/c009-today-content-page`
 - **下一候选任务**：C-011 — 点亮与连续记录（Planned；C-010 final-head CI 验证后启动）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -68,8 +68,8 @@
 
 ## 6. 精确下一动作
 
-1. 提交并推送 `agent/c010-action-task`，创建 base=`agent/c009-today-content-page` 的 stacked Draft PR；
-2. 回写 PR 链接并等待同一 final head 的 11/11 CI SUCCESS；
+1. 推送 PR #163 handoff 回写，确认 base、Draft、Issue 与 remote head 一致；
+2. 等待同一 final head 的 11/11 CI SUCCESS；
 3. 保持 Issue #61 Open、PR Draft，不运行 exact-head merge verifier；
 4. 从 verified C-010 final head 创建 `agent/c011-day-lighting` 并恢复 C-011 上下文。
 
