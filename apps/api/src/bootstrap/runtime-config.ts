@@ -60,6 +60,11 @@ const RuntimeConfigValueShape = {
   DAILYENERGY_PRODUCT_DATE_POLICY_VERSION: z.literal(
     PRODUCT_DATE_POLICY_VERSION,
   ),
+  DAILYENERGY_REDIS_KEY_PREFIX: z
+    .string()
+    .regex(/^[a-z0-9][a-z0-9-]{0,63}$/u)
+    .optional(),
+  DAILYENERGY_REDIS_URL: z.url().optional(),
   DAILYENERGY_RELEASE_ID: z.string().regex(RELEASE_ID_PATTERN),
   DAILYENERGY_RUNTIME_PROFILE: z.literal("API"),
   DAILYENERGY_SHUTDOWN_GRACE_MS: PositiveMillisecondsSchema.default(10_000),
@@ -105,6 +110,16 @@ function validateRuntimeValues(
       code: "custom",
       message: "port must be in the range 1..65535",
       path: ["DAILYENERGY_PORT"],
+    });
+  }
+  if (
+    (value.DAILYENERGY_REDIS_URL === undefined) !==
+    (value.DAILYENERGY_REDIS_KEY_PREFIX === undefined)
+  ) {
+    context.addIssue({
+      code: "custom",
+      message: "Redis URL and key prefix must be configured together",
+      path: ["DAILYENERGY_REDIS_URL"],
     });
   }
   if (
@@ -189,6 +204,10 @@ export interface RuntimeConfig {
   readonly maintenanceMode: MaintenanceMode;
   readonly port: number;
   readonly productDatePolicyVersion: typeof PRODUCT_DATE_POLICY_VERSION;
+  readonly redisCache?: {
+    readonly keyPrefix: string;
+    readonly redisUrl: string;
+  };
   readonly releaseId: string;
   readonly runtimeProfile: "API";
   readonly shutdownGraceMs: number;
@@ -269,6 +288,8 @@ export function calculateRuntimeFingerprints(
       port: input.DAILYENERGY_PORT,
       product_date_policy_version:
         input.DAILYENERGY_PRODUCT_DATE_POLICY_VERSION,
+      redis_key_prefix: input.DAILYENERGY_REDIS_KEY_PREFIX ?? "ABSENT",
+      redis_url: input.DAILYENERGY_REDIS_URL ?? "ABSENT",
       release_id: input.DAILYENERGY_RELEASE_ID,
       runtime_profile: input.DAILYENERGY_RUNTIME_PROFILE,
       shutdown_grace_ms: input.DAILYENERGY_SHUTDOWN_GRACE_MS,
@@ -322,6 +343,15 @@ export function loadRuntimeConfig(
     maintenanceMode: input.DAILYENERGY_MAINTENANCE_MODE,
     port: input.DAILYENERGY_PORT,
     productDatePolicyVersion: input.DAILYENERGY_PRODUCT_DATE_POLICY_VERSION,
+    ...(input.DAILYENERGY_REDIS_URL === undefined ||
+    input.DAILYENERGY_REDIS_KEY_PREFIX === undefined
+      ? {}
+      : {
+          redisCache: {
+            keyPrefix: input.DAILYENERGY_REDIS_KEY_PREFIX,
+            redisUrl: input.DAILYENERGY_REDIS_URL,
+          },
+        }),
     releaseId: input.DAILYENERGY_RELEASE_ID,
     runtimeProfile: input.DAILYENERGY_RUNTIME_PROFILE,
     shutdownGraceMs: input.DAILYENERGY_SHUTDOWN_GRACE_MS,

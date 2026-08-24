@@ -53,22 +53,33 @@ export {
   CheckinCorrectRequestSchema,
   CheckinSubmitRequestSchema,
   CheckinViewSchema,
+  GenerationStartRequestSchema,
   WechatSessionRequestSchema,
 } from "./public-transport.js";
 export type {
   CheckinCorrectRequest,
   CheckinSubmitRequest,
   CheckinView,
+  GenerationStartRequest,
   WechatSessionRequest,
 } from "./public-transport.js";
 
 export {
   ClientDailyContentViewSchema,
   DailyInteractionStateSchema,
+  GenerationIntentStatusSchema,
+  GenerationIntentStatusValues,
+  GenerationIntentViewSchema,
+  RelationshipViewSchema,
+  TodayViewSchema,
 } from "./client-daily-content.js";
 export type {
   ClientDailyContentView,
   DailyInteractionState,
+  GenerationIntentStatus,
+  GenerationIntentView,
+  RelationshipView,
+  TodayView,
 } from "./client-daily-content.js";
 
 export {

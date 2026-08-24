@@ -20,11 +20,11 @@ function cloneRegistry() {
 test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () => {
   assert.deepEqual(await loadAndValidateCoverageRegistry(), {
     counts: {
-      COVERED: 271,
+      COVERED: 283,
       NA_WITH_REASON: 0,
-      PLANNED: 516,
+      PLANNED: 508,
     },
-    total: 787,
+    total: 791,
   });
 
   const domainEntries = registry.entries.filter(({ source_id: sourceId }) =>
@@ -85,6 +85,28 @@ test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () =>
       "P13-D22",
       "P13-D23",
       "P13-D24",
+    ],
+  );
+
+  const c008Entries = registry.entries.filter(({ evidence }) =>
+    evidence?.some(
+      ({ origin }) => origin === "tests/registry/c008-evidence-manifest.json",
+    ),
+  );
+  assert.deepEqual(
+    c008Entries.map(({ source_id: sourceId }) => sourceId),
+    [
+      "PDM-D03",
+      "S20-C01",
+      "S20-C03",
+      "S20-C09",
+      "S20-C10",
+      "S20-D02",
+      "S20-D03",
+      "S20-D08",
+      "S20-D09",
+      "S20-D10",
+      "S31-TEST-022",
     ],
   );
 });

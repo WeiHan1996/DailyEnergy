@@ -10,10 +10,12 @@ import {
   BACKGROUND_WORKER_MANIFEST,
   BullMqConsumer,
   BullMqProducer,
+  createInteractiveGenerationHandlers,
   fingerprintCapabilityManifest,
   INTERACTIVE_WORKER_MANIFEST,
   OutboxRelay,
   OutboxRelayCrashError,
+  PostgresDailyGenerationRuntime,
   PostgresQueueStore,
   QueueRetryableError,
   QueueTerminalError,
@@ -188,7 +190,7 @@ async function insertDataTask(
   { expires = "now() + interval '1 day'", kind = "DELETE" } = {},
 ) {
   const taskId = randomUUID();
-  const targetKey = `synthetic-${taskId}`;
+  const targetKey = new Date().toISOString().slice(0, 10);
   const retentionAnchor = expires.includes(" - interval")
     ? "now() - interval '1 day'"
     : "now()";
@@ -275,6 +277,82 @@ async function count(admin, table, predicate, values = []) {
   return result.rows[0].count;
 }
 
+async function createReadyQueueDay({
+  adapters,
+  now,
+  ordinal,
+  productDate,
+  stores,
+}) {
+  const session = await stores.auth.establishSession({
+    identity: {
+      keyVersion: "synthetic-key-v1",
+      providerCode: "WECHAT_MINIAPP",
+      subjectCiphertext: hash(`c008:queue:identity:${ordinal}`),
+      subjectLookupToken: hash(`c008:queue:lookup:${ordinal}`),
+    },
+    newAccount: {
+      ownerScopeToken: hash(`c008:queue:owner:${ordinal}`),
+      stableSubjectCiphertext: adapters.protectDevelopmentSubject(
+        `synthetic:c008:queue:${ordinal}`,
+      ),
+      stableSubjectKeyVersion: adapters.DEVELOPMENT_SUBJECT_KEY_VERSION,
+    },
+    now,
+    session: {
+      expiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60_000),
+      issuedAt: now,
+      tokenHash: hash(`c008:queue:session:${ordinal}`),
+    },
+  });
+  assert.equal(session.status, "ACTIVE");
+  if (session.status !== "ACTIVE") {
+    throw new Error("C008_QUEUE_ACCOUNT_SETUP_FAILED");
+  }
+  const accountId = session.session.accountId;
+  assert.equal(
+    (
+      await stores.consent.acceptConsent({
+        accountId,
+        commandRef: `c008-queue-consent-${ordinal}`,
+        normalizedPayloadFingerprint: hash(`c008:queue:consent:${ordinal}`),
+        noticeVersion: "necessary-consent-v1",
+        now: new Date(now.getTime() + 1),
+      })
+    ).status,
+    "ACCEPTED",
+  );
+  assert.equal(
+    (
+      await stores.consent.completeOnboarding({
+        accountId,
+        commandRef: `c008-queue-onboarding-${ordinal}`,
+        expressionStyle: "BALANCED",
+        normalizedPayloadFingerprint: hash(`c008:queue:onboarding:${ordinal}`),
+        now: new Date(now.getTime() + 2),
+      })
+    ).status,
+    "ACCEPTED",
+  );
+  assert.equal(
+    (
+      await stores.checkin.submit({
+        accountId,
+        commandRef: `c008-queue-checkin-${ordinal}`,
+        energy: "STEADY",
+        mood: "GOOD",
+        normalizedPayloadFingerprint: hash(`c008:queue:checkin:${ordinal}`),
+        now: new Date(now.getTime() + 3),
+        productDate,
+        productDatePolicyVersion: "product-date-v1",
+        sleep: "OKAY",
+      })
+    ).status,
+    "ACCEPTED",
+  );
+  return accountId;
+}
+
 test(
   "T-QUEUE-INTEGRATION-001 real Redis 8, BullMQ 5 and PostgreSQL 18 resilience",
   {
@@ -297,9 +375,233 @@ test(
         DATABASE_URL: loginUrls.migration,
         PRISMA_BIN: prismaBin,
       });
+      await runNode("tooling/database/seed.mjs", { DATABASE_URL: adminUrl });
       const { Client } = loadPg();
       const admin = await connectAdmin(Client, adminUrl);
       try {
+        await t.test(
+          "C-008 outbox/inbox publishes once and Redis cache loss rebuilds from PostgreSQL",
+          async () => {
+            await redisContainer.exec(["redis-cli", "FLUSHALL"]);
+            const apiAdapters =
+              await import("../../packages/server-adapters/dist/api/index.js");
+            const { resolveProductDate } =
+              await import("../../packages/server-core/dist/modules/product-time/public/index.js");
+            const now = new Date();
+            const productDate = resolveProductDate(now).productDate;
+            const auth = await apiAdapters.PostgresAuthStore.connect({
+              applicationName: "c008-queue-auth",
+              connectionLimit: 2,
+              connectionString: loginUrls.api,
+              expectedDatabaseRole: "daily_energy_api",
+            });
+            const consent =
+              await apiAdapters.PostgresConsentProfileStore.connect({
+                applicationName: "c008-queue-consent",
+                connectionLimit: 2,
+                connectionString: loginUrls.api,
+                expectedDatabaseRole: "daily_energy_api",
+              });
+            const checkin = await apiAdapters.PostgresCheckinStore.connect({
+              applicationName: "c008-queue-checkin",
+              connectionLimit: 2,
+              connectionString: loginUrls.api,
+              expectedDatabaseRole: "daily_energy_api",
+            });
+            const cache = await apiAdapters.RedisDailyContentCache.connect({
+              keyPrefix: "c008-queue-cache",
+              redisUrl,
+            });
+            const generation =
+              await apiAdapters.PostgresDailyGenerationStore.connect({
+                applicationName: "c008-queue-generation",
+                cache,
+                connectionLimit: 4,
+                connectionString: loginUrls.api,
+                expectedDatabaseRole: "daily_energy_api",
+              });
+            const runtime = await PostgresDailyGenerationRuntime.connect({
+              applicationName: "c008-queue-runtime",
+              connectionLimit: 4,
+              connectionString: loginUrls.interactive,
+              expectedDatabaseRole: "daily_energy_interactive",
+            });
+            const interactiveStore = await connectStore(
+              "worker-interactive",
+              loginUrls.interactive,
+              INTERACTIVE_WORKER_MANIFEST,
+            );
+            const backgroundStore = await connectStore(
+              "worker-background",
+              loginUrls.background,
+              BACKGROUND_WORKER_MANIFEST,
+            );
+            const producer = await BullMqProducer.connect(
+              redisUrl,
+              "c008-generation-pipeline",
+            );
+            const telemetry = [];
+            let ackCrashInjected = false;
+            const handlers = createInteractiveGenerationHandlers({
+              executeIntent: (intentRef) =>
+                runtime.executeIntent(intentRef, {
+                  now: () => new Date(now.getTime() + 1_000),
+                }),
+            });
+            const consumer = await BullMqConsumer.connect(
+              INTERACTIVE_WORKER_MANIFEST,
+              queueConfig(
+                INTERACTIVE_WORKER_MANIFEST,
+                redisUrl,
+                "c008-generation-pipeline",
+              ),
+              handlers,
+              interactiveStore,
+              { record: (item) => telemetry.push(item) },
+              {
+                async afterInboxCommitBeforeAck() {
+                  if (!ackCrashInjected) {
+                    ackCrashInjected = true;
+                    throw new Error("synthetic commit-before-ack crash");
+                  }
+                },
+              },
+            );
+            try {
+              const accountId = await createReadyQueueDay({
+                adapters: apiAdapters,
+                now,
+                ordinal: 1,
+                productDate,
+                stores: { auth, checkin, consent },
+              });
+              const started = await generation.start({
+                accountId,
+                commandRef: "c008-queue-generation-1",
+                expectedCheckinRevision: 1,
+                normalizedPayloadFingerprint: hash("c008:queue:generation:1"),
+                now: new Date(now.getTime() + 10),
+                productDate,
+                productDatePolicyVersion: "product-date-v1",
+              });
+              assert.equal(started.status, "ACCEPTED");
+              if (started.status !== "ACCEPTED") {
+                throw new Error("C008_QUEUE_INTENT_MISSING");
+              }
+              const eventId = (
+                await admin.query(
+                  `SELECT id FROM runtime_outbox_event
+                    WHERE "aggregateRef"=$1
+                      AND "eventType"='GenerationIntentAccepted'`,
+                  [started.value.intent_ref],
+                )
+              ).rows[0].id;
+              await new OutboxRelay({
+                producer,
+                store: backgroundStore,
+              }).relayOnce();
+              await waitForJob(producer, "interactive", eventId, "completed");
+              assert.equal(
+                await count(
+                  admin,
+                  "app_published_daily_result",
+                  '"generationIntentId"=$1',
+                  [started.value.intent_ref],
+                ),
+                1,
+              );
+              assert.equal(
+                await count(
+                  admin,
+                  "runtime_inbox_receipt",
+                  '"consumerCode"=$1 AND "eventId"=$2',
+                  ["interactive-generation", eventId],
+                ),
+                1,
+              );
+              assert.ok(
+                telemetry.some(
+                  ({ outcomeCode }) => outcomeCode === "DUPLICATE",
+                ),
+              );
+
+              const beforeLoss = await generation.getToday({
+                accountId,
+                productDate,
+              });
+              assert.equal(beforeLoss.status, "FOUND");
+              await redisContainer.exec(["redis-cli", "FLUSHALL"]);
+              const afterLoss = await generation.getToday({
+                accountId,
+                productDate,
+              });
+              assert.equal(afterLoss.status, "FOUND");
+              assert.deepEqual(afterLoss, beforeLoss);
+              const cacheKeys = await redisContainer.exec([
+                "redis-cli",
+                "--scan",
+                "--pattern",
+                "c008-queue-cache:*",
+              ]);
+              assert.notEqual(cacheKeys.output.trim(), "");
+              const deletionTaskRef = randomUUID();
+              await admin.query(
+                `INSERT INTO restricted_data_task
+                  (id,"accountId",kind,scope,"targetType","targetKey",
+                   "activeSlot",state,revision,"confirmationVersion",
+                   "requestedAt","failureScopeCodes",
+                   "retentionPolicyVersion","retentionAnchorAt")
+                 VALUES ($1,$2,'DELETE','DAY','DAY',$3,true,'QUEUED',1,
+                         'confirmation-v1',$4,ARRAY[]::text[],
+                         'retention-policy-v1',$4)`,
+                [deletionTaskRef, accountId, productDate, now],
+              );
+              await admin.query(
+                `INSERT INTO restricted_deletion_guard
+                  (id,"accountId",scope,"targetKey",revision,
+                   "deletionEpoch","taskRef","semanticBlockedAt",
+                   "retentionPolicyVersion","retentionAnchorAt")
+                 VALUES (gen_random_uuid(),$1,'DAY',$2,1,1,$3,$4,
+                         'retention-policy-v1',$4)`,
+                [accountId, productDate, deletionTaskRef, now],
+              );
+              assert.equal(
+                await generation
+                  .getToday({ accountId, productDate })
+                  .then(({ status }) => status),
+                "STATE_PRECONDITION_FAILED",
+              );
+              await admin.query(
+                `DELETE FROM restricted_deletion_guard WHERE "taskRef"=$1`,
+                [deletionTaskRef],
+              );
+              await admin.query(
+                `DELETE FROM restricted_data_task WHERE id=$1`,
+                [deletionTaskRef],
+              );
+              assert.equal(
+                await count(
+                  admin,
+                  "app_published_daily_result",
+                  '"accountId"=$1 AND "productDate"=$2',
+                  [accountId, productDate],
+                ),
+                1,
+              );
+            } finally {
+              await consumer.drain(2_000);
+              await producer.close();
+              await backgroundStore.close();
+              await interactiveStore.close();
+              await runtime.close();
+              await generation.close();
+              await checkin.close();
+              await consent.close();
+              await auth.close();
+            }
+          },
+        );
+
         await t.test(
           "S29-ARCH-018/S31-TEST-025 relay crash replays one domain effect",
           async () => {
@@ -728,7 +1030,7 @@ test(
             redisUrl = replacement.url;
             await admin.query(
               `UPDATE app_generation_intent
-               SET state='CANCELLED', "updatedAt"=now()
+               SET state='CANCELLED',revision=revision+1,"updatedAt"=now()
                WHERE state IN ('QUEUED','RUNNING','FALLBACK_RUNNING','RETRYABLE_FAILED')`,
             );
             await admin.query("DELETE FROM runtime_inbox_receipt");

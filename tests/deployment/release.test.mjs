@@ -1427,6 +1427,9 @@ test("T-E012-DEPLOY-001 keeps Docker builds, public bindings and raw secrets out
   assert.ok(
     environment.includes("DAILYENERGY_REDIS_KEY_PREFIX=dailyenergy-dev\n"),
   );
+  assert.ok(
+    environment.includes("DAILYENERGY_API_REDIS_URL=redis://redis:6379\n"),
+  );
   assert.equal(
     environment.includes(
       `DAILYENERGY_REDIS_KEY_PREFIX=dailyenergy-dev-${value.release_id}`,

@@ -1,10 +1,4 @@
-import {
-  createCipheriv,
-  createHash,
-  createHmac,
-  randomBytes,
-  randomUUID,
-} from "node:crypto";
+import { createHash, randomBytes, randomUUID } from "node:crypto";
 
 import { Inject, Injectable } from "@nestjs/common";
 import type {
@@ -12,6 +6,11 @@ import type {
   AuthStore,
   NewSessionMaterial,
   ProtectedExternalIdentity,
+} from "@daily-energy/server-adapters/api";
+import {
+  DEVELOPMENT_SUBJECT_KEY_VERSION,
+  developmentSubjectLookupToken,
+  protectDevelopmentSubject,
 } from "@daily-energy/server-adapters/api";
 import type { WechatSessionRequest } from "@daily-energy/shared-schemas";
 
@@ -30,10 +29,6 @@ import {
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1_000;
 const SESSION_REFRESH_AFTER_MS = 15 * 24 * 60 * 60 * 1_000;
 const WECHAT_EXCHANGE_TIMEOUT_MS = 3_000;
-const DEVELOPMENT_KEY_VERSION = "development-synthetic-v1";
-const DEVELOPMENT_KEY = createHash("sha256")
-  .update("dailyenergy-c001-development-synthetic-identity-v1", "utf8")
-  .digest();
 
 export interface SessionResponse {
   readonly account_state: "ACTIVE";
@@ -74,10 +69,10 @@ export class AuthService implements SessionResolver {
         identity: protectIdentity(identity.providerCode, identity.subject),
         newAccount: {
           ownerScopeToken: randomBytes(32),
-          stableSubjectCiphertext: encryptSyntheticSubject(
+          stableSubjectCiphertext: protectDevelopmentSubject(
             `stable:${randomUUID()}`,
           ),
-          stableSubjectKeyVersion: DEVELOPMENT_KEY_VERSION,
+          stableSubjectKeyVersion: DEVELOPMENT_SUBJECT_KEY_VERSION,
         },
         now,
         session,
@@ -259,25 +254,11 @@ function protectIdentity(
   subject: string,
 ): ProtectedExternalIdentity {
   return {
-    keyVersion: DEVELOPMENT_KEY_VERSION,
+    keyVersion: DEVELOPMENT_SUBJECT_KEY_VERSION,
     providerCode,
-    subjectCiphertext: encryptSyntheticSubject(subject),
-    subjectLookupToken: createHmac("sha256", DEVELOPMENT_KEY)
-      .update(providerCode, "utf8")
-      .update("\u0000", "utf8")
-      .update(subject, "utf8")
-      .digest(),
+    subjectCiphertext: protectDevelopmentSubject(subject),
+    subjectLookupToken: developmentSubjectLookupToken(providerCode, subject),
   };
-}
-
-function encryptSyntheticSubject(subject: string): Buffer {
-  const iv = randomBytes(12);
-  const cipher = createCipheriv("aes-256-gcm", DEVELOPMENT_KEY, iv);
-  const ciphertext = Buffer.concat([
-    cipher.update(subject, "utf8"),
-    cipher.final(),
-  ]);
-  return Buffer.concat([iv, cipher.getAuthTag(), ciphertext]);
 }
 
 class ExchangeTimeoutError extends Error {}

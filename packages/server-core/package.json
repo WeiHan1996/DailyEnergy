@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./content-publication": {
+      "types": "./dist/modules/content-publication/public/index.d.ts",
+      "import": "./dist/modules/content-publication/public/index.js"
+    },
     "./generation": {
       "types": "./dist/modules/generation/public/index.d.ts",
       "import": "./dist/modules/generation/public/index.js"

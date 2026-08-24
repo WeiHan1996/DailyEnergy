@@ -108,6 +108,10 @@ export interface QueueJobHandler {
     envelope: VersionedJobEnvelope,
     transaction: QueueTransaction,
   ): Promise<string>;
+  afterCommit?(
+    envelope: VersionedJobEnvelope,
+    outcomeCode: string,
+  ): Promise<void>;
 }
 
 export function handlerKey(eventType: string, eventVersion: string): string {

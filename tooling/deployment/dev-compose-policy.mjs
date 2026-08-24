@@ -210,6 +210,7 @@ function mergedComposeModel() {
     DAILYENERGY_ADMIN_IMAGE: "synthetic-admin-image",
     DAILYENERGY_API_CAPABILITY_FINGERPRINT: "a".repeat(64),
     DAILYENERGY_API_DEPLOY_FINGERPRINT: "b".repeat(64),
+    DAILYENERGY_API_REDIS_URL: "redis://redis:6379",
     DAILYENERGY_CONFIG_DIR: "/srv/dailyenergy/config",
     DAILYENERGY_COS_CONFIG_REF: "dev-cos-config-v1",
     DAILYENERGY_COS_SECRET_DIR:

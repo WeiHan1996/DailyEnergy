@@ -62,6 +62,23 @@ export {
 } from "../product-time/postgres-product-time-store.js";
 
 export {
+  PostgresDailyGenerationStore,
+  UNAVAILABLE_DAILY_GENERATION_STORE,
+  type DailyGenerationStore,
+  type GenerationGuardFailure,
+  type GenerationIntentQueryResult,
+  type GenerationStartResult,
+  type PostgresDailyGenerationStoreConfig,
+  type TodayQueryResult,
+} from "../generation/postgres-daily-generation-store.js";
+export {
+  RedisDailyContentCache,
+  UNAVAILABLE_DAILY_CONTENT_CACHE,
+  type DailyContentCache,
+  type DailyContentCacheIdentity,
+} from "../generation/daily-content-cache.js";
+
+export {
   PostgresCheckinStore,
   UNAVAILABLE_CHECKIN_STORE,
   type CheckinGuardFailure,
@@ -106,3 +123,9 @@ export type {
   DatabaseFactory,
   DatabaseFactoryConfig,
 } from "../db/internal/contracts.js";
+
+export {
+  DEVELOPMENT_SUBJECT_KEY_VERSION,
+  developmentSubjectLookupToken,
+  protectDevelopmentSubject,
+} from "../identity/development-protected-subject.js";

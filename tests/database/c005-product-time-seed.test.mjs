@@ -80,7 +80,7 @@ async function insertDailyPublication(client, accountId) {
         "manifestFingerprint","inputSnapshotFingerprint","rootSeedMaterialRef",
         "completionGrantVersion","updatedAt","retentionPolicyVersion",
         "retentionAnchorAt","expiresAt")
-     VALUES ($1,$2,$3::date,'product-date-v1',$4::timestamptz,1,'QUEUED','daily-v1',
+     VALUES ($1,$2,$3::date,'product-date-v1',$4::timestamptz,1,'RUNNING','daily-v1',
              'manifest-ref-daily-v1',$5,$6,'root-seed-ref-v1','grant-v1',
              $4::timestamptz,'retention-policy-v1',$4::timestamptz,
              $4::timestamptz+interval '7 days')`,

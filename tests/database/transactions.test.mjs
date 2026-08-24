@@ -119,7 +119,7 @@ async function dailyPublication(client, accountId, productDate, suffix) {
       (id,"accountId","targetProductDate","productDatePolicyVersion","acceptedAt",revision,state,
        "resultVersion","manifestRef","manifestFingerprint","inputSnapshotFingerprint","rootSeedMaterialRef",
        "completionGrantVersion","createdAt","updatedAt","retentionPolicyVersion","retentionAnchorAt")
-     VALUES ($1,$2,$3,'product-date-v1',$4,1,'QUEUED','result-v1','manifest-v1',$5,$6,'seed-v1',
+     VALUES ($1,$2,$3,'product-date-v1',$4,1,'RUNNING','result-v1','manifest-v1',$5,$6,'seed-v1',
              'grant-v1',$4,$4,'retention-policy-v1',$4)`,
     [
       intentId,

@@ -392,8 +392,7 @@ async function grantGuardReason(
          ON visibility."resultId"=result.id
       WHERE result.id=$1::uuid AND result."accountId"=$2::uuid
         AND result."productDate"=$3::date
-        AND visibility.state IN ('AVAILABLE', 'FALLBACK_ONLY')
-      FOR SHARE OF visibility`,
+        AND visibility.state IN ('AVAILABLE', 'FALLBACK_ONLY')`,
     [grant.resultRef, grant.ownerRef, grant.productDate],
   );
   return result.rowCount === 1 ? undefined : "RESULT_INVALID";

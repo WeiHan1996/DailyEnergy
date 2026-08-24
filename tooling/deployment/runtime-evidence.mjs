@@ -214,6 +214,8 @@ export async function collectDevRuntimeEvidence(
           DAILYENERGY_MAINTENANCE_MODE: "OFF",
           DAILYENERGY_PORT: "3000",
           DAILYENERGY_PRODUCT_DATE_POLICY_VERSION: "product-date-v1",
+          DAILYENERGY_REDIS_KEY_PREFIX: "dailyenergy-dev",
+          DAILYENERGY_REDIS_URL: "redis://redis:6379",
           DAILYENERGY_RELEASE_ID: releaseId,
           DAILYENERGY_RUNTIME_PROFILE: "API",
           DAILYENERGY_SHUTDOWN_GRACE_MS: "5000",

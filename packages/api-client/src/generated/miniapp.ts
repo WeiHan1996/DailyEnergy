@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:f0d7840a96f4a66fe0a833bc9ea4fdd40c80ed02837adfe9ff706c3ad66a1b47
+// source-fingerprint: sha256:3b2f6bbc3972d3af739d5b1453f4b4f094f0812dd96d2927a4a222aa3fcc48f4
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:f0d7840a96f4a66fe0a833bc9ea4fdd40c80ed02837adfe9ff706c3ad66a1b47";
+  "sha256:3b2f6bbc3972d3af739d5b1453f4b4f094f0812dd96d2927a4a222aa3fcc48f4";
 
 export interface paths {
   "/auth/reauth/verify": {
@@ -840,9 +840,9 @@ export interface components {
       reason: components["schemas"]["VersionToken"];
     };
     GenerationIntentView: {
-      intent_ref: components["schemas"]["OpaqueRef"];
-      product_date: components["schemas"]["ProductDate"];
-      result_ref?: components["schemas"]["OpaqueRef"];
+      intent_ref: string;
+      product_date: string;
+      result_ref?: string;
       retry_after_seconds?: number;
       status:
         | "QUEUED"
@@ -855,9 +855,12 @@ export interface components {
       updated_at: string;
     };
     GenerationStartRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      expected_checkin_revision: components["schemas"]["PositiveRevision"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      expected_checkin_revision: number;
     };
     HelpfulnessRating: "HELPFUL" | "NEUTRAL" | "NOT_HELPFUL" | "NOT_USED";
     HelpfulnessUpdateRequest: {
@@ -1057,16 +1060,6 @@ export interface components {
       included_day_product_dates: Array<components["schemas"]["ProductDate"]>;
       relationship_scope: "CURRENT_CYCLE_AND_HISTORY";
     };
-    RelationshipStage:
-      | "BEFORE_FIRST_MEETING"
-      | "NEWLY_MET"
-      | "BECOMING_FAMILIAR"
-      | "FIRST_WEEK_RECORDED";
-    RelationshipView: {
-      display_token?: components["schemas"]["VersionToken"];
-      encounter_day_count: number;
-      stage: components["schemas"]["RelationshipStage"];
-    };
     RequestId: string;
     Revision: number;
     SafetyBlockView: {
@@ -1169,9 +1162,78 @@ export interface components {
     };
     TaskStatus: "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED";
     TodayView: {
-      content: components["schemas"]["ClientDailyContentView"];
-      interaction: components["schemas"]["DailyInteractionView"];
-      relationship: components["schemas"]["RelationshipView"];
+      content: {
+        closing: string;
+        content_label: "娱乐与行动参考";
+        contract: "daily-content-view";
+        core_tip: string;
+        dimensions: Array<{
+          band: "LOW" | "STEADY" | "HIGH";
+          band_label: string;
+          explanation: string;
+          id: "pace" | "action" | "connection" | "resources" | "recovery";
+          is_focus: boolean;
+          label: string;
+        }>;
+        explanation_paragraphs: Array<string>;
+        focus_dimension_id:
+          "pace" | "action" | "connection" | "resources" | "recovery";
+        generated_at: string;
+        greeting: string;
+        optional_task: {
+          instruction: string;
+          task_id: string;
+        };
+        overall: {
+          band: "LOW" | "STEADY" | "HIGH";
+          band_label: string;
+          summary: string;
+        };
+        personalization_notice: "NONE" | "PERSONALIZATION_REDUCED";
+        primary_action: {
+          action_id: string;
+          constraint_label?: string;
+          instruction: string;
+          rationale?: string;
+        };
+        product_date: string;
+        result_id: string;
+        result_version: string;
+        rituals: Array<{
+          display_value: string;
+          kind: "COLOR" | "NUMBER";
+          note: string;
+        }>;
+        schema_version: string;
+        state_response: string;
+      };
+      interaction: {
+        contract: "daily-interaction-state";
+        helpfulness: {
+          rating:
+            "UNRATED" | "HELPFUL" | "NEUTRAL" | "NOT_HELPFUL" | "NOT_USED";
+          revision: number;
+        };
+        is_lit: boolean;
+        product_date: string;
+        result_id: string;
+        schema_version: string;
+        task: {
+          revision: number;
+          status: "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED";
+          task_id: string;
+        };
+        updated_at: string;
+      };
+      relationship: {
+        display_token?: string;
+        encounter_day_count: number;
+        stage:
+          | "BEFORE_FIRST_MEETING"
+          | "NEWLY_MET"
+          | "BECOMING_FAMILIAR"
+          | "FIRST_WEEK_RECORDED";
+      };
     };
     VersionToken: string;
     WechatSessionRequest: {

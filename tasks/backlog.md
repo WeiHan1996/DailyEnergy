@@ -1,9 +1,9 @@
 # DailyEnergy 项目 Backlog
 
 - **文档状态**：Active
-- **最后更新**：2026-08-21
+- **最后更新**：2026-08-24
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：[C-007 本地模板内容](./current.md)已提交 stacked Draft PR #160 并完成自动 Gate；等待 final-head CI 后启动 C-008
+- **当前任务**：[C-008 今日结果幂等与缓存](./current.md)已完成自动 Gate 并进入 In Review；等待 Draft PR final-head CI 后启动 C-009
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -209,7 +209,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | In Review | [Draft PR #158](https://github.com/WeiHan1996/DailyEnergy/pull/158)；等待统一审核          |
 | [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎           | In Review | [Draft PR #159](https://github.com/WeiHan1996/DailyEnergy/pull/159)；等待统一审核          |
 | [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容       | In Review | [Draft PR #160](https://github.com/WeiHan1996/DailyEnergy/pull/160)；等待统一审核          |
-| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | Planned   | 并发唯一、重复读取                                                                         |
+| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | In Review | Draft PR 待创建；自动 Gate PASS，等待统一审核                                              |
 | [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面       | Planned   | 结构化展示和回看                                                                           |
 | [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务           | Planned   | 一个主要行动和可选任务                                                                     |
 | [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | Planned   | 幂等、不惩罚中断                                                                           |

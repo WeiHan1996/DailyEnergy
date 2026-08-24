@@ -2,7 +2,7 @@
   "version": 1,
   "algorithm": "sha256",
   "schema": "daily_energy",
-  "catalogSha256": "78638b19820932d56c38b5a4fa4f1f2818d9a48b9b4308c7f6c2be7bf1a6ba10",
+  "catalogSha256": "d98dec12a49f1ea0977f7da43fd44b9fd11c606365560fb9c171d70f57152830",
   "sections": {
     "schemas": {
       "count": 1,
@@ -33,24 +33,24 @@
       "sha256": "3b676d3489d17fe25eb41d60fcdd2d780fcf8074a9edb34366291fdb8642c6e4"
     },
     "triggers": {
-      "count": 31,
-      "sha256": "8ee85c18005aa5c9da711f5e78dca11f4fae4011bc8a8773dc14156c9afc8fab"
+      "count": 36,
+      "sha256": "62bdc324881b434e05aeac265b3114b801574bea7e942e4444de00f8d8fe6c25"
     },
     "functions": {
-      "count": 29,
-      "sha256": "1be03fc003f91b272f6369db94f53311f68dac5ff0630df335210957ee4c5c2f"
+      "count": 36,
+      "sha256": "1beeeaff4f6614e2950b5a9ec3fb7e1b8567101fe6c841531b6c051fef06f75e"
     },
     "schemaAcl": {
       "count": 9,
       "sha256": "492815ca1e728968e5e46129b8d3bc08803a4a4f7b354755bd42ac1d832e7fa4"
     },
     "relationAcl": {
-      "count": 1603,
-      "sha256": "8b1de950f79128543dec01c1848282e1e9016bbf080b8bc3a858bfd38414dced"
+      "count": 1599,
+      "sha256": "b9edfb6f18734fec0856d96b19b5872eaa63b7d50f74f8b2d1db59966ffb65d6"
     },
     "functionAcl": {
-      "count": 56,
-      "sha256": "95e1c27418e5d74b702559ce671ac06bd2843d0a218618ac890118debc765995"
+      "count": 66,
+      "sha256": "d9f2695df665e5193b91e1fcf9e5d5c2293625e3d2d890050c74b0b02ee5c440"
     },
     "defaultPrivileges": {
       "count": 0,

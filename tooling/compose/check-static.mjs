@@ -54,7 +54,7 @@ const networkAllowlist = Object.freeze({
     "migration_data",
     "restricted_data",
   ],
-  redis: ["background_data", "interactive_data", "restricted_data"],
+  redis: ["api_data", "background_data", "interactive_data", "restricted_data"],
   "worker-background": ["background_data", "background_external"],
   "worker-interactive": ["interactive_data", "interactive_external"],
   "worker-restricted": ["restricted_data", "restricted_external"],

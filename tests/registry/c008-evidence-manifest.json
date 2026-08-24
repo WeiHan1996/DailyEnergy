@@ -1,0 +1,153 @@
+{
+  "manifest_version": "c-008-evidence-v1",
+  "scope": "C-008 unique GenerationIntent, short TX-02/TX-03 publication, PublishGuard, start/status/today API, outbox/inbox recovery and guarded Redis projection cache",
+  "authority": [
+    "docs/decisions/ADR-0002-deterministic-daily-result.md",
+    "docs/decisions/ADR-0005-data-retention-and-deletion.md",
+    "docs/data/domain-model.md",
+    "docs/ai/safety.md",
+    "docs/product/state-machine.md",
+    "docs/technical/api.md",
+    "docs/technical/architecture.md",
+    "docs/technical/database.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C008-CORE-001": {
+      "file": "packages/server-core/src/modules/generation/domain/lifecycle.test.ts",
+      "selector": "C-008 generation lifecycle decisions",
+      "level": "UNIT",
+      "assertions": [
+        "claim and publish decisions reject stale revision, changed guard, closed completion window and terminal state",
+        "existing published facts return the existing result instead of creating another publication"
+      ]
+    },
+    "T-C008-CONTRACT-001": {
+      "file": "apps/api/src/generation/generation.contract.test.ts",
+      "selector": "C-008 generation transport contract",
+      "level": "CONTRACT",
+      "assertions": [
+        "strict start input rejects owner, product date, result version, root seed and guard epoch fields",
+        "OpenAPI start/status/today paths bind the shared request and client-view contracts",
+        "pending, retryable and terminal generation outcomes remain stable typed API errors"
+      ]
+    },
+    "T-C008-E2E-001": {
+      "file": "apps/api/src/generation.e2e.test.ts",
+      "selector": "C-008 HTTP generation flow",
+      "level": "E2E",
+      "assertions": [
+        "double start and same-command replay return one intent while changed payload conflicts",
+        "status and today use owner-scoped resources and expose bounded Retry-After polling",
+        "Today returns only the allowlisted content, interaction and relationship projection",
+        "Safety blocks start, status and Today before ordinary views are exposed",
+        "all three routes use stable low-cardinality operation codes"
+      ]
+    },
+    "T-C008-WORKER-001": {
+      "file": "packages/server-adapters/src/generation/interactive-generation-handler.test.ts",
+      "selector": "interactive generation handler",
+      "level": "UNIT",
+      "assertions": [
+        "Inbox transaction claims one intent before post-commit deterministic execution",
+        "duplicate post-commit recovery safely executes the same intent again",
+        "stale or unknown guard epochs cancel or terminally reject before generation"
+      ]
+    },
+    "T-C008-DB-001": {
+      "file": "tests/database/c008-daily-generation.test.mjs",
+      "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+      "level": "DB",
+      "assertions": [
+        "two starts create one owner/date intent, snapshot and accepted outbox event",
+        "two concurrent publishers leave one immutable result and the loser returns existing",
+        "Safety and DAY deletion arriving before publish cancel the intent and create no result",
+        "deterministic failure becomes terminal and Today exposes only the stable terminal outcome",
+        "non-owner reads are not found and API/Interactive roles keep their reviewed ACL boundaries",
+        "cache-miss Today rebuilds the client projection from the authoritative PostgreSQL AVAILABLE result"
+      ]
+    },
+    "T-C008-QUEUE-001": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "C-008 outbox/inbox publishes once and Redis cache loss rebuilds from PostgreSQL",
+      "level": "INTEGRATION",
+      "assertions": [
+        "real PostgreSQL outbox relays through Redis 8 and BullMQ 5 into the Interactive Inbox handler",
+        "commit-before-ACK retry reuses one InboxReceipt and one published result",
+        "Redis FLUSHALL loses no business fact and Today rebuilds the same projection from PostgreSQL",
+        "a live DAY deletion guard blocks a previously cached Today projection"
+      ]
+    },
+    "T-C008-DEPLOY-001": {
+      "file": "tests/compose/static.test.mjs",
+      "selector": "T-COMPOSE-STATIC-001 accepts the bounded E-009 topology",
+      "level": "STATIC",
+      "assertions": [
+        "API Redis access is limited to the internal api_data network",
+        "Redis configuration participates in the API deploy fingerprint without becoming a startup truth dependency"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "PDM-D03",
+      "status": "COVERED",
+      "proof_ids": ["T-C008-DB-001", "T-C008-QUEUE-001"]
+    },
+    {
+      "source_id": "S20-C01",
+      "status": "COVERED",
+      "proof_ids": ["T-C008-CONTRACT-001", "T-C008-E2E-001"]
+    },
+    {
+      "source_id": "S20-C03",
+      "status": "COVERED",
+      "proof_ids": ["T-C008-CONTRACT-001", "T-C008-E2E-001"]
+    },
+    {
+      "source_id": "S20-C09",
+      "status": "COVERED",
+      "proof_ids": ["T-C008-CONTRACT-001", "T-C008-E2E-001"]
+    },
+    {
+      "source_id": "S20-C10",
+      "status": "COVERED",
+      "proof_ids": ["T-C008-CONTRACT-001", "T-C008-E2E-001"]
+    },
+    {
+      "source_id": "S20-D02",
+      "status": "COVERED",
+      "proof_ids": ["T-C008-CONTRACT-001", "T-C008-E2E-001"]
+    },
+    {
+      "source_id": "S20-D03",
+      "status": "COVERED",
+      "proof_ids": ["T-C008-CONTRACT-001", "T-C008-E2E-001", "T-C008-QUEUE-001"]
+    },
+    {
+      "source_id": "S20-D08",
+      "status": "COVERED",
+      "proof_ids": ["T-C008-CONTRACT-001", "T-C008-E2E-001"]
+    },
+    {
+      "source_id": "S20-D09",
+      "status": "COVERED",
+      "proof_ids": ["T-C008-CONTRACT-001", "T-C008-E2E-001", "T-C008-DB-001"]
+    },
+    {
+      "source_id": "S20-D10",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-C008-CONTRACT-001",
+        "T-C008-E2E-001",
+        "T-C008-DB-001",
+        "T-C008-QUEUE-001"
+      ]
+    },
+    {
+      "source_id": "S31-TEST-022",
+      "status": "COVERED",
+      "proof_ids": ["T-C008-DB-001"]
+    }
+  ]
+}

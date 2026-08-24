@@ -8,7 +8,7 @@ import type {
 } from "@daily-energy/server-adapters/worker-interactive";
 import {
   createWorkerInteractiveDatabaseFactory,
-  startWorkerInteractiveInfrastructure,
+  startWorkerInteractiveRuntime,
   workerInteractiveManifest,
 } from "@daily-energy/server-adapters/worker-interactive";
 
@@ -38,7 +38,7 @@ export function createInteractiveWorkerEntrypoint(
     "worker-interactive",
     unknown
   > = createWorkerInteractiveDatabaseFactory(),
-  infrastructureStarter: WorkerInfrastructureStarter = startWorkerInteractiveInfrastructure,
+  infrastructureStarter: WorkerInfrastructureStarter = startWorkerInteractiveRuntime,
   handlers: readonly QueueJobHandler[] = [],
 ): WorkerEntrypoint {
   return Object.freeze({

@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:2fa7766c8daf534d4aad5f8efb3098fa91e0efe35d272aaa3e2bd80d36454b2f
+// source-fingerprint: sha256:2fa98239cc761da70f4e28a076185245c6958f333c5d35351229d0a57fc24c0d
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:2fa7766c8daf534d4aad5f8efb3098fa91e0efe35d272aaa3e2bd80d36454b2f";
+  "sha256:2fa98239cc761da70f4e28a076185245c6958f333c5d35351229d0a57fc24c0d";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -39,6 +39,11 @@ export const JSON_SCHEMA_IDS = {
   checkinSubmitRequest: "urn:dailyenergy:schema:checkin-submit-request:1.0.0",
   checkinCorrectRequest: "urn:dailyenergy:schema:checkin-correct-request:1.0.0",
   checkinView: "urn:dailyenergy:schema:checkin-view:1.0.0",
+  generationStartRequest:
+    "urn:dailyenergy:schema:generation-start-request:1.0.0",
+  generationIntentView: "urn:dailyenergy:schema:generation-intent-view:1.0.0",
+  relationshipView: "urn:dailyenergy:schema:relationship-view:1.0.0",
+  todayView: "urn:dailyenergy:schema:today-view:1.0.0",
 } as const;
 
 export const jsonSchemas = {
@@ -4084,6 +4089,429 @@ export const jsonSchemas = {
       "write_window",
       "updated_at",
     ],
+    type: "object",
+  },
+  generationStartRequest: {
+    $id: "urn:dailyenergy:schema:generation-start-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      expected_checkin_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+    },
+    required: ["command_ref", "expected_checkin_revision"],
+    type: "object",
+  },
+  generationIntentView: {
+    $id: "urn:dailyenergy:schema:generation-intent-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      intent_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+      product_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+      result_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+      retry_after_seconds: {
+        maximum: 3600,
+        minimum: 0,
+        type: "integer",
+      },
+      status: {
+        enum: [
+          "QUEUED",
+          "RUNNING",
+          "FALLBACK_RUNNING",
+          "RETRYABLE_FAILED",
+          "SUCCEEDED",
+          "TERMINAL_FAILED",
+          "CANCELLED",
+        ],
+        type: "string",
+      },
+      updated_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+    },
+    required: ["intent_ref", "product_date", "status", "updated_at"],
+    type: "object",
+  },
+  relationshipView: {
+    $id: "urn:dailyenergy:schema:relationship-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      display_token: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      encounter_day_count: {
+        maximum: 9007199254740991,
+        minimum: 0,
+        type: "integer",
+      },
+      stage: {
+        enum: [
+          "BEFORE_FIRST_MEETING",
+          "NEWLY_MET",
+          "BECOMING_FAMILIAR",
+          "FIRST_WEEK_RECORDED",
+        ],
+        type: "string",
+      },
+    },
+    required: ["stage", "encounter_day_count"],
+    type: "object",
+  },
+  todayView: {
+    $id: "urn:dailyenergy:schema:today-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      content: {
+        additionalProperties: false,
+        properties: {
+          closing: {
+            type: "string",
+          },
+          content_label: {
+            const: "娱乐与行动参考",
+            type: "string",
+          },
+          contract: {
+            const: "daily-content-view",
+            type: "string",
+          },
+          core_tip: {
+            type: "string",
+          },
+          dimensions: {
+            items: {
+              additionalProperties: false,
+              properties: {
+                band: {
+                  enum: ["LOW", "STEADY", "HIGH"],
+                  type: "string",
+                },
+                band_label: {
+                  type: "string",
+                },
+                explanation: {
+                  type: "string",
+                },
+                id: {
+                  enum: [
+                    "pace",
+                    "action",
+                    "connection",
+                    "resources",
+                    "recovery",
+                  ],
+                  type: "string",
+                },
+                is_focus: {
+                  type: "boolean",
+                },
+                label: {
+                  type: "string",
+                },
+              },
+              required: [
+                "id",
+                "label",
+                "band",
+                "band_label",
+                "explanation",
+                "is_focus",
+              ],
+              type: "object",
+            },
+            maxItems: 5,
+            minItems: 5,
+            type: "array",
+          },
+          explanation_paragraphs: {
+            items: {
+              type: "string",
+            },
+            maxItems: 2,
+            minItems: 1,
+            type: "array",
+          },
+          focus_dimension_id: {
+            enum: ["pace", "action", "connection", "resources", "recovery"],
+            type: "string",
+          },
+          generated_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          greeting: {
+            type: "string",
+          },
+          optional_task: {
+            additionalProperties: false,
+            properties: {
+              instruction: {
+                type: "string",
+              },
+              task_id: {
+                pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                type: "string",
+              },
+            },
+            required: ["task_id", "instruction"],
+            type: "object",
+          },
+          overall: {
+            additionalProperties: false,
+            properties: {
+              band: {
+                enum: ["LOW", "STEADY", "HIGH"],
+                type: "string",
+              },
+              band_label: {
+                type: "string",
+              },
+              summary: {
+                type: "string",
+              },
+            },
+            required: ["band", "band_label", "summary"],
+            type: "object",
+          },
+          personalization_notice: {
+            enum: ["NONE", "PERSONALIZATION_REDUCED"],
+            type: "string",
+          },
+          primary_action: {
+            additionalProperties: false,
+            properties: {
+              action_id: {
+                pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                type: "string",
+              },
+              constraint_label: {
+                type: "string",
+              },
+              instruction: {
+                type: "string",
+              },
+              rationale: {
+                type: "string",
+              },
+            },
+            required: ["action_id", "instruction"],
+            type: "object",
+          },
+          product_date: {
+            pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            type: "string",
+          },
+          result_id: {
+            pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            type: "string",
+          },
+          result_version: {
+            pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            type: "string",
+          },
+          rituals: {
+            items: {
+              additionalProperties: false,
+              properties: {
+                display_value: {
+                  type: "string",
+                },
+                kind: {
+                  enum: ["COLOR", "NUMBER"],
+                  type: "string",
+                },
+                note: {
+                  type: "string",
+                },
+              },
+              required: ["kind", "display_value", "note"],
+              type: "object",
+            },
+            maxItems: 2,
+            type: "array",
+          },
+          schema_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          state_response: {
+            type: "string",
+          },
+        },
+        required: [
+          "contract",
+          "schema_version",
+          "result_id",
+          "product_date",
+          "result_version",
+          "generated_at",
+          "content_label",
+          "greeting",
+          "state_response",
+          "overall",
+          "focus_dimension_id",
+          "dimensions",
+          "core_tip",
+          "explanation_paragraphs",
+          "primary_action",
+          "optional_task",
+          "rituals",
+          "closing",
+          "personalization_notice",
+        ],
+        type: "object",
+      },
+      interaction: {
+        additionalProperties: false,
+        properties: {
+          contract: {
+            const: "daily-interaction-state",
+            type: "string",
+          },
+          helpfulness: {
+            additionalProperties: false,
+            properties: {
+              rating: {
+                enum: [
+                  "UNRATED",
+                  "HELPFUL",
+                  "NEUTRAL",
+                  "NOT_HELPFUL",
+                  "NOT_USED",
+                ],
+                type: "string",
+              },
+              revision: {
+                maximum: 9007199254740991,
+                minimum: 0,
+                type: "integer",
+              },
+            },
+            required: ["revision", "rating"],
+            type: "object",
+          },
+          is_lit: {
+            type: "boolean",
+          },
+          product_date: {
+            pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            type: "string",
+          },
+          result_id: {
+            pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            type: "string",
+          },
+          schema_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          task: {
+            additionalProperties: false,
+            properties: {
+              revision: {
+                exclusiveMinimum: 0,
+                maximum: 9007199254740991,
+                type: "integer",
+              },
+              status: {
+                enum: ["UNMARKED", "INTERESTED", "COMPLETED", "SKIPPED"],
+                type: "string",
+              },
+              task_id: {
+                pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                type: "string",
+              },
+            },
+            required: ["task_id", "revision", "status"],
+            type: "object",
+          },
+          updated_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+        },
+        required: [
+          "contract",
+          "schema_version",
+          "result_id",
+          "product_date",
+          "is_lit",
+          "task",
+          "helpfulness",
+          "updated_at",
+        ],
+        type: "object",
+      },
+      relationship: {
+        additionalProperties: false,
+        properties: {
+          display_token: {
+            pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            type: "string",
+          },
+          encounter_day_count: {
+            maximum: 9007199254740991,
+            minimum: 0,
+            type: "integer",
+          },
+          stage: {
+            enum: [
+              "BEFORE_FIRST_MEETING",
+              "NEWLY_MET",
+              "BECOMING_FAMILIAR",
+              "FIRST_WEEK_RECORDED",
+            ],
+            type: "string",
+          },
+        },
+        required: ["stage", "encounter_day_count"],
+        type: "object",
+      },
+    },
+    required: ["content", "interaction", "relationship"],
     type: "object",
   },
 } as const;

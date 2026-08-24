@@ -3823,13 +3823,16 @@
         "additionalProperties": false,
         "properties": {
           "intent_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           },
           "product_date": {
-            "$ref": "#/components/schemas/ProductDate"
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           },
           "result_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           },
           "retry_after_seconds": {
             "maximum": 3600,
@@ -3849,7 +3852,7 @@
             "type": "string"
           },
           "updated_at": {
-            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
             "type": "string"
           }
         },
@@ -3859,26 +3862,47 @@
           "status",
           "updated_at"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "GenerationIntentViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "GenerationStartRequest": {
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "expected_checkin_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           }
         },
         "required": [
           "command_ref",
           "expected_checkin_revision"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "GenerationStartRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "HelpfulnessRating": {
         "enum": [
@@ -4731,21 +4755,31 @@
         "additionalProperties": false,
         "properties": {
           "display_token": {
-            "$ref": "#/components/schemas/VersionToken"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "type": "string"
           },
           "encounter_day_count": {
+            "maximum": 9007199254740991,
             "minimum": 0,
             "type": "integer"
           },
           "stage": {
-            "$ref": "#/components/schemas/RelationshipStage"
+            "enum": [
+              "BEFORE_FIRST_MEETING",
+              "NEWLY_MET",
+              "BECOMING_FAMILIAR",
+              "FIRST_WEEK_RECORDED"
+            ],
+            "type": "string"
           }
         },
         "required": [
           "stage",
           "encounter_day_count"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "RelationshipViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "RequestId": {
         "maxLength": 128,
@@ -5209,13 +5243,366 @@
         "additionalProperties": false,
         "properties": {
           "content": {
-            "$ref": "#/components/schemas/ClientDailyContentView"
+            "additionalProperties": false,
+            "properties": {
+              "closing": {
+                "type": "string"
+              },
+              "content_label": {
+                "enum": [
+                  "娱乐与行动参考"
+                ],
+                "type": "string"
+              },
+              "contract": {
+                "enum": [
+                  "daily-content-view"
+                ],
+                "type": "string"
+              },
+              "core_tip": {
+                "type": "string"
+              },
+              "dimensions": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "band": {
+                      "enum": [
+                        "LOW",
+                        "STEADY",
+                        "HIGH"
+                      ],
+                      "type": "string"
+                    },
+                    "band_label": {
+                      "type": "string"
+                    },
+                    "explanation": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "enum": [
+                        "pace",
+                        "action",
+                        "connection",
+                        "resources",
+                        "recovery"
+                      ],
+                      "type": "string"
+                    },
+                    "is_focus": {
+                      "type": "boolean"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label",
+                    "band",
+                    "band_label",
+                    "explanation",
+                    "is_focus"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 5,
+                "minItems": 5,
+                "type": "array"
+              },
+              "explanation_paragraphs": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 2,
+                "minItems": 1,
+                "type": "array"
+              },
+              "focus_dimension_id": {
+                "enum": [
+                  "pace",
+                  "action",
+                  "connection",
+                  "resources",
+                  "recovery"
+                ],
+                "type": "string"
+              },
+              "generated_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "greeting": {
+                "type": "string"
+              },
+              "optional_task": {
+                "additionalProperties": false,
+                "properties": {
+                  "instruction": {
+                    "type": "string"
+                  },
+                  "task_id": {
+                    "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id",
+                  "instruction"
+                ],
+                "type": "object"
+              },
+              "overall": {
+                "additionalProperties": false,
+                "properties": {
+                  "band": {
+                    "enum": [
+                      "LOW",
+                      "STEADY",
+                      "HIGH"
+                    ],
+                    "type": "string"
+                  },
+                  "band_label": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "band",
+                  "band_label",
+                  "summary"
+                ],
+                "type": "object"
+              },
+              "personalization_notice": {
+                "enum": [
+                  "NONE",
+                  "PERSONALIZATION_REDUCED"
+                ],
+                "type": "string"
+              },
+              "primary_action": {
+                "additionalProperties": false,
+                "properties": {
+                  "action_id": {
+                    "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                    "type": "string"
+                  },
+                  "constraint_label": {
+                    "type": "string"
+                  },
+                  "instruction": {
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "action_id",
+                  "instruction"
+                ],
+                "type": "object"
+              },
+              "product_date": {
+                "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                "type": "string"
+              },
+              "result_id": {
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
+              },
+              "result_version": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                "type": "string"
+              },
+              "rituals": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "display_value": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "COLOR",
+                        "NUMBER"
+                      ],
+                      "type": "string"
+                    },
+                    "note": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "display_value",
+                    "note"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 2,
+                "type": "array"
+              },
+              "schema_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "state_response": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract",
+              "schema_version",
+              "result_id",
+              "product_date",
+              "result_version",
+              "generated_at",
+              "content_label",
+              "greeting",
+              "state_response",
+              "overall",
+              "focus_dimension_id",
+              "dimensions",
+              "core_tip",
+              "explanation_paragraphs",
+              "primary_action",
+              "optional_task",
+              "rituals",
+              "closing",
+              "personalization_notice"
+            ],
+            "type": "object"
           },
           "interaction": {
-            "$ref": "#/components/schemas/DailyInteractionView"
+            "additionalProperties": false,
+            "properties": {
+              "contract": {
+                "enum": [
+                  "daily-interaction-state"
+                ],
+                "type": "string"
+              },
+              "helpfulness": {
+                "additionalProperties": false,
+                "properties": {
+                  "rating": {
+                    "enum": [
+                      "UNRATED",
+                      "HELPFUL",
+                      "NEUTRAL",
+                      "NOT_HELPFUL",
+                      "NOT_USED"
+                    ],
+                    "type": "string"
+                  },
+                  "revision": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "revision",
+                  "rating"
+                ],
+                "type": "object"
+              },
+              "is_lit": {
+                "type": "boolean"
+              },
+              "product_date": {
+                "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                "type": "string"
+              },
+              "result_id": {
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
+              },
+              "schema_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "task": {
+                "additionalProperties": false,
+                "properties": {
+                  "revision": {
+                    "exclusiveMinimum": true,
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "status": {
+                    "enum": [
+                      "UNMARKED",
+                      "INTERESTED",
+                      "COMPLETED",
+                      "SKIPPED"
+                    ],
+                    "type": "string"
+                  },
+                  "task_id": {
+                    "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id",
+                  "revision",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "updated_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract",
+              "schema_version",
+              "result_id",
+              "product_date",
+              "is_lit",
+              "task",
+              "helpfulness",
+              "updated_at"
+            ],
+            "type": "object"
           },
           "relationship": {
-            "$ref": "#/components/schemas/RelationshipView"
+            "additionalProperties": false,
+            "properties": {
+              "display_token": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                "type": "string"
+              },
+              "encounter_day_count": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "stage": {
+                "enum": [
+                  "BEFORE_FIRST_MEETING",
+                  "NEWLY_MET",
+                  "BECOMING_FAMILIAR",
+                  "FIRST_WEEK_RECORDED"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "stage",
+              "encounter_day_count"
+            ],
+            "type": "object"
           }
         },
         "required": [
@@ -5223,7 +5610,9 @@
           "interaction",
           "relationship"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "TodayViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "VersionToken": {
         "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
@@ -9334,6 +9723,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:f0d7840a96f4a66fe0a833bc9ea4fdd40c80ed02837adfe9ff706c3ad66a1b47"
+    "source-fingerprint": "sha256:3b2f6bbc3972d3af739d5b1453f4b4f094f0812dd96d2927a4a222aa3fcc48f4"
   }
 }

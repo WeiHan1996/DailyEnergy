@@ -46,7 +46,9 @@
     "runtime": "server-adapter"
   },
   "dependencies": {
+    "@daily-energy/prompt-library": "workspace:*",
     "@daily-energy/server-core": "workspace:*",
+    "@daily-energy/shared-schemas": "workspace:*",
     "@opentelemetry/api": "catalog:",
     "@opentelemetry/exporter-prometheus": "catalog:",
     "@opentelemetry/exporter-trace-otlp-http": "catalog:",
@@ -60,7 +62,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@daily-energy/prompt-library": "workspace:*",
     "@daily-energy/typescript-config": "workspace:*",
     "@types/pg": "catalog:",
     "vitest": "catalog:"

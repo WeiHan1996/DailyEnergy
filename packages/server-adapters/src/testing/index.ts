@@ -53,6 +53,15 @@ export { OutboxRelay, OutboxRelayCrashError } from "../queue/outbox-relay.js";
 export { PostgresQueueStore } from "../queue/postgres-store.js";
 export { RedisLossRebuilder } from "../queue/redis-loss-rebuilder.js";
 export { startWorkerInfrastructure } from "../queue/worker-runtime.js";
+export {
+  createInteractiveGenerationHandlers,
+  type DailyGenerationExecutor,
+} from "../generation/interactive-generation-handler.js";
+export {
+  PostgresDailyGenerationRuntime,
+  type GenerationExecutionHooks,
+  type GenerationExecutionOutcome,
+} from "../generation/postgres-daily-generation-runtime.js";
 export type { QueueRuntimeConfig } from "../queue/config.js";
 export type {
   QueueConsumerFaultHooks,

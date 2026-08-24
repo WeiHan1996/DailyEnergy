@@ -32,6 +32,10 @@
     {
       "name": "20260821000001_c005_product_time_manifest",
       "sha256": "f85fcf20552889dbfd723d5c84b1568762b1b428225843d86801d6e8f75bbb8d"
+    },
+    {
+      "name": "20260824000000_c008_daily_generation_publication",
+      "sha256": "1d3c7908e4d0d82af9cc5524a58c63912ce3bfe1e41b045f3724de6c6fba4d40"
     }
   ]
 }

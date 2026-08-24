@@ -3,9 +3,9 @@
   "registry_version": "e-010-source-registry-v1",
   "snapshot_base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
   "counts": {
-    "total": 787,
-    "COVERED": 271,
-    "PLANNED": 516,
+    "total": 791,
+    "COVERED": 283,
+    "PLANNED": 508,
     "NA_WITH_REASON": 0
   },
   "planned_policy": {
@@ -37,7 +37,7 @@
       "set_id": "s31-testing",
       "authority_path": "docs/technical/testing.md",
       "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-      "counts": { "COVERED": 26, "PLANNED": 22, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 27, "PLANNED": 21, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s32-deployment",
@@ -67,7 +67,7 @@
       "set_id": "s20-api",
       "authority_path": "docs/technical/api.md",
       "owner": "Owning API or business implementation issue",
-      "counts": { "COVERED": 11, "PLANNED": 37, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 17, "PLANNED": 31, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s12-gateway",
@@ -85,13 +85,13 @@
       "set_id": "s21-privacy",
       "authority_path": "docs/operations/privacy-data-map.md",
       "owner": "Owning privacy, data-rights, or business implementation issue",
-      "counts": { "COVERED": 5, "PLANNED": 29, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 6, "PLANNED": 28, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "shared-schemas",
       "authority_path": "packages/shared-schemas/src/json-schema.ts",
       "owner": "E-008 contract maintenance",
-      "counts": { "COVERED": 23, "PLANNED": 0, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 27, "PLANNED": 0, "NA_WITH_REASON": 0 }
     }
   ]
 }
