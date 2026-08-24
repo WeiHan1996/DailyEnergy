@@ -1,0 +1,10 @@
+{
+  "usingComponents": {
+    "de-app-header": "../../components/app-header/index",
+    "de-loading-skeleton": "../../components/loading-skeleton/index",
+    "de-offline-state": "../../components/offline-state/index",
+    "de-page-shell": "../../components/page-shell/index",
+    "de-recoverable-error": "../../components/recoverable-error/index"
+  },
+  "navigationStyle": "custom"
+}

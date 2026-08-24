@@ -57,6 +57,7 @@ export {
   createInteractiveGenerationHandlers,
   type DailyGenerationExecutor,
 } from "../generation/interactive-generation-handler.js";
+export { createDayLitHandlers } from "../relationship/day-lit-handler.js";
 export {
   PostgresDailyGenerationRuntime,
   type GenerationExecutionHooks,

@@ -4,8 +4,8 @@
   "snapshot_base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
   "counts": {
     "total": 793,
-    "COVERED": 291,
-    "PLANNED": 502,
+    "COVERED": 297,
+    "PLANNED": 496,
     "NA_WITH_REASON": 0
   },
   "planned_policy": {
@@ -55,19 +55,19 @@
       "set_id": "s17-domain-model",
       "authority_path": "docs/data/domain-model.md",
       "owner": "Owning Phase 2-3 domain implementation issue",
-      "counts": { "COVERED": 14, "PLANNED": 34, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 17, "PLANNED": 31, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s19-database",
       "authority_path": "docs/technical/database.md",
       "owner": "Owning database or business implementation issue",
-      "counts": { "COVERED": 56, "PLANNED": 37, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 58, "PLANNED": 35, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s20-api",
       "authority_path": "docs/technical/api.md",
       "owner": "Owning API or business implementation issue",
-      "counts": { "COVERED": 18, "PLANNED": 30, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 19, "PLANNED": 29, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s12-gateway",

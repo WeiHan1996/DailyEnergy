@@ -123,13 +123,17 @@ async function startGeneration(store, accountId, ordinal, fingerprint) {
 }
 
 async function acceptedEnvelope(admin, intentRef) {
+  return outboxEnvelope(admin, intentRef, "GenerationIntentAccepted");
+}
+
+async function outboxEnvelope(admin, aggregateRef, eventType) {
   const row = (
     await admin.query(
       `SELECT id,"aggregateRef","aggregateRevision","eventType",
               "eventVersion","guardEpochs","createdAt"
          FROM runtime_outbox_event
-        WHERE "aggregateRef"=$1 AND "eventType"='GenerationIntentAccepted'`,
-      [intentRef],
+        WHERE "aggregateRef"=$1 AND "eventType"=$2`,
+      [aggregateRef, eventType],
     )
   ).rows[0];
   assert.ok(row);
@@ -247,6 +251,14 @@ test(
         expectedDatabaseRole: "daily_energy_interactive",
         profile: "worker-interactive",
       });
+      const backgroundQueueStore =
+        await testingAdapters.PostgresQueueStore.connect({
+          applicationName: "c011-background-queue-store",
+          connectionLimit: 4,
+          connectionString: loginUrls.background,
+          expectedDatabaseRole: "daily_energy_background",
+          profile: "worker-background",
+        });
       resources.push(
         auth,
         consent,
@@ -255,6 +267,7 @@ test(
         dailyInteraction,
         runtime,
         queueStore,
+        backgroundQueueStore,
       );
       const stores = { auth, consent, checkin };
       const handlers =
@@ -263,6 +276,8 @@ test(
         ({ eventType }) => eventType === "GenerationIntentAccepted",
       );
       assert.ok(acceptedHandler);
+      const dayLitHandler = testingAdapters.createDayLitHandlers()[0];
+      assert.ok(dayLitHandler);
 
       const accountId = await createReadyDay(
         stores,
@@ -501,6 +516,191 @@ test(
         taskHistory.status === "FOUND" &&
           taskHistory.value.interaction?.task.status,
         "UNMARKED",
+      );
+
+      const lightInput = {
+        accountId,
+        commandRef: "c011-light-device-a",
+        normalizedPayloadFingerprint: bytes("c011:light:device-a"),
+        now: new Date("2026-08-24T20:05:00.000Z"),
+        productDate,
+        productDatePolicyVersion: "product-date-v1",
+        resultRef: today.value.interaction.result_id,
+        sessionId,
+      };
+      const concurrentLights = await Promise.all([
+        dailyInteraction.lightDay(lightInput),
+        dailyInteraction.lightDay({
+          ...lightInput,
+          commandRef: "c011-light-device-b",
+          normalizedPayloadFingerprint: bytes("c011:light:device-b"),
+        }),
+      ]);
+      assert.deepEqual(concurrentLights.map(({ status }) => status).sort(), [
+        "ACCEPTED",
+        "DUPLICATE",
+      ]);
+      assert.equal(
+        (await dailyInteraction.lightDay(lightInput)).status,
+        "DUPLICATE",
+      );
+      assert.equal(
+        (
+          await dailyInteraction.lightDay({
+            ...lightInput,
+            normalizedPayloadFingerprint: bytes("c011:light:changed"),
+          })
+        ).status,
+        "IDEMPOTENCY_CONFLICT",
+      );
+      const lightRows = await admin.query(
+        `SELECT light.id
+           FROM app_daily_light_fact light
+           JOIN app_daily_interaction interaction
+             ON interaction.id=light."interactionId"
+          WHERE interaction."accountId"=$1 AND interaction."productDate"=$2`,
+        [accountId, productDate],
+      );
+      assert.equal(lightRows.rowCount, 1);
+      const lightId = lightRows.rows[0].id;
+      assert.equal(
+        (
+          await admin.query(
+            `SELECT count(*)::int AS count FROM runtime_outbox_event
+              WHERE "aggregateRef"=$1 AND "eventType"='DayLit'`,
+            [lightId],
+          )
+        ).rows[0].count,
+        1,
+      );
+      const dayLitEnvelope = await outboxEnvelope(admin, lightId, "DayLit");
+      const concurrentRelationshipEvents = [
+        dayLitEnvelope,
+        { ...dayLitEnvelope, eventId: randomUUID() },
+      ];
+      const relationshipOutcomes = await Promise.all(
+        concurrentRelationshipEvents.map((event) =>
+          backgroundQueueStore.consumeInbox(
+            "background-relationship",
+            event,
+            (transaction) => dayLitHandler.handle(event, transaction),
+          ),
+        ),
+      );
+      assert.deepEqual(
+        relationshipOutcomes.map(({ outcomeCode }) => outcomeCode).sort(),
+        ["RELATIONSHIP_EXISTS", "RELATIONSHIP_LINKED"],
+      );
+      assert.equal(
+        (
+          await backgroundQueueStore.consumeInbox(
+            "background-relationship",
+            dayLitEnvelope,
+            (transaction) => dayLitHandler.handle(dayLitEnvelope, transaction),
+          )
+        ).duplicate,
+        true,
+      );
+      assert.equal(
+        (
+          await admin.query(
+            `SELECT count(*)::int AS count FROM app_relationship_cycle
+              WHERE "accountId"=$1 AND "activeSlot" IS TRUE`,
+            [accountId],
+          )
+        ).rows[0].count,
+        1,
+      );
+      assert.equal(
+        (
+          await admin.query(
+            `SELECT count(*)::int AS count
+               FROM app_relationship_encounter_link
+              WHERE "sourceLightId"=$1`,
+            [lightId],
+          )
+        ).rows[0].count,
+        1,
+      );
+      const litToday = await generation.getToday({ accountId, productDate });
+      assert.equal(litToday.status, "FOUND");
+      assert.deepEqual(
+        litToday.status === "FOUND" && litToday.value.relationship,
+        {
+          display_token: "FIRST_MEETING",
+          encounter_day_count: 1,
+          stage: "NEWLY_MET",
+        },
+      );
+      const recent = await dailyInteraction.listHistory({
+        accountId,
+        productDate,
+      });
+      assert.equal(recent.status, "FOUND");
+      assert.equal(recent.status === "FOUND" && recent.value.items.length, 7);
+      assert.deepEqual(recent.status === "FOUND" && recent.value.items[0], {
+        product_date: productDate,
+        state: "RECORDED",
+        is_lit: true,
+        has_result: true,
+        has_evening_feedback: false,
+      });
+
+      const relationshipDeletionTaskRef = randomUUID();
+      const cutoffAt = new Date("2026-08-24T20:10:00.000Z");
+      await admin.query(
+        `INSERT INTO restricted_data_task
+          (id,"accountId",kind,scope,"targetType","targetKey","activeSlot",
+           state,revision,"confirmationVersion","requestedAt","guardedAt",
+           "startedAt","onlineErasedAt","finishedAt","failureScopeCodes",
+           "backupPurgeDeadline","retentionPolicyVersion","retentionAnchorAt")
+         VALUES ($1,$2,'DELETE','RELATIONSHIP_DATA','RELATIONSHIP_DATA','SELF',
+                 NULL,'SUCCEEDED',2,'confirmation-v1',$3,$3,$3,$3,$3,
+                 ARRAY[]::text[],$4,'retention-policy-v1',$3)`,
+        [
+          relationshipDeletionTaskRef,
+          accountId,
+          cutoffAt,
+          new Date(cutoffAt.getTime() + 35 * 24 * 60 * 60_000),
+        ],
+      );
+      await admin.query(
+        `INSERT INTO restricted_deletion_guard
+          (id,"accountId",scope,"targetKey",revision,"deletionEpoch",
+           "taskRef","semanticBlockedAt","releasedAt","retentionPolicyVersion",
+           "retentionAnchorAt")
+         VALUES (gen_random_uuid(),$1,'RELATIONSHIP_DATA','SELF',2,1,$2,$3,$3,
+                 'retention-policy-v1',$3)`,
+        [accountId, relationshipDeletionTaskRef, cutoffAt],
+      );
+      await admin.query(
+        `UPDATE app_relationship_cycle
+            SET state='CLOSED_BY_DELETION',"activeSlot"=NULL,"closedAt"=$2
+          WHERE "accountId"=$1 AND "activeSlot" IS TRUE`,
+        [accountId, cutoffAt],
+      );
+      const replayEnvelope = {
+        ...dayLitEnvelope,
+        eventId: randomUUID(),
+        occurredAt: new Date(cutoffAt.getTime() + 1_000).toISOString(),
+      };
+      const cutoffReplay = await backgroundQueueStore.consumeInbox(
+        "background-relationship",
+        replayEnvelope,
+        (transaction) => dayLitHandler.handle(replayEnvelope, transaction),
+      );
+      assert.equal(cutoffReplay.outcomeCode, "SOURCE_BEFORE_CUTOFF");
+      assert.equal(
+        (
+          await admin.query(
+            `SELECT count(*)::int AS count
+               FROM app_relationship_encounter_link link
+               JOIN app_relationship_cycle cycle ON cycle.id=link."cycleId"
+              WHERE cycle."accountId"=$1 AND cycle."activeSlot" IS TRUE`,
+            [accountId],
+          )
+        ).rows[0].count,
+        0,
       );
 
       const c010DeletionTaskRef = randomUUID();

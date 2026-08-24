@@ -7,6 +7,7 @@ import {
   type C004Api,
   type C009Api,
   type C010Api,
+  type C011Api,
   type SafetyView,
 } from "../../services/miniapp-api.js";
 import { DailyViewCache } from "./daily-cache.js";
@@ -32,8 +33,8 @@ function unavailable(): Promise<never> {
 }
 
 function fakeApi(
-  overrides: Partial<C004Api & C009Api & C010Api>,
-): C004Api & C009Api & C010Api {
+  overrides: Partial<C004Api & C009Api & C010Api & C011Api>,
+): C004Api & C009Api & C010Api & C011Api {
   return {
     correctCheckin: unavailable,
     getTodayCheckin: unavailable,
@@ -42,6 +43,8 @@ function fakeApi(
     getHistoryDay: unavailable,
     getToday: unavailable,
     getInteraction: unavailable,
+    lightDay: unavailable,
+    listHistory: unavailable,
     startGeneration: unavailable,
     updateTask: unavailable,
     ...overrides,
@@ -469,6 +472,97 @@ describe("C-009 daily coordinator", () => {
     ).resolves.toMatchObject({
       kind: "today",
       noticeCode: "TASK_WINDOW_CLOSED",
+    });
+  });
+});
+
+describe("C-011 lighting and recent records", () => {
+  it("reconciles an unknown light outcome before retrying the same command", async () => {
+    const state = storage();
+    const lit = { ...todayFixture.interaction, is_lit: true };
+    const lightDay = vi
+      .fn<C011Api["lightDay"]>()
+      .mockRejectedValueOnce(new MiniappPlatformError("NETWORK_FAILED"));
+    const coordinator = new DailyCoordinator(
+      state.port,
+      fakeApi({
+        getInteraction: async () => ({
+          interaction: lit,
+          productDate: "2026-08-24",
+        }),
+        getToday: async () => ({
+          productDate: "2026-08-24",
+          today: todayFixture,
+        }),
+        lightDay,
+      }),
+      "scope",
+      () => 1_000,
+      () => "light-command-unknown",
+    );
+    await coordinator.loadToday();
+    await expect(
+      coordinator.lightDay({
+        productDate: "2026-08-24",
+        resultRef: todayFixture.interaction.result_id,
+      }),
+    ).resolves.toMatchObject({
+      kind: "today",
+      noticeCode: "LIGHT_OUTCOME_PENDING",
+      view: { interaction: { is_lit: false } },
+    });
+    await expect(coordinator.retryLight()).resolves.toMatchObject({
+      kind: "today",
+      noticeCode: "LIGHT_CONFIRMED",
+      view: { interaction: { is_lit: true } },
+    });
+    expect(lightDay).toHaveBeenCalledTimes(1);
+    expect(lightDay).toHaveBeenCalledWith({
+      commandRef: "light-command-unknown",
+      productDate: "2026-08-24",
+      resultRef: todayFixture.interaction.result_id,
+    });
+  });
+
+  it("caches seven explicit dates and never turns a missing day into a fact", async () => {
+    const state = storage();
+    const history = {
+      items: [
+        {
+          product_date: "2026-08-24",
+          state: "RECORDED" as const,
+          is_lit: true,
+          has_result: true,
+          has_evening_feedback: false,
+        },
+        {
+          product_date: "2026-08-23",
+          state: "MISSING" as const,
+          is_lit: false,
+          has_result: false,
+          has_evening_feedback: false,
+        },
+      ],
+      page_info: { has_more: false },
+    };
+    const listHistory = vi
+      .fn<C011Api["listHistory"]>()
+      .mockResolvedValueOnce({ history, productDate: "2026-08-24" })
+      .mockRejectedValueOnce(new MiniappPlatformError("NETWORK_FAILED"));
+    const coordinator = new DailyCoordinator(
+      state.port,
+      fakeApi({ listHistory }),
+      "scope",
+    );
+    await expect(coordinator.loadHistoryList()).resolves.toMatchObject({
+      kind: "records",
+      offline: false,
+      view: history,
+    });
+    await expect(coordinator.loadHistoryList()).resolves.toMatchObject({
+      kind: "records",
+      offline: true,
+      view: history,
     });
   });
 });

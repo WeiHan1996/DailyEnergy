@@ -5,10 +5,13 @@ import type {
   DailyInteractionGuardFailure,
   DailyInteractionQueryResult,
   DailyInteractionStore,
+  DailyLightMutationResult,
   DailyTaskMutationResult,
 } from "@daily-energy/server-adapters/api";
 import type {
   DailyInteractionState,
+  HistoryListView,
+  LightDayRequest,
   TaskStateUpdateRequest,
 } from "@daily-energy/shared-schemas";
 
@@ -26,9 +29,11 @@ import {
 } from "../product-date/product-date.js";
 import { ApiException } from "../transport/common/api-exception.js";
 
-export interface DailyInteractionServiceResult {
+export interface DailyInteractionServiceResult<
+  View extends DailyInteractionState | HistoryListView = DailyInteractionState,
+> {
   readonly resolution: ProductDateResolution;
-  readonly view: DailyInteractionState;
+  readonly view: View;
 }
 
 @Injectable()
@@ -58,6 +63,45 @@ export class DailyInteractionService {
     return { resolution, view: result.value };
   }
 
+  public async listHistory(
+    principal: SessionPrincipal,
+  ): Promise<DailyInteractionServiceResult<HistoryListView>> {
+    const resolution = this.#resolve();
+    const result = await this.#storeCall(() =>
+      this.store.listHistory({
+        accountId: principal.accountId,
+        productDate: resolution.productDate,
+      }),
+    );
+    if (result.status !== "FOUND") {
+      throw guardException(result.status, resolution);
+    }
+    return { resolution, view: result.value };
+  }
+
+  public async lightDay(
+    principal: SessionPrincipal,
+    request: LightDayRequest,
+  ): Promise<DailyInteractionServiceResult> {
+    const resolution = this.#resolve();
+    const result = await this.#storeCall(() =>
+      this.store.lightDay({
+        accountId: principal.accountId,
+        commandRef: request.command_ref,
+        normalizedPayloadFingerprint: payloadFingerprint("ILLUMINATE", {
+          product_date: request.product_date,
+          result_ref: request.result_ref,
+        }),
+        now: resolution.now,
+        productDate: request.product_date,
+        productDatePolicyVersion: this.config.productDatePolicyVersion,
+        resultRef: request.result_ref,
+        sessionId: principal.sessionId,
+      }),
+    );
+    return { resolution, view: lightMutationView(result, resolution) };
+  }
+
   public async updateTask(
     principal: SessionPrincipal,
     request: TaskStateUpdateRequest,
@@ -68,7 +112,7 @@ export class DailyInteractionService {
         accountId: principal.accountId,
         commandRef: request.command_ref,
         expectedRevision: request.expected_revision,
-        normalizedPayloadFingerprint: payloadFingerprint({
+        normalizedPayloadFingerprint: payloadFingerprint("TASK_STATUS_SET", {
           expected_revision: request.expected_revision,
           product_date: request.product_date,
           status: request.status,
@@ -138,6 +182,28 @@ function mutationView(
   throw guardException(result.status, resolution);
 }
 
+function lightMutationView(
+  result: DailyLightMutationResult,
+  resolution: ProductDateResolution,
+): DailyInteractionState {
+  if (result.status === "ACCEPTED" || result.status === "DUPLICATE") {
+    return result.value;
+  }
+  if (result.status === "NOT_FOUND") {
+    throw exception("RESOURCE_NOT_FOUND", resolution);
+  }
+  if (result.status === "IDEMPOTENCY_CONFLICT") {
+    throw exception("IDEMPOTENCY_CONFLICT", resolution);
+  }
+  if (
+    result.status === "VIEW_CONTINUATION_EXPIRED" ||
+    result.status === "WRITE_WINDOW_CLOSED"
+  ) {
+    throw exception(result.status, resolution);
+  }
+  throw guardException(result.status, resolution);
+}
+
 function guardException(
   status: DailyInteractionGuardFailure,
   resolution: ProductDateResolution,
@@ -162,12 +228,13 @@ function exception(
 }
 
 function payloadFingerprint(
+  operation: "ILLUMINATE" | "TASK_STATUS_SET",
   payload: Readonly<Record<string, unknown>>,
 ): Buffer {
   return createHash("sha256")
     .update(
       JSON.stringify({
-        operation: "TASK_STATUS_SET",
+        operation,
         payload: Object.fromEntries(
           Object.entries(payload).sort(([left], [right]) =>
             left.localeCompare(right),

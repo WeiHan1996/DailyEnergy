@@ -5,9 +5,11 @@ import {
   type C004Api,
   type C009Api,
   type C010Api,
+  type C011Api,
   type DailyInteractionView,
   type GenerationIntentView,
   type HistoryDayView,
+  type HistoryListView,
   type SafetyView,
   type TodayView,
 } from "../../services/miniapp-api.js";
@@ -15,12 +17,17 @@ import { createCommandRef } from "../onboarding/onboarding-flow.js";
 import {
   DailyViewCache,
   PendingGenerationStore,
+  PendingLightCommandStore,
   PendingTaskUpdateStore,
+  type PendingLightCommand,
   type PendingGeneration,
   type PendingTaskUpdate,
 } from "./daily-cache.js";
 
 export type DailyNoticeCode =
+  | "LIGHT_CONFIRMED"
+  | "LIGHT_OUTCOME_PENDING"
+  | "LIGHT_WINDOW_CLOSED"
   | "TASK_CONFLICT"
   | "TASK_OUTCOME_PENDING"
   | "TASK_UPDATED"
@@ -39,6 +46,12 @@ export type DailyFlowResult =
       readonly noticeCode?: DailyNoticeCode;
       readonly productDate: string;
       readonly view: TodayView;
+    }
+  | {
+      readonly kind: "records";
+      readonly offline: boolean;
+      readonly productDate: string;
+      readonly view: HistoryListView;
     }
   | {
       readonly kind: "history";
@@ -67,20 +80,27 @@ const guardCodes = new Set([
 export class DailyCoordinator {
   readonly #cache: DailyViewCache;
   readonly #pending: PendingGenerationStore;
+  readonly #pendingLight: PendingLightCommandStore;
   readonly #pendingTask: PendingTaskUpdateStore;
   #busy = false;
+  #lightBusy = false;
   #taskBusy = false;
   #safetyView?: SafetyView;
 
   public constructor(
     storage: StoragePort,
-    private readonly api: C004Api & C009Api & C010Api,
+    private readonly api: C004Api & C009Api & C010Api & C011Api,
     sessionScope: string,
     now: () => number = Date.now,
     private readonly commandRef: (prefix: string) => string = createCommandRef,
   ) {
     this.#cache = new DailyViewCache(storage, sessionScope, now);
     this.#pending = new PendingGenerationStore(storage, sessionScope, now);
+    this.#pendingLight = new PendingLightCommandStore(
+      storage,
+      sessionScope,
+      now,
+    );
     this.#pendingTask = new PendingTaskUpdateStore(storage, sessionScope, now);
   }
 
@@ -94,7 +114,7 @@ export class DailyCoordinator {
     try {
       const available = await this.#readToday(false);
       if (available !== undefined) {
-        return this.#withPendingTaskState(available);
+        return this.#withPendingInteractionState(available);
       }
       return await this.#resumeOrStart(expectedCheckinRevision);
     } catch (error) {
@@ -120,7 +140,9 @@ export class DailyCoordinator {
 
   public async loadToday(): Promise<DailyFlowResult> {
     try {
-      return await this.#withPendingTaskState((await this.#readToday(true))!);
+      return await this.#withPendingInteractionState(
+        (await this.#readToday(true))!,
+      );
     } catch (error) {
       return this.#failure(error, true);
     }
@@ -176,6 +198,96 @@ export class DailyCoordinator {
       return await this.#submitPendingTask(pending);
     } finally {
       this.#taskBusy = false;
+    }
+  }
+
+  public async lightDay(input: {
+    readonly productDate: string;
+    readonly resultRef: string;
+  }): Promise<DailyFlowResult> {
+    if (this.#lightBusy) {
+      return { kind: "recovery", reasonCode: "WRITE_IN_PROGRESS" };
+    }
+    this.#lightBusy = true;
+    try {
+      const existing = await this.#pendingLight.load();
+      const pending =
+        existing ??
+        ({
+          commandRef: this.commandRef("light"),
+          productDate: input.productDate,
+          resultRef: input.resultRef,
+        } satisfies PendingLightCommand);
+      if (
+        existing !== undefined &&
+        (existing.productDate !== input.productDate ||
+          existing.resultRef !== input.resultRef)
+      ) {
+        return this.#cachedToday("LIGHT_OUTCOME_PENDING", false);
+      }
+      await this.#pendingLight.save(pending);
+      return await this.#submitPendingLight(pending);
+    } finally {
+      this.#lightBusy = false;
+    }
+  }
+
+  public async retryLight(): Promise<DailyFlowResult> {
+    const pending = await this.#pendingLight.load();
+    if (pending === undefined) {
+      return this.loadToday();
+    }
+    if (this.#lightBusy) {
+      return { kind: "recovery", reasonCode: "WRITE_IN_PROGRESS" };
+    }
+    this.#lightBusy = true;
+    try {
+      const current = await this.api.getInteraction();
+      if (
+        current.interaction.product_date === pending.productDate &&
+        current.interaction.result_id === pending.resultRef &&
+        current.interaction.is_lit
+      ) {
+        await this.#pendingLight.clear();
+        return this.#cachedTodayWithInteraction(
+          current.interaction,
+          "LIGHT_CONFIRMED",
+          false,
+        );
+      }
+      return await this.#submitPendingLight(pending);
+    } catch (error) {
+      if (isNetworkFailure(error)) {
+        return this.#cachedToday("LIGHT_OUTCOME_PENDING", true);
+      }
+      await this.#pendingLight.clear();
+      return this.#failure(error, true);
+    } finally {
+      this.#lightBusy = false;
+    }
+  }
+
+  public async loadHistoryList(): Promise<DailyFlowResult> {
+    try {
+      const envelope = await this.api.listHistory();
+      await this.#cache.saveHistoryList(envelope.history);
+      return {
+        kind: "records",
+        offline: false,
+        productDate: envelope.productDate,
+        view: envelope.history,
+      };
+    } catch (error) {
+      const cached = await this.#cache.loadHistoryList();
+      if (isNetworkFailure(error) && cached !== undefined) {
+        return {
+          kind: "records",
+          offline: true,
+          productDate: cached.items[0]?.product_date ?? "",
+          view: cached,
+        };
+      }
+      return this.#failure(error, false);
     }
   }
 
@@ -266,6 +378,80 @@ export class DailyCoordinator {
       return { ...result, noticeCode: "TASK_UPDATED" };
     }
     return { ...result, noticeCode: "TASK_OUTCOME_PENDING" };
+  }
+
+  async #withPendingInteractionState(
+    result: DailyFlowResult,
+  ): Promise<DailyFlowResult> {
+    return this.#withPendingTaskState(
+      await this.#withPendingLightState(result),
+    );
+  }
+
+  async #withPendingLightState(
+    result: DailyFlowResult,
+  ): Promise<DailyFlowResult> {
+    if (result.kind !== "today") {
+      return result;
+    }
+    const pending = await this.#pendingLight.load();
+    if (pending === undefined) {
+      return result;
+    }
+    if (
+      pending.productDate !== result.view.interaction.product_date ||
+      pending.resultRef !== result.view.interaction.result_id
+    ) {
+      await this.#pendingLight.clear();
+      return result;
+    }
+    if (result.view.interaction.is_lit) {
+      await this.#pendingLight.clear();
+      return {
+        ...result,
+        noticeCode: result.noticeCode ?? "LIGHT_CONFIRMED",
+      };
+    }
+    return {
+      ...result,
+      noticeCode: result.noticeCode ?? "LIGHT_OUTCOME_PENDING",
+    };
+  }
+
+  async #submitPendingLight(
+    pending: PendingLightCommand,
+  ): Promise<DailyFlowResult> {
+    try {
+      const envelope = await this.api.lightDay(pending);
+      if (
+        envelope.interaction.product_date !== pending.productDate ||
+        envelope.interaction.result_id !== pending.resultRef ||
+        !envelope.interaction.is_lit
+      ) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+      }
+      await this.#pendingLight.clear();
+      return this.#cachedTodayWithInteraction(
+        envelope.interaction,
+        "LIGHT_CONFIRMED",
+        false,
+      );
+    } catch (error) {
+      if (
+        error instanceof MiniappApiError &&
+        ["VIEW_CONTINUATION_EXPIRED", "WRITE_WINDOW_CLOSED"].includes(
+          error.code,
+        )
+      ) {
+        await this.#pendingLight.clear();
+        return this.#cachedToday("LIGHT_WINDOW_CLOSED", false);
+      }
+      if (isNetworkFailure(error)) {
+        return this.#cachedToday("LIGHT_OUTCOME_PENDING", true);
+      }
+      await this.#pendingLight.clear();
+      return this.#failure(error, true);
+    }
   }
 
   async #submitPendingTask(
@@ -434,6 +620,7 @@ export class DailyCoordinator {
         await Promise.all([
           this.#cache.clear(),
           this.#pending.clear(),
+          this.#pendingLight.clear(),
           this.#pendingTask.clear(),
         ]);
         return { kind: "safety", reasonCode: error.code };
@@ -442,6 +629,7 @@ export class DailyCoordinator {
         await Promise.all([
           this.#cache.clear(),
           this.#pending.clear(),
+          this.#pendingLight.clear(),
           this.#pendingTask.clear(),
         ]);
         return { kind: "recovery", reasonCode: error.code };

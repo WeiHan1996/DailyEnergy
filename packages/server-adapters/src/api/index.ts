@@ -79,7 +79,9 @@ export {
   type DailyInteractionGuardFailure,
   type DailyInteractionQueryResult,
   type DailyInteractionStore,
+  type DailyLightMutationResult,
   type DailyTaskMutationResult,
+  type HistoryListQueryResult,
   type PostgresDailyInteractionStoreConfig,
 } from "../daily-interaction/postgres-daily-interaction-store.js";
 export {

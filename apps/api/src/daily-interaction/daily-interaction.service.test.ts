@@ -59,6 +59,8 @@ function fakeStore(
   return {
     close: async () => undefined,
     get: unavailable,
+    lightDay: unavailable,
+    listHistory: unavailable,
     openToday: async () => ({ status: "RECORDED" }),
     updateTask: unavailable,
     ...overrides,
@@ -151,5 +153,51 @@ describe("C-010 daily interaction application service", () => {
         }),
       ).getToday(principal),
     ).rejects.toMatchObject({ code: "DEPENDENCY_UNAVAILABLE" });
+  });
+});
+
+describe("C-011 light and history application service", () => {
+  it("binds the owner/session and fingerprints the original light target", async () => {
+    const lightDay = vi.fn<DailyInteractionStore["lightDay"]>(async () => ({
+      status: "ACCEPTED",
+      value: { ...interaction, is_lit: true },
+    }));
+    await expect(
+      service(fakeStore({ lightDay })).lightDay(principal, {
+        command_ref: "light-command-0001",
+        product_date: "2026-08-24",
+        result_ref: interaction.result_id,
+      }),
+    ).resolves.toMatchObject({ view: { is_lit: true } });
+    expect(lightDay).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accountId: principal.accountId,
+        productDate: "2026-08-24",
+        resultRef: interaction.result_id,
+        sessionId: principal.sessionId,
+      }),
+    );
+  });
+
+  it("returns an explicit recent-date projection", async () => {
+    const value = {
+      items: [
+        {
+          product_date: "2026-08-24",
+          state: "RECORDED" as const,
+          is_lit: true,
+          has_result: true,
+          has_evening_feedback: false,
+        },
+      ],
+      page_info: { has_more: false },
+    };
+    await expect(
+      service(
+        fakeStore({
+          listHistory: async () => ({ status: "FOUND", value }),
+        }),
+      ).listHistory(principal),
+    ).resolves.toMatchObject({ view: value });
   });
 });

@@ -2353,18 +2353,7 @@ components:
     GenerationStartRequest:
       x-source-contract: GenerationStartRequestSchema
     LightDayRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        result_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-      additionalProperties: false
-      required:
-        - command_ref
-        - result_ref
+      x-source-contract: LightDayRequestSchema
     TaskStateUpdateRequest:
       x-source-contract: TaskStateUpdateRequestSchema
     HelpfulnessUpdateRequest:
@@ -3185,28 +3174,7 @@ components:
     WeeklyView:
       x-source-contract: ClientWeeklySummaryViewSchema
     HistoryDaySummaryView:
-      type: object
-      properties:
-        product_date:
-          $ref: "#/components/schemas/ProductDate"
-        state:
-          type: string
-          enum:
-            - RECORDED
-            - MISSING
-        is_lit:
-          type: boolean
-        has_result:
-          type: boolean
-        has_evening_feedback:
-          type: boolean
-      additionalProperties: false
-      required:
-        - product_date
-        - state
-        - is_lit
-        - has_result
-        - has_evening_feedback
+      x-source-contract: HistoryDaySummaryViewSchema
     HistoryDayView:
       x-source-contract: HistoryDayViewSchema
     MatterView:
@@ -3722,28 +3690,7 @@ components:
         - policy_version
         - created_at
     HistoryListView:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/HistoryDaySummaryView"
-        next_cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-        page_info:
-          type: object
-          properties:
-            has_more:
-              type: boolean
-          additionalProperties: false
-          required:
-            - has_more
-      additionalProperties: false
-      required:
-        - items
-        - page_info
+      x-source-contract: HistoryListViewSchema
     MatterListView:
       type: object
       properties:

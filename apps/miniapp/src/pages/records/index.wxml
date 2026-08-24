@@ -1,0 +1,53 @@
+<de-page-shell labelled-by="records-title">
+  <de-app-header
+    slot="header"
+    back-label="返回今天"
+    show-back="{{true}}"
+    title="最近记录"
+    subtitle="最近 7 个产品日期"
+    bind:back="back"
+  ></de-app-header>
+
+  <view class="records" data-screen-id="{{screenId}}">
+    <de-loading-skeleton
+      wx:if="{{loading && !items.length}}"
+      label="正在读取最近记录"
+      lines="7"
+      variant="card"
+    ></de-loading-skeleton>
+
+    <de-recoverable-error
+      wx:elif="{{error && !items.length}}"
+      message="暂时没能读取最近记录。重试仍会按真实日期读取。"
+      bind:retry="retry"
+    ></de-recoverable-error>
+
+    <block wx:else>
+      <de-offline-state
+        wx:if="{{offline}}"
+        message="这是最后同步的只读记录；缺失日期不会被补齐。"
+        bind:retry="retry"
+      ></de-offline-state>
+
+      <view id="records-title" class="records__title">一起留下的日子</view>
+      <view class="records__list" aria-label="最近七天记录">
+        <view
+          wx:for="{{items}}"
+          wx:key="product_date"
+          class="records__row {{item.state === 'MISSING' ? 'records__row--missing' : ''}}"
+          aria-role="{{item.has_result ? 'button' : 'text'}}"
+          data-can-open="{{item.has_result}}"
+          data-date="{{item.product_date}}"
+          bind:tap="openDay"
+        >
+          <view class="records__date">{{item.product_date}}</view>
+          <view class="records__facts">
+            <text>{{item.status_text}}</text>
+            <text wx:if="{{item.has_evening_feedback}}"> · 有晚间记录</text>
+          </view>
+        </view>
+      </view>
+      <view class="records__boundary">没有记录的日期会保留为空，不影响已经留下的相遇日。</view>
+    </block>
+  </view>
+</de-page-shell>

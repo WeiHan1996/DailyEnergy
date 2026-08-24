@@ -128,6 +128,14 @@ export const GenerationStartRequestSchema = z
   })
   .strict();
 
+export const LightDayRequestSchema = z
+  .object({
+    ...CommandShape,
+    product_date: ProductDateSchema,
+    result_ref: OpaqueIdSchema,
+  })
+  .strict();
+
 export const TaskStateUpdateRequestSchema = z
   .object({
     ...CommandShape,
@@ -238,6 +246,7 @@ export type CheckinCorrectRequest = z.infer<typeof CheckinCorrectRequestSchema>;
 export type GenerationStartRequest = z.infer<
   typeof GenerationStartRequestSchema
 >;
+export type LightDayRequest = z.infer<typeof LightDayRequestSchema>;
 export type TaskStateUpdateRequest = z.infer<
   typeof TaskStateUpdateRequestSchema
 >;

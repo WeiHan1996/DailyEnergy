@@ -10,6 +10,7 @@ import {
   BACKGROUND_WORKER_MANIFEST,
   BullMqConsumer,
   BullMqProducer,
+  createDayLitHandlers,
   createInteractiveGenerationHandlers,
   fingerprintCapabilityManifest,
   INTERACTIVE_WORKER_MANIFEST,
@@ -256,9 +257,17 @@ async function insertOutbox(
 
 async function waitForJob(producer, queueFamily, eventId, expectedState) {
   const deadline = Date.now() + 8_000;
+  let lastReason = "MISSING";
+  let lastState = "missing";
   while (Date.now() < deadline) {
     const job = await producer.getJob(queueFamily, eventId);
-    if (job && (await job.getState()) === expectedState) {
+    const state = job === undefined ? undefined : await job.getState();
+    lastState = state ?? "missing";
+    lastReason = job?.failedReason ?? "NONE";
+    if (job && state === "failed" && expectedState !== "failed") {
+      throw new Error(`QUEUE_JOB_FAILED:${queueFamily}:${job.failedReason}`);
+    }
+    if (job && state === expectedState) {
       const settledJob = await producer.getJob(queueFamily, eventId);
       if (settledJob && (await settledJob.getState()) === expectedState) {
         return settledJob;
@@ -266,7 +275,9 @@ async function waitForJob(producer, queueFamily, eventId, expectedState) {
     }
     await new Promise((resolve) => setTimeout(resolve, 20));
   }
-  throw new Error(`QUEUE_JOB_TIMEOUT:${queueFamily}:${expectedState}`);
+  throw new Error(
+    `QUEUE_JOB_TIMEOUT:${queueFamily}:${expectedState}:${lastState}:${lastReason}`,
+  );
 }
 
 async function count(admin, table, predicate, values = []) {
@@ -420,6 +431,13 @@ test(
                 connectionString: loginUrls.api,
                 expectedDatabaseRole: "daily_energy_api",
               });
+            const dailyInteraction =
+              await apiAdapters.PostgresDailyInteractionStore.connect({
+                applicationName: "c011-queue-daily-interaction",
+                connectionLimit: 4,
+                connectionString: loginUrls.api,
+                expectedDatabaseRole: "daily_energy_api",
+              });
             const runtime = await PostgresDailyGenerationRuntime.connect({
               applicationName: "c008-queue-runtime",
               connectionLimit: 4,
@@ -466,6 +484,16 @@ test(
                   }
                 },
               },
+            );
+            const backgroundConsumer = await BullMqConsumer.connect(
+              BACKGROUND_WORKER_MANIFEST,
+              queueConfig(
+                BACKGROUND_WORKER_MANIFEST,
+                redisUrl,
+                "c008-generation-pipeline",
+              ),
+              createDayLitHandlers(),
+              backgroundStore,
             );
             try {
               const accountId = await createReadyQueueDay({
@@ -523,6 +551,96 @@ test(
                 telemetry.some(
                   ({ outcomeCode }) => outcomeCode === "DUPLICATE",
                 ),
+              );
+
+              const generatedToday = await generation.getToday({
+                accountId,
+                productDate,
+              });
+              assert.equal(generatedToday.status, "FOUND");
+              if (generatedToday.status !== "FOUND") {
+                throw new Error("C011_QUEUE_TODAY_MISSING");
+              }
+              const sessionId = (
+                await admin.query(
+                  `SELECT id FROM app_session_credential
+                    WHERE "accountId"=$1 AND "revokedAt" IS NULL
+                    ORDER BY "issuedAt" DESC,id LIMIT 1`,
+                  [accountId],
+                )
+              ).rows[0].id;
+              assert.deepEqual(
+                await dailyInteraction.openToday({
+                  accountId,
+                  openedAt: now,
+                  productDate,
+                  resultId: generatedToday.value.interaction.result_id,
+                  sessionId,
+                }),
+                { status: "RECORDED" },
+              );
+              const lit = await dailyInteraction.lightDay({
+                accountId,
+                commandRef: "c011-queue-light",
+                normalizedPayloadFingerprint: hash("c011:queue:light"),
+                now,
+                productDate,
+                productDatePolicyVersion: "product-date-v1",
+                resultRef: generatedToday.value.interaction.result_id,
+                sessionId,
+              });
+              assert.equal(lit.status, "ACCEPTED");
+              const dayLitEventId = (
+                await admin.query(
+                  `SELECT id FROM runtime_outbox_event
+                    WHERE "eventType"='DayLit'
+                      AND "aggregateRef" IN (
+                        SELECT light.id FROM app_daily_light_fact light
+                        JOIN app_daily_interaction interaction
+                          ON interaction.id=light."interactionId"
+                        WHERE interaction."accountId"=$1
+                          AND interaction."productDate"=$2
+                      )`,
+                  [accountId, productDate],
+                )
+              ).rows[0].id;
+              const dayLitRelay = await new OutboxRelay({
+                producer,
+                store: backgroundStore,
+              }).relayOnce();
+              assert.ok(dayLitRelay.published >= 1);
+              assert.equal(
+                (
+                  await admin.query(
+                    `SELECT state FROM runtime_outbox_event WHERE id=$1`,
+                    [dayLitEventId],
+                  )
+                ).rows[0].state,
+                "PUBLISHED",
+              );
+              await waitForJob(
+                producer,
+                "background",
+                dayLitEventId,
+                "completed",
+              );
+              assert.equal(
+                await count(
+                  admin,
+                  "runtime_inbox_receipt",
+                  '"consumerCode"=$1 AND "eventId"=$2',
+                  ["background-relationship", dayLitEventId],
+                ),
+                1,
+              );
+              assert.equal(
+                await count(
+                  admin,
+                  "app_relationship_encounter_link",
+                  '"sourceEventId"=$1',
+                  [dayLitEventId],
+                ),
+                1,
               );
 
               const beforeLoss = await generation.getToday({
@@ -589,11 +707,13 @@ test(
                 1,
               );
             } finally {
+              await backgroundConsumer.drain(2_000);
               await consumer.drain(2_000);
               await producer.close();
               await backgroundStore.close();
               await interactiveStore.close();
               await runtime.close();
+              await dailyInteraction.close();
               await generation.close();
               await checkin.close();
               await consent.close();

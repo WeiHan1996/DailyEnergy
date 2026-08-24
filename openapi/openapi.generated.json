@@ -3963,7 +3963,8 @@
             "type": "boolean"
           },
           "product_date": {
-            "$ref": "#/components/schemas/ProductDate"
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           },
           "state": {
             "enum": [
@@ -3980,7 +3981,9 @@
           "has_result",
           "has_evening_feedback"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "HistoryDaySummaryViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "HistoryDayView": {
         "additionalProperties": false,
@@ -4702,8 +4705,40 @@
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/HistoryDaySummaryView"
+              "additionalProperties": false,
+              "properties": {
+                "has_evening_feedback": {
+                  "type": "boolean"
+                },
+                "has_result": {
+                  "type": "boolean"
+                },
+                "is_lit": {
+                  "type": "boolean"
+                },
+                "product_date": {
+                  "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  "type": "string"
+                },
+                "state": {
+                  "enum": [
+                    "RECORDED",
+                    "MISSING"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "product_date",
+                "state",
+                "is_lit",
+                "has_result",
+                "has_evening_feedback"
+              ],
+              "type": "object"
             },
+            "maxItems": 50,
+            "minItems": 1,
             "type": "array"
           },
           "next_cursor": {
@@ -4728,7 +4763,9 @@
           "items",
           "page_info"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "HistoryListViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "IdentityVerificationView": {
         "additionalProperties": false,
@@ -4838,20 +4875,42 @@
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
+          },
+          "product_date": {
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           },
           "result_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           }
         },
         "required": [
           "command_ref",
+          "product_date",
           "result_ref"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "LightDayRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "LogoutRequest": {
         "additionalProperties": false,
@@ -10445,6 +10504,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:bc934c42dc063703c4065403dc1dba4a76497ab76feff0ebcd17d88fec7e4c3e"
+    "source-fingerprint": "sha256:9651c77c8236b964f559408648a8f4dd8208cd6406bdc882494d633d3a453b1c"
   }
 }

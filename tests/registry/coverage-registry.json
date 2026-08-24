@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 291, "NA_WITH_REASON": 0, "PLANNED": 502 },
+  "counts": { "COVERED": 297, "NA_WITH_REASON": 0, "PLANNED": 496 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -535,11 +535,35 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a released relationship deletion epoch and cutoff prevent an old light from entering a new cycle",
+            "a session/result/date-bound continuation permits the original day without rewriting it to the new date",
+            "real PostgreSQL 18 serializes two device light commands to one LightFact and one logical DayLit outbox",
+            "seven product dates are newest-first and missing dates contain no fabricated facts",
+            "two concurrent DayLit events leave one active cycle, one encounter link and one relationship day"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C011-DB-001"
+        },
+        {
+          "assertions": [
+            "one DayLit event produces one inbox receipt and one relationship link",
+            "real Redis 8 and BullMQ 5 route DayLit only to the background-relationship capability",
+            "the PostgreSQL 18 InboxReceipt and EncounterLink commit before BullMQ acknowledgement"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-008 outbox/inbox publishes once and Redis cache loss rebuilds from PostgreSQL",
+          "test_id": "T-C011-QUEUE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -548,11 +572,36 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a released relationship deletion epoch and cutoff prevent an old light from entering a new cycle",
+            "a session/result/date-bound continuation permits the original day without rewriting it to the new date",
+            "real PostgreSQL 18 serializes two device light commands to one LightFact and one logical DayLit outbox",
+            "seven product dates are newest-first and missing dates contain no fabricated facts",
+            "two concurrent DayLit events leave one active cycle, one encounter link and one relationship day"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C011-DB-001"
+        },
+        {
+          "assertions": [
+            "an already successful unknown request is not submitted a second time",
+            "offline history uses only a validated cache whose missing days remain fact-free",
+            "task status and lighting remain independent",
+            "unknown light outcome stores one bounded command and reads authoritative interaction before any retry"
+          ],
+          "file": "apps/miniapp/src/features/daily/daily-flow.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-011 lighting and recent records",
+          "test_id": "T-C011-MINIAPP-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -600,11 +649,35 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a released relationship deletion epoch and cutoff prevent an old light from entering a new cycle",
+            "a session/result/date-bound continuation permits the original day without rewriting it to the new date",
+            "real PostgreSQL 18 serializes two device light commands to one LightFact and one logical DayLit outbox",
+            "seven product dates are newest-first and missing dates contain no fabricated facts",
+            "two concurrent DayLit events leave one active cycle, one encounter link and one relationship day"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C011-DB-001"
+        },
+        {
+          "assertions": [
+            "replay returns the existing link without advancing the projection",
+            "stale epochs and post-deletion cutoff sources are rejected",
+            "valid source revision and guard epochs update a deterministic relationship projection"
+          ],
+          "file": "packages/server-adapters/src/relationship/day-lit-handler.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-011 DayLit relationship handler",
+          "test_id": "T-C011-WORKER-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -5478,6 +5551,20 @@
           "origin": "tests/database/evidence-manifest.json",
           "selector": "T-DB-TX-006 TX-06 light/outbox and replay-safe inbox/link are atomic",
           "test_id": "T-DB-TX-006"
+        },
+        {
+          "assertions": [
+            "a released relationship deletion epoch and cutoff prevent an old light from entering a new cycle",
+            "a session/result/date-bound continuation permits the original day without rewriting it to the new date",
+            "real PostgreSQL 18 serializes two device light commands to one LightFact and one logical DayLit outbox",
+            "seven product dates are newest-first and missing dates contain no fabricated facts",
+            "two concurrent DayLit events leave one active cycle, one encounter link and one relationship day"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C011-DB-001"
         }
       ],
       "status": "COVERED",
@@ -5497,6 +5584,32 @@
           "origin": "tests/database/evidence-manifest.json",
           "selector": "T-DB-TX-006 TX-06 light/outbox and replay-safe inbox/link are atomic",
           "test_id": "T-DB-TX-006"
+        },
+        {
+          "assertions": [
+            "a released relationship deletion epoch and cutoff prevent an old light from entering a new cycle",
+            "a session/result/date-bound continuation permits the original day without rewriting it to the new date",
+            "real PostgreSQL 18 serializes two device light commands to one LightFact and one logical DayLit outbox",
+            "seven product dates are newest-first and missing dates contain no fabricated facts",
+            "two concurrent DayLit events leave one active cycle, one encounter link and one relationship day"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C011-DB-001"
+        },
+        {
+          "assertions": [
+            "one DayLit event produces one inbox receipt and one relationship link",
+            "real Redis 8 and BullMQ 5 route DayLit only to the background-relationship capability",
+            "the PostgreSQL 18 InboxReceipt and EncounterLink commit before BullMQ acknowledgement"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-008 outbox/inbox publishes once and Redis cache loss rebuilds from PostgreSQL",
+          "test_id": "T-C011-QUEUE-001"
         }
       ],
       "status": "COVERED",
@@ -5506,22 +5619,58 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a released relationship deletion epoch and cutoff prevent an old light from entering a new cycle",
+            "a session/result/date-bound continuation permits the original day without rewriting it to the new date",
+            "real PostgreSQL 18 serializes two device light commands to one LightFact and one logical DayLit outbox",
+            "seven product dates are newest-first and missing dates contain no fabricated facts",
+            "two concurrent DayLit events leave one active cycle, one encounter link and one relationship day"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C011-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-023",
       "source_sets": ["s19-database"]
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a released relationship deletion epoch and cutoff prevent an old light from entering a new cycle",
+            "a session/result/date-bound continuation permits the original day without rewriting it to the new date",
+            "real PostgreSQL 18 serializes two device light commands to one LightFact and one logical DayLit outbox",
+            "seven product dates are newest-first and missing dates contain no fabricated facts",
+            "two concurrent DayLit events leave one active cycle, one encounter link and one relationship day"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C011-DB-001"
+        },
+        {
+          "assertions": [
+            "replay returns the existing link without advancing the projection",
+            "stale epochs and post-deletion cutoff sources are rejected",
+            "valid source revision and guard epochs update a deterministic relationship projection"
+          ],
+          "file": "packages/server-adapters/src/relationship/day-lit-handler.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-011 DayLit relationship handler",
+          "test_id": "T-C011-WORKER-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-024",
       "source_sets": ["s19-database"]
@@ -6722,11 +6871,33 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "client MAIN_ACTION_REACHED claims are rejected instead of stored or trusted",
+            "recent records expose only explicit allowlisted facts and stable low-cardinality operations",
+            "same light command replays one result while a changed payload conflicts"
+          ],
+          "file": "apps/api/src/daily-interaction.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-011 HTTP light and records flow",
+          "test_id": "T-C011-API-001"
+        },
+        {
+          "assertions": [
+            "authenticated OpenAPI light/history paths resolve to executable shared schemas",
+            "the recent history contract represents missing dates without invented light, result or evening facts",
+            "the strict light command binds command, original product date and published result while rejecting reading position and guard authority"
+          ],
+          "file": "apps/api/src/daily-interaction/daily-interaction.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c011-evidence-manifest.json",
+          "selector": "C-011 light and history transport contract",
+          "test_id": "T-C011-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-D04",
       "source_sets": ["s20-api"]

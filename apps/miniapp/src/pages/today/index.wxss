@@ -49,6 +49,12 @@
   line-height: var(--de-font-line-body);
 }
 
+.today__light-action,
+.today__records-entry {
+  display: flex;
+  justify-content: center;
+}
+
 .today__dimension {
   display: flex;
   padding: var(--de-component-notice-padding) 0;

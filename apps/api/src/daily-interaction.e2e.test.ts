@@ -76,6 +76,56 @@ class HttpDailyInteractionStore implements DailyInteractionStore {
     return { status: "RECORDED" } as const;
   }
 
+  public async listHistory(): ReturnType<DailyInteractionStore["listHistory"]> {
+    return {
+      status: "FOUND",
+      value: {
+        items: [
+          {
+            product_date: this.current.product_date,
+            state: "RECORDED",
+            is_lit: this.current.is_lit,
+            has_result: true,
+            has_evening_feedback: false,
+          },
+        ],
+        page_info: { has_more: false },
+      },
+    };
+  }
+
+  public async lightDay(
+    input: Parameters<DailyInteractionStore["lightDay"]>[0],
+  ) {
+    if (this.nextFailure !== undefined) {
+      return { status: this.nextFailure } as const;
+    }
+    const receipt = this.receipts.get(input.commandRef);
+    if (receipt !== undefined) {
+      return receipt.fingerprint.equals(input.normalizedPayloadFingerprint)
+        ? ({ status: "DUPLICATE", value: receipt.value! } as const)
+        : ({ status: "IDEMPOTENCY_CONFLICT" } as const);
+    }
+    if (
+      input.accountId !== accountId ||
+      input.sessionId !== sessionId ||
+      input.productDate !== this.current.product_date ||
+      input.resultRef !== this.current.result_id
+    ) {
+      return { status: "NOT_FOUND" } as const;
+    }
+    this.current = {
+      ...this.current,
+      is_lit: true,
+      updated_at: input.now.toISOString(),
+    };
+    this.receipts.set(input.commandRef, {
+      fingerprint: input.normalizedPayloadFingerprint,
+      value: this.current,
+    });
+    return { status: "ACCEPTED", value: this.current } as const;
+  }
+
   public async updateTask(
     input: Parameters<DailyInteractionStore["updateTask"]>[0],
   ) {
@@ -266,5 +316,52 @@ describe("C-010 HTTP daily task flow", () => {
     ).expect(status);
     expect(response.body.error.code).toBe(code);
     expect(store.current).toEqual(initial);
+  });
+});
+
+describe("C-011 HTTP light and records flow", () => {
+  it("lights once, replays one command and rejects client reading claims", async () => {
+    const events: OrdinaryLogEvent[] = [];
+    const store = new HttpDailyInteractionStore();
+    const application = await testApplication(store, events);
+    const light = {
+      command_ref: "light-command-0001",
+      product_date: "2026-08-24",
+      result_ref: initial.result_id,
+    };
+    const send = (body: Record<string, unknown>) =>
+      authenticated(
+        request(application.getHttpServer())
+          .post("/v1/daily/interaction/light")
+          .set("Idempotency-Key", light.command_ref)
+          .send(body),
+      );
+    await send(light).expect(200);
+    const replay = await send(light).expect(200);
+    expect(replay.body.data).toMatchObject({ is_lit: true });
+    await send({ ...light, result_ref: "another-result" }).expect(409);
+    await send({ ...light, main_action_reached: true }).expect(400);
+    expect(events.map(({ operation_code }) => operation_code)).toContain(
+      "DAILY_LIGHT_CREATE",
+    );
+  });
+
+  it("returns the recent list with explicit fact-free missing dates", async () => {
+    const application = await testApplication(new HttpDailyInteractionStore());
+    const response = await authenticated(
+      request(application.getHttpServer()).get("/v1/history/days"),
+    ).expect(200);
+    expect(response.body.data).toEqual({
+      items: [
+        {
+          product_date: "2026-08-24",
+          state: "RECORDED",
+          is_lit: false,
+          has_result: true,
+          has_evening_feedback: false,
+        },
+      ],
+      page_info: { has_more: false },
+    });
   });
 });

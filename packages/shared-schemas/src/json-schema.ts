@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:cbf337f98a0cdf8d1b0db7664d983167967f7bd77ff046e4ca6edcb72089426a
+// source-fingerprint: sha256:f70a5d272f4235fd03cf8d4c67fdc5189d24c70bc2db0057c3271982478ed6f8
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:cbf337f98a0cdf8d1b0db7664d983167967f7bd77ff046e4ca6edcb72089426a";
+  "sha256:f70a5d272f4235fd03cf8d4c67fdc5189d24c70bc2db0057c3271982478ed6f8";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:

@@ -1,8 +1,12 @@
+import { createHash, randomUUID } from "node:crypto";
+
 import { Pool, type PoolClient } from "pg";
 
 import {
   DailyInteractionStateSchema,
+  HistoryListViewSchema,
   type DailyInteractionState,
+  type HistoryListView,
   type TaskStatus,
 } from "@daily-energy/shared-schemas";
 import {
@@ -21,6 +25,7 @@ import { resolveGenerationGuardSnapshot } from "../generation/guard-snapshot.js"
 
 const RETENTION_POLICY_VERSION = "retention-policy-v1";
 const COMMAND_RECEIPT_TTL_MS = 7 * 24 * 60 * 60_000;
+const OUTBOX_TTL_MS = 30 * 24 * 60 * 60_000;
 const ACCOUNT_GUARD_LOCK_SEED = 20_400;
 
 export type DailyInteractionGuardFailure =
@@ -54,12 +59,44 @@ export type DailyTaskMutationResult =
         | DailyInteractionGuardFailure;
     };
 
+export type DailyLightMutationResult =
+  | {
+      readonly status: "ACCEPTED" | "DUPLICATE";
+      readonly value: DailyInteractionState;
+    }
+  | {
+      readonly status:
+        | "IDEMPOTENCY_CONFLICT"
+        | "NOT_FOUND"
+        | "VIEW_CONTINUATION_EXPIRED"
+        | "WRITE_WINDOW_CLOSED"
+        | DailyInteractionGuardFailure;
+    };
+
+export type HistoryListQueryResult =
+  | { readonly status: "FOUND"; readonly value: HistoryListView }
+  | { readonly status: DailyInteractionGuardFailure };
+
 export interface DailyInteractionStore {
   close(): Promise<void>;
   get(input: {
     readonly accountId: string;
     readonly productDate: string;
   }): Promise<DailyInteractionQueryResult>;
+  lightDay(input: {
+    readonly accountId: string;
+    readonly commandRef: string;
+    readonly normalizedPayloadFingerprint: Buffer;
+    readonly now: Date;
+    readonly productDate: string;
+    readonly productDatePolicyVersion: string;
+    readonly resultRef: string;
+    readonly sessionId: string;
+  }): Promise<DailyLightMutationResult>;
+  listHistory(input: {
+    readonly accountId: string;
+    readonly productDate: string;
+  }): Promise<HistoryListQueryResult>;
   openToday(input: {
     readonly accountId: string;
     readonly openedAt: Date;
@@ -95,6 +132,7 @@ interface InteractionRow {
   readonly helpfulnessRevision: number | null;
   readonly interactionId: string;
   readonly isLit: boolean;
+  readonly lightId: string | null;
   readonly productDate: string;
   readonly resultId: string;
   readonly taskRef: string;
@@ -195,6 +233,145 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
       return row === undefined
         ? { status: "NOT_FOUND" }
         : { status: "FOUND", value: interactionView(row) };
+    });
+  }
+
+  public async listHistory(input: {
+    readonly accountId: string;
+    readonly productDate: string;
+  }): Promise<HistoryListQueryResult> {
+    return this.#transaction(async (client) => {
+      await lockAccountGuard(client, input.accountId);
+      const guard = await historyGuard(client, input.accountId);
+      if (guard !== undefined) {
+        return { status: guard };
+      }
+      const rows = await client.query<{
+        hasEveningFeedback: boolean;
+        hasResult: boolean;
+        isLit: boolean;
+        productDate: string;
+        recorded: boolean;
+      }>(
+        `SELECT product_date AS "productDate",recorded,
+                has_result AS "hasResult",is_lit AS "isLit",
+                has_evening_feedback AS "hasEveningFeedback"
+           FROM daily_energy.list_c011_history_days($1::uuid,$2::date)`,
+        [input.accountId, input.productDate],
+      );
+      return {
+        status: "FOUND",
+        value: HistoryListViewSchema.parse({
+          items: rows.rows.map((row) => ({
+            product_date: row.productDate,
+            state: row.recorded ? "RECORDED" : "MISSING",
+            is_lit: row.isLit,
+            has_result: row.hasResult,
+            has_evening_feedback: row.hasEveningFeedback,
+          })),
+          page_info: { has_more: false },
+        }),
+      };
+    });
+  }
+
+  public async lightDay(input: {
+    readonly accountId: string;
+    readonly commandRef: string;
+    readonly normalizedPayloadFingerprint: Buffer;
+    readonly now: Date;
+    readonly productDate: string;
+    readonly productDatePolicyVersion: string;
+    readonly resultRef: string;
+    readonly sessionId: string;
+  }): Promise<DailyLightMutationResult> {
+    return this.#transaction(async (client) => {
+      await lockAccountGuard(client, input.accountId);
+      const guard = await resolveGenerationGuardSnapshot(
+        client,
+        input.accountId,
+        input.productDate,
+      );
+      if (guard.status !== "ALLOWED") {
+        return { status: guard.status };
+      }
+      const current = await readInteraction(
+        client,
+        input.accountId,
+        input.productDate,
+        undefined,
+        true,
+      );
+      if (current === undefined || current.resultId !== input.resultRef) {
+        return { status: "NOT_FOUND" };
+      }
+      const claim = await claimLightCommand(client, input);
+      if (claim.status === "CONFLICT") {
+        return { status: "IDEMPOTENCY_CONFLICT" };
+      }
+      if (claim.status === "DUPLICATE" && claim.responseRef !== null) {
+        if (claim.responseRef !== current.lightId) {
+          throw new Error("DAILY_LIGHT_COMMAND_RESPONSE_MISMATCH");
+        }
+        return { status: "DUPLICATE", value: interactionView(current) };
+      }
+      if (current.lightId !== null) {
+        await attachCommandResponse(client, input, current.lightId);
+        return { status: "DUPLICATE", value: interactionView(current) };
+      }
+      const windowFailure = await interactionWindowFailure(
+        client,
+        input,
+        current,
+        "ILLUMINATE",
+      );
+      if (windowFailure !== undefined) {
+        return { status: windowFailure };
+      }
+      const lightId = randomUUID();
+      await client.query(
+        `INSERT INTO daily_energy.app_daily_light_fact
+          (id,"interactionId","sourceCommandRef","litAt",
+           "sourceValidityRevision","retentionPolicyVersion","retentionScope",
+           "retentionAnchorAt")
+         VALUES ($1::uuid,$2::uuid,$3::uuid,$4::timestamptz,1,$5,'DAY',
+                 $4::timestamptz)`,
+        [
+          lightId,
+          current.interactionId,
+          commandRefStorageUuid(input.commandRef),
+          input.now,
+          RETENTION_POLICY_VERSION,
+        ],
+      );
+      const aggregateUpdated = await client.query(
+        `UPDATE daily_energy.app_daily_interaction
+            SET "aggregateRevision"="aggregateRevision"+1,
+                "updatedAt"=$1::timestamptz
+          WHERE id=$2::uuid AND "aggregateRevision"=$3`,
+        [input.now, current.interactionId, current.aggregateRevision],
+      );
+      if (aggregateUpdated.rowCount !== 1) {
+        throw new Error("DAILY_LIGHT_AGGREGATE_CAS_LOST");
+      }
+      await insertDayLitOutbox(client, {
+        deletionEpoch: guard.deletionEpoch,
+        lightId,
+        now: input.now,
+        productDate: input.productDate,
+        safetyEpoch: guard.safetyEpoch,
+      });
+      await attachCommandResponse(client, input, lightId);
+      return {
+        status: "ACCEPTED",
+        value: interactionView({
+          ...current,
+          aggregateRevision: current.aggregateRevision + 1,
+          isLit: true,
+          lightId,
+          updatedAt: input.now,
+        }),
+      };
     });
   }
 
@@ -413,6 +590,12 @@ export const UNAVAILABLE_DAILY_INTERACTION_STORE: DailyInteractionStore =
     async get() {
       throw new Error("DAILY_INTERACTION_STORE_UNAVAILABLE");
     },
+    async lightDay() {
+      throw new Error("DAILY_INTERACTION_STORE_UNAVAILABLE");
+    },
+    async listHistory() {
+      throw new Error("DAILY_INTERACTION_STORE_UNAVAILABLE");
+    },
     async openToday() {
       return { status: "RECORDED" } as const;
     },
@@ -437,7 +620,7 @@ async function readInteraction(
               task.revision AS "taskRevision",task.status::text AS "taskStatus",
               helpfulness.rating::text AS "helpfulnessRating",
               helpfulness.revision AS "helpfulnessRevision",
-              (light.id IS NOT NULL) AS "isLit"
+              light.id AS "lightId",(light.id IS NOT NULL) AS "isLit"
          FROM daily_energy.app_daily_interaction interaction
          JOIN daily_energy.app_published_result_visibility visibility
            ON visibility."resultId"=interaction."resultId"
@@ -493,6 +676,20 @@ async function taskWindowFailure(
   },
   current: InteractionRow,
 ): Promise<"VIEW_CONTINUATION_EXPIRED" | "WRITE_WINDOW_CLOSED" | undefined> {
+  return interactionWindowFailure(client, input, current, "TASK_STATUS_SET");
+}
+
+async function interactionWindowFailure(
+  client: PoolClient,
+  input: {
+    readonly accountId: string;
+    readonly now: Date;
+    readonly productDate: string;
+    readonly sessionId: string;
+  },
+  current: InteractionRow,
+  operation: "ILLUMINATE" | "TASK_STATUS_SET",
+): Promise<"VIEW_CONTINUATION_EXPIRED" | "WRITE_WINDOW_CLOSED" | undefined> {
   const grant = await findContinuationGrant(client, {
     accountId: input.accountId,
     productDate: input.productDate,
@@ -502,7 +699,7 @@ async function taskWindowFailure(
   const writeWindow = evaluateWriteWindow({
     ...(grant === undefined ? {} : { grant }),
     now: input.now,
-    operation: "TASK_STATUS_SET",
+    operation,
     ownerRef: input.accountId,
     sessionRef: input.sessionId,
     surface: "DLY-003",
@@ -516,6 +713,119 @@ async function taskWindowFailure(
       input.now.getTime() >= grant.expiresAt.getTime())
     ? "VIEW_CONTINUATION_EXPIRED"
     : "WRITE_WINDOW_CLOSED";
+}
+
+async function claimLightCommand(
+  client: PoolClient,
+  input: {
+    readonly accountId: string;
+    readonly commandRef: string;
+    readonly normalizedPayloadFingerprint: Buffer;
+    readonly now: Date;
+    readonly productDate: string;
+    readonly productDatePolicyVersion: string;
+    readonly resultRef: string;
+  },
+): Promise<CommandClaim> {
+  const commandRef = commandRefStorageUuid(input.commandRef);
+  const targetKey = `${input.productDate}:${input.resultRef}`;
+  const inserted = await client.query(
+    `INSERT INTO daily_energy.runtime_command_receipt
+      (id,"accountId","commandRef","operationCode","targetScope",
+       "targetKey","productDatePolicyVersion","normalizedPayloadFingerprint",
+       "acceptedAt","retentionPolicyVersion","retentionScope",
+       "retentionAnchorAt","expiresAt")
+     VALUES (gen_random_uuid(),$1,$2,'ILLUMINATE','DAY',$3,$4,$5,
+             $6::timestamptz,$7,'RUNTIME',$6::timestamptz,$8::timestamptz)
+     ON CONFLICT ("accountId","commandRef") DO NOTHING`,
+    [
+      input.accountId,
+      commandRef,
+      targetKey,
+      input.productDatePolicyVersion,
+      input.normalizedPayloadFingerprint,
+      input.now,
+      RETENTION_POLICY_VERSION,
+      new Date(input.now.getTime() + COMMAND_RECEIPT_TTL_MS),
+    ],
+  );
+  if (inserted.rowCount === 1) {
+    return { status: "NEW" };
+  }
+  const row = (
+    await client.query<ReceiptRow>(
+      `SELECT "operationCode","targetKey","productDatePolicyVersion",
+              "normalizedPayloadFingerprint","responseRef"
+         FROM daily_energy.runtime_command_receipt
+        WHERE "accountId"=$1::uuid AND "commandRef"=$2::uuid
+        FOR UPDATE`,
+      [input.accountId, commandRef],
+    )
+  ).rows[0];
+  if (row === undefined) {
+    throw new Error("DAILY_LIGHT_COMMAND_RECEIPT_MISSING");
+  }
+  return row.operationCode === "ILLUMINATE" &&
+    row.targetKey === targetKey &&
+    row.productDatePolicyVersion === input.productDatePolicyVersion &&
+    row.normalizedPayloadFingerprint.equals(input.normalizedPayloadFingerprint)
+    ? { responseRef: row.responseRef, status: "DUPLICATE" }
+    : { status: "CONFLICT" };
+}
+
+async function insertDayLitOutbox(
+  client: PoolClient,
+  input: {
+    readonly deletionEpoch: bigint;
+    readonly lightId: string;
+    readonly now: Date;
+    readonly productDate: string;
+    readonly safetyEpoch: bigint;
+  },
+): Promise<void> {
+  const idempotencyKey = createHash("sha256")
+    .update(`c011:DayLit:${input.lightId}:1`, "utf8")
+    .digest();
+  await client.query(
+    `INSERT INTO daily_energy.runtime_outbox_event
+      (id,"aggregateType","aggregateRef","aggregateRevision","eventType",
+       "eventVersion","idempotencyKey","allowlistedPayload","guardEpochs",
+       state,"availableAt","attemptCount","createdAt","retentionPolicyVersion",
+       "retentionScope","retentionAnchorAt","expiresAt")
+     VALUES (gen_random_uuid(),'DailyLight',$1::uuid,1,'DayLit','v1',$2,
+             $3::jsonb,$4::jsonb,'PENDING',$5::timestamptz,0,$5::timestamptz,
+             $6,'RUNTIME',$5::timestamptz,$7::timestamptz)`,
+    [
+      input.lightId,
+      idempotencyKey,
+      JSON.stringify({
+        product_date: input.productDate,
+        source_validity_revision: 1,
+      }),
+      JSON.stringify({
+        deletion: input.deletionEpoch.toString(),
+        safety: input.safetyEpoch.toString(),
+      }),
+      input.now,
+      RETENTION_POLICY_VERSION,
+      new Date(input.now.getTime() + OUTBOX_TTL_MS),
+    ],
+  );
+}
+
+async function historyGuard(
+  client: PoolClient,
+  accountId: string,
+): Promise<DailyInteractionGuardFailure | undefined> {
+  const row = (
+    await client.query<{ status: DailyInteractionGuardFailure | "ALLOWED" }>(
+      `SELECT daily_energy.resolve_c011_history_guard(
+         $1::uuid,'necessary-consent-v1'
+       ) AS status`,
+      [accountId],
+    )
+  ).rows[0];
+  return row === undefined || row.status === "ALLOWED" ? undefined : row.status;
 }
 
 async function findContinuationGrant(
