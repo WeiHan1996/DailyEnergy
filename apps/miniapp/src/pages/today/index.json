@@ -10,7 +10,8 @@
     "de-offline-state": "../../components/offline-state/index",
     "de-page-shell": "../../components/page-shell/index",
     "de-recoverable-error": "../../components/recoverable-error/index",
-    "de-section-card": "../../components/section-card/index"
+    "de-section-card": "../../components/section-card/index",
+    "de-state-selector": "../../components/state-selector/index"
   },
   "navigationStyle": "custom"
 }

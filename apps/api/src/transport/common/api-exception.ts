@@ -1,6 +1,7 @@
 import { HttpStatus } from "@nestjs/common";
 import {
   CheckinViewSchema,
+  DailyInteractionStateSchema,
   MemoryPreferencesViewSchema,
   NotificationSettingsViewSchema,
   ProfileViewSchema,
@@ -216,6 +217,20 @@ export const API_ERROR_CATALOG = {
     retryable: false,
     status: HttpStatus.BAD_REQUEST,
   },
+  VIEW_CONTINUATION_EXPIRED: {
+    category: "GUARD",
+    message: "这一天的继续操作时间已结束，请前往今天。",
+    messageKey: "error.view_continuation_expired",
+    retryable: false,
+    status: HttpStatus.FORBIDDEN,
+  },
+  WRITE_WINDOW_CLOSED: {
+    category: "GUARD",
+    message: "这一天现在只能查看，不能再修改。",
+    messageKey: "error.write_window_closed",
+    retryable: false,
+    status: HttpStatus.FORBIDDEN,
+  },
 } as const satisfies Readonly<Record<string, ApiErrorDefinition>>;
 
 export type ApiErrorCode = keyof typeof API_ERROR_CATALOG;
@@ -245,6 +260,7 @@ const RevisionErrorDetailsSchema = z.strictObject({
   current_revision: z.number().int().positive(),
   current: z.union([
     CheckinViewSchema,
+    DailyInteractionStateSchema,
     ProfileViewSchema,
     MemoryPreferencesViewSchema,
     NotificationSettingsViewSchema,

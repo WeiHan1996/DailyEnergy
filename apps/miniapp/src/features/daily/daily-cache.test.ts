@@ -5,6 +5,7 @@ import {
   DAILY_VIEW_CACHE_TTL_MS,
   DailyViewCache,
   PendingGenerationStore,
+  PendingTaskUpdateStore,
 } from "./daily-cache.js";
 import { historyFixture, todayFixture } from "./daily-fixture.test.js";
 
@@ -89,6 +90,29 @@ describe("C-009 daily view cache", () => {
     });
     await expect(
       new PendingGenerationStore(state.port, "scope-two", () => 1_000).load(),
+    ).resolves.toBeUndefined();
+  });
+
+  it("keeps one session-scoped task command only for unknown-outcome recovery", async () => {
+    const state = storage();
+    const pending = new PendingTaskUpdateStore(
+      state.port,
+      "scope-one",
+      () => 1_000,
+    );
+    await pending.save({
+      commandRef: "task-command-one",
+      expectedRevision: 1,
+      productDate: "2026-08-24",
+      status: "INTERESTED",
+      taskRef: "task.close-one-distraction.v1",
+    });
+    await expect(pending.load()).resolves.toMatchObject({
+      commandRef: "task-command-one",
+      status: "INTERESTED",
+    });
+    await expect(
+      new PendingTaskUpdateStore(state.port, "scope-two", () => 1_000).load(),
     ).resolves.toBeUndefined();
   });
 });

@@ -3,6 +3,7 @@ import {
   UNAVAILABLE_CHECKIN_STORE,
   UNAVAILABLE_CONSENT_PROFILE_STORE,
   UNAVAILABLE_DAILY_GENERATION_STORE,
+  UNAVAILABLE_DAILY_INTERACTION_STORE,
 } from "@daily-energy/server-adapters/api";
 
 import { AuthAttemptLimiter } from "../auth/auth-attempt-limiter.js";
@@ -16,6 +17,7 @@ import { ShutdownObserver } from "../bootstrap/shutdown-observer.js";
 import { CheckinService } from "../checkin/checkin.service.js";
 import { ConsentProfileService } from "../consent-profile/consent-profile.service.js";
 import { GenerationService } from "../generation/generation.service.js";
+import { DailyInteractionService } from "../daily-interaction/daily-interaction.service.js";
 import {
   developmentPreferredNameCodec,
   UNAVAILABLE_PREFERRED_NAME_CODEC,
@@ -40,6 +42,7 @@ import { CheckinController } from "../transport/public/checkin.controller.js";
 import { ConsentProfileController } from "../transport/public/consent-profile.controller.js";
 import { HealthController } from "../transport/public/health.controller.js";
 import { GenerationController } from "../transport/public/generation.controller.js";
+import { DailyInteractionController } from "../transport/public/daily-interaction.controller.js";
 import { HealthService } from "../transport/public/health.service.js";
 import { LaunchAudienceGuard } from "../transport/public/launch-audience.guard.js";
 import { PublicAudienceGuard } from "../transport/public/public-audience.guard.js";
@@ -51,6 +54,7 @@ import {
   CHECKIN_STORE,
   CONSENT_PROFILE_STORE,
   DAILY_GENERATION_STORE,
+  DAILY_INTERACTION_STORE,
   type ApiComposition,
   ORDINARY_LOG_SINK,
   PREFERRED_NAME_CODEC,
@@ -103,6 +107,12 @@ export class ApiModule {
         useValue:
           composition.overrides?.dailyGenerationStore ??
           UNAVAILABLE_DAILY_GENERATION_STORE,
+      },
+      {
+        provide: DAILY_INTERACTION_STORE,
+        useValue:
+          composition.overrides?.dailyInteractionStore ??
+          UNAVAILABLE_DAILY_INTERACTION_STORE,
       },
       {
         provide: PREFERRED_NAME_CODEC,
@@ -162,6 +172,7 @@ export class ApiModule {
       AuthService,
       CheckinService,
       ConsentProfileService,
+      DailyInteractionService,
       GenerationService,
       HealthService,
       HttpLoggingInterceptor,
@@ -179,6 +190,7 @@ export class ApiModule {
         AuthController,
         CheckinController,
         ConsentProfileController,
+        DailyInteractionController,
         GenerationController,
         HealthController,
         PublicController,

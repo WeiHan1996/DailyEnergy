@@ -1,0 +1,81 @@
+{
+  "evidence_version": "c-010-manual-evidence-v1",
+  "task_id": "C-010",
+  "execution_status": "MANUAL_EVIDENCE_PENDING",
+  "pass_claim": "PROHIBITED",
+  "synthetic_accounts_only": true,
+  "design_source": {
+    "status": "AVAILABLE_READ_ONLY",
+    "figma_file": "T5HS32Ciz6LZh81KbqhFGo",
+    "figma_version": "D-004 Accepted 2026-08-19 via PR #145",
+    "frame_ids": ["220:20", "220:25"],
+    "source_inspection": "BROWSER_READ_ONLY_VERIFIED_2026-08-24",
+    "observed_boundaries": [
+      "one primary action remains visually dominant before optional task controls",
+      "completion feedback is restrained and contains no points, reward or celebration",
+      "the accepted copy states that task completion is not required for lighting the day"
+    ]
+  },
+  "implementation_states": {
+    "task_unmarked": "MANUAL_EVIDENCE_PENDING",
+    "task_interested": "MANUAL_EVIDENCE_PENDING",
+    "task_completed": "MANUAL_EVIDENCE_PENDING",
+    "task_skipped": "MANUAL_EVIDENCE_PENDING",
+    "task_pending_unknown": "MANUAL_EVIDENCE_PENDING",
+    "task_revision_conflict": "MANUAL_EVIDENCE_PENDING",
+    "task_offline_disabled": "MANUAL_EVIDENCE_PENDING",
+    "task_continuation_closed": "MANUAL_EVIDENCE_PENDING",
+    "task_safety_overlay": "MANUAL_EVIDENCE_PENDING",
+    "large_text_125": "MANUAL_EVIDENCE_PENDING",
+    "reduced_motion": "MANUAL_EVIDENCE_PENDING"
+  },
+  "devtools": {
+    "status": "INFRA_BLOCKED",
+    "reason_code": "MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT",
+    "cli_path_verified": true,
+    "runner_version": null,
+    "base_library_version": "3.7.12",
+    "screen_ids": ["DLY-003"]
+  },
+  "design_review": {
+    "token_and_component_reuse": "AUTOMATED_GATE_AVAILABLE",
+    "component_mapping": [
+      "DE / SectionCard",
+      "DE / StateSelector",
+      "DE / InlineNotice",
+      "DE / OfflineState"
+    ],
+    "recorded_differences": [
+      "C-010 uses the existing accessible StateSelector contract for all four correctable states instead of adding an unregistered task component",
+      "point-lighting remains read-only and unchanged until C-011",
+      "implementation screenshots remain unavailable while the DevTools runner is INFRA_BLOCKED"
+    ],
+    "visual_and_interaction_review": "C010_UNIFIED_REVIEW_PENDING",
+    "user_acceptance": "C010_UNIFIED_REVIEW_PENDING"
+  },
+  "security_review": {
+    "status": "OWNER_REVIEW_PENDING",
+    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "reviewed_boundaries": [
+      "the client supplies a target date only to identify the original page; a live session-bound continuation grant and server clock remain authoritative",
+      "same command replay, semantic no-op and concurrent CAS cannot create a second task fact or silently overwrite a newer revision",
+      "unknown outcome stores one session-scoped bounded command identity and never forms an offline write queue",
+      "Safety, account and DAY deletion guards execute before task mutation and clear ordinary local cache",
+      "task status changes do not alter result, checkin, light, helpfulness, evening feedback or relationship state"
+    ],
+    "residual_evidence": [
+      "owner pressure-language and task-behavior review during the unified C-004 through C-015 audit",
+      "WeChat DevTools route and interaction evidence after the launch-timeout infrastructure issue is resolved",
+      "iOS/Android large-text, screen-reader, network transition and safe-area evidence",
+      "Production WeChat publication and deployment authorization remain outside C-010"
+    ],
+    "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
+  },
+  "real_device": {
+    "ios": "MANUAL_EVIDENCE_PENDING",
+    "android": "MANUAL_EVIDENCE_PENDING",
+    "matrix": []
+  },
+  "reviewer": null,
+  "reviewed_at_utc": null
+}

@@ -54,6 +54,7 @@ export {
   CheckinSubmitRequestSchema,
   CheckinViewSchema,
   GenerationStartRequestSchema,
+  TaskStateUpdateRequestSchema,
   WechatSessionRequestSchema,
 } from "./public-transport.js";
 export type {
@@ -61,6 +62,7 @@ export type {
   CheckinSubmitRequest,
   CheckinView,
   GenerationStartRequest,
+  TaskStateUpdateRequest,
   WechatSessionRequest,
 } from "./public-transport.js";
 

@@ -75,6 +75,23 @@
 
       <de-section-card heading="如果愿意">
         <view class="today__optional-task">{{view.content.optional_task.instruction}}</view>
+        <de-state-selector
+          accessible-label="可选任务状态"
+          disabled="{{offline || taskBusy || taskPending || taskReadOnly}}"
+          error="{{taskError}}"
+          label="你想怎样标记"
+          options="{{taskOptions}}"
+          selected-value="{{view.interaction.task.status}}"
+          supporting-text="完全可选，不影响点亮或今天的结果。"
+          bind:change="updateTask"
+        ></de-state-selector>
+        <de-inline-notice
+          wx:if="{{taskNotice}}"
+          action-label="{{taskNoticeAction}}"
+          message="{{taskNotice}}"
+          tone="{{taskReadOnly ? 'warning' : 'info'}}"
+          bind:action="retryTask"
+        ></de-inline-notice>
       </de-section-card>
 
       <de-inline-notice

@@ -86,6 +86,7 @@ export {
   ProfileUpdateRequestSchema,
   ProfileViewSchema,
   StyleCalibrationRequestSchema,
+  TaskStateUpdateRequestSchema,
   WechatSessionRequestSchema,
 } from "./public-transport.js";
 export type {
@@ -106,6 +107,7 @@ export type {
   ProfileUpdateRequest,
   ProfileView,
   StyleCalibrationRequest,
+  TaskStateUpdateRequest,
   WechatSessionRequest,
 } from "./public-transport.js";
 

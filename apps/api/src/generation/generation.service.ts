@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { Inject, Injectable } from "@nestjs/common";
 import type {
   DailyGenerationStore,
+  DailyInteractionStore,
   GenerationGuardFailure,
   HistoryDayQueryResult,
   GenerationIntentQueryResult,
@@ -20,6 +21,7 @@ import type { SessionPrincipal } from "../auth/contracts.js";
 import type { RuntimeConfig } from "../bootstrap/runtime-config.js";
 import {
   DAILY_GENERATION_STORE,
+  DAILY_INTERACTION_STORE,
   PRODUCT_DATE_CLOCK,
   RUNTIME_CONFIG,
 } from "../composition/tokens.js";
@@ -40,6 +42,8 @@ export class GenerationService {
   public constructor(
     @Inject(DAILY_GENERATION_STORE)
     private readonly store: DailyGenerationStore,
+    @Inject(DAILY_INTERACTION_STORE)
+    private readonly interactionStore: DailyInteractionStore,
     @Inject(PRODUCT_DATE_CLOCK) private readonly clock: ProductDateClock,
     @Inject(RUNTIME_CONFIG) private readonly config: RuntimeConfig,
   ) {}
@@ -114,6 +118,18 @@ export class GenerationService {
     );
     if (result.status !== "FOUND") {
       throw todayException(result.status, resolution);
+    }
+    const opened = await this.#storeCall(() =>
+      this.interactionStore.openToday({
+        accountId: principal.accountId,
+        openedAt: resolution.now,
+        productDate: result.value.content.product_date,
+        resultId: result.value.content.result_id,
+        sessionId: principal.sessionId,
+      }),
+    );
+    if (opened.status !== "RECORDED") {
+      throw guardException(opened.status, resolution);
     }
     return { resolution, view: result.value };
   }

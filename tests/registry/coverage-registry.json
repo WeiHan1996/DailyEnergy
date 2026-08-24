@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 289, "NA_WITH_REASON": 0, "PLANNED": 503 },
+  "counts": { "COVERED": 291, "NA_WITH_REASON": 0, "PLANNED": 502 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -6733,11 +6733,48 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "read and update routes emit stable low-cardinality operation codes",
+            "Safety, closed and expired continuation responses never produce optimistic task success",
+            "same command and payload replay one result while changed payload or mismatched idempotency header conflicts",
+            "stale expected revision returns the latest strict interaction without owner/session/guard leakage"
+          ],
+          "file": "apps/api/src/daily-interaction.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c010-evidence-manifest.json",
+          "selector": "C-010 HTTP daily task flow",
+          "test_id": "T-C010-API-001"
+        },
+        {
+          "assertions": [
+            "interaction responses are the existing client-safe DailyInteractionState projection",
+            "owner, session, continuation grant and guard epochs remain server-only",
+            "the strict task command binds command, original product date, published task ID, expected revision and closed status enum"
+          ],
+          "file": "apps/api/src/daily-interaction/daily-interaction.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c010-evidence-manifest.json",
+          "selector": "C-010 daily task transport contract",
+          "test_id": "T-C010-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a live DAY deletion guard blocks the task write and the task never changes the independent light fact",
+            "a session-bound DLY-003 grant permits the original day at 04:05 and expires at the 04:30 boundary",
+            "historical interaction reads the frozen task state without regenerating content",
+            "real PostgreSQL 18 lets only one of two task CAS writers win and returns the latest revision to the loser",
+            "same command replay and semantic no-op do not increment task revision"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c010-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C010-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-D05",
       "source_sets": ["s20-api"]
@@ -14853,6 +14890,35 @@
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:rule-facts:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:task-state-update-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:task-state-update-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:task-state-update-request:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {

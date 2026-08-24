@@ -5,14 +5,15 @@ E-004 提供微信原生小程序 TypeScript 运行骨架，D-002 在该 client-
 第一次认识；C-004 已实现 DLY-001 每日签到、同日草稿、三项结构化选择、
 提交/更正、Offline/Error/Disabled/跨日和 Unknown outcome 恢复。C-009 已实现
 DLY-002 生成恢复、DLY-003 今日内容、REC-002 历史只读/MISSING 与 session-scoped
-白名单缓存；点亮、任务写入、反馈、趋势和删除命令仍由后续 C 系列任务交付。
+白名单缓存；C-010 已激活一个可选任务的四态 CAS、同 command 未知结果恢复、
+跨日 continuation 与离线禁写。点亮、反馈、趋势和删除命令仍由后续 C 系列任务交付。
 
 ## 目录边界
 
 - `src/app`：公开构建配置校验和应用上下文；
 - `src/pages`：启动、承接、首次认识、每日签到、生成、今日、历史日、安全与恢复页面；
 - `src/components`：D-002 的 15 个微信原生组件目录，对应 17 个逻辑组件合同；
-- `src/features`：onboarding/checkin/daily 的纯客户端草稿、同 intent 恢复与只读缓存编排；
+- `src/features`：onboarding/checkin/daily 的纯客户端草稿、同 intent/command 恢复与只读缓存编排；
 - `src/platform`：微信 login、storage、network、share、subscription
   adapter 与可替换 port；
 - `src/services`：E-008 交付 API Client 后的调用编排入口；
@@ -78,7 +79,7 @@ pnpm --filter @daily-energy/app-miniapp build
   DevTools 结果分类和 bundle 静态规则；
 - `pnpm build`：TypeScript 产物与 client-only bundle Gate；
 - `pnpm test:devtools`：需要
-  `WECHAT_DEVTOOLS_CLI_PATH`，通过 `miniprogram-automator` 验证启动、DLY-002、DLY-003、REC-002、安全与恢复页。
+  `WECHAT_DEVTOOLS_CLI_PATH`，通过 `miniprogram-automator` 验证启动、DLY-002、DLY-003、REC-002、任务状态、安全与恢复页。
 
 只有 CLI 缺失、automation endpoint 不可连接或启动握手超时等明确基础设施
 错误会返回 `INFRA_BLOCKED`（exit 2）。启动成功后的页面脚本、模块加载、

@@ -1,0 +1,66 @@
+{
+  "manifest_version": "c-010-evidence-v1",
+  "scope": "C-010 optional task command contract, owner/session/date guards, PostgreSQL CAS and idempotency, continuation window, Mini Program unknown-outcome recovery and pressure-free interaction",
+  "authority": [
+    "docs/product/state-machine.md",
+    "docs/product/business-rules.md",
+    "docs/design/content-layout.md",
+    "docs/data/domain-model.md",
+    "docs/technical/api.md",
+    "docs/technical/database.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C010-CONTRACT-001": {
+      "file": "apps/api/src/daily-interaction/daily-interaction.contract.test.ts",
+      "selector": "C-010 daily task transport contract",
+      "level": "CONTRACT",
+      "assertions": [
+        "the strict task command binds command, original product date, published task ID, expected revision and closed status enum",
+        "owner, session, continuation grant and guard epochs remain server-only",
+        "interaction responses are the existing client-safe DailyInteractionState projection"
+      ]
+    },
+    "T-C010-API-001": {
+      "file": "apps/api/src/daily-interaction.e2e.test.ts",
+      "selector": "C-010 HTTP daily task flow",
+      "level": "E2E",
+      "assertions": [
+        "same command and payload replay one result while changed payload or mismatched idempotency header conflicts",
+        "stale expected revision returns the latest strict interaction without owner/session/guard leakage",
+        "Safety, closed and expired continuation responses never produce optimistic task success",
+        "read and update routes emit stable low-cardinality operation codes"
+      ]
+    },
+    "T-C010-DB-001": {
+      "file": "tests/database/c008-daily-generation.test.mjs",
+      "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+      "level": "DB",
+      "assertions": [
+        "real PostgreSQL 18 lets only one of two task CAS writers win and returns the latest revision to the loser",
+        "same command replay and semantic no-op do not increment task revision",
+        "a session-bound DLY-003 grant permits the original day at 04:05 and expires at the 04:30 boundary",
+        "a live DAY deletion guard blocks the task write and the task never changes the independent light fact",
+        "historical interaction reads the frozen task state without regenerating content"
+      ]
+    },
+    "T-C010-MINIAPP-001": {
+      "file": "apps/miniapp/src/features/daily/daily-flow.test.ts",
+      "selector": "C-009 daily coordinator / C-010 optional task",
+      "level": "MODULE",
+      "assertions": [
+        "the client persists one attempted command only after an unknown network outcome and retries that same identity",
+        "CAS conflict replaces the cached interaction with the latest strict server view",
+        "expired continuation becomes read-only and offline never creates a queued write",
+        "INTERESTED, COMPLETED, SKIPPED and UNMARKED remain independent of is_lit"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S20-D05",
+      "status": "COVERED",
+      "proof_ids": ["T-C010-CONTRACT-001", "T-C010-API-001", "T-C010-DB-001"]
+    }
+  ]
+}

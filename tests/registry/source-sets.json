@@ -230,7 +230,7 @@
         "kind": "text-regex",
         "pattern": "urn:dailyenergy:schema:[a-z0-9-]+:[0-9]+\\.[0-9]+\\.[0-9]+"
       },
-      "expected_count": 28,
+      "expected_count": 29,
       "requirements": [{ "any_of": ["UNIT"] }, { "any_of": ["CONTRACT"] }],
       "planned_owner": "E-008 contract maintenance"
     }
@@ -302,6 +302,10 @@
     },
     {
       "path": "tests/registry/c009-evidence-manifest.json",
+      "kind": "proof-map"
+    },
+    {
+      "path": "tests/registry/c010-evidence-manifest.json",
       "kind": "proof-map"
     }
   ],

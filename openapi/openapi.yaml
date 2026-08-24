@@ -2366,24 +2366,7 @@ components:
         - command_ref
         - result_ref
     TaskStateUpdateRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        task_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-        expected_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-        status:
-          $ref: "#/components/schemas/TaskStatus"
-      additionalProperties: false
-      required:
-        - command_ref
-        - task_ref
-        - expected_revision
-        - status
+      x-source-contract: TaskStateUpdateRequestSchema
     HelpfulnessUpdateRequest:
       type: object
       properties:

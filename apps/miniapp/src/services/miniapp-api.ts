@@ -13,6 +13,7 @@ export type CheckinSleep = components["schemas"]["Sleep"];
 export type GenerationIntentView =
   components["schemas"]["GenerationIntentView"];
 export type TodayView = components["schemas"]["TodayView"];
+export type DailyInteractionView = TodayView["interaction"];
 export type HistoryDayView = components["schemas"]["HistoryDayView"];
 type ConsentView = components["schemas"]["ConsentView"];
 export type ExpressionStyle = components["schemas"]["ExpressionStyle"];
@@ -67,6 +68,11 @@ export interface HistoryDayEnvelope {
   readonly productDate: string;
 }
 
+export interface DailyInteractionEnvelope {
+  readonly interaction: DailyInteractionView;
+  readonly productDate: string;
+}
+
 export interface C003Api {
   acceptConsent(input: {
     readonly commandRef: string;
@@ -112,6 +118,17 @@ export interface C009Api {
   }): Promise<GenerationIntentEnvelope>;
 }
 
+export interface C010Api {
+  getInteraction(): Promise<DailyInteractionEnvelope>;
+  updateTask(input: {
+    readonly commandRef: string;
+    readonly expectedRevision: number;
+    readonly productDate: string;
+    readonly status: DailyInteractionView["task"]["status"];
+    readonly taskRef: string;
+  }): Promise<DailyInteractionEnvelope>;
+}
+
 export class MiniappApiError extends Error {
   public constructor(
     public readonly code: string,
@@ -121,6 +138,7 @@ export class MiniappApiError extends Error {
     public readonly safetyView?: SafetyView,
     public readonly productDate?: string,
     public readonly retryAfterSeconds?: number,
+    public readonly currentInteraction?: DailyInteractionView,
   ) {
     super(code);
     this.name = "MiniappApiError";
@@ -188,6 +206,9 @@ function apiError(body: unknown, status: number): MiniappApiError {
   const retryAfterSeconds = isRecord(error?.details)
     ? error.details.retry_after_seconds
     : undefined;
+  const currentInteraction = isRecord(error?.details)
+    ? safeInteractionView(error.details.current)
+    : undefined;
   return new MiniappApiError(
     code,
     status,
@@ -200,7 +221,16 @@ function apiError(body: unknown, status: number): MiniappApiError {
       retryAfterSeconds >= 0
       ? retryAfterSeconds
       : undefined,
+    currentInteraction,
   );
+}
+
+function safeInteractionView(value: unknown): DailyInteractionView | undefined {
+  try {
+    return projectInteractionView(value);
+  } catch {
+    return undefined;
+  }
 }
 
 function projectSafetyView(value: unknown): SafetyView | undefined {
@@ -816,10 +846,10 @@ function headers(sessionToken?: string, commandRef?: string) {
 
 export function createMiniappApi(
   network: NetworkPort,
-): C003Api & C004Api & C009Api {
+): C003Api & C004Api & C009Api & C010Api {
   let sessionToken: string | undefined;
 
-  const api: C003Api & C004Api & C009Api = {
+  const api: C003Api & C004Api & C009Api & C010Api = {
     async createSession(input): Promise<SessionEnvelope> {
       const response = await network.request({
         body: input as StorageValue,
@@ -1006,6 +1036,42 @@ export function createMiniappApi(
       const parsed = successData(response.data, response.statusCode);
       return Object.freeze({
         history: projectHistoryDayView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async getInteraction(): Promise<DailyInteractionEnvelope> {
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: "/v1/daily/interaction",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        interaction: projectInteractionView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async updateTask(input): Promise<DailyInteractionEnvelope> {
+      if (!isProductDate(input.productDate) || !isOpaqueRef(input.taskRef)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          expected_revision: input.expectedRevision,
+          product_date: input.productDate,
+          status: input.status,
+          task_ref: input.taskRef,
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/daily/interaction/task",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        interaction: projectInteractionView(parsed.data),
         productDate: parsed.productDate,
       });
     },

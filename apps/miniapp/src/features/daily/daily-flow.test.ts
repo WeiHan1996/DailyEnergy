@@ -6,6 +6,7 @@ import {
   MiniappApiError,
   type C004Api,
   type C009Api,
+  type C010Api,
   type SafetyView,
 } from "../../services/miniapp-api.js";
 import { DailyViewCache } from "./daily-cache.js";
@@ -30,7 +31,9 @@ function unavailable(): Promise<never> {
   return Promise.reject(new Error("UNEXPECTED_API_CALL"));
 }
 
-function fakeApi(overrides: Partial<C004Api & C009Api>): C004Api & C009Api {
+function fakeApi(
+  overrides: Partial<C004Api & C009Api & C010Api>,
+): C004Api & C009Api & C010Api {
   return {
     correctCheckin: unavailable,
     getTodayCheckin: unavailable,
@@ -38,7 +41,9 @@ function fakeApi(overrides: Partial<C004Api & C009Api>): C004Api & C009Api {
     getGeneration: unavailable,
     getHistoryDay: unavailable,
     getToday: unavailable,
+    getInteraction: unavailable,
     startGeneration: unavailable,
+    updateTask: unavailable,
     ...overrides,
   };
 }
@@ -284,5 +289,186 @@ describe("C-009 daily coordinator", () => {
     await expect(
       new DailyViewCache(state.port, "scope").loadHistory("2026-08-23"),
     ).resolves.toBeUndefined();
+  });
+
+  it("updates one optional task and keeps it separate from lighting", async () => {
+    const state = storage();
+    const interested = {
+      ...todayFixture.interaction,
+      task: {
+        ...todayFixture.interaction.task,
+        revision: 2,
+        status: "INTERESTED" as const,
+      },
+    };
+    const updateTask = vi.fn<C010Api["updateTask"]>(async () => ({
+      interaction: interested,
+      productDate: "2026-08-24",
+    }));
+    const coordinator = new DailyCoordinator(
+      state.port,
+      fakeApi({
+        getToday: async () => ({
+          productDate: "2026-08-24",
+          today: todayFixture,
+        }),
+        updateTask,
+      }),
+      "scope",
+      () => 1_000,
+      () => "task-command-one",
+    );
+    await coordinator.loadToday();
+    await expect(
+      coordinator.updateTask({
+        expectedRevision: 1,
+        productDate: "2026-08-24",
+        status: "INTERESTED",
+        taskRef: todayFixture.interaction.task.task_id,
+      }),
+    ).resolves.toMatchObject({
+      kind: "today",
+      noticeCode: "TASK_UPDATED",
+      view: {
+        interaction: { is_lit: false, task: { status: "INTERESTED" } },
+      },
+    });
+    expect(updateTask).toHaveBeenCalledWith({
+      commandRef: "task-command-one",
+      expectedRevision: 1,
+      productDate: "2026-08-24",
+      status: "INTERESTED",
+      taskRef: todayFixture.interaction.task.task_id,
+    });
+  });
+
+  it("persists and retries the same task command after an unknown outcome", async () => {
+    const state = storage();
+    const completed = {
+      ...todayFixture.interaction,
+      task: {
+        ...todayFixture.interaction.task,
+        revision: 2,
+        status: "COMPLETED" as const,
+      },
+    };
+    const updateTask = vi
+      .fn<C010Api["updateTask"]>()
+      .mockRejectedValueOnce(new MiniappPlatformError("NETWORK_FAILED"))
+      .mockResolvedValue({
+        interaction: completed,
+        productDate: "2026-08-24",
+      });
+    const coordinator = new DailyCoordinator(
+      state.port,
+      fakeApi({
+        getToday: async () => ({
+          productDate: "2026-08-24",
+          today: todayFixture,
+        }),
+        updateTask,
+      }),
+      "scope",
+      () => 1_000,
+      () => "task-command-unknown",
+    );
+    await coordinator.loadToday();
+    await expect(
+      coordinator.updateTask({
+        expectedRevision: 1,
+        productDate: "2026-08-24",
+        status: "COMPLETED",
+        taskRef: todayFixture.interaction.task.task_id,
+      }),
+    ).resolves.toMatchObject({
+      kind: "today",
+      noticeCode: "TASK_OUTCOME_PENDING",
+      offline: true,
+    });
+    await expect(coordinator.retryTask()).resolves.toMatchObject({
+      kind: "today",
+      noticeCode: "TASK_UPDATED",
+      view: { interaction: { task: { status: "COMPLETED" } } },
+    });
+    expect(updateTask).toHaveBeenCalledTimes(2);
+    expect(updateTask.mock.calls[0]?.[0]).toEqual(
+      updateTask.mock.calls[1]?.[0],
+    );
+  });
+
+  it("reconciles CAS conflicts and closes an expired old-day task", async () => {
+    const state = storage();
+    const conflict = {
+      ...todayFixture.interaction,
+      task: {
+        ...todayFixture.interaction.task,
+        revision: 2,
+        status: "SKIPPED" as const,
+      },
+    };
+    const updateTask = vi
+      .fn<C010Api["updateTask"]>()
+      .mockRejectedValueOnce(
+        new MiniappApiError(
+          "REVISION_CONFLICT",
+          409,
+          false,
+          undefined,
+          undefined,
+          "2026-08-24",
+          undefined,
+          conflict,
+        ),
+      )
+      .mockRejectedValueOnce(
+        new MiniappApiError(
+          "VIEW_CONTINUATION_EXPIRED",
+          403,
+          false,
+          undefined,
+          undefined,
+          "2026-08-25",
+        ),
+      );
+    const coordinator = new DailyCoordinator(
+      state.port,
+      fakeApi({
+        getToday: async () => ({
+          productDate: "2026-08-24",
+          today: todayFixture,
+        }),
+        updateTask,
+      }),
+      "scope",
+      () => 1_000,
+      (() => {
+        let ordinal = 0;
+        return () => `task-command-${++ordinal}`;
+      })(),
+    );
+    await coordinator.loadToday();
+    await expect(
+      coordinator.updateTask({
+        expectedRevision: 1,
+        productDate: "2026-08-24",
+        status: "COMPLETED",
+        taskRef: todayFixture.interaction.task.task_id,
+      }),
+    ).resolves.toMatchObject({
+      kind: "today",
+      noticeCode: "TASK_CONFLICT",
+      view: { interaction: { task: { revision: 2, status: "SKIPPED" } } },
+    });
+    await expect(
+      coordinator.updateTask({
+        expectedRevision: 2,
+        productDate: "2026-08-24",
+        status: "INTERESTED",
+        taskRef: todayFixture.interaction.task.task_id,
+      }),
+    ).resolves.toMatchObject({
+      kind: "today",
+      noticeCode: "TASK_WINDOW_CLOSED",
+    });
   });
 });

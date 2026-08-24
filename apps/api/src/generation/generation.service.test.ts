@@ -1,4 +1,7 @@
-import type { DailyGenerationStore } from "@daily-energy/server-adapters/api";
+import {
+  UNAVAILABLE_DAILY_INTERACTION_STORE,
+  type DailyGenerationStore,
+} from "@daily-energy/server-adapters/api";
 import type { CheckinView } from "@daily-energy/shared-schemas";
 import type { HistoryDayView } from "@daily-energy/shared-schemas";
 import { describe, expect, it, vi } from "vitest";
@@ -79,7 +82,12 @@ function fakeStore(
 }
 
 function service(store: DailyGenerationStore) {
-  return new GenerationService(store, { now: () => now }, config());
+  return new GenerationService(
+    store,
+    UNAVAILABLE_DAILY_INTERACTION_STORE,
+    { now: () => now },
+    config(),
+  );
 }
 
 describe("C-008 generation application service", () => {
