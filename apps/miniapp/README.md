@@ -7,13 +7,14 @@ E-004 提供微信原生小程序 TypeScript 运行骨架，D-002 在该 client-
 DLY-002 生成恢复、DLY-003 今日内容、REC-002 历史只读/MISSING 与 session-scoped
 白名单缓存；C-010 已激活一个可选任务的四态 CAS、同 command 未知结果恢复、
 跨日 continuation 与离线禁写；C-011 已激活阅读资格后的幂等点亮、同 command
-未知结果恢复、一次克制确认和 REC-001 七日真实记录列表。晚间反馈、趋势总结和
-删除命令仍由后续 C 系列任务交付。
+未知结果恢复、一次克制确认和 REC-001 七日真实记录列表；C-012 已实现 EVE-001
+真实晚间反馈、协调保存、同 command unknown recovery、Offline 只读和历史投影。
+趋势总结和删除命令仍由后续 C 系列任务交付。
 
 ## 目录边界
 
 - `src/app`：公开构建配置校验和应用上下文；
-- `src/pages`：启动、承接、首次认识、每日签到、生成、今日、最近记录、历史日、安全与恢复页面；
+- `src/pages`：启动、承接、首次认识、每日签到、生成、今日、晚间反馈、最近记录、历史日、安全与恢复页面；
 - `src/components`：D-002 的 15 个微信原生组件目录，对应 17 个逻辑组件合同；
 - `src/features`：onboarding/checkin/daily 的纯客户端草稿、同 intent/command 恢复与只读缓存编排；
 - `src/platform`：微信 login、storage、network、share、subscription

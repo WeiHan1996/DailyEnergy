@@ -2412,50 +2412,7 @@ components:
         - expected_revision
         - status
     EveningSaveRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        product_date:
-          $ref: "#/components/schemas/ProductDate"
-        expected_feedback_revision:
-          $ref: "#/components/schemas/Revision"
-        expected_helpfulness_revision:
-          $ref: "#/components/schemas/Revision"
-        overall_feeling:
-          $ref: "#/components/schemas/OverallFeeling"
-        helpfulness_rating:
-          $ref: "#/components/schemas/HelpfulnessRating"
-        task_patch:
-          $ref: "#/components/schemas/EveningTaskPatch"
-        note_patch:
-          $ref: "#/components/schemas/NotePatch"
-        client_context:
-          type: object
-          properties:
-            app_version:
-              type: string
-              minLength: 1
-              maxLength: 64
-            entry_source:
-              $ref: "#/components/schemas/VersionToken"
-            view_schema_version:
-              $ref: "#/components/schemas/Semver"
-          additionalProperties: false
-          required:
-            - entry_source
-            - view_schema_version
-      additionalProperties: false
-      required:
-        - command_ref
-        - product_date
-        - expected_feedback_revision
-        - expected_helpfulness_revision
-        - overall_feeling
-        - helpfulness_rating
-        - client_context
-      x-source-contract: EveningReflectionSubmissionSchema
-      x-source-mapper: mapEveningSaveRequestToSubmission
+      x-source-contract: EveningSaveRequestSchema
     EveningSkipRequest:
       type: object
       properties:

@@ -121,7 +121,7 @@ describe("audience-separated API clients", () => {
       },
       client_context: {
         app_version: "0.1.0",
-        entry_source: "evening-card-v1",
+        entry_source: "TODAY_EVENING_CARD",
         view_schema_version: "1.0.0",
       },
     });
@@ -144,7 +144,7 @@ describe("audience-separated API clients", () => {
         operation: "CLEAR",
       },
       client_context: {
-        entry_source: "evening-card-v1",
+        entry_source: "TODAY_EVENING_CARD",
         view_schema_version: "1.0.0",
       },
     });
@@ -160,7 +160,7 @@ describe("audience-separated API clients", () => {
         overall_feeling: "STEADY",
         helpfulness_rating: "HELPFUL",
         client_context: {
-          entry_source: "evening-card-v1",
+          entry_source: "TODAY_EVENING_CARD",
           view_schema_version: "1.0.0",
         },
       }),

@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 297, "NA_WITH_REASON": 0, "PLANNED": 496 },
+  "counts": { "COVERED": 303, "NA_WITH_REASON": 0, "PLANNED": 490 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -610,11 +610,36 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "HIGH_RISK returns SAFETY_OVERLAY and never invokes the ordinary EveningStore",
+            "HTTP responses and ordinary logs contain no note, ciphertext, account, guard or fingerprint",
+            "one command saves and replays one allowlisted evening view while changed payload conflicts"
+          ],
+          "file": "apps/api/src/evening.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-012 HTTP evening flow",
+          "test_id": "T-C012-API-001"
+        },
+        {
+          "assertions": [
+            "a changed high-risk command fingerprint conflicts and no ordinary evening row is created for the Safety account",
+            "api-safety pool writes one minimal decision/event/plan/state and same-command replay is idempotent",
+            "one stale component revision leaves all component and aggregate revisions unchanged",
+            "optional note persists only as ciphertext/key version and never enters the outbox payload",
+            "real PostgreSQL 18 commits feedback, helpfulness, optional task and aggregate revisions together",
+            "UNRATED remains no helpfulness row and an EVE empty continuation grant legally binds revision zero"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C012-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -623,11 +648,36 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a changed high-risk command fingerprint conflicts and no ordinary evening row is created for the Safety account",
+            "api-safety pool writes one minimal decision/event/plan/state and same-command replay is idempotent",
+            "one stale component revision leaves all component and aggregate revisions unchanged",
+            "optional note persists only as ciphertext/key version and never enters the outbox payload",
+            "real PostgreSQL 18 commits feedback, helpfulness, optional task and aggregate revisions together",
+            "UNRATED remains no helpfulness row and an EVE empty continuation grant legally binds revision zero"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C012-DB-001"
+        },
+        {
+          "assertions": [
+            "CLEAR note is protected before the ordinary store receives it",
+            "HIGH_RISK activates the dedicated Safety port before any ordinary transaction",
+            "INDETERMINATE free-text classification fails closed without saving"
+          ],
+          "file": "apps/api/src/evening/evening.service.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-012 evening service",
+          "test_id": "T-C012-SERVICE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -5483,6 +5533,21 @@
           "origin": "tests/database/evidence-manifest.json",
           "selector": "T-DB-TX-004 TX-04 EVE components commit together and conflict rolls all back",
           "test_id": "T-DB-TX-004"
+        },
+        {
+          "assertions": [
+            "a changed high-risk command fingerprint conflicts and no ordinary evening row is created for the Safety account",
+            "api-safety pool writes one minimal decision/event/plan/state and same-command replay is idempotent",
+            "one stale component revision leaves all component and aggregate revisions unchanged",
+            "optional note persists only as ciphertext/key version and never enters the outbox payload",
+            "real PostgreSQL 18 commits feedback, helpfulness, optional task and aggregate revisions together",
+            "UNRATED remains no helpfulness row and an EVE empty continuation grant legally binds revision zero"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C012-DB-001"
         }
       ],
       "status": "COVERED",
@@ -5502,6 +5567,21 @@
           "origin": "tests/database/evidence-manifest.json",
           "selector": "T-DB-TX-004 TX-04 EVE components commit together and conflict rolls all back",
           "test_id": "T-DB-TX-004"
+        },
+        {
+          "assertions": [
+            "a changed high-risk command fingerprint conflicts and no ordinary evening row is created for the Safety account",
+            "api-safety pool writes one minimal decision/event/plan/state and same-command replay is idempotent",
+            "one stale component revision leaves all component and aggregate revisions unchanged",
+            "optional note persists only as ciphertext/key version and never enters the outbox payload",
+            "real PostgreSQL 18 commits feedback, helpfulness, optional task and aggregate revisions together",
+            "UNRATED remains no helpfulness row and an EVE empty continuation grant legally binds revision zero"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C012-DB-001"
         }
       ],
       "status": "COVERED",
@@ -5521,6 +5601,33 @@
           "origin": "tests/database/evidence-manifest.json",
           "selector": "T-DB-TX-005 TX-05 HIGH_RISK commits only minimal safety facts and rollback is complete",
           "test_id": "T-DB-TX-005"
+        },
+        {
+          "assertions": [
+            "a changed high-risk command fingerprint conflicts and no ordinary evening row is created for the Safety account",
+            "api-safety pool writes one minimal decision/event/plan/state and same-command replay is idempotent",
+            "one stale component revision leaves all component and aggregate revisions unchanged",
+            "optional note persists only as ciphertext/key version and never enters the outbox payload",
+            "real PostgreSQL 18 commits feedback, helpfulness, optional task and aggregate revisions together",
+            "UNRATED remains no helpfulness row and an EVE empty continuation grant legally binds revision zero"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C012-DB-001"
+        },
+        {
+          "assertions": [
+            "CLEAR note is protected before the ordinary store receives it",
+            "HIGH_RISK activates the dedicated Safety port before any ordinary transaction",
+            "INDETERMINATE free-text classification fails closed without saving"
+          ],
+          "file": "apps/api/src/evening/evening.service.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-012 evening service",
+          "test_id": "T-C012-SERVICE-001"
         }
       ],
       "status": "COVERED",
@@ -5530,11 +5637,24 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a changed high-risk command fingerprint conflicts and no ordinary evening row is created for the Safety account",
+            "api-safety pool writes one minimal decision/event/plan/state and same-command replay is idempotent",
+            "one stale component revision leaves all component and aggregate revisions unchanged",
+            "optional note persists only as ciphertext/key version and never enters the outbox payload",
+            "real PostgreSQL 18 commits feedback, helpfulness, optional task and aggregate revisions together",
+            "UNRATED remains no helpfulness row and an EVE empty continuation grant legally binds revision zero"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C012-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-020",
       "source_sets": ["s19-database"]
@@ -7146,33 +7266,99 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "HIGH_RISK returns SAFETY_OVERLAY and never invokes the ordinary EveningStore",
+            "HTTP responses and ordinary logs contain no note, ciphertext, account, guard or fingerprint",
+            "one command saves and replays one allowlisted evening view while changed payload conflicts"
+          ],
+          "file": "apps/api/src/evening.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-012 HTTP evening flow",
+          "test_id": "T-C012-API-001"
+        },
+        {
+          "assertions": [
+            "authenticated OpenAPI evening paths resolve to the shared request and view contracts",
+            "note SET/CLEAR shapes, real-state enums, client view and Safety overlay are closed executable schemas",
+            "strict coordinated input binds feedback/helpfulness/task revisions and rejects owner, guard, window and relationship authority"
+          ],
+          "file": "apps/api/src/evening/evening.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-012 evening transport contract",
+          "test_id": "T-C012-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-E01",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "HIGH_RISK returns SAFETY_OVERLAY and never invokes the ordinary EveningStore",
+            "HTTP responses and ordinary logs contain no note, ciphertext, account, guard or fingerprint",
+            "one command saves and replays one allowlisted evening view while changed payload conflicts"
+          ],
+          "file": "apps/api/src/evening.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-012 HTTP evening flow",
+          "test_id": "T-C012-API-001"
+        },
+        {
+          "assertions": [
+            "authenticated OpenAPI evening paths resolve to the shared request and view contracts",
+            "note SET/CLEAR shapes, real-state enums, client view and Safety overlay are closed executable schemas",
+            "strict coordinated input binds feedback/helpfulness/task revisions and rejects owner, guard, window and relationship authority"
+          ],
+          "file": "apps/api/src/evening/evening.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-012 evening transport contract",
+          "test_id": "T-C012-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-E02",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "HIGH_RISK returns SAFETY_OVERLAY and never invokes the ordinary EveningStore",
+            "HTTP responses and ordinary logs contain no note, ciphertext, account, guard or fingerprint",
+            "one command saves and replays one allowlisted evening view while changed payload conflicts"
+          ],
+          "file": "apps/api/src/evening.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-012 HTTP evening flow",
+          "test_id": "T-C012-API-001"
+        },
+        {
+          "assertions": [
+            "authenticated OpenAPI evening paths resolve to the shared request and view contracts",
+            "note SET/CLEAR shapes, real-state enums, client view and Safety overlay are closed executable schemas",
+            "strict coordinated input binds feedback/helpfulness/task revisions and rejects owner, guard, window and relationship authority"
+          ],
+          "file": "apps/api/src/evening/evening.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c012-evidence-manifest.json",
+          "selector": "C-012 evening transport contract",
+          "test_id": "T-C012-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-E03",
       "source_sets": ["s20-api"]

@@ -1,11 +1,12 @@
 # DailyEnergy API
 
 E-003 established the NestJS 11 + Express 5 composition root. C-001 through
-C-011 now add WeChat sessions, consent/profile/onboarding, daily check-in,
+C-012 now add WeChat sessions, consent/profile/onboarding, daily check-in,
 deterministic result publication, task state, idempotent point-lighting and the
-recent-history fact list. Owner/session/ProductDate and Safety/deletion guards
-remain server-authoritative; restricted rows are exposed only through bounded
-guard projections.
+recent-history fact list, plus coordinated evening feedback/helpfulness/task
+updates. Owner/session/ProductDate and Safety/deletion guards remain
+server-authoritative; optional notes are classified before persistence,
+encrypted at rest and excluded from ordinary logs and events.
 
 ## Local synthetic start
 

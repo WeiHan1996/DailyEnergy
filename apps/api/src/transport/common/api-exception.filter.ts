@@ -29,6 +29,7 @@ interface NormalizedApiError {
   readonly messageKey: string;
   readonly productDate?: string;
   readonly retryable: boolean;
+  readonly safetyView?: import("@daily-energy/shared-schemas").SafetyOverlayView;
   readonly serverNow?: Date;
   readonly status: number;
 }
@@ -94,6 +95,9 @@ function normalizeException(exception: unknown): NormalizedApiError {
       ? {}
       : { productDate: normalized.productDate }),
     retryable: normalized.retryable,
+    ...(normalized.safetyView === undefined
+      ? {}
+      : { safetyView: normalized.safetyView }),
     ...(normalized.serverNow === undefined
       ? {}
       : { serverNow: normalized.serverNow }),
@@ -151,6 +155,9 @@ export class ApiExceptionFilter implements ExceptionFilter {
         message_key: normalized.messageKey,
         message: normalized.message,
         retryable: normalized.retryable,
+        ...(normalized.safetyView === undefined
+          ? {}
+          : { safety_view: normalized.safetyView }),
         ...details,
       },
     });

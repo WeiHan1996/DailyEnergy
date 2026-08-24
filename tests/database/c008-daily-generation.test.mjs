@@ -202,6 +202,8 @@ test(
 
       const apiAdapters =
         await import("../../packages/server-adapters/dist/api/index.js");
+      const restrictedApiAdapters =
+        await import("../../packages/server-adapters/dist/api-restricted/index.js");
       const testingAdapters =
         await import("../../packages/server-adapters/dist/testing/index.js");
       const auth = await apiAdapters.PostgresAuthStore.connect({
@@ -237,6 +239,19 @@ test(
           connectionString: loginUrls.api,
           expectedDatabaseRole: "daily_energy_api",
         });
+      const evening = await apiAdapters.PostgresEveningStore.connect({
+        applicationName: "c012-evening-store",
+        connectionLimit: 8,
+        connectionString: loginUrls.api,
+        expectedDatabaseRole: "daily_energy_api",
+      });
+      const eveningSafety =
+        await restrictedApiAdapters.PostgresEveningSafetyStore.connect({
+          applicationName: "c012-evening-safety-store",
+          connectionLimit: 4,
+          connectionString: loginUrls.safety,
+          expectedDatabaseRole: "daily_energy_safety",
+        });
       const runtime =
         await testingAdapters.PostgresDailyGenerationRuntime.connect({
           applicationName: "c008-generation-runtime",
@@ -265,6 +280,8 @@ test(
         checkin,
         generation,
         dailyInteraction,
+        evening,
+        eveningSafety,
         runtime,
         queueStore,
         backgroundQueueStore,
@@ -703,6 +720,150 @@ test(
         0,
       );
 
+      const eveningRead = await evening.get({
+        accountId,
+        now: new Date("2026-08-24T12:00:00.000Z"),
+        openForContinuation: true,
+        productDate,
+        sessionId,
+      });
+      assert.equal(eveningRead.status, "FOUND");
+      assert.deepEqual(
+        eveningRead.status === "FOUND" && eveningRead.value.helpfulness,
+        { rating: "UNRATED", revision: 0 },
+      );
+      const eveningRequest = {
+        command_ref: "c012-evening-first",
+        product_date: productDate,
+        expected_feedback_revision: 0,
+        expected_helpfulness_revision: 0,
+        overall_feeling: "STEADY",
+        helpfulness_rating: "HELPFUL",
+        task_patch: {
+          task_ref: today.value.interaction.task.task_id,
+          expected_revision: 4,
+          status: "COMPLETED",
+        },
+        client_context: {
+          entry_source: "TODAY_EVENING_CARD",
+          view_schema_version: "1.0.0",
+        },
+      };
+      const eveningSaved = await evening.save({
+        accountId,
+        normalizedPayloadFingerprint: bytes("c012:evening:first"),
+        now: new Date("2026-08-24T12:00:01.000Z"),
+        productDatePolicyVersion: "product-date-v1",
+        request: eveningRequest,
+        sessionId,
+      });
+      assert.equal(eveningSaved.status, "ACCEPTED");
+      assert.deepEqual(
+        eveningSaved.status === "ACCEPTED" && {
+          feedback: eveningSaved.value.feedback?.revision,
+          helpfulness: eveningSaved.value.helpfulness.revision,
+          task: eveningSaved.value.task.revision,
+          taskStatus: eveningSaved.value.task.status,
+        },
+        { feedback: 1, helpfulness: 1, task: 5, taskStatus: "COMPLETED" },
+      );
+      const beforeConflict = await admin.query(
+        `SELECT feedback.revision AS feedback,helpfulness.revision AS helpfulness,
+                task.revision AS task,interaction."aggregateRevision" AS aggregate
+           FROM app_daily_interaction interaction
+           JOIN app_evening_feedback_record feedback
+             ON feedback."interactionId"=interaction.id
+           JOIN app_daily_helpfulness_record helpfulness
+             ON helpfulness."interactionId"=interaction.id
+           JOIN app_daily_task_state task ON task."interactionId"=interaction.id
+          WHERE interaction."accountId"=$1 AND interaction."productDate"=$2`,
+        [accountId, productDate],
+      );
+      const eveningConflict = await evening.save({
+        accountId,
+        normalizedPayloadFingerprint: bytes("c012:evening:conflict"),
+        now: new Date("2026-08-24T12:00:02.000Z"),
+        productDatePolicyVersion: "product-date-v1",
+        request: {
+          ...eveningRequest,
+          command_ref: "c012-evening-conflict",
+          expected_feedback_revision: 1,
+          expected_helpfulness_revision: 0,
+          overall_feeling: "PRETTY_GOOD",
+          task_patch: {
+            ...eveningRequest.task_patch,
+            expected_revision: 5,
+            status: "SKIPPED",
+          },
+        },
+        sessionId,
+      });
+      assert.equal(eveningConflict.status, "REVISION_CONFLICT");
+      const afterConflict = await admin.query(
+        `SELECT feedback.revision AS feedback,helpfulness.revision AS helpfulness,
+                task.revision AS task,interaction."aggregateRevision" AS aggregate
+           FROM app_daily_interaction interaction
+           JOIN app_evening_feedback_record feedback
+             ON feedback."interactionId"=interaction.id
+           JOIN app_daily_helpfulness_record helpfulness
+             ON helpfulness."interactionId"=interaction.id
+           JOIN app_daily_task_state task ON task."interactionId"=interaction.id
+          WHERE interaction."accountId"=$1 AND interaction."productDate"=$2`,
+        [accountId, productDate],
+      );
+      assert.deepEqual(afterConflict.rows[0], beforeConflict.rows[0]);
+
+      const notePlaintext = "今天把最难的一步拆小了。";
+      const protectedNote = {
+        ciphertext: bytes(`c012:protected:${notePlaintext}`),
+        keyVersion: "synthetic-evening-note-v1",
+      };
+      const eveningWithNote = await evening.save({
+        accountId,
+        normalizedPayloadFingerprint: bytes("c012:evening:note"),
+        note: protectedNote,
+        now: new Date("2026-08-24T12:00:03.000Z"),
+        productDatePolicyVersion: "product-date-v1",
+        request: {
+          ...eveningRequest,
+          command_ref: "c012-evening-note",
+          expected_feedback_revision: 1,
+          expected_helpfulness_revision: 1,
+          overall_feeling: "PRETTY_GOOD",
+          note_patch: { operation: "SET", value: notePlaintext },
+          task_patch: undefined,
+        },
+        sessionId,
+      });
+      assert.equal(eveningWithNote.status, "ACCEPTED");
+      const noteRow = (
+        await admin.query(
+          `SELECT "noteCiphertext","noteKeyVersion",revision
+             FROM app_evening_feedback_record
+            WHERE "interactionId" IN (
+              SELECT id FROM app_daily_interaction
+               WHERE "accountId"=$1 AND "productDate"=$2
+            )`,
+          [accountId, productDate],
+        )
+      ).rows[0];
+      assert.equal(noteRow.noteKeyVersion, protectedNote.keyVersion);
+      assert.equal(noteRow.revision, 2);
+      assert.notEqual(noteRow.noteCiphertext.toString("utf8"), notePlaintext);
+      assert.equal(
+        (
+          await admin.query(
+            `SELECT count(*)::int AS count FROM runtime_outbox_event
+              WHERE "aggregateRef" IN (
+                SELECT id FROM app_daily_interaction
+                 WHERE "accountId"=$1 AND "productDate"=$2
+              ) AND "eventType"='WeeklySourceChanged'`,
+            [accountId, productDate],
+          )
+        ).rows[0].count,
+        2,
+      );
+
       const c010DeletionTaskRef = randomUUID();
       await admin.query(
         `INSERT INTO restricted_data_task
@@ -735,6 +896,67 @@ test(
         ).status,
         "STATE_PRECONDITION_FAILED",
       );
+
+      const safetyAccountId = await createReadyDay(
+        stores,
+        apiAdapters.protectDevelopmentSubject,
+        apiAdapters.DEVELOPMENT_SUBJECT_KEY_VERSION,
+        8,
+      );
+      const safetyInput = {
+        accountId: safetyAccountId,
+        categoryCodes: ["SELF_HARM"],
+        classifierVersion: "synthetic-classifier-v1",
+        commandRef: "c012-evening-high-risk",
+        irreversibleFingerprint: bytes("c012:high-risk:decision"),
+        now: new Date(baseNow.getTime() + 8_100),
+        policyVersion: "safety-v1",
+        ruleVersion: "safety-rules-v1",
+      };
+      const safetyActivated = await eveningSafety.activate(safetyInput);
+      assert.equal(safetyActivated.status, "ACCEPTED");
+      assert.equal(
+        safetyActivated.status === "ACCEPTED" && safetyActivated.view.state,
+        "ACTIVE",
+      );
+      assert.equal(
+        (await eveningSafety.activate(safetyInput)).status,
+        "DUPLICATE",
+      );
+      assert.equal(
+        (
+          await eveningSafety.activate({
+            ...safetyInput,
+            irreversibleFingerprint: bytes("c012:high-risk:changed"),
+          })
+        ).status,
+        "IDEMPOTENCY_CONFLICT",
+      );
+      const safetyFacts = (
+        await admin.query(
+          `SELECT
+             (SELECT count(*)::int FROM restricted_safety_decision
+               WHERE "accountId"=$1) AS decisions,
+             (SELECT count(*)::int FROM restricted_safety_event
+               WHERE "accountId"=$1) AS events,
+             (SELECT count(*)::int FROM restricted_safety_response_plan
+               WHERE "accountId"=$1) AS plans,
+             (SELECT count(*)::int FROM app_evening_feedback_record feedback
+               JOIN app_daily_interaction interaction
+                 ON interaction.id=feedback."interactionId"
+              WHERE interaction."accountId"=$1) AS feedback,
+             (SELECT state::text FROM restricted_safety_state
+               WHERE "accountId"=$1) AS state`,
+          [safetyAccountId],
+        )
+      ).rows[0];
+      assert.deepEqual(safetyFacts, {
+        decisions: 1,
+        events: 1,
+        feedback: 0,
+        plans: 1,
+        state: "ACTIVE",
+      });
 
       const blockedAccountId = await createReadyDay(
         stores,

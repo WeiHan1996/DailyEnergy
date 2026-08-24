@@ -35,7 +35,7 @@ export type NotePatch = z.infer<typeof NotePatchSchema>;
 const TaskPatchSchema = z
   .object({
     task_id: OpaqueIdSchema,
-    expected_revision: RevisionSchema,
+    expected_revision: PositiveRevisionSchema,
     status: TaskStatusSchema,
   })
   .strict();
@@ -54,7 +54,12 @@ export const EveningReflectionSubmissionSchema = z
     note_patch: NotePatchSchema.optional(),
     client_context: z
       .object({
-        entry_source: VersionTokenSchema,
+        entry_source: z.enum([
+          "TODAY_SECONDARY",
+          "TODAY_EVENING_CARD",
+          "REMINDER_DEEP_LINK",
+          "EDIT_EXISTING",
+        ]),
         view_schema_version: SemverSchema,
       })
       .strict(),

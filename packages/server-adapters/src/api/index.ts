@@ -85,6 +85,17 @@ export {
   type PostgresDailyInteractionStoreConfig,
 } from "../daily-interaction/postgres-daily-interaction-store.js";
 export {
+  PostgresEveningStore,
+  UNAVAILABLE_EVENING_STORE,
+  type EveningGuardFailure,
+  type EveningQueryResult,
+  type EveningSaveResult,
+  type EveningStore,
+  type PostgresEveningStoreConfig,
+  type ProtectedEveningNote,
+  type StoredEveningView,
+} from "../evening/postgres-evening-store.js";
+export {
   RedisDailyContentCache,
   UNAVAILABLE_DAILY_CONTENT_CACHE,
   type DailyContentCache,

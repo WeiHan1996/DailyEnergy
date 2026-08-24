@@ -6,6 +6,7 @@
     "pages/checkin-handoff/index",
     "pages/generation/index",
     "pages/today/index",
+    "pages/evening/index",
     "pages/records/index",
     "pages/history-day/index",
     "pages/safety/index",

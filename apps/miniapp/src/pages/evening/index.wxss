@@ -1,0 +1,52 @@
+.evening,
+.evening__intro,
+.evening__note {
+  display: flex;
+  flex-direction: column;
+  gap: var(--de-component-card-gap);
+}
+
+.evening {
+  gap: var(--de-layout-section-gap);
+}
+
+.evening__label {
+  color: var(--de-color-brand-strong);
+  font-size: var(--de-font-meta-size);
+  font-weight: var(--de-font-semibold);
+}
+
+.evening__title {
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-page-title-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}
+
+.evening__copy,
+.evening__help,
+.evening__readonly {
+  color: var(--de-color-text-secondary);
+  font-size: var(--de-font-body-size);
+  line-height: var(--de-font-line-body);
+}
+
+.evening__note-heading {
+  display: flex;
+  justify-content: space-between;
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-label-size);
+  font-weight: var(--de-font-semibold);
+}
+
+.evening__input {
+  box-sizing: border-box;
+  min-height: var(--de-state-touch-target);
+  padding: var(--de-component-notice-padding);
+  border: var(--de-component-card-border-width) solid
+    var(--de-color-border-default);
+  border-radius: var(--de-component-card-radius);
+  background: var(--de-color-surface-primary);
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-body-size);
+}

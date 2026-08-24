@@ -31,6 +31,7 @@ import {
   type ProductDateResolution,
 } from "../product-date/product-date.js";
 import { ApiException } from "../transport/common/api-exception.js";
+import { EveningService } from "../evening/evening.service.js";
 
 export interface GenerationServiceResult<T> {
   readonly resolution: ProductDateResolution;
@@ -46,6 +47,7 @@ export class GenerationService {
     private readonly interactionStore: DailyInteractionStore,
     @Inject(PRODUCT_DATE_CLOCK) private readonly clock: ProductDateClock,
     @Inject(RUNTIME_CONFIG) private readonly config: RuntimeConfig,
+    private readonly eveningService?: EveningService,
   ) {}
 
   public async start(
@@ -103,7 +105,14 @@ export class GenerationService {
     if (result.status !== "FOUND") {
       throw historyException(result.status, resolution);
     }
-    return { resolution, view: result.value };
+    const evening = await this.eveningService?.getByDate(
+      principal,
+      productDate,
+    );
+    return {
+      resolution,
+      view: { ...result.value, ...(evening === undefined ? {} : { evening }) },
+    };
   }
 
   public async getToday(

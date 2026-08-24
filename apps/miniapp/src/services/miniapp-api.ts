@@ -16,6 +16,7 @@ export type TodayView = components["schemas"]["TodayView"];
 export type DailyInteractionView = TodayView["interaction"];
 export type HistoryDayView = components["schemas"]["HistoryDayView"];
 export type HistoryListView = components["schemas"]["HistoryListView"];
+export type EveningView = components["schemas"]["EveningView"];
 type ConsentView = components["schemas"]["ConsentView"];
 export type ExpressionStyle = components["schemas"]["ExpressionStyle"];
 type ProfileView = components["schemas"]["ProfileView"];
@@ -76,6 +77,11 @@ export interface HistoryListEnvelope {
 
 export interface DailyInteractionEnvelope {
   readonly interaction: DailyInteractionView;
+  readonly productDate: string;
+}
+
+export interface EveningEnvelope {
+  readonly evening: EveningView;
   readonly productDate: string;
 }
 
@@ -145,6 +151,26 @@ export interface C011Api {
   listHistory(): Promise<HistoryListEnvelope>;
 }
 
+export interface C012Api {
+  getEvening(): Promise<EveningEnvelope>;
+  saveEvening(input: {
+    readonly commandRef: string;
+    readonly expectedFeedbackRevision: number;
+    readonly expectedHelpfulnessRevision: number;
+    readonly helpfulnessRating: EveningView["options"]["helpfulness"][number];
+    readonly notePatch?:
+      | { readonly operation: "CLEAR" }
+      | { readonly operation: "SET"; readonly value: string };
+    readonly overallFeeling: EveningView["options"]["overall_feeling"][number];
+    readonly productDate: string;
+    readonly taskPatch?: {
+      readonly expectedRevision: number;
+      readonly status: EveningView["options"]["task_status"][number];
+      readonly taskRef: string;
+    };
+  }): Promise<EveningEnvelope>;
+}
+
 export class MiniappApiError extends Error {
   public constructor(
     public readonly code: string,
@@ -155,6 +181,7 @@ export class MiniappApiError extends Error {
     public readonly productDate?: string,
     public readonly retryAfterSeconds?: number,
     public readonly currentInteraction?: DailyInteractionView,
+    public readonly currentEvening?: EveningView,
   ) {
     super(code);
     this.name = "MiniappApiError";
@@ -225,6 +252,9 @@ function apiError(body: unknown, status: number): MiniappApiError {
   const currentInteraction = isRecord(error?.details)
     ? safeInteractionView(error.details.current)
     : undefined;
+  const currentEvening = isRecord(error?.details)
+    ? safeEveningView(error.details.current)
+    : undefined;
   return new MiniappApiError(
     code,
     status,
@@ -238,7 +268,16 @@ function apiError(body: unknown, status: number): MiniappApiError {
       ? retryAfterSeconds
       : undefined,
     currentInteraction,
+    currentEvening,
   );
+}
+
+function safeEveningView(value: unknown): EveningView | undefined {
+  try {
+    return projectEveningView(value);
+  } catch {
+    return undefined;
+  }
 }
 
 function safeInteractionView(value: unknown): DailyInteractionView | undefined {
@@ -782,8 +821,7 @@ export function projectHistoryDayView(
       "interaction",
       "evening",
     ]) ||
-    !isProductDate(data.product_date) ||
-    data.evening !== undefined
+    !isProductDate(data.product_date)
   ) {
     throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
   }
@@ -798,11 +836,18 @@ export function projectHistoryDayView(
     data.interaction === undefined
       ? undefined
       : projectInteractionView(data.interaction);
+  const evening =
+    data.evening === undefined ? undefined : projectEveningView(data.evening);
   if (
     (checkin === undefined &&
       content === undefined &&
       interaction === undefined) ||
-    [checkin?.product_date, content?.product_date, interaction?.product_date]
+    [
+      checkin?.product_date,
+      content?.product_date,
+      interaction?.product_date,
+      evening?.product_date,
+    ]
       .filter((item): item is string => item !== undefined)
       .some((item) => item !== data.product_date) ||
     (content !== undefined &&
@@ -816,6 +861,7 @@ export function projectHistoryDayView(
     ...(checkin === undefined ? {} : { checkin }),
     ...(content === undefined ? {} : { content }),
     ...(interaction === undefined ? {} : { interaction }),
+    ...(evening === undefined ? {} : { evening }),
   });
 }
 
@@ -868,6 +914,102 @@ export function projectHistoryListView(value: unknown): HistoryListView {
   return freezeJson(value) as HistoryListView;
 }
 
+export function projectEveningView(value: unknown): EveningView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      "contract",
+      "schema_version",
+      "product_date",
+      "availability",
+      "write_window",
+      "unavailable_message",
+      "feedback",
+      "helpfulness",
+      "task",
+      "options",
+      "note_max_characters",
+      "primary_action",
+      "completion_message",
+    ]) ||
+    value.contract !== "evening-feedback-view" ||
+    value.schema_version !== "1.0.0" ||
+    !isProductDate(value.product_date) ||
+    ![
+      "UNAVAILABLE",
+      "EDITABLE_EMPTY",
+      "EDITABLE_SUBMITTED",
+      "READ_ONLY_SUBMITTED",
+      "READ_ONLY_EMPTY",
+    ].includes(String(value.availability)) ||
+    !["OPEN", "CONTINUATION_ONLY", "CLOSED"].includes(
+      String(value.write_window),
+    ) ||
+    !isRecord(value.helpfulness) ||
+    typeof value.helpfulness.revision !== "number" ||
+    !Number.isInteger(value.helpfulness.revision) ||
+    value.helpfulness.revision < 0 ||
+    !["UNRATED", "HELPFUL", "NEUTRAL", "NOT_HELPFUL", "NOT_USED"].includes(
+      String(value.helpfulness.rating),
+    ) ||
+    !isRecord(value.options) ||
+    !Array.isArray(value.options.overall_feeling) ||
+    value.options.overall_feeling.join("|") !==
+      "VERY_HEAVY|SOMEWHAT_HEAVY|STEADY|PRETTY_GOOD|LIGHT|UNSURE" ||
+    !Array.isArray(value.options.helpfulness) ||
+    value.options.helpfulness.join("|") !==
+      "HELPFUL|NEUTRAL|NOT_HELPFUL|NOT_USED" ||
+    !Array.isArray(value.options.task_status) ||
+    value.options.task_status.join("|") !==
+      "UNMARKED|INTERESTED|COMPLETED|SKIPPED" ||
+    value.note_max_characters !== 80 ||
+    !["SAVE", "SAVE_CHANGES", "READ_ONLY"].includes(
+      String(value.primary_action),
+    ) ||
+    !isText(value.completion_message)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  const feedback = value.feedback;
+  const submitted = String(value.availability).endsWith("SUBMITTED");
+  if (
+    submitted !== isRecord(feedback) ||
+    (isRecord(feedback) &&
+      (!hasOnlyKeys(feedback, [
+        "revision",
+        "overall_feeling",
+        "note",
+        "first_submitted_at",
+        "updated_at",
+      ]) ||
+        typeof feedback.revision !== "number" ||
+        feedback.revision < 1 ||
+        ![
+          "VERY_HEAVY",
+          "SOMEWHAT_HEAVY",
+          "STEADY",
+          "PRETTY_GOOD",
+          "LIGHT",
+          "UNSURE",
+        ].includes(String(feedback.overall_feeling)) ||
+        (feedback.note !== undefined && typeof feedback.note !== "string") ||
+        !isTimestamp(feedback.first_submitted_at) ||
+        !isTimestamp(feedback.updated_at))) ||
+    (value.task !== undefined &&
+      (!isRecord(value.task) ||
+        !isOpaqueRef(value.task.task_id) ||
+        !isText(value.task.instruction) ||
+        typeof value.task.revision !== "number" ||
+        value.task.revision < 1 ||
+        !["UNMARKED", "INTERESTED", "COMPLETED", "SKIPPED"].includes(
+          String(value.task.status),
+        )))
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(value) as EveningView;
+}
+
 function freezeJson<T>(value: T): T {
   if (typeof value === "object" && value !== null) {
     Object.freeze(value);
@@ -911,10 +1053,10 @@ function headers(sessionToken?: string, commandRef?: string) {
 
 export function createMiniappApi(
   network: NetworkPort,
-): C003Api & C004Api & C009Api & C010Api & C011Api {
+): C003Api & C004Api & C009Api & C010Api & C011Api & C012Api {
   let sessionToken: string | undefined;
 
-  const api: C003Api & C004Api & C009Api & C010Api & C011Api = {
+  const api: C003Api & C004Api & C009Api & C010Api & C011Api & C012Api = {
     async createSession(input): Promise<SessionEnvelope> {
       const response = await network.request({
         body: input as StorageValue,
@@ -1148,6 +1290,59 @@ export function createMiniappApi(
       const parsed = successData(response.data, response.statusCode);
       return Object.freeze({
         history: projectHistoryListView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async getEvening(): Promise<EveningEnvelope> {
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: "/v1/evening/today",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        evening: projectEveningView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async saveEvening(input): Promise<EveningEnvelope> {
+      if (!isProductDate(input.productDate)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          product_date: input.productDate,
+          expected_feedback_revision: input.expectedFeedbackRevision,
+          expected_helpfulness_revision: input.expectedHelpfulnessRevision,
+          overall_feeling: input.overallFeeling,
+          helpfulness_rating: input.helpfulnessRating,
+          ...(input.taskPatch === undefined
+            ? {}
+            : {
+                task_patch: {
+                  task_ref: input.taskPatch.taskRef,
+                  expected_revision: input.taskPatch.expectedRevision,
+                  status: input.taskPatch.status,
+                },
+              }),
+          ...(input.notePatch === undefined
+            ? {}
+            : { note_patch: input.notePatch }),
+          client_context: {
+            entry_source: "TODAY_EVENING_CARD",
+            view_schema_version: "1.0.0",
+          },
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/evening/save",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        evening: projectEveningView(parsed.data),
         productDate: parsed.productDate,
       });
     },

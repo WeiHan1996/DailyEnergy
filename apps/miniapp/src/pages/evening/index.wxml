@@ -1,0 +1,104 @@
+<de-page-shell labelled-by="evening-title">
+  <de-app-header
+    slot="header"
+    back-label="返回今天"
+    show-back="{{true}}"
+    title="回看今天"
+    subtitle="{{view ? view.product_date : ''}}"
+    bind:back="back"
+  ></de-app-header>
+
+  <view class="evening" data-screen-id="{{screenId}}">
+    <de-loading-skeleton
+      wx:if="{{loading && !view}}"
+      label="正在读取晚间记录"
+      lines="6"
+      variant="card"
+    ></de-loading-skeleton>
+    <de-recoverable-error
+      wx:elif="{{error && !view}}"
+      message="暂时没能读取晚间记录。已填写的内容会保留在当前页面。"
+      bind:retry="retry"
+    ></de-recoverable-error>
+
+    <block wx:elif="{{view}}">
+      <de-offline-state
+        wx:if="{{offline}}"
+        message="这是最后同步的只读记录。恢复网络后，请主动确认再保存。"
+        bind:retry="retry"
+      ></de-offline-state>
+
+      <view class="evening__intro">
+        <view class="evening__label">你的真实记录</view>
+        <view id="evening-title" class="evening__title">今天整体感觉怎么样？</view>
+        <view class="evening__copy">这里只记录你的真实感受，不判断今天的内容是否应验。</view>
+      </view>
+
+      <de-state-selector
+        accessible-label="整体感受"
+        disabled="{{offline || busy || view.primary_action === 'READ_ONLY'}}"
+        error="{{fieldError}}"
+        label="整体感受"
+        options="{{overallOptions}}"
+        selected-value="{{overallFeeling}}"
+        supporting-text="说不准也是有效选择。"
+        bind:change="chooseOverall"
+      ></de-state-selector>
+
+      <de-state-selector
+        accessible-label="建议帮助度"
+        disabled="{{offline || busy || view.primary_action === 'READ_ONLY'}}"
+        label="今天的建议对你有帮助吗"
+        options="{{helpfulnessOptions}}"
+        selected-value="{{helpfulnessRating}}"
+        supporting-text="未使用和没帮助是不同的真实记录。"
+        bind:change="chooseHelpfulness"
+      ></de-state-selector>
+
+      <de-state-selector
+        wx:if="{{view.task}}"
+        accessible-label="可选任务状态"
+        disabled="{{offline || busy || view.primary_action === 'READ_ONLY'}}"
+        label="可选任务"
+        options="{{taskOptions}}"
+        selected-value="{{taskStatus}}"
+        supporting-text="不完成也没关系，不影响点亮或关系记录。"
+        bind:change="chooseTask"
+      ></de-state-selector>
+
+      <view class="evening__note">
+        <view class="evening__note-heading">
+          <text>留一句话</text>
+          <text>{{note.length}}/80</text>
+        </view>
+        <input
+          class="evening__input"
+          aria-label="可选的一句话"
+          disabled="{{offline || busy || view.primary_action === 'READ_ONLY'}}"
+          maxlength="80"
+          placeholder="可不填"
+          value="{{note}}"
+          bindinput="inputNote"
+        />
+        <view class="evening__help">这句话不会自动进入长期记忆、七天总结或分享。</view>
+      </view>
+
+      <de-inline-notice
+        wx:if="{{notice}}"
+        action-label="{{noticeAction}}"
+        message="{{notice}}"
+        tone="{{view.feedback ? 'success' : 'info'}}"
+        bind:action="retry"
+      ></de-inline-notice>
+
+      <de-action-button
+        wx:if="{{view.primary_action !== 'READ_ONLY'}}"
+        block="{{true}}"
+        disabled="{{offline || busy}}"
+        label="{{busy ? '正在保存' : view.primary_action === 'SAVE' ? '保存今天' : '保存修改'}}"
+        bind:press="save"
+      ></de-action-button>
+      <view wx:else class="evening__readonly">这一天的晚间记录现在只读。</view>
+    </block>
+  </view>
+</de-page-shell>
