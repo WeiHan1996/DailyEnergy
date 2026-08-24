@@ -3,14 +3,14 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-24
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：C-012 — 实现晚间反馈与轻反馈
-- **任务状态**：In Review（C-004～C-015 统一审核批次；不请求逐项审核）
-- **任务 Profile**：`security`（自由文本 Safety input gate、api-safety pool、协调事务与删除边界）
-- **工作分支**：`agent/c012-evening-feedback`
-- **Stacked base**：[C-011 Draft PR #164](https://github.com/WeiHan1996/DailyEnergy/pull/164)，verified head `3ca1105b676cc01b6af1d9d6b4f1bf28e84d7589`
-- **任务 Issue**：[C-012 Issue #64](https://github.com/WeiHan1996/DailyEnergy/issues/64)
-- **Draft PR**：[PR #165](https://github.com/WeiHan1996/DailyEnergy/pull/165)；base=`agent/c011-day-lighting`
-- **下一候选任务**：C-013 — 七天趋势（Planned；C-012 final-head CI 验证后启动）
+- **当前任务**：C-013 — 七天趋势
+- **任务状态**：In Progress（C-004～C-015 统一审核批次；不请求逐项审核）
+- **任务 Profile**：`security`（stacked 安全边界、七天真实数据与隐私最小化证明）
+- **工作分支**：`agent/c013-seven-day-trends`
+- **Stacked base**：[C-012 Draft PR #165](https://github.com/WeiHan1996/DailyEnergy/pull/165)，verified head `b70b9e390ab5d8514d13c576f21bdade18ad18e6`
+- **任务 Issue**：[C-013 Issue #70](https://github.com/WeiHan1996/DailyEnergy/issues/70)
+- **Draft PR**：待创建；base=`agent/c012-evening-feedback`
+- **下一候选任务**：C-014 — 数据查看与删除（Planned；C-013 final-head CI 验证后启动）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 连续推进授权与 stacked 规则
@@ -20,7 +20,7 @@
 - 下游 branch 基于上游 verified final head；上游 PR 未被提前接受或合并，统一审核前全部保持 Draft；
 - 任一缺失 Accepted 决策、无法满足的依赖、外部授权或手工证据仍须如实阻断，不因连续授权而猜测。
 
-## 2. 已验证上游 C-004～C-011
+## 2. 已验证上游 C-004～C-012
 
 - C-004 Draft PR #157 verified head `9a902a5d2d5b666be33f9c90faa92dffafce0037`，CI run `32456442334` 11/11 SUCCESS；
 - C-005 Draft PR #158 verified head `e0383934f2d224e1d3e1636ab24311656f7b2604`，CI run `32463505126` 11/11 SUCCESS；
@@ -30,7 +30,8 @@
 - C-009 Draft PR #162 verified head `941c302995935b763dae3b45c5a56fddf68bdae2`，CI run `32692776724` 11/11 SUCCESS；
 - C-010 Draft PR #163 verified head `e6dc3717ad94799ab821e6d5c983dec6dd568043`，CI run `32697952655` 11/11 SUCCESS；
 - C-011 Draft PR #164 verified head `3ca1105b676cc01b6af1d9d6b4f1bf28e84d7589`，CI run `32705520165` 11/11 SUCCESS；
-- C-004～C-011 均保持 In Review、PR Draft、Issue Open；owner manual evidence 等待 C-015 后统一审核；
+- C-012 Draft PR #165 verified head `b70b9e390ab5d8514d13c576f21bdade18ad18e6`，CI run `32728000420` 11/11 SUCCESS；
+- C-004～C-012 均保持 In Review、PR Draft、Issue Open；owner manual evidence 等待 C-015 后统一审核；
 - exact-head merge verifier 因 Draft/unified review 延后，Production / RC 继续 `NO_GO`。
 
 ## 3. C-012 已完成交付
@@ -57,7 +58,7 @@
 - `pnpm agent:validate --mode=changed`：`automated=PASS / MANUAL_EVIDENCE_REQUIRED`；
 - `pnpm agent:validate --mode=task --task=C-012`：`automated=PASS / MANUAL_EVIDENCE_REQUIRED`；
 - manual evidence：`tests/manual-rc/c012-evidence.json`；Figma `495:220`/`495:224`/`507:3` 已只读核对，owner threat/design/a11y/real-device review 仍 Pending；
-- DevTools=`MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT / INFRA_BLOCKED`；final-head CI 11/11 等待 Draft PR 创建并推送最终提交。
+- DevTools=`MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT / INFRA_BLOCKED`；final-head CI run `32728000420` 已在精确 head `b70b9e390ab5d8514d13c576f21bdade18ad18e6` 取得 11/11 SUCCESS。
 
 ## 5. 手工证据与发布边界
 
@@ -67,10 +68,10 @@
 
 ## 6. 精确下一动作
 
-1. 推送 PR #165 handoff 回填，确认 base、Draft、Issue 与 remote head 一致；
-2. 等待精确 final head 的 11/11 CI SUCCESS；
-3. 从 verified C-012 final head 创建 `agent/c013-seven-day-trends` 并切换 durable current task；
-4. C-012 PR/Issue 保持 Draft/Open，manual evidence 等待 C-015 后统一审核。
+1. 运行 `pnpm agent:prepare C-013 --remote --deep` 并读取返回的全部 required sources、Issue #70、Accepted weekly-summary Schema、REC-001 原始设计证据、API/DB contracts、测试与 fixtures；
+2. 建立 C-013 Requirement-to-Proof Matrix，仅实现真实七日数据、缺失处理与 REC-001 趋势页面，不提前实现 C-014 删除或 C-015 埋点；
+3. 运行 changed、task/full Gate 与相关真实基础设施证据，保留 `MANUAL_EVIDENCE_REQUIRED`；
+4. 创建 stacked Draft PR 并等待精确 final head 的 11/11 CI SUCCESS；C-004～C-012 PR/Issue 保持 Draft/Open。
 
 ## 7. C-015 后统一审核
 
