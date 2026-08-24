@@ -1,0 +1,126 @@
+<de-page-shell labelled-by="today-title">
+  <de-app-header
+    slot="header"
+    title="今天"
+    subtitle="{{view ? view.content.product_date : ''}}"
+  ></de-app-header>
+
+  <view class="today" data-screen-id="{{screenId}}">
+    <de-loading-skeleton
+      wx:if="{{loading && !view}}"
+      label="正在读取今天的内容"
+      lines="5"
+      variant="card"
+    ></de-loading-skeleton>
+
+    <de-recoverable-error
+      wx:elif="{{error && !view}}"
+      message="暂时没能读取今天的内容。重试会读取同一个结果。"
+      bind:retry="retry"
+    ></de-recoverable-error>
+
+    <block wx:elif="{{view}}">
+      <de-offline-state
+        wx:if="{{offline}}"
+        message="这是这台设备最后同步的只读内容。恢复网络后会先检查当前状态。"
+        bind:retry="retry"
+      ></de-offline-state>
+
+      <de-inline-notice
+        wx:if="{{view.content.personalization_notice === 'PERSONALIZATION_REDUCED'}}"
+        title="核心结果不变"
+        message="今天的表达暂时少了一些个性化内容。"
+      ></de-inline-notice>
+
+      <view class="today__hero">
+        <view class="today__greeting">{{view.content.greeting}}</view>
+        <view class="today__label">{{view.content.content_label}}</view>
+      </view>
+
+      <de-energy-summary
+        context="娱乐与行动参考"
+        detail="{{view.content.overall.summary}}"
+        label="整体能量"
+        level="{{view.content.overall.band_label}}"
+        offline="{{offline}}"
+        show-score="{{false}}"
+      ></de-energy-summary>
+
+      <view class="today__focus" aria-role="article">
+        <view class="today__focus-meta">今日重点 · {{focus.label}}</view>
+        <view id="today-title" class="today__focus-title">{{view.content.core_tip}}</view>
+        <view class="today__focus-copy">{{focus.explanation}}</view>
+      </view>
+
+      <de-action-button
+        block="{{true}}"
+        label="看看今天怎么做"
+        bind:press="showAction"
+      ></de-action-button>
+
+      <de-friend-message
+        label="今天想对你说"
+        title="{{view.content.state_response}}"
+        body="{{explanationText}}"
+      ></de-friend-message>
+
+      <view id="today-action">
+        <de-action-card
+          action="{{view.content.primary_action.instruction}}"
+          label="今天可以这样做"
+          reason="{{actionReason}}"
+          show-button="{{false}}"
+        ></de-action-card>
+      </view>
+
+      <de-section-card heading="如果愿意">
+        <view class="today__optional-task">{{view.content.optional_task.instruction}}</view>
+      </de-section-card>
+
+      <de-inline-notice
+        wx:if="{{view.interaction.is_lit}}"
+        title="今天已留下"
+        message="再次回来时，仍会看到同一个核心结果。"
+        tone="success"
+      ></de-inline-notice>
+
+      <de-section-card heading="再看看">
+        <view class="today__dimension today__dimension--focus">
+          <view class="today__dimension-heading">
+            <text>{{focus.label}}</text>
+            <text>{{focus.band_label}}</text>
+          </view>
+          <view class="today__dimension-copy">{{focus.explanation}}</view>
+        </view>
+
+        <view
+          wx:for="{{otherDimensions}}"
+          wx:key="id"
+          class="today__dimension"
+        >
+          <view class="today__dimension-heading">
+            <text>{{item.label}}</text>
+            <text>{{item.band_label}}</text>
+          </view>
+          <view wx:if="{{expanded}}" class="today__dimension-copy">{{item.explanation}}</view>
+        </view>
+
+        <de-action-button
+          label="{{expanded ? '收起五维' : '展开五维'}}"
+          variant="text"
+          bind:press="toggleDimensions"
+        ></de-action-button>
+      </de-section-card>
+
+      <de-section-card wx:if="{{view.content.rituals.length}}" heading="一点仪式感" variant="subtle">
+        <view wx:for="{{view.content.rituals}}" wx:key="kind" class="today__ritual">
+          <text class="today__ritual-value">{{item.display_value}}</text>
+          <text class="today__ritual-note">{{item.note}}</text>
+        </view>
+      </de-section-card>
+
+      <view class="today__closing">{{view.content.closing}}</view>
+      <view class="today__boundary">今日内容仅作娱乐与行动参考，不替代专业判断。</view>
+    </block>
+  </view>
+</de-page-shell>

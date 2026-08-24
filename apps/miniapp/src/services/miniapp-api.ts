@@ -10,6 +10,10 @@ export type CheckinView = components["schemas"]["CheckinView"];
 export type CheckinMood = components["schemas"]["Mood"];
 export type CheckinEnergy = components["schemas"]["Energy"];
 export type CheckinSleep = components["schemas"]["Sleep"];
+export type GenerationIntentView =
+  components["schemas"]["GenerationIntentView"];
+export type TodayView = components["schemas"]["TodayView"];
+export type HistoryDayView = components["schemas"]["HistoryDayView"];
 type ConsentView = components["schemas"]["ConsentView"];
 export type ExpressionStyle = components["schemas"]["ExpressionStyle"];
 type ProfileView = components["schemas"]["ProfileView"];
@@ -48,6 +52,21 @@ export interface CheckinEnvelope {
   readonly productDate: string;
 }
 
+export interface GenerationIntentEnvelope {
+  readonly intent: GenerationIntentView;
+  readonly productDate: string;
+}
+
+export interface TodayEnvelope {
+  readonly productDate: string;
+  readonly today: TodayView;
+}
+
+export interface HistoryDayEnvelope {
+  readonly history: HistoryDayView;
+  readonly productDate: string;
+}
+
 export interface C003Api {
   acceptConsent(input: {
     readonly commandRef: string;
@@ -83,6 +102,16 @@ export interface C004Api {
   }): Promise<CheckinEnvelope>;
 }
 
+export interface C009Api {
+  getGeneration(intentRef: string): Promise<GenerationIntentEnvelope>;
+  getHistoryDay(productDate: string): Promise<HistoryDayEnvelope>;
+  getToday(): Promise<TodayEnvelope>;
+  startGeneration(input: {
+    readonly commandRef: string;
+    readonly expectedCheckinRevision: number;
+  }): Promise<GenerationIntentEnvelope>;
+}
+
 export class MiniappApiError extends Error {
   public constructor(
     public readonly code: string,
@@ -91,6 +120,7 @@ export class MiniappApiError extends Error {
     public readonly requestId?: string,
     public readonly safetyView?: SafetyView,
     public readonly productDate?: string,
+    public readonly retryAfterSeconds?: number,
   ) {
     super(code);
     this.name = "MiniappApiError";
@@ -101,8 +131,23 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function isProductDate(value: unknown): value is string {
-  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/u.test(value);
+export function isProductDate(value: unknown): value is string {
+  if (typeof value !== "string") {
+    return false;
+  }
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/u.exec(value);
+  if (match === null) {
+    return false;
+  }
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
 }
 
 export function isExpressionStyle(value: unknown): value is ExpressionStyle {
@@ -140,6 +185,9 @@ function apiError(body: unknown, status: number): MiniappApiError {
   const productDate = isProductDate(envelope?.product_date)
     ? envelope.product_date
     : undefined;
+  const retryAfterSeconds = isRecord(error?.details)
+    ? error.details.retry_after_seconds
+    : undefined;
   return new MiniappApiError(
     code,
     status,
@@ -147,6 +195,11 @@ function apiError(body: unknown, status: number): MiniappApiError {
     requestId,
     safetyView,
     productDate,
+    typeof retryAfterSeconds === "number" &&
+      Number.isInteger(retryAfterSeconds) &&
+      retryAfterSeconds >= 0
+      ? retryAfterSeconds
+      : undefined,
   );
 }
 
@@ -388,6 +441,348 @@ function checkinView(data: Record<string, unknown>): CheckinView {
   });
 }
 
+const generationStatuses = new Set<GenerationIntentView["status"]>([
+  "QUEUED",
+  "RUNNING",
+  "FALLBACK_RUNNING",
+  "RETRYABLE_FAILED",
+  "SUCCEEDED",
+  "TERMINAL_FAILED",
+  "CANCELLED",
+]);
+const dimensionIds = [
+  "pace",
+  "action",
+  "connection",
+  "resources",
+  "recovery",
+] as const;
+
+function hasOnlyKeys(
+  value: Record<string, unknown>,
+  keys: readonly string[],
+): boolean {
+  const allowed = new Set(keys);
+  return Object.keys(value).every((key) => allowed.has(key));
+}
+
+function isText(value: unknown): value is string {
+  return typeof value === "string" && value.length > 0;
+}
+
+function isTimestamp(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    Number.isFinite(Date.parse(value)) &&
+    /(?:Z|[+-]\d{2}:\d{2})$/u.test(value)
+  );
+}
+
+function isOpaqueRef(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    value.length >= 1 &&
+    value.length <= 128 &&
+    !/[\s\u0000-\u001f\u007f]/u.test(value)
+  );
+}
+
+function projectGenerationIntentView(
+  data: Record<string, unknown>,
+): GenerationIntentView {
+  if (
+    !hasOnlyKeys(data, [
+      "intent_ref",
+      "product_date",
+      "status",
+      "result_ref",
+      "retry_after_seconds",
+      "updated_at",
+    ]) ||
+    !isOpaqueRef(data.intent_ref) ||
+    !isProductDate(data.product_date) ||
+    !generationStatuses.has(data.status as GenerationIntentView["status"]) ||
+    !isTimestamp(data.updated_at) ||
+    (data.result_ref !== undefined && !isOpaqueRef(data.result_ref)) ||
+    (data.retry_after_seconds !== undefined &&
+      (typeof data.retry_after_seconds !== "number" ||
+        !Number.isInteger(data.retry_after_seconds) ||
+        data.retry_after_seconds < 0)) ||
+    (data.status === "SUCCEEDED") !== (data.result_ref !== undefined)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(data) as unknown as GenerationIntentView;
+}
+
+function isDimension(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      "id",
+      "label",
+      "band",
+      "band_label",
+      "explanation",
+      "is_focus",
+    ]) &&
+    dimensionIds.includes(value.id as (typeof dimensionIds)[number]) &&
+    isText(value.label) &&
+    ["LOW", "STEADY", "HIGH"].includes(String(value.band)) &&
+    isText(value.band_label) &&
+    isText(value.explanation) &&
+    typeof value.is_focus === "boolean"
+  );
+}
+
+function isPrimaryAction(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      "action_id",
+      "instruction",
+      "rationale",
+      "constraint_label",
+    ]) &&
+    isOpaqueRef(value.action_id) &&
+    isText(value.instruction) &&
+    (value.rationale === undefined || isText(value.rationale)) &&
+    (value.constraint_label === undefined || isText(value.constraint_label))
+  );
+}
+
+function isOptionalTask(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ["task_id", "instruction"]) &&
+    isOpaqueRef(value.task_id) &&
+    isText(value.instruction)
+  );
+}
+
+function isRitual(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, ["kind", "display_value", "note"]) &&
+    ["COLOR", "NUMBER"].includes(String(value.kind)) &&
+    isText(value.display_value) &&
+    isText(value.note)
+  );
+}
+
+function projectDailyContentView(value: unknown) {
+  if (!isRecord(value)) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  const dimensions = value.dimensions;
+  const overall = value.overall;
+  const paragraphs = value.explanation_paragraphs;
+  const rituals = value.rituals;
+  if (
+    !hasOnlyKeys(value, [
+      "contract",
+      "schema_version",
+      "result_id",
+      "product_date",
+      "result_version",
+      "generated_at",
+      "content_label",
+      "greeting",
+      "state_response",
+      "overall",
+      "focus_dimension_id",
+      "dimensions",
+      "core_tip",
+      "explanation_paragraphs",
+      "primary_action",
+      "optional_task",
+      "rituals",
+      "closing",
+      "personalization_notice",
+    ]) ||
+    value.contract !== "daily-content-view" ||
+    value.schema_version !== "1.0.0" ||
+    !isOpaqueRef(value.result_id) ||
+    !isProductDate(value.product_date) ||
+    !isText(value.result_version) ||
+    !isTimestamp(value.generated_at) ||
+    value.content_label !== "娱乐与行动参考" ||
+    !isText(value.greeting) ||
+    !isText(value.state_response) ||
+    !isRecord(overall) ||
+    !hasOnlyKeys(overall, ["band", "band_label", "summary"]) ||
+    !["LOW", "STEADY", "HIGH"].includes(String(overall.band)) ||
+    !isText(overall.band_label) ||
+    !isText(overall.summary) ||
+    !dimensionIds.includes(
+      value.focus_dimension_id as (typeof dimensionIds)[number],
+    ) ||
+    !Array.isArray(dimensions) ||
+    dimensions.length !== dimensionIds.length ||
+    dimensions.some((item) => !isDimension(item)) ||
+    dimensions[0]?.id !== value.focus_dimension_id ||
+    new Set(dimensions.map((item) => item.id)).size !== dimensionIds.length ||
+    !isText(value.core_tip) ||
+    !Array.isArray(paragraphs) ||
+    paragraphs.length < 1 ||
+    paragraphs.length > 2 ||
+    paragraphs.some((item) => !isText(item)) ||
+    !isPrimaryAction(value.primary_action) ||
+    !isOptionalTask(value.optional_task) ||
+    !Array.isArray(rituals) ||
+    rituals.length > 2 ||
+    rituals.some((item) => !isRitual(item)) ||
+    !isText(value.closing) ||
+    !["NONE", "PERSONALIZATION_REDUCED"].includes(
+      String(value.personalization_notice),
+    )
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(value) as TodayView["content"];
+}
+
+function projectInteractionView(value: unknown) {
+  if (!isRecord(value)) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  const task = value.task;
+  const helpfulness = value.helpfulness;
+  if (
+    !hasOnlyKeys(value, [
+      "contract",
+      "schema_version",
+      "result_id",
+      "product_date",
+      "is_lit",
+      "task",
+      "helpfulness",
+      "updated_at",
+    ]) ||
+    value.contract !== "daily-interaction-state" ||
+    value.schema_version !== "1.0.0" ||
+    !isOpaqueRef(value.result_id) ||
+    !isProductDate(value.product_date) ||
+    typeof value.is_lit !== "boolean" ||
+    !isRecord(task) ||
+    !hasOnlyKeys(task, ["task_id", "revision", "status"]) ||
+    !isOpaqueRef(task.task_id) ||
+    typeof task.revision !== "number" ||
+    !Number.isInteger(task.revision) ||
+    task.revision < 1 ||
+    !["UNMARKED", "INTERESTED", "COMPLETED", "SKIPPED"].includes(
+      String(task.status),
+    ) ||
+    !isRecord(helpfulness) ||
+    !hasOnlyKeys(helpfulness, ["revision", "rating"]) ||
+    typeof helpfulness.revision !== "number" ||
+    !Number.isInteger(helpfulness.revision) ||
+    helpfulness.revision < 0 ||
+    !["UNRATED", "HELPFUL", "NEUTRAL", "NOT_HELPFUL", "NOT_USED"].includes(
+      String(helpfulness.rating),
+    ) ||
+    (helpfulness.rating === "UNRATED") !== (helpfulness.revision === 0) ||
+    !isTimestamp(value.updated_at)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(value) as TodayView["interaction"];
+}
+
+function projectRelationshipView(value: unknown) {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, ["stage", "encounter_day_count", "display_token"]) ||
+    ![
+      "BEFORE_FIRST_MEETING",
+      "NEWLY_MET",
+      "BECOMING_FAMILIAR",
+      "FIRST_WEEK_RECORDED",
+    ].includes(String(value.stage)) ||
+    typeof value.encounter_day_count !== "number" ||
+    !Number.isInteger(value.encounter_day_count) ||
+    value.encounter_day_count < 0 ||
+    (value.display_token !== undefined && !isText(value.display_token))
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(value) as TodayView["relationship"];
+}
+
+export function projectTodayView(data: Record<string, unknown>): TodayView {
+  if (!hasOnlyKeys(data, ["content", "interaction", "relationship"])) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  const content = projectDailyContentView(data.content);
+  const interaction = projectInteractionView(data.interaction);
+  const relationship = projectRelationshipView(data.relationship);
+  if (
+    content.product_date !== interaction.product_date ||
+    content.result_id !== interaction.result_id
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return Object.freeze({ content, interaction, relationship });
+}
+
+export function projectHistoryDayView(
+  data: Record<string, unknown>,
+): HistoryDayView {
+  if (
+    !hasOnlyKeys(data, [
+      "product_date",
+      "checkin",
+      "content",
+      "interaction",
+      "evening",
+    ]) ||
+    !isProductDate(data.product_date) ||
+    data.evening !== undefined
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  const checkin = isRecord(data.checkin)
+    ? checkinView(data.checkin)
+    : undefined;
+  const content =
+    data.content === undefined
+      ? undefined
+      : projectDailyContentView(data.content);
+  const interaction =
+    data.interaction === undefined
+      ? undefined
+      : projectInteractionView(data.interaction);
+  if (
+    (checkin === undefined &&
+      content === undefined &&
+      interaction === undefined) ||
+    [checkin?.product_date, content?.product_date, interaction?.product_date]
+      .filter((item): item is string => item !== undefined)
+      .some((item) => item !== data.product_date) ||
+    (content !== undefined &&
+      interaction !== undefined &&
+      content.result_id !== interaction.result_id)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return Object.freeze({
+    product_date: data.product_date,
+    ...(checkin === undefined ? {} : { checkin }),
+    ...(content === undefined ? {} : { content }),
+    ...(interaction === undefined ? {} : { interaction }),
+  });
+}
+
+function freezeJson<T>(value: T): T {
+  if (typeof value === "object" && value !== null) {
+    Object.freeze(value);
+    for (const entry of Object.values(value)) {
+      freezeJson(entry);
+    }
+  }
+  return value;
+}
+
 function commandReceipt(data: Record<string, unknown>): CommandReceiptView {
   if (
     typeof data.command_ref !== "string" ||
@@ -419,10 +814,12 @@ function headers(sessionToken?: string, commandRef?: string) {
   });
 }
 
-export function createMiniappApi(network: NetworkPort): C003Api & C004Api {
+export function createMiniappApi(
+  network: NetworkPort,
+): C003Api & C004Api & C009Api {
   let sessionToken: string | undefined;
 
-  const api: C003Api & C004Api = {
+  const api: C003Api & C004Api & C009Api = {
     async createSession(input): Promise<SessionEnvelope> {
       const response = await network.request({
         body: input as StorageValue,
@@ -547,6 +944,68 @@ export function createMiniappApi(network: NetworkPort): C003Api & C004Api {
       const parsed = successData(response.data, response.statusCode);
       return Object.freeze({
         checkin: checkinView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async startGeneration(input): Promise<GenerationIntentEnvelope> {
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          expected_checkin_revision: input.expectedCheckinRevision,
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/daily/generation/start",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        intent: projectGenerationIntentView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async getGeneration(intentRef): Promise<GenerationIntentEnvelope> {
+      if (!isOpaqueRef(intentRef)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: `/v1/daily/generation/${encodeURIComponent(intentRef)}`,
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        intent: projectGenerationIntentView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async getToday(): Promise<TodayEnvelope> {
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: "/v1/daily/today",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        today: projectTodayView(parsed.data),
+      });
+    },
+
+    async getHistoryDay(productDate): Promise<HistoryDayEnvelope> {
+      if (!isProductDate(productDate)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: `/v1/daily/by-date/${encodeURIComponent(productDate)}`,
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        history: projectHistoryDayView(parsed.data),
         productDate: parsed.productDate,
       });
     },

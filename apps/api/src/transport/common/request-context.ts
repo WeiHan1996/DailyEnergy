@@ -29,6 +29,12 @@ function operationFor(method: string, url: string): OperationCode {
   ) {
     return "GENERATION_STATUS";
   }
+  if (
+    method.toUpperCase() === "GET" &&
+    /^\/v1\/daily\/by-date\/[^/]+$/u.test(path ?? "")
+  ) {
+    return "DAILY_HISTORY_READ";
+  }
   const operations: Readonly<Record<string, OperationCode>> = {
     "GET /health/live": "HEALTH_LIVE",
     "GET /health/ready": "HEALTH_READY",

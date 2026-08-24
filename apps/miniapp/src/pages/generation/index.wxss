@@ -1,0 +1,95 @@
+.generation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--de-layout-section-gap);
+}
+
+.generation__eyebrow {
+  min-height: var(--de-state-touch-target);
+  color: var(--de-color-brand-strong);
+  font-size: var(--de-font-label-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-state-touch-target);
+}
+
+.generation__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--de-component-card-gap);
+}
+
+.generation__title {
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-page-title-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}
+
+.generation__subtitle,
+.generation__leave-copy {
+  color: var(--de-color-text-secondary);
+  font-size: var(--de-font-body-size);
+  line-height: var(--de-font-line-body);
+}
+
+.generation__motion {
+  display: flex;
+  min-height: calc(var(--de-state-touch-target) * 2);
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.generation__pulse {
+  width: var(--de-state-touch-target);
+  height: var(--de-state-touch-target);
+  border: var(--de-component-card-border-width) solid
+    var(--de-color-brand-primary);
+  border-radius: 50%;
+  background: var(--de-color-brand-soft);
+  animation: generation-pulse var(--de-motion-slow) ease-in-out infinite
+    alternate;
+}
+
+.generation__status {
+  box-sizing: border-box;
+  display: flex;
+  padding: var(--de-component-card-padding);
+  flex-direction: column;
+  border: var(--de-component-card-border-width) solid
+    var(--de-color-border-subtle);
+  border-radius: var(--de-component-card-radius);
+  background: var(--de-color-surface-secondary);
+  gap: var(--de-component-card-gap);
+}
+
+.generation__status-title {
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-body-size);
+  font-weight: var(--de-font-semibold);
+}
+
+.generation__status-copy {
+  color: var(--de-color-text-muted);
+  font-size: var(--de-font-label-size);
+  line-height: var(--de-font-line-body);
+}
+
+@keyframes generation-pulse {
+  from {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .generation__pulse {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

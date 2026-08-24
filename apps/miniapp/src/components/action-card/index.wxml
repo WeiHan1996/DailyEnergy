@@ -11,7 +11,7 @@
     <text>已经留下</text>
   </view>
   <de-action-button
-    wx:else
+    wx:elif="{{showButton}}"
     accessible-label="{{buttonLabel}}：{{action}}"
     block
     disabled="{{disabled}}"

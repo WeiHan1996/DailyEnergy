@@ -1,0 +1,14 @@
+{
+  "usingComponents": {
+    "de-action-card": "../../components/action-card/index",
+    "de-app-header": "../../components/app-header/index",
+    "de-energy-summary": "../../components/energy-summary/index",
+    "de-friend-message": "../../components/friend-message/index",
+    "de-loading-skeleton": "../../components/loading-skeleton/index",
+    "de-offline-state": "../../components/offline-state/index",
+    "de-page-shell": "../../components/page-shell/index",
+    "de-recoverable-error": "../../components/recoverable-error/index",
+    "de-section-card": "../../components/section-card/index"
+  },
+  "navigationStyle": "custom"
+}

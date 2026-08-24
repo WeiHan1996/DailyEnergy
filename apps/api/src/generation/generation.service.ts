@@ -4,6 +4,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import type {
   DailyGenerationStore,
   GenerationGuardFailure,
+  HistoryDayQueryResult,
   GenerationIntentQueryResult,
   GenerationStartResult,
   TodayQueryResult,
@@ -11,6 +12,7 @@ import type {
 import type {
   GenerationIntentView,
   GenerationStartRequest,
+  HistoryDayView,
   TodayView,
 } from "@daily-energy/shared-schemas";
 
@@ -76,6 +78,26 @@ export class GenerationService {
     );
     if (result.status !== "FOUND") {
       throw queryException(result.status, resolution);
+    }
+    return { resolution, view: result.value };
+  }
+
+  public async getByDate(
+    principal: SessionPrincipal,
+    productDate: string,
+  ): Promise<GenerationServiceResult<HistoryDayView>> {
+    const resolution = this.#resolve();
+    if (productDate >= resolution.productDate) {
+      throw exception("RESOURCE_NOT_FOUND", resolution);
+    }
+    const result = await this.#storeCall(() =>
+      this.store.getByDate({
+        accountId: principal.accountId,
+        productDate,
+      }),
+    );
+    if (result.status !== "FOUND") {
+      throw historyException(result.status, resolution);
     }
     return { resolution, view: result.value };
   }
@@ -148,6 +170,15 @@ function startView(
 
 function queryException(
   status: Exclude<GenerationIntentQueryResult["status"], "FOUND">,
+  resolution: ProductDateResolution,
+): ApiException {
+  return status === "NOT_FOUND"
+    ? exception("RESOURCE_NOT_FOUND", resolution)
+    : guardException(status, resolution);
+}
+
+function historyException(
+  status: Exclude<HistoryDayQueryResult["status"], "FOUND">,
   resolution: ProductDateResolution,
 ): ApiException {
   return status === "NOT_FOUND"

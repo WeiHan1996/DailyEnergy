@@ -3225,21 +3225,7 @@ components:
         - has_result
         - has_evening_feedback
     HistoryDayView:
-      type: object
-      properties:
-        product_date:
-          $ref: "#/components/schemas/ProductDate"
-        checkin:
-          $ref: "#/components/schemas/CheckinView"
-        content:
-          $ref: "#/components/schemas/ClientDailyContentView"
-        interaction:
-          $ref: "#/components/schemas/DailyInteractionView"
-        evening:
-          $ref: "#/components/schemas/EveningView"
-      additionalProperties: false
-      required:
-        - product_date
+      x-source-contract: HistoryDayViewSchema
     MatterView:
       type: object
       properties:

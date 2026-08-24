@@ -6,6 +6,9 @@ export const MINIAPP_PAGE_REGISTRY = Object.freeze([
   "pages/landing/index",
   "pages/onboarding/index",
   "pages/checkin-handoff/index",
+  "pages/generation/index",
+  "pages/today/index",
+  "pages/history-day/index",
   "pages/safety/index",
   "pages/recovery/index",
 ]);

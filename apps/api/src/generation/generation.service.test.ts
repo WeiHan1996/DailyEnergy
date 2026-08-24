@@ -1,5 +1,6 @@
 import type { DailyGenerationStore } from "@daily-energy/server-adapters/api";
 import type { CheckinView } from "@daily-energy/shared-schemas";
+import type { HistoryDayView } from "@daily-energy/shared-schemas";
 import { describe, expect, it, vi } from "vitest";
 
 import type { SessionPrincipal } from "../auth/contracts.js";
@@ -36,6 +37,14 @@ const currentCheckin: CheckinView = {
   updated_at: now.toISOString(),
   write_window: "OPEN",
 };
+const history: HistoryDayView = {
+  product_date: "2026-08-23",
+  checkin: {
+    ...currentCheckin,
+    product_date: "2026-08-23",
+    write_window: "CLOSED",
+  },
+};
 
 function config() {
   return loadRuntimeConfig({
@@ -61,6 +70,7 @@ function fakeStore(
 ): DailyGenerationStore {
   return {
     close: async () => undefined,
+    getByDate: unavailable,
     getIntent: unavailable,
     getToday: unavailable,
     start: unavailable,
@@ -148,6 +158,24 @@ describe("C-008 generation application service", () => {
         fakeStore({ getIntent: async () => ({ status: "NOT_FOUND" }) }),
       ).getIntent(principal, intent.intent_ref),
     ).rejects.toMatchObject({ code: "RESOURCE_NOT_FOUND" });
+  });
+
+  it("reads only a past owner-scoped HistoryDayView", async () => {
+    const getByDate = vi.fn<DailyGenerationStore["getByDate"]>(async () => ({
+      status: "FOUND",
+      value: history,
+    }));
+    await expect(
+      service(fakeStore({ getByDate })).getByDate(principal, "2026-08-23"),
+    ).resolves.toMatchObject({ view: history });
+    expect(getByDate).toHaveBeenCalledWith({
+      accountId: principal.accountId,
+      productDate: "2026-08-23",
+    });
+    await expect(
+      service(fakeStore({ getByDate })).getByDate(principal, "2026-08-24"),
+    ).rejects.toMatchObject({ code: "RESOURCE_NOT_FOUND" });
+    expect(getByDate).toHaveBeenCalledOnce();
   });
 
   it("normalizes store failures without leaking database details", async () => {

@@ -3,9 +3,9 @@
   "registry_version": "e-010-source-registry-v1",
   "snapshot_base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
   "counts": {
-    "total": 791,
-    "COVERED": 283,
-    "PLANNED": 508,
+    "total": 792,
+    "COVERED": 289,
+    "PLANNED": 503,
     "NA_WITH_REASON": 0
   },
   "planned_policy": {
@@ -19,7 +19,7 @@
       "set_id": "s28-stack",
       "authority_path": "docs/decisions/ADR-0006-monorepo-and-stack.md",
       "owner": "E-010 and the owning Phase 1 implementation issue",
-      "counts": { "COVERED": 8, "PLANNED": 24, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 9, "PLANNED": 23, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s29-architecture",
@@ -31,7 +31,7 @@
       "set_id": "s30-repository",
       "authority_path": "docs/technical/repository-structure.md",
       "owner": "E-010 or E-011 according to the missing runner or Gate",
-      "counts": { "COVERED": 11, "PLANNED": 37, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 12, "PLANNED": 36, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s31-testing",
@@ -55,7 +55,7 @@
       "set_id": "s17-domain-model",
       "authority_path": "docs/data/domain-model.md",
       "owner": "Owning Phase 2-3 domain implementation issue",
-      "counts": { "COVERED": 11, "PLANNED": 37, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 14, "PLANNED": 34, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s19-database",
@@ -91,7 +91,7 @@
       "set_id": "shared-schemas",
       "authority_path": "packages/shared-schemas/src/json-schema.ts",
       "owner": "E-008 contract maintenance",
-      "counts": { "COVERED": 27, "PLANNED": 0, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 28, "PLANNED": 0, "NA_WITH_REASON": 0 }
     }
   ]
 }

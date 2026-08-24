@@ -131,12 +131,14 @@ const SCHEMA_EXPORTS = [
   ],
   ["relationshipView", "RelationshipViewSchema", "relationship-view"],
   ["todayView", "TodayViewSchema", "today-view"],
+  ["historyDayView", "HistoryDayViewSchema", "history-day-view"],
 ];
 
 const SCHEMA_SOURCE_PATHS = [
   "packages/shared-schemas/src/client.ts",
   "packages/shared-schemas/src/client-daily-content.ts",
   "packages/shared-schemas/src/client-evening-feedback.ts",
+  "packages/shared-schemas/src/client-history.ts",
   "packages/shared-schemas/src/client-weekly-summary.ts",
   "packages/shared-schemas/src/common.ts",
   "packages/shared-schemas/src/daily-content.ts",

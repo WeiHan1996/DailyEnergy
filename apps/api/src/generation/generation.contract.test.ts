@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import {
   GenerationIntentViewSchema,
   GenerationStartRequestSchema,
+  HistoryDayViewSchema,
   TodayViewSchema,
 } from "@daily-energy/shared-schemas";
 import { parse } from "yaml";
@@ -42,6 +43,13 @@ describe("C-008 generation transport contract", () => {
       "interaction",
       "relationship",
     ]);
+    expect(HistoryDayViewSchema.keyof().options).toEqual([
+      "product_date",
+      "checkin",
+      "content",
+      "interaction",
+      "evening",
+    ]);
   });
 
   it("maps start, status and today to authenticated closed schemas", async () => {
@@ -66,6 +74,7 @@ describe("C-008 generation transport contract", () => {
       ["/daily/generation/start", "post"],
       ["/daily/generation/{intent_ref}", "get"],
       ["/daily/today", "get"],
+      ["/daily/by-date/{product_date}", "get"],
     ] as const) {
       const operation = document.paths[path]?.[method];
       expect(operation?.security).toEqual([{ userBearerAuth: [] }]);
@@ -81,6 +90,9 @@ describe("C-008 generation transport contract", () => {
     });
     expect(document.components.schemas.TodayView).toEqual({
       "x-source-contract": "TodayViewSchema",
+    });
+    expect(document.components.schemas.HistoryDayView).toEqual({
+      "x-source-contract": "HistoryDayViewSchema",
     });
   });
 

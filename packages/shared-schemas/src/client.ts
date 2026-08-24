@@ -73,6 +73,8 @@ export {
   RelationshipViewSchema,
   TodayViewSchema,
 } from "./client-daily-content.js";
+export { HistoryDayViewSchema } from "./client-history.js";
+export type { HistoryDayView } from "./client-history.js";
 export type {
   ClientDailyContentView,
   DailyInteractionState,
