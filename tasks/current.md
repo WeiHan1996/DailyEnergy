@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c009-today-content-page`
 - **Stacked base**：[C-008 Draft PR #161](https://github.com/WeiHan1996/DailyEnergy/pull/161)，verified head `7e4a6e1b1b21eda9ea5fb51184cc7ca0047b86ac`
 - **任务 Issue**：[C-009 Issue #60](https://github.com/WeiHan1996/DailyEnergy/issues/60)
-- **Draft PR**：待创建；计划 base=`agent/c008-daily-result-publication`
+- **Draft PR**：[PR #162](https://github.com/WeiHan1996/DailyEnergy/pull/162)；base=`agent/c008-daily-result-publication`
 - **下一候选任务**：C-010 — 行动任务（Planned；C-009 final-head CI 验证后启动）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -64,8 +64,8 @@
 
 ## 6. 精确下一动作
 
-1. 提交并推送 `agent/c009-today-content-page`，创建 base=`agent/c008-daily-result-publication` 的 stacked Draft PR；
-2. 回写 PR 链接并等待同一 final head 的 11/11 CI SUCCESS；
+1. 推送 PR #162 handoff 回写，确认 base、Draft、Issue 与 remote head 一致；
+2. 等待同一 final head 的 11/11 CI SUCCESS；
 3. 保持 Issue #60 Open、PR Draft，不运行 exact-head merge verifier；
 4. 从 verified C-009 final head 创建 `agent/c010-action-task` 并恢复 C-010 上下文。
 
