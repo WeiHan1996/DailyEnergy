@@ -1,10 +1,10 @@
 {
   "usingComponents": {
     "de-app-header": "../../components/app-header/index",
+    "de-action-button": "../../components/action-button/index",
+    "de-inline-notice": "../../components/inline-notice/index",
     "de-loading-skeleton": "../../components/loading-skeleton/index",
-    "de-offline-state": "../../components/offline-state/index",
-    "de-page-shell": "../../components/page-shell/index",
-    "de-recoverable-error": "../../components/recoverable-error/index"
+    "de-page-shell": "../../components/page-shell/index"
   },
   "navigationStyle": "custom"
 }

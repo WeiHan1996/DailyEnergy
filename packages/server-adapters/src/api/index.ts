@@ -96,6 +96,14 @@ export {
   type StoredEveningView,
 } from "../evening/postgres-evening-store.js";
 export {
+  PostgresWeeklyStore,
+  UNAVAILABLE_WEEKLY_STORE,
+  type PostgresWeeklyStoreConfig,
+  type WeeklyGuardFailure,
+  type WeeklyQueryResult,
+  type WeeklyStore,
+} from "../weekly/postgres-weekly-store.js";
+export {
   RedisDailyContentCache,
   UNAVAILABLE_DAILY_CONTENT_CACHE,
   type DailyContentCache,

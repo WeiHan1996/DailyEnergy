@@ -34,6 +34,10 @@ function setup() {
     "00000000-0000-4000-8000-000000000002",
     "NotificationIntentDue",
   );
+  const weekly = envelope(
+    "00000000-0000-4000-8000-000000000006",
+    "WeeklySummaryDue",
+  );
   const published = envelope(
     "00000000-0000-4000-8000-000000000003",
     "DailyResultPublished",
@@ -50,6 +54,7 @@ function setup() {
     listDataTasksDue: vi.fn(async () => []),
     listGenerationDue: vi.fn(async () => [generation]),
     listNotificationDue: vi.fn(async () => [notification]),
+    listWeeklyDue: vi.fn(async () => [weekly]),
     listPublishedOutboxCandidates: vi.fn(async () => [
       published,
       consumed,
@@ -65,6 +70,7 @@ function setup() {
     producer: { enqueue } satisfies QueueProducerPort,
     published,
     store,
+    weekly,
   };
 }
 
@@ -96,7 +102,7 @@ describe("Redis loss rebuilder", () => {
         store: state.store,
       }).rebuild(50),
     ).resolves.toEqual({
-      dueRows: 1,
+      dueRows: 2,
       publishedOutbox: 1,
       skippedReceipts: 1,
       unsupported: 1,
@@ -105,6 +111,7 @@ describe("Redis loss rebuilder", () => {
       "background",
       state.notification,
     );
+    expect(state.enqueue).toHaveBeenCalledWith("background", state.weekly);
     expect(state.enqueue).toHaveBeenCalledWith("background", state.published);
     expect(state.enqueue).not.toHaveBeenCalledWith(
       expect.anything(),

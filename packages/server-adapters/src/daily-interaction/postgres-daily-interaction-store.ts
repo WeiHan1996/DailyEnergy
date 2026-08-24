@@ -355,7 +355,9 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
         throw new Error("DAILY_LIGHT_AGGREGATE_CAS_LOST");
       }
       await insertDayLitOutbox(client, {
+        aggregateRevision: current.aggregateRevision + 1,
         deletionEpoch: guard.deletionEpoch,
+        interactionId: current.interactionId,
         lightId,
         now: input.now,
         productDate: input.productDate,
@@ -540,6 +542,14 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
       if (aggregateUpdated.rowCount !== 1) {
         throw new Error("DAILY_INTERACTION_AGGREGATE_CAS_LOST");
       }
+      await insertWeeklySourceChangedOutbox(client, {
+        aggregateRevision: current.aggregateRevision + 1,
+        deletionEpoch: guard.deletionEpoch,
+        interactionId: current.interactionId,
+        now: input.now,
+        productDate: input.productDate,
+        safetyEpoch: guard.safetyEpoch,
+      });
       await attachCommandResponse(client, input, current.taskStateId);
       return {
         status: "ACCEPTED",
@@ -776,7 +786,9 @@ async function claimLightCommand(
 async function insertDayLitOutbox(
   client: PoolClient,
   input: {
+    readonly aggregateRevision: number;
     readonly deletionEpoch: bigint;
+    readonly interactionId: string;
     readonly lightId: string;
     readonly now: Date;
     readonly productDate: string;
@@ -802,6 +814,57 @@ async function insertDayLitOutbox(
         product_date: input.productDate,
         source_validity_revision: 1,
       }),
+      JSON.stringify({
+        deletion: input.deletionEpoch.toString(),
+        safety: input.safetyEpoch.toString(),
+      }),
+      input.now,
+      RETENTION_POLICY_VERSION,
+      new Date(input.now.getTime() + OUTBOX_TTL_MS),
+    ],
+  );
+  await insertWeeklySourceChangedOutbox(client, {
+    aggregateRevision: input.aggregateRevision,
+    deletionEpoch: input.deletionEpoch,
+    interactionId: input.interactionId,
+    now: input.now,
+    productDate: input.productDate,
+    safetyEpoch: input.safetyEpoch,
+  });
+}
+
+async function insertWeeklySourceChangedOutbox(
+  client: PoolClient,
+  input: {
+    readonly aggregateRevision: number;
+    readonly deletionEpoch: bigint;
+    readonly interactionId: string;
+    readonly now: Date;
+    readonly productDate: string;
+    readonly safetyEpoch: bigint;
+  },
+): Promise<void> {
+  const idempotencyKey = createHash("sha256")
+    .update(
+      `c013:WeeklySourceChanged:${input.interactionId}:${input.aggregateRevision}`,
+      "utf8",
+    )
+    .digest();
+  await client.query(
+    `INSERT INTO daily_energy.runtime_outbox_event
+      (id,"aggregateType","aggregateRef","aggregateRevision","eventType",
+       "eventVersion","idempotencyKey","allowlistedPayload","guardEpochs",
+       state,"availableAt","attemptCount","createdAt","retentionPolicyVersion",
+       "retentionScope","retentionAnchorAt","expiresAt")
+     VALUES (gen_random_uuid(),'DailyInteraction',$1::uuid,$2,
+             'WeeklySourceChanged','v1',$3,$4::jsonb,$5::jsonb,'PENDING',
+             $6::timestamptz,0,$6::timestamptz,$7,'RUNTIME',$6::timestamptz,
+             $8::timestamptz)`,
+    [
+      input.interactionId,
+      input.aggregateRevision,
+      idempotencyKey,
+      JSON.stringify({ product_date: input.productDate }),
       JSON.stringify({
         deletion: input.deletionEpoch.toString(),
         safety: input.safetyEpoch.toString(),

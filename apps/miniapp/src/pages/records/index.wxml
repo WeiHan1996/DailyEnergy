@@ -10,44 +10,134 @@
 
   <view class="records" data-screen-id="{{screenId}}">
     <de-loading-skeleton
-      wx:if="{{loading && !items.length}}"
-      label="正在读取最近记录"
+      wx:if="{{loading && !model}}"
+      label="正在读取七天真实记录"
       lines="7"
       variant="card"
     ></de-loading-skeleton>
 
-    <de-recoverable-error
-      wx:elif="{{error && !items.length}}"
-      message="暂时没能读取最近记录。重试仍会按真实日期读取。"
-      bind:retry="retry"
-    ></de-recoverable-error>
+    <block wx:elif="{{error && !model}}">
+      <de-inline-notice
+        title="暂时没能读取最近记录"
+        message="已经保存的内容仍在；重新读取仍会按七个真实产品日期展开。"
+        tone="error"
+      ></de-inline-notice>
+      <de-action-button
+        block="{{true}}"
+        label="重新读取"
+        loading="{{retrying}}"
+        variant="secondary"
+        bind:press="retry"
+      ></de-action-button>
+    </block>
+
+    <block wx:elif="{{noCacheOffline && !model}}">
+      <de-inline-notice
+        title="当前没有离线记录"
+        message="恢复网络后可以读取最近七个产品日期；这里不会用示例数据补位。"
+        tone="info"
+      ></de-inline-notice>
+      <de-action-button
+        block="{{true}}"
+        disabled="{{offline}}"
+        label="重新连接"
+        loading="{{retrying}}"
+        variant="secondary"
+        bind:press="retry"
+      ></de-action-button>
+    </block>
 
     <block wx:else>
-      <de-offline-state
+      <de-inline-notice
         wx:if="{{offline}}"
-        message="这是最后同步的只读记录；缺失日期不会被补齐。"
-        bind:retry="retry"
-      ></de-offline-state>
+        title="离线内容"
+        message="这是最后同步的只读窗口；恢复网络后会重新核对源记录和总结状态。"
+        tone="info"
+      ></de-inline-notice>
 
-      <view id="records-title" class="records__title">一起留下的日子</view>
-      <view class="records__list" aria-label="最近七天记录">
+      <view class="records__intro">
+        <view class="records__eyebrow">你的真实记录</view>
+        <view id="records-title" class="records__title">最近七天</view>
+        <view class="records__range">{{model.range_text}}</view>
+        <view class="records__coverage">{{model.coverage_text}}</view>
+      </view>
+
+      <de-inline-notice
+        wx:if="{{model.show_state_notice}}"
+        title="{{model.state_title}}"
+        message="{{model.state_message}}"
+        tone="{{model.state_tone}}"
+      ></de-inline-notice>
+
+      <view wx:if="{{model.empty}}" class="records__empty">
+        <view class="records__empty-title">从今天开始</view>
+        <view class="records__empty-copy">想开始时，留下今天的真实状态就可以。</view>
+        <de-action-button
+          block="{{true}}"
+          label="返回今天"
+          variant="primary"
+          bind:press="goToday"
+        ></de-action-button>
+      </view>
+
+      <view wx:if="{{model.show_charts}}" class="records__charts">
         <view
-          wx:for="{{items}}"
-          wx:key="product_date"
-          class="records__row {{item.state === 'MISSING' ? 'records__row--missing' : ''}}"
-          aria-role="{{item.has_result ? 'button' : 'text'}}"
-          data-can-open="{{item.has_result}}"
-          data-date="{{item.product_date}}"
-          bind:tap="openDay"
+          wx:for="{{model.charts}}"
+          wx:key="id"
+          class="records__chart"
+          aria-label="{{item.title}}。{{item.summary}}"
         >
-          <view class="records__date">{{item.product_date}}</view>
-          <view class="records__facts">
-            <text>{{item.status_text}}</text>
-            <text wx:if="{{item.has_evening_feedback}}"> · 有晚间记录</text>
+          <view class="records__section-title">{{item.title}}</view>
+          <view class="records__chart-summary">{{item.summary}}</view>
+          <view class="records__chart-grid">
+            <view wx:for="{{item.days}}" wx:for-item="day" wx:key="date_label" class="records__chart-day">
+              <view class="records__plot" aria-hidden="true">
+                <view wx:if="{{day.missing}}" class="records__missing-mark">-</view>
+                <view wx:else class="records__point {{day.level_class}} {{day.unsure ? 'records__point--unsure' : ''}}"></view>
+              </view>
+              <view class="records__value">{{day.value_label}}</view>
+              <view class="records__date">{{day.date_label}}</view>
+            </view>
           </view>
         </view>
       </view>
-      <view class="records__boundary">没有记录的日期会保留为空，不影响已经留下的相遇日。</view>
+
+      <view wx:if="{{!model.empty}}" class="records__activity">
+        <view class="records__section-title">这七天留下了什么</view>
+        <view class="records__activity-copy">{{model.activity_text}}</view>
+      </view>
+
+      <view wx:if="{{!model.empty}}" class="records__summary">
+        <view class="records__section-title">{{model.summary_title}}</view>
+        <view wx:if="{{model.summary_message}}" class="records__summary-message">{{model.summary_message}}</view>
+        <view wx:for="{{model.summary_paragraphs}}" wx:key="*this" class="records__paragraph">{{item}}</view>
+      </view>
+
+      <view class="records__disclosure">
+        <view class="records__section-title">依据哪些记录</view>
+        <view>{{model.data_disclosure}}</view>
+        <view>真实状态和娱乐性今日能量分开计算；缺失日期不连线、不补齐。</view>
+      </view>
+
+      <view class="records__days">
+        <view class="records__section-title">最近日记录</view>
+        <view
+          wx:for="{{model.rows}}"
+          wx:key="product_date"
+          class="records__row {{item.can_open ? '' : 'records__row--missing'}}"
+          aria-role="{{item.can_open ? 'button' : 'text'}}"
+          aria-label="{{item.date_label}}，{{item.state_text}}，{{item.detail_text}}"
+          data-can-open="{{item.can_open}}"
+          data-date="{{item.product_date}}"
+          bind:tap="openDay"
+        >
+          <view>
+            <view class="records__row-date">{{item.date_label}}</view>
+            <view class="records__row-detail">{{item.detail_text}}</view>
+          </view>
+          <view class="records__row-state">{{item.state_text}}</view>
+        </view>
+      </view>
     </block>
   </view>
 </de-page-shell>

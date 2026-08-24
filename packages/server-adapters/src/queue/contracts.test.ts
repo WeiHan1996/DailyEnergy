@@ -90,4 +90,21 @@ describe("worker capability manifests", () => {
       true,
     );
   });
+
+  it("keeps Weekly background capacity isolated from Daily generation", () => {
+    expect(routeForEvent("WeeklySummaryDue", "v1")).toMatchObject({
+      queueFamily: "background",
+    });
+    expect(routeForEvent("GenerationIntentDue", "v1")).toMatchObject({
+      queueFamily: "interactive",
+    });
+    expect(BACKGROUND_WORKER_MANIFEST.queueName).not.toBe(
+      INTERACTIVE_WORKER_MANIFEST.queueName,
+    );
+    expect(BACKGROUND_WORKER_MANIFEST.databaseRole).not.toBe(
+      INTERACTIVE_WORKER_MANIFEST.databaseRole,
+    );
+    expect(BACKGROUND_WORKER_MANIFEST.egressAllowlist).toContain("ai.weekly");
+    expect(INTERACTIVE_WORKER_MANIFEST.egressAllowlist).toContain("ai.daily");
+  });
 });

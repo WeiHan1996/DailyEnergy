@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 303, "NA_WITH_REASON": 0, "PLANNED": 490 },
+  "counts": { "COVERED": 311, "NA_WITH_REASON": 0, "PLANNED": 482 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -509,11 +509,36 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "0, 2, 5 and 7 real-state days map to EMPTY, POINTS_ONLY, PARTIAL and COMPLETE without compressing the seven dates",
+            "INVALIDATED facts project without a summary and the same accepted source produces byte-stable aggregate and plan output",
+            "missing and UNSURE values never become ordinal observations while direction, mode and helpful-action thresholds remain deterministic",
+            "the controlled template references only the approved fact plan and the client projection contains no source, note, score, model or provider fields"
+          ],
+          "file": "packages/server-core/src/modules/weekly-reflection/domain/weekly-aggregate.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "weekly-aggregate-v1",
+          "test_id": "T-C013-CORE-001"
+        },
+        {
+          "assertions": [
+            "a source correction immediately removes the old summary, then publishes one new revision through the fingerprint-bound TX-07 CAS",
+            "an active DAY deletion guard makes the source date missing and prevents the old summary from remaining visible",
+            "real PostgreSQL 18 derives exactly seven source slots, creates one stable due row and atomically publishes the current local-template summary",
+            "same-event replay is an Inbox no-op while two source corrections create immutable fingerprints and a stale intermediate due intent is cancelled",
+            "snapshot JSON contains no note, entertainment score, expression, model or provider"
+          ],
+          "file": "tests/database/c013-weekly-reflection.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "C-013 real PostgreSQL snapshot, due row, TX-07 invalidation and deletion visibility",
+          "test_id": "T-C013-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -522,11 +547,20 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a note-only evening revision keeps the weekly overall-feeling source revision and value unchanged",
+            "all WeeklySourceChanged outbox events contain only product date, component revisions and guard epochs, never note or expression content"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C013-NOTE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -4483,11 +4517,35 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "current and historical window reads pass only the owner from the authenticated session and reject malformed or future anchors",
+            "Safety blocks ordinary weekly reads before any data view is returned",
+            "the HTTP whitelist contains coverage and summary status but no source fingerprint, source ref, note, score, provider or model"
+          ],
+          "file": "apps/api/src/weekly.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "C-013 HTTP weekly flow",
+          "test_id": "T-C013-API-001"
+        },
+        {
+          "assertions": [
+            "a source correction immediately removes the old summary, then publishes one new revision through the fingerprint-bound TX-07 CAS",
+            "an active DAY deletion guard makes the source date missing and prevents the old summary from remaining visible",
+            "real PostgreSQL 18 derives exactly seven source slots, creates one stable due row and atomically publishes the current local-template summary",
+            "same-event replay is an Inbox no-op while two source corrections create immutable fingerprints and a stale intermediate due intent is cancelled",
+            "snapshot JSON contains no note, entertainment score, expression, model or provider"
+          ],
+          "file": "tests/database/c013-weekly-reflection.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "C-013 real PostgreSQL snapshot, due row, TX-07 invalidation and deletion visibility",
+          "test_id": "T-C013-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -5852,22 +5910,43 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a source correction immediately removes the old summary, then publishes one new revision through the fingerprint-bound TX-07 CAS",
+            "an active DAY deletion guard makes the source date missing and prevents the old summary from remaining visible",
+            "real PostgreSQL 18 derives exactly seven source slots, creates one stable due row and atomically publishes the current local-template summary",
+            "same-event replay is an Inbox no-op while two source corrections create immutable fingerprints and a stale intermediate due intent is cancelled",
+            "snapshot JSON contains no note, entertainment score, expression, model or provider"
+          ],
+          "file": "tests/database/c013-weekly-reflection.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "C-013 real PostgreSQL snapshot, due row, TX-07 invalidation and deletion visibility",
+          "test_id": "T-C013-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-030",
       "source_sets": ["s19-database"]
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a note-only evening revision keeps the weekly overall-feeling source revision and value unchanged",
+            "all WeeklySourceChanged outbox events contain only product date, component revisions and guard epochs, never note or expression content"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C013-NOTE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-031",
       "source_sets": ["s19-database"]
@@ -7365,22 +7444,64 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "current and historical window reads pass only the owner from the authenticated session and reject malformed or future anchors",
+            "Safety blocks ordinary weekly reads before any data view is returned",
+            "the HTTP whitelist contains coverage and summary status but no source fingerprint, source ref, note, score, provider or model"
+          ],
+          "file": "apps/api/src/weekly.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "C-013 HTTP weekly flow",
+          "test_id": "T-C013-API-001"
+        },
+        {
+          "assertions": [
+            "current and historical weekly endpoints are authenticated read-only GET operations",
+            "WeeklyView remains bound to the executable ClientWeeklySummaryView contract"
+          ],
+          "file": "apps/api/src/weekly/weekly.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "C-013 weekly transport contract",
+          "test_id": "T-C013-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-E04",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "current and historical window reads pass only the owner from the authenticated session and reject malformed or future anchors",
+            "Safety blocks ordinary weekly reads before any data view is returned",
+            "the HTTP whitelist contains coverage and summary status but no source fingerprint, source ref, note, score, provider or model"
+          ],
+          "file": "apps/api/src/weekly.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "C-013 HTTP weekly flow",
+          "test_id": "T-C013-API-001"
+        },
+        {
+          "assertions": [
+            "current and historical weekly endpoints are authenticated read-only GET operations",
+            "WeeklyView remains bound to the executable ClientWeeklySummaryView contract"
+          ],
+          "file": "apps/api/src/weekly/weekly.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "C-013 weekly transport contract",
+          "test_id": "T-C013-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-E05",
       "source_sets": ["s20-api"]
@@ -8698,11 +8819,19 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "WeeklySummaryDue is statically routed to the Background queue and weekly egress while Daily generation remains on its distinct Interactive queue, role and daily egress"
+          ],
+          "file": "packages/server-adapters/src/queue/contracts.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c013-evidence-manifest.json",
+          "selector": "worker capability manifests",
+          "test_id": "T-C013-CAPABILITY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [

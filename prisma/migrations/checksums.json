@@ -44,6 +44,10 @@
     {
       "name": "20260824000002_c012_evening_feedback_permissions",
       "sha256": "1ac248dc8b4bd180ebe4790024947f439f852287ec052a31a9335b157f0f1090"
+    },
+    {
+      "name": "20260824000003_c013_weekly_reflection",
+      "sha256": "0ef03a61d0eb4f8632981b1f47e53617b31ea0c4128f58ea129cf19749570d19"
     }
   ]
 }

@@ -6,6 +6,7 @@ import type {
   DailyInteractionStore,
   EveningStore,
   TelemetryRuntime,
+  WeeklyStore,
 } from "@daily-energy/server-adapters/api";
 
 import type { RuntimeConfig } from "../bootstrap/runtime-config.js";
@@ -32,6 +33,7 @@ export const CONSENT_PROFILE_STORE = Symbol("CONSENT_PROFILE_STORE");
 export const DAILY_GENERATION_STORE = Symbol("DAILY_GENERATION_STORE");
 export const DAILY_INTERACTION_STORE = Symbol("DAILY_INTERACTION_STORE");
 export const EVENING_STORE = Symbol("EVENING_STORE");
+export const WEEKLY_STORE = Symbol("WEEKLY_STORE");
 export const EVENING_NOTE_CODEC = Symbol("EVENING_NOTE_CODEC");
 export const EVENING_SAFETY_GATE = Symbol("EVENING_SAFETY_GATE");
 export const EVENING_SAFETY_STORE = Symbol("EVENING_SAFETY_STORE");
@@ -56,6 +58,7 @@ export interface ApiCompositionOverrides {
   readonly dailyGenerationStore?: DailyGenerationStore;
   readonly dailyInteractionStore?: DailyInteractionStore;
   readonly eveningStore?: EveningStore;
+  readonly weeklyStore?: WeeklyStore;
   readonly eveningNoteCodec?: EveningNoteCodec;
   readonly eveningSafetyGate?: EveningSafetyInputGate;
   readonly eveningSafetyStore?: EveningSafetyStore;

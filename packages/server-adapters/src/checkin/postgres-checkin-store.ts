@@ -1,4 +1,8 @@
+import { createHash } from "node:crypto";
+
 import { Pool, type PoolClient } from "pg";
+
+import { resolveGenerationGuardSnapshot } from "../generation/guard-snapshot.js";
 
 import { commandRefStorageUuid } from "../commands/command-ref.js";
 import { CURRENT_NECESSARY_CONSENT_NOTICE_VERSION } from "../consent-profile/postgres-consent-profile-store.js";
@@ -7,6 +11,7 @@ import { prismaRuntime } from "../db/internal/prisma-runtime.js";
 
 const RETENTION_POLICY_VERSION = "retention-policy-v1";
 const COMMAND_RECEIPT_TTL_MS = 7 * 24 * 60 * 60 * 1_000;
+const OUTBOX_TTL_MS = 30 * 24 * 60 * 60 * 1_000;
 const CHECKIN_LOCK_SEED = 20_004;
 const ACCOUNT_GUARD_LOCK_SEED = 20_400;
 
@@ -368,6 +373,22 @@ export class PostgresCheckinStore implements CheckinStore {
         checkinRef: current.checkinRef,
         revision: nextRevision,
       });
+      const weeklyGuard = await resolveGenerationGuardSnapshot(
+        client,
+        input.accountId,
+        input.productDate,
+      );
+      if (weeklyGuard.status !== "ALLOWED") {
+        throw new Error("CHECKIN_CORRECTION_GUARD_CHANGED");
+      }
+      await insertCheckinCorrectedOutbox(client, {
+        checkinRef: current.checkinRef,
+        deletionEpoch: weeklyGuard.deletionEpoch,
+        now: input.now,
+        productDate: input.productDate,
+        revision: nextRevision,
+        safetyEpoch: weeklyGuard.safetyEpoch,
+      });
       await attachResponse(client, input, revisionRef);
       return {
         status: "ACCEPTED",
@@ -412,6 +433,48 @@ export class PostgresCheckinStore implements CheckinStore {
       throw new Error("CHECKIN_STORE_CLOSED");
     }
   }
+}
+
+async function insertCheckinCorrectedOutbox(
+  client: PoolClient,
+  input: {
+    readonly checkinRef: string;
+    readonly deletionEpoch: bigint;
+    readonly now: Date;
+    readonly productDate: string;
+    readonly revision: number;
+    readonly safetyEpoch: bigint;
+  },
+): Promise<void> {
+  const idempotencyKey = createHash("sha256")
+    .update(
+      `c013:CheckinCorrected:${input.checkinRef}:${input.revision}`,
+      "utf8",
+    )
+    .digest();
+  await client.query(
+    `INSERT INTO daily_energy.runtime_outbox_event
+      (id,"aggregateType","aggregateRef","aggregateRevision","eventType",
+       "eventVersion","idempotencyKey","allowlistedPayload","guardEpochs",
+       state,"availableAt","attemptCount","createdAt","retentionPolicyVersion",
+       "retentionScope","retentionAnchorAt","expiresAt")
+     VALUES (gen_random_uuid(),'MorningCheckin',$1::uuid,$2,'CheckinCorrected',
+             'v1',$3,$4::jsonb,$5::jsonb,'PENDING',$6::timestamptz,0,
+             $6::timestamptz,$7,'RUNTIME',$6::timestamptz,$8::timestamptz)`,
+    [
+      input.checkinRef,
+      input.revision,
+      idempotencyKey,
+      JSON.stringify({ product_date: input.productDate }),
+      JSON.stringify({
+        deletion: input.deletionEpoch.toString(),
+        safety: input.safetyEpoch.toString(),
+      }),
+      input.now,
+      RETENTION_POLICY_VERSION,
+      new Date(input.now.getTime() + OUTBOX_TTL_MS),
+    ],
+  );
 }
 
 export const UNAVAILABLE_CHECKIN_STORE: CheckinStore = {

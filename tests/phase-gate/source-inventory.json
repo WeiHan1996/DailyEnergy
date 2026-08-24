@@ -4,8 +4,8 @@
   "snapshot_base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
   "counts": {
     "total": 793,
-    "COVERED": 303,
-    "PLANNED": 490,
+    "COVERED": 311,
+    "PLANNED": 482,
     "NA_WITH_REASON": 0
   },
   "planned_policy": {
@@ -25,7 +25,7 @@
       "set_id": "s29-architecture",
       "authority_path": "docs/technical/architecture.md",
       "owner": "Owning Phase 1-3 architecture implementation issue",
-      "counts": { "COVERED": 9, "PLANNED": 39, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 10, "PLANNED": 38, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s30-repository",
@@ -55,19 +55,19 @@
       "set_id": "s17-domain-model",
       "authority_path": "docs/data/domain-model.md",
       "owner": "Owning Phase 2-3 domain implementation issue",
-      "counts": { "COVERED": 19, "PLANNED": 29, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 21, "PLANNED": 27, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s19-database",
       "authority_path": "docs/technical/database.md",
       "owner": "Owning database or business implementation issue",
-      "counts": { "COVERED": 59, "PLANNED": 34, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 61, "PLANNED": 32, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s20-api",
       "authority_path": "docs/technical/api.md",
       "owner": "Owning API or business implementation issue",
-      "counts": { "COVERED": 22, "PLANNED": 26, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 24, "PLANNED": 24, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s12-gateway",
@@ -85,7 +85,7 @@
       "set_id": "s21-privacy",
       "authority_path": "docs/operations/privacy-data-map.md",
       "owner": "Owning privacy, data-rights, or business implementation issue",
-      "counts": { "COVERED": 6, "PLANNED": 28, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 7, "PLANNED": 27, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "shared-schemas",

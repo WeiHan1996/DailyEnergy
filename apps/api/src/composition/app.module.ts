@@ -5,6 +5,7 @@ import {
   UNAVAILABLE_DAILY_GENERATION_STORE,
   UNAVAILABLE_DAILY_INTERACTION_STORE,
   UNAVAILABLE_EVENING_STORE,
+  UNAVAILABLE_WEEKLY_STORE,
 } from "@daily-energy/server-adapters/api";
 
 import { AuthAttemptLimiter } from "../auth/auth-attempt-limiter.js";
@@ -20,6 +21,7 @@ import { ConsentProfileService } from "../consent-profile/consent-profile.servic
 import { GenerationService } from "../generation/generation.service.js";
 import { DailyInteractionService } from "../daily-interaction/daily-interaction.service.js";
 import { EveningService } from "../evening/evening.service.js";
+import { WeeklyService } from "../weekly/weekly.service.js";
 import {
   developmentEveningNoteCodec,
   UNAVAILABLE_EVENING_NOTE_CODEC,
@@ -54,6 +56,7 @@ import { HealthController } from "../transport/public/health.controller.js";
 import { GenerationController } from "../transport/public/generation.controller.js";
 import { DailyInteractionController } from "../transport/public/daily-interaction.controller.js";
 import { EveningController } from "../transport/public/evening.controller.js";
+import { WeeklyController } from "../transport/public/weekly.controller.js";
 import { HealthService } from "../transport/public/health.service.js";
 import { LaunchAudienceGuard } from "../transport/public/launch-audience.guard.js";
 import { PublicAudienceGuard } from "../transport/public/public-audience.guard.js";
@@ -70,6 +73,7 @@ import {
   EVENING_SAFETY_GATE,
   EVENING_SAFETY_STORE,
   EVENING_STORE,
+  WEEKLY_STORE,
   type ApiComposition,
   ORDINARY_LOG_SINK,
   PREFERRED_NAME_CODEC,
@@ -138,6 +142,11 @@ export class ApiModule {
         provide: EVENING_STORE,
         useValue:
           composition.overrides?.eveningStore ?? UNAVAILABLE_EVENING_STORE,
+      },
+      {
+        provide: WEEKLY_STORE,
+        useValue:
+          composition.overrides?.weeklyStore ?? UNAVAILABLE_WEEKLY_STORE,
       },
       {
         provide: EVENING_NOTE_CODEC,
@@ -217,6 +226,7 @@ export class ApiModule {
       DailyInteractionService,
       EveningService,
       GenerationService,
+      WeeklyService,
       HealthService,
       HttpLoggingInterceptor,
       LaunchAudienceGuard,
@@ -236,6 +246,7 @@ export class ApiModule {
         DailyInteractionController,
         EveningController,
         GenerationController,
+        WeeklyController,
         HealthController,
         PublicController,
       ],
