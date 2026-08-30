@@ -20,11 +20,11 @@ function cloneRegistry() {
 test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () => {
   assert.deepEqual(await loadAndValidateCoverageRegistry(), {
     counts: {
-      COVERED: 311,
+      COVERED: 343,
       NA_WITH_REASON: 0,
-      PLANNED: 482,
+      PLANNED: 470,
     },
-    total: 793,
+    total: 813,
   });
 
   const domainEntries = registry.entries.filter(({ source_id: sourceId }) =>

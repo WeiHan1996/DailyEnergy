@@ -124,6 +124,9 @@ Page({
   goToday() {
     wx.reLaunch({ url: "/pages/today/index" });
   },
+  openDataRights() {
+    wx.navigateTo({ url: "/pages/privacy-data/index" });
+  },
   async load() {
     await this.applyResult(await getMiniappAppContext().weekly.load());
   },

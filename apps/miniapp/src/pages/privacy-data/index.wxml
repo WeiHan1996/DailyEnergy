@@ -1,0 +1,104 @@
+<de-page-shell labelled-by="privacy-title">
+  <de-app-header
+    slot="header"
+    back-label="返回"
+    show-back="{{true}}"
+    title="隐私与数据"
+    subtitle="查看和管理自己的数据"
+    bind:back="back"
+  ></de-app-header>
+
+  <view class="privacy" data-screen-id="{{screenId}}">
+    <de-loading-skeleton wx:if="{{loading}}" label="正在读取数据权利状态" lines="6" variant="card"></de-loading-skeleton>
+
+    <block wx:else>
+      <de-inline-notice
+        wx:if="{{offline}}"
+        title="当前离线"
+        message="数据用途说明仍可阅读；导出、删除和注销不会离线排队。"
+        tone="info"
+      ></de-inline-notice>
+      <block wx:if="{{error}}">
+        <de-inline-notice title="暂时没能读取任务状态" message="已有任务不会重复创建；重新连接后再读取。" tone="error"></de-inline-notice>
+        <de-action-button block="{{true}}" disabled="{{offline}}" label="重新读取" variant="secondary" bind:press="load"></de-action-button>
+      </block>
+
+      <view id="privacy-title" class="privacy__title">你的数据，由你决定。</view>
+      <de-section-card heading="收集与用途">
+        <view class="privacy__copy">资料和每日记录用于提供一日约一分钟的陪伴体验；真实状态、娱乐性今日能量、晚间反馈和行为数据保持分开。</view>
+        <view class="privacy__copy">记忆只在明确授权后使用，并且可以查看、撤回和删除。</view>
+      </de-section-card>
+
+      <de-section-card heading="查看和管理">
+        <view class="privacy__copy">可以从最近记录逐日查看已保存内容；删除后日期会如实显示为缺失。</view>
+        <de-action-button block="{{true}}" label="查看最近记录" variant="secondary" bind:press="openRecords"></de-action-button>
+      </de-section-card>
+
+      <de-section-card heading="导出自己的数据">
+        <de-inline-notice
+          wx:if="{{latestExport && (latestExport.status === 'PENDING' || latestExport.status === 'RUNNING')}}"
+          title="正在准备导出"
+          message="{{latestExport.target_summary}}；刷新本页可查看最新状态。"
+          tone="info"
+        ></de-inline-notice>
+        <de-inline-notice
+          wx:elif="{{latestExport && latestExport.status === 'FAILED'}}"
+          title="导出暂未完成"
+          message="没有影响日常使用，也没有删除任何数据。"
+          tone="error"
+        ></de-inline-notice>
+        <de-inline-notice
+          wx:elif="{{latestExport && latestExport.export_artifact && latestExport.export_artifact.state === 'READY'}}"
+          title="导出已准备好"
+          message="安全下载入口会在 {{latestExport.export_artifact.expires_at}} 到期，下载不会延长时间。"
+          tone="success"
+        ></de-inline-notice>
+        <de-inline-notice
+          wx:elif="{{latestExport && latestExport.export_artifact && latestExport.export_artifact.state === 'EXPIRED'}}"
+          title="导出已经到期"
+          message="旧入口不再可用，可以重新发起一份当前数据导出。"
+          tone="info"
+        ></de-inline-notice>
+        <de-inline-notice
+          wx:elif="{{latestExport && latestExport.export_artifact && latestExport.export_artifact.state === 'INVALIDATED'}}"
+          title="数据已经变化"
+          message="旧导出已失效，可以重新发起一份当前数据导出。"
+          tone="info"
+        ></de-inline-notice>
+        <de-action-button
+          wx:if="{{latestExport && latestExport.export_artifact && latestExport.export_artifact.state === 'READY'}}"
+          block="{{true}}"
+          disabled="{{offline || exporting}}"
+          label="下载 JSON"
+          variant="primary"
+          bind:press="downloadExport"
+        ></de-action-button>
+        <de-action-button
+          wx:else
+          block="{{true}}"
+          disabled="{{offline || exporting || !summary || !summary.capabilities.export_account || (latestExport && (latestExport.status === 'PENDING' || latestExport.status === 'RUNNING'))}}"
+          label="导出 JSON"
+          variant="primary"
+          bind:press="startExport"
+        ></de-action-button>
+        <de-action-button
+          wx:if="{{latestExport && (latestExport.status === 'PENDING' || latestExport.status === 'RUNNING')}}"
+          block="{{true}}"
+          disabled="{{offline || exporting}}"
+          label="刷新状态"
+          variant="secondary"
+          bind:press="load"
+        ></de-action-button>
+      </de-section-card>
+
+      <view class="privacy__danger">
+        <view class="privacy__section-title">删除数据</view>
+        <view class="privacy__copy">删除 guard 会先阻止旧记录继续被读取或使用；在线清理目标为 72 小时，隔离备份最长 35 天到期。</view>
+        <de-action-button block="{{true}}" disabled="{{offline || !summary || !summary.capabilities.delete_relationship_data}}" label="删除关系数据" variant="secondary" bind:press="openRelationshipDeletion"></de-action-button>
+        <de-action-button block="{{true}}" disabled="{{offline || !summary || !summary.capabilities.delete_account}}" label="注销账户" variant="danger" bind:press="openAccountDeletion"></de-action-button>
+      </view>
+
+      <view class="privacy__policy">部分最小安全、删除回执或法律要求的证据可能限期隔离保留，不会继续用于普通产品体验、生成或营销。</view>
+    </block>
+  </view>
+</de-page-shell>

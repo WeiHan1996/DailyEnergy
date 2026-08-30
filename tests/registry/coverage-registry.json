@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 311, "NA_WITH_REASON": 0, "PLANNED": 482 },
+  "counts": { "COVERED": 343, "NA_WITH_REASON": 0, "PLANNED": 470 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -4254,6 +4254,38 @@
           "origin": "tests/registry/c008-evidence-manifest.json",
           "selector": "C-008 outbox/inbox publishes once and Redis cache loss rebuilds from PostgreSQL",
           "test_id": "T-C008-QUEUE-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT confirm stores only one status grant in restricted local storage, clears ordinary caches and removes the token after terminal success",
+            "offline data-rights reads and writes are not queued or persisted",
+            "the synchronous DAY guard response clears daily, evening and weekly local caches"
+          ],
+          "file": "apps/miniapp/src/features/data-rights/data-rights-flow.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 data-rights flow",
+          "test_id": "T-C014-MINIAPP-001"
         }
       ],
       "status": "COVERED",
@@ -4278,11 +4310,43 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ACCOUNT confirm requires a challenge-scoped identity verification ref",
+            "DataRightsSummary, one-task status grant and export document are strict and reject internal ref, fingerprint, epoch and unknown fields",
+            "DELETE and EXPORT completion semantics are split; a successful export requires READY/EXPIRED/INVALIDATED artifact metadata and cannot claim erasure timestamps",
+            "export, DAY, MATTER, RELATIONSHIP_DATA and ACCOUNT requests are strict and reject client guard/epoch fields",
+            "relationship selected dates and expected revisions must match in exact order"
+          ],
+          "file": "packages/shared-schemas/test/c014-data-rights.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 data-rights contracts",
+          "test_id": "T-C014-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -4291,11 +4355,29 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -4304,11 +4386,69 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ACCOUNT prepare, one-time WeChat reauth and confirm remain distinct challenge-bound calls and return one plaintext status token while the store receives only its hash",
+            "authenticated summary/list and DAY delete bind the owner from the session, expose only approved revisions and reject unknown deletion fields",
+            "export creates a DataTaskView while RELATIONSHIP_DATA prepare/confirm freezes an explicit empty DAY vector",
+            "ordinary Bearer cannot enter the status-only endpoint; DeletionStatus reads only its bound task",
+            "READY download is a no-store JSON attachment without a generic envelope, token, seed, Prompt, provider, epoch or source fingerprint"
+          ],
+          "file": "apps/api/src/data-rights.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 HTTP data-rights flow",
+          "test_id": "T-C014-API-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT confirm requires a challenge-scoped identity verification ref",
+            "DataRightsSummary, one-task status grant and export document are strict and reject internal ref, fingerprint, epoch and unknown fields",
+            "DELETE and EXPORT completion semantics are split; a successful export requires READY/EXPIRED/INVALIDATED artifact metadata and cannot claim erasure timestamps",
+            "export, DAY, MATTER, RELATIONSHIP_DATA and ACCOUNT requests are strict and reject client guard/epoch fields",
+            "relationship selected dates and expected revisions must match in exact order"
+          ],
+          "file": "packages/shared-schemas/test/c014-data-rights.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 data-rights contracts",
+          "test_id": "T-C014-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
+        },
+        {
+          "assertions": [
+            "all four restricted event capabilities call closed database functions with only task ref, revision/guard when applicable and execution time",
+            "export finalization hashes only the revision vector and persists no body; retention due uses a separate closed purge function",
+            "the queue handler payload contains no openid, note, checkin, ciphertext, expression body or target key"
+          ],
+          "file": "packages/server-adapters/src/data-rights/data-task-handler.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 restricted data-task handler",
+          "test_id": "T-C014-WORKER-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -4606,11 +4746,41 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
+        },
+        {
+          "assertions": [
+            "all four restricted event capabilities call closed database functions with only task ref, revision/guard when applicable and execution time",
+            "export finalization hashes only the revision vector and persists no body; retention due uses a separate closed purge function",
+            "the queue handler payload contains no openid, note, checkin, ciphertext, expression body or target key"
+          ],
+          "file": "packages/server-adapters/src/data-rights/data-task-handler.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 restricted data-task handler",
+          "test_id": "T-C014-WORKER-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -6093,6 +6263,26 @@
           "origin": "tests/database/evidence-manifest.json",
           "selector": "T-DB-TX-009 TX-09 active deletion task/guard is concurrent-idempotent and failure keeps prior epoch",
           "test_id": "T-DB-TX-009"
+        },
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
         }
       ],
       "status": "COVERED",
@@ -6113,11 +6303,29 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-043",
       "source_sets": ["s19-database"]
@@ -6184,6 +6392,26 @@
           "origin": "tests/database/evidence-manifest.json",
           "selector": "SQL-019 rejects invalid synthetic data",
           "test_id": "T-DB-INTEGRATION-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
         }
       ],
       "status": "COVERED",
@@ -6312,6 +6540,26 @@
           "origin": "tests/database/evidence-manifest.json",
           "selector": "SQL-020 enforces role matrix and real factory startup rejects direct grants and extra membership",
           "test_id": "T-DB-INTEGRATION-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
         }
       ],
       "status": "COVERED",
@@ -7607,22 +7855,94 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ACCOUNT prepare, one-time WeChat reauth and confirm remain distinct challenge-bound calls and return one plaintext status token while the store receives only its hash",
+            "authenticated summary/list and DAY delete bind the owner from the session, expose only approved revisions and reject unknown deletion fields",
+            "export creates a DataTaskView while RELATIONSHIP_DATA prepare/confirm freezes an explicit empty DAY vector",
+            "ordinary Bearer cannot enter the status-only endpoint; DeletionStatus reads only its bound task",
+            "READY download is a no-store JSON attachment without a generic envelope, token, seed, Prompt, provider, epoch or source fingerprint"
+          ],
+          "file": "apps/api/src/data-rights.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 HTTP data-rights flow",
+          "test_id": "T-C014-API-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT confirm requires a challenge-scoped identity verification ref",
+            "DataRightsSummary, one-task status grant and export document are strict and reject internal ref, fingerprint, epoch and unknown fields",
+            "DELETE and EXPORT completion semantics are split; a successful export requires READY/EXPIRED/INVALIDATED artifact metadata and cannot claim erasure timestamps",
+            "export, DAY, MATTER, RELATIONSHIP_DATA and ACCOUNT requests are strict and reject client guard/epoch fields",
+            "relationship selected dates and expected revisions must match in exact order"
+          ],
+          "file": "packages/shared-schemas/test/c014-data-rights.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 data-rights contracts",
+          "test_id": "T-C014-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-S05",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ACCOUNT prepare, one-time WeChat reauth and confirm remain distinct challenge-bound calls and return one plaintext status token while the store receives only its hash",
+            "authenticated summary/list and DAY delete bind the owner from the session, expose only approved revisions and reject unknown deletion fields",
+            "export creates a DataTaskView while RELATIONSHIP_DATA prepare/confirm freezes an explicit empty DAY vector",
+            "ordinary Bearer cannot enter the status-only endpoint; DeletionStatus reads only its bound task",
+            "READY download is a no-store JSON attachment without a generic envelope, token, seed, Prompt, provider, epoch or source fingerprint"
+          ],
+          "file": "apps/api/src/data-rights.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 HTTP data-rights flow",
+          "test_id": "T-C014-API-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT confirm requires a challenge-scoped identity verification ref",
+            "DataRightsSummary, one-task status grant and export document are strict and reject internal ref, fingerprint, epoch and unknown fields",
+            "DELETE and EXPORT completion semantics are split; a successful export requires READY/EXPIRED/INVALIDATED artifact metadata and cannot claim erasure timestamps",
+            "export, DAY, MATTER, RELATIONSHIP_DATA and ACCOUNT requests are strict and reject client guard/epoch fields",
+            "relationship selected dates and expected revisions must match in exact order"
+          ],
+          "file": "packages/shared-schemas/test/c014-data-rights.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 data-rights contracts",
+          "test_id": "T-C014-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-S06",
       "source_sets": ["s20-api"]
@@ -7640,22 +7960,94 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ACCOUNT prepare, one-time WeChat reauth and confirm remain distinct challenge-bound calls and return one plaintext status token while the store receives only its hash",
+            "authenticated summary/list and DAY delete bind the owner from the session, expose only approved revisions and reject unknown deletion fields",
+            "export creates a DataTaskView while RELATIONSHIP_DATA prepare/confirm freezes an explicit empty DAY vector",
+            "ordinary Bearer cannot enter the status-only endpoint; DeletionStatus reads only its bound task",
+            "READY download is a no-store JSON attachment without a generic envelope, token, seed, Prompt, provider, epoch or source fingerprint"
+          ],
+          "file": "apps/api/src/data-rights.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 HTTP data-rights flow",
+          "test_id": "T-C014-API-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT confirm requires a challenge-scoped identity verification ref",
+            "DataRightsSummary, one-task status grant and export document are strict and reject internal ref, fingerprint, epoch and unknown fields",
+            "DELETE and EXPORT completion semantics are split; a successful export requires READY/EXPIRED/INVALIDATED artifact metadata and cannot claim erasure timestamps",
+            "export, DAY, MATTER, RELATIONSHIP_DATA and ACCOUNT requests are strict and reject client guard/epoch fields",
+            "relationship selected dates and expected revisions must match in exact order"
+          ],
+          "file": "packages/shared-schemas/test/c014-data-rights.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 data-rights contracts",
+          "test_id": "T-C014-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-S08",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ACCOUNT prepare, one-time WeChat reauth and confirm remain distinct challenge-bound calls and return one plaintext status token while the store receives only its hash",
+            "authenticated summary/list and DAY delete bind the owner from the session, expose only approved revisions and reject unknown deletion fields",
+            "export creates a DataTaskView while RELATIONSHIP_DATA prepare/confirm freezes an explicit empty DAY vector",
+            "ordinary Bearer cannot enter the status-only endpoint; DeletionStatus reads only its bound task",
+            "READY download is a no-store JSON attachment without a generic envelope, token, seed, Prompt, provider, epoch or source fingerprint"
+          ],
+          "file": "apps/api/src/data-rights.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 HTTP data-rights flow",
+          "test_id": "T-C014-API-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT confirm requires a challenge-scoped identity verification ref",
+            "DataRightsSummary, one-task status grant and export document are strict and reject internal ref, fingerprint, epoch and unknown fields",
+            "DELETE and EXPORT completion semantics are split; a successful export requires READY/EXPIRED/INVALIDATED artifact metadata and cannot claim erasure timestamps",
+            "export, DAY, MATTER, RELATIONSHIP_DATA and ACCOUNT requests are strict and reject client guard/epoch fields",
+            "relationship selected dates and expected revisions must match in exact order"
+          ],
+          "file": "packages/shared-schemas/test/c014-data-rights.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 data-rights contracts",
+          "test_id": "T-C014-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-S09",
       "source_sets": ["s20-api"]
@@ -9066,11 +9458,29 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -10596,6 +11006,26 @@
           "origin": "tests/database/evidence-manifest.json",
           "selector": "SQL-020 enforces role matrix and real factory startup rejects direct grants and extra membership",
           "test_id": "T-DB-INTEGRATION-001"
+        },
+        {
+          "assertions": [
+            "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token",
+            "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+            "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+            "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+            "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+            "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+            "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+            "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+            "summary returns current account/relationship revisions without internal refs",
+            "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+            "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-DB-001"
         }
       ],
       "status": "COVERED",
@@ -10892,22 +11322,42 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a deterministic third-step restore-deny failure records RESTRICTED_EVIDENCE FAILED, keeps ACCOUNT DELETING after online cleanup, and succeeds on the same task after restart",
+            "an active legal hold keeps the original ACCOUNT task FAILED and DELETING, then a new revision-scoped due event retries the same task",
+            "confirmation commits the deletion guard before any Restricted Worker execution and ordinary source rows remain blocked while the worker is absent"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-RESILIENCE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["E2E", "RESILIENCE"] }],
       "source_id": "S31-TEST-037",
       "source_sets": ["s31-testing"]
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a deterministic third-step restore-deny failure records RESTRICTED_EVIDENCE FAILED, keeps ACCOUNT DELETING after online cleanup, and succeeds on the same task after restart",
+            "an active legal hold keeps the original ACCOUNT task FAILED and DELETING, then a new revision-scoped due event retries the same task",
+            "confirmation commits the deletion guard before any Restricted Worker execution and ordinary source rows remain blocked while the worker is absent"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/c014-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-C014-RESILIENCE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["E2E", "RESILIENCE"] }],
       "source_id": "S31-TEST-038",
       "source_sets": ["s31-testing"]
@@ -14745,6 +15195,35 @@
       "evidence": [
         {
           "assertions": [
+            "urn:dailyenergy:schema:account-deletion-accepted-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:account-deletion-accepted-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:account-deletion-accepted-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
             "urn:dailyenergy:schema:checkin-correct-request:1.0.0 participates in the executable contract drift Gate"
           ],
           "file": "tooling/check-contracts.mjs",
@@ -14760,7 +15239,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14789,7 +15268,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14818,7 +15297,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14847,7 +15326,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14876,7 +15355,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14905,7 +15384,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14934,7 +15413,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14963,7 +15442,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14992,13 +15471,419 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:daily-task-state:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:data-export-document:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:data-export-document:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:data-export-document:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:data-rights-summary-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:data-rights-summary-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:data-rights-summary-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:data-task-cancel-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:data-task-cancel-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:data-task-cancel-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:data-task-list-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:data-task-list-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:data-task-list-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:data-task-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:data-task-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:data-task-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:day-expected-revision:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:day-expected-revision:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:day-expected-revision:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-account-confirm-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-account-confirm-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:delete-account-confirm-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-account-prepare-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-account-prepare-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:delete-account-prepare-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-day-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-day-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:delete-day-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-matter-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-matter-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:delete-matter-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-relationship-confirm-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-relationship-confirm-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:delete-relationship-confirm-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-relationship-prepare-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:delete-relationship-prepare-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:delete-relationship-prepare-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:deletion-confirmation-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:deletion-confirmation-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:deletion-confirmation-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:deletion-status-grant-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:deletion-status-grant-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:deletion-status-grant-view:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {
@@ -15021,7 +15906,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15050,7 +15935,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15079,7 +15964,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15108,13 +15993,71 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:evening-reflection-submission:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:export-artifact-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:export-artifact-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:export-artifact-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:export-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:export-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:export-request:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {
@@ -15137,7 +16080,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15166,7 +16109,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15195,7 +16138,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15224,7 +16167,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15253,13 +16196,42 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:history-day-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:identity-verification-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:identity-verification-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:identity-verification-view:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {
@@ -15282,7 +16254,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15311,13 +16283,71 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:published-weekly-summary:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:reauth-verify-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:reauth-verify-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:reauth-verify-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:relationship-deletion-target:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:relationship-deletion-target:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:relationship-deletion-target:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {
@@ -15340,7 +16370,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15369,7 +16399,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15398,7 +16428,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15427,7 +16457,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15456,7 +16486,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15485,7 +16515,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15514,7 +16544,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15543,7 +16573,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -15572,7 +16602,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "selector": "exports 49 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],

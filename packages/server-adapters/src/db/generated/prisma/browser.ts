@@ -284,9 +284,29 @@ export type NotificationIntent = Prisma.NotificationIntentModel
 export type NotificationDeliveryAttempt = Prisma.NotificationDeliveryAttemptModel
 /**
  * Model DataTask
- * 
+ *
  */
 export type DataTask = Prisma.DataTaskModel
+/**
+ * Model ExportManifest
+ *
+ */
+export type ExportManifest = Prisma.ExportManifestModel
+/**
+ * Model DeletionStatusGrant
+ *
+ */
+export type DeletionStatusGrant = Prisma.DeletionStatusGrantModel
+/**
+ * Model DeletionConfirmationChallenge
+ *
+ */
+export type DeletionConfirmationChallenge = Prisma.DeletionConfirmationChallengeModel
+/**
+ * Model IdentityVerification
+ *
+ */
+export type IdentityVerification = Prisma.IdentityVerificationModel
 /**
  * Model DeletionGuard
  * 

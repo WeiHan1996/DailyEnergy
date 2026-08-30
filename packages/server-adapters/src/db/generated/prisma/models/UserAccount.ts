@@ -332,6 +332,8 @@ export type UserAccountWhereInput = {
   notificationIntents?: Prisma.NotificationIntentListRelationFilter
   dataTasks?: Prisma.DataTaskListRelationFilter
   deletionGuards?: Prisma.DeletionGuardListRelationFilter
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeListRelationFilter
+  identityVerifications?: Prisma.IdentityVerificationListRelationFilter
 }
 
 export type UserAccountOrderByWithRelationInput = {
@@ -379,6 +381,8 @@ export type UserAccountOrderByWithRelationInput = {
   notificationIntents?: Prisma.NotificationIntentOrderByRelationAggregateInput
   dataTasks?: Prisma.DataTaskOrderByRelationAggregateInput
   deletionGuards?: Prisma.DeletionGuardOrderByRelationAggregateInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeOrderByRelationAggregateInput
+  identityVerifications?: Prisma.IdentityVerificationOrderByRelationAggregateInput
 }
 
 export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -429,6 +433,8 @@ export type UserAccountWhereUniqueInput = Prisma.AtLeast<{
   notificationIntents?: Prisma.NotificationIntentListRelationFilter
   dataTasks?: Prisma.DataTaskListRelationFilter
   deletionGuards?: Prisma.DeletionGuardListRelationFilter
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeListRelationFilter
+  identityVerifications?: Prisma.IdentityVerificationListRelationFilter
 }, "id" | "ownerScopeToken">
 
 export type UserAccountOrderByWithAggregationInput = {
@@ -522,6 +528,8 @@ export type UserAccountCreateInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateInput = {
@@ -569,6 +577,8 @@ export type UserAccountUncheckedCreateInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUpdateInput = {
@@ -616,6 +626,8 @@ export type UserAccountUpdateInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateInput = {
@@ -663,6 +675,8 @@ export type UserAccountUncheckedUpdateInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateManyInput = {
@@ -1206,6 +1220,34 @@ export type UserAccountUpdateOneRequiredWithoutDataTasksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutDataTasksInput, Prisma.UserAccountUpdateWithoutDataTasksInput>, Prisma.UserAccountUncheckedUpdateWithoutDataTasksInput>
 }
 
+export type UserAccountCreateNestedOneWithoutDeletionChallengesInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutDeletionChallengesInput, Prisma.UserAccountUncheckedCreateWithoutDeletionChallengesInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutDeletionChallengesInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutDeletionChallengesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutDeletionChallengesInput, Prisma.UserAccountUncheckedCreateWithoutDeletionChallengesInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutDeletionChallengesInput
+  upsert?: Prisma.UserAccountUpsertWithoutDeletionChallengesInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutDeletionChallengesInput, Prisma.UserAccountUpdateWithoutDeletionChallengesInput>, Prisma.UserAccountUncheckedUpdateWithoutDeletionChallengesInput>
+}
+
+export type UserAccountCreateNestedOneWithoutIdentityVerificationsInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutIdentityVerificationsInput, Prisma.UserAccountUncheckedCreateWithoutIdentityVerificationsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutIdentityVerificationsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+}
+
+export type UserAccountUpdateOneRequiredWithoutIdentityVerificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAccountCreateWithoutIdentityVerificationsInput, Prisma.UserAccountUncheckedCreateWithoutIdentityVerificationsInput>
+  connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutIdentityVerificationsInput
+  upsert?: Prisma.UserAccountUpsertWithoutIdentityVerificationsInput
+  connect?: Prisma.UserAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserAccountUpdateToOneWithWhereWithoutIdentityVerificationsInput, Prisma.UserAccountUpdateWithoutIdentityVerificationsInput>, Prisma.UserAccountUncheckedUpdateWithoutIdentityVerificationsInput>
+}
+
 export type UserAccountCreateNestedOneWithoutDeletionGuardsInput = {
   create?: Prisma.XOR<Prisma.UserAccountCreateWithoutDeletionGuardsInput, Prisma.UserAccountUncheckedCreateWithoutDeletionGuardsInput>
   connectOrCreate?: Prisma.UserAccountCreateOrConnectWithoutDeletionGuardsInput
@@ -1264,6 +1306,8 @@ export type UserAccountCreateWithoutExternalIdentitiesInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutExternalIdentitiesInput = {
@@ -1310,6 +1354,8 @@ export type UserAccountUncheckedCreateWithoutExternalIdentitiesInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutExternalIdentitiesInput = {
@@ -1372,6 +1418,8 @@ export type UserAccountUpdateWithoutExternalIdentitiesInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutExternalIdentitiesInput = {
@@ -1418,6 +1466,8 @@ export type UserAccountUncheckedUpdateWithoutExternalIdentitiesInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutSessionsInput = {
@@ -1464,6 +1514,8 @@ export type UserAccountCreateWithoutSessionsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutSessionsInput = {
@@ -1510,6 +1562,8 @@ export type UserAccountUncheckedCreateWithoutSessionsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutSessionsInput = {
@@ -1572,6 +1626,8 @@ export type UserAccountUpdateWithoutSessionsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSessionsInput = {
@@ -1618,6 +1674,8 @@ export type UserAccountUncheckedUpdateWithoutSessionsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutConsentsInput = {
@@ -1664,6 +1722,8 @@ export type UserAccountCreateWithoutConsentsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutConsentsInput = {
@@ -1710,6 +1770,8 @@ export type UserAccountUncheckedCreateWithoutConsentsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutConsentsInput = {
@@ -1772,6 +1834,8 @@ export type UserAccountUpdateWithoutConsentsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutConsentsInput = {
@@ -1818,6 +1882,8 @@ export type UserAccountUncheckedUpdateWithoutConsentsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutProfileInput = {
@@ -1864,6 +1930,8 @@ export type UserAccountCreateWithoutProfileInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutProfileInput = {
@@ -1910,6 +1978,8 @@ export type UserAccountUncheckedCreateWithoutProfileInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutProfileInput = {
@@ -1972,6 +2042,8 @@ export type UserAccountUpdateWithoutProfileInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutProfileInput = {
@@ -2018,6 +2090,8 @@ export type UserAccountUncheckedUpdateWithoutProfileInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutOnboardingInput = {
@@ -2064,6 +2138,8 @@ export type UserAccountCreateWithoutOnboardingInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutOnboardingInput = {
@@ -2110,6 +2186,8 @@ export type UserAccountUncheckedCreateWithoutOnboardingInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutOnboardingInput = {
@@ -2172,6 +2250,8 @@ export type UserAccountUpdateWithoutOnboardingInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutOnboardingInput = {
@@ -2218,6 +2298,8 @@ export type UserAccountUncheckedUpdateWithoutOnboardingInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutContinuationGrantsInput = {
@@ -2264,6 +2346,8 @@ export type UserAccountCreateWithoutContinuationGrantsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutContinuationGrantsInput = {
@@ -2310,6 +2394,8 @@ export type UserAccountUncheckedCreateWithoutContinuationGrantsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutContinuationGrantsInput = {
@@ -2372,6 +2458,8 @@ export type UserAccountUpdateWithoutContinuationGrantsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutContinuationGrantsInput = {
@@ -2418,6 +2506,8 @@ export type UserAccountUncheckedUpdateWithoutContinuationGrantsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutCommandReceiptsInput = {
@@ -2464,6 +2554,8 @@ export type UserAccountCreateWithoutCommandReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutCommandReceiptsInput = {
@@ -2510,6 +2602,8 @@ export type UserAccountUncheckedCreateWithoutCommandReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutCommandReceiptsInput = {
@@ -2572,6 +2666,8 @@ export type UserAccountUpdateWithoutCommandReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCommandReceiptsInput = {
@@ -2618,6 +2714,8 @@ export type UserAccountUncheckedUpdateWithoutCommandReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutCheckinsInput = {
@@ -2664,6 +2762,8 @@ export type UserAccountCreateWithoutCheckinsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutCheckinsInput = {
@@ -2710,6 +2810,8 @@ export type UserAccountUncheckedCreateWithoutCheckinsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutCheckinsInput = {
@@ -2772,6 +2874,8 @@ export type UserAccountUpdateWithoutCheckinsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutCheckinsInput = {
@@ -2818,6 +2922,8 @@ export type UserAccountUncheckedUpdateWithoutCheckinsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutGenerationIntentsInput = {
@@ -2864,6 +2970,8 @@ export type UserAccountCreateWithoutGenerationIntentsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutGenerationIntentsInput = {
@@ -2910,6 +3018,8 @@ export type UserAccountUncheckedCreateWithoutGenerationIntentsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutGenerationIntentsInput = {
@@ -2972,6 +3082,8 @@ export type UserAccountUpdateWithoutGenerationIntentsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutGenerationIntentsInput = {
@@ -3018,6 +3130,8 @@ export type UserAccountUncheckedUpdateWithoutGenerationIntentsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutDailyResultsInput = {
@@ -3064,6 +3178,8 @@ export type UserAccountCreateWithoutDailyResultsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutDailyResultsInput = {
@@ -3110,6 +3226,8 @@ export type UserAccountUncheckedCreateWithoutDailyResultsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutDailyResultsInput = {
@@ -3172,6 +3290,8 @@ export type UserAccountUpdateWithoutDailyResultsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutDailyResultsInput = {
@@ -3218,6 +3338,8 @@ export type UserAccountUncheckedUpdateWithoutDailyResultsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutDailyInteractionsInput = {
@@ -3264,6 +3386,8 @@ export type UserAccountCreateWithoutDailyInteractionsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutDailyInteractionsInput = {
@@ -3310,6 +3434,8 @@ export type UserAccountUncheckedCreateWithoutDailyInteractionsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutDailyInteractionsInput = {
@@ -3372,6 +3498,8 @@ export type UserAccountUpdateWithoutDailyInteractionsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutDailyInteractionsInput = {
@@ -3418,6 +3546,8 @@ export type UserAccountUncheckedUpdateWithoutDailyInteractionsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutRelationshipCyclesInput = {
@@ -3464,6 +3594,8 @@ export type UserAccountCreateWithoutRelationshipCyclesInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutRelationshipCyclesInput = {
@@ -3510,6 +3642,8 @@ export type UserAccountUncheckedCreateWithoutRelationshipCyclesInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutRelationshipCyclesInput = {
@@ -3572,6 +3706,8 @@ export type UserAccountUpdateWithoutRelationshipCyclesInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutRelationshipCyclesInput = {
@@ -3618,6 +3754,8 @@ export type UserAccountUncheckedUpdateWithoutRelationshipCyclesInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutMattersInput = {
@@ -3664,6 +3802,8 @@ export type UserAccountCreateWithoutMattersInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutMattersInput = {
@@ -3710,6 +3850,8 @@ export type UserAccountUncheckedCreateWithoutMattersInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutMattersInput = {
@@ -3772,6 +3914,8 @@ export type UserAccountUpdateWithoutMattersInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMattersInput = {
@@ -3818,6 +3962,8 @@ export type UserAccountUncheckedUpdateWithoutMattersInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutMemoryPurposeGrantsInput = {
@@ -3864,6 +4010,8 @@ export type UserAccountCreateWithoutMemoryPurposeGrantsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutMemoryPurposeGrantsInput = {
@@ -3910,6 +4058,8 @@ export type UserAccountUncheckedCreateWithoutMemoryPurposeGrantsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutMemoryPurposeGrantsInput = {
@@ -3972,6 +4122,8 @@ export type UserAccountUpdateWithoutMemoryPurposeGrantsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMemoryPurposeGrantsInput = {
@@ -4018,6 +4170,8 @@ export type UserAccountUncheckedUpdateWithoutMemoryPurposeGrantsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutMemoryMasterPreferenceInput = {
@@ -4064,6 +4218,8 @@ export type UserAccountCreateWithoutMemoryMasterPreferenceInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutMemoryMasterPreferenceInput = {
@@ -4110,6 +4266,8 @@ export type UserAccountUncheckedCreateWithoutMemoryMasterPreferenceInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutMemoryMasterPreferenceInput = {
@@ -4172,6 +4330,8 @@ export type UserAccountUpdateWithoutMemoryMasterPreferenceInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMemoryMasterPreferenceInput = {
@@ -4218,6 +4378,8 @@ export type UserAccountUncheckedUpdateWithoutMemoryMasterPreferenceInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutMemoryMentionReceiptsInput = {
@@ -4264,6 +4426,8 @@ export type UserAccountCreateWithoutMemoryMentionReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutMemoryMentionReceiptsInput = {
@@ -4310,6 +4474,8 @@ export type UserAccountUncheckedCreateWithoutMemoryMentionReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutMemoryMentionReceiptsInput = {
@@ -4372,6 +4538,8 @@ export type UserAccountUpdateWithoutMemoryMentionReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMemoryMentionReceiptsInput = {
@@ -4418,6 +4586,8 @@ export type UserAccountUncheckedUpdateWithoutMemoryMentionReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutMemorySnapshotsInput = {
@@ -4464,6 +4634,8 @@ export type UserAccountCreateWithoutMemorySnapshotsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutMemorySnapshotsInput = {
@@ -4510,6 +4682,8 @@ export type UserAccountUncheckedCreateWithoutMemorySnapshotsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutMemorySnapshotsInput = {
@@ -4572,6 +4746,8 @@ export type UserAccountUpdateWithoutMemorySnapshotsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutMemorySnapshotsInput = {
@@ -4618,6 +4794,8 @@ export type UserAccountUncheckedUpdateWithoutMemorySnapshotsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutWeeklyWindowsInput = {
@@ -4664,6 +4842,8 @@ export type UserAccountCreateWithoutWeeklyWindowsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutWeeklyWindowsInput = {
@@ -4710,6 +4890,8 @@ export type UserAccountUncheckedCreateWithoutWeeklyWindowsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutWeeklyWindowsInput = {
@@ -4772,6 +4954,8 @@ export type UserAccountUpdateWithoutWeeklyWindowsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutWeeklyWindowsInput = {
@@ -4818,6 +5002,8 @@ export type UserAccountUncheckedUpdateWithoutWeeklyWindowsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutSafetyStateInput = {
@@ -4864,6 +5050,8 @@ export type UserAccountCreateWithoutSafetyStateInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutSafetyStateInput = {
@@ -4910,6 +5098,8 @@ export type UserAccountUncheckedCreateWithoutSafetyStateInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutSafetyStateInput = {
@@ -4972,6 +5162,8 @@ export type UserAccountUpdateWithoutSafetyStateInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSafetyStateInput = {
@@ -5018,6 +5210,8 @@ export type UserAccountUncheckedUpdateWithoutSafetyStateInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutSafetyDecisionsInput = {
@@ -5064,6 +5258,8 @@ export type UserAccountCreateWithoutSafetyDecisionsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutSafetyDecisionsInput = {
@@ -5110,6 +5306,8 @@ export type UserAccountUncheckedCreateWithoutSafetyDecisionsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutSafetyDecisionsInput = {
@@ -5172,6 +5370,8 @@ export type UserAccountUpdateWithoutSafetyDecisionsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSafetyDecisionsInput = {
@@ -5218,6 +5418,8 @@ export type UserAccountUncheckedUpdateWithoutSafetyDecisionsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutSafetyEventsInput = {
@@ -5264,6 +5466,8 @@ export type UserAccountCreateWithoutSafetyEventsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutSafetyEventsInput = {
@@ -5310,6 +5514,8 @@ export type UserAccountUncheckedCreateWithoutSafetyEventsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutSafetyEventsInput = {
@@ -5372,6 +5578,8 @@ export type UserAccountUpdateWithoutSafetyEventsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSafetyEventsInput = {
@@ -5418,6 +5626,8 @@ export type UserAccountUncheckedUpdateWithoutSafetyEventsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutSafetyResponsePlansInput = {
@@ -5464,6 +5674,8 @@ export type UserAccountCreateWithoutSafetyResponsePlansInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutSafetyResponsePlansInput = {
@@ -5510,6 +5722,8 @@ export type UserAccountUncheckedCreateWithoutSafetyResponsePlansInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutSafetyResponsePlansInput = {
@@ -5572,6 +5786,8 @@ export type UserAccountUpdateWithoutSafetyResponsePlansInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutSafetyResponsePlansInput = {
@@ -5618,6 +5834,8 @@ export type UserAccountUncheckedUpdateWithoutSafetyResponsePlansInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutRecoveryReceiptsInput = {
@@ -5664,6 +5882,8 @@ export type UserAccountCreateWithoutRecoveryReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutRecoveryReceiptsInput = {
@@ -5710,6 +5930,8 @@ export type UserAccountUncheckedCreateWithoutRecoveryReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutRecoveryReceiptsInput = {
@@ -5772,6 +5994,8 @@ export type UserAccountUpdateWithoutRecoveryReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutRecoveryReceiptsInput = {
@@ -5818,6 +6042,8 @@ export type UserAccountUncheckedUpdateWithoutRecoveryReceiptsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutNotificationPreferencesInput = {
@@ -5864,6 +6090,8 @@ export type UserAccountCreateWithoutNotificationPreferencesInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutNotificationPreferencesInput = {
@@ -5910,6 +6138,8 @@ export type UserAccountUncheckedCreateWithoutNotificationPreferencesInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutNotificationPreferencesInput = {
@@ -5972,6 +6202,8 @@ export type UserAccountUpdateWithoutNotificationPreferencesInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutNotificationPreferencesInput = {
@@ -6018,6 +6250,8 @@ export type UserAccountUncheckedUpdateWithoutNotificationPreferencesInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutPlatformPermissionsInput = {
@@ -6064,6 +6298,8 @@ export type UserAccountCreateWithoutPlatformPermissionsInput = {
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutPlatformPermissionsInput = {
@@ -6110,6 +6346,8 @@ export type UserAccountUncheckedCreateWithoutPlatformPermissionsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutPlatformPermissionsInput = {
@@ -6172,6 +6410,8 @@ export type UserAccountUpdateWithoutPlatformPermissionsInput = {
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutPlatformPermissionsInput = {
@@ -6218,6 +6458,8 @@ export type UserAccountUncheckedUpdateWithoutPlatformPermissionsInput = {
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutNotificationIntentsInput = {
@@ -6264,6 +6506,8 @@ export type UserAccountCreateWithoutNotificationIntentsInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutNotificationIntentsInput = {
@@ -6310,6 +6554,8 @@ export type UserAccountUncheckedCreateWithoutNotificationIntentsInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutNotificationIntentsInput = {
@@ -6372,6 +6618,8 @@ export type UserAccountUpdateWithoutNotificationIntentsInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutNotificationIntentsInput = {
@@ -6418,6 +6666,8 @@ export type UserAccountUncheckedUpdateWithoutNotificationIntentsInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutDataTasksInput = {
@@ -6464,6 +6714,8 @@ export type UserAccountCreateWithoutDataTasksInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotCreateNestedManyWithoutAccountInput
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutDataTasksInput = {
@@ -6510,6 +6762,8 @@ export type UserAccountUncheckedCreateWithoutDataTasksInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotUncheckedCreateNestedManyWithoutAccountInput
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutDataTasksInput = {
@@ -6572,6 +6826,8 @@ export type UserAccountUpdateWithoutDataTasksInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotUpdateManyWithoutAccountNestedInput
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutDataTasksInput = {
@@ -6618,6 +6874,424 @@ export type UserAccountUncheckedUpdateWithoutDataTasksInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotUncheckedUpdateManyWithoutAccountNestedInput
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
+}
+
+export type UserAccountCreateWithoutDeletionChallengesInput = {
+  id?: string
+  ownerScopeToken: runtime.Bytes
+  stableSubjectCiphertext: runtime.Bytes
+  stableSubjectKeyVersion: string
+  state?: $Enums.AccountState
+  revision?: number
+  restrictionCode?: string | null
+  lastActiveUseAt: Date | string
+  inactivityDeletionDueAt: Date | string
+  activeDeletionTaskRef?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  retentionPolicyVersion: string
+  retentionScope?: $Enums.RetentionScope
+  retentionAnchorAt: Date | string
+  expiresAt?: Date | string | null
+  externalIdentities?: Prisma.ExternalIdentityCreateNestedManyWithoutAccountInput
+  sessions?: Prisma.SessionCredentialCreateNestedManyWithoutAccountInput
+  consents?: Prisma.NecessaryConsentRecordCreateNestedManyWithoutAccountInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutAccountInput
+  onboarding?: Prisma.OnboardingCompletionCreateNestedOneWithoutAccountInput
+  continuationGrants?: Prisma.ViewContinuationGrantCreateNestedManyWithoutAccountInput
+  commandReceipts?: Prisma.CommandReceiptCreateNestedManyWithoutAccountInput
+  checkins?: Prisma.MorningCheckinCreateNestedManyWithoutAccountInput
+  generationIntents?: Prisma.GenerationIntentCreateNestedManyWithoutAccountInput
+  dailyResults?: Prisma.PublishedDailyResultCreateNestedManyWithoutAccountInput
+  dailyInteractions?: Prisma.DailyInteractionCreateNestedManyWithoutAccountInput
+  relationshipCycles?: Prisma.RelationshipCycleCreateNestedManyWithoutAccountInput
+  matters?: Prisma.ImportantMatterCreateNestedManyWithoutAccountInput
+  memoryPurposeGrants?: Prisma.MemoryPurposeGrantCreateNestedManyWithoutAccountInput
+  memoryMasterPreference?: Prisma.MemoryMasterPreferenceCreateNestedOneWithoutAccountInput
+  memoryMentionReceipts?: Prisma.MemoryMentionReceiptCreateNestedManyWithoutAccountInput
+  memorySnapshots?: Prisma.MemoryContextSnapshotCreateNestedManyWithoutAccountInput
+  weeklyWindows?: Prisma.WeeklyWindowCreateNestedManyWithoutAccountInput
+  safetyState?: Prisma.SafetyStateCreateNestedOneWithoutAccountInput
+  safetyDecisions?: Prisma.SafetyDecisionCreateNestedManyWithoutAccountInput
+  safetyEvents?: Prisma.SafetyEventCreateNestedManyWithoutAccountInput
+  safetyResponsePlans?: Prisma.SafetyResponsePlanCreateNestedManyWithoutAccountInput
+  recoveryReceipts?: Prisma.RecoveryCommandReceiptCreateNestedManyWithoutAccountInput
+  notificationPreferences?: Prisma.NotificationPreferenceCreateNestedManyWithoutAccountInput
+  platformPermissions?: Prisma.PlatformPermissionSnapshotCreateNestedManyWithoutAccountInput
+  notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
+  dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
+  deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
+}
+
+export type UserAccountUncheckedCreateWithoutDeletionChallengesInput = {
+  id?: string
+  ownerScopeToken: runtime.Bytes
+  stableSubjectCiphertext: runtime.Bytes
+  stableSubjectKeyVersion: string
+  state?: $Enums.AccountState
+  revision?: number
+  restrictionCode?: string | null
+  lastActiveUseAt: Date | string
+  inactivityDeletionDueAt: Date | string
+  activeDeletionTaskRef?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  retentionPolicyVersion: string
+  retentionScope?: $Enums.RetentionScope
+  retentionAnchorAt: Date | string
+  expiresAt?: Date | string | null
+  externalIdentities?: Prisma.ExternalIdentityUncheckedCreateNestedManyWithoutAccountInput
+  sessions?: Prisma.SessionCredentialUncheckedCreateNestedManyWithoutAccountInput
+  consents?: Prisma.NecessaryConsentRecordUncheckedCreateNestedManyWithoutAccountInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutAccountInput
+  onboarding?: Prisma.OnboardingCompletionUncheckedCreateNestedOneWithoutAccountInput
+  continuationGrants?: Prisma.ViewContinuationGrantUncheckedCreateNestedManyWithoutAccountInput
+  commandReceipts?: Prisma.CommandReceiptUncheckedCreateNestedManyWithoutAccountInput
+  checkins?: Prisma.MorningCheckinUncheckedCreateNestedManyWithoutAccountInput
+  generationIntents?: Prisma.GenerationIntentUncheckedCreateNestedManyWithoutAccountInput
+  dailyResults?: Prisma.PublishedDailyResultUncheckedCreateNestedManyWithoutAccountInput
+  dailyInteractions?: Prisma.DailyInteractionUncheckedCreateNestedManyWithoutAccountInput
+  relationshipCycles?: Prisma.RelationshipCycleUncheckedCreateNestedManyWithoutAccountInput
+  matters?: Prisma.ImportantMatterUncheckedCreateNestedManyWithoutAccountInput
+  memoryPurposeGrants?: Prisma.MemoryPurposeGrantUncheckedCreateNestedManyWithoutAccountInput
+  memoryMasterPreference?: Prisma.MemoryMasterPreferenceUncheckedCreateNestedOneWithoutAccountInput
+  memoryMentionReceipts?: Prisma.MemoryMentionReceiptUncheckedCreateNestedManyWithoutAccountInput
+  memorySnapshots?: Prisma.MemoryContextSnapshotUncheckedCreateNestedManyWithoutAccountInput
+  weeklyWindows?: Prisma.WeeklyWindowUncheckedCreateNestedManyWithoutAccountInput
+  safetyState?: Prisma.SafetyStateUncheckedCreateNestedOneWithoutAccountInput
+  safetyDecisions?: Prisma.SafetyDecisionUncheckedCreateNestedManyWithoutAccountInput
+  safetyEvents?: Prisma.SafetyEventUncheckedCreateNestedManyWithoutAccountInput
+  safetyResponsePlans?: Prisma.SafetyResponsePlanUncheckedCreateNestedManyWithoutAccountInput
+  recoveryReceipts?: Prisma.RecoveryCommandReceiptUncheckedCreateNestedManyWithoutAccountInput
+  notificationPreferences?: Prisma.NotificationPreferenceUncheckedCreateNestedManyWithoutAccountInput
+  platformPermissions?: Prisma.PlatformPermissionSnapshotUncheckedCreateNestedManyWithoutAccountInput
+  notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
+  dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
+  deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
+}
+
+export type UserAccountCreateOrConnectWithoutDeletionChallengesInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutDeletionChallengesInput, Prisma.UserAccountUncheckedCreateWithoutDeletionChallengesInput>
+}
+
+export type UserAccountUpsertWithoutDeletionChallengesInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutDeletionChallengesInput, Prisma.UserAccountUncheckedUpdateWithoutDeletionChallengesInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutDeletionChallengesInput, Prisma.UserAccountUncheckedCreateWithoutDeletionChallengesInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutDeletionChallengesInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutDeletionChallengesInput, Prisma.UserAccountUncheckedUpdateWithoutDeletionChallengesInput>
+}
+
+export type UserAccountUpdateWithoutDeletionChallengesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerScopeToken?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  stableSubjectCiphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  stableSubjectKeyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  restrictionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveUseAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inactivityDeletionDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activeDeletionTaskRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  retentionPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  retentionScope?: Prisma.EnumRetentionScopeFieldUpdateOperationsInput | $Enums.RetentionScope
+  retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  externalIdentities?: Prisma.ExternalIdentityUpdateManyWithoutAccountNestedInput
+  sessions?: Prisma.SessionCredentialUpdateManyWithoutAccountNestedInput
+  consents?: Prisma.NecessaryConsentRecordUpdateManyWithoutAccountNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutAccountNestedInput
+  onboarding?: Prisma.OnboardingCompletionUpdateOneWithoutAccountNestedInput
+  continuationGrants?: Prisma.ViewContinuationGrantUpdateManyWithoutAccountNestedInput
+  commandReceipts?: Prisma.CommandReceiptUpdateManyWithoutAccountNestedInput
+  checkins?: Prisma.MorningCheckinUpdateManyWithoutAccountNestedInput
+  generationIntents?: Prisma.GenerationIntentUpdateManyWithoutAccountNestedInput
+  dailyResults?: Prisma.PublishedDailyResultUpdateManyWithoutAccountNestedInput
+  dailyInteractions?: Prisma.DailyInteractionUpdateManyWithoutAccountNestedInput
+  relationshipCycles?: Prisma.RelationshipCycleUpdateManyWithoutAccountNestedInput
+  matters?: Prisma.ImportantMatterUpdateManyWithoutAccountNestedInput
+  memoryPurposeGrants?: Prisma.MemoryPurposeGrantUpdateManyWithoutAccountNestedInput
+  memoryMasterPreference?: Prisma.MemoryMasterPreferenceUpdateOneWithoutAccountNestedInput
+  memoryMentionReceipts?: Prisma.MemoryMentionReceiptUpdateManyWithoutAccountNestedInput
+  memorySnapshots?: Prisma.MemoryContextSnapshotUpdateManyWithoutAccountNestedInput
+  weeklyWindows?: Prisma.WeeklyWindowUpdateManyWithoutAccountNestedInput
+  safetyState?: Prisma.SafetyStateUpdateOneWithoutAccountNestedInput
+  safetyDecisions?: Prisma.SafetyDecisionUpdateManyWithoutAccountNestedInput
+  safetyEvents?: Prisma.SafetyEventUpdateManyWithoutAccountNestedInput
+  safetyResponsePlans?: Prisma.SafetyResponsePlanUpdateManyWithoutAccountNestedInput
+  recoveryReceipts?: Prisma.RecoveryCommandReceiptUpdateManyWithoutAccountNestedInput
+  notificationPreferences?: Prisma.NotificationPreferenceUpdateManyWithoutAccountNestedInput
+  platformPermissions?: Prisma.PlatformPermissionSnapshotUpdateManyWithoutAccountNestedInput
+  notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
+  dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
+  deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutDeletionChallengesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerScopeToken?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  stableSubjectCiphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  stableSubjectKeyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  restrictionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveUseAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inactivityDeletionDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activeDeletionTaskRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  retentionPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  retentionScope?: Prisma.EnumRetentionScopeFieldUpdateOperationsInput | $Enums.RetentionScope
+  retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  externalIdentities?: Prisma.ExternalIdentityUncheckedUpdateManyWithoutAccountNestedInput
+  sessions?: Prisma.SessionCredentialUncheckedUpdateManyWithoutAccountNestedInput
+  consents?: Prisma.NecessaryConsentRecordUncheckedUpdateManyWithoutAccountNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutAccountNestedInput
+  onboarding?: Prisma.OnboardingCompletionUncheckedUpdateOneWithoutAccountNestedInput
+  continuationGrants?: Prisma.ViewContinuationGrantUncheckedUpdateManyWithoutAccountNestedInput
+  commandReceipts?: Prisma.CommandReceiptUncheckedUpdateManyWithoutAccountNestedInput
+  checkins?: Prisma.MorningCheckinUncheckedUpdateManyWithoutAccountNestedInput
+  generationIntents?: Prisma.GenerationIntentUncheckedUpdateManyWithoutAccountNestedInput
+  dailyResults?: Prisma.PublishedDailyResultUncheckedUpdateManyWithoutAccountNestedInput
+  dailyInteractions?: Prisma.DailyInteractionUncheckedUpdateManyWithoutAccountNestedInput
+  relationshipCycles?: Prisma.RelationshipCycleUncheckedUpdateManyWithoutAccountNestedInput
+  matters?: Prisma.ImportantMatterUncheckedUpdateManyWithoutAccountNestedInput
+  memoryPurposeGrants?: Prisma.MemoryPurposeGrantUncheckedUpdateManyWithoutAccountNestedInput
+  memoryMasterPreference?: Prisma.MemoryMasterPreferenceUncheckedUpdateOneWithoutAccountNestedInput
+  memoryMentionReceipts?: Prisma.MemoryMentionReceiptUncheckedUpdateManyWithoutAccountNestedInput
+  memorySnapshots?: Prisma.MemoryContextSnapshotUncheckedUpdateManyWithoutAccountNestedInput
+  weeklyWindows?: Prisma.WeeklyWindowUncheckedUpdateManyWithoutAccountNestedInput
+  safetyState?: Prisma.SafetyStateUncheckedUpdateOneWithoutAccountNestedInput
+  safetyDecisions?: Prisma.SafetyDecisionUncheckedUpdateManyWithoutAccountNestedInput
+  safetyEvents?: Prisma.SafetyEventUncheckedUpdateManyWithoutAccountNestedInput
+  safetyResponsePlans?: Prisma.SafetyResponsePlanUncheckedUpdateManyWithoutAccountNestedInput
+  recoveryReceipts?: Prisma.RecoveryCommandReceiptUncheckedUpdateManyWithoutAccountNestedInput
+  notificationPreferences?: Prisma.NotificationPreferenceUncheckedUpdateManyWithoutAccountNestedInput
+  platformPermissions?: Prisma.PlatformPermissionSnapshotUncheckedUpdateManyWithoutAccountNestedInput
+  notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
+  dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
+  deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
+}
+
+export type UserAccountCreateWithoutIdentityVerificationsInput = {
+  id?: string
+  ownerScopeToken: runtime.Bytes
+  stableSubjectCiphertext: runtime.Bytes
+  stableSubjectKeyVersion: string
+  state?: $Enums.AccountState
+  revision?: number
+  restrictionCode?: string | null
+  lastActiveUseAt: Date | string
+  inactivityDeletionDueAt: Date | string
+  activeDeletionTaskRef?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  retentionPolicyVersion: string
+  retentionScope?: $Enums.RetentionScope
+  retentionAnchorAt: Date | string
+  expiresAt?: Date | string | null
+  externalIdentities?: Prisma.ExternalIdentityCreateNestedManyWithoutAccountInput
+  sessions?: Prisma.SessionCredentialCreateNestedManyWithoutAccountInput
+  consents?: Prisma.NecessaryConsentRecordCreateNestedManyWithoutAccountInput
+  profile?: Prisma.UserProfileCreateNestedOneWithoutAccountInput
+  onboarding?: Prisma.OnboardingCompletionCreateNestedOneWithoutAccountInput
+  continuationGrants?: Prisma.ViewContinuationGrantCreateNestedManyWithoutAccountInput
+  commandReceipts?: Prisma.CommandReceiptCreateNestedManyWithoutAccountInput
+  checkins?: Prisma.MorningCheckinCreateNestedManyWithoutAccountInput
+  generationIntents?: Prisma.GenerationIntentCreateNestedManyWithoutAccountInput
+  dailyResults?: Prisma.PublishedDailyResultCreateNestedManyWithoutAccountInput
+  dailyInteractions?: Prisma.DailyInteractionCreateNestedManyWithoutAccountInput
+  relationshipCycles?: Prisma.RelationshipCycleCreateNestedManyWithoutAccountInput
+  matters?: Prisma.ImportantMatterCreateNestedManyWithoutAccountInput
+  memoryPurposeGrants?: Prisma.MemoryPurposeGrantCreateNestedManyWithoutAccountInput
+  memoryMasterPreference?: Prisma.MemoryMasterPreferenceCreateNestedOneWithoutAccountInput
+  memoryMentionReceipts?: Prisma.MemoryMentionReceiptCreateNestedManyWithoutAccountInput
+  memorySnapshots?: Prisma.MemoryContextSnapshotCreateNestedManyWithoutAccountInput
+  weeklyWindows?: Prisma.WeeklyWindowCreateNestedManyWithoutAccountInput
+  safetyState?: Prisma.SafetyStateCreateNestedOneWithoutAccountInput
+  safetyDecisions?: Prisma.SafetyDecisionCreateNestedManyWithoutAccountInput
+  safetyEvents?: Prisma.SafetyEventCreateNestedManyWithoutAccountInput
+  safetyResponsePlans?: Prisma.SafetyResponsePlanCreateNestedManyWithoutAccountInput
+  recoveryReceipts?: Prisma.RecoveryCommandReceiptCreateNestedManyWithoutAccountInput
+  notificationPreferences?: Prisma.NotificationPreferenceCreateNestedManyWithoutAccountInput
+  platformPermissions?: Prisma.PlatformPermissionSnapshotCreateNestedManyWithoutAccountInput
+  notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
+  dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
+  deletionGuards?: Prisma.DeletionGuardCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+}
+
+export type UserAccountUncheckedCreateWithoutIdentityVerificationsInput = {
+  id?: string
+  ownerScopeToken: runtime.Bytes
+  stableSubjectCiphertext: runtime.Bytes
+  stableSubjectKeyVersion: string
+  state?: $Enums.AccountState
+  revision?: number
+  restrictionCode?: string | null
+  lastActiveUseAt: Date | string
+  inactivityDeletionDueAt: Date | string
+  activeDeletionTaskRef?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  retentionPolicyVersion: string
+  retentionScope?: $Enums.RetentionScope
+  retentionAnchorAt: Date | string
+  expiresAt?: Date | string | null
+  externalIdentities?: Prisma.ExternalIdentityUncheckedCreateNestedManyWithoutAccountInput
+  sessions?: Prisma.SessionCredentialUncheckedCreateNestedManyWithoutAccountInput
+  consents?: Prisma.NecessaryConsentRecordUncheckedCreateNestedManyWithoutAccountInput
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutAccountInput
+  onboarding?: Prisma.OnboardingCompletionUncheckedCreateNestedOneWithoutAccountInput
+  continuationGrants?: Prisma.ViewContinuationGrantUncheckedCreateNestedManyWithoutAccountInput
+  commandReceipts?: Prisma.CommandReceiptUncheckedCreateNestedManyWithoutAccountInput
+  checkins?: Prisma.MorningCheckinUncheckedCreateNestedManyWithoutAccountInput
+  generationIntents?: Prisma.GenerationIntentUncheckedCreateNestedManyWithoutAccountInput
+  dailyResults?: Prisma.PublishedDailyResultUncheckedCreateNestedManyWithoutAccountInput
+  dailyInteractions?: Prisma.DailyInteractionUncheckedCreateNestedManyWithoutAccountInput
+  relationshipCycles?: Prisma.RelationshipCycleUncheckedCreateNestedManyWithoutAccountInput
+  matters?: Prisma.ImportantMatterUncheckedCreateNestedManyWithoutAccountInput
+  memoryPurposeGrants?: Prisma.MemoryPurposeGrantUncheckedCreateNestedManyWithoutAccountInput
+  memoryMasterPreference?: Prisma.MemoryMasterPreferenceUncheckedCreateNestedOneWithoutAccountInput
+  memoryMentionReceipts?: Prisma.MemoryMentionReceiptUncheckedCreateNestedManyWithoutAccountInput
+  memorySnapshots?: Prisma.MemoryContextSnapshotUncheckedCreateNestedManyWithoutAccountInput
+  weeklyWindows?: Prisma.WeeklyWindowUncheckedCreateNestedManyWithoutAccountInput
+  safetyState?: Prisma.SafetyStateUncheckedCreateNestedOneWithoutAccountInput
+  safetyDecisions?: Prisma.SafetyDecisionUncheckedCreateNestedManyWithoutAccountInput
+  safetyEvents?: Prisma.SafetyEventUncheckedCreateNestedManyWithoutAccountInput
+  safetyResponsePlans?: Prisma.SafetyResponsePlanUncheckedCreateNestedManyWithoutAccountInput
+  recoveryReceipts?: Prisma.RecoveryCommandReceiptUncheckedCreateNestedManyWithoutAccountInput
+  notificationPreferences?: Prisma.NotificationPreferenceUncheckedCreateNestedManyWithoutAccountInput
+  platformPermissions?: Prisma.PlatformPermissionSnapshotUncheckedCreateNestedManyWithoutAccountInput
+  notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
+  dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
+  deletionGuards?: Prisma.DeletionGuardUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+}
+
+export type UserAccountCreateOrConnectWithoutIdentityVerificationsInput = {
+  where: Prisma.UserAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutIdentityVerificationsInput, Prisma.UserAccountUncheckedCreateWithoutIdentityVerificationsInput>
+}
+
+export type UserAccountUpsertWithoutIdentityVerificationsInput = {
+  update: Prisma.XOR<Prisma.UserAccountUpdateWithoutIdentityVerificationsInput, Prisma.UserAccountUncheckedUpdateWithoutIdentityVerificationsInput>
+  create: Prisma.XOR<Prisma.UserAccountCreateWithoutIdentityVerificationsInput, Prisma.UserAccountUncheckedCreateWithoutIdentityVerificationsInput>
+  where?: Prisma.UserAccountWhereInput
+}
+
+export type UserAccountUpdateToOneWithWhereWithoutIdentityVerificationsInput = {
+  where?: Prisma.UserAccountWhereInput
+  data: Prisma.XOR<Prisma.UserAccountUpdateWithoutIdentityVerificationsInput, Prisma.UserAccountUncheckedUpdateWithoutIdentityVerificationsInput>
+}
+
+export type UserAccountUpdateWithoutIdentityVerificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerScopeToken?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  stableSubjectCiphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  stableSubjectKeyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  restrictionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveUseAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inactivityDeletionDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activeDeletionTaskRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  retentionPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  retentionScope?: Prisma.EnumRetentionScopeFieldUpdateOperationsInput | $Enums.RetentionScope
+  retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  externalIdentities?: Prisma.ExternalIdentityUpdateManyWithoutAccountNestedInput
+  sessions?: Prisma.SessionCredentialUpdateManyWithoutAccountNestedInput
+  consents?: Prisma.NecessaryConsentRecordUpdateManyWithoutAccountNestedInput
+  profile?: Prisma.UserProfileUpdateOneWithoutAccountNestedInput
+  onboarding?: Prisma.OnboardingCompletionUpdateOneWithoutAccountNestedInput
+  continuationGrants?: Prisma.ViewContinuationGrantUpdateManyWithoutAccountNestedInput
+  commandReceipts?: Prisma.CommandReceiptUpdateManyWithoutAccountNestedInput
+  checkins?: Prisma.MorningCheckinUpdateManyWithoutAccountNestedInput
+  generationIntents?: Prisma.GenerationIntentUpdateManyWithoutAccountNestedInput
+  dailyResults?: Prisma.PublishedDailyResultUpdateManyWithoutAccountNestedInput
+  dailyInteractions?: Prisma.DailyInteractionUpdateManyWithoutAccountNestedInput
+  relationshipCycles?: Prisma.RelationshipCycleUpdateManyWithoutAccountNestedInput
+  matters?: Prisma.ImportantMatterUpdateManyWithoutAccountNestedInput
+  memoryPurposeGrants?: Prisma.MemoryPurposeGrantUpdateManyWithoutAccountNestedInput
+  memoryMasterPreference?: Prisma.MemoryMasterPreferenceUpdateOneWithoutAccountNestedInput
+  memoryMentionReceipts?: Prisma.MemoryMentionReceiptUpdateManyWithoutAccountNestedInput
+  memorySnapshots?: Prisma.MemoryContextSnapshotUpdateManyWithoutAccountNestedInput
+  weeklyWindows?: Prisma.WeeklyWindowUpdateManyWithoutAccountNestedInput
+  safetyState?: Prisma.SafetyStateUpdateOneWithoutAccountNestedInput
+  safetyDecisions?: Prisma.SafetyDecisionUpdateManyWithoutAccountNestedInput
+  safetyEvents?: Prisma.SafetyEventUpdateManyWithoutAccountNestedInput
+  safetyResponsePlans?: Prisma.SafetyResponsePlanUpdateManyWithoutAccountNestedInput
+  recoveryReceipts?: Prisma.RecoveryCommandReceiptUpdateManyWithoutAccountNestedInput
+  notificationPreferences?: Prisma.NotificationPreferenceUpdateManyWithoutAccountNestedInput
+  platformPermissions?: Prisma.PlatformPermissionSnapshotUpdateManyWithoutAccountNestedInput
+  notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
+  dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
+  deletionGuards?: Prisma.DeletionGuardUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+}
+
+export type UserAccountUncheckedUpdateWithoutIdentityVerificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerScopeToken?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  stableSubjectCiphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  stableSubjectKeyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.EnumAccountStateFieldUpdateOperationsInput | $Enums.AccountState
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  restrictionCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastActiveUseAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inactivityDeletionDueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activeDeletionTaskRef?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  retentionPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  retentionScope?: Prisma.EnumRetentionScopeFieldUpdateOperationsInput | $Enums.RetentionScope
+  retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  externalIdentities?: Prisma.ExternalIdentityUncheckedUpdateManyWithoutAccountNestedInput
+  sessions?: Prisma.SessionCredentialUncheckedUpdateManyWithoutAccountNestedInput
+  consents?: Prisma.NecessaryConsentRecordUncheckedUpdateManyWithoutAccountNestedInput
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutAccountNestedInput
+  onboarding?: Prisma.OnboardingCompletionUncheckedUpdateOneWithoutAccountNestedInput
+  continuationGrants?: Prisma.ViewContinuationGrantUncheckedUpdateManyWithoutAccountNestedInput
+  commandReceipts?: Prisma.CommandReceiptUncheckedUpdateManyWithoutAccountNestedInput
+  checkins?: Prisma.MorningCheckinUncheckedUpdateManyWithoutAccountNestedInput
+  generationIntents?: Prisma.GenerationIntentUncheckedUpdateManyWithoutAccountNestedInput
+  dailyResults?: Prisma.PublishedDailyResultUncheckedUpdateManyWithoutAccountNestedInput
+  dailyInteractions?: Prisma.DailyInteractionUncheckedUpdateManyWithoutAccountNestedInput
+  relationshipCycles?: Prisma.RelationshipCycleUncheckedUpdateManyWithoutAccountNestedInput
+  matters?: Prisma.ImportantMatterUncheckedUpdateManyWithoutAccountNestedInput
+  memoryPurposeGrants?: Prisma.MemoryPurposeGrantUncheckedUpdateManyWithoutAccountNestedInput
+  memoryMasterPreference?: Prisma.MemoryMasterPreferenceUncheckedUpdateOneWithoutAccountNestedInput
+  memoryMentionReceipts?: Prisma.MemoryMentionReceiptUncheckedUpdateManyWithoutAccountNestedInput
+  memorySnapshots?: Prisma.MemoryContextSnapshotUncheckedUpdateManyWithoutAccountNestedInput
+  weeklyWindows?: Prisma.WeeklyWindowUncheckedUpdateManyWithoutAccountNestedInput
+  safetyState?: Prisma.SafetyStateUncheckedUpdateOneWithoutAccountNestedInput
+  safetyDecisions?: Prisma.SafetyDecisionUncheckedUpdateManyWithoutAccountNestedInput
+  safetyEvents?: Prisma.SafetyEventUncheckedUpdateManyWithoutAccountNestedInput
+  safetyResponsePlans?: Prisma.SafetyResponsePlanUncheckedUpdateManyWithoutAccountNestedInput
+  recoveryReceipts?: Prisma.RecoveryCommandReceiptUncheckedUpdateManyWithoutAccountNestedInput
+  notificationPreferences?: Prisma.NotificationPreferenceUncheckedUpdateManyWithoutAccountNestedInput
+  platformPermissions?: Prisma.PlatformPermissionSnapshotUncheckedUpdateManyWithoutAccountNestedInput
+  notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
+  dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
+  deletionGuards?: Prisma.DeletionGuardUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountCreateWithoutDeletionGuardsInput = {
@@ -6664,6 +7338,8 @@ export type UserAccountCreateWithoutDeletionGuardsInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotCreateNestedManyWithoutAccountInput
   notificationIntents?: Prisma.NotificationIntentCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountUncheckedCreateWithoutDeletionGuardsInput = {
@@ -6710,6 +7386,8 @@ export type UserAccountUncheckedCreateWithoutDeletionGuardsInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotUncheckedCreateNestedManyWithoutAccountInput
   notificationIntents?: Prisma.NotificationIntentUncheckedCreateNestedManyWithoutAccountInput
   dataTasks?: Prisma.DataTaskUncheckedCreateNestedManyWithoutAccountInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedCreateNestedManyWithoutAccountInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedCreateNestedManyWithoutAccountInput
 }
 
 export type UserAccountCreateOrConnectWithoutDeletionGuardsInput = {
@@ -6772,6 +7450,8 @@ export type UserAccountUpdateWithoutDeletionGuardsInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotUpdateManyWithoutAccountNestedInput
   notificationIntents?: Prisma.NotificationIntentUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUpdateManyWithoutAccountNestedInput
 }
 
 export type UserAccountUncheckedUpdateWithoutDeletionGuardsInput = {
@@ -6818,6 +7498,8 @@ export type UserAccountUncheckedUpdateWithoutDeletionGuardsInput = {
   platformPermissions?: Prisma.PlatformPermissionSnapshotUncheckedUpdateManyWithoutAccountNestedInput
   notificationIntents?: Prisma.NotificationIntentUncheckedUpdateManyWithoutAccountNestedInput
   dataTasks?: Prisma.DataTaskUncheckedUpdateManyWithoutAccountNestedInput
+  deletionChallenges?: Prisma.DeletionConfirmationChallengeUncheckedUpdateManyWithoutAccountNestedInput
+  identityVerifications?: Prisma.IdentityVerificationUncheckedUpdateManyWithoutAccountNestedInput
 }
 
 
@@ -6850,6 +7532,8 @@ export type UserAccountCountOutputType = {
   notificationIntents: number
   dataTasks: number
   deletionGuards: number
+  deletionChallenges: number
+  identityVerifications: number
 }
 
 export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -6877,6 +7561,8 @@ export type UserAccountCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   notificationIntents?: boolean | UserAccountCountOutputTypeCountNotificationIntentsArgs
   dataTasks?: boolean | UserAccountCountOutputTypeCountDataTasksArgs
   deletionGuards?: boolean | UserAccountCountOutputTypeCountDeletionGuardsArgs
+  deletionChallenges?: boolean | UserAccountCountOutputTypeCountDeletionChallengesArgs
+  identityVerifications?: boolean | UserAccountCountOutputTypeCountIdentityVerificationsArgs
 }
 
 /**
@@ -7057,6 +7743,20 @@ export type UserAccountCountOutputTypeCountDeletionGuardsArgs<ExtArgs extends ru
   where?: Prisma.DeletionGuardWhereInput
 }
 
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountDeletionChallengesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DeletionConfirmationChallengeWhereInput
+}
+
+/**
+ * UserAccountCountOutputType without action
+ */
+export type UserAccountCountOutputTypeCountIdentityVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IdentityVerificationWhereInput
+}
+
 
 export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -7103,6 +7803,8 @@ export type UserAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   notificationIntents?: boolean | Prisma.UserAccount$notificationIntentsArgs<ExtArgs>
   dataTasks?: boolean | Prisma.UserAccount$dataTasksArgs<ExtArgs>
   deletionGuards?: boolean | Prisma.UserAccount$deletionGuardsArgs<ExtArgs>
+  deletionChallenges?: boolean | Prisma.UserAccount$deletionChallengesArgs<ExtArgs>
+  identityVerifications?: boolean | Prisma.UserAccount$identityVerificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userAccount"]>
 
@@ -7193,6 +7895,8 @@ export type UserAccountInclude<ExtArgs extends runtime.Types.Extensions.Internal
   notificationIntents?: boolean | Prisma.UserAccount$notificationIntentsArgs<ExtArgs>
   dataTasks?: boolean | Prisma.UserAccount$dataTasksArgs<ExtArgs>
   deletionGuards?: boolean | Prisma.UserAccount$deletionGuardsArgs<ExtArgs>
+  deletionChallenges?: boolean | Prisma.UserAccount$deletionChallengesArgs<ExtArgs>
+  identityVerifications?: boolean | Prisma.UserAccount$identityVerificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserAccountCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserAccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -7229,6 +7933,8 @@ export type $UserAccountPayload<ExtArgs extends runtime.Types.Extensions.Interna
     notificationIntents: Prisma.$NotificationIntentPayload<ExtArgs>[]
     dataTasks: Prisma.$DataTaskPayload<ExtArgs>[]
     deletionGuards: Prisma.$DeletionGuardPayload<ExtArgs>[]
+    deletionChallenges: Prisma.$DeletionConfirmationChallengePayload<ExtArgs>[]
+    identityVerifications: Prisma.$IdentityVerificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -7669,6 +8375,8 @@ export interface Prisma__UserAccountClient<T, Null = never, ExtArgs extends runt
   notificationIntents<T extends Prisma.UserAccount$notificationIntentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$notificationIntentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationIntentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   dataTasks<T extends Prisma.UserAccount$dataTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$dataTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DataTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deletionGuards<T extends Prisma.UserAccount$deletionGuardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$deletionGuardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeletionGuardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deletionChallenges<T extends Prisma.UserAccount$deletionChallengesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$deletionChallengesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeletionConfirmationChallengePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  identityVerifications<T extends Prisma.UserAccount$identityVerificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccount$identityVerificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IdentityVerificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8756,6 +9464,54 @@ export type UserAccount$deletionGuardsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.DeletionGuardScalarFieldEnum | Prisma.DeletionGuardScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.deletionChallenges
+ */
+export type UserAccount$deletionChallengesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeletionConfirmationChallenge
+   */
+  select?: Prisma.DeletionConfirmationChallengeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeletionConfirmationChallenge
+   */
+  omit?: Prisma.DeletionConfirmationChallengeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeletionConfirmationChallengeInclude<ExtArgs> | null
+  where?: Prisma.DeletionConfirmationChallengeWhereInput
+  orderBy?: Prisma.DeletionConfirmationChallengeOrderByWithRelationInput | Prisma.DeletionConfirmationChallengeOrderByWithRelationInput[]
+  cursor?: Prisma.DeletionConfirmationChallengeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DeletionConfirmationChallengeScalarFieldEnum | Prisma.DeletionConfirmationChallengeScalarFieldEnum[]
+}
+
+/**
+ * UserAccount.identityVerifications
+ */
+export type UserAccount$identityVerificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IdentityVerification
+   */
+  select?: Prisma.IdentityVerificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IdentityVerification
+   */
+  omit?: Prisma.IdentityVerificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IdentityVerificationInclude<ExtArgs> | null
+  where?: Prisma.IdentityVerificationWhereInput
+  orderBy?: Prisma.IdentityVerificationOrderByWithRelationInput | Prisma.IdentityVerificationOrderByWithRelationInput[]
+  cursor?: Prisma.IdentityVerificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IdentityVerificationScalarFieldEnum | Prisma.IdentityVerificationScalarFieldEnum[]
 }
 
 /**

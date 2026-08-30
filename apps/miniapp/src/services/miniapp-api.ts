@@ -18,6 +18,17 @@ export type HistoryDayView = components["schemas"]["HistoryDayView"];
 export type HistoryListView = components["schemas"]["HistoryListView"];
 export type EveningView = components["schemas"]["EveningView"];
 export type WeeklyView = components["schemas"]["WeeklyView"];
+export type DataTaskView = components["schemas"]["DataTaskView"];
+export type DataTaskListView = components["schemas"]["DataTaskListView"];
+export type DataRightsSummaryView =
+  components["schemas"]["DataRightsSummaryView"];
+export type AccountDeletionAcceptedView =
+  components["schemas"]["AccountDeletionAcceptedView"];
+export type DataExportDocument = components["schemas"]["DataExportDocument"];
+export type DeletionConfirmationView =
+  components["schemas"]["DeletionConfirmationView"];
+export type IdentityVerificationView =
+  components["schemas"]["IdentityVerificationView"];
 type ConsentView = components["schemas"]["ConsentView"];
 export type ExpressionStyle = components["schemas"]["ExpressionStyle"];
 type ProfileView = components["schemas"]["ProfileView"];
@@ -89,6 +100,36 @@ export interface EveningEnvelope {
 export interface WeeklyEnvelope {
   readonly productDate: string;
   readonly weekly: WeeklyView;
+}
+
+export interface DataTaskEnvelope {
+  readonly productDate: string;
+  readonly task: DataTaskView;
+}
+
+export interface DataTaskListEnvelope {
+  readonly productDate: string;
+  readonly tasks: DataTaskListView;
+}
+
+export interface DataRightsSummaryEnvelope {
+  readonly productDate: string;
+  readonly summary: DataRightsSummaryView;
+}
+
+export interface AccountDeletionAcceptedEnvelope {
+  readonly accepted: AccountDeletionAcceptedView;
+  readonly productDate: string;
+}
+
+export interface DeletionConfirmationEnvelope {
+  readonly confirmation: DeletionConfirmationView;
+  readonly productDate: string;
+}
+
+export interface IdentityVerificationEnvelope {
+  readonly productDate: string;
+  readonly verification: IdentityVerificationView;
 }
 
 export interface C003Api {
@@ -182,6 +223,80 @@ export interface C013Api {
   getWeeklyWindow(endProductDate: string): Promise<WeeklyEnvelope>;
 }
 
+export interface C014Api {
+  cancelDataTask(input: {
+    readonly commandRef: string;
+    readonly expectedTaskRevision: number;
+    readonly taskRef: string;
+  }): Promise<DataTaskEnvelope>;
+  confirmAccountDeletion(input: {
+    readonly challengeRef: string;
+    readonly commandRef: string;
+    readonly confirmationVersion: string;
+    readonly expectedAccountRevision: number;
+    readonly identityVerificationRef: string;
+  }): Promise<AccountDeletionAcceptedEnvelope>;
+  confirmRelationshipDeletion(input: {
+    readonly challengeRef: string;
+    readonly commandRef: string;
+    readonly confirmationVersion: string;
+    readonly expectedDayRevisions: ReadonlyArray<{
+      readonly expected_revision: number;
+      readonly product_date: string;
+    }>;
+    readonly expectedRelationshipRevision: number;
+    readonly identityVerificationRef?: string;
+    readonly includedDayProductDates: readonly string[];
+  }): Promise<DataTaskEnvelope>;
+  createDataExport(input: {
+    readonly commandRef: string;
+    readonly confirmationVersion: string;
+  }): Promise<DataTaskEnvelope>;
+  downloadDataExport(input: {
+    readonly downloadRef: string;
+    readonly taskRef: string;
+  }): Promise<DataExportDocument>;
+  deleteDay(input: {
+    readonly commandRef: string;
+    readonly confirmationVersion: string;
+    readonly expectedRevision: number;
+    readonly productDate: string;
+  }): Promise<DataTaskEnvelope>;
+  deleteMatter(input: {
+    readonly commandRef: string;
+    readonly confirmationVersion: string;
+    readonly expectedRevision: number;
+    readonly matterRef: string;
+  }): Promise<DataTaskEnvelope>;
+  getDataTask(taskRef: string): Promise<DataTaskEnvelope>;
+  getDataRightsSummary(): Promise<DataRightsSummaryEnvelope>;
+  getDeletionStatus(input: {
+    readonly statusToken: string;
+    readonly taskRef: string;
+  }): Promise<DataTaskEnvelope>;
+  listDataTasks(): Promise<DataTaskListEnvelope>;
+  prepareAccountDeletion(input: {
+    readonly commandRef: string;
+    readonly confirmationVersion: string;
+    readonly expectedAccountRevision: number;
+  }): Promise<DeletionConfirmationEnvelope>;
+  prepareRelationshipDeletion(input: {
+    readonly commandRef: string;
+    readonly confirmationVersion: string;
+    readonly expectedDayRevisions: ReadonlyArray<{
+      readonly expected_revision: number;
+      readonly product_date: string;
+    }>;
+    readonly expectedRelationshipRevision: number;
+    readonly includedDayProductDates: readonly string[];
+  }): Promise<DeletionConfirmationEnvelope>;
+  verifyDeletionIdentity(input: {
+    readonly challengeRef: string;
+    readonly commandRef: string;
+    readonly wechatCode: string;
+  }): Promise<IdentityVerificationEnvelope>;
+}
+
 export class MiniappApiError extends Error {
   public constructor(
     public readonly code: string,
@@ -231,7 +346,7 @@ function successData(
   status: number,
 ): { readonly data: Record<string, unknown>; readonly productDate: string } {
   if (
-    status !== 200 ||
+    (status !== 200 && status !== 202) ||
     !isRecord(body) ||
     body.ok !== true ||
     !isRecord(body.data) ||
@@ -1304,6 +1419,365 @@ function isWeeklyCount(value: unknown): boolean {
   );
 }
 
+export function projectDataRightsSummaryView(
+  value: unknown,
+): DataRightsSummaryView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      "account",
+      "relationship",
+      "capabilities",
+      "confirmation_versions",
+      "online_erasure_sla_hours",
+      "backup_max_days",
+    ]) ||
+    !isRecord(value.account) ||
+    !hasOnlyKeys(value.account, ["expected_revision", "state"]) ||
+    !Number.isInteger(value.account.expected_revision) ||
+    Number(value.account.expected_revision) < 1 ||
+    value.account.state !== "ACTIVE" ||
+    (value.relationship !== undefined &&
+      (!isRecord(value.relationship) ||
+        !hasOnlyKeys(value.relationship, ["expected_revision", "state"]) ||
+        !Number.isInteger(value.relationship.expected_revision) ||
+        Number(value.relationship.expected_revision) < 1 ||
+        value.relationship.state !== "PRESENT")) ||
+    !isRecord(value.capabilities) ||
+    !hasOnlyKeys(value.capabilities, [
+      "export_account",
+      "delete_day",
+      "delete_matter",
+      "delete_relationship_data",
+      "delete_account",
+    ]) ||
+    Object.values(value.capabilities).some(
+      (capability) => typeof capability !== "boolean",
+    ) ||
+    !isRecord(value.confirmation_versions) ||
+    !hasOnlyKeys(value.confirmation_versions, [
+      "export_account",
+      "delete_day",
+      "delete_matter",
+      "delete_relationship_data",
+      "delete_account",
+    ]) ||
+    value.confirmation_versions.export_account !== "data-export-v1" ||
+    value.confirmation_versions.delete_day !== "data-rights-day-v1" ||
+    value.confirmation_versions.delete_matter !== "data-rights-matter-v1" ||
+    value.confirmation_versions.delete_relationship_data !==
+      "data-rights-relationship-v1" ||
+    value.confirmation_versions.delete_account !== "data-rights-account-v1" ||
+    value.online_erasure_sla_hours !== 72 ||
+    value.backup_max_days !== 35
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(value) as DataRightsSummaryView;
+}
+
+function projectExportArtifact(value: unknown) {
+  if (!isRecord(value) || value.format !== "JSON") {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  if (value.state === "PREPARING" && hasOnlyKeys(value, ["state", "format"])) {
+    return freezeJson(value);
+  }
+  if (
+    value.state === "READY" &&
+    hasOnlyKeys(value, [
+      "state",
+      "format",
+      "download_ref",
+      "ready_at",
+      "expires_at",
+    ]) &&
+    isOpaqueRef(value.download_ref) &&
+    isTimestamp(value.ready_at) &&
+    isTimestamp(value.expires_at)
+  ) {
+    return freezeJson(value);
+  }
+  if (
+    ["EXPIRED", "INVALIDATED"].includes(String(value.state)) &&
+    hasOnlyKeys(value, ["state", "format"])
+  ) {
+    return freezeJson(value);
+  }
+  throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+}
+
+export function projectDataTaskView(value: unknown): DataTaskView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      "task_ref",
+      "revision",
+      "kind",
+      "scope",
+      "target_summary",
+      "status",
+      "online_erased_at",
+      "backup_purge_deadline",
+      "export_artifact",
+      "can_cancel",
+      "failure_summary_code",
+      "created_at",
+      "updated_at",
+    ]) ||
+    !isOpaqueRef(value.task_ref) ||
+    !Number.isInteger(value.revision) ||
+    Number(value.revision) < 1 ||
+    !["EXPORT", "DELETE"].includes(String(value.kind)) ||
+    !["DAY", "MATTER", "RELATIONSHIP_DATA", "ACCOUNT"].includes(
+      String(value.scope),
+    ) ||
+    !isText(value.target_summary) ||
+    String(value.target_summary).length > 120 ||
+    !["PENDING", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"].includes(
+      String(value.status),
+    ) ||
+    typeof value.can_cancel !== "boolean" ||
+    !isTimestamp(value.created_at) ||
+    !isTimestamp(value.updated_at) ||
+    (value.online_erased_at !== undefined &&
+      !isTimestamp(value.online_erased_at)) ||
+    (value.backup_purge_deadline !== undefined &&
+      !isTimestamp(value.backup_purge_deadline)) ||
+    (value.failure_summary_code !== undefined &&
+      !isText(value.failure_summary_code)) ||
+    (value.export_artifact !== undefined &&
+      projectExportArtifact(value.export_artifact) === undefined) ||
+    (value.status === "FAILED" && value.failure_summary_code === undefined) ||
+    (value.kind === "DELETE" &&
+      value.status === "SUCCEEDED" &&
+      (value.online_erased_at === undefined ||
+        value.backup_purge_deadline === undefined)) ||
+    (value.kind === "DELETE" && value.export_artifact !== undefined) ||
+    (value.kind === "EXPORT" &&
+      (value.online_erased_at !== undefined ||
+        value.backup_purge_deadline !== undefined)) ||
+    (value.kind === "EXPORT" &&
+      ["PENDING", "RUNNING"].includes(String(value.status)) &&
+      (!isRecord(value.export_artifact) ||
+        value.export_artifact.state !== "PREPARING")) ||
+    (value.kind === "EXPORT" &&
+      value.status === "SUCCEEDED" &&
+      (!isRecord(value.export_artifact) ||
+        !["READY", "EXPIRED", "INVALIDATED"].includes(
+          String(value.export_artifact.state),
+        ))) ||
+    (value.can_cancel &&
+      !(value.kind === "EXPORT" && value.status === "PENDING"))
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(value) as DataTaskView;
+}
+
+export function projectAccountDeletionAcceptedView(
+  value: unknown,
+): AccountDeletionAcceptedView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, ["task", "status_grant"]) ||
+    !isRecord(value.status_grant) ||
+    !hasOnlyKeys(value.status_grant, [
+      "task_ref",
+      "status_token",
+      "expires_at",
+    ]) ||
+    !isOpaqueRef(value.status_grant.task_ref) ||
+    typeof value.status_grant.status_token !== "string" ||
+    !/^[A-Za-z0-9_-]{32,256}$/u.test(value.status_grant.status_token) ||
+    !isTimestamp(value.status_grant.expires_at)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  const task = projectDataTaskView(value.task);
+  if (
+    task.kind !== "DELETE" ||
+    task.scope !== "ACCOUNT" ||
+    task.task_ref !== value.status_grant.task_ref
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return Object.freeze({
+    status_grant: Object.freeze({
+      expires_at: value.status_grant.expires_at as string,
+      status_token: value.status_grant.status_token as string,
+      task_ref: value.status_grant.task_ref as string,
+    }),
+    task,
+  });
+}
+
+export function projectDataExportDocument(value: unknown): DataExportDocument {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      "schema_version",
+      "generated_at",
+      "profile",
+      "consent_summary",
+      "days",
+      "matters",
+      "relationship_summary",
+      "notification_preferences",
+      "safety_summary",
+      "data_task_summaries",
+    ]) ||
+    value.schema_version !== "data-export-v1" ||
+    !isTimestamp(value.generated_at) ||
+    !isRecord(value.consent_summary) ||
+    !Array.isArray(value.days) ||
+    value.days.length > 10_000 ||
+    !Array.isArray(value.matters) ||
+    value.matters.length > 1_000 ||
+    !isRecord(value.notification_preferences) ||
+    !Array.isArray(value.data_task_summaries) ||
+    value.data_task_summaries.length > 1_000 ||
+    containsForbiddenExportField(value)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(value) as DataExportDocument;
+}
+
+function containsForbiddenExportField(value: unknown): boolean {
+  if (Array.isArray(value)) {
+    return value.some(containsForbiddenExportField);
+  }
+  if (!isRecord(value)) {
+    return false;
+  }
+  return Object.entries(value).some(
+    ([key, item]) =>
+      /^(status_token|.*ciphertext|.*key_version|.*seed.*|.*epoch.*|source_fingerprint|prompt|provider.*|checkpoint|receipt)$/iu.test(
+        key,
+      ) || containsForbiddenExportField(item),
+  );
+}
+
+export function projectDataTaskListView(value: unknown): DataTaskListView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, ["items", "next_cursor", "page_info"]) ||
+    !Array.isArray(value.items) ||
+    value.items.length > 50 ||
+    !isRecord(value.page_info) ||
+    !hasOnlyKeys(value.page_info, ["has_more"]) ||
+    typeof value.page_info.has_more !== "boolean" ||
+    (value.next_cursor !== undefined && !isText(value.next_cursor)) ||
+    value.page_info.has_more !== (value.next_cursor !== undefined)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  const items = value.items.map(projectDataTaskView);
+  return Object.freeze({
+    items,
+    ...(typeof value.next_cursor === "string"
+      ? { next_cursor: value.next_cursor }
+      : {}),
+    page_info: Object.freeze({ has_more: value.page_info.has_more }),
+  });
+}
+
+export function projectDeletionConfirmationView(
+  value: unknown,
+): DeletionConfirmationView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      "confirmation_challenge_ref",
+      "scope",
+      "target",
+      "confirmation_version",
+      "expected_revision",
+      "expected_day_revisions",
+      "immediate_effects",
+      "derived_effects",
+      "online_erasure_sla_hours",
+      "backup_max_days",
+      "identity_reverification_required",
+      "expires_at",
+    ]) ||
+    !isOpaqueRef(value.confirmation_challenge_ref) ||
+    !["RELATIONSHIP_DATA", "ACCOUNT"].includes(String(value.scope)) ||
+    !isRecord(value.target) ||
+    !isText(value.confirmation_version) ||
+    !Number.isInteger(value.expected_revision) ||
+    Number(value.expected_revision) < 1 ||
+    !Array.isArray(value.immediate_effects) ||
+    value.immediate_effects.length < 1 ||
+    value.immediate_effects.length > 12 ||
+    !value.immediate_effects.every(isText) ||
+    !Array.isArray(value.derived_effects) ||
+    value.derived_effects.length > 12 ||
+    !value.derived_effects.every(isText) ||
+    value.online_erasure_sla_hours !== 72 ||
+    value.backup_max_days !== 35 ||
+    typeof value.identity_reverification_required !== "boolean" ||
+    !isTimestamp(value.expires_at)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  if (value.scope === "ACCOUNT") {
+    if (
+      !hasOnlyKeys(value.target, ["subject"]) ||
+      value.target.subject !== "SELF" ||
+      value.expected_day_revisions !== undefined ||
+      value.identity_reverification_required !== true
+    ) {
+      throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+    }
+  } else {
+    const dates = value.target.included_day_product_dates;
+    const revisions = value.expected_day_revisions;
+    if (
+      !hasOnlyKeys(value.target, [
+        "relationship_scope",
+        "included_day_product_dates",
+      ]) ||
+      value.target.relationship_scope !== "CURRENT_CYCLE_AND_HISTORY" ||
+      !Array.isArray(dates) ||
+      dates.length > 45 ||
+      !dates.every(isProductDate) ||
+      !Array.isArray(revisions) ||
+      revisions.length !== dates.length ||
+      revisions.some(
+        (item, index) =>
+          !isRecord(item) ||
+          item.product_date !== dates[index] ||
+          !Number.isInteger(item.expected_revision) ||
+          Number(item.expected_revision) < 0,
+      )
+    ) {
+      throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+    }
+  }
+  return freezeJson(value) as DeletionConfirmationView;
+}
+
+export function projectIdentityVerificationView(
+  value: unknown,
+): IdentityVerificationView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      "identity_verification_ref",
+      "confirmation_challenge_ref",
+      "expires_at",
+    ]) ||
+    !isOpaqueRef(value.identity_verification_ref) ||
+    !isOpaqueRef(value.confirmation_challenge_ref) ||
+    !isTimestamp(value.expires_at)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(value) as IdentityVerificationView;
+}
+
 function freezeJson<T>(value: T): T {
   if (typeof value === "object" && value !== null) {
     Object.freeze(value);
@@ -1345,9 +1819,61 @@ function headers(sessionToken?: string, commandRef?: string) {
   });
 }
 
+function deletionStatusHeaders(statusToken: string) {
+  return Object.freeze({
+    "Accept-Language": "zh-CN",
+    Authorization: `DeletionStatus ${statusToken}`,
+  });
+}
+
+function relationshipDeletionBody(
+  input: {
+    readonly commandRef: string;
+    readonly confirmationVersion: string;
+    readonly expectedDayRevisions: ReadonlyArray<{
+      readonly expected_revision: number;
+      readonly product_date: string;
+    }>;
+    readonly expectedRelationshipRevision: number;
+    readonly includedDayProductDates: readonly string[];
+  },
+  confirmed: boolean,
+) {
+  if (
+    input.includedDayProductDates.length !==
+      input.expectedDayRevisions.length ||
+    input.includedDayProductDates.some(
+      (date, index) =>
+        !isProductDate(date) ||
+        input.expectedDayRevisions[index]?.product_date !== date,
+    )
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+  }
+  return {
+    command_ref: input.commandRef,
+    confirmation_version: input.confirmationVersion,
+    expected_relationship_revision: input.expectedRelationshipRevision,
+    included_day_expected_revisions: input.expectedDayRevisions,
+    scope: "RELATIONSHIP_DATA" as const,
+    target: {
+      included_day_product_dates: input.includedDayProductDates,
+      relationship_scope: "CURRENT_CYCLE_AND_HISTORY" as const,
+    },
+    ...(confirmed ? { confirmed: true as const } : {}),
+  };
+}
+
 export function createMiniappApi(
   network: NetworkPort,
-): C003Api & C004Api & C009Api & C010Api & C011Api & C012Api & C013Api {
+): C003Api &
+  C004Api &
+  C009Api &
+  C010Api &
+  C011Api &
+  C012Api &
+  C013Api &
+  C014Api {
   let sessionToken: string | undefined;
 
   const api: C003Api &
@@ -1356,7 +1882,8 @@ export function createMiniappApi(
     C010Api &
     C011Api &
     C012Api &
-    C013Api = {
+    C013Api &
+    C014Api = {
     async createSession(input): Promise<SessionEnvelope> {
       const response = await network.request({
         body: input as StorageValue,
@@ -1633,6 +2160,267 @@ export function createMiniappApi(
       return Object.freeze({
         productDate: parsed.productDate,
         weekly: projectWeeklyView(parsed.data),
+      });
+    },
+
+    async getDataRightsSummary(): Promise<DataRightsSummaryEnvelope> {
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: "/v1/data-rights/summary",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        summary: projectDataRightsSummaryView(parsed.data),
+      });
+    },
+
+    async listDataTasks(): Promise<DataTaskListEnvelope> {
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: "/v1/data-rights/tasks",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        tasks: projectDataTaskListView(parsed.data),
+      });
+    },
+
+    async getDataTask(taskRef): Promise<DataTaskEnvelope> {
+      if (!isOpaqueRef(taskRef)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: `/v1/data-rights/tasks/${encodeURIComponent(taskRef)}`,
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        task: projectDataTaskView(parsed.data),
+      });
+    },
+
+    async createDataExport(input): Promise<DataTaskEnvelope> {
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          confirmation_version: input.confirmationVersion,
+          export_format: "JSON",
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/data-rights/export",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        task: projectDataTaskView(parsed.data),
+      });
+    },
+
+    async downloadDataExport(input): Promise<DataExportDocument> {
+      if (!isOpaqueRef(input.taskRef) || !isOpaqueRef(input.downloadRef)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: `/v1/data-rights/exports/${encodeURIComponent(input.taskRef)}/artifacts/${encodeURIComponent(input.downloadRef)}`,
+      });
+      if (response.statusCode !== 200) {
+        throw apiError(response.data, response.statusCode);
+      }
+      return projectDataExportDocument(response.data);
+    },
+
+    async deleteDay(input): Promise<DataTaskEnvelope> {
+      if (!isProductDate(input.productDate)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          confirmation_version: input.confirmationVersion,
+          confirmed: true,
+          expected_revision: input.expectedRevision,
+          scope: "DAY",
+          target: { product_date: input.productDate },
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/data-rights/delete/day",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        task: projectDataTaskView(parsed.data),
+      });
+    },
+
+    async deleteMatter(input): Promise<DataTaskEnvelope> {
+      if (!isOpaqueRef(input.matterRef)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          confirmation_version: input.confirmationVersion,
+          confirmed: true,
+          expected_revision: input.expectedRevision,
+          scope: "MATTER",
+          target: { matter_ref: input.matterRef },
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/data-rights/delete/matter",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        task: projectDataTaskView(parsed.data),
+      });
+    },
+
+    async prepareRelationshipDeletion(
+      input,
+    ): Promise<DeletionConfirmationEnvelope> {
+      const response = await network.request({
+        body: relationshipDeletionBody(input, false),
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/data-rights/delete/relationship/prepare",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        confirmation: projectDeletionConfirmationView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async confirmRelationshipDeletion(input): Promise<DataTaskEnvelope> {
+      const response = await network.request({
+        body: {
+          ...relationshipDeletionBody(input, true),
+          confirmation_challenge_ref: input.challengeRef,
+          ...(input.identityVerificationRef === undefined
+            ? {}
+            : { identity_verification_ref: input.identityVerificationRef }),
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/data-rights/delete/relationship/confirm",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        task: projectDataTaskView(parsed.data),
+      });
+    },
+
+    async prepareAccountDeletion(input): Promise<DeletionConfirmationEnvelope> {
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          confirmation_version: input.confirmationVersion,
+          expected_account_revision: input.expectedAccountRevision,
+          scope: "ACCOUNT",
+          target: { subject: "SELF" },
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/data-rights/delete/account/prepare",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        confirmation: projectDeletionConfirmationView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async verifyDeletionIdentity(input): Promise<IdentityVerificationEnvelope> {
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          confirmation_challenge_ref: input.challengeRef,
+          wechat_code: input.wechatCode,
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/auth/reauth/verify",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        verification: projectIdentityVerificationView(parsed.data),
+      });
+    },
+
+    async confirmAccountDeletion(
+      input,
+    ): Promise<AccountDeletionAcceptedEnvelope> {
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          confirmation_challenge_ref: input.challengeRef,
+          confirmation_version: input.confirmationVersion,
+          confirmed: true,
+          expected_account_revision: input.expectedAccountRevision,
+          identity_verification_ref: input.identityVerificationRef,
+          scope: "ACCOUNT",
+          target: { subject: "SELF" },
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/data-rights/delete/account/confirm",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        accepted: projectAccountDeletionAcceptedView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async getDeletionStatus(input): Promise<DataTaskEnvelope> {
+      if (
+        !isOpaqueRef(input.taskRef) ||
+        !/^[A-Za-z0-9_-]{32,256}$/u.test(input.statusToken)
+      ) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        headers: deletionStatusHeaders(input.statusToken),
+        method: "GET",
+        path: `/v1/data-rights/deletion-status/${encodeURIComponent(input.taskRef)}`,
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        task: projectDataTaskView(parsed.data),
+      });
+    },
+
+    async cancelDataTask(input): Promise<DataTaskEnvelope> {
+      if (!isOpaqueRef(input.taskRef)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          expected_task_revision: input.expectedTaskRevision,
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: `/v1/data-rights/tasks/${encodeURIComponent(input.taskRef)}/cancel`,
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        task: projectDataTaskView(parsed.data),
       });
     },
 

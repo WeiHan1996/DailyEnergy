@@ -11,6 +11,8 @@ export const MINIAPP_PAGE_REGISTRY = Object.freeze([
   "pages/evening/index",
   "pages/records/index",
   "pages/history-day/index",
+  "pages/privacy-data/index",
+  "pages/data-deletion/index",
   "pages/safety/index",
   "pages/recovery/index",
 ]);

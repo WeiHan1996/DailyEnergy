@@ -62,3 +62,9 @@
   flex-direction: column;
   gap: var(--de-component-card-gap);
 }
+
+.history__danger-action {
+  padding-top: var(--de-layout-content-gap);
+  border-top: var(--de-component-card-border-width) solid
+    var(--de-color-danger-border);
+}

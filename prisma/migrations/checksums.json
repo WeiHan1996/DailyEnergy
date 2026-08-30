@@ -48,6 +48,14 @@
     {
       "name": "20260824000003_c013_weekly_reflection",
       "sha256": "0ef03a61d0eb4f8632981b1f47e53617b31ea0c4128f58ea129cf19749570d19"
+    },
+    {
+      "name": "20260824999999_c014_data_task_cancelled_state",
+      "sha256": "8673363d6bb65c5b26021e46ec9b37c866353de367ed63214a314f6c580d45ca"
+    },
+    {
+      "name": "20260825000000_c014_data_rights",
+      "sha256": "e24d0f57f7cba02297be6827050d8d688ac15887495798f8f9b1c64851c01af8"
     }
   ]
 }

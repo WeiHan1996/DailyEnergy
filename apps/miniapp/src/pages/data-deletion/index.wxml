@@ -1,0 +1,88 @@
+<de-page-shell labelled-by="deletion-title">
+  <de-app-header
+    slot="header"
+    back-label="返回隐私与数据"
+    show-back="{{true}}"
+    title="{{scope === 'ACCOUNT' ? '注销账户' : '删除关系数据'}}"
+    subtitle="理解范围后再确认"
+    bind:back="back"
+  ></de-app-header>
+
+  <view class="deletion" data-screen-id="{{screenId}}">
+    <de-loading-skeleton wx:if="{{loading}}" label="正在读取删除范围" lines="6" variant="card"></de-loading-skeleton>
+
+    <block wx:else>
+      <de-inline-notice
+        wx:if="{{offline}}"
+        title="当前离线"
+        message="删除、身份验证和状态刷新不会离线排队。"
+        tone="info"
+      ></de-inline-notice>
+      <view id="deletion-title" class="deletion__title">
+        {{scope === 'ACCOUNT' ? '注销会结束这个账户。' : '删除关系数据'}}
+      </view>
+
+      <de-section-card wx:if="{{scope === 'ACCOUNT'}}" heading="会删除什么">
+        <view class="deletion__copy">账户身份映射、资料、日记录、晚间反馈、关系、事项、设置、通知和活动导出副本。</view>
+      </de-section-card>
+      <de-section-card wx:else heading="范围边界">
+        <view class="deletion__copy">关系阶段、相遇记录和关系表达属于关系数据；真实的每日状态默认保留。</view>
+        <view class="deletion__copy">本次不选择任何 DAY，不会静默扩大到每日真实记录。</view>
+      </de-section-card>
+
+      <de-section-card heading="处理时间和例外" variant="subtle">
+        <view class="deletion__copy">确认后 guard 先阻止普通读取、写入和生成；在线数据按 72 小时目标清理。</view>
+        <view class="deletion__copy">隔离备份最长 35 天到期。法律要求的最小安全或删除回执可能限期隔离保留。</view>
+      </de-section-card>
+
+      <de-inline-notice
+        wx:if="{{state === 'VERIFYING'}}"
+        title="正在核对身份和范围"
+        message="只会继续这一次明确确认，不会创建第二个删除任务。"
+        tone="info"
+      ></de-inline-notice>
+      <de-inline-notice
+        wx:elif="{{state === 'DELETING'}}"
+        title="正在处理"
+        message="删除 guard 已生效；刷新或服务恢复不会重新开放已承诺删除的数据。"
+        tone="info"
+      ></de-inline-notice>
+      <de-inline-notice
+        wx:elif="{{state === 'FAILED'}}"
+        title="处理尚未完成"
+        message="已完成的步骤不会回退，guard 继续生效；请刷新同一个任务状态。"
+        tone="error"
+      ></de-inline-notice>
+      <de-inline-notice
+        wx:elif="{{state === 'COMPLETED'}}"
+        title="在线数据已完成清理"
+        message="最迟备份到期时间：{{task.backup_purge_deadline}}。这不表示所有隔离介质已经瞬间逐字节擦除。"
+        tone="success"
+      ></de-inline-notice>
+      <de-inline-notice
+        wx:elif="{{state === 'DISABLED'}}"
+        title="当前没有可删除的关系数据"
+        message="不会创建空任务，也不会改动真实的每日记录。"
+        tone="info"
+      ></de-inline-notice>
+
+      <de-action-button
+        wx:if="{{state === 'NORMAL'}}"
+        block="{{true}}"
+        disabled="{{offline || submitting || !summary}}"
+        label="{{scope === 'ACCOUNT' ? '确认注销账户' : '确认删除关系数据'}}"
+        variant="danger"
+        bind:press="submit"
+      ></de-action-button>
+      <de-action-button
+        wx:if="{{state === 'DELETING' || state === 'FAILED'}}"
+        block="{{true}}"
+        disabled="{{offline || submitting}}"
+        label="刷新处理状态"
+        variant="secondary"
+        bind:press="refreshStatus"
+      ></de-action-button>
+      <de-action-button block="{{true}}" label="{{state === 'COMPLETED' ? '完成' : '取消'}}" variant="text" bind:press="back"></de-action-button>
+    </block>
+  </view>
+</de-page-shell>

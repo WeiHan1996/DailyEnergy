@@ -80,10 +80,10 @@ describe("public and JSON Schema exports", () => {
     }
   });
 
-  it("exports 29 stable, unique JSON Schema IDs", () => {
-    expect(Object.keys(jsonSchemas)).toHaveLength(29);
-    expect(Object.keys(JSON_SCHEMA_IDS)).toHaveLength(29);
-    expect(new Set(Object.values(JSON_SCHEMA_IDS)).size).toBe(29);
+  it("exports 49 stable, unique JSON Schema IDs", () => {
+    expect(Object.keys(jsonSchemas)).toHaveLength(49);
+    expect(Object.keys(JSON_SCHEMA_IDS)).toHaveLength(49);
+    expect(new Set(Object.values(JSON_SCHEMA_IDS)).size).toBe(49);
     expect(JSON_SCHEMA_IDS.taskStateUpdateRequest).toBe(
       "urn:dailyenergy:schema:task-state-update-request:1.0.0",
     );

@@ -1,0 +1,181 @@
+{
+  "manifest_version": "c-014-evidence-v1",
+  "scope": "C-014 strict data-rights transport, revision discovery, zero-body 24-hour export manifest/download, 2 MiB whole-response limit, seven-day account deletion status grant, challenge-scoped confirmation, TX-09 guards, four-scope restricted cleanup, failure-preserving retry, receipt/restore deny, retention due reconstruction and client cache invalidation",
+  "authority": [
+    "docs/decisions/ADR-0005-data-retention-and-deletion.md",
+    "docs/decisions/ADR-0008-data-rights-delivery-and-status.md",
+    "docs/design/phase2-remaining-handoff.md",
+    "docs/operations/privacy-data-map.md",
+    "docs/technical/api.md",
+    "docs/technical/architecture.md",
+    "docs/technical/database.md",
+    "docs/technical/data-rights-contract-amendment.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C014-CONTRACT-001": {
+      "file": "packages/shared-schemas/test/c014-data-rights.test.ts",
+      "selector": "C-014 data-rights contracts",
+      "level": "CONTRACT",
+      "assertions": [
+        "export, DAY, MATTER, RELATIONSHIP_DATA and ACCOUNT requests are strict and reject client guard/epoch fields",
+        "relationship selected dates and expected revisions must match in exact order",
+        "ACCOUNT confirm requires a challenge-scoped identity verification ref",
+        "DELETE and EXPORT completion semantics are split; a successful export requires READY/EXPIRED/INVALIDATED artifact metadata and cannot claim erasure timestamps",
+        "DataRightsSummary, one-task status grant and export document are strict and reject internal ref, fingerprint, epoch and unknown fields"
+      ]
+    },
+    "T-C014-API-001": {
+      "file": "apps/api/src/data-rights.e2e.test.ts",
+      "selector": "C-014 HTTP data-rights flow",
+      "level": "E2E",
+      "assertions": [
+        "authenticated summary/list and DAY delete bind the owner from the session, expose only approved revisions and reject unknown deletion fields",
+        "ACCOUNT prepare, one-time WeChat reauth and confirm remain distinct challenge-bound calls and return one plaintext status token while the store receives only its hash",
+        "ordinary Bearer cannot enter the status-only endpoint; DeletionStatus reads only its bound task",
+        "READY download is a no-store JSON attachment without a generic envelope, token, seed, Prompt, provider, epoch or source fingerprint",
+        "export creates a DataTaskView while RELATIONSHIP_DATA prepare/confirm freezes an explicit empty DAY vector"
+      ]
+    },
+    "T-C014-DB-001": {
+      "file": "tests/database/c014-data-rights.test.mjs",
+      "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+      "level": "DB",
+      "assertions": [
+        "real PostgreSQL 18 rejects ordinary API reads of restricted DataTask rows and applies the complete migration/catalog role boundary",
+        "DAY confirm synchronously commits one guard before the Restricted Worker physically removes the day and writes DayErasureGuard, restore deny and deletion receipt",
+        "MATTER deletion removes the exact matter, its dependency and ciphertext fragment while preserving a prevalidated fallback; RELATIONSHIP_DATA with an empty selected-day vector removes relationship facts and preserves the real DAY",
+        "summary returns current account/relationship revisions without internal refs",
+        "same export command returns one task; Restricted Worker freezes a minimal source vector and creates one READY 24-hour manifest with no body/content/object column",
+        "repeated READY reads return the same source, correction invalidates the old manifest, and the exact 24-hour boundary expires it",
+        "retention due is rebuilt from PostgreSQL and expires READY metadata without Redis as a fact source",
+        "wrong identity cannot verify an ACCOUNT challenge; verification command replay preserves the original TTL and cross-challenge command reuse conflicts; confirm revokes the session and creates one guarded task",
+        "an active legal hold leaves the original ACCOUNT task FAILED and account DELETING; after release a revision-scoped due event retries the same task and succeeds",
+        "wrong status token is rejected, FAILED remains readable on the same grant, and the first SUCCEEDED read consumes the grant",
+        "ACCOUNT completion destroys identity material and creates a six-month de-identified receipt without a blinded account token"
+      ]
+    },
+    "T-C014-WORKER-001": {
+      "file": "packages/server-adapters/src/data-rights/data-task-handler.test.ts",
+      "selector": "C-014 restricted data-task handler",
+      "level": "MODULE",
+      "assertions": [
+        "all four restricted event capabilities call closed database functions with only task ref, revision/guard when applicable and execution time",
+        "export finalization hashes only the revision vector and persists no body; retention due uses a separate closed purge function",
+        "the queue handler payload contains no openid, note, checkin, ciphertext, expression body or target key"
+      ]
+    },
+    "T-C014-RESILIENCE-001": {
+      "file": "tests/database/c014-data-rights.test.mjs",
+      "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+      "level": "RESILIENCE",
+      "assertions": [
+        "confirmation commits the deletion guard before any Restricted Worker execution and ordinary source rows remain blocked while the worker is absent",
+        "an active legal hold keeps the original ACCOUNT task FAILED and DELETING, then a new revision-scoped due event retries the same task",
+        "a deterministic third-step restore-deny failure records RESTRICTED_EVIDENCE FAILED, keeps ACCOUNT DELETING after online cleanup, and succeeds on the same task after restart"
+      ]
+    },
+    "T-C014-MINIAPP-001": {
+      "file": "apps/miniapp/src/features/data-rights/data-rights-flow.test.ts",
+      "selector": "C-014 data-rights flow",
+      "level": "MODULE",
+      "assertions": [
+        "the synchronous DAY guard response clears daily, evening and weekly local caches",
+        "offline data-rights reads and writes are not queued or persisted",
+        "ACCOUNT confirm stores only one status grant in restricted local storage, clears ordinary caches and removes the token after terminal success"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "PDM-D03",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-DB-001", "T-C014-MINIAPP-001"]
+    },
+    {
+      "source_id": "PDM-D05",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-CONTRACT-001", "T-C014-DB-001"]
+    },
+    {
+      "source_id": "PDM-D06",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-DB-001"]
+    },
+    {
+      "source_id": "PDM-D07",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-C014-CONTRACT-001",
+        "T-C014-API-001",
+        "T-C014-DB-001",
+        "T-C014-WORKER-001"
+      ]
+    },
+    {
+      "source_id": "PDM-U07",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-DB-001", "T-C014-WORKER-001"]
+    },
+    {
+      "source_id": "S19-DB-041",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-043",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-048",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-057",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-DB-001"]
+    },
+    {
+      "source_id": "S20-S05",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-CONTRACT-001", "T-C014-API-001"]
+    },
+    {
+      "source_id": "S20-S06",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-CONTRACT-001", "T-C014-API-001", "T-C014-DB-001"]
+    },
+    {
+      "source_id": "S20-S08",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-CONTRACT-001", "T-C014-API-001", "T-C014-DB-001"]
+    },
+    {
+      "source_id": "S20-S09",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-CONTRACT-001", "T-C014-API-001"]
+    },
+    {
+      "source_id": "S29-ARCH-035",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-DB-001"]
+    },
+    {
+      "source_id": "S31-TEST-023",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-DB-001"]
+    },
+    {
+      "source_id": "S31-TEST-037",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-RESILIENCE-001"]
+    },
+    {
+      "source_id": "S31-TEST-038",
+      "status": "COVERED",
+      "proof_ids": ["T-C014-RESILIENCE-001"]
+    }
+  ]
+}

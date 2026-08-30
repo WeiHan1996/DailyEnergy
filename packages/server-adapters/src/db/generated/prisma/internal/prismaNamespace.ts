@@ -451,6 +451,10 @@ export const ModelName = {
   NotificationIntent: 'NotificationIntent',
   NotificationDeliveryAttempt: 'NotificationDeliveryAttempt',
   DataTask: 'DataTask',
+  ExportManifest: 'ExportManifest',
+  DeletionStatusGrant: 'DeletionStatusGrant',
+  DeletionConfirmationChallenge: 'DeletionConfirmationChallenge',
+  IdentityVerification: 'IdentityVerification',
   DeletionGuard: 'DeletionGuard',
   DeletionStepCheckpoint: 'DeletionStepCheckpoint',
   DayErasureGuard: 'DayErasureGuard',
@@ -482,7 +486,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "externalIdentity" | "sessionCredential" | "necessaryConsentRecord" | "userProfile" | "userProfileRevision" | "onboardingCompletion" | "viewContinuationGrant" | "commandReceipt" | "morningCheckin" | "morningCheckinRevision" | "generationIntent" | "generationInputSnapshot" | "gatewayInvocation" | "gatewayAttempt" | "gatewayCandidate" | "publishedDailyResult" | "publishedResultVisibility" | "resultContentSlot" | "personalizedContentFragment" | "sourceDependency" | "dailyInteraction" | "dailyLightFact" | "dailyTaskState" | "dailyHelpfulnessRecord" | "eveningFeedbackRecord" | "eveningFeedbackRevision" | "relationshipCycle" | "relationshipEncounterLink" | "relationshipNodeReceipt" | "importantMatter" | "importantMatterRevision" | "memoryPurposeGrant" | "memoryMasterPreference" | "memoryMentionReceipt" | "memoryContextSnapshot" | "weeklyWindow" | "weeklySourceSnapshot" | "weeklySummaryIntent" | "publishedWeeklySummaryRevision" | "weeklyContentSlot" | "weeklyPersonalizedContentFragment" | "weeklySourceDependency" | "safetyState" | "safetyDecision" | "safetyEvent" | "safetyResponsePlan" | "safetyResourceEntry" | "recoveryCommandReceipt" | "notificationPreference" | "platformPermissionSnapshot" | "notificationIntent" | "notificationDeliveryAttempt" | "dataTask" | "deletionGuard" | "deletionStepCheckpoint" | "dayErasureGuard" | "deletionReceipt" | "providerDeletionRequest" | "backupCatalogEntry" | "restoreDenyRecord" | "retentionPolicyEntry" | "providerDataHandlingProfile" | "legalHold" | "restrictedAuditEvent" | "outboxEvent" | "inboxReceipt" | "versionCatalogEntry" | "evaluationRun" | "evaluationSample"
+    modelProps: "userAccount" | "externalIdentity" | "sessionCredential" | "necessaryConsentRecord" | "userProfile" | "userProfileRevision" | "onboardingCompletion" | "viewContinuationGrant" | "commandReceipt" | "morningCheckin" | "morningCheckinRevision" | "generationIntent" | "generationInputSnapshot" | "gatewayInvocation" | "gatewayAttempt" | "gatewayCandidate" | "publishedDailyResult" | "publishedResultVisibility" | "resultContentSlot" | "personalizedContentFragment" | "sourceDependency" | "dailyInteraction" | "dailyLightFact" | "dailyTaskState" | "dailyHelpfulnessRecord" | "eveningFeedbackRecord" | "eveningFeedbackRevision" | "relationshipCycle" | "relationshipEncounterLink" | "relationshipNodeReceipt" | "importantMatter" | "importantMatterRevision" | "memoryPurposeGrant" | "memoryMasterPreference" | "memoryMentionReceipt" | "memoryContextSnapshot" | "weeklyWindow" | "weeklySourceSnapshot" | "weeklySummaryIntent" | "publishedWeeklySummaryRevision" | "weeklyContentSlot" | "weeklyPersonalizedContentFragment" | "weeklySourceDependency" | "safetyState" | "safetyDecision" | "safetyEvent" | "safetyResponsePlan" | "safetyResourceEntry" | "recoveryCommandReceipt" | "notificationPreference" | "platformPermissionSnapshot" | "notificationIntent" | "notificationDeliveryAttempt" | "dataTask" | "exportManifest" | "deletionStatusGrant" | "deletionConfirmationChallenge" | "identityVerification" | "deletionGuard" | "deletionStepCheckpoint" | "dayErasureGuard" | "deletionReceipt" | "providerDeletionRequest" | "backupCatalogEntry" | "restoreDenyRecord" | "retentionPolicyEntry" | "providerDataHandlingProfile" | "legalHold" | "restrictedAuditEvent" | "outboxEvent" | "inboxReceipt" | "versionCatalogEntry" | "evaluationRun" | "evaluationSample"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4482,6 +4486,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ExportManifest: {
+      payload: Prisma.$ExportManifestPayload<ExtArgs>
+      fields: Prisma.ExportManifestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ExportManifestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ExportManifestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload>
+        }
+        findFirst: {
+          args: Prisma.ExportManifestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ExportManifestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload>
+        }
+        findMany: {
+          args: Prisma.ExportManifestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload>[]
+        }
+        create: {
+          args: Prisma.ExportManifestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload>
+        }
+        createMany: {
+          args: Prisma.ExportManifestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ExportManifestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload>[]
+        }
+        delete: {
+          args: Prisma.ExportManifestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload>
+        }
+        update: {
+          args: Prisma.ExportManifestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload>
+        }
+        deleteMany: {
+          args: Prisma.ExportManifestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ExportManifestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ExportManifestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload>[]
+        }
+        upsert: {
+          args: Prisma.ExportManifestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExportManifestPayload>
+        }
+        aggregate: {
+          args: Prisma.ExportManifestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExportManifest>
+        }
+        groupBy: {
+          args: Prisma.ExportManifestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExportManifestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ExportManifestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExportManifestCountAggregateOutputType> | number
+        }
+      }
+    }
+    DeletionStatusGrant: {
+      payload: Prisma.$DeletionStatusGrantPayload<ExtArgs>
+      fields: Prisma.DeletionStatusGrantFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeletionStatusGrantFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeletionStatusGrantFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload>
+        }
+        findFirst: {
+          args: Prisma.DeletionStatusGrantFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeletionStatusGrantFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload>
+        }
+        findMany: {
+          args: Prisma.DeletionStatusGrantFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload>[]
+        }
+        create: {
+          args: Prisma.DeletionStatusGrantCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload>
+        }
+        createMany: {
+          args: Prisma.DeletionStatusGrantCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeletionStatusGrantCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload>[]
+        }
+        delete: {
+          args: Prisma.DeletionStatusGrantDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload>
+        }
+        update: {
+          args: Prisma.DeletionStatusGrantUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload>
+        }
+        deleteMany: {
+          args: Prisma.DeletionStatusGrantDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeletionStatusGrantUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeletionStatusGrantUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload>[]
+        }
+        upsert: {
+          args: Prisma.DeletionStatusGrantUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionStatusGrantPayload>
+        }
+        aggregate: {
+          args: Prisma.DeletionStatusGrantAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeletionStatusGrant>
+        }
+        groupBy: {
+          args: Prisma.DeletionStatusGrantGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeletionStatusGrantGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeletionStatusGrantCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeletionStatusGrantCountAggregateOutputType> | number
+        }
+      }
+    }
+    DeletionConfirmationChallenge: {
+      payload: Prisma.$DeletionConfirmationChallengePayload<ExtArgs>
+      fields: Prisma.DeletionConfirmationChallengeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeletionConfirmationChallengeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeletionConfirmationChallengeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload>
+        }
+        findFirst: {
+          args: Prisma.DeletionConfirmationChallengeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeletionConfirmationChallengeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload>
+        }
+        findMany: {
+          args: Prisma.DeletionConfirmationChallengeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload>[]
+        }
+        create: {
+          args: Prisma.DeletionConfirmationChallengeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload>
+        }
+        createMany: {
+          args: Prisma.DeletionConfirmationChallengeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeletionConfirmationChallengeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload>[]
+        }
+        delete: {
+          args: Prisma.DeletionConfirmationChallengeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload>
+        }
+        update: {
+          args: Prisma.DeletionConfirmationChallengeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload>
+        }
+        deleteMany: {
+          args: Prisma.DeletionConfirmationChallengeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeletionConfirmationChallengeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeletionConfirmationChallengeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload>[]
+        }
+        upsert: {
+          args: Prisma.DeletionConfirmationChallengeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletionConfirmationChallengePayload>
+        }
+        aggregate: {
+          args: Prisma.DeletionConfirmationChallengeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeletionConfirmationChallenge>
+        }
+        groupBy: {
+          args: Prisma.DeletionConfirmationChallengeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeletionConfirmationChallengeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeletionConfirmationChallengeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeletionConfirmationChallengeCountAggregateOutputType> | number
+        }
+      }
+    }
+    IdentityVerification: {
+      payload: Prisma.$IdentityVerificationPayload<ExtArgs>
+      fields: Prisma.IdentityVerificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.IdentityVerificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.IdentityVerificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload>
+        }
+        findFirst: {
+          args: Prisma.IdentityVerificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.IdentityVerificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload>
+        }
+        findMany: {
+          args: Prisma.IdentityVerificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload>[]
+        }
+        create: {
+          args: Prisma.IdentityVerificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload>
+        }
+        createMany: {
+          args: Prisma.IdentityVerificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.IdentityVerificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload>[]
+        }
+        delete: {
+          args: Prisma.IdentityVerificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload>
+        }
+        update: {
+          args: Prisma.IdentityVerificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.IdentityVerificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.IdentityVerificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.IdentityVerificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.IdentityVerificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdentityVerificationPayload>
+        }
+        aggregate: {
+          args: Prisma.IdentityVerificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateIdentityVerification>
+        }
+        groupBy: {
+          args: Prisma.IdentityVerificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IdentityVerificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.IdentityVerificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IdentityVerificationCountAggregateOutputType> | number
+        }
+      }
+    }
     DeletionGuard: {
       payload: Prisma.$DeletionGuardPayload<ExtArgs>
       fields: Prisma.DeletionGuardFieldRefs
@@ -6756,6 +7056,80 @@ export const DataTaskScalarFieldEnum = {
 export type DataTaskScalarFieldEnum = (typeof DataTaskScalarFieldEnum)[keyof typeof DataTaskScalarFieldEnum]
 
 
+export const ExportManifestScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  sourceRevisionVector: 'sourceRevisionVector',
+  sourceFingerprint: 'sourceFingerprint',
+  schemaVersion: 'schemaVersion',
+  policyVersion: 'policyVersion',
+  downloadRef: 'downloadRef',
+  state: 'state',
+  readyAt: 'readyAt',
+  expiresAt: 'expiresAt',
+  invalidatedAt: 'invalidatedAt',
+  expiredAt: 'expiredAt',
+  updatedAt: 'updatedAt',
+  retentionPolicyVersion: 'retentionPolicyVersion',
+  retentionScope: 'retentionScope',
+  retentionAnchorAt: 'retentionAnchorAt'
+} as const
+
+export type ExportManifestScalarFieldEnum = (typeof ExportManifestScalarFieldEnum)[keyof typeof ExportManifestScalarFieldEnum]
+
+
+export const DeletionStatusGrantScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  tokenHash: 'tokenHash',
+  failedAttemptCount: 'failedAttemptCount',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  terminalObservedAt: 'terminalObservedAt',
+  retentionPolicyVersion: 'retentionPolicyVersion',
+  retentionScope: 'retentionScope',
+  retentionAnchorAt: 'retentionAnchorAt'
+} as const
+
+export type DeletionStatusGrantScalarFieldEnum = (typeof DeletionStatusGrantScalarFieldEnum)[keyof typeof DeletionStatusGrantScalarFieldEnum]
+
+
+export const DeletionConfirmationChallengeScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  commandRef: 'commandRef',
+  scope: 'scope',
+  targetKey: 'targetKey',
+  frozenPayload: 'frozenPayload',
+  expectedRevision: 'expectedRevision',
+  confirmationVersion: 'confirmationVersion',
+  identityReverificationRequired: 'identityReverificationRequired',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  retentionPolicyVersion: 'retentionPolicyVersion',
+  retentionScope: 'retentionScope',
+  retentionAnchorAt: 'retentionAnchorAt'
+} as const
+
+export type DeletionConfirmationChallengeScalarFieldEnum = (typeof DeletionConfirmationChallengeScalarFieldEnum)[keyof typeof DeletionConfirmationChallengeScalarFieldEnum]
+
+
+export const IdentityVerificationScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  challengeId: 'challengeId',
+  verifiedAt: 'verifiedAt',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  retentionPolicyVersion: 'retentionPolicyVersion',
+  retentionScope: 'retentionScope',
+  retentionAnchorAt: 'retentionAnchorAt'
+} as const
+
+export type IdentityVerificationScalarFieldEnum = (typeof IdentityVerificationScalarFieldEnum)[keyof typeof IdentityVerificationScalarFieldEnum]
+
+
 export const DeletionGuardScalarFieldEnum = {
   id: 'id',
   accountId: 'accountId',
@@ -7578,6 +7952,20 @@ export type EnumDataTaskStateFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'DataTaskState[]'
  */
 export type ListEnumDataTaskStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DataTaskState[]'>
+
+
+
+/**
+ * Reference to a field of type 'ExportArtifactState'
+ */
+export type EnumExportArtifactStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExportArtifactState'>
+
+
+
+/**
+ * Reference to a field of type 'ExportArtifactState[]'
+ */
+export type ListEnumExportArtifactStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExportArtifactState[]'>
     
 
 
@@ -7925,6 +8313,10 @@ export type GlobalOmitConfig = {
   notificationIntent?: Prisma.NotificationIntentOmit
   notificationDeliveryAttempt?: Prisma.NotificationDeliveryAttemptOmit
   dataTask?: Prisma.DataTaskOmit
+  exportManifest?: Prisma.ExportManifestOmit
+  deletionStatusGrant?: Prisma.DeletionStatusGrantOmit
+  deletionConfirmationChallenge?: Prisma.DeletionConfirmationChallengeOmit
+  identityVerification?: Prisma.IdentityVerificationOmit
   deletionGuard?: Prisma.DeletionGuardOmit
   deletionStepCheckpoint?: Prisma.DeletionStepCheckpointOmit
   dayErasureGuard?: Prisma.DayErasureGuardOmit
@@ -8003,4 +8395,3 @@ export type PrismaAction =
  * `PrismaClient` proxy available in interactive transactions.
  */
 export type TransactionClient = Omit<DefaultPrismaClient, runtime.ITXClientDenyList>
-

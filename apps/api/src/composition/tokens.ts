@@ -4,6 +4,7 @@ import type {
   ConsentProfileStore,
   DailyGenerationStore,
   DailyInteractionStore,
+  DataRightsStore,
   EveningStore,
   TelemetryRuntime,
   WeeklyStore,
@@ -13,6 +14,10 @@ import type { RuntimeConfig } from "../bootstrap/runtime-config.js";
 import type { WechatCodeExchange } from "../auth/contracts.js";
 import type { PreferredNameCodec } from "../consent-profile/preferred-name-codec.js";
 import type { EveningNoteCodec } from "../evening/evening-note-codec.js";
+import type {
+  DeletionStatusTokenIssuer,
+  MatterTitleCodec,
+} from "../data-rights/data-rights-codec.js";
 import type {
   EveningSafetyInputGate,
   EveningSafetyStore,
@@ -32,7 +37,12 @@ export const CHECKIN_STORE = Symbol("CHECKIN_STORE");
 export const CONSENT_PROFILE_STORE = Symbol("CONSENT_PROFILE_STORE");
 export const DAILY_GENERATION_STORE = Symbol("DAILY_GENERATION_STORE");
 export const DAILY_INTERACTION_STORE = Symbol("DAILY_INTERACTION_STORE");
+export const DATA_RIGHTS_STORE = Symbol("DATA_RIGHTS_STORE");
+export const DELETION_STATUS_TOKEN_ISSUER = Symbol(
+  "DELETION_STATUS_TOKEN_ISSUER",
+);
 export const EVENING_STORE = Symbol("EVENING_STORE");
+export const MATTER_TITLE_CODEC = Symbol("MATTER_TITLE_CODEC");
 export const WEEKLY_STORE = Symbol("WEEKLY_STORE");
 export const EVENING_NOTE_CODEC = Symbol("EVENING_NOTE_CODEC");
 export const EVENING_SAFETY_GATE = Symbol("EVENING_SAFETY_GATE");
@@ -57,7 +67,10 @@ export interface ApiCompositionOverrides {
   readonly consentProfileStore?: ConsentProfileStore;
   readonly dailyGenerationStore?: DailyGenerationStore;
   readonly dailyInteractionStore?: DailyInteractionStore;
+  readonly dataRightsStore?: DataRightsStore;
+  readonly deletionStatusTokenIssuer?: DeletionStatusTokenIssuer;
   readonly eveningStore?: EveningStore;
+  readonly matterTitleCodec?: MatterTitleCodec;
   readonly weeklyStore?: WeeklyStore;
   readonly eveningNoteCodec?: EveningNoteCodec;
   readonly eveningSafetyGate?: EveningSafetyInputGate;

@@ -137,6 +137,70 @@ const SCHEMA_EXPORTS = [
   ["relationshipView", "RelationshipViewSchema", "relationship-view"],
   ["todayView", "TodayViewSchema", "today-view"],
   ["historyDayView", "HistoryDayViewSchema", "history-day-view"],
+  ["reauthVerifyRequest", "ReauthVerifyRequestSchema", "reauth-verify-request"],
+  ["exportRequest", "ExportRequestSchema", "export-request"],
+  ["deleteDayRequest", "DeleteDayRequestSchema", "delete-day-request"],
+  ["deleteMatterRequest", "DeleteMatterRequestSchema", "delete-matter-request"],
+  ["dayExpectedRevision", "DayExpectedRevisionSchema", "day-expected-revision"],
+  [
+    "relationshipDeletionTarget",
+    "RelationshipDeletionTargetSchema",
+    "relationship-deletion-target",
+  ],
+  [
+    "deleteRelationshipPrepareRequest",
+    "DeleteRelationshipPrepareRequestSchema",
+    "delete-relationship-prepare-request",
+  ],
+  [
+    "deleteRelationshipConfirmRequest",
+    "DeleteRelationshipConfirmRequestSchema",
+    "delete-relationship-confirm-request",
+  ],
+  [
+    "deleteAccountPrepareRequest",
+    "DeleteAccountPrepareRequestSchema",
+    "delete-account-prepare-request",
+  ],
+  [
+    "deleteAccountConfirmRequest",
+    "DeleteAccountConfirmRequestSchema",
+    "delete-account-confirm-request",
+  ],
+  [
+    "dataTaskCancelRequest",
+    "DataTaskCancelRequestSchema",
+    "data-task-cancel-request",
+  ],
+  ["dataTaskView", "DataTaskViewSchema", "data-task-view"],
+  ["dataTaskListView", "DataTaskListViewSchema", "data-task-list-view"],
+  [
+    "dataRightsSummaryView",
+    "DataRightsSummaryViewSchema",
+    "data-rights-summary-view",
+  ],
+  ["exportArtifactView", "ExportArtifactViewSchema", "export-artifact-view"],
+  [
+    "deletionStatusGrantView",
+    "DeletionStatusGrantViewSchema",
+    "deletion-status-grant-view",
+  ],
+  [
+    "accountDeletionAcceptedView",
+    "AccountDeletionAcceptedViewSchema",
+    "account-deletion-accepted-view",
+  ],
+  ["dataExportDocument", "DataExportDocumentSchema", "data-export-document"],
+  [
+    "deletionConfirmationView",
+    "DeletionConfirmationViewSchema",
+    "deletion-confirmation-view",
+  ],
+  [
+    "identityVerificationView",
+    "IdentityVerificationViewSchema",
+    "identity-verification-view",
+  ],
 ];
 
 const SCHEMA_SOURCE_PATHS = [

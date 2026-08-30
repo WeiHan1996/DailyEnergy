@@ -70,6 +70,7 @@ export const RESTRICTED_WORKER_MANIFEST = manifest({
   handlers: [
     capability("DataDeletionStarted", "restricted-data-task"),
     capability("DataTaskDue", "restricted-data-task"),
+    capability("DataRightsRetentionDue", "restricted-data-task"),
     capability("DeletionGuarded", "restricted-data-task"),
   ],
   profile: "worker-restricted",

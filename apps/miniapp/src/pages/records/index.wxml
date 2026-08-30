@@ -138,6 +138,12 @@
           <view class="records__row-state">{{item.state_text}}</view>
         </view>
       </view>
+      <de-action-button
+        block="{{true}}"
+        label="隐私与数据"
+        variant="text"
+        bind:press="openDataRights"
+      ></de-action-button>
     </block>
   </view>
 </de-page-shell>

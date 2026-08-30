@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-08-21
+- **最后更新**：2026-08-28
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -149,15 +149,16 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 ### 7.4 数据与接口
 
-| 文件                                                        | 状态     | 目的                                                    | 主要依赖                                           |
-| ----------------------------------------------------------- | -------- | ------------------------------------------------------- | -------------------------------------------------- |
-| [docs/data/domain-model.md](./data/domain-model.md)         | Accepted | 领域上下文、聚合、实体、关系、唯一性、修订与失效        | state-machine、schemas、memory、safety、evaluation |
-| [docs/technical/database.md](./technical/database.md)       | Accepted | PostgreSQL 表、索引、约束、事务、迁移和删除规格         | domain-model、ADR-0005                             |
-| [prisma/schema.prisma](../prisma/schema.prisma)             | Accepted | Prisma ORM 7 / PostgreSQL 可执行结构草案                | database spec                                      |
-| [docs/technical/api.md](./technical/api.md)                 | Accepted | 小程序、后端和后台接口契约                              | domain、schemas、database                          |
-| [docs/technical/error-codes.md](./technical/error-codes.md) | Accepted | 错误、恢复和降级语义                                    | API、interaction-states                            |
-| [openapi/openapi.yaml](../openapi/openapi.yaml)             | Accepted | OpenAPI 3 可执行路径草案                                | api.md                                             |
-| [packages/api-client](../packages/api-client/README.md)     | Draft    | E-008 Public/Admin 生成客户端、mapper 与 drift 使用说明 | shared-schemas、OpenAPI、error-codes               |
+| 文件                                                                                              | 状态     | 目的                                                    | 主要依赖                                           |
+| ------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------- | -------------------------------------------------- |
+| [docs/data/domain-model.md](./data/domain-model.md)                                               | Accepted | 领域上下文、聚合、实体、关系、唯一性、修订与失效        | state-machine、schemas、memory、safety、evaluation |
+| [docs/technical/database.md](./technical/database.md)                                             | Accepted | PostgreSQL 表、索引、约束、事务、迁移和删除规格         | domain-model、ADR-0005                             |
+| [prisma/schema.prisma](../prisma/schema.prisma)                                                   | Accepted | Prisma ORM 7 / PostgreSQL 可执行结构草案                | database spec                                      |
+| [docs/technical/api.md](./technical/api.md)                                                       | Accepted | 小程序、后端和后台接口契约                              | domain、schemas、database                          |
+| [docs/technical/data-rights-contract-amendment.md](./technical/data-rights-contract-amendment.md) | Accepted | C-014 revision、短期导出和删除状态续读修订              | ADR-0005、ADR-0008、API                            |
+| [docs/technical/error-codes.md](./technical/error-codes.md)                                       | Accepted | 错误、恢复和降级语义                                    | API、interaction-states                            |
+| [openapi/openapi.yaml](../openapi/openapi.yaml)                                                   | Accepted | OpenAPI 3 可执行路径草案                                | api.md                                             |
+| [packages/api-client](../packages/api-client/README.md)                                           | Draft    | E-008 Public/Admin 生成客户端、mapper 与 drift 使用说明 | shared-schemas、OpenAPI、error-codes               |
 
 ### 7.5 数据分析、隐私与运营
 
@@ -205,8 +206,12 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [ADR-0005-data-retention-and-deletion.md](./decisions/ADR-0005-data-retention-and-deletion.md)           | Accepted | 保存期限、删除、备份、受托方和受限证据                  | 数据库开发前      |
 | [ADR-0006-monorepo-and-stack.md](./decisions/ADR-0006-monorepo-and-stack.md)                             | Accepted | pnpm/Turbo 单仓、运行时、框架、数据与版本治理           | 工程初始化前      |
 | [ADR-0007-development-colocation-exception.md](./decisions/ADR-0007-development-colocation-exception.md) | Accepted | 临时 DEV 同机 PostgreSQL/Redis、私有 COS 与生产退出边界 | E-012 开工前      |
+| [ADR-0008-data-rights-delivery-and-status.md](./decisions/ADR-0008-data-rights-delivery-and-status.md)   | Accepted | revision discovery、短期导出与删除状态续读              | C-014 恢复前      |
 
 如果实际决策发生变化，应调整 ADR 名称和顺序，不为填满编号而创建无价值文档。
+
+C-014 的 [数据权利传输契约修订](./technical/data-rights-contract-amendment.md) 已于
+2026-08-28 随 ADR-0008 一并接受，成为 API/OpenAPI、共享 Schema 与实现的权威增量合同。
 
 ## 9. 实施阶段文档
 

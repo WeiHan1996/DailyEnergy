@@ -249,10 +249,21 @@ export const DataTaskState = {
   QUEUED: 'QUEUED',
   RUNNING: 'RUNNING',
   FAILED: 'FAILED',
-  SUCCEEDED: 'SUCCEEDED'
+  SUCCEEDED: 'SUCCEEDED',
+  CANCELLED: 'CANCELLED'
 } as const
 
 export type DataTaskState = (typeof DataTaskState)[keyof typeof DataTaskState]
+
+
+export const ExportArtifactState = {
+  PREPARING: 'PREPARING',
+  READY: 'READY',
+  EXPIRED: 'EXPIRED',
+  INVALIDATED: 'INVALIDATED'
+} as const
+
+export type ExportArtifactState = (typeof ExportArtifactState)[keyof typeof ExportArtifactState]
 
 
 export const DeletionStepState = {

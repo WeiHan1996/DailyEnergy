@@ -4,6 +4,7 @@ import {
   UNAVAILABLE_CONSENT_PROFILE_STORE,
   UNAVAILABLE_DAILY_GENERATION_STORE,
   UNAVAILABLE_DAILY_INTERACTION_STORE,
+  UNAVAILABLE_DATA_RIGHTS_STORE,
   UNAVAILABLE_EVENING_STORE,
   UNAVAILABLE_WEEKLY_STORE,
 } from "@daily-energy/server-adapters/api";
@@ -20,6 +21,14 @@ import { CheckinService } from "../checkin/checkin.service.js";
 import { ConsentProfileService } from "../consent-profile/consent-profile.service.js";
 import { GenerationService } from "../generation/generation.service.js";
 import { DailyInteractionService } from "../daily-interaction/daily-interaction.service.js";
+import { DataRightsService } from "../data-rights/data-rights.service.js";
+import { DeletionStatusAttemptLimiter } from "../data-rights/deletion-status-attempt-limiter.js";
+import {
+  developmentDeletionStatusTokenIssuer,
+  developmentMatterTitleCodec,
+  UNAVAILABLE_DELETION_STATUS_TOKEN_ISSUER,
+  UNAVAILABLE_MATTER_TITLE_CODEC,
+} from "../data-rights/data-rights-codec.js";
 import { EveningService } from "../evening/evening.service.js";
 import { WeeklyService } from "../weekly/weekly.service.js";
 import {
@@ -55,6 +64,8 @@ import { ConsentProfileController } from "../transport/public/consent-profile.co
 import { HealthController } from "../transport/public/health.controller.js";
 import { GenerationController } from "../transport/public/generation.controller.js";
 import { DailyInteractionController } from "../transport/public/daily-interaction.controller.js";
+import { DataRightsController } from "../transport/public/data-rights.controller.js";
+import { DeletionStatusController } from "../transport/public/deletion-status.controller.js";
 import { EveningController } from "../transport/public/evening.controller.js";
 import { WeeklyController } from "../transport/public/weekly.controller.js";
 import { HealthService } from "../transport/public/health.service.js";
@@ -69,10 +80,13 @@ import {
   CONSENT_PROFILE_STORE,
   DAILY_GENERATION_STORE,
   DAILY_INTERACTION_STORE,
+  DATA_RIGHTS_STORE,
+  DELETION_STATUS_TOKEN_ISSUER,
   EVENING_NOTE_CODEC,
   EVENING_SAFETY_GATE,
   EVENING_SAFETY_STORE,
   EVENING_STORE,
+  MATTER_TITLE_CODEC,
   WEEKLY_STORE,
   type ApiComposition,
   ORDINARY_LOG_SINK,
@@ -109,6 +123,16 @@ export class ApiModule {
     )
       ? developmentEveningNoteCodec()
       : UNAVAILABLE_EVENING_NOTE_CODEC;
+    const developmentMatterCodec = ["LOCAL", "CI", "DEV"].includes(
+      composition.config.environment,
+    )
+      ? developmentMatterTitleCodec()
+      : UNAVAILABLE_MATTER_TITLE_CODEC;
+    const developmentStatusTokenIssuer = ["LOCAL", "CI", "DEV"].includes(
+      composition.config.environment,
+    )
+      ? developmentDeletionStatusTokenIssuer()
+      : UNAVAILABLE_DELETION_STATUS_TOKEN_ISSUER;
     const providers: Provider[] = [
       { provide: RUNTIME_CONFIG, useValue: composition.config },
       {
@@ -139,9 +163,26 @@ export class ApiModule {
           UNAVAILABLE_DAILY_INTERACTION_STORE,
       },
       {
+        provide: DATA_RIGHTS_STORE,
+        useValue:
+          composition.overrides?.dataRightsStore ??
+          UNAVAILABLE_DATA_RIGHTS_STORE,
+      },
+      {
+        provide: DELETION_STATUS_TOKEN_ISSUER,
+        useValue:
+          composition.overrides?.deletionStatusTokenIssuer ??
+          developmentStatusTokenIssuer,
+      },
+      {
         provide: EVENING_STORE,
         useValue:
           composition.overrides?.eveningStore ?? UNAVAILABLE_EVENING_STORE,
+      },
+      {
+        provide: MATTER_TITLE_CODEC,
+        useValue:
+          composition.overrides?.matterTitleCodec ?? developmentMatterCodec,
       },
       {
         provide: WEEKLY_STORE,
@@ -224,6 +265,8 @@ export class ApiModule {
       CheckinService,
       ConsentProfileService,
       DailyInteractionService,
+      DataRightsService,
+      DeletionStatusAttemptLimiter,
       EveningService,
       GenerationService,
       WeeklyService,
@@ -244,6 +287,8 @@ export class ApiModule {
         CheckinController,
         ConsentProfileController,
         DailyInteractionController,
+        DataRightsController,
+        DeletionStatusController,
         EveningController,
         GenerationController,
         WeeklyController,

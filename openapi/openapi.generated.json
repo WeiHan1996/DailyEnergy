@@ -39,6 +39,14 @@
           "type": "string"
         }
       },
+      "DownloadRef": {
+        "in": "path",
+        "name": "download_ref",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/OpaqueRef"
+        }
+      },
       "EndDatePath": {
         "in": "path",
         "name": "end_date",
@@ -188,6 +196,21 @@
           }
         }
       },
+      "SuccessAccountDeletionAccepted": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiSuccessAccountDeletionAccepted"
+            }
+          }
+        },
+        "description": "Account deletion accepted with a one-task status grant",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/RequestIdResponseHeader"
+          }
+        }
+      },
       "SuccessAdminOps": {
         "content": {
           "application/json": {
@@ -272,6 +295,21 @@
           }
         },
         "description": "Successful Consent response",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/RequestIdResponseHeader"
+          }
+        }
+      },
+      "SuccessDataRightsSummary": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiSuccessDataRightsSummary"
+            }
+          }
+        },
+        "description": "Successful DataRightsSummary response",
         "headers": {
           "X-Request-Id": {
             "$ref": "#/components/headers/RequestIdResponseHeader"
@@ -643,6 +681,208 @@
       }
     },
     "schemas": {
+      "AccountDeletionAcceptedView": {
+        "additionalProperties": false,
+        "properties": {
+          "status_grant": {
+            "additionalProperties": false,
+            "properties": {
+              "expires_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "status_token": {
+                "maxLength": 256,
+                "minLength": 32,
+                "pattern": "^[A-Za-z0-9_-]+$",
+                "type": "string"
+              },
+              "task_ref": {
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "task_ref",
+              "status_token",
+              "expires_at"
+            ],
+            "type": "object"
+          },
+          "task": {
+            "additionalProperties": false,
+            "properties": {
+              "backup_purge_deadline": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "can_cancel": {
+                "type": "boolean"
+              },
+              "created_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "export_artifact": {
+                "oneOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "format": {
+                        "enum": [
+                          "JSON"
+                        ],
+                        "type": "string"
+                      },
+                      "state": {
+                        "enum": [
+                          "PREPARING"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "state",
+                      "format"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "download_ref": {
+                        "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                        "type": "string"
+                      },
+                      "expires_at": {
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                      },
+                      "format": {
+                        "enum": [
+                          "JSON"
+                        ],
+                        "type": "string"
+                      },
+                      "ready_at": {
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                        "type": "string"
+                      },
+                      "state": {
+                        "enum": [
+                          "READY"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "state",
+                      "format",
+                      "download_ref",
+                      "ready_at",
+                      "expires_at"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "format": {
+                        "enum": [
+                          "JSON"
+                        ],
+                        "type": "string"
+                      },
+                      "state": {
+                        "enum": [
+                          "EXPIRED",
+                          "INVALIDATED"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "state",
+                      "format"
+                    ],
+                    "type": "object"
+                  }
+                ]
+              },
+              "failure_summary_code": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "EXPORT",
+                  "DELETE"
+                ],
+                "type": "string"
+              },
+              "online_erased_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "revision": {
+                "exclusiveMinimum": true,
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "scope": {
+                "enum": [
+                  "DAY",
+                  "MATTER",
+                  "RELATIONSHIP_DATA",
+                  "ACCOUNT"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "PENDING",
+                  "RUNNING",
+                  "SUCCEEDED",
+                  "FAILED",
+                  "CANCELLED"
+                ],
+                "type": "string"
+              },
+              "target_summary": {
+                "type": "string"
+              },
+              "task_ref": {
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
+              },
+              "updated_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "task_ref",
+              "revision",
+              "kind",
+              "scope",
+              "target_summary",
+              "status",
+              "can_cancel",
+              "created_at",
+              "updated_at"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "task",
+          "status_grant"
+        ],
+        "type": "object",
+        "x-source-contract": "AccountDeletionAcceptedViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
+      },
       "AdminAdvanceDataTaskRequest": {
         "additionalProperties": false,
         "properties": {
@@ -868,8 +1108,12 @@
               "DAY_REBUILD_TASK_FAILED",
               "DAY_REBUILD_TASK_PENDING",
               "DAY_REBUILD_VERSION_UNAVAILABLE",
+              "DELETION_STATUS_GRANT_INVALID",
               "DEPENDENCY_UNAVAILABLE",
+              "EXPORT_ARTIFACT_EXPIRED",
               "EXPORT_NOT_READY",
+              "EXPORT_SOURCE_CHANGED",
+              "EXPORT_TOO_LARGE",
               "FEATURE_DISABLED",
               "GENERATION_FAILED_RETRYABLE",
               "GENERATION_FAILED_TERMINAL",
@@ -960,6 +1204,42 @@
           "request_id",
           "server_now",
           "error"
+        ],
+        "type": "object"
+      },
+      "ApiSuccessAccountDeletionAccepted": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AccountDeletionAcceptedView"
+          },
+          "ok": {
+            "enum": [
+              true
+            ],
+            "type": "boolean"
+          },
+          "product_date": {
+            "$ref": "#/components/schemas/ProductDate"
+          },
+          "product_date_policy_version": {
+            "$ref": "#/components/schemas/VersionToken"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/RequestId"
+          },
+          "server_now": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "request_id",
+          "server_now",
+          "product_date",
+          "product_date_policy_version",
+          "data"
         ],
         "type": "object"
       },
@@ -1148,6 +1428,42 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ConsentView"
+          },
+          "ok": {
+            "enum": [
+              true
+            ],
+            "type": "boolean"
+          },
+          "product_date": {
+            "$ref": "#/components/schemas/ProductDate"
+          },
+          "product_date_policy_version": {
+            "$ref": "#/components/schemas/VersionToken"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/RequestId"
+          },
+          "server_now": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "request_id",
+          "server_now",
+          "product_date",
+          "product_date_policy_version",
+          "data"
+        ],
+        "type": "object"
+      },
+      "ApiSuccessDataRightsSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DataRightsSummaryView"
           },
           "ok": {
             "enum": [
@@ -2690,32 +3006,1099 @@
         "x-source-contract": "DailyInteractionStateSchema",
         "x-source-projection": "zod-openapi-3.0"
       },
+      "DataExportDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "consent_summary": {
+            "additionalProperties": false,
+            "properties": {
+              "accepted_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "notice_version": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "MISSING",
+                  "ACCEPTED",
+                  "WITHDRAWN"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "state",
+              "notice_version"
+            ],
+            "type": "object"
+          },
+          "data_task_summaries": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "backup_purge_deadline": {
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  "type": "string"
+                },
+                "created_at": {
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  "type": "string"
+                },
+                "failure_summary_code": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "EXPORT",
+                    "DELETE"
+                  ],
+                  "type": "string"
+                },
+                "online_erased_at": {
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  "type": "string"
+                },
+                "revision": {
+                  "exclusiveMinimum": true,
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "scope": {
+                  "enum": [
+                    "DAY",
+                    "MATTER",
+                    "RELATIONSHIP_DATA",
+                    "ACCOUNT"
+                  ],
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "PENDING",
+                    "RUNNING",
+                    "SUCCEEDED",
+                    "FAILED",
+                    "CANCELLED"
+                  ],
+                  "type": "string"
+                },
+                "target_summary": {
+                  "type": "string"
+                },
+                "updated_at": {
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "revision",
+                "kind",
+                "scope",
+                "target_summary",
+                "status",
+                "created_at",
+                "updated_at"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          },
+          "days": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "checkin": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "energy": {
+                      "enum": [
+                        "EMPTY",
+                        "LOW",
+                        "STEADY",
+                        "HIGH",
+                        "FULL",
+                        "UNSURE"
+                      ],
+                      "type": "string"
+                    },
+                    "mood": {
+                      "enum": [
+                        "VERY_LOW",
+                        "LOW",
+                        "STEADY",
+                        "GOOD",
+                        "LIGHT",
+                        "UNSURE"
+                      ],
+                      "type": "string"
+                    },
+                    "revision": {
+                      "exclusiveMinimum": true,
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "sleep": {
+                      "enum": [
+                        "POOR",
+                        "LOW",
+                        "OKAY",
+                        "GOOD",
+                        "UNSURE"
+                      ],
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "revision",
+                    "mood",
+                    "energy",
+                    "sleep",
+                    "updated_at"
+                  ],
+                  "type": "object"
+                },
+                "content": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "closing": {
+                      "type": "string"
+                    },
+                    "content_label": {
+                      "enum": [
+                        "娱乐与行动参考"
+                      ],
+                      "type": "string"
+                    },
+                    "contract": {
+                      "enum": [
+                        "daily-content-view"
+                      ],
+                      "type": "string"
+                    },
+                    "core_tip": {
+                      "type": "string"
+                    },
+                    "dimensions": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "band": {
+                            "enum": [
+                              "LOW",
+                              "STEADY",
+                              "HIGH"
+                            ],
+                            "type": "string"
+                          },
+                          "band_label": {
+                            "type": "string"
+                          },
+                          "explanation": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "enum": [
+                              "pace",
+                              "action",
+                              "connection",
+                              "resources",
+                              "recovery"
+                            ],
+                            "type": "string"
+                          },
+                          "is_focus": {
+                            "type": "boolean"
+                          },
+                          "label": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "label",
+                          "band",
+                          "band_label",
+                          "explanation",
+                          "is_focus"
+                        ],
+                        "type": "object"
+                      },
+                      "maxItems": 5,
+                      "minItems": 5,
+                      "type": "array"
+                    },
+                    "explanation_paragraphs": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 2,
+                      "minItems": 1,
+                      "type": "array"
+                    },
+                    "focus_dimension_id": {
+                      "enum": [
+                        "pace",
+                        "action",
+                        "connection",
+                        "resources",
+                        "recovery"
+                      ],
+                      "type": "string"
+                    },
+                    "generated_at": {
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                      "type": "string"
+                    },
+                    "greeting": {
+                      "type": "string"
+                    },
+                    "optional_task": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "instruction": {
+                          "type": "string"
+                        },
+                        "task_id": {
+                          "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "task_id",
+                        "instruction"
+                      ],
+                      "type": "object"
+                    },
+                    "overall": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "band": {
+                          "enum": [
+                            "LOW",
+                            "STEADY",
+                            "HIGH"
+                          ],
+                          "type": "string"
+                        },
+                        "band_label": {
+                          "type": "string"
+                        },
+                        "summary": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "band",
+                        "band_label",
+                        "summary"
+                      ],
+                      "type": "object"
+                    },
+                    "personalization_notice": {
+                      "enum": [
+                        "NONE",
+                        "PERSONALIZATION_REDUCED"
+                      ],
+                      "type": "string"
+                    },
+                    "primary_action": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "action_id": {
+                          "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                          "type": "string"
+                        },
+                        "constraint_label": {
+                          "type": "string"
+                        },
+                        "instruction": {
+                          "type": "string"
+                        },
+                        "rationale": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "action_id",
+                        "instruction"
+                      ],
+                      "type": "object"
+                    },
+                    "product_date": {
+                      "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                      "type": "string"
+                    },
+                    "result_id": {
+                      "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                      "type": "string"
+                    },
+                    "result_version": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                      "type": "string"
+                    },
+                    "rituals": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "display_value": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "COLOR",
+                              "NUMBER"
+                            ],
+                            "type": "string"
+                          },
+                          "note": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "display_value",
+                          "note"
+                        ],
+                        "type": "object"
+                      },
+                      "maxItems": 2,
+                      "type": "array"
+                    },
+                    "schema_version": {
+                      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                      "type": "string"
+                    },
+                    "state_response": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "contract",
+                    "schema_version",
+                    "result_id",
+                    "product_date",
+                    "result_version",
+                    "generated_at",
+                    "content_label",
+                    "greeting",
+                    "state_response",
+                    "overall",
+                    "focus_dimension_id",
+                    "dimensions",
+                    "core_tip",
+                    "explanation_paragraphs",
+                    "primary_action",
+                    "optional_task",
+                    "rituals",
+                    "closing",
+                    "personalization_notice"
+                  ],
+                  "type": "object"
+                },
+                "evening": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "note": {
+                      "maxLength": 80,
+                      "type": "string"
+                    },
+                    "overall_feeling": {
+                      "enum": [
+                        "VERY_HEAVY",
+                        "SOMEWHAT_HEAVY",
+                        "STEADY",
+                        "PRETTY_GOOD",
+                        "LIGHT",
+                        "UNSURE"
+                      ],
+                      "type": "string"
+                    },
+                    "revision": {
+                      "exclusiveMinimum": true,
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "updated_at": {
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "revision",
+                    "overall_feeling",
+                    "updated_at"
+                  ],
+                  "type": "object"
+                },
+                "interaction": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "helpfulness": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "rating": {
+                          "enum": [
+                            "UNRATED",
+                            "HELPFUL",
+                            "NEUTRAL",
+                            "NOT_HELPFUL",
+                            "NOT_USED"
+                          ],
+                          "type": "string"
+                        },
+                        "revision": {
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "revision",
+                        "rating"
+                      ],
+                      "type": "object"
+                    },
+                    "is_lit": {
+                      "type": "boolean"
+                    },
+                    "task": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "revision": {
+                          "exclusiveMinimum": true,
+                          "maximum": 9007199254740991,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "UNMARKED",
+                            "INTERESTED",
+                            "COMPLETED",
+                            "SKIPPED"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "revision",
+                        "status"
+                      ],
+                      "type": "object"
+                    },
+                    "updated_at": {
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "is_lit",
+                    "task",
+                    "helpfulness",
+                    "updated_at"
+                  ],
+                  "type": "object"
+                },
+                "product_date": {
+                  "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "product_date"
+              ],
+              "type": "object"
+            },
+            "maxItems": 10000,
+            "type": "array"
+          },
+          "generated_at": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            "type": "string"
+          },
+          "matters": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "daily_use_granted": {
+                  "type": "boolean"
+                },
+                "revision": {
+                  "exclusiveMinimum": true,
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "status": {
+                  "enum": [
+                    "ACTIVE",
+                    "PAUSED",
+                    "COMPLETED",
+                    "EXPIRED"
+                  ],
+                  "type": "string"
+                },
+                "target_date": {
+                  "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "updated_at": {
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  "type": "string"
+                },
+                "weekly_use_granted": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "revision",
+                "title",
+                "status",
+                "daily_use_granted",
+                "weekly_use_granted",
+                "updated_at"
+              ],
+              "type": "object"
+            },
+            "maxItems": 1000,
+            "type": "array"
+          },
+          "notification_preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "items": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "notification_type": {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                      "type": "string"
+                    },
+                    "revision": {
+                      "exclusiveMinimum": true,
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "updated_at": {
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "notification_type",
+                    "enabled",
+                    "revision",
+                    "updated_at"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 50,
+                "type": "array"
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "type": "object"
+          },
+          "profile": {
+            "additionalProperties": false,
+            "properties": {
+              "expression_style": {
+                "enum": [
+                  "BALANCED",
+                  "GENTLE",
+                  "LIGHT_HUMOR",
+                  "CLEAR_DIRECT"
+                ],
+                "type": "string"
+              },
+              "onboarding_completed": {
+                "type": "boolean"
+              },
+              "preferred_name": {
+                "type": "string"
+              },
+              "revision": {
+                "exclusiveMinimum": true,
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "updated_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "revision",
+              "expression_style",
+              "onboarding_completed",
+              "updated_at"
+            ],
+            "type": "object"
+          },
+          "relationship_summary": {
+            "additionalProperties": false,
+            "properties": {
+              "encounter_day_count": {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "revision": {
+                "exclusiveMinimum": true,
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "stage": {
+                "enum": [
+                  "BEFORE_FIRST_MEETING",
+                  "NEWLY_MET",
+                  "BECOMING_FAMILIAR",
+                  "FIRST_WEEK_RECORDED"
+                ],
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "PRESENT"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "revision",
+              "state",
+              "stage",
+              "encounter_day_count",
+              "updated_at"
+            ],
+            "type": "object"
+          },
+          "safety_summary": {
+            "additionalProperties": false,
+            "properties": {
+              "revision": {
+                "exclusiveMinimum": true,
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "state": {
+                "enum": [
+                  "CLEAR",
+                  "ACTIVE",
+                  "RECOVERY_PENDING"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "state",
+              "revision",
+              "updated_at"
+            ],
+            "type": "object"
+          },
+          "schema_version": {
+            "enum": [
+              "data-export-v1"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "generated_at",
+          "consent_summary",
+          "days",
+          "matters",
+          "notification_preferences",
+          "data_task_summaries"
+        ],
+        "type": "object",
+        "x-source-contract": "DataExportDocumentSchema",
+        "x-source-projection": "zod-openapi-3.0"
+      },
+      "DataRightsSummaryView": {
+        "additionalProperties": false,
+        "properties": {
+          "account": {
+            "additionalProperties": false,
+            "properties": {
+              "expected_revision": {
+                "exclusiveMinimum": true,
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "state": {
+                "enum": [
+                  "ACTIVE"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "expected_revision",
+              "state"
+            ],
+            "type": "object"
+          },
+          "backup_max_days": {
+            "enum": [
+              35
+            ],
+            "type": "number"
+          },
+          "capabilities": {
+            "additionalProperties": false,
+            "properties": {
+              "delete_account": {
+                "type": "boolean"
+              },
+              "delete_day": {
+                "type": "boolean"
+              },
+              "delete_matter": {
+                "type": "boolean"
+              },
+              "delete_relationship_data": {
+                "type": "boolean"
+              },
+              "export_account": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "export_account",
+              "delete_day",
+              "delete_matter",
+              "delete_relationship_data",
+              "delete_account"
+            ],
+            "type": "object"
+          },
+          "confirmation_versions": {
+            "additionalProperties": false,
+            "properties": {
+              "delete_account": {
+                "enum": [
+                  "data-rights-account-v1"
+                ],
+                "type": "string"
+              },
+              "delete_day": {
+                "enum": [
+                  "data-rights-day-v1"
+                ],
+                "type": "string"
+              },
+              "delete_matter": {
+                "enum": [
+                  "data-rights-matter-v1"
+                ],
+                "type": "string"
+              },
+              "delete_relationship_data": {
+                "enum": [
+                  "data-rights-relationship-v1"
+                ],
+                "type": "string"
+              },
+              "export_account": {
+                "enum": [
+                  "data-export-v1"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "export_account",
+              "delete_day",
+              "delete_matter",
+              "delete_relationship_data",
+              "delete_account"
+            ],
+            "type": "object"
+          },
+          "online_erasure_sla_hours": {
+            "enum": [
+              72
+            ],
+            "type": "number"
+          },
+          "relationship": {
+            "additionalProperties": false,
+            "properties": {
+              "expected_revision": {
+                "exclusiveMinimum": true,
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "state": {
+                "enum": [
+                  "PRESENT"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "expected_revision",
+              "state"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "account",
+          "capabilities",
+          "confirmation_versions",
+          "online_erasure_sla_hours",
+          "backup_max_days"
+        ],
+        "type": "object",
+        "x-source-contract": "DataRightsSummaryViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
+      },
       "DataTaskCancelRequest": {
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "expected_task_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           }
         },
         "required": [
           "command_ref",
           "expected_task_revision"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "DataTaskCancelRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "DataTaskListView": {
         "additionalProperties": false,
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/DataTaskView"
+              "additionalProperties": false,
+              "properties": {
+                "backup_purge_deadline": {
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  "type": "string"
+                },
+                "can_cancel": {
+                  "type": "boolean"
+                },
+                "created_at": {
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  "type": "string"
+                },
+                "export_artifact": {
+                  "oneOf": [
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "format": {
+                          "enum": [
+                            "JSON"
+                          ],
+                          "type": "string"
+                        },
+                        "state": {
+                          "enum": [
+                            "PREPARING"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "format"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "download_ref": {
+                          "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                          "type": "string"
+                        },
+                        "format": {
+                          "enum": [
+                            "JSON"
+                          ],
+                          "type": "string"
+                        },
+                        "ready_at": {
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                          "type": "string"
+                        },
+                        "state": {
+                          "enum": [
+                            "READY"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "format",
+                        "download_ref",
+                        "ready_at",
+                        "expires_at"
+                      ],
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "properties": {
+                        "format": {
+                          "enum": [
+                            "JSON"
+                          ],
+                          "type": "string"
+                        },
+                        "state": {
+                          "enum": [
+                            "EXPIRED",
+                            "INVALIDATED"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "state",
+                        "format"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "failure_summary_code": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "EXPORT",
+                    "DELETE"
+                  ],
+                  "type": "string"
+                },
+                "online_erased_at": {
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  "type": "string"
+                },
+                "revision": {
+                  "exclusiveMinimum": true,
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "scope": {
+                  "enum": [
+                    "DAY",
+                    "MATTER",
+                    "RELATIONSHIP_DATA",
+                    "ACCOUNT"
+                  ],
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "PENDING",
+                    "RUNNING",
+                    "SUCCEEDED",
+                    "FAILED",
+                    "CANCELLED"
+                  ],
+                  "type": "string"
+                },
+                "target_summary": {
+                  "type": "string"
+                },
+                "task_ref": {
+                  "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "task_ref",
+                "revision",
+                "kind",
+                "scope",
+                "target_summary",
+                "status",
+                "can_cancel",
+                "created_at",
+                "updated_at"
+              ],
+              "type": "object"
             },
+            "maxItems": 50,
             "type": "array"
           },
           "next_cursor": {
@@ -2740,24 +4123,113 @@
           "items",
           "page_info"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "DataTaskListViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "DataTaskView": {
         "additionalProperties": false,
         "properties": {
           "backup_purge_deadline": {
-            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
             "type": "string"
           },
           "can_cancel": {
             "type": "boolean"
           },
           "created_at": {
-            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
             "type": "string"
           },
+          "export_artifact": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "format": {
+                    "enum": [
+                      "JSON"
+                    ],
+                    "type": "string"
+                  },
+                  "state": {
+                    "enum": [
+                      "PREPARING"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "state",
+                  "format"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "download_ref": {
+                    "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                    "type": "string"
+                  },
+                  "expires_at": {
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                    "type": "string"
+                  },
+                  "format": {
+                    "enum": [
+                      "JSON"
+                    ],
+                    "type": "string"
+                  },
+                  "ready_at": {
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                    "type": "string"
+                  },
+                  "state": {
+                    "enum": [
+                      "READY"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "state",
+                  "format",
+                  "download_ref",
+                  "ready_at",
+                  "expires_at"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "format": {
+                    "enum": [
+                      "JSON"
+                    ],
+                    "type": "string"
+                  },
+                  "state": {
+                    "enum": [
+                      "EXPIRED",
+                      "INVALIDATED"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "state",
+                  "format"
+                ],
+                "type": "object"
+              }
+            ]
+          },
           "failure_summary_code": {
-            "$ref": "#/components/schemas/VersionToken"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "type": "string"
           },
           "kind": {
             "enum": [
@@ -2767,11 +4239,14 @@
             "type": "string"
           },
           "online_erased_at": {
-            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
             "type": "string"
           },
           "revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "scope": {
             "enum": [
@@ -2793,14 +4268,14 @@
             "type": "string"
           },
           "target_summary": {
-            "maxLength": 120,
             "type": "string"
           },
           "task_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           },
           "updated_at": {
-            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
             "type": "string"
           }
         },
@@ -2815,38 +4290,61 @@
           "created_at",
           "updated_at"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "DataTaskViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "DayExpectedRevision": {
         "additionalProperties": false,
         "properties": {
           "expected_revision": {
-            "$ref": "#/components/schemas/Revision"
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "product_date": {
-            "$ref": "#/components/schemas/ProductDate"
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           }
         },
         "required": [
           "product_date",
           "expected_revision"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "DayExpectedRevisionSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "DeleteAccountConfirmRequest": {
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "confirmation_challenge_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           },
           "confirmation_version": {
-            "$ref": "#/components/schemas/VersionToken"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "type": "string"
           },
           "confirmed": {
             "enum": [
@@ -2855,10 +4353,14 @@
             "type": "boolean"
           },
           "expected_account_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "identity_verification_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           },
           "scope": {
             "enum": [
@@ -2892,22 +4394,42 @@
           "confirmed",
           "identity_verification_ref"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "DeleteAccountConfirmRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "DeleteAccountPrepareRequest": {
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "confirmation_version": {
-            "$ref": "#/components/schemas/VersionToken"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "type": "string"
           },
           "expected_account_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "scope": {
             "enum": [
@@ -2938,19 +4460,36 @@
           "expected_account_revision",
           "confirmation_version"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "DeleteAccountPrepareRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "DeleteDayRequest": {
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "confirmation_version": {
-            "$ref": "#/components/schemas/VersionToken"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "type": "string"
           },
           "confirmed": {
             "enum": [
@@ -2959,7 +4498,9 @@
             "type": "boolean"
           },
           "expected_revision": {
-            "$ref": "#/components/schemas/Revision"
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "scope": {
             "enum": [
@@ -2971,7 +4512,8 @@
             "additionalProperties": false,
             "properties": {
               "product_date": {
-                "$ref": "#/components/schemas/ProductDate"
+                "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                "type": "string"
               }
             },
             "required": [
@@ -2988,19 +4530,36 @@
           "confirmed",
           "expected_revision"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "DeleteDayRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "DeleteMatterRequest": {
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "confirmation_version": {
-            "$ref": "#/components/schemas/VersionToken"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "type": "string"
           },
           "confirmed": {
             "enum": [
@@ -3009,7 +4568,10 @@
             "type": "boolean"
           },
           "expected_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "scope": {
             "enum": [
@@ -3021,7 +4583,8 @@
             "additionalProperties": false,
             "properties": {
               "matter_ref": {
-                "$ref": "#/components/schemas/OpaqueRef"
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
               }
             },
             "required": [
@@ -3038,22 +4601,40 @@
           "confirmed",
           "expected_revision"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "DeleteMatterRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "DeleteRelationshipConfirmRequest": {
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "confirmation_challenge_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           },
           "confirmation_version": {
-            "$ref": "#/components/schemas/VersionToken"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "type": "string"
           },
           "confirmed": {
             "enum": [
@@ -3062,58 +4643,34 @@
             "type": "boolean"
           },
           "expected_relationship_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "identity_verification_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
-          },
-          "included_day_expected_revisions": {
-            "items": {
-              "$ref": "#/components/schemas/DayExpectedRevision"
-            },
-            "maxItems": 45,
-            "type": "array"
-          },
-          "scope": {
-            "enum": [
-              "RELATIONSHIP_DATA"
-            ],
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
             "type": "string"
           },
-          "target": {
-            "$ref": "#/components/schemas/RelationshipDeletionTarget"
-          }
-        },
-        "required": [
-          "command_ref",
-          "confirmation_challenge_ref",
-          "scope",
-          "target",
-          "expected_relationship_revision",
-          "included_day_expected_revisions",
-          "confirmation_version",
-          "confirmed"
-        ],
-        "type": "object"
-      },
-      "DeleteRelationshipPrepareRequest": {
-        "additionalProperties": false,
-        "properties": {
-          "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
-          },
-          "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
-          },
-          "confirmation_version": {
-            "$ref": "#/components/schemas/VersionToken"
-          },
-          "expected_relationship_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
-          },
           "included_day_expected_revisions": {
             "items": {
-              "$ref": "#/components/schemas/DayExpectedRevision"
+              "additionalProperties": false,
+              "properties": {
+                "expected_revision": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "product_date": {
+                  "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "product_date",
+                "expected_revision"
+              ],
+              "type": "object"
             },
             "maxItems": 45,
             "type": "array"
@@ -3129,11 +4686,112 @@
             "properties": {
               "included_day_product_dates": {
                 "items": {
-                  "$ref": "#/components/schemas/ProductDate"
+                  "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  "type": "string"
                 },
                 "maxItems": 45,
-                "type": "array",
-                "uniqueItems": true
+                "type": "array"
+              },
+              "relationship_scope": {
+                "enum": [
+                  "CURRENT_CYCLE_AND_HISTORY"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "relationship_scope",
+              "included_day_product_dates"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "command_ref",
+          "confirmation_challenge_ref",
+          "scope",
+          "target",
+          "expected_relationship_revision",
+          "included_day_expected_revisions",
+          "confirmation_version",
+          "confirmed"
+        ],
+        "type": "object",
+        "x-source-contract": "DeleteRelationshipConfirmRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
+      },
+      "DeleteRelationshipPrepareRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "client_context": {
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "command_ref": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
+          },
+          "confirmation_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "type": "string"
+          },
+          "expected_relationship_revision": {
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "included_day_expected_revisions": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "expected_revision": {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "product_date": {
+                  "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "product_date",
+                "expected_revision"
+              ],
+              "type": "object"
+            },
+            "maxItems": 45,
+            "type": "array"
+          },
+          "scope": {
+            "enum": [
+              "RELATIONSHIP_DATA"
+            ],
+            "type": "string"
+          },
+          "target": {
+            "additionalProperties": false,
+            "properties": {
+              "included_day_product_dates": {
+                "items": {
+                  "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  "type": "string"
+                },
+                "maxItems": 45,
+                "type": "array"
               },
               "relationship_scope": {
                 "enum": [
@@ -3157,74 +4815,197 @@
           "included_day_expected_revisions",
           "confirmation_version"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "DeleteRelationshipPrepareRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "DeletionConfirmationView": {
-        "additionalProperties": false,
-        "properties": {
-          "backup_max_days": {
-            "enum": [
-              35
-            ],
-            "type": "integer"
-          },
-          "confirmation_challenge_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
-          },
-          "confirmation_version": {
-            "$ref": "#/components/schemas/VersionToken"
-          },
-          "derived_effects": {
-            "items": {
-              "type": "string"
-            },
-            "maxItems": 12,
-            "type": "array"
-          },
-          "expected_day_revisions": {
-            "items": {
-              "$ref": "#/components/schemas/DayExpectedRevision"
-            },
-            "maxItems": 45,
-            "type": "array"
-          },
-          "expected_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
-          },
-          "expires_at": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "identity_reverification_required": {
-            "type": "boolean"
-          },
-          "immediate_effects": {
-            "items": {
-              "type": "string"
-            },
-            "maxItems": 12,
-            "minItems": 1,
-            "type": "array"
-          },
-          "online_erasure_sla_hours": {
-            "enum": [
-              72
-            ],
-            "type": "integer"
-          },
-          "scope": {
-            "enum": [
-              "RELATIONSHIP_DATA",
-              "ACCOUNT"
-            ],
-            "type": "string"
-          },
-          "target": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/RelationshipDeletionTarget"
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "backup_max_days": {
+                "enum": [
+                  35
+                ],
+                "type": "number"
               },
-              {
+              "confirmation_challenge_ref": {
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
+              },
+              "confirmation_version": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                "type": "string"
+              },
+              "derived_effects": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              "expected_day_revisions": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "expected_revision": {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "product_date": {
+                      "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "product_date",
+                    "expected_revision"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 45,
+                "type": "array"
+              },
+              "expected_revision": {
+                "exclusiveMinimum": true,
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "expires_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "identity_reverification_required": {
+                "type": "boolean"
+              },
+              "immediate_effects": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 12,
+                "minItems": 1,
+                "type": "array"
+              },
+              "online_erasure_sla_hours": {
+                "enum": [
+                  72
+                ],
+                "type": "number"
+              },
+              "scope": {
+                "enum": [
+                  "RELATIONSHIP_DATA"
+                ],
+                "type": "string"
+              },
+              "target": {
+                "additionalProperties": false,
+                "properties": {
+                  "included_day_product_dates": {
+                    "items": {
+                      "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                      "type": "string"
+                    },
+                    "maxItems": 45,
+                    "type": "array"
+                  },
+                  "relationship_scope": {
+                    "enum": [
+                      "CURRENT_CYCLE_AND_HISTORY"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "relationship_scope",
+                  "included_day_product_dates"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "confirmation_challenge_ref",
+              "confirmation_version",
+              "expected_revision",
+              "immediate_effects",
+              "derived_effects",
+              "online_erasure_sla_hours",
+              "backup_max_days",
+              "identity_reverification_required",
+              "expires_at",
+              "scope",
+              "target",
+              "expected_day_revisions"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "backup_max_days": {
+                "enum": [
+                  35
+                ],
+                "type": "number"
+              },
+              "confirmation_challenge_ref": {
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
+              },
+              "confirmation_version": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                "type": "string"
+              },
+              "derived_effects": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              "expected_day_revisions": {
+                "not": {}
+              },
+              "expected_revision": {
+                "exclusiveMinimum": true,
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "expires_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "identity_reverification_required": {
+                "enum": [
+                  true
+                ],
+                "type": "boolean"
+              },
+              "immediate_effects": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 12,
+                "minItems": 1,
+                "type": "array"
+              },
+              "online_erasure_sla_hours": {
+                "enum": [
+                  72
+                ],
+                "type": "number"
+              },
+              "scope": {
+                "enum": [
+                  "ACCOUNT"
+                ],
+                "type": "string"
+              },
+              "target": {
                 "additionalProperties": false,
                 "properties": {
                   "subject": {
@@ -3239,23 +5020,52 @@
                 ],
                 "type": "object"
               }
-            ]
+            },
+            "required": [
+              "confirmation_challenge_ref",
+              "confirmation_version",
+              "expected_revision",
+              "immediate_effects",
+              "derived_effects",
+              "online_erasure_sla_hours",
+              "backup_max_days",
+              "identity_reverification_required",
+              "expires_at",
+              "scope",
+              "target"
+            ],
+            "type": "object"
+          }
+        ],
+        "x-source-contract": "DeletionConfirmationViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
+      },
+      "DeletionStatusGrantView": {
+        "additionalProperties": false,
+        "properties": {
+          "expires_at": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            "type": "string"
+          },
+          "status_token": {
+            "maxLength": 256,
+            "minLength": 32,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "type": "string"
+          },
+          "task_ref": {
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           }
         },
         "required": [
-          "confirmation_challenge_ref",
-          "scope",
-          "target",
-          "confirmation_version",
-          "expected_revision",
-          "immediate_effects",
-          "derived_effects",
-          "online_erasure_sla_hours",
-          "backup_max_days",
-          "identity_reverification_required",
+          "task_ref",
+          "status_token",
           "expires_at"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "DeletionStatusGrantViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "Energy": {
         "enum": [
@@ -3814,17 +5624,120 @@
         "x-source-contract": "ClientEveningFeedbackViewSchema",
         "x-source-projection": "zod-openapi-3.0"
       },
+      "ExportArtifactView": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "format": {
+                "enum": [
+                  "JSON"
+                ],
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "PREPARING"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "state",
+              "format"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "download_ref": {
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
+              },
+              "expires_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "format": {
+                "enum": [
+                  "JSON"
+                ],
+                "type": "string"
+              },
+              "ready_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "READY"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "state",
+              "format",
+              "download_ref",
+              "ready_at",
+              "expires_at"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "format": {
+                "enum": [
+                  "JSON"
+                ],
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "EXPIRED",
+                  "INVALIDATED"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "state",
+              "format"
+            ],
+            "type": "object"
+          }
+        ],
+        "x-source-contract": "ExportArtifactViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
+      },
       "ExportRequest": {
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "confirmation_version": {
-            "$ref": "#/components/schemas/VersionToken"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "type": "string"
           },
           "export_format": {
             "enum": [
@@ -3838,7 +5751,9 @@
           "export_format",
           "confirmation_version"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "ExportRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "ExpressionStyle": {
         "enum": [
@@ -4860,14 +6775,16 @@
         "additionalProperties": false,
         "properties": {
           "confirmation_challenge_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           },
           "expires_at": {
-            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
             "type": "string"
           },
           "identity_verification_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           }
         },
         "required": [
@@ -4875,7 +6792,9 @@
           "confirmation_challenge_ref",
           "expires_at"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "IdentityVerificationViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "LaunchStateSnapshot": {
         "additionalProperties": false,
@@ -5534,13 +7453,28 @@
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "confirmation_challenge_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           },
           "wechat_code": {
             "maxLength": 256,
@@ -5553,18 +7487,20 @@
           "confirmation_challenge_ref",
           "wechat_code"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "ReauthVerifyRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "RelationshipDeletionTarget": {
         "additionalProperties": false,
         "properties": {
           "included_day_product_dates": {
             "items": {
-              "$ref": "#/components/schemas/ProductDate"
+              "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+              "type": "string"
             },
             "maxItems": 45,
-            "type": "array",
-            "uniqueItems": true
+            "type": "array"
           },
           "relationship_scope": {
             "enum": [
@@ -5577,7 +7513,9 @@
           "relationship_scope",
           "included_day_product_dates"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "RelationshipDeletionTargetSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "RelationshipStage": {
         "enum": [
@@ -6973,6 +8911,12 @@
         "scheme": "bearer",
         "type": "http"
       },
+      "deletionStatusAuth": {
+        "description": "Exact `DeletionStatus <status_token>` scheme; never grants ordinary API access.",
+        "in": "header",
+        "name": "Authorization",
+        "type": "apiKey"
+      },
       "safetyContinuationAuth": {
         "description": "Opaque, short-lived Safety-only continuation. Grants no ordinary account access.",
         "in": "header",
@@ -8317,7 +10261,7 @@
         },
         "responses": {
           "202": {
-            "$ref": "#/components/responses/SuccessDataTask"
+            "$ref": "#/components/responses/SuccessAccountDeletionAccepted"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -8657,6 +10601,48 @@
         ]
       }
     },
+    "/data-rights/deletion-status/{task_ref}": {
+      "get": {
+        "operationId": "getAccountDeletionStatus",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestIdHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/TaskRef"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessDataTask"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "deletionStatusAuth": []
+          }
+        ],
+        "summary": "Read one account-deletion task with a status-only grant",
+        "tags": [
+          "DataRights"
+        ]
+      }
+    },
     "/data-rights/export": {
       "post": {
         "operationId": "createExportTask",
@@ -8713,6 +10699,135 @@
           }
         ],
         "summary": "Create a data export task",
+        "tags": [
+          "DataRights"
+        ]
+      }
+    },
+    "/data-rights/exports/{task_ref}/artifacts/{download_ref}": {
+      "get": {
+        "operationId": "downloadDataExportArtifact",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestIdHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/TaskRef"
+          },
+          {
+            "$ref": "#/components/parameters/DownloadRef"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataExportDocument"
+                }
+              }
+            },
+            "description": "Deterministic JSON export attachment",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "enum": [
+                    "no-store"
+                  ],
+                  "type": "string"
+                }
+              },
+              "Content-Disposition": {
+                "schema": {
+                  "enum": [
+                    "attachment; filename=\"dailyenergy-export.json\""
+                  ],
+                  "type": "string"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "enum": [
+                    "nosniff"
+                  ],
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "$ref": "#/components/headers/RequestIdResponseHeader"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "userBearerAuth": []
+          }
+        ],
+        "summary": "Generate and download one READY export without persisting its body",
+        "tags": [
+          "DataRights"
+        ]
+      }
+    },
+    "/data-rights/summary": {
+      "get": {
+        "operationId": "getDataRightsSummary",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestIdHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessDataRightsSummary"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [
+          {
+            "userBearerAuth": []
+          }
+        ],
+        "summary": "Read owner-scoped revisions and data-rights capabilities",
         "tags": [
           "DataRights"
         ]
@@ -10593,6 +12708,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:64ae0b2b9320ea9b00bb4b16f64952e09f91a4dc175adec387eab8a7ff2e6605"
+    "source-fingerprint": "sha256:1479280a50b42254b8de63769f559a8cbbe93395f5b6d7db8d379b52b4c67c87"
   }
 }

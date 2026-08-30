@@ -115,7 +115,15 @@ describe("worker profile entrypoints", () => {
     expect(restricted.connect).toHaveBeenCalledWith(restrictedConfig.database);
     expect(startInteractive).toHaveBeenCalledWith(interactiveConfig, []);
     expect(startBackground).toHaveBeenCalledWith(backgroundConfig, []);
-    expect(startRestricted).toHaveBeenCalledWith(restrictedConfig, []);
+    expect(startRestricted).toHaveBeenCalledWith(
+      restrictedConfig,
+      expect.arrayContaining([
+        expect.objectContaining({ eventType: "DataDeletionStarted" }),
+        expect.objectContaining({ eventType: "DataTaskDue" }),
+        expect.objectContaining({ eventType: "DataRightsRetentionDue" }),
+        expect.objectContaining({ eventType: "DeletionGuarded" }),
+      ]),
+    );
 
     await Promise.all([
       interactiveProcess.drain(),

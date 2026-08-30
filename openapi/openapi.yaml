@@ -1526,6 +1526,28 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/SafetyRecoveryConfirmRequest"
+  /data-rights/summary:
+    get:
+      tags:
+        - DataRights
+      operationId: getDataRightsSummary
+      summary: Read owner-scoped revisions and data-rights capabilities
+      security:
+        - userBearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RequestIdHeader"
+        - $ref: "#/components/parameters/AcceptLanguageHeader"
+      responses:
+        "200":
+          $ref: "#/components/responses/SuccessDataRightsSummary"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
   /data-rights/tasks:
     get:
       tags:
@@ -1608,6 +1630,58 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/ExportRequest"
+  /data-rights/exports/{task_ref}/artifacts/{download_ref}:
+    get:
+      tags:
+        - DataRights
+      operationId: downloadDataExportArtifact
+      summary: Generate and download one READY export without persisting its body
+      security:
+        - userBearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RequestIdHeader"
+        - $ref: "#/components/parameters/AcceptLanguageHeader"
+        - $ref: "#/components/parameters/TaskRef"
+        - $ref: "#/components/parameters/DownloadRef"
+      responses:
+        "200":
+          description: Deterministic JSON export attachment
+          headers:
+            X-Request-Id:
+              $ref: "#/components/headers/RequestIdResponseHeader"
+            Cache-Control:
+              schema:
+                type: string
+                enum:
+                  - no-store
+            Content-Disposition:
+              schema:
+                type: string
+                enum:
+                  - attachment; filename="dailyenergy-export.json"
+            X-Content-Type-Options:
+              schema:
+                type: string
+                enum:
+                  - nosniff
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataExportDocument"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
   /data-rights/delete/day:
     post:
       tags:
@@ -1797,7 +1871,7 @@ paths:
         - $ref: "#/components/parameters/IdempotencyKeyHeader"
       responses:
         "202":
-          $ref: "#/components/responses/SuccessDataTask"
+          $ref: "#/components/responses/SuccessAccountDeletionAccepted"
         "400":
           $ref: "#/components/responses/BadRequest"
         "422":
@@ -1818,6 +1892,29 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/DeleteAccountConfirmRequest"
+  /data-rights/deletion-status/{task_ref}:
+    get:
+      tags:
+        - DataRights
+      operationId: getAccountDeletionStatus
+      summary: Read one account-deletion task with a status-only grant
+      security:
+        - deletionStatusAuth: []
+      parameters:
+        - $ref: "#/components/parameters/RequestIdHeader"
+        - $ref: "#/components/parameters/AcceptLanguageHeader"
+        - $ref: "#/components/parameters/TaskRef"
+      responses:
+        "200":
+          $ref: "#/components/responses/SuccessDataTask"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
   /data-rights/tasks/{task_ref}/cancel:
     post:
       tags:
@@ -2065,6 +2162,11 @@ components:
       in: header
       name: X-Safety-Continuation
       description: Opaque, short-lived Safety-only continuation. Grants no ordinary account access.
+    deletionStatusAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Exact `DeletionStatus <status_token>` scheme; never grants ordinary API access.
   parameters:
     RequestIdHeader:
       name: X-Request-Id
@@ -2115,6 +2217,12 @@ components:
         $ref: "#/components/schemas/OpaqueRef"
     TaskRef:
       name: task_ref
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/OpaqueRef"
+    DownloadRef:
+      name: download_ref
       in: path
       required: true
       schema:
@@ -2214,23 +2322,7 @@ components:
       required:
         - command_ref
     ReauthVerifyRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        confirmation_challenge_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-        wechat_code:
-          type: string
-          minLength: 1
-          maxLength: 256
-      additionalProperties: false
-      required:
-        - command_ref
-        - confirmation_challenge_ref
-        - wechat_code
+      x-source-contract: ReauthVerifyRequestSchema
     ConsentAcceptRequest:
       type: object
       properties:
@@ -2638,294 +2730,35 @@ components:
         - recovery_ref
         - recovery_action_version
     ExportRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        export_format:
-          type: string
-          enum:
-            - JSON
-        confirmation_version:
-          $ref: "#/components/schemas/VersionToken"
-      additionalProperties: false
-      required:
-        - command_ref
-        - export_format
-        - confirmation_version
+      x-source-contract: ExportRequestSchema
     DeleteDayRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        scope:
-          type: string
-          enum:
-            - DAY
-        target:
-          type: object
-          properties:
-            product_date:
-              $ref: "#/components/schemas/ProductDate"
-          additionalProperties: false
-          required:
-            - product_date
-        confirmation_version:
-          $ref: "#/components/schemas/VersionToken"
-        confirmed:
-          type: boolean
-          enum:
-            - true
-        expected_revision:
-          $ref: "#/components/schemas/Revision"
-      additionalProperties: false
-      required:
-        - command_ref
-        - scope
-        - target
-        - confirmation_version
-        - confirmed
-        - expected_revision
+      x-source-contract: DeleteDayRequestSchema
     DeleteMatterRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        scope:
-          type: string
-          enum:
-            - MATTER
-        target:
-          type: object
-          properties:
-            matter_ref:
-              $ref: "#/components/schemas/OpaqueRef"
-          additionalProperties: false
-          required:
-            - matter_ref
-        confirmation_version:
-          $ref: "#/components/schemas/VersionToken"
-        confirmed:
-          type: boolean
-          enum:
-            - true
-        expected_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-      additionalProperties: false
-      required:
-        - command_ref
-        - scope
-        - target
-        - confirmation_version
-        - confirmed
-        - expected_revision
+      x-source-contract: DeleteMatterRequestSchema
     DayExpectedRevision:
-      type: object
-      properties:
-        product_date:
-          $ref: "#/components/schemas/ProductDate"
-        expected_revision:
-          $ref: "#/components/schemas/Revision"
-      additionalProperties: false
-      required:
-        - product_date
-        - expected_revision
+      x-source-contract: DayExpectedRevisionSchema
     DeleteRelationshipPrepareRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        scope:
-          type: string
-          enum:
-            - RELATIONSHIP_DATA
-        target:
-          type: object
-          properties:
-            relationship_scope:
-              type: string
-              enum:
-                - CURRENT_CYCLE_AND_HISTORY
-            included_day_product_dates:
-              type: array
-              items:
-                $ref: "#/components/schemas/ProductDate"
-              maxItems: 45
-              uniqueItems: true
-          additionalProperties: false
-          required:
-            - relationship_scope
-            - included_day_product_dates
-        expected_relationship_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-        included_day_expected_revisions:
-          type: array
-          items:
-            $ref: "#/components/schemas/DayExpectedRevision"
-          maxItems: 45
-        confirmation_version:
-          $ref: "#/components/schemas/VersionToken"
-      additionalProperties: false
-      required:
-        - command_ref
-        - scope
-        - target
-        - expected_relationship_revision
-        - included_day_expected_revisions
-        - confirmation_version
+      x-source-contract: DeleteRelationshipPrepareRequestSchema
     DeleteRelationshipConfirmRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        confirmation_challenge_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-        scope:
-          type: string
-          enum:
-            - RELATIONSHIP_DATA
-        target:
-          $ref: "#/components/schemas/RelationshipDeletionTarget"
-        expected_relationship_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-        included_day_expected_revisions:
-          type: array
-          items:
-            $ref: "#/components/schemas/DayExpectedRevision"
-          maxItems: 45
-        confirmation_version:
-          $ref: "#/components/schemas/VersionToken"
-        confirmed:
-          type: boolean
-          enum:
-            - true
-        identity_verification_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-      additionalProperties: false
-      required:
-        - command_ref
-        - confirmation_challenge_ref
-        - scope
-        - target
-        - expected_relationship_revision
-        - included_day_expected_revisions
-        - confirmation_version
-        - confirmed
+      x-source-contract: DeleteRelationshipConfirmRequestSchema
     RelationshipDeletionTarget:
-      type: object
-      properties:
-        relationship_scope:
-          type: string
-          enum:
-            - CURRENT_CYCLE_AND_HISTORY
-        included_day_product_dates:
-          type: array
-          items:
-            $ref: "#/components/schemas/ProductDate"
-          maxItems: 45
-          uniqueItems: true
-      additionalProperties: false
-      required:
-        - relationship_scope
-        - included_day_product_dates
+      x-source-contract: RelationshipDeletionTargetSchema
     DeleteAccountPrepareRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        scope:
-          type: string
-          enum:
-            - ACCOUNT
-        target:
-          type: object
-          properties:
-            subject:
-              type: string
-              enum:
-                - SELF
-          additionalProperties: false
-          required:
-            - subject
-        expected_account_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-        confirmation_version:
-          $ref: "#/components/schemas/VersionToken"
-      additionalProperties: false
-      required:
-        - command_ref
-        - scope
-        - target
-        - expected_account_revision
-        - confirmation_version
+      x-source-contract: DeleteAccountPrepareRequestSchema
     DeleteAccountConfirmRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        confirmation_challenge_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-        scope:
-          type: string
-          enum:
-            - ACCOUNT
-        target:
-          type: object
-          properties:
-            subject:
-              type: string
-              enum:
-                - SELF
-          additionalProperties: false
-          required:
-            - subject
-        expected_account_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-        confirmation_version:
-          $ref: "#/components/schemas/VersionToken"
-        confirmed:
-          type: boolean
-          enum:
-            - true
-        identity_verification_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-      additionalProperties: false
-      required:
-        - command_ref
-        - confirmation_challenge_ref
-        - scope
-        - target
-        - expected_account_revision
-        - confirmation_version
-        - confirmed
-        - identity_verification_ref
+      x-source-contract: DeleteAccountConfirmRequestSchema
     DataTaskCancelRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        expected_task_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-      additionalProperties: false
-      required:
-        - command_ref
-        - expected_task_revision
+      x-source-contract: DataTaskCancelRequestSchema
+    DataRightsSummaryView:
+      x-source-contract: DataRightsSummaryViewSchema
+    ExportArtifactView:
+      x-source-contract: ExportArtifactViewSchema
+    DeletionStatusGrantView:
+      x-source-contract: DeletionStatusGrantViewSchema
+    AccountDeletionAcceptedView:
+      x-source-contract: AccountDeletionAcceptedViewSchema
+    DataExportDocument:
+      x-source-contract: DataExportDocumentSchema
     SupportFeedbackRequest:
       type: object
       properties:
@@ -3060,20 +2893,7 @@ components:
         - consent_required
         - onboarding_required
     IdentityVerificationView:
-      type: object
-      properties:
-        identity_verification_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-        confirmation_challenge_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-        expires_at:
-          type: string
-          format: date-time
-      additionalProperties: false
-      required:
-        - identity_verification_ref
-        - confirmation_challenge_ref
-        - expires_at
+      x-source-contract: IdentityVerificationViewSchema
     ConsentView:
       type: object
       properties:
@@ -3420,130 +3240,9 @@ components:
         - daily_state
         - maintenance_state
     DataTaskView:
-      type: object
-      properties:
-        task_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-        revision:
-          $ref: "#/components/schemas/PositiveRevision"
-        kind:
-          type: string
-          enum:
-            - EXPORT
-            - DELETE
-        scope:
-          type: string
-          enum:
-            - DAY
-            - MATTER
-            - RELATIONSHIP_DATA
-            - ACCOUNT
-        target_summary:
-          type: string
-          maxLength: 120
-        status:
-          type: string
-          enum:
-            - PENDING
-            - RUNNING
-            - SUCCEEDED
-            - FAILED
-            - CANCELLED
-        online_erased_at:
-          type: string
-          format: date-time
-        backup_purge_deadline:
-          type: string
-          format: date-time
-        can_cancel:
-          type: boolean
-        failure_summary_code:
-          $ref: "#/components/schemas/VersionToken"
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      additionalProperties: false
-      required:
-        - task_ref
-        - revision
-        - kind
-        - scope
-        - target_summary
-        - status
-        - can_cancel
-        - created_at
-        - updated_at
+      x-source-contract: DataTaskViewSchema
     DeletionConfirmationView:
-      type: object
-      properties:
-        confirmation_challenge_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-        scope:
-          type: string
-          enum:
-            - RELATIONSHIP_DATA
-            - ACCOUNT
-        target:
-          oneOf:
-            - $ref: "#/components/schemas/RelationshipDeletionTarget"
-            - type: object
-              properties:
-                subject:
-                  type: string
-                  enum:
-                    - SELF
-              additionalProperties: false
-              required:
-                - subject
-        confirmation_version:
-          $ref: "#/components/schemas/VersionToken"
-        expected_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-        expected_day_revisions:
-          type: array
-          items:
-            $ref: "#/components/schemas/DayExpectedRevision"
-          maxItems: 45
-        immediate_effects:
-          type: array
-          items:
-            type: string
-          minItems: 1
-          maxItems: 12
-        derived_effects:
-          type: array
-          items:
-            type: string
-          maxItems: 12
-        online_erasure_sla_hours:
-          type: integer
-          enum:
-            - 72
-        backup_max_days:
-          type: integer
-          enum:
-            - 35
-        identity_reverification_required:
-          type: boolean
-        expires_at:
-          type: string
-          format: date-time
-      additionalProperties: false
-      required:
-        - confirmation_challenge_ref
-        - scope
-        - target
-        - confirmation_version
-        - expected_revision
-        - immediate_effects
-        - derived_effects
-        - online_erasure_sla_hours
-        - backup_max_days
-        - identity_reverification_required
-        - expires_at
+      x-source-contract: DeletionConfirmationViewSchema
     FaqEntryView:
       type: object
       properties:
@@ -3672,28 +3371,7 @@ components:
         - items
         - page_info
     DataTaskListView:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/DataTaskView"
-        next_cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-        page_info:
-          type: object
-          properties:
-            has_more:
-              type: boolean
-          additionalProperties: false
-          required:
-            - has_more
-      additionalProperties: false
-      required:
-        - items
-        - page_info
+      x-source-contract: DataTaskListViewSchema
     AdminSafetyEventListView:
       type: object
       properties:
@@ -4342,6 +4020,58 @@ components:
         - product_date
         - product_date_policy_version
         - data
+    ApiSuccessDataRightsSummary:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+            - true
+        request_id:
+          $ref: "#/components/schemas/RequestId"
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: "#/components/schemas/ProductDate"
+        product_date_policy_version:
+          $ref: "#/components/schemas/VersionToken"
+        data:
+          $ref: "#/components/schemas/DataRightsSummaryView"
+      additionalProperties: false
+      required:
+        - ok
+        - request_id
+        - server_now
+        - product_date
+        - product_date_policy_version
+        - data
+    ApiSuccessAccountDeletionAccepted:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+            - true
+        request_id:
+          $ref: "#/components/schemas/RequestId"
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: "#/components/schemas/ProductDate"
+        product_date_policy_version:
+          $ref: "#/components/schemas/VersionToken"
+        data:
+          $ref: "#/components/schemas/AccountDeletionAcceptedView"
+      additionalProperties: false
+      required:
+        - ok
+        - request_id
+        - server_now
+        - product_date
+        - product_date_policy_version
+        - data
     ApiSuccessDataTask:
       type: object
       properties:
@@ -4705,6 +4435,24 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ApiSuccessSafety"
+    SuccessDataRightsSummary:
+      description: Successful DataRightsSummary response
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestIdResponseHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiSuccessDataRightsSummary"
+    SuccessAccountDeletionAccepted:
+      description: Account deletion accepted with a one-task status grant
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestIdResponseHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiSuccessAccountDeletionAccepted"
     SuccessDataTask:
       description: Successful DataTask response
       headers:
