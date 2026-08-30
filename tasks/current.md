@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c014-data-rights`
 - **Stacked base**：[C-013 Draft PR #166](https://github.com/WeiHan1996/DailyEnergy/pull/166)，verified head `e43e75ba8a18e013709578d5dfc64764c0d7b787`
 - **任务 Issue**：[C-014 Issue #65](https://github.com/WeiHan1996/DailyEnergy/issues/65)；保持 Open
-- **Draft PR**：待创建；base=`agent/c013-seven-day-trends`
+- **Draft PR**：[C-014 Draft PR #167](https://github.com/WeiHan1996/DailyEnergy/pull/167)；base=`agent/c013-seven-day-trends`，保持 Draft
 - **下一候选任务**：C-015 — 核心埋点（Planned；C-014 final-head CI 验证后启动）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -66,10 +66,9 @@
 
 ## 6. 精确下一动作
 
-1. 提交并 push `agent/c014-data-rights`，创建 base=`agent/c013-seven-day-trends` 的 Draft PR，Issue #65 保持 Open；
-2. 回填 Draft PR 与 final head，取得同一精确 head 的 11/11 CI SUCCESS；
-3. 仅在 C-014 final-head CI 验证后，从该 head 创建 `agent/c015-*` 并开始 C-015；
-4. C-004～C-014 PR 继续保持 Draft，不逐项请求 owner 审核。
+1. push PR #167 的项目控制 final head，取得同一精确 head 的 11/11 CI SUCCESS；
+2. 仅在 C-014 final-head CI 验证后，从该 head 创建 `agent/c015-*` 并开始 C-015；
+3. C-004～C-014 PR 继续保持 Draft、Issue Open，不逐项请求 owner 审核。
 
 ## 7. C-015 后统一审核
 
