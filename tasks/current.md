@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c015-core-analytics`
 - **Stacked base**：[C-014 Draft PR #167](https://github.com/WeiHan1996/DailyEnergy/pull/167)，verified head `42be22699254a57a1607b4c2725c73e4006e6a45`
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
-- **Draft PR**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)；base=`agent/c014-data-rights`，保持 Draft；verified implementation/review-handoff head `eea571a2afbdf9147243fcd45a6073f6f905dd6f`，CI run `33322940475` 11/11 SUCCESS
+- **Draft PR**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)；base=`agent/c014-data-rights`，保持 Draft；verified status head `487a939914e7c18614634e313dab18c0e8c90e3f`，CI run `33323187131` 11/11 SUCCESS
 - **下一候选动作**：项目所有者统一审核 C-004～C-015；不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -33,7 +33,7 @@
 - C-012 Draft PR #165 verified head `b70b9e390ab5d8514d13c576f21bdade18ad18e6`，CI run `32728000420` 11/11 SUCCESS；
 - C-013 Draft PR #166 verified head `e43e75ba8a18e013709578d5dfc64764c0d7b787`，CI run `32742512307` 11/11 SUCCESS；
 - C-014 Draft PR #167 verified head `42be22699254a57a1607b4c2725c73e4006e6a45`，CI run `33317649790` 11/11 SUCCESS；
-- C-015 Draft PR #168 verified implementation/review-handoff head `eea571a2afbdf9147243fcd45a6073f6f905dd6f`，CI run `33322940475` 11/11 SUCCESS；
+- C-015 Draft PR #168 verified implementation/review-handoff head `eea571a2afbdf9147243fcd45a6073f6f905dd6f`，CI run `33322940475` 11/11 SUCCESS；verified status head `487a939914e7c18614634e313dab18c0e8c90e3f`，CI run `33323187131` 11/11 SUCCESS；
 - C-004～C-015 均保持 In Review、PR Draft、Issue Open；owner manual evidence 进入当前统一审核；
 - exact-head merge verifier 因 Draft/unified review 延后，Production / RC 继续 `NO_GO`。
 
@@ -69,9 +69,9 @@
 
 ## 6. 精确下一动作
 
-1. 当前 final status-only handoff commit 取得 11/11 CI SUCCESS；
-2. 向项目所有者交付 C-004～C-015 统一审核包，逐 PR 列出 verified head/run、自动 Gate、manual evidence 与未决授权；
-3. 只有项目所有者明确统一批准后，才按依赖顺序运行 exact-head verifier、更新状态并准备合并；不启动 C-016。
+1. 项目所有者统一审核 C-004～C-015 的 verified head/run、自动 Gate、manual evidence 与未决授权；
+2. 只有项目所有者明确统一批准后，才按依赖顺序运行 exact-head verifier、更新状态并准备合并；
+3. 审核前所有 PR 保持 Draft、Issues 保持 Open、Production/RC 保持 `NO_GO`；不启动 C-016。
 
 ## 7. C-015 后统一审核
 
