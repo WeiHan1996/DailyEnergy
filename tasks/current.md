@@ -4,13 +4,13 @@
 - **最后更新**：2026-08-31
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-015 — 核心埋点
-- **任务状态**：In Review（C-004～C-015 统一审核批次；C-015 自动 Gate 完成，等待 Draft PR final-head CI）
+- **任务状态**：In Review（C-004～C-015 统一审核批次；C-015 verified implementation head CI 11/11，统一审核已就绪）
 - **任务 Profile**：`security`（analytics 最小化、不可关联聚合、删除与 Safety/正文隔离）
 - **工作分支**：`agent/c015-core-analytics`
 - **Stacked base**：[C-014 Draft PR #167](https://github.com/WeiHan1996/DailyEnergy/pull/167)，verified head `42be22699254a57a1607b4c2725c73e4006e6a45`
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
-- **Draft PR**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)；base=`agent/c014-data-rights`，保持 Draft
-- **下一候选动作**：C-004～C-015 统一审核包（C-015 final-head CI 后）
+- **Draft PR**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)；base=`agent/c014-data-rights`，保持 Draft；verified implementation/review-handoff head `eea571a2afbdf9147243fcd45a6073f6f905dd6f`，CI run `33322940475` 11/11 SUCCESS
+- **下一候选动作**：项目所有者统一审核 C-004～C-015；不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 1. 连续推进授权与 stacked 规则
@@ -20,7 +20,7 @@
 - 下游 branch 基于上游 verified final head；上游 PR 未被提前接受或合并，统一审核前全部保持 Draft；
 - 任一缺失 Accepted 决策、无法满足的依赖、外部授权或手工证据仍须如实阻断，不因连续授权而猜测。
 
-## 2. 已验证上游 C-004～C-014
+## 2. 已验证 C-004～C-015
 
 - C-004 Draft PR #157 verified head `9a902a5d2d5b666be33f9c90faa92dffafce0037`，CI run `32456442334` 11/11 SUCCESS；
 - C-005 Draft PR #158 verified head `e0383934f2d224e1d3e1636ab24311656f7b2604`，CI run `32463505126` 11/11 SUCCESS；
@@ -33,7 +33,8 @@
 - C-012 Draft PR #165 verified head `b70b9e390ab5d8514d13c576f21bdade18ad18e6`，CI run `32728000420` 11/11 SUCCESS；
 - C-013 Draft PR #166 verified head `e43e75ba8a18e013709578d5dfc64764c0d7b787`，CI run `32742512307` 11/11 SUCCESS；
 - C-014 Draft PR #167 verified head `42be22699254a57a1607b4c2725c73e4006e6a45`，CI run `33317649790` 11/11 SUCCESS；
-- C-004～C-014 均保持 In Review、PR Draft、Issue Open；owner manual evidence 等待 C-015 后统一审核；
+- C-015 Draft PR #168 verified implementation/review-handoff head `eea571a2afbdf9147243fcd45a6073f6f905dd6f`，CI run `33322940475` 11/11 SUCCESS；
+- C-004～C-015 均保持 In Review、PR Draft、Issue Open；owner manual evidence 进入当前统一审核；
 - exact-head merge verifier 因 Draft/unified review 延后，Production / RC 继续 `NO_GO`。
 
 ## 3. C-015 已完成交付
@@ -68,9 +69,9 @@
 
 ## 6. 精确下一动作
 
-1. push PR #168 的项目控制 final head，并取得同一精确 head 的 11/11 CI SUCCESS；
-2. 核对 PR #168 保持 Draft、Issue #68 保持 Open、base 精确为 `agent/c014-data-rights`；
-3. 生成 C-004～C-015 统一审核包，不启动 C-016。
+1. 当前 final status-only handoff commit 取得 11/11 CI SUCCESS；
+2. 向项目所有者交付 C-004～C-015 统一审核包，逐 PR 列出 verified head/run、自动 Gate、manual evidence 与未决授权；
+3. 只有项目所有者明确统一批准后，才按依赖顺序运行 exact-head verifier、更新状态并准备合并；不启动 C-016。
 
 ## 7. C-015 后统一审核
 
