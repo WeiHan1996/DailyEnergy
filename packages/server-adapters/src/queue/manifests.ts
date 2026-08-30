@@ -42,6 +42,8 @@ export const BACKGROUND_WORKER_MANIFEST = manifest({
   databaseRole: "daily_energy_background",
   egressAllowlist: ["ai.weekly", "postgresql", "redis", "wechat.notification"],
   handlers: [
+    capability("AnalyticsAggregationDue", "background-analytics"),
+    capability("AnalyticsRetentionDue", "background-analytics"),
     capability("CheckinCorrected", "background-projection"),
     capability("DailyResultPublished", "background-projection"),
     capability("DayLit", "background-relationship"),

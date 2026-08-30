@@ -20,12 +20,24 @@ function cloneRegistry() {
 test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () => {
   assert.deepEqual(await loadAndValidateCoverageRegistry(), {
     counts: {
-      COVERED: 343,
+      COVERED: 538,
       NA_WITH_REASON: 0,
-      PLANNED: 470,
+      PLANNED: 466,
     },
-    total: 813,
+    total: 1004,
   });
+
+  const analyticsEntries = registry.entries.filter(
+    ({ source_sets: sourceSets }) =>
+      sourceSets.some((sourceSet) =>
+        ["s24-event-tracking", "s25-metrics"].includes(sourceSet),
+      ),
+  );
+  assert.equal(analyticsEntries.length, 185);
+  assert.equal(
+    analyticsEntries.every(({ status }) => status === "COVERED"),
+    true,
+  );
 
   const domainEntries = registry.entries.filter(({ source_id: sourceId }) =>
     sourceId.startsWith("D17-"),

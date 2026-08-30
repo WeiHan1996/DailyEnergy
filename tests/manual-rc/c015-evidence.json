@@ -1,0 +1,66 @@
+{
+  "evidence_version": "c-015-manual-evidence-v1",
+  "task_id": "C-015",
+  "draft_pr": null,
+  "execution_status": "AUTOMATED_IMPLEMENTATION_COMPLETE_MANUAL_EVIDENCE_PENDING",
+  "pass_claim": "PROHIBITED",
+  "synthetic_accounts_only": true,
+  "accepted_scope": {
+    "events": 58,
+    "metrics": 23,
+    "hard_gates": 4,
+    "minimum_cell_size": 10,
+    "maximum_dimensions": 2,
+    "t4_retention_months": 13,
+    "client_signal_reliability": "BEST_EFFORT_NO_OFFLINE_REPLAY",
+    "research_metrics": "S25-Q01_AND_S25-Q02_UNAVAILABLE",
+    "experiment_assignment": "DISABLED",
+    "channel_attribution": "COARSE_SCENE_CODE_ONLY"
+  },
+  "automated_evidence": {
+    "event_and_transport_contracts": "PASS",
+    "t0_to_t4_module": "PASS",
+    "ten_metric_fixtures": "PASS",
+    "api_first_party_signal_e2e": "PASS",
+    "miniapp_no_queue_sender": "PASS",
+    "background_batch_handler": "PASS",
+    "postgresql_18_c015": "PASS",
+    "postgresql_18_drift_lifecycle": "90/90 PASS",
+    "source_registry": "538/1004 COVERED; 466 PLANNED; 0 NA_WITH_REASON",
+    "changed_security_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED",
+    "task_security_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED",
+    "full_security_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED",
+    "root_tests": "18/18 Turbo tasks PASS",
+    "root_build": "9/9 Turbo tasks PASS",
+    "redis_8_bullmq_5_queue": "8/8 PASS"
+  },
+  "security_review": {
+    "status": "OWNER_REVIEW_PENDING",
+    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "reviewed_boundaries": [
+      "no raw event, user event history, persistent cohort membership, user hash, device, session, IP, page content, Prompt or Safety-category store exists",
+      "PRODUCT, RUNTIME, GOVERNANCE and SAFETY_CONTROL use four physical T4 tables with no ordinary API or Background direct read grant",
+      "the client endpoint rejects identity, client product date, unknown properties and authority completion events",
+      "sub-k client counts remain only in process memory; failed publishes are dropped and never queued for replay",
+      "authority owner/cycle keys exist only inside one PostgreSQL function execution and are released with transaction-local temporary tables",
+      "database checks enforce k=10, at most two dimensions, exact 13-month expiry and no exact values for suppressed metrics",
+      "same revision replaces rows and a later authority revision recomputes D1/D3/D7 without a persistent late-user list",
+      "Q01/Q02, individual experiment assignment and channel-specific retention have explicit unavailable/disabled results",
+      "logs and operational telemetry do not become product analytics sources"
+    ],
+    "residual_evidence": [
+      "owner review of differential-query resistance and the four-plane role matrix",
+      "WeChat DevTools network inspection confirming an offline signal is not persisted or replayed after restart",
+      "production deployment inspection confirming no third-party analytics, BI, ad, replay or attribution SDK is bundled",
+      "privacy/legal confirmation of the actual processing entity, production location and user notice",
+      "production scheduler authorization and incident thresholds remain outside automated C-015 evidence"
+    ],
+    "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
+  },
+  "real_device": {
+    "ios_network_no_replay": "MANUAL_EVIDENCE_PENDING",
+    "android_network_no_replay": "MANUAL_EVIDENCE_PENDING"
+  },
+  "reviewer": null,
+  "reviewed_at_utc": null
+}

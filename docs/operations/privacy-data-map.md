@@ -3,7 +3,7 @@
 - **文档状态**：Accepted
 - **接受日期**：2026-07-26
 - **所属任务**：S-21 — 隐私数据地图
-- **最后更新**：2026-08-28（C-014 按 ADR-0008 增补零正文导出 manifest 与删除状态 grant）
+- **最后更新**：2026-08-31（C-015 登记第一方 T0→T4 聚合、四平面隔离与 13 个月 TTL）
 - **适用范围**：Phase 0B / P0～P1 数据收集、使用、存储、传输、访问、保存、删除与用户权利
 - **上游权威**：[产品状态机](../product/state-machine.md)、[业务规则](../product/business-rules.md)、[结构化记忆](../ai/memory.md)、[内容安全](../ai/safety.md)、[AI Gateway](../ai/gateway.md)、[领域模型](../data/domain-model.md)、[ADR-0005](../decisions/ADR-0005-data-retention-and-deletion.md)、[ADR-0008](../decisions/ADR-0008-data-rights-delivery-and-status.md)、[数据权利传输契约修订](../technical/data-rights-contract-amendment.md)、[数据库规格](../technical/database.md)、[API 契约](../technical/api.md)、[Prisma 草案](../../prisma/schema.prisma)
 - **下游任务**：S-22～S-25、S-29、S-31～S-33、C-002、C-014、C-015、A-005～A-008
@@ -147,7 +147,7 @@
 | PDM-SECURITY-LOG-001      | 认证、网络与安全设施               | 无普通客户端接口                                                | Security Log                           | 外部安全日志域；不进入 Prisma 产品表                                                                                                                                                | 仅在适用权利请求中提供不损害安全的摘要                                                  |
 | PDM-BACKUP-001            | PostgreSQL/对象/WAL/PITR 复制      | 无 API/View                                                     | Isolated Backup                        | `BackupCatalogEntry` 只登记目录；备份载荷在隔离介质                                                                                                                                 | 不直接读取；恢复前先应用删除账本                                                        |
 | PDM-SUPPORT-001           | FAQ/支持反馈                       | `POST /support/feedback`                                        | S-22 前仅 T0 请求                      | 尚无 Prisma 权威模型                                                                                                                                                                | 仅中性提交结果；文本不持久化、不转交                                                    |
-| PDM-ANALYTICS-001         | 受审产品/运行投影                  | S-24 前无生产 API/SDK                                           | T0 Projection / T4 Aggregate           | 不建立用户级 analytics model；匿名聚合位置由 S-24 冻结                                                                                                                              | 不返回用户级事件历史                                                                    |
+| PDM-ANALYTICS-001         | 受审产品/运行投影                  | `POST /analytics/signals`（仅八类 best effort）；受控批查询     | T0 Projection / T4 Aggregate           | 无 raw/user/session event model；四张物理隔离 aggregate 表 + metric/Gate snapshot                                                                                                   | 不返回用户级事件历史或被抑制小样本                                                      |
 | PDM-EVALUATION-001        | 合成 corpus/评测任务               | 无用户 API/View                                                 | Evaluation Run / Sample                | `EvaluationRun`；`EvaluationSample`                                                                                                                                                 | 不适用；禁止真实 AccountRef                                                             |
 | PDM-IMPACT-ASSESSMENT-001 | 隐私评估与变更评审                 | 无用户 API/View                                                 | Impact Assessment / Processing Record  | 文档级受限证据；不写入真实样本                                                                                                                                                      | 不适用；必要时公开结论摘要                                                              |
 | PDM-SYSTEM-001            | 发布与运维配置                     | 无用户 API/View                                                 | Version / Retention / Provider Profile | `VersionCatalogEntry`；`RetentionPolicyEntry`；`ProviderDataHandlingProfile`；`BackupCatalogEntry`                                                                                  | 仅公开版本/政策所需部分                                                                 |
@@ -165,27 +165,38 @@ C-002 在 `apps/api/src/consent-profile/lifecycle.ts` 注册 consent、profile�
 
 自动化证据登记在 `tests/registry/c002-evidence-manifest.json`；security Profile 仍要求人工核验 session-owner、称呼密钥、数据库列权限、撤回竞态和删除传播边界，自动化不得替代该审核。
 
+### 5.2 C-015 Analytics 实现登记（2026-08-31）
+
+- 58 个事件、属性和枚举由 shared Zod registry 封闭；未知字段、wrong plane、provider/model、正文和高基数 ref 整条拒绝；
+- 八类客户端信号没有 user/device/session/IP，服务端绑定产品日期；sub-k 只在进程内，失败直接丢弃且客户端不离线 replay；
+- 权威 owner/cycle 只存在于一次 PostgreSQL SECURITY DEFINER 计算的 transaction-local temp tables；不建立 raw event、用户轨迹或 cohort membership；
+- PRODUCT、RUNTIME、GOVERNANCE、SAFETY_CONTROL 使用四张物理 T4 表，普通 API/Background 无直接读取权限；
+- 数据库约束强制 `k=10`、最多两维、被抑制指标无精确值、revision replacement 和产品日期后 13 个自然月物理删除；
+- Q01/Q02 返回 `UNAVAILABLE`；个体实验 assignment、第三方 SDK/BI 和渠道/素材 D1/D3/D7 继续关闭。
+
+自动化证据登记在 `tests/registry/c015-evidence-manifest.json`；owner differential-query/threat review、真机无 replay、实际生产位置/主体/用户说明和部署授权仍为人工/外部 Gate。
+
 ## 6. 处理目的、必要性与禁止用途
 
-| 数据组                        | 允许目的                         | 必要性/可选性            | 明确禁止                                                       |
-| ----------------------------- | -------------------------------- | ------------------------ | -------------------------------------------------------------- |
-| Account / Session             | 登录、会话恢复、owner 授权、注销 | 核心必要                 | 广告画像、联系人匹配、跨产品身份拼接                           |
-| Consent                       | 显示和证明必要告知状态           | 核心必要                 | 把平台通知权限当作业务同意                                     |
-| Profile                       | 称呼与表达风格                   | 称呼可选、风格为产品设置 | 推断真实姓名、性别、职业、关系或社会身份                       |
-| Checkin                       | 今日内容输入、真实趋势、历史回看 | 核心用户行为             | 医疗/心理诊断、风险定价、人格标签、对外比较                    |
-| Daily Result                  | 展示当天和历史内容               | 核心派生                 | 当成未来承诺、医疗/投资/法律结论或重新推断事实                 |
-| Interaction / Relationship    | 记录完成行为与真实共同经历       | 互动可选                 | 断签惩罚、焦虑召回、虚拟恋爱或排他性依赖                       |
-| Evening                       | 保存用户真实回顾                 | 可选                     | note 进入 Weekly、普通 AI、memory、通知、分享或 analytics      |
-| Matter / Memory               | 用户主动事项和精确用途引用       | 完全可选且可撤回         | 自动抽取日记、外部抓取、通用长期画像、跨用途借权               |
-| Weekly                        | 聚合真实七日结构事实             | 核心回望                 | 引用 raw note、每日 AI 文本、未批准事项或虚构原因              |
-| Safety                        | 阻断普通流程、固定响应、受控恢复 | 安全必要                 | 诊断、危机档案、营销、普通客服浏览、模型生成固定响应           |
-| Notification                  | 用户选择的中性提醒               | 默认关闭                 | 恐惧、低分、断签压力、敏感原文或擅自新增权限                   |
-| Share                         | 用户主动生成隐私安全卡片         | 可选                     | 默认包含称呼、签到、note、事项、Safety 或隐藏记忆              |
-| Runtime / Logs                | 幂等、可靠执行、安全、故障与成本 | 技术必要                 | 保存请求/响应 body、自由文本或高基数用户画像标签               |
-| Rights / Evidence             | 完成访问、导出、删除和防复活     | 权利与安全必要           | 恢复被删内容、用删除回执做产品行为分析                         |
-| Restricted Audit / Legal Hold | 证明受限操作或履行明确法律要求   | 受限必要                 | 作为通用排障借口、恢复正文、进入产品或分析                     |
-| Analytics                     | S-24 评审最小匿名聚合            | 未授权生产               | 用户级事件持久化、跨日身份拼接、SDK 自动采集                   |
-| Support                       | 响应用户主动问题                 | 可选                     | 自动进入普通 AI、记忆或长期内容库；S-22 前不得持久化或人工转交 |
+| 数据组                        | 允许目的                         | 必要性/可选性                       | 明确禁止                                                       |
+| ----------------------------- | -------------------------------- | ----------------------------------- | -------------------------------------------------------------- |
+| Account / Session             | 登录、会话恢复、owner 授权、注销 | 核心必要                            | 广告画像、联系人匹配、跨产品身份拼接                           |
+| Consent                       | 显示和证明必要告知状态           | 核心必要                            | 把平台通知权限当作业务同意                                     |
+| Profile                       | 称呼与表达风格                   | 称呼可选、风格为产品设置            | 推断真实姓名、性别、职业、关系或社会身份                       |
+| Checkin                       | 今日内容输入、真实趋势、历史回看 | 核心用户行为                        | 医疗/心理诊断、风险定价、人格标签、对外比较                    |
+| Daily Result                  | 展示当天和历史内容               | 核心派生                            | 当成未来承诺、医疗/投资/法律结论或重新推断事实                 |
+| Interaction / Relationship    | 记录完成行为与真实共同经历       | 互动可选                            | 断签惩罚、焦虑召回、虚拟恋爱或排他性依赖                       |
+| Evening                       | 保存用户真实回顾                 | 可选                                | note 进入 Weekly、普通 AI、memory、通知、分享或 analytics      |
+| Matter / Memory               | 用户主动事项和精确用途引用       | 完全可选且可撤回                    | 自动抽取日记、外部抓取、通用长期画像、跨用途借权               |
+| Weekly                        | 聚合真实七日结构事实             | 核心回望                            | 引用 raw note、每日 AI 文本、未批准事项或虚构原因              |
+| Safety                        | 阻断普通流程、固定响应、受控恢复 | 安全必要                            | 诊断、危机档案、营销、普通客服浏览、模型生成固定响应           |
+| Notification                  | 用户选择的中性提醒               | 默认关闭                            | 恐惧、低分、断签压力、敏感原文或擅自新增权限                   |
+| Share                         | 用户主动生成隐私安全卡片         | 可选                                | 默认包含称呼、签到、note、事项、Safety 或隐藏记忆              |
+| Runtime / Logs                | 幂等、可靠执行、安全、故障与成本 | 技术必要                            | 保存请求/响应 body、自由文本或高基数用户画像标签               |
+| Rights / Evidence             | 完成访问、导出、删除和防复活     | 权利与安全必要                      | 恢复被删内容、用删除回执做产品行为分析                         |
+| Restricted Audit / Legal Hold | 证明受限操作或履行明确法律要求   | 受限必要                            | 作为通用排障借口、恢复正文、进入产品或分析                     |
+| Analytics                     | S-24/C-015 第一方最小 T4 聚合    | Accepted 范围；生产 Gate 待外部授权 | 用户级事件持久化、跨日身份拼接、SDK 自动采集                   |
+| Support                       | 响应用户主动问题                 | 可选                                | 自动进入普通 AI、记忆或长期内容库；S-22 前不得持久化或人工转交 |
 
 ### 6.1 法定敏感个人信息与未成年人
 
@@ -310,17 +321,17 @@ C-002 在 `apps/api/src/consent-profile/lifecycle.ts` 注册 consent、profile�
 
 ## 10. 第三方、受托方与跨境核验
 
-| 类别                        | 当前状态                        | 上线前必备证据                                                                               | 未满足时行为                         |
-| --------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------ |
-| 微信平台                    | 具体账号/合同/字段待配置        | 平台协议、登录/订阅字段清单、删除与账号注销说明                                              | 不启用对应生产能力                   |
-| Primary AI Provider         | 未选择生产 winner               | 服务区域、subprocessors、training off、在线/备份保留、删除能力、合同/DPA、披露版本           | route 不得 ACTIVE，使用本地模板      |
-| Backup AI Provider          | 未选择生产 winner               | 与 primary 相同，且确认故障域和数据处理独立性                                                | route 不得 ACTIVE                    |
-| PostgreSQL/Redis/Queue 托管 | 部署商未冻结                    | 区域、加密、访问角色、备份、日志、删除和迁移退出条款                                         | 不部署真实数据                       |
-| 对象存储/CDN                | 厂商未冻结                      | 区域、对象版本、CDN purge、密钥销毁、访问日志和最长 35 天备份                                | 分享/导出生产能力关闭                |
-| 日志/监控平台               | 厂商未冻结                      | allowlist、采样、区域、TTL、访问、导出、删除和禁止正文                                       | 只使用本地脱敏最小日志               |
-| Analytics / 实验平台        | S-24 未冻结，当前禁用用户级采集 | 事件/属性 allowlist、不可关联证明或合法处理边界、区域、TTL、访问、删除、SDK 自动采集关闭证据 | 不发送用户级事件；只保留本地 T4 聚合 |
-| 企业身份/管理后台           | 厂商未冻结                      | SSO/MFA、角色、离职撤权、审计和区域                                                          | 不开放生产后台                       |
-| 用户支持/工单               | S-22 未冻结                     | 工单字段、自由文本边界、人员、TTL、删除、Safety 路由                                         | 不持久化支持文本                     |
+| 类别                        | 当前状态                                                 | 上线前必备证据                                                                                              | 未满足时行为                           |
+| --------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| 微信平台                    | 具体账号/合同/字段待配置                                 | 平台协议、登录/订阅字段清单、删除与账号注销说明                                                             | 不启用对应生产能力                     |
+| Primary AI Provider         | 未选择生产 winner                                        | 服务区域、subprocessors、training off、在线/备份保留、删除能力、合同/DPA、披露版本                          | route 不得 ACTIVE，使用本地模板        |
+| Backup AI Provider          | 未选择生产 winner                                        | 与 primary 相同，且确认故障域和数据处理独立性                                                               | route 不得 ACTIVE                      |
+| PostgreSQL/Redis/Queue 托管 | 部署商未冻结                                             | 区域、加密、访问角色、备份、日志、删除和迁移退出条款                                                        | 不部署真实数据                         |
+| 对象存储/CDN                | 厂商未冻结                                               | 区域、对象版本、CDN purge、密钥销毁、访问日志和最长 35 天备份                                               | 分享/导出生产能力关闭                  |
+| 日志/监控平台               | 厂商未冻结                                               | allowlist、采样、区域、TTL、访问、导出、删除和禁止正文                                                      | 只使用本地脱敏最小日志                 |
+| Analytics / 实验平台        | S-24 已 Accepted；C-015 仅实现第一方 T0/T4；第三方仍禁用 | 58-event allowlist、四平面隔离、k=10、13 个月 TTL、无 user/device/session/raw event 与 SDK 自动采集关闭证据 | 不发送用户级事件；只保留第一方 T4 聚合 |
+| 企业身份/管理后台           | 厂商未冻结                                               | SSO/MFA、角色、离职撤权、审计和区域                                                                         | 不开放生产后台                         |
+| 用户支持/工单               | S-22 未冻结                                              | 工单字段、自由文本边界、人员、TTL、删除、Safety 路由                                                        | 不持久化支持文本                       |
 
 跨境状态不是“默认无”或“默认有”。在所有实际 provider、云资源、subprocessor、远程支持和日志平台确认前，状态为 **UNVERIFIED / 阻塞生产**。若存在境外处理或访问，必须在上线前完成适用的法律评估、告知、合同和技术措施，不能仅修改本表状态。
 
@@ -532,7 +543,7 @@ Safety、网络安全、删除和受限审计可以有独立的合规/运行计�
 3. **实际受托方和跨境**：尚未选择生产厂商；所有状态均为 UNVERIFIED，不能据此宣称无跨境或已合规。
 4. **完整运营 RBAC 与受限权利摘要**：由 S-22/S-29/A-005 冻结；当前默认普通后台无用户全文能力，无法生成第 12.1 节摘要前不得开放生产受限后台。
 5. **受限审计期限**：`RestrictedAuditEvent.expiresAt` 已强制存在，但最大期限未被 Accepted 上游冻结；S-22/S-29 必须按最短必要确定，之前不得生产写入。
-6. **Analytics**：S-24 只能从第 13 节选择最小候选；当前用户级 SDK、事件表、队列和第三方发送全部关闭。
+6. **Analytics**：S-24/C-015 只允许 T0 transient + k-safe T4；用户级 SDK、raw event 表、跨日 subject、第三方发送、个体 assignment 和 S-27 前渠道留存全部关闭。
 7. **未成年人**：目标画像不能证明实际用户年龄；必须在生产前 Accepted“排除不满十四周岁”或“监护人同意 + 专门规则”路径，不得静默采集年龄证明。
 8. **最终法律文本**：必须在实际主体、部署和受托方确定后生成，并与本文一致；不得用本文直接替代。
 

@@ -24,6 +24,13 @@ C-013 新增 `@daily-energy/server-core/weekly-reflection`：
 - 只引用 approved fact IDs 的 `weekly-expression-v1` 计划；
 - 不调用网络的完整本地模板，以及不含源 ref/fingerprint/note/score 的 Client View 投影。
 
+C-015 新增 `@daily-energy/server-core/analytics`：
+
+- T0 transient observation 到 T4 的 `k=10`、最多两维、父桶/OTHER/全抑制纯函数；
+- 23 个 S-25 指标、四个 count-free Gate、Wilson 95% 区间和十个固定 fixture；
+- ActivationCycle/EncounterLink 的精确 D1/D3/D7 只在函数调用内使用 owner/cycle key，
+  返回值不含持久 subject。
+
 本包不得导入 Nest、Prisma、Redis、BullMQ、provider SDK、环境变量或客户端代码。
 PostgreSQL 和运行 profile 实现位于 `@daily-energy/server-adapters` 的显式 capability
 subpath。Weekly 持久化、TX-07 与 HTTP 适配仍位于 adapters/API，不进入本包。

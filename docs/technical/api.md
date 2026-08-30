@@ -3,7 +3,7 @@
 - **文档状态**：Accepted
 - **接受日期**：2026-07-22
 - **所属任务**：S-20 — API 契约
-- **最后更新**：2026-08-28（C-014 按 ADR-0008 增补 revision discovery、零正文导出与删除状态续读）
+- **最后更新**：2026-08-31（C-015 增补第一方 identity-free best-effort signal 入口）
 - **适用范围**：微信小程序、NestJS API、最小管理后台的 HTTP 契约；幂等、权限、revision/CAS、Safety/deletion 阻断与 Unknown outcome
 - **上游规范**：[产品状态机](../product/state-machine.md)、[业务规则](../product/business-rules.md)、[交互状态](../design/interaction-states.md)、[页面规格](../design/screen-specs.md)、[共享 Schema](../../packages/shared-schemas/README.md)、[领域模型](../data/domain-model.md)、[ADR-0005](../decisions/ADR-0005-data-retention-and-deletion.md)、[ADR-0008](../decisions/ADR-0008-data-rights-delivery-and-status.md)、[数据权利传输契约修订](./data-rights-contract-amendment.md)、[数据库规格](./database.md)、[AI Gateway](../ai/gateway.md)、[内容安全](../ai/safety.md)、[结构化记忆](../ai/memory.md)
 - **配套**：[错误码](./error-codes.md)、[OpenAPI 草案](../../openapi/openapi.yaml)
@@ -380,6 +380,17 @@ CommandReceiptV1 {
 | GET    | `/support/faq`      | 静态/版本化 FAQ                                |
 | POST   | `/support/feedback` | 分类 + 可选文本；Safety 检查；不进 ordinary AI |
 
+### 15.1 C-015 第一方客户端信号
+
+| Method | Path                 | 说明                                                                  |
+| ------ | -------------------- | --------------------------------------------------------------------- |
+| POST   | `/analytics/signals` | 八类 strict 客户端信号；无身份/日期/正文；服务端日期；202 best effort |
+
+- 请求不接受 ordinary session、owner/device/session/IP、客户端 product date/time 或任意 properties；
+- 客户端不离线排队、不跨重启补发，失败不影响业务旅程；
+- API 在进程内保留 sub-k 临时计数，达到 `k=10` 后才调用封闭 T4 写入函数；
+- 客户端 success 不能证明任何权威业务完成，也不能用于唯一用户漏斗。
+
 ## 16. 管理后台最小接口
 
 前缀 `/v1/admin`；独立鉴权。
@@ -555,6 +566,7 @@ CommandReceiptV1 {
 - 状态：Accepted；
 - 接受日期：2026-07-22；
 - 2026-08-28：项目所有者接受 ADR-0008 与数据权利传输契约修订；C-014 以 additive endpoint/optional field 增补 summary、24 小时 manifest/download、7 天 status grant 与 2 MiB 上限；
+- 2026-08-31：C-015 按 Accepted S-24 增补 additive `/analytics/signals`；不改变用户 API 权威、认证或业务成功语义；
 - 内容 PR：[PR #24](https://github.com/WeiHan1996/DailyEnergy/pull/24)，squash 合并提交 `207de0e`；
 - 审核修复：DAY 重记、Safety-first、删除确认、签到 CAS 与 OpenAPI 可执行性；
 - 最终验证：48 个 API 场景唯一；OpenAPI 62 paths / 65 operations / 136 schemas；Redocly recommended 0 errors / 0 warnings；

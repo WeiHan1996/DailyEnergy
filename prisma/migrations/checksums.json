@@ -56,6 +56,10 @@
     {
       "name": "20260825000000_c014_data_rights",
       "sha256": "e24d0f57f7cba02297be6827050d8d688ac15887495798f8f9b1c64851c01af8"
+    },
+    {
+      "name": "20260830000000_c015_core_analytics",
+      "sha256": "2c8d2ed2e99e4f7a0df186afd542217bb8ab75e802f3eb6d57e0e0742663b0ab"
     }
   ]
 }

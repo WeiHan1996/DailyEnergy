@@ -3,7 +3,7 @@
 服务端基础设施 adapter 包。数据库连接与 Redis/BullMQ 队列通过
 profile-specific exports 暴露，client 和 server-core 不能直接导入具体 SDK。
 
-`./api` 当前还导出 C-001～C-013 已实现的 PostgreSQL stores。Daily interaction
+`./api` 当前还导出 C-001～C-015 已实现的 PostgreSQL stores。Daily interaction
 store 在同一事务处理点亮 command receipt、LightFact、aggregate revision 与
 DayLit outbox；普通 API 通过白名单函数读取历史/Safety/删除守卫，不直接读取
 受限表。`worker-background` 默认注册 DayLit 与 Weekly handlers：前者以
@@ -32,3 +32,8 @@ C-012 新增 ordinary EveningStore 与 `api-restricted` Evening Safety store：�
 C-013 的 `PostgresWeeklyStore` 每次读取都从受控函数重建最小真实源并比较当前
 fingerprint；失配时不返回旧 summary。晚间 note、娱乐分数、表达正文和 provider 字段
 不进入 source snapshot、outbox 或客户端。
+
+C-015 的 `PostgresAnalyticsStore` 只调用封闭 SQL：API 只能递交达到 k 的客户端
+计数 delta，Background 只能重建某个已成熟产品日和执行 TTL。四个 T4 平面表不向这两个
+profile 开放直接读取；Background 的 aggregation/retention handler payload 也不含
+owner、cycle、device、session、正文或 Prompt。

@@ -7,7 +7,7 @@ This directory contains the PostgreSQL 18 / Prisma 7 migration and verification 
 - Prisma CLI and Client: `7.9.1` (same exact version; supplied by the root install)
 - PostgreSQL test image: `postgres:18.0-bookworm@sha256:3f55f8895c4ed50603e2fbdfc72fffeeaba3173321fee5cb825bbbeb30d9d854`
 - Application schema: `daily_energy`
-- Migration head: `20260825000000_c014_data_rights` (14 committed migrations)
+- Migration head: `20260830000000_c015_core_analytics` (15 committed migrations)
 
 `DATABASE_URL` is required by `prisma.config.ts`; no credential or production default is committed.
 
@@ -21,7 +21,7 @@ DATABASE_URL=... PRISMA_BIN=/absolute/path/to/prisma node tooling/database/migra
 DATABASE_URL=... node tooling/database/seed.mjs
 DATABASE_URL=... node tooling/database/check-drift.mjs
 DB_CATALOG_FINGERPRINT_WRITE=1 DATABASE_URL=... node tooling/database/write-catalog-fingerprint.mjs
-DATABASE_INTEGRATION=1 PRISMA_BIN=/absolute/path/to/prisma node --test --test-concurrency=1 tests/database/integration.test.mjs tests/database/transactions.test.mjs tests/database/auth-identity.test.mjs tests/database/c002-consent-profile.test.mjs tests/database/c004-checkin.test.mjs tests/database/c005-product-time-seed.test.mjs tests/database/c008-daily-generation.test.mjs tests/database/c013-weekly-reflection.test.mjs tests/database/c014-data-rights.test.mjs
+DATABASE_INTEGRATION=1 PRISMA_BIN=/absolute/path/to/prisma node --test --test-concurrency=1 tests/database/integration.test.mjs tests/database/transactions.test.mjs tests/database/auth-identity.test.mjs tests/database/c002-consent-profile.test.mjs tests/database/c004-checkin.test.mjs tests/database/c005-product-time-seed.test.mjs tests/database/c008-daily-generation.test.mjs tests/database/c013-weekly-reflection.test.mjs tests/database/c014-data-rights.test.mjs tests/database/c015-core-analytics.test.mjs
 DATABASE_URL=... DB_RECOVERY_STAGE=isolated DB_RESTORE_LEDGER_CHECKPOINT=... \
   DB_RESTORE_LEDGER_FINGERPRINT=... DB_DELETED_DATA_DETECTOR_HOOK=/absolute/hook \
   node tooling/database/replay-restore-ledger.mjs
@@ -138,7 +138,7 @@ recovery ledger ordering, detector failure, and readiness closure. It also execu
 must-fail fixtures for SQL-001 through SQL-020 and the transaction suite:
 
 - clean migration deployment, idempotent re-application, deterministic synthetic seed, and
-  exact current 74 application tables / 36 enum types / 72 functions / SQL-ID drift checks;
+  exact current 80 application tables / 36 enum types / 81 functions / SQL-ID drift checks;
 - normalized catalog fingerprints for columns/type/default/nullability, direct column ACLs,
   ordered enum labels, constraint/index/trigger/function definitions, object owners,
   schema/relation/function ACLs, default privileges, group-role attributes, and owner membership;
@@ -161,6 +161,7 @@ must-fail fixtures for SQL-001 through SQL-020 and the transaction suite:
   a stable redacted error, followed by successful roll-forward;
 - TX-01 through TX-09 atomic commit, rollback, replay, compare-and-swap, lock-claim, and concurrent-winner behavior using multiple PostgreSQL connections and deterministic barriers;
 - C-014 summary revision discovery, four-scope cleanup, zero-body READY export manifest, repeated deterministic source reads, correction invalidation, exact 24-hour expiry, PostgreSQL retention due reconstruction, hash-only deletion status grant, legal-hold FAILED retry and de-identified ACCOUNT completion;
+- C-015 four-plane T4 physical isolation, sub-k rejection, identity-free client count, 23 metric/four Gate rebuild, exact D1/D3/D7, revision replacement, count-free suppression/query and 13-month physical retention;
 - migration checksum mutation and the repository-level rejection of `prisma db push`.
 
 The harness uses only synthetic identities and data. It does not connect to production, use

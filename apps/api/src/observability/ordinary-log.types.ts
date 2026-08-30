@@ -7,6 +7,7 @@ import type {
 import { API_ERROR_CATALOG } from "../transport/common/api-exception.js";
 
 export const OPERATION_CODES = [
+  "ANALYTICS_SIGNAL_SUBMIT",
   "ADMIN_OPS_PLACEHOLDER",
   "API_LIFECYCLE",
   "AUTH_SESSION_LOGOUT",

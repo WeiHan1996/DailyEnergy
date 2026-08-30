@@ -47,6 +47,8 @@ tags:
     description: DataRights operations
   - name: Support
     description: Support operations
+  - name: Analytics
+    description: First-party, best-effort, identity-free client signals
   - name: Admin
     description: Admin operations
 paths:
@@ -2010,6 +2012,33 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/SupportFeedbackRequest"
+  /analytics/signals:
+    post:
+      tags:
+        - Analytics
+      operationId: submitAnalyticsSignal
+      summary: Submit one best-effort first-party signal without identity or offline replay
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/RequestIdHeader"
+        - $ref: "#/components/parameters/AcceptLanguageHeader"
+      responses:
+        "202":
+          $ref: "#/components/responses/SuccessAnalyticsSignal"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientAnalyticsSignalRequest"
   /admin/auth/login:
     post:
       tags:
@@ -2759,6 +2788,10 @@ components:
       x-source-contract: AccountDeletionAcceptedViewSchema
     DataExportDocument:
       x-source-contract: DataExportDocumentSchema
+    ClientAnalyticsSignalRequest:
+      x-source-contract: ClientAnalyticsSignalRequestSchema
+    ClientAnalyticsSignalAcceptedView:
+      x-source-contract: ClientAnalyticsSignalAcceptedViewSchema
     SupportFeedbackRequest:
       type: object
       properties:
@@ -4176,6 +4209,32 @@ components:
         - product_date
         - product_date_policy_version
         - data
+    ApiSuccessAnalyticsSignal:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          enum:
+            - true
+        request_id:
+          $ref: "#/components/schemas/RequestId"
+        server_now:
+          type: string
+          format: date-time
+        product_date:
+          $ref: "#/components/schemas/ProductDate"
+        product_date_policy_version:
+          $ref: "#/components/schemas/VersionToken"
+        data:
+          $ref: "#/components/schemas/ClientAnalyticsSignalAcceptedView"
+      additionalProperties: false
+      required:
+        - ok
+        - request_id
+        - server_now
+        - product_date
+        - product_date_policy_version
+        - data
     ApiSuccessAdminSession:
       type: object
       properties:
@@ -4489,6 +4548,15 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ApiSuccessFaq"
+    SuccessAnalyticsSignal:
+      description: Accepted best-effort analytics signal
+      headers:
+        X-Request-Id:
+          $ref: "#/components/headers/RequestIdResponseHeader"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiSuccessAnalyticsSignal"
     SuccessAdminSession:
       description: Successful AdminSession response
       headers:

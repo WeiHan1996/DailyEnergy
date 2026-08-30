@@ -1,0 +1,132 @@
+{
+  "manifest_version": "c-015-evidence-v1",
+  "scope": "C-015 58-event strict registry, identity-free best-effort client signal, transient authority-fact and ActivationCycle joins, four physically isolated k=10 T4 planes, 23 metrics, four count-free Gates, D1/D3/D7 revision rebuild, 13-month TTL, background batch and disabled research/experiment/acquisition expansion",
+  "authority": [
+    "docs/analytics/channel-attribution.md",
+    "docs/analytics/event-tracking.md",
+    "docs/analytics/experiments.md",
+    "docs/analytics/metrics.md",
+    "docs/operations/privacy-data-map.md",
+    "docs/technical/api.md",
+    "docs/technical/architecture.md",
+    "docs/technical/database.md",
+    "docs/technical/observability.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C015-CONTRACT-001": {
+      "file": "packages/shared-schemas/test/c015-analytics.test.ts",
+      "selector": "C-015 analytics executable contracts",
+      "level": "CONTRACT",
+      "assertions": [
+        "exactly 58 unique events map to one of PRODUCT, RUNTIME, GOVERNANCE or SAFETY_CONTROL with strict per-event attributes",
+        "wrong planes, unknown fields, unknown event properties, provider/model labels and authority facts on the client endpoint are rejected",
+        "23 metrics, four Gates and Q01/Q02 UNAVAILABLE identifiers are versioned executable registries",
+        "suppressed, blocked and unavailable reports cannot expose numerator, denominator or value"
+      ]
+    },
+    "T-C015-CORE-001": {
+      "file": "packages/server-core/src/modules/analytics/domain/aggregate.test.ts",
+      "selector": "C-015 T0 to T4 anonymous aggregation",
+      "level": "MODULE",
+      "assertions": [
+        "subject keys exist only in transient inputs and never in T4 output",
+        "k=10, maximum two dimensions, OTHER parent folding, global dimension removal and full suppression are deterministic",
+        "client event counts never invent unique owners and mixed identity modes fail closed",
+        "raw-content and forbidden-field output detection rejects user, session, device and content fields"
+      ]
+    },
+    "T-C015-METRIC-001": {
+      "file": "packages/server-core/src/modules/analytics/domain/metrics.test.ts",
+      "selector": "C-015 S-25 metric contract and ten fixed fixtures",
+      "level": "MODULE",
+      "assertions": [
+        "all ten S25-FX fixtures produce the Accepted numerator, denominator, suppression, latency and cost results",
+        "D1/D3/D7 use exact ActivationCycle dates and mature windows instead of any-return windows",
+        "helpfulness and task metrics use final state while client signals remain best effort",
+        "23 reports, shared Wilson interval and four count-free hard Gates remain versioned and deterministic"
+      ]
+    },
+    "T-C015-API-001": {
+      "file": "apps/api/src/analytics.e2e.test.ts",
+      "selector": "C-015 first-party analytics signal endpoint",
+      "level": "E2E",
+      "assertions": [
+        "the endpoint accepts no identity, client date, arbitrary properties or authority completion event",
+        "the first nine counts remain in process memory and only the tenth creates a T4 delta",
+        "a failed publish is dropped while the response remains best effort and no replay contract is created",
+        "service product date and environment, not client state, bind the aggregate"
+      ]
+    },
+    "T-C015-MINIAPP-001": {
+      "file": "apps/miniapp/src/features/analytics/client-signal.test.ts",
+      "selector": "C-015 miniapp best-effort analytics",
+      "level": "MODULE",
+      "assertions": [
+        "one page lifecycle may suppress a duplicate only in memory",
+        "offline failure is dropped without storage, queue, identity, product date or client timestamp",
+        "the first-party transport is unauthenticated, strict and uses a bounded two-second timeout"
+      ]
+    },
+    "T-C015-WORKER-001": {
+      "file": "packages/server-adapters/src/analytics/analytics-handler.test.ts",
+      "selector": "C-015 background analytics handlers",
+      "level": "INTEGRATION",
+      "assertions": [
+        "only Background owns aggregation and retention event capabilities",
+        "the due envelope projects the previous finalized product date with no owner, cycle, session, device, note or Prompt payload",
+        "retention routes only to the closed PostgreSQL TTL function"
+      ]
+    },
+    "T-C015-DB-001": {
+      "file": "tests/database/c015-core-analytics.test.mjs",
+      "selector": "C-015 PostgreSQL T4 isolation, k=10, metrics, retention and revision rebuild",
+      "level": "DB",
+      "assertions": [
+        "real PostgreSQL 18 physically separates four T4 planes and denies direct API/Background table reads",
+        "no raw event, user, device, session or cross-day subject table exists and analytics columns contain no forbidden refs/content",
+        "a first persisted client cell requires k=10, subsequent deltas remain k-safe, unknown events and a third dimension fail closed",
+        "23 metric rows and four count-free Gate rows are rebuilt from current authority facts without persistent owner/cycle membership",
+        "D1/D3/D7 produce 7/20, 4/20 and 3/20; a later valid link with revision 2 recomputes D1 to 8/20",
+        "same-revision rerun replaces rather than adds rows, suppressed reports omit exact values, Q01 stays UNAVAILABLE and 13-month TTL physically deletes T4 rows"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "PDM-U08",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-C015-CONTRACT-001",
+        "T-C015-API-001",
+        "T-C015-MINIAPP-001",
+        "T-C015-DB-001"
+      ]
+    },
+    {
+      "source_id": "S29-ARCH-045",
+      "status": "COVERED",
+      "proof_ids": ["T-C015-CORE-001", "T-C015-DB-001"]
+    },
+    {
+      "source_id": "S31-TEST-010",
+      "status": "COVERED",
+      "proof_ids": ["T-C015-CONTRACT-001", "T-C015-API-001"]
+    },
+    {
+      "source_id": "S31-TEST-017",
+      "status": "COVERED",
+      "proof_ids": ["T-C015-DB-001"]
+    },
+    {
+      "source_id": "S31-TEST-023",
+      "status": "COVERED",
+      "proof_ids": ["T-C015-DB-001"]
+    },
+    {
+      "source_id": "S31-TEST-024",
+      "status": "COVERED",
+      "proof_ids": ["T-C015-DB-001"]
+    }
+  ]
+}

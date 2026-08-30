@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:19ea05b7a98a1570e6e1af833cca5d79fa805cbc44b4e7b54fdedc70bd0b8e88
+// source-fingerprint: sha256:6973ffa5d175eb947cad85cb0f0e9d73879a24a4d91dca78cc030f3839400eed
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:19ea05b7a98a1570e6e1af833cca5d79fa805cbc44b4e7b54fdedc70bd0b8e88";
+  "sha256:6973ffa5d175eb947cad85cb0f0e9d73879a24a4d91dca78cc030f3839400eed";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -78,6 +78,15 @@ export const JSON_SCHEMA_IDS = {
     "urn:dailyenergy:schema:deletion-confirmation-view:1.0.0",
   identityVerificationView:
     "urn:dailyenergy:schema:identity-verification-view:1.0.0",
+  analyticsProjectionV1: "urn:dailyenergy:schema:analytics-projection-v1:1.0.0",
+  anonymousDailyAggregateV1:
+    "urn:dailyenergy:schema:anonymous-daily-aggregate-v1:1.0.0",
+  clientAnalyticsSignalRequest:
+    "urn:dailyenergy:schema:client-analytics-signal-request:1.0.0",
+  clientAnalyticsSignalAcceptedView:
+    "urn:dailyenergy:schema:client-analytics-signal-accepted-view:1.0.0",
+  metricReportV1: "urn:dailyenergy:schema:metric-report-v1:1.0.0",
+  metricGateReportV1: "urn:dailyenergy:schema:metric-gate-report-v1:1.0.0",
 } as const;
 
 export const jsonSchemas = {
@@ -7304,6 +7313,827 @@ export const jsonSchemas = {
       "identity_verification_ref",
       "confirmation_challenge_ref",
       "expires_at",
+    ],
+    type: "object",
+  },
+  analyticsProjectionV1: {
+    $id: "urn:dailyenergy:schema:analytics-projection-v1:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      app_version_bucket: {
+        anyOf: [
+          {
+            const: "OTHER",
+            type: "string",
+          },
+          {
+            pattern: "^\\d+\\.\\d+$",
+            type: "string",
+          },
+        ],
+      },
+      environment: {
+        enum: ["PROD", "STAGING", "TEST", "DEV"],
+        type: "string",
+      },
+      event_name: {
+        enum: [
+          "app_launch_resolved",
+          "landing_viewed",
+          "landing_primary_action_clicked",
+          "consent_accepted",
+          "consent_withdrawn",
+          "onboarding_completed",
+          "checkin_submitted",
+          "checkin_corrected",
+          "checkin_rebuilt",
+          "generation_started",
+          "daily_result_available",
+          "daily_result_read",
+          "main_action_reached",
+          "dimensions_expanded",
+          "day_lit",
+          "task_status_updated",
+          "helpfulness_updated",
+          "evening_saved",
+          "evening_updated",
+          "evening_skipped",
+          "weekly_view_read",
+          "weekly_summary_read",
+          "history_day_read",
+          "settings_viewed",
+          "faq_opened",
+          "profile_updated",
+          "style_calibration_saved",
+          "matter_created",
+          "matter_updated",
+          "matter_status_changed",
+          "matter_deleted",
+          "notification_settings_updated",
+          "notification_permission_observed",
+          "notification_intent_outcome",
+          "notification_deeplink_resolved",
+          "share_preview_created",
+          "share_intent_created",
+          "support_feedback_submitted",
+          "data_rights_entry_viewed",
+          "data_task_created",
+          "data_task_stage_changed",
+          "data_task_sla_outcome",
+          "deleted_data_reactivation_blocked",
+          "api_operation_outcome",
+          "product_date_resolution_outcome",
+          "generation_runtime_outcome",
+          "cache_lookup_outcome",
+          "queue_stage_outcome",
+          "gateway_usage_aggregate",
+          "notification_dispatch_outcome",
+          "raw_content_detector_outcome",
+          "provider_profile_conformance_outcome",
+          "release_contract_outcome",
+          "safety_input_gate_outcome",
+          "safety_fixed_response_outcome",
+          "safety_resource_registry_outcome",
+          "safety_resource_action_aggregate",
+          "safety_recovery_outcome",
+        ],
+        type: "string",
+      },
+      event_properties: {
+        additionalProperties: {},
+        propertyNames: {
+          maxLength: 64,
+          minLength: 1,
+          type: "string",
+        },
+        type: "object",
+      },
+      event_schema_version: {
+        const: 1,
+        type: "number",
+      },
+      locale_bucket: {
+        enum: ["ZH_CN", "OTHER"],
+        type: "string",
+      },
+      plane: {
+        enum: ["PRODUCT", "RUNTIME", "GOVERNANCE", "SAFETY_CONTROL"],
+        type: "string",
+      },
+      product_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+      product_date_policy_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      server_received_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+    },
+    required: [
+      "environment",
+      "event_name",
+      "event_schema_version",
+      "plane",
+      "product_date",
+      "product_date_policy_version",
+      "server_received_at",
+    ],
+    type: "object",
+  },
+  anonymousDailyAggregateV1: {
+    $id: "urn:dailyenergy:schema:anonymous-daily-aggregate-v1:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      aggregate_schema_version: {
+        const: "anonymous-daily-aggregate-v1",
+        type: "string",
+      },
+      aggregation_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      dimensions: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            code: {
+              anyOf: [
+                {
+                  maxLength: 32,
+                  minLength: 1,
+                  pattern: "^(?:[A-Z][A-Z0-9_]{0,30}|OTHER)$",
+                  type: "string",
+                },
+                {
+                  anyOf: [
+                    {
+                      const: "OTHER",
+                      type: "string",
+                    },
+                    {
+                      pattern: "^\\d+\\.\\d+$",
+                      type: "string",
+                    },
+                  ],
+                },
+                {
+                  pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  type: "string",
+                },
+              ],
+            },
+            name: {
+              pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+              type: "string",
+            },
+          },
+          required: ["code", "name"],
+          type: "object",
+        },
+        maxItems: 2,
+        type: "array",
+      },
+      environment: {
+        enum: ["PROD", "STAGING", "TEST", "DEV"],
+        type: "string",
+      },
+      event_count: {
+        maximum: 9007199254740991,
+        minimum: 0,
+        type: "integer",
+      },
+      event_name: {
+        enum: [
+          "app_launch_resolved",
+          "landing_viewed",
+          "landing_primary_action_clicked",
+          "consent_accepted",
+          "consent_withdrawn",
+          "onboarding_completed",
+          "checkin_submitted",
+          "checkin_corrected",
+          "checkin_rebuilt",
+          "generation_started",
+          "daily_result_available",
+          "daily_result_read",
+          "main_action_reached",
+          "dimensions_expanded",
+          "day_lit",
+          "task_status_updated",
+          "helpfulness_updated",
+          "evening_saved",
+          "evening_updated",
+          "evening_skipped",
+          "weekly_view_read",
+          "weekly_summary_read",
+          "history_day_read",
+          "settings_viewed",
+          "faq_opened",
+          "profile_updated",
+          "style_calibration_saved",
+          "matter_created",
+          "matter_updated",
+          "matter_status_changed",
+          "matter_deleted",
+          "notification_settings_updated",
+          "notification_permission_observed",
+          "notification_intent_outcome",
+          "notification_deeplink_resolved",
+          "share_preview_created",
+          "share_intent_created",
+          "support_feedback_submitted",
+          "data_rights_entry_viewed",
+          "data_task_created",
+          "data_task_stage_changed",
+          "data_task_sla_outcome",
+          "deleted_data_reactivation_blocked",
+          "api_operation_outcome",
+          "product_date_resolution_outcome",
+          "generation_runtime_outcome",
+          "cache_lookup_outcome",
+          "queue_stage_outcome",
+          "gateway_usage_aggregate",
+          "notification_dispatch_outcome",
+          "raw_content_detector_outcome",
+          "provider_profile_conformance_outcome",
+          "release_contract_outcome",
+          "safety_input_gate_outcome",
+          "safety_fixed_response_outcome",
+          "safety_resource_registry_outcome",
+          "safety_resource_action_aggregate",
+          "safety_recovery_outcome",
+        ],
+        type: "string",
+      },
+      event_schema_version: {
+        const: 1,
+        type: "number",
+      },
+      expires_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      generated_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      plane: {
+        enum: ["PRODUCT", "RUNTIME", "GOVERNANCE", "SAFETY_CONTROL"],
+        type: "string",
+      },
+      product_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+      source_contract_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      sum_value: {
+        maximum: 9007199254740991,
+        minimum: 0,
+        type: "integer",
+      },
+      unique_owner_count: {
+        maximum: 9007199254740991,
+        minimum: 0,
+        type: "integer",
+      },
+    },
+    required: [
+      "aggregate_schema_version",
+      "aggregation_revision",
+      "dimensions",
+      "environment",
+      "event_count",
+      "event_name",
+      "event_schema_version",
+      "expires_at",
+      "generated_at",
+      "plane",
+      "product_date",
+      "source_contract_version",
+    ],
+    type: "object",
+  },
+  clientAnalyticsSignalRequest: {
+    $id: "urn:dailyenergy:schema:client-analytics-signal-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    oneOf: [
+      {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          event_name: {
+            const: "landing_viewed",
+            type: "string",
+          },
+          event_schema_version: {
+            const: 1,
+            type: "number",
+          },
+          locale: {
+            enum: ["zh-CN", "other"],
+            type: "string",
+          },
+          scene_code: {
+            enum: [
+              "DIRECT",
+              "CHANNEL_LANDING",
+              "SHARE",
+              "NOTIFICATION",
+              "OTHER",
+            ],
+            type: "string",
+          },
+          surface_version_bucket: {
+            maxLength: 32,
+            minLength: 1,
+            pattern: "^(?:[A-Z][A-Z0-9_]{0,30}|OTHER)$",
+            type: "string",
+          },
+        },
+        required: [
+          "app_version",
+          "event_schema_version",
+          "locale",
+          "event_name",
+          "scene_code",
+          "surface_version_bucket",
+        ],
+        type: "object",
+      },
+      {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          event_name: {
+            const: "landing_primary_action_clicked",
+            type: "string",
+          },
+          event_schema_version: {
+            const: 1,
+            type: "number",
+          },
+          locale: {
+            enum: ["zh-CN", "other"],
+            type: "string",
+          },
+          scene_code: {
+            enum: [
+              "DIRECT",
+              "CHANNEL_LANDING",
+              "SHARE",
+              "NOTIFICATION",
+              "OTHER",
+            ],
+            type: "string",
+          },
+          surface_version_bucket: {
+            maxLength: 32,
+            minLength: 1,
+            pattern: "^(?:[A-Z][A-Z0-9_]{0,30}|OTHER)$",
+            type: "string",
+          },
+        },
+        required: [
+          "app_version",
+          "event_schema_version",
+          "locale",
+          "event_name",
+          "scene_code",
+          "surface_version_bucket",
+        ],
+        type: "object",
+      },
+      {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          event_name: {
+            const: "main_action_reached",
+            type: "string",
+          },
+          event_schema_version: {
+            const: 1,
+            type: "number",
+          },
+          locale: {
+            enum: ["zh-CN", "other"],
+            type: "string",
+          },
+        },
+        required: [
+          "app_version",
+          "event_schema_version",
+          "locale",
+          "event_name",
+        ],
+        type: "object",
+      },
+      {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          event_name: {
+            const: "dimensions_expanded",
+            type: "string",
+          },
+          event_schema_version: {
+            const: 1,
+            type: "number",
+          },
+          locale: {
+            enum: ["zh-CN", "other"],
+            type: "string",
+          },
+        },
+        required: [
+          "app_version",
+          "event_schema_version",
+          "locale",
+          "event_name",
+        ],
+        type: "object",
+      },
+      {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          event_name: {
+            const: "weekly_summary_read",
+            type: "string",
+          },
+          event_schema_version: {
+            const: 1,
+            type: "number",
+          },
+          locale: {
+            enum: ["zh-CN", "other"],
+            type: "string",
+          },
+        },
+        required: [
+          "app_version",
+          "event_schema_version",
+          "locale",
+          "event_name",
+        ],
+        type: "object",
+      },
+      {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          event_name: {
+            const: "settings_viewed",
+            type: "string",
+          },
+          event_schema_version: {
+            const: 1,
+            type: "number",
+          },
+          locale: {
+            enum: ["zh-CN", "other"],
+            type: "string",
+          },
+        },
+        required: [
+          "app_version",
+          "event_schema_version",
+          "locale",
+          "event_name",
+        ],
+        type: "object",
+      },
+      {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          event_name: {
+            const: "faq_opened",
+            type: "string",
+          },
+          event_schema_version: {
+            const: 1,
+            type: "number",
+          },
+          faq_category_code: {
+            enum: [
+              "PRODUCT",
+              "PRIVACY",
+              "SAFETY",
+              "DATA_RIGHTS",
+              "ACCOUNT",
+              "NOTIFICATIONS",
+              "SUPPORT",
+              "OTHER",
+            ],
+            type: "string",
+          },
+          locale: {
+            enum: ["zh-CN", "other"],
+            type: "string",
+          },
+        },
+        required: [
+          "app_version",
+          "event_schema_version",
+          "locale",
+          "event_name",
+          "faq_category_code",
+        ],
+        type: "object",
+      },
+      {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          event_name: {
+            const: "data_rights_entry_viewed",
+            type: "string",
+          },
+          event_schema_version: {
+            const: 1,
+            type: "number",
+          },
+          locale: {
+            enum: ["zh-CN", "other"],
+            type: "string",
+          },
+        },
+        required: [
+          "app_version",
+          "event_schema_version",
+          "locale",
+          "event_name",
+        ],
+        type: "object",
+      },
+    ],
+  },
+  clientAnalyticsSignalAcceptedView: {
+    $id: "urn:dailyenergy:schema:client-analytics-signal-accepted-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      accepted: {
+        const: true,
+        type: "boolean",
+      },
+    },
+    required: ["accepted"],
+    type: "object",
+  },
+  metricReportV1: {
+    $id: "urn:dailyenergy:schema:metric-report-v1:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      aggregation_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      denominator: {
+        maximum: 9007199254740991,
+        minimum: 0,
+        type: "integer",
+      },
+      dimensions: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            code: {
+              anyOf: [
+                {
+                  maxLength: 32,
+                  minLength: 1,
+                  pattern: "^(?:[A-Z][A-Z0-9_]{0,30}|OTHER)$",
+                  type: "string",
+                },
+                {
+                  anyOf: [
+                    {
+                      const: "OTHER",
+                      type: "string",
+                    },
+                    {
+                      pattern: "^\\d+\\.\\d+$",
+                      type: "string",
+                    },
+                  ],
+                },
+                {
+                  pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  type: "string",
+                },
+              ],
+            },
+            name: {
+              pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+              type: "string",
+            },
+          },
+          required: ["code", "name"],
+          type: "object",
+        },
+        maxItems: 2,
+        type: "array",
+      },
+      expires_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      generated_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      metric_id: {
+        enum: [
+          "S25-M01",
+          "S25-M02",
+          "S25-M03",
+          "S25-M04",
+          "S25-M05",
+          "S25-M06",
+          "S25-M07",
+          "S25-M08",
+          "S25-M09",
+          "S25-M10",
+          "S25-M11",
+          "S25-M12",
+          "S25-M13",
+          "S25-M14",
+          "S25-M15",
+          "S25-M16",
+          "S25-M17",
+          "S25-M18",
+          "S25-M19",
+          "S25-M20",
+          "S25-M21",
+          "S25-M22",
+          "S25-M23",
+        ],
+        type: "string",
+      },
+      metric_version: {
+        const: 1,
+        type: "number",
+      },
+      notes_code: {
+        items: {
+          enum: [
+            "PROVISIONAL",
+            "TEMPLATE_INCLUDED",
+            "BEST_EFFORT_SIGNAL",
+            "POST_AGGREGATION_DELETION_NOT_RESTATED",
+            "CHANNEL_UNAVAILABLE",
+          ],
+          type: "string",
+        },
+        maxItems: 5,
+        type: "array",
+      },
+      numerator: {
+        maximum: 9007199254740991,
+        minimum: 0,
+        type: "integer",
+      },
+      period_or_cohort: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+      source_contract_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      status: {
+        enum: [
+          "PROVISIONAL",
+          "FINALIZED",
+          "SUPPRESSED",
+          "BLOCKED",
+          "UNAVAILABLE",
+        ],
+        type: "string",
+      },
+      value: {
+        minimum: 0,
+        type: "number",
+      },
+      wilson_high: {
+        maximum: 1,
+        minimum: 0,
+        type: "number",
+      },
+      wilson_low: {
+        maximum: 1,
+        minimum: 0,
+        type: "number",
+      },
+    },
+    required: [
+      "aggregation_revision",
+      "dimensions",
+      "expires_at",
+      "generated_at",
+      "metric_id",
+      "metric_version",
+      "notes_code",
+      "period_or_cohort",
+      "source_contract_version",
+      "status",
+    ],
+    type: "object",
+  },
+  metricGateReportV1: {
+    $id: "urn:dailyenergy:schema:metric-gate-report-v1:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      aggregation_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      gate_id: {
+        enum: ["S25-G01", "S25-G02", "S25-G03", "S25-G04"],
+        type: "string",
+      },
+      generated_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      reason_codes: {
+        items: {
+          enum: [
+            "CONTRACT_FAILURE",
+            "RAW_CONTENT_MATCH",
+            "SMALL_CELL_OR_JOIN_PATH",
+            "DELETION_OR_TTL_BREACH",
+          ],
+          type: "string",
+        },
+        maxItems: 4,
+        type: "array",
+      },
+      status: {
+        enum: ["PASS", "BLOCKED"],
+        type: "string",
+      },
+    },
+    required: [
+      "aggregation_revision",
+      "gate_id",
+      "generated_at",
+      "reason_codes",
+      "status",
     ],
     type: "object",
   },

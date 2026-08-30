@@ -1,12 +1,15 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:1479280a50b42254b8de63769f559a8cbbe93395f5b6d7db8d379b52b4c67c87
+// source-fingerprint: sha256:062f9291880a9d0ce57b9923f31c2ebb8c05ed66d201eb407a591ce28cc7304e
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:1479280a50b42254b8de63769f559a8cbbe93395f5b6d7db8d379b52b4c67c87";
+  "sha256:062f9291880a9d0ce57b9923f31c2ebb8c05ed66d201eb407a591ce28cc7304e";
 
 export interface paths {
+  "/analytics/signals": {
+    post: operations["submitAnalyticsSignal"];
+  };
   "/auth/reauth/verify": {
     post: operations["verifyDeletionIdentity"];
   };
@@ -325,6 +328,14 @@ export interface components {
       request_id: components["schemas"]["RequestId"];
       server_now: string;
     };
+    ApiSuccessAnalyticsSignal: {
+      data: components["schemas"]["ClientAnalyticsSignalAcceptedView"];
+      ok: true;
+      product_date: components["schemas"]["ProductDate"];
+      product_date_policy_version: components["schemas"]["VersionToken"];
+      request_id: components["schemas"]["RequestId"];
+      server_now: string;
+    };
     ApiSuccessCheckin: {
       data: components["schemas"]["CheckinView"];
       ok: true;
@@ -568,6 +579,73 @@ export interface components {
       updated_at: string;
       write_window: "OPEN" | "CONTINUATION_ONLY" | "CLOSED";
     };
+    ClientAnalyticsSignalAcceptedView: {
+      accepted: true;
+    };
+    ClientAnalyticsSignalRequest:
+      | {
+          app_version: string;
+          event_name: "landing_viewed";
+          event_schema_version: 1;
+          locale: "zh-CN" | "other";
+          scene_code:
+            "DIRECT" | "CHANNEL_LANDING" | "SHARE" | "NOTIFICATION" | "OTHER";
+          surface_version_bucket: string;
+        }
+      | {
+          app_version: string;
+          event_name: "landing_primary_action_clicked";
+          event_schema_version: 1;
+          locale: "zh-CN" | "other";
+          scene_code:
+            "DIRECT" | "CHANNEL_LANDING" | "SHARE" | "NOTIFICATION" | "OTHER";
+          surface_version_bucket: string;
+        }
+      | {
+          app_version: string;
+          event_name: "main_action_reached";
+          event_schema_version: 1;
+          locale: "zh-CN" | "other";
+        }
+      | {
+          app_version: string;
+          event_name: "dimensions_expanded";
+          event_schema_version: 1;
+          locale: "zh-CN" | "other";
+        }
+      | {
+          app_version: string;
+          event_name: "weekly_summary_read";
+          event_schema_version: 1;
+          locale: "zh-CN" | "other";
+        }
+      | {
+          app_version: string;
+          event_name: "settings_viewed";
+          event_schema_version: 1;
+          locale: "zh-CN" | "other";
+        }
+      | {
+          app_version: string;
+          event_name: "faq_opened";
+          event_schema_version: 1;
+          faq_category_code:
+            | "PRODUCT"
+            | "PRIVACY"
+            | "SAFETY"
+            | "DATA_RIGHTS"
+            | "ACCOUNT"
+            | "NOTIFICATIONS"
+            | "SUPPORT"
+            | "OTHER";
+          locale: "zh-CN" | "other";
+        }
+      | {
+          app_version: string;
+          event_name: "data_rights_entry_viewed";
+          event_schema_version: 1;
+          locale: "zh-CN" | "other";
+        };
     ClientContext: {
       app_version?: string;
       scene?: string;
@@ -4235,6 +4313,46 @@ export interface operations {
       };
     };
   };
+  submitAnalyticsSignal: {
+    parameters?: {
+      header?: {
+        "Accept-Language"?: "zh-CN";
+        "X-Request-Id"?: components["schemas"]["RequestId"];
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClientAnalyticsSignalRequest"];
+      };
+    };
+    responses: {
+      "202": {
+        content: {
+          "application/json": components["schemas"]["ApiSuccessAnalyticsSignal"];
+        };
+      };
+      "400": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "422": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "429": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "503": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   submitCheckin: {
     parameters: {
       header: {
@@ -5002,6 +5120,7 @@ export const MINIAPP_OPERATIONS = {
   skipEvening: { method: "POST", path: "/v1/evening/skip" },
   startGeneration: { method: "POST", path: "/v1/daily/generation/start" },
   startSafetyRecovery: { method: "POST", path: "/v1/safety/recovery/start" },
+  submitAnalyticsSignal: { method: "POST", path: "/v1/analytics/signals" },
   submitCheckin: { method: "POST", path: "/v1/daily/checkin/submit" },
   submitFeedback: { method: "POST", path: "/v1/support/feedback" },
   submitStyleCalibration: {

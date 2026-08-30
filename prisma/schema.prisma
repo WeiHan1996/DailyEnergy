@@ -2018,3 +2018,137 @@ model EvaluationSample {
   @@index([expiresAt])
   @@map("evaluation_sample")
 }
+
+model AnalyticsProductDailyAggregate {
+  id                    String   @id @default(uuid()) @db.Uuid
+  productDate           DateTime @db.Date
+  environment           String   @db.VarChar(16)
+  eventName             String   @db.VarChar(64)
+  eventSchemaVersion    Int      @default(1)
+  dimension1Name        String?  @db.VarChar(64)
+  dimension1Code        String?  @db.VarChar(64)
+  dimension2Name        String?  @db.VarChar(64)
+  dimension2Code        String?  @db.VarChar(64)
+  eventCount            BigInt
+  uniqueOwnerCount      BigInt?
+  sumValue              BigInt?
+  aggregationRevision   BigInt
+  sourceContractVersion String   @db.VarChar(64)
+  generatedAt           DateTime @db.Timestamptz(3)
+  expiresAt             DateTime @db.Timestamptz(3)
+
+  @@index([productDate, environment, eventName])
+  @@index([expiresAt])
+  @@map("analytics_product_daily_aggregate")
+}
+
+model AnalyticsRuntimeDailyAggregate {
+  id                    String   @id @default(uuid()) @db.Uuid
+  productDate           DateTime @db.Date
+  environment           String   @db.VarChar(16)
+  eventName             String   @db.VarChar(64)
+  eventSchemaVersion    Int      @default(1)
+  dimension1Name        String?  @db.VarChar(64)
+  dimension1Code        String?  @db.VarChar(64)
+  dimension2Name        String?  @db.VarChar(64)
+  dimension2Code        String?  @db.VarChar(64)
+  eventCount            BigInt
+  uniqueOwnerCount      BigInt?
+  sumValue              BigInt?
+  aggregationRevision   BigInt
+  sourceContractVersion String   @db.VarChar(64)
+  generatedAt           DateTime @db.Timestamptz(3)
+  expiresAt             DateTime @db.Timestamptz(3)
+
+  @@index([productDate, environment, eventName])
+  @@index([expiresAt])
+  @@map("analytics_runtime_daily_aggregate")
+}
+
+model AnalyticsGovernanceDailyAggregate {
+  id                    String   @id @default(uuid()) @db.Uuid
+  productDate           DateTime @db.Date
+  environment           String   @db.VarChar(16)
+  eventName             String   @db.VarChar(64)
+  eventSchemaVersion    Int      @default(1)
+  dimension1Name        String?  @db.VarChar(64)
+  dimension1Code        String?  @db.VarChar(64)
+  dimension2Name        String?  @db.VarChar(64)
+  dimension2Code        String?  @db.VarChar(64)
+  eventCount            BigInt
+  uniqueOwnerCount      BigInt?
+  sumValue              BigInt?
+  aggregationRevision   BigInt
+  sourceContractVersion String   @db.VarChar(64)
+  generatedAt           DateTime @db.Timestamptz(3)
+  expiresAt             DateTime @db.Timestamptz(3)
+
+  @@index([productDate, environment, eventName])
+  @@index([expiresAt])
+  @@map("analytics_governance_daily_aggregate")
+}
+
+model AnalyticsSafetyDailyAggregate {
+  id                    String   @id @default(uuid()) @db.Uuid
+  productDate           DateTime @db.Date
+  environment           String   @db.VarChar(16)
+  eventName             String   @db.VarChar(64)
+  eventSchemaVersion    Int      @default(1)
+  dimension1Name        String?  @db.VarChar(64)
+  dimension1Code        String?  @db.VarChar(64)
+  dimension2Name        String?  @db.VarChar(64)
+  dimension2Code        String?  @db.VarChar(64)
+  eventCount            BigInt
+  uniqueOwnerCount      BigInt?
+  sumValue              BigInt?
+  aggregationRevision   BigInt
+  sourceContractVersion String   @db.VarChar(64)
+  generatedAt           DateTime @db.Timestamptz(3)
+  expiresAt             DateTime @db.Timestamptz(3)
+
+  @@index([productDate, environment, eventName])
+  @@index([expiresAt])
+  @@map("analytics_safety_daily_aggregate")
+}
+
+model AnalyticsProductMetricSnapshot {
+  id                    String   @id @default(uuid()) @db.Uuid
+  metricId              String   @db.VarChar(16)
+  metricVersion         Int      @default(1)
+  periodOrCohort        DateTime @db.Date
+  environment           String   @db.VarChar(16)
+  status                String   @db.VarChar(16)
+  numerator             BigInt?
+  denominator           BigInt?
+  value                 Decimal? @db.Decimal(24, 10)
+  wilsonLow             Decimal? @db.Decimal(16, 12)
+  wilsonHigh            Decimal? @db.Decimal(16, 12)
+  dimension1Name        String?  @db.VarChar(64)
+  dimension1Code        String?  @db.VarChar(64)
+  dimension2Name        String?  @db.VarChar(64)
+  dimension2Code        String?  @db.VarChar(64)
+  notesCodes            String[]
+  sourceContractVersion String   @db.VarChar(64)
+  aggregationRevision   BigInt
+  generatedAt           DateTime @db.Timestamptz(3)
+  expiresAt             DateTime @db.Timestamptz(3)
+
+  @@index([periodOrCohort, environment, metricId])
+  @@index([expiresAt])
+  @@map("analytics_product_metric_snapshot")
+}
+
+model AnalyticsGateSnapshot {
+  id                  String   @id @default(uuid()) @db.Uuid
+  gateId              String   @db.VarChar(16)
+  environment         String   @db.VarChar(16)
+  status              String   @db.VarChar(16)
+  reasonCodes         String[]
+  aggregationRevision BigInt
+  generatedAt         DateTime @db.Timestamptz(3)
+  expiresAt           DateTime @db.Timestamptz(3)
+
+  @@index([environment, gateId])
+  @@index([expiresAt])
+  @@map("analytics_gate_snapshot")
+}

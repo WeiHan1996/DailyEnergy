@@ -29,6 +29,8 @@ export type DeletionConfirmationView =
   components["schemas"]["DeletionConfirmationView"];
 export type IdentityVerificationView =
   components["schemas"]["IdentityVerificationView"];
+export type ClientAnalyticsSignalRequest =
+  components["schemas"]["ClientAnalyticsSignalRequest"];
 type ConsentView = components["schemas"]["ConsentView"];
 export type ExpressionStyle = components["schemas"]["ExpressionStyle"];
 type ProfileView = components["schemas"]["ProfileView"];
@@ -295,6 +297,10 @@ export interface C014Api {
     readonly commandRef: string;
     readonly wechatCode: string;
   }): Promise<IdentityVerificationEnvelope>;
+}
+
+export interface C015Api {
+  submitAnalyticsSignal(input: ClientAnalyticsSignalRequest): Promise<void>;
 }
 
 export class MiniappApiError extends Error {
@@ -1873,7 +1879,8 @@ export function createMiniappApi(
   C011Api &
   C012Api &
   C013Api &
-  C014Api {
+  C014Api &
+  C015Api {
   let sessionToken: string | undefined;
 
   const api: C003Api &
@@ -1883,7 +1890,8 @@ export function createMiniappApi(
     C011Api &
     C012Api &
     C013Api &
-    C014Api = {
+    C014Api &
+    C015Api = {
     async createSession(input): Promise<SessionEnvelope> {
       const response = await network.request({
         body: input as StorageValue,
@@ -2422,6 +2430,23 @@ export function createMiniappApi(
         productDate: parsed.productDate,
         task: projectDataTaskView(parsed.data),
       });
+    },
+
+    async submitAnalyticsSignal(input): Promise<void> {
+      const response = await network.request({
+        body: input as StorageValue,
+        headers: headers(),
+        method: "POST",
+        path: "/v1/analytics/signals",
+        timeoutMs: 2_000,
+      });
+      const parsed = successData(response.data, response.statusCode);
+      if (
+        parsed.data.accepted !== true ||
+        Object.keys(parsed.data).length !== 1
+      ) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 202, false);
+      }
     },
 
     async saveEvening(input): Promise<EveningEnvelope> {

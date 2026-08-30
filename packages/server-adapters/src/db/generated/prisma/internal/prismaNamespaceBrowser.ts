@@ -124,7 +124,13 @@ export const ModelName = {
   InboxReceipt: 'InboxReceipt',
   VersionCatalogEntry: 'VersionCatalogEntry',
   EvaluationRun: 'EvaluationRun',
-  EvaluationSample: 'EvaluationSample'
+  EvaluationSample: 'EvaluationSample',
+  AnalyticsProductDailyAggregate: 'AnalyticsProductDailyAggregate',
+  AnalyticsRuntimeDailyAggregate: 'AnalyticsRuntimeDailyAggregate',
+  AnalyticsGovernanceDailyAggregate: 'AnalyticsGovernanceDailyAggregate',
+  AnalyticsSafetyDailyAggregate: 'AnalyticsSafetyDailyAggregate',
+  AnalyticsProductMetricSnapshot: 'AnalyticsProductMetricSnapshot',
+  AnalyticsGateSnapshot: 'AnalyticsGateSnapshot'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1584,6 +1590,134 @@ export const EvaluationSampleScalarFieldEnum = {
 export type EvaluationSampleScalarFieldEnum = (typeof EvaluationSampleScalarFieldEnum)[keyof typeof EvaluationSampleScalarFieldEnum]
 
 
+export const AnalyticsProductDailyAggregateScalarFieldEnum = {
+  id: 'id',
+  productDate: 'productDate',
+  environment: 'environment',
+  eventName: 'eventName',
+  eventSchemaVersion: 'eventSchemaVersion',
+  dimension1Name: 'dimension1Name',
+  dimension1Code: 'dimension1Code',
+  dimension2Name: 'dimension2Name',
+  dimension2Code: 'dimension2Code',
+  eventCount: 'eventCount',
+  uniqueOwnerCount: 'uniqueOwnerCount',
+  sumValue: 'sumValue',
+  aggregationRevision: 'aggregationRevision',
+  sourceContractVersion: 'sourceContractVersion',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsProductDailyAggregateScalarFieldEnum = (typeof AnalyticsProductDailyAggregateScalarFieldEnum)[keyof typeof AnalyticsProductDailyAggregateScalarFieldEnum]
+
+
+export const AnalyticsRuntimeDailyAggregateScalarFieldEnum = {
+  id: 'id',
+  productDate: 'productDate',
+  environment: 'environment',
+  eventName: 'eventName',
+  eventSchemaVersion: 'eventSchemaVersion',
+  dimension1Name: 'dimension1Name',
+  dimension1Code: 'dimension1Code',
+  dimension2Name: 'dimension2Name',
+  dimension2Code: 'dimension2Code',
+  eventCount: 'eventCount',
+  uniqueOwnerCount: 'uniqueOwnerCount',
+  sumValue: 'sumValue',
+  aggregationRevision: 'aggregationRevision',
+  sourceContractVersion: 'sourceContractVersion',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsRuntimeDailyAggregateScalarFieldEnum = (typeof AnalyticsRuntimeDailyAggregateScalarFieldEnum)[keyof typeof AnalyticsRuntimeDailyAggregateScalarFieldEnum]
+
+
+export const AnalyticsGovernanceDailyAggregateScalarFieldEnum = {
+  id: 'id',
+  productDate: 'productDate',
+  environment: 'environment',
+  eventName: 'eventName',
+  eventSchemaVersion: 'eventSchemaVersion',
+  dimension1Name: 'dimension1Name',
+  dimension1Code: 'dimension1Code',
+  dimension2Name: 'dimension2Name',
+  dimension2Code: 'dimension2Code',
+  eventCount: 'eventCount',
+  uniqueOwnerCount: 'uniqueOwnerCount',
+  sumValue: 'sumValue',
+  aggregationRevision: 'aggregationRevision',
+  sourceContractVersion: 'sourceContractVersion',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsGovernanceDailyAggregateScalarFieldEnum = (typeof AnalyticsGovernanceDailyAggregateScalarFieldEnum)[keyof typeof AnalyticsGovernanceDailyAggregateScalarFieldEnum]
+
+
+export const AnalyticsSafetyDailyAggregateScalarFieldEnum = {
+  id: 'id',
+  productDate: 'productDate',
+  environment: 'environment',
+  eventName: 'eventName',
+  eventSchemaVersion: 'eventSchemaVersion',
+  dimension1Name: 'dimension1Name',
+  dimension1Code: 'dimension1Code',
+  dimension2Name: 'dimension2Name',
+  dimension2Code: 'dimension2Code',
+  eventCount: 'eventCount',
+  uniqueOwnerCount: 'uniqueOwnerCount',
+  sumValue: 'sumValue',
+  aggregationRevision: 'aggregationRevision',
+  sourceContractVersion: 'sourceContractVersion',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsSafetyDailyAggregateScalarFieldEnum = (typeof AnalyticsSafetyDailyAggregateScalarFieldEnum)[keyof typeof AnalyticsSafetyDailyAggregateScalarFieldEnum]
+
+
+export const AnalyticsProductMetricSnapshotScalarFieldEnum = {
+  id: 'id',
+  metricId: 'metricId',
+  metricVersion: 'metricVersion',
+  periodOrCohort: 'periodOrCohort',
+  environment: 'environment',
+  status: 'status',
+  numerator: 'numerator',
+  denominator: 'denominator',
+  value: 'value',
+  wilsonLow: 'wilsonLow',
+  wilsonHigh: 'wilsonHigh',
+  dimension1Name: 'dimension1Name',
+  dimension1Code: 'dimension1Code',
+  dimension2Name: 'dimension2Name',
+  dimension2Code: 'dimension2Code',
+  notesCodes: 'notesCodes',
+  sourceContractVersion: 'sourceContractVersion',
+  aggregationRevision: 'aggregationRevision',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsProductMetricSnapshotScalarFieldEnum = (typeof AnalyticsProductMetricSnapshotScalarFieldEnum)[keyof typeof AnalyticsProductMetricSnapshotScalarFieldEnum]
+
+
+export const AnalyticsGateSnapshotScalarFieldEnum = {
+  id: 'id',
+  gateId: 'gateId',
+  environment: 'environment',
+  status: 'status',
+  reasonCodes: 'reasonCodes',
+  aggregationRevision: 'aggregationRevision',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsGateSnapshotScalarFieldEnum = (typeof AnalyticsGateSnapshotScalarFieldEnum)[keyof typeof AnalyticsGateSnapshotScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1630,4 +1764,3 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-

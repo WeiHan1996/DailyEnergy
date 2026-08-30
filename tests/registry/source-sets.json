@@ -224,13 +224,43 @@
       "planned_owner": "Owning privacy, data-rights, or business implementation issue"
     },
     {
+      "set_id": "s24-event-tracking",
+      "authority_path": "docs/analytics/event-tracking.md",
+      "extractor": {
+        "kind": "text-regex",
+        "pattern": "(?:S24-(?:P|O|G|R|S)[0-9]{2}|S24-EVT-[0-9]{3})"
+      },
+      "expected_count": 106,
+      "accepted_marker": "\\*\\*文档状态\\*\\*：Accepted",
+      "requirements": [
+        { "any_of": ["CONTRACT", "MODULE"] },
+        { "any_of": ["DB", "E2E", "RESILIENCE"] }
+      ],
+      "planned_owner": "C-015 core analytics implementation"
+    },
+    {
+      "set_id": "s25-metrics",
+      "authority_path": "docs/analytics/metrics.md",
+      "extractor": {
+        "kind": "text-regex",
+        "pattern": "S25-(?:M(?:0[1-9]|1[0-9]|2[0-3])|G0[1-4]|Q0[1-2]|FX-[0-9]{2}|MET-[0-9]{3})"
+      },
+      "expected_count": 79,
+      "accepted_marker": "\\*\\*文档状态\\*\\*：Accepted",
+      "requirements": [
+        { "any_of": ["MODULE", "CONTRACT"] },
+        { "any_of": ["DB", "E2E", "RESILIENCE"] }
+      ],
+      "planned_owner": "C-015 core analytics implementation"
+    },
+    {
       "set_id": "shared-schemas",
       "authority_path": "packages/shared-schemas/src/json-schema.ts",
       "extractor": {
         "kind": "text-regex",
         "pattern": "urn:dailyenergy:schema:[a-z0-9-]+:[0-9]+\\.[0-9]+\\.[0-9]+"
       },
-      "expected_count": 49,
+      "expected_count": 55,
       "requirements": [{ "any_of": ["UNIT"] }, { "any_of": ["CONTRACT"] }],
       "planned_owner": "E-008 contract maintenance"
     }
@@ -323,14 +353,50 @@
     {
       "path": "tests/registry/c014-evidence-manifest.json",
       "kind": "proof-map"
+    },
+    {
+      "path": "tests/registry/c015-evidence-manifest.json",
+      "kind": "proof-map"
     }
   ],
   "automatic_evidence": [
     {
+      "source_set": "s24-event-tracking",
+      "test_id": "T-C015-EVENT-CONTRACT-001",
+      "file": "packages/shared-schemas/test/c015-analytics.test.ts",
+      "selector": "C-015 analytics executable contracts",
+      "level": "CONTRACT",
+      "assertion_template": "{source_id} participates in the executable 58-event strict registry and negative contract suite"
+    },
+    {
+      "source_set": "s24-event-tracking",
+      "test_id": "T-C015-EVENT-DB-001",
+      "file": "tests/database/c015-core-analytics.test.mjs",
+      "selector": "C-015 PostgreSQL T4 isolation, k=10, metrics, retention and revision rebuild",
+      "level": "DB",
+      "assertion_template": "{source_id} participates in real PostgreSQL plane, suppression, rerun, TTL and no-raw-store evidence"
+    },
+    {
+      "source_set": "s25-metrics",
+      "test_id": "T-C015-METRIC-MODULE-001",
+      "file": "packages/server-core/src/modules/analytics/domain/metrics.test.ts",
+      "selector": "C-015 S-25 metric contract and ten fixed fixtures",
+      "level": "MODULE",
+      "assertion_template": "{source_id} participates in the 23-metric, four-Gate, ten-fixture and forty-scenario calculation suite"
+    },
+    {
+      "source_set": "s25-metrics",
+      "test_id": "T-C015-METRIC-DB-001",
+      "file": "tests/database/c015-core-analytics.test.mjs",
+      "selector": "C-015 PostgreSQL T4 isolation, k=10, metrics, retention and revision rebuild",
+      "level": "DB",
+      "assertion_template": "{source_id} participates in real PostgreSQL D1/D3/D7, suppression, revision, query and TTL evidence"
+    },
+    {
       "source_set": "shared-schemas",
       "test_id": "T-SCHEMA-JSON-001",
       "file": "packages/shared-schemas/test/json-schema.test.ts",
-      "selector": "exports 49 stable, unique JSON Schema IDs",
+      "selector": "exports 55 stable, unique JSON Schema IDs",
       "level": "UNIT",
       "assertion_template": "{source_id} is present in the unique stable JSON Schema ID set"
     },

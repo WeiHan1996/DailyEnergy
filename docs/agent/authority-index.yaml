@@ -194,6 +194,43 @@ taskRules:
         required: true
         reason: Required evidence
 
+  - match: C-015
+    profile: security
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Product, analytics-minimization, privacy, and security guardrails
+      - path: tasks/current.md
+        required: true
+        reason: Current C-015 scope and unified-review authorization
+      - path: docs/analytics/event-tracking.md
+        required: true
+        reason: Accepted 58-event registry, T0-to-T4, k=10, plane, and client-signal contract
+      - path: docs/analytics/metrics.md
+        required: true
+        reason: Accepted 23 metrics, four Gates, D1/D3/D7, fixture, and suppression contract
+      - path: docs/analytics/experiments.md
+        required: true
+        reason: Accepted prohibition on individual experiment assignment before its privacy Gate
+      - path: docs/analytics/channel-attribution.md
+        required: true
+        reason: Accepted coarse scene_code-only boundary before Acquisition Mapping
+      - path: docs/operations/privacy-data-map.md
+        required: true
+        reason: T0/T4 data map, forbidden fields, access, deletion, and retention boundary
+      - path: docs/technical/observability.md
+        required: true
+        reason: Product analytics and operational telemetry isolation
+      - path: docs/technical/api.md
+        required: true
+        reason: First-party transport and strict external input contract
+      - path: docs/technical/database.md
+        required: true
+        reason: PostgreSQL roles, migrations, source facts, and no-second-truth constraints
+      - path: docs/technical/testing.md
+        required: true
+        reason: Contract, DB, security-negative, and failure evidence
+
   - match: C-*
     profile: code
     sources:
@@ -214,6 +251,27 @@ taskRules:
         reason: Required evidence
 
 topicRules:
+  - id: analytics
+    patterns:
+      - docs/analytics/**
+      - apps/*/src/**/analytics/**
+      - packages/*/src/**/analytics/**
+      - tests/database/c015-*
+      - prisma/migrations/*_c015_*
+    sources:
+      - path: docs/analytics/event-tracking.md
+        required: true
+        reason: Accepted event and T4 boundary
+      - path: docs/analytics/metrics.md
+        required: true
+        reason: Accepted metric and cohort boundary
+      - path: docs/operations/privacy-data-map.md
+        required: true
+        reason: Analytics privacy map and forbidden data
+      - path: docs/technical/observability.md
+        required: true
+        reason: Analytics and telemetry isolation
+
   - id: agent-workflow
     patterns:
       - AGENTS.md
