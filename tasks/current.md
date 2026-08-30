@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c015-core-analytics`
 - **Stacked base**：[C-014 Draft PR #167](https://github.com/WeiHan1996/DailyEnergy/pull/167)，verified head `42be22699254a57a1607b4c2725c73e4006e6a45`
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
-- **Draft PR**：待创建；base=`agent/c014-data-rights`
+- **Draft PR**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)；base=`agent/c014-data-rights`，保持 Draft
 - **下一候选动作**：C-004～C-015 统一审核包（C-015 final-head CI 后）
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
@@ -68,8 +68,8 @@
 
 ## 6. 精确下一动作
 
-1. 提交并 push `agent/c015-core-analytics`，创建 base=`agent/c014-data-rights` 的 Draft PR，Issue #68 保持 Open；
-2. 把 PR 号写回项目控制与 manual evidence，push final head 并取得同一精确 head 的 11/11 CI SUCCESS；
+1. push PR #168 的项目控制 final head，并取得同一精确 head 的 11/11 CI SUCCESS；
+2. 核对 PR #168 保持 Draft、Issue #68 保持 Open、base 精确为 `agent/c014-data-rights`；
 3. 生成 C-004～C-015 统一审核包，不启动 C-016。
 
 ## 7. C-015 后统一审核
