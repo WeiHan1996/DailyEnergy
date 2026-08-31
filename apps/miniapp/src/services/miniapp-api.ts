@@ -17,6 +17,7 @@ export type DailyInteractionView = TodayView["interaction"];
 export type HistoryDayView = components["schemas"]["HistoryDayView"];
 export type HistoryListView = components["schemas"]["HistoryListView"];
 export type EveningView = components["schemas"]["EveningView"];
+export type WeeklyView = components["schemas"]["WeeklyView"];
 type ConsentView = components["schemas"]["ConsentView"];
 export type ExpressionStyle = components["schemas"]["ExpressionStyle"];
 type ProfileView = components["schemas"]["ProfileView"];
@@ -83,6 +84,11 @@ export interface DailyInteractionEnvelope {
 export interface EveningEnvelope {
   readonly evening: EveningView;
   readonly productDate: string;
+}
+
+export interface WeeklyEnvelope {
+  readonly productDate: string;
+  readonly weekly: WeeklyView;
 }
 
 export interface C003Api {
@@ -169,6 +175,11 @@ export interface C012Api {
       readonly taskRef: string;
     };
   }): Promise<EveningEnvelope>;
+}
+
+export interface C013Api {
+  getWeeklyCurrent(): Promise<WeeklyEnvelope>;
+  getWeeklyWindow(endProductDate: string): Promise<WeeklyEnvelope>;
 }
 
 export class MiniappApiError extends Error {
@@ -1010,6 +1021,289 @@ export function projectEveningView(value: unknown): EveningView {
   return freezeJson(value) as EveningView;
 }
 
+export function projectWeeklyView(value: unknown): WeeklyView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      "contract",
+      "schema_version",
+      "window_id",
+      "window_start_date",
+      "window_end_date",
+      "projection_version",
+      "coverage",
+      "days",
+      "metrics",
+      "activity",
+      "summary",
+      "summary_status",
+      "data_disclosure",
+      "relationship_display_token",
+    ]) ||
+    value.contract !== "weekly-summary-view" ||
+    value.schema_version !== "1.0.0" ||
+    !isOpaqueRef(value.window_id) ||
+    !isProductDate(value.window_start_date) ||
+    !isProductDate(value.window_end_date) ||
+    !isText(value.projection_version) ||
+    !isRecord(value.coverage) ||
+    !Array.isArray(value.days) ||
+    value.days.length !== 7 ||
+    !Array.isArray(value.metrics) ||
+    value.metrics.length !== 4 ||
+    !isRecord(value.activity) ||
+    !isText(value.data_disclosure) ||
+    ![
+      "NOT_ELIGIBLE",
+      "ELIGIBLE",
+      "GENERATING",
+      "AVAILABLE",
+      "INVALIDATED",
+      "FAILED",
+    ].includes(String(value.summary_status)) ||
+    (value.relationship_display_token !== undefined &&
+      !isText(value.relationship_display_token))
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  const dates = value.days.map((day) =>
+    isRecord(day) && isProductDate(day.product_date)
+      ? day.product_date
+      : undefined,
+  );
+  if (
+    dates.some((date) => date === undefined) ||
+    dates[0] !== value.window_start_date ||
+    dates[6] !== value.window_end_date ||
+    dates.some(
+      (date, index) =>
+        index > 0 &&
+        Date.parse(`${date}T00:00:00Z`) -
+          Date.parse(`${dates[index - 1]}T00:00:00Z`) !==
+          86_400_000,
+    ) ||
+    !isWeeklyCoverage(value.coverage, value.days) ||
+    value.days.some((day) => !isWeeklyDay(day)) ||
+    !isWeeklyMetrics(value.metrics) ||
+    !isWeeklyActivity(value.activity) ||
+    !isWeeklySummary(value.summary, String(value.summary_status))
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(value) as WeeklyView;
+}
+
+function isWeeklyCoverage(
+  value: Record<string, unknown>,
+  days: readonly unknown[],
+): boolean {
+  if (
+    !hasOnlyKeys(value, [
+      "level",
+      "window_day_count",
+      "real_state_day_count",
+      "checkin_day_count",
+      "evening_feedback_day_count",
+      "lit_day_count",
+      "missing_dates",
+    ]) ||
+    !["EMPTY", "POINTS_ONLY", "PARTIAL", "COMPLETE"].includes(
+      String(value.level),
+    ) ||
+    value.window_day_count !== 7 ||
+    !Array.isArray(value.missing_dates) ||
+    value.missing_dates.some((date) => !isProductDate(date))
+  ) {
+    return false;
+  }
+  const records = days.filter(
+    (day) => isRecord(day) && day.state === "RECORDED",
+  ).length;
+  const checkins = days.filter(
+    (day) => isRecord(day) && day.morning !== undefined,
+  ).length;
+  const evenings = days.filter(
+    (day) => isRecord(day) && day.evening !== undefined,
+  ).length;
+  const lit = days.filter((day) => isRecord(day) && day.is_lit === true).length;
+  return (
+    value.real_state_day_count === records &&
+    value.checkin_day_count === checkins &&
+    value.evening_feedback_day_count === evenings &&
+    value.lit_day_count === lit &&
+    value.missing_dates.length === 7 - records
+  );
+}
+
+function isWeeklyDay(value: unknown): boolean {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      "product_date",
+      "state",
+      "morning",
+      "evening",
+      "is_lit",
+      "helpfulness",
+      "task_status",
+    ]) ||
+    !isProductDate(value.product_date) ||
+    !["RECORDED", "MISSING"].includes(String(value.state)) ||
+    typeof value.is_lit !== "boolean" ||
+    (value.helpfulness !== undefined &&
+      !["UNRATED", "HELPFUL", "NEUTRAL", "NOT_HELPFUL", "NOT_USED"].includes(
+        String(value.helpfulness),
+      )) ||
+    (value.task_status !== undefined &&
+      !["UNMARKED", "INTERESTED", "COMPLETED", "SKIPPED"].includes(
+        String(value.task_status),
+      ))
+  ) {
+    return false;
+  }
+  const morning = value.morning;
+  const evening = value.evening;
+  const validMorning =
+    morning === undefined ||
+    (isRecord(morning) &&
+      hasOnlyKeys(morning, ["mood", "energy", "sleep"]) &&
+      isCheckinMood(morning.mood) &&
+      isCheckinEnergy(morning.energy) &&
+      isCheckinSleep(morning.sleep));
+  const validEvening =
+    evening === undefined ||
+    (isRecord(evening) &&
+      hasOnlyKeys(evening, ["overall_feeling"]) &&
+      [
+        "VERY_HEAVY",
+        "SOMEWHAT_HEAVY",
+        "STEADY",
+        "PRETTY_GOOD",
+        "LIGHT",
+        "UNSURE",
+      ].includes(String(evening.overall_feeling)));
+  const hasState = morning !== undefined || evening !== undefined;
+  return (
+    validMorning && validEvening && (value.state === "RECORDED") === hasState
+  );
+}
+
+function isWeeklyMetrics(values: readonly unknown[]): boolean {
+  const ids = new Set<string>();
+  for (const value of values) {
+    if (
+      !isRecord(value) ||
+      !hasOnlyKeys(value, [
+        "id",
+        "observed_count",
+        "unsure_count",
+        "missing_count",
+        "direction",
+        "direction_label",
+      ]) ||
+      ![
+        "MORNING_MOOD",
+        "MORNING_ENERGY",
+        "MORNING_SLEEP",
+        "EVENING_OVERALL",
+      ].includes(String(value.id)) ||
+      !isWeeklyCount(value.observed_count) ||
+      !isWeeklyCount(value.unsure_count) ||
+      !isWeeklyCount(value.missing_count) ||
+      Number(value.observed_count) +
+        Number(value.unsure_count) +
+        Number(value.missing_count) !==
+        7 ||
+      ![
+        "INSUFFICIENT_DATA",
+        "LOWER_LATE",
+        "SIMILAR",
+        "HIGHER_LATE",
+        "VARIABLE",
+      ].includes(String(value.direction)) ||
+      !isText(value.direction_label)
+    ) {
+      return false;
+    }
+    ids.add(String(value.id));
+  }
+  return ids.size === 4;
+}
+
+function isWeeklyActivity(value: Record<string, unknown>): boolean {
+  const helpfulness = value.helpfulness;
+  const tasks = value.tasks;
+  if (
+    !hasOnlyKeys(value, ["lit_day_count", "helpfulness", "tasks"]) ||
+    !isWeeklyCount(value.lit_day_count) ||
+    !isRecord(helpfulness) ||
+    !isRecord(tasks)
+  ) {
+    return false;
+  }
+  const helpfulnessKeys = [
+    "rated_day_count",
+    "helpful_count",
+    "neutral_count",
+    "not_helpful_count",
+    "not_used_count",
+    "unrated_day_count",
+    "top_helpful_action_kind",
+  ];
+  const taskKeys = [
+    "task_offered_day_count",
+    "completed_count",
+    "skipped_count",
+    "interested_count",
+    "unmarked_count",
+  ];
+  return (
+    hasOnlyKeys(helpfulness, helpfulnessKeys) &&
+    helpfulnessKeys
+      .filter((key) => key !== "top_helpful_action_kind")
+      .every((key) => isWeeklyCount(helpfulness[key])) &&
+    (helpfulness.top_helpful_action_kind === undefined ||
+      isText(helpfulness.top_helpful_action_kind)) &&
+    hasOnlyKeys(tasks, taskKeys) &&
+    taskKeys.every((key) => isWeeklyCount(tasks[key]))
+  );
+}
+
+function isWeeklySummary(value: unknown, status: string): boolean {
+  if (status !== "AVAILABLE") {
+    return value === undefined;
+  }
+  return (
+    isRecord(value) &&
+    hasOnlyKeys(value, [
+      "summary_id",
+      "revision",
+      "kind",
+      "title",
+      "paragraphs",
+    ]) &&
+    isOpaqueRef(value.summary_id) &&
+    typeof value.revision === "number" &&
+    Number.isInteger(value.revision) &&
+    value.revision >= 1 &&
+    ["PARTIAL_REVIEW", "COMPLETE_REVIEW"].includes(String(value.kind)) &&
+    isText(value.title) &&
+    Array.isArray(value.paragraphs) &&
+    value.paragraphs.length >= 2 &&
+    value.paragraphs.length <= 5 &&
+    value.paragraphs.every(isText)
+  );
+}
+
+function isWeeklyCount(value: unknown): boolean {
+  return (
+    typeof value === "number" &&
+    Number.isInteger(value) &&
+    value >= 0 &&
+    value <= 7
+  );
+}
+
 function freezeJson<T>(value: T): T {
   if (typeof value === "object" && value !== null) {
     Object.freeze(value);
@@ -1053,10 +1347,16 @@ function headers(sessionToken?: string, commandRef?: string) {
 
 export function createMiniappApi(
   network: NetworkPort,
-): C003Api & C004Api & C009Api & C010Api & C011Api & C012Api {
+): C003Api & C004Api & C009Api & C010Api & C011Api & C012Api & C013Api {
   let sessionToken: string | undefined;
 
-  const api: C003Api & C004Api & C009Api & C010Api & C011Api & C012Api = {
+  const api: C003Api &
+    C004Api &
+    C009Api &
+    C010Api &
+    C011Api &
+    C012Api &
+    C013Api = {
     async createSession(input): Promise<SessionEnvelope> {
       const response = await network.request({
         body: input as StorageValue,
@@ -1304,6 +1604,35 @@ export function createMiniappApi(
       return Object.freeze({
         evening: projectEveningView(parsed.data),
         productDate: parsed.productDate,
+      });
+    },
+
+    async getWeeklyCurrent(): Promise<WeeklyEnvelope> {
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: "/v1/weekly/current",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        weekly: projectWeeklyView(parsed.data),
+      });
+    },
+
+    async getWeeklyWindow(endProductDate): Promise<WeeklyEnvelope> {
+      if (!isProductDate(endProductDate)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: `/v1/weekly/window/${encodeURIComponent(endProductDate)}`,
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        weekly: projectWeeklyView(parsed.data),
       });
     },
 

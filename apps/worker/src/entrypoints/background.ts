@@ -8,7 +8,7 @@ import type {
 } from "@daily-energy/server-adapters/worker-background";
 import {
   createWorkerBackgroundDatabaseFactory,
-  startWorkerBackgroundInfrastructure,
+  startWorkerBackgroundRuntime,
   workerBackgroundManifest,
 } from "@daily-energy/server-adapters/worker-background";
 
@@ -38,7 +38,7 @@ export function createBackgroundWorkerEntrypoint(
     "worker-background",
     unknown
   > = createWorkerBackgroundDatabaseFactory(),
-  infrastructureStarter: WorkerInfrastructureStarter = startWorkerBackgroundInfrastructure,
+  infrastructureStarter: WorkerInfrastructureStarter = startWorkerBackgroundRuntime,
   handlers: readonly QueueJobHandler[] = [],
 ): WorkerEntrypoint {
   return Object.freeze({

@@ -9,6 +9,7 @@ import {
   PostgresDailyGenerationStore,
   PostgresDailyInteractionStore,
   PostgresEveningStore,
+  PostgresWeeklyStore,
   RedisDailyContentCache,
   UNAVAILABLE_DAILY_CONTENT_CACHE,
   startApiTelemetry,
@@ -18,6 +19,7 @@ import {
   type DailyGenerationStore,
   type DailyInteractionStore,
   type EveningStore,
+  type WeeklyStore,
   type TelemetryRuntime,
 } from "@daily-energy/server-adapters/api";
 
@@ -67,6 +69,7 @@ async function main(): Promise<void> {
   let dailyGenerationStore: DailyGenerationStore | undefined;
   let dailyInteractionStore: DailyInteractionStore | undefined;
   let eveningStore: EveningStore | undefined;
+  let weeklyStore: WeeklyStore | undefined;
   try {
     const config = loadRuntimeConfig(process.env);
     telemetry = startApiTelemetrySafely(startApiTelemetry, {
@@ -139,6 +142,12 @@ async function main(): Promise<void> {
           connectionString,
           expectedDatabaseRole: "daily_energy_api",
         });
+        weeklyStore = await PostgresWeeklyStore.connect({
+          applicationName: "daily-energy:api:weekly",
+          connectionLimit: 4,
+          connectionString,
+          expectedDatabaseRole: "daily_energy_api",
+        });
       } catch {
         throw new ApiStartupError("API_DATABASE_NOT_READY");
       }
@@ -151,6 +160,7 @@ async function main(): Promise<void> {
       ...(dailyGenerationStore === undefined ? {} : { dailyGenerationStore }),
       ...(dailyInteractionStore === undefined ? {} : { dailyInteractionStore }),
       ...(eveningStore === undefined ? {} : { eveningStore }),
+      ...(weeklyStore === undefined ? {} : { weeklyStore }),
       readinessChecks,
       shutdownDrainHooks: [
         ...(authStore === undefined
@@ -171,6 +181,9 @@ async function main(): Promise<void> {
         ...(eveningStore === undefined
           ? []
           : [{ drain: () => eveningStore?.close() }]),
+        ...(weeklyStore === undefined
+          ? []
+          : [{ drain: () => weeklyStore?.close() }]),
         { drain: () => telemetry?.shutdown() },
       ],
       telemetryRuntime: telemetry,
@@ -193,6 +206,7 @@ async function main(): Promise<void> {
     await dailyGenerationStore?.close().catch(() => undefined);
     await dailyInteractionStore?.close().catch(() => undefined);
     await eveningStore?.close().catch(() => undefined);
+    await weeklyStore?.close().catch(() => undefined);
     await telemetry?.shutdown().catch(() => undefined);
     writeStartupFailure(
       error instanceof RuntimeConfigError

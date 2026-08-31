@@ -408,6 +408,44 @@ export class PostgresQueueStore {
     );
   }
 
+  async listWeeklyDue(limit: number): Promise<readonly VersionedJobEnvelope[]> {
+    this.#assertProfile("worker-background");
+    const result = await this.#pool.query<{
+      acceptedAt: Date;
+      deletionEpoch: string;
+      id: string;
+      revision: number;
+      safetyEpoch: string;
+    }>(
+      `SELECT intent.id,intent.revision,intent."createdAt" AS "acceptedAt",
+              COALESCE(guard.snapshot->>'deletion_epoch','0') AS "deletionEpoch",
+              COALESCE(guard.snapshot->>'safety_epoch','0') AS "safetyEpoch"
+         FROM daily_energy.app_weekly_summary_intent intent
+         JOIN daily_energy.app_weekly_window weekly_window
+           ON weekly_window.id=intent."windowId"
+         JOIN daily_energy.app_user_account account
+           ON account.id=weekly_window."accountId"
+         CROSS JOIN LATERAL (
+           SELECT daily_energy.resolve_c013_weekly_guard(
+             account.id,weekly_window."endProductDate",'necessary-consent-v1'
+           ) AS snapshot
+         ) guard
+        WHERE intent.state IN ('RUNNING','RETRYABLE_FAILED')
+          AND account.state='ACTIVE'
+          AND weekly_window."currentSourceFingerprint"=intent."sourceFingerprint"
+          AND (intent."expiresAt" IS NULL OR intent."expiresAt">now())
+        ORDER BY intent."updatedAt",intent.id
+        LIMIT $1`,
+      [limit],
+    );
+    return result.rows.map((row) =>
+      dueEnvelope("WeeklySummaryDue", row.id, row.revision, row.acceptedAt, {
+        deletion: row.deletionEpoch,
+        safety: row.safetyEpoch,
+      }),
+    );
+  }
+
   async listDataTasksDue(
     limit: number,
   ): Promise<readonly VersionedJobEnvelope[]> {

@@ -49,6 +49,7 @@ export const BACKGROUND_WORKER_MANIFEST = manifest({
     capability("NotificationIntentDue", "background-notification"),
     capability("SafetyActivated", "background-suppression"),
     capability("WeeklySourceChanged", "background-weekly"),
+    capability("WeeklySummaryDue", "background-weekly-summary"),
   ],
   profile: "worker-background",
   queueFamily: "background",

@@ -9,14 +9,16 @@ DLY-002 生成恢复、DLY-003 今日内容、REC-002 历史只读/MISSING 与 s
 跨日 continuation 与离线禁写；C-011 已激活阅读资格后的幂等点亮、同 command
 未知结果恢复、一次克制确认和 REC-001 七日真实记录列表；C-012 已实现 EVE-001
 真实晚间反馈、协调保存、同 command unknown recovery、Offline 只读和历史投影。
-趋势总结和删除命令仍由后续 C 系列任务交付。
+C-013 已把 REC-001 扩展为 Empty / Points Only / Partial / Complete、四类真实状态图表、
+本地模板总结、source invalidation 重建、历史窗口和 session-scoped Offline 只读缓存；
+删除命令仍由后续 C-014 交付。
 
 ## 目录边界
 
 - `src/app`：公开构建配置校验和应用上下文；
 - `src/pages`：启动、承接、首次认识、每日签到、生成、今日、晚间反馈、最近记录、历史日、安全与恢复页面；
 - `src/components`：D-002 的 15 个微信原生组件目录，对应 17 个逻辑组件合同；
-- `src/features`：onboarding/checkin/daily 的纯客户端草稿、同 intent/command 恢复与只读缓存编排；
+- `src/features`：onboarding/checkin/daily/evening/weekly 的纯客户端草稿、同 intent/command 恢复与只读缓存编排；
 - `src/platform`：微信 login、storage、network、share、subscription
   adapter 与可替换 port；
 - `src/services`：E-008 交付 API Client 后的调用编排入口；

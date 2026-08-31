@@ -850,19 +850,72 @@ test(
       assert.equal(noteRow.noteKeyVersion, protectedNote.keyVersion);
       assert.equal(noteRow.revision, 2);
       assert.notEqual(noteRow.noteCiphertext.toString("utf8"), notePlaintext);
+      const weeklyEveningSource = (
+        await admin.query(
+          `SELECT "feedbackRevision","overallFeeling"
+             FROM list_c013_weekly_source_days($1,$2::date)
+            WHERE "productDate"=$2::date::text`,
+          [accountId, productDate],
+        )
+      ).rows[0];
+      assert.deepEqual(weeklyEveningSource, {
+        feedbackRevision: 2,
+        overallFeeling: "PRETTY_GOOD",
+      });
+      const noteOnlyClear = await evening.save({
+        accountId,
+        normalizedPayloadFingerprint: bytes("c012:evening:note-clear"),
+        now: new Date("2026-08-24T12:00:04.000Z"),
+        productDatePolicyVersion: "product-date-v1",
+        request: {
+          ...eveningRequest,
+          command_ref: "c012-evening-note-clear",
+          expected_feedback_revision: 2,
+          expected_helpfulness_revision: 1,
+          overall_feeling: "PRETTY_GOOD",
+          note_patch: { operation: "CLEAR" },
+          task_patch: undefined,
+        },
+        sessionId,
+      });
+      assert.equal(noteOnlyClear.status, "ACCEPTED");
+      const afterNoteOnly = (
+        await admin.query(
+          `SELECT "feedbackRevision","overallFeeling"
+             FROM list_c013_weekly_source_days($1,$2::date)
+            WHERE "productDate"=$2::date::text`,
+          [accountId, productDate],
+        )
+      ).rows[0];
+      assert.deepEqual(afterNoteOnly, weeklyEveningSource);
+      const weeklySourceEvents = (
+        await admin.query(
+          `SELECT "aggregateRevision","allowlistedPayload","guardEpochs"
+             FROM runtime_outbox_event
+            WHERE "aggregateRef" IN (
+              SELECT id FROM app_daily_interaction
+               WHERE "accountId"=$1 AND "productDate"=$2
+            ) AND "eventType"='WeeklySourceChanged'
+            ORDER BY "aggregateRevision"`,
+          [accountId, productDate],
+        )
+      ).rows;
+      assert.equal(weeklySourceEvents.length, 7);
       assert.equal(
-        (
-          await admin.query(
-            `SELECT count(*)::int AS count FROM runtime_outbox_event
-              WHERE "aggregateRef" IN (
-                SELECT id FROM app_daily_interaction
-                 WHERE "accountId"=$1 AND "productDate"=$2
-              ) AND "eventType"='WeeklySourceChanged'`,
-            [accountId, productDate],
-          )
-        ).rows[0].count,
-        2,
+        new Set(weeklySourceEvents.map((row) => row.aggregateRevision)).size,
+        7,
       );
+      for (const event of weeklySourceEvents) {
+        assert.deepEqual(Object.keys(event.guardEpochs).sort(), [
+          "deletion",
+          "safety",
+        ]);
+        assert.equal(event.allowlistedPayload.product_date, productDate);
+        assert.doesNotMatch(
+          JSON.stringify(event),
+          /note|cipher|instruction|mood|energy|sleep|expression|prompt/iu,
+        );
+      }
 
       const c010DeletionTaskRef = randomUUID();
       await admin.query(

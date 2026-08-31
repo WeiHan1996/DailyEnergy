@@ -18,6 +18,12 @@ C-006 在 `generation` public subpath 增加 `daily-rules-v1` / `daily-score-v1`
 - 严格 RuleFacts 与 ControlledExpressionPlanV1；
 - server-only 有限 choice trace，不含 root seed、digest 或用户身份。
 
+C-013 新增 `@daily-energy/server-core/weekly-reflection`：
+
+- `weekly-aggregate-v1` 的七日 coverage、direction、mode、帮助度与任务聚合；
+- 只引用 approved fact IDs 的 `weekly-expression-v1` 计划；
+- 不调用网络的完整本地模板，以及不含源 ref/fingerprint/note/score 的 Client View 投影。
+
 本包不得导入 Nest、Prisma、Redis、BullMQ、provider SDK、环境变量或客户端代码。
 PostgreSQL 和运行 profile 实现位于 `@daily-energy/server-adapters` 的显式 capability
-subpath。C-005 不实现评分、表达、发布或 GenerationIntent HTTP 命令。
+subpath。Weekly 持久化、TX-07 与 HTTP 适配仍位于 adapters/API，不进入本包。

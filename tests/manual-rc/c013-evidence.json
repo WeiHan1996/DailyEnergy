@@ -1,0 +1,103 @@
+{
+  "evidence_version": "c-013-manual-evidence-v1",
+  "task_id": "C-013",
+  "execution_status": "MANUAL_EVIDENCE_PENDING",
+  "pass_claim": "PROHIBITED",
+  "synthetic_accounts_only": true,
+  "design_source": {
+    "status": "AVAILABLE_READ_ONLY",
+    "figma_file": "T5HS32Ciz6LZh81KbqhFGo",
+    "figma_version": "D-005 Accepted 2026-08-19 via PR #146",
+    "frame_ids": [
+      "495:225",
+      "495:226",
+      "495:227",
+      "495:228",
+      "495:229",
+      "495:230",
+      "495:231",
+      "495:232",
+      "495:233",
+      "507:4"
+    ],
+    "visual_snapshot_ids": ["515:524", "515:527", "515:530"],
+    "source_inspection": "BROWSER_READ_ONLY_VERIFIED_2026-08-24",
+    "observed_boundaries": [
+      "REC-001 is the latest seven consecutive product dates, with Empty, Points Only, Partial and Complete separated by real-state day count",
+      "Points Only keeps discrete observations and does not use rising, falling or stable trend language",
+      "every chart repeats dates and values as text, while missing dates remain visible gaps rather than connected or inferred points",
+      "Rebuilding removes the stale summary and keeps only currently valid source facts until the new fingerprint publishes",
+      "the accepted 375px frame is a fixed 375px vertical layout with readable chart summaries, dates and values"
+    ]
+  },
+  "implementation_states": {
+    "empty": "MANUAL_EVIDENCE_PENDING",
+    "points_only_1_2_days": "MANUAL_EVIDENCE_PENDING",
+    "partial_3_6_days": "MANUAL_EVIDENCE_PENDING",
+    "complete_7_days": "MANUAL_EVIDENCE_PENDING",
+    "loading": "MANUAL_EVIDENCE_PENDING",
+    "recoverable_error": "MANUAL_EVIDENCE_PENDING",
+    "offline_read_only": "MANUAL_EVIDENCE_PENDING",
+    "fallback_summary": "MANUAL_EVIDENCE_PENDING",
+    "source_invalidated_rebuilding": "MANUAL_EVIDENCE_PENDING",
+    "historical_window": "MANUAL_EVIDENCE_PENDING",
+    "small_375": "MANUAL_EVIDENCE_PENDING",
+    "large_text_125": "MANUAL_EVIDENCE_PENDING",
+    "screen_reader_chart_summary": "MANUAL_EVIDENCE_PENDING",
+    "reduced_motion": "MANUAL_EVIDENCE_PENDING"
+  },
+  "devtools": {
+    "status": "INFRA_BLOCKED",
+    "reason_code": "MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT",
+    "cli_path_verified": true,
+    "runner_version": null,
+    "base_library_version": "3.7.12",
+    "screen_ids": ["DLY-003", "REC-001", "REC-002", "SAFE-001"]
+  },
+  "design_review": {
+    "token_and_component_reuse": "AUTOMATED_GATE_AVAILABLE",
+    "component_mapping": [
+      "DE / PageShell",
+      "DE / AppHeader",
+      "DE / Button / Primary and Secondary",
+      "DE / InlineNotice",
+      "DE / LoadingSkeleton"
+    ],
+    "recorded_differences": [
+      "the implementation uses stable seven-column accessible dot plots instead of decorative connected paths; every missing date is an explicit unconnected gap and every value is repeated as text",
+      "summary lifecycle notices use InlineNotice with any recovery command as a separate formal Button, matching the accepted no-action-inside-state-card rule",
+      "four executable weekly metrics are rendered from the Accepted Schema; entertainment energy and five-dimension scores are not added as chart series",
+      "implementation screenshots remain unavailable while the WeChat DevTools runner is INFRA_BLOCKED"
+    ],
+    "visual_and_interaction_review": "C013_UNIFIED_REVIEW_PENDING",
+    "user_acceptance": "C013_UNIFIED_REVIEW_PENDING"
+  },
+  "security_review": {
+    "status": "OWNER_REVIEW_PENDING",
+    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "reviewed_boundaries": [
+      "API and Background roles obtain account, epoch and seven-day source fields only through closed SECURITY DEFINER functions; neither role gains direct restricted-table access",
+      "weekly source projection excludes note, ciphertext, entertainment scores, expression text, Prompt, provider and model fields",
+      "a note-only feedback change retains the last overall-feeling field revision, so the weekly fingerprint and summary remain unchanged",
+      "source fingerprint mismatch hides the current summary before background rebuilding and TX-07 publishes only against the current fingerprint",
+      "WeeklySummaryDue uses the intent UUID as the stable outbox/job ID; Redis loss scans RUNNING PostgreSQL intents and Inbox prevents duplicate effects",
+      "the local template uses only deterministic approved fact IDs; C-013 does not call a provider or invent causes",
+      "offline cache is session-scoped, bounded, read-only and cleared by Safety; no offline write queue exists"
+    ],
+    "residual_evidence": [
+      "owner visual review of the recorded dot-plot difference, source disclosure, sample-pressure wording and Rebuilding state during the unified C-004 through C-015 audit",
+      "WeChat DevTools route, layout, accessibility tree and weak-network evidence after the launch timeout is resolved",
+      "iOS/Android large-text, screen-reader, safe-area, touch-target and Reduced Motion evidence",
+      "future AI weekly expression, provider qualification and professional Safety gates remain outside C-013",
+      "Production publication and deployment authorization remain outside C-013"
+    ],
+    "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
+  },
+  "real_device": {
+    "ios": "MANUAL_EVIDENCE_PENDING",
+    "android": "MANUAL_EVIDENCE_PENDING",
+    "matrix": []
+  },
+  "reviewer": null,
+  "reviewed_at_utc": null
+}

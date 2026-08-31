@@ -1,0 +1,136 @@
+{
+  "manifest_version": "c-013-evidence-v1",
+  "scope": "C-013 rolling seven-date real-state aggregation, deterministic local summary, source fingerprint invalidation, TX-07 publication, background due recovery, strict Weekly HTTP views and accessible REC-001 states",
+  "authority": [
+    "docs/ai/weekly-summary-schema.md",
+    "docs/ai/scoring-rules.md",
+    "docs/design/phase2-remaining-handoff.md",
+    "docs/operations/privacy-data-map.md",
+    "docs/technical/api.md",
+    "docs/technical/architecture.md",
+    "docs/technical/database.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C013-CORE-001": {
+      "file": "packages/server-core/src/modules/weekly-reflection/domain/weekly-aggregate.test.ts",
+      "selector": "weekly-aggregate-v1",
+      "level": "MODULE",
+      "assertions": [
+        "0, 2, 5 and 7 real-state days map to EMPTY, POINTS_ONLY, PARTIAL and COMPLETE without compressing the seven dates",
+        "missing and UNSURE values never become ordinal observations while direction, mode and helpful-action thresholds remain deterministic",
+        "the controlled template references only the approved fact plan and the client projection contains no source, note, score, model or provider fields",
+        "INVALIDATED facts project without a summary and the same accepted source produces byte-stable aggregate and plan output"
+      ]
+    },
+    "T-C013-CONTRACT-001": {
+      "file": "apps/api/src/weekly/weekly.contract.test.ts",
+      "selector": "C-013 weekly transport contract",
+      "level": "CONTRACT",
+      "assertions": [
+        "current and historical weekly endpoints are authenticated read-only GET operations",
+        "WeeklyView remains bound to the executable ClientWeeklySummaryView contract"
+      ]
+    },
+    "T-C013-API-001": {
+      "file": "apps/api/src/weekly.e2e.test.ts",
+      "selector": "C-013 HTTP weekly flow",
+      "level": "E2E",
+      "assertions": [
+        "current and historical window reads pass only the owner from the authenticated session and reject malformed or future anchors",
+        "Safety blocks ordinary weekly reads before any data view is returned",
+        "the HTTP whitelist contains coverage and summary status but no source fingerprint, source ref, note, score, provider or model"
+      ]
+    },
+    "T-C013-DB-001": {
+      "file": "tests/database/c013-weekly-reflection.test.mjs",
+      "selector": "C-013 real PostgreSQL snapshot, due row, TX-07 invalidation and deletion visibility",
+      "level": "DB",
+      "assertions": [
+        "real PostgreSQL 18 derives exactly seven source slots, creates one stable due row and atomically publishes the current local-template summary",
+        "same-event replay is an Inbox no-op while two source corrections create immutable fingerprints and a stale intermediate due intent is cancelled",
+        "a source correction immediately removes the old summary, then publishes one new revision through the fingerprint-bound TX-07 CAS",
+        "an active DAY deletion guard makes the source date missing and prevents the old summary from remaining visible",
+        "snapshot JSON contains no note, entertainment score, expression, model or provider"
+      ]
+    },
+    "T-C013-NOTE-001": {
+      "file": "tests/database/c008-daily-generation.test.mjs",
+      "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+      "level": "DB",
+      "assertions": [
+        "a note-only evening revision keeps the weekly overall-feeling source revision and value unchanged",
+        "all WeeklySourceChanged outbox events contain only product date, component revisions and guard epochs, never note or expression content"
+      ]
+    },
+    "T-C013-CAPABILITY-001": {
+      "file": "packages/server-adapters/src/queue/contracts.test.ts",
+      "selector": "worker capability manifests",
+      "level": "CONTRACT",
+      "assertions": [
+        "WeeklySummaryDue is statically routed to the Background queue and weekly egress while Daily generation remains on its distinct Interactive queue, role and daily egress"
+      ]
+    },
+    "T-C013-MINIAPP-001": {
+      "file": "apps/miniapp/src/features/weekly/weekly-flow.test.ts",
+      "selector": "C-013 weekly flow",
+      "level": "MODULE",
+      "assertions": [
+        "the strict seven-date view is cached for bounded read-only offline use",
+        "historical requests never substitute a cache from another window",
+        "Safety clears the ordinary weekly cache and routes to the fixed overlay"
+      ]
+    },
+    "T-C013-REC001-001": {
+      "file": "apps/miniapp/src/pages/records/index.test.ts",
+      "selector": "REC-001 view model",
+      "level": "MODULE",
+      "assertions": [
+        "Points Only renders five explicit chart gaps and the insufficient-data wording instead of a trend conclusion",
+        "source invalidation displays rebuilding copy and carries no stale summary paragraphs"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "D17-M05",
+      "status": "COVERED",
+      "proof_ids": ["T-C013-CORE-001", "T-C013-DB-001"]
+    },
+    {
+      "source_id": "D17-M06",
+      "status": "COVERED",
+      "proof_ids": ["T-C013-NOTE-001"]
+    },
+    {
+      "source_id": "PDM-U02",
+      "status": "COVERED",
+      "proof_ids": ["T-C013-DB-001", "T-C013-API-001"]
+    },
+    {
+      "source_id": "S19-DB-030",
+      "status": "COVERED",
+      "proof_ids": ["T-C013-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-031",
+      "status": "COVERED",
+      "proof_ids": ["T-C013-NOTE-001"]
+    },
+    {
+      "source_id": "S20-E04",
+      "status": "COVERED",
+      "proof_ids": ["T-C013-CONTRACT-001", "T-C013-API-001"]
+    },
+    {
+      "source_id": "S20-E05",
+      "status": "COVERED",
+      "proof_ids": ["T-C013-CONTRACT-001", "T-C013-API-001"]
+    },
+    {
+      "source_id": "S29-ARCH-025",
+      "status": "COVERED",
+      "proof_ids": ["T-C013-CAPABILITY-001"]
+    }
+  ]
+}

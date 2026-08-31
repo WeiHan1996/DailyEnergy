@@ -13,6 +13,7 @@ export interface RedisRebuildStore {
   listDataTasksDue(limit: number): Promise<readonly VersionedJobEnvelope[]>;
   listGenerationDue(limit: number): Promise<readonly VersionedJobEnvelope[]>;
   listNotificationDue(limit: number): Promise<readonly VersionedJobEnvelope[]>;
+  listWeeklyDue(limit: number): Promise<readonly VersionedJobEnvelope[]>;
   listPublishedOutboxCandidates(
     limit: number,
   ): Promise<readonly VersionedJobEnvelope[]>;
@@ -110,7 +111,12 @@ export class RedisLossRebuilder {
       case "worker-interactive":
         return this.#store.listGenerationDue(limit);
       case "worker-background":
-        return this.#store.listNotificationDue(limit);
+        return Promise.all([
+          this.#store.listNotificationDue(limit),
+          this.#store.listWeeklyDue(limit),
+        ]).then(([notifications, weekly]) =>
+          [...notifications, ...weekly].slice(0, limit),
+        );
       case "worker-restricted":
         return this.#store.listDataTasksDue(limit);
     }

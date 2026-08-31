@@ -20,6 +20,7 @@ import {
   type TelemetryTransportConfig,
 } from "../telemetry/runtime.js";
 import { createDayLitHandlers } from "../relationship/day-lit-handler.js";
+import { createWeeklyHandlers } from "../weekly/weekly-handler.js";
 
 export type WorkerBackgroundDatabaseCapability =
   DatabaseCapability<"worker-background">;
@@ -61,12 +62,17 @@ export function startWorkerBackgroundRuntime(
 ): Promise<WorkerInfrastructureRuntime> {
   return startWorkerBackgroundInfrastructure(
     config,
-    handlers.length > 0 ? handlers : createDayLitHandlers(),
+    handlers.length > 0 ? handlers : createWorkerBackgroundHandlers(),
     telemetry,
   );
 }
 
 export { createDayLitHandlers } from "../relationship/day-lit-handler.js";
+export { createWeeklyHandlers } from "../weekly/weekly-handler.js";
+
+export function createWorkerBackgroundHandlers(): readonly QueueJobHandler[] {
+  return Object.freeze([...createDayLitHandlers(), ...createWeeklyHandlers()]);
+}
 
 export function startWorkerBackgroundTelemetry(
   config: TelemetryTransportConfig,

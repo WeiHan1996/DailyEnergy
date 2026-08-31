@@ -23,6 +23,10 @@
     "./product-time/spi": {
       "types": "./dist/modules/product-time/spi/index.d.ts",
       "import": "./dist/modules/product-time/spi/index.js"
+    },
+    "./weekly-reflection": {
+      "types": "./dist/modules/weekly-reflection/public/index.d.ts",
+      "import": "./dist/modules/weekly-reflection/public/index.js"
     }
   },
   "scripts": {
