@@ -4,8 +4,8 @@
   "snapshot_base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
   "counts": {
     "total": 787,
-    "COVERED": 244,
-    "PLANNED": 543,
+    "COVERED": 271,
+    "PLANNED": 516,
     "NA_WITH_REASON": 0
   },
   "planned_policy": {
@@ -79,7 +79,7 @@
       "set_id": "s16-ai-corpus",
       "authority_path": "docs/ai/evaluation-corpus.json",
       "owner": "Applicable AI implementation and evaluation issue",
-      "counts": { "COVERED": 0, "PLANNED": 269, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 27, "PLANNED": 242, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s21-privacy",

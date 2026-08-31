@@ -1,4 +1,5 @@
 import {
+  ControlledExpressionPlanV1Schema,
   type GenerationInputSnapshot,
   type RuleFacts,
 } from "@daily-energy/shared-schemas";
@@ -73,6 +74,17 @@ describe("C-006 daily derivation bindings", () => {
     expect(
       result.controlledExpressionPlan.source_dependency_requirements,
     ).toEqual([]);
+    expect(
+      ControlledExpressionPlanV1Schema.safeParse(
+        result.controlledExpressionPlan,
+      ).success,
+    ).toBe(true);
+    expect(
+      ControlledExpressionPlanV1Schema.safeParse({
+        ...result.controlledExpressionPlan,
+        unknown_template_input: true,
+      }).success,
+    ).toBe(false);
   });
 
   it("rejects closed-world snapshot field and semantic style violations", () => {

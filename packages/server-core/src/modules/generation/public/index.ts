@@ -47,7 +47,7 @@ export {
   DAILY_SCORE_VERSION,
 } from "../domain/daily-rules.js";
 export type {
-  ControlledExpressionPlanV1,
   DailyChoiceTrace,
   DailyRuleDerivation,
 } from "../domain/daily-rules.js";
+export type { ControlledExpressionPlanV1 } from "@daily-energy/shared-schemas";

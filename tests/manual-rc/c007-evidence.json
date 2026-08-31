@@ -1,0 +1,35 @@
+{
+  "evidence_version": "c-007-manual-evidence-v1",
+  "task_id": "C-007",
+  "execution_status": "MANUAL_EVIDENCE_PENDING",
+  "pass_claim": "PROHIBITED",
+  "synthetic_accounts_only": true,
+  "content_review": {
+    "status": "OWNER_REVIEW_PENDING",
+    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "review_scope": [
+      "read the full rendered copy for BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT and confirm they remain one restrained digital-friend personality",
+      "confirm LOW_ASSERTION, PARTIAL_ASSERTION and mood/energy/sleep care-first copy does not shame, diagnose, overstate or pressure",
+      "confirm all eight primary actions and optional tasks are concrete, low consequence and contain only one main action",
+      "confirm all dimension and ritual phrases remain entertainment/action references without medical, investment, legal, relationship or future claims",
+      "confirm preferred-name omission, no-memory Daily v1 language and no fabricated continuity feel acceptable",
+      "confirm template copy and attribution are acceptable for unified C-004 through C-015 review"
+    ],
+    "automated_evidence": [
+      "strict C-006 plan and ExpressionPayload Schema binding",
+      "all action/task/ritual/style/assertion catalogs and character budgets",
+      "whole-candidate negative Safety and internal-disclosure tests",
+      "server-only architecture fixture and real C-006-plan integration",
+      "pinned registry SHA-256 fingerprint"
+    ],
+    "residual_evidence": [
+      "owner content-quality and threat-boundary judgment cannot be replaced by automated tests",
+      "provider/model qualification is not applicable because C-007 makes zero provider calls",
+      "C-008 must separately prove live guards, unique intent, atomic publication, cache and late-result rejection",
+      "Production credentials, deployment authorization and RC manual evidence remain outside C-007"
+    ],
+    "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
+  },
+  "reviewer": null,
+  "reviewed_at_utc": null
+}

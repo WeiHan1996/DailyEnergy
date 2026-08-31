@@ -43,6 +43,12 @@ export default defineConfig({
           lines: 90,
           statements: 90,
         },
+        "packages/prompt-library/src/**": {
+          branches: 85,
+          functions: 90,
+          lines: 90,
+          statements: 90,
+        },
         "packages/shared-schemas/src/**": {
           branches: 95,
           functions: 100,
@@ -62,6 +68,9 @@ export default defineConfig({
       ]),
       nodeProject("api-client", "packages/api-client", ["test/**/*.test.ts"]),
       nodeProject("server-core", "packages/server-core", ["src/**/*.test.ts"]),
+      nodeProject("prompt-library", "packages/prompt-library", [
+        "src/**/*.test.ts",
+      ]),
       nodeProject("server-adapters", "packages/server-adapters", [
         "src/**/*.test.ts",
       ]),

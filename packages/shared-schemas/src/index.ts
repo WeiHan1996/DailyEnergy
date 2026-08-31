@@ -5,6 +5,8 @@ export {
   BandValues,
   EnergySchema,
   EnergyValues,
+  EffortSchema,
+  EffortValues,
   ExpressionStyleSchema,
   ExpressionStyleValues,
   GenerationModeSchema,
@@ -44,6 +46,7 @@ export type {
   ActionKind,
   Band,
   Energy,
+  Effort,
   ExpressionStyle,
   GenerationMode,
   HelpfulnessRating,
@@ -114,6 +117,9 @@ export type {
 } from "./client-daily-content.js";
 
 export {
+  ControlledExpressionPlanV1Schema,
+  DailyExpressionRequiredSectionValues,
+  DailyProhibitedClaimClassValues,
   ExpressionPayloadSchema,
   GenerationInputSnapshotSchema,
   OverallLabelTokenSchema,
@@ -123,6 +129,7 @@ export {
   RuleFactsSchema,
 } from "./daily-content.js";
 export type {
+  ControlledExpressionPlanV1,
   ExpressionPayload,
   GenerationInputSnapshot,
   OverallLabelToken,

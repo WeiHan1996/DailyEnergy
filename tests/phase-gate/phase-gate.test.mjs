@@ -43,8 +43,8 @@ test("T-E014-GATE-001 accepts conditional development admission and Production N
     conditions: 1,
     deferred: 7,
     total: 787,
-    COVERED: 244,
-    PLANNED: 543,
+    COVERED: 271,
+    PLANNED: 516,
     NA_WITH_REASON: 0,
   });
 });
