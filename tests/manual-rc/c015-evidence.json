@@ -20,7 +20,9 @@
   "stack_merge_strategy_head": "3d33a80df646097cc1fcef361e9c4a08703cd656",
   "stack_merge_strategy_ci_run": 33368423171,
   "stack_merge_strategy_ci_checks": "11/11 SUCCESS",
-  "repository_merge_commit_setting": "BLOCKED_EXPLICIT_RULESET_CHANGE_APPROVAL_REQUIRED",
+  "repository_merge_commit_setting": "EXPLICITLY_APPROVED_TEMPORARY_CHANGE_PENDING",
+  "ruleset_change_approved_at_utc": "2026-08-31T07:57:27Z",
+  "ruleset_change_scope": "TEMPORARILY_REMOVE_REQUIRED_LINEAR_HISTORY_AND_ALLOW_ONLY_MERGE; PRESERVE_ALL_OTHER_RULES; RESTORE_ON_SUCCESS_OR_ABORT",
   "merge_window_attempt": {
     "pr_157_exact_head_verifier": "PASS / run 32456442334 / 11 checks",
     "merge_result": "REJECTED_BY_REQUIRED_LINEAR_HISTORY_AND_SQUASH_ONLY_RULESET",
@@ -29,7 +31,7 @@
     "pr_157_restored_to_draft": true,
     "main_unchanged": "97b7181ea172f86d0ac3fe37af464f6bd0f169d8"
   },
-  "execution_status": "BLOCKED_RULESET_APPROVAL_AND_EXTERNAL_EVIDENCE_PENDING",
+  "execution_status": "CONTROLLED_MERGE_WINDOW_APPROVED_EXTERNAL_EVIDENCE_PENDING",
   "pass_claim": "PROHIBITED",
   "synthetic_accounts_only": true,
   "accepted_scope": {
