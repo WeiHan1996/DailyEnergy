@@ -4,13 +4,13 @@
 - **最后更新**：2026-08-31
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-015 — C-004～C-015 统一审核修复
-- **任务状态**：In Review（项目所有者已通过代码/threat-boundary 审核并选择 merge commit 保留 stack ancestry；受控合并与外部/真机证据待完成）
+- **任务状态**：Blocked（等待项目所有者明确批准一次性 main ruleset 安全控制变更；仓库/PR/main 已恢复原状态）
 - **任务 Profile**：`security`（幂等、Safety、删除不复活、隐私、确定性与 analytics 可信性）
 - **工作分支**：`agent/c004-c015-review-fixes`
 - **修复基线**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)，remote head `fd04b787926127bda64fc6cb07cfcf356d85ed8b`，CI run `33323476723` 11/11 SUCCESS
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
-- **当前 PR**：[统一修复 Draft PR #169](https://github.com/WeiHan1996/DailyEnergy/pull/169)；base=`agent/c015-core-analytics`，implementation head `6fdb3f5a9a868bdac4d8ab025ad8c9eaf29da2ed`，owner-reviewed head `405f3c29fc916cfb314f9a665e8093df57911bf6`，CI run `33357978808` 11/11 SUCCESS；PR #157～#168 保持 Draft，不改远端 stacked refs
-- **下一候选动作**：临时启用仓库 merge commit，按 #157～#169 顺序执行 exact-head verifier 与 `--merge --match-head-commit`，完成后恢复仓库设置；不启动 C-016
+- **当前 PR**：[统一修复 Draft PR #169](https://github.com/WeiHan1996/DailyEnergy/pull/169)；base=`agent/c015-core-analytics`，strategy head `3d33a80df646097cc1fcef361e9c4a08703cd656`，CI run `33368423171` 11/11 SUCCESS；PR #157～#169 均保持 Draft/Open
+- **下一候选动作**：项目所有者明确批准临时移除 main `required_linear_history`、把 ruleset allowed method 从 `squash` 改为仅 `merge`，并在合并后原样恢复；不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 0. 统一审核修复
@@ -20,6 +20,8 @@
 - 统一修复 Draft PR #169 已基于 PR #168 精确 head 创建；verified status head `884a2050f19352bfb2371535a1c9f9abc29b2e6e` 的同一 CI run `33357674745` 已 11/11 SUCCESS；
 - 项目所有者于 2026-08-31 明确“审核通过”，接受 PR #169 的代码修复与 differential-query/four-plane threat boundary；该决定不替代真机、生产 bundle、处理主体/位置/用户说明证据，也不授权 force-push、错误 base merge 或 Production/RC；
 - 项目所有者随后明确选择 merge commit 保留 #157～#168 stack ancestry；仓库当前仅允许 squash，因此该一次性策略要求在受控合并窗口临时启用 `allow_merge_commit`，逐项 exact-head 合并后恢复为关闭，不执行 branch rewrite；
+- PR #157 exact-head verifier 已以 head `9a902a5d2d5b666be33f9c90faa92dffafce0037` / run `32456442334` / 11 checks 通过，但 GitHub ruleset 因 `required_linear_history` 与 squash-only 拒绝 merge commit；没有发生合并；
+- 仓库 `allow_merge_commit` 已恢复为 `false`，main ruleset 仍保持 deletion/non-fast-forward/linear-history/squash-only/11 strict checks/no bypass，PR #157 已恢复 Draft，main 仍为 `97b7181ea172f86d0ac3fe37af464f6bd0f169d8`；
 - 修复范围只覆盖已报告的幂等与时间边界、continuation/DayLit 收敛、Safety/删除竞态、本地敏感缓存与期限、规则/template invariant，以及 C-015 信号、指标、Gate 和基数合同；
 - 不改变 Accepted 产品方向、框架、数据库或服务边界，不启动 C-016，不将人工证据或 Production/RC Gate 冒充完成；
 - 修复先在独立顶层分支完成并验证；未经项目所有者授权，不 force-push 或重写现有 stacked PR；
@@ -90,6 +92,7 @@
 - E-012 deployment contract `50/50`，证明新发布必须保存真实 tzdb release、runtime/manifest 漂移 fail closed，同时历史 ReleaseManifestV1 仍可读取；
 - PR #169 verified status head `884a2050f19352bfb2371535a1c9f9abc29b2e6e` 的 CI run `33357674745` 为 11/11 SUCCESS；
 - PR #169 owner-reviewed head `405f3c29fc916cfb314f9a665e8093df57911bf6` 的 CI run `33357978808` 为 11/11 SUCCESS；
+- PR #169 merge-strategy head `3d33a80df646097cc1fcef361e9c4a08703cd656` 的 CI run `33368423171` 为 11/11 SUCCESS；
 - format、lint、architecture、typecheck、codegen、contract、registry、agent workflow、CI audit/supply chain、`git diff --check main` 均通过；
 - full Gate 内部 `prisma generate` 的非语义格式副作用已按项目所有者授权恢复；四个 C-014 生成模型只保留行尾空白清理。
 
@@ -103,8 +106,8 @@
 
 1. 项目所有者已完成 differential-query/four-plane threat review；仍需 WeChat DevTools/真机 offline no-replay 与生产 bundle/主体/位置/用户说明证据；
 2. 统一修复 Draft PR #169 已在 `agent/c015-core-analytics` 精确 head `fd04b787926127bda64fc6cb07cfcf356d85ed8b` 之上创建，仅用于当前 stacked review；没有 force-push 或改写 #157～#168；
-3. 项目所有者已选择 merge commit：临时把仓库 `allow_merge_commit` 从 `false` 设为 `true`，依次把 #157 merge 到 main、将下一个 PR retarget 到 main，再以 `--merge --match-head-commit` 合并至 #169；任一步 head/check/base/mergeability 漂移立即停止；
-4. #169 合并或流程中止后必须恢复 `allow_merge_commit=false`；该策略不授权 force-push、删除 branch、Production/RC 或补签外部证据；C-016 仍不启动。
+3. **解锁条件**：项目所有者明确批准一次性把仓库 `allow_merge_commit` 设为 `true`，从 main ruleset `21080906` 临时移除 `required_linear_history`，并把 `pull_request.allowed_merge_methods` 从 `["squash"]` 改为仅 `["merge"]`；deletion、non-fast-forward、review 参数、11 strict checks 与空 bypass 必须逐字节保留；
+4. 获批后依次把 #157 merge 到 main、将下一个 PR retarget 到 main，再以 exact-head verifier + `--merge --match-head-commit` 合并至 #169；任一步漂移立即停止；流程完成或中止后原样恢复 ruleset 与 `allow_merge_commit=false` 并验证；不授权 force-push、删除 branch、Production/RC 或补签外部证据。
 
 ## 9. C-015 后统一审核
 

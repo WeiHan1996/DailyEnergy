@@ -17,8 +17,19 @@
   "remediation_final_ci_run": 33357978808,
   "remediation_final_ci_checks": "11/11 SUCCESS",
   "stack_merge_strategy": "MERGE_COMMIT_PRESERVE_ANCESTRY_OWNER_APPROVED",
-  "repository_merge_commit_setting": "TEMPORARY_ENABLE_AND_RESTORE_REQUIRED",
-  "execution_status": "OWNER_CODE_AND_THREAT_REVIEW_APPROVED_EXTERNAL_EVIDENCE_PENDING",
+  "stack_merge_strategy_head": "3d33a80df646097cc1fcef361e9c4a08703cd656",
+  "stack_merge_strategy_ci_run": 33368423171,
+  "stack_merge_strategy_ci_checks": "11/11 SUCCESS",
+  "repository_merge_commit_setting": "BLOCKED_EXPLICIT_RULESET_CHANGE_APPROVAL_REQUIRED",
+  "merge_window_attempt": {
+    "pr_157_exact_head_verifier": "PASS / run 32456442334 / 11 checks",
+    "merge_result": "REJECTED_BY_REQUIRED_LINEAR_HISTORY_AND_SQUASH_ONLY_RULESET",
+    "pull_requests_merged": 0,
+    "repository_settings_restored": true,
+    "pr_157_restored_to_draft": true,
+    "main_unchanged": "97b7181ea172f86d0ac3fe37af464f6bd0f169d8"
+  },
+  "execution_status": "BLOCKED_RULESET_APPROVAL_AND_EXTERNAL_EVIDENCE_PENDING",
   "pass_claim": "PROHIBITED",
   "synthetic_accounts_only": true,
   "accepted_scope": {
