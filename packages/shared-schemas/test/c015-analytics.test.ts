@@ -110,6 +110,16 @@ describe("C-015 analytics executable contracts", () => {
         locale: "zh-CN",
       }),
     ).toThrow();
+    expect(() =>
+      ClientAnalyticsSignalRequestSchema.parse({
+        app_version: "1.4.2",
+        event_name: "landing_viewed",
+        event_schema_version: 1,
+        locale: "zh-CN",
+        scene_code: "DIRECT",
+        surface_version_bucket: "ATTACKER_BUCKET",
+      }),
+    ).toThrow();
   });
 
   it("registers 23 metrics and four Gates while research metrics stay unavailable", () => {

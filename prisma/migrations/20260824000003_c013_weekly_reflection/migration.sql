@@ -212,6 +212,48 @@ AS $$
    LIMIT 1;
 $$;
 
+-- Published summaries remain immutable. Background may only freeze the
+-- retention clock of a superseded revision; every content or identity field
+-- stays protected by SQL-008.
+CREATE OR REPLACE FUNCTION "daily_energy"."reject_immutable_change"()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = pg_catalog
+AS $$
+BEGIN
+  IF TG_OP='UPDATE' AND TG_TABLE_NAME='app_published_weekly_summary_revision' THEN
+    IF pg_has_role(session_user,'daily_energy_background','MEMBER')
+       AND (to_jsonb(NEW)-ARRAY['retentionAnchorAt','expiresAt']::text[])=
+           (to_jsonb(OLD)-ARRAY['retentionAnchorAt','expiresAt']::text[])
+       AND (
+         (OLD."expiresAt" IS NULL
+          AND NEW."retentionAnchorAt">=OLD."retentionAnchorAt"
+          AND NEW."expiresAt"=NEW."retentionAnchorAt"+interval '30 days')
+         OR
+         (OLD."expiresAt" IS NOT NULL
+          AND NEW."retentionAnchorAt"=OLD."retentionAnchorAt"
+          AND NEW."expiresAt"=OLD."expiresAt")
+       ) THEN
+      RETURN NEW;
+    END IF;
+  END IF;
+  IF TG_OP='DELETE'
+     AND TG_TABLE_NAME IN (
+       'app_generation_input_snapshot',
+       'app_published_daily_result',
+       'app_published_weekly_summary_revision'
+     )
+     AND pg_has_role(session_user,'daily_energy_deletion','MEMBER') THEN
+    RETURN OLD;
+  END IF;
+  RAISE EXCEPTION USING ERRCODE='55000',MESSAGE='SQL-008';
+END
+$$;
+
+GRANT UPDATE ("retentionAnchorAt","expiresAt")
+ON TABLE "daily_energy"."app_published_weekly_summary_revision"
+TO "daily_energy_background";
+
 REVOKE ALL ON FUNCTION "daily_energy"."resolve_c013_weekly_guard"(uuid,date,text)
 FROM PUBLIC;
 REVOKE ALL ON FUNCTION "daily_energy"."list_c013_weekly_source_days"(uuid,date)
@@ -225,5 +267,6 @@ TO "daily_energy_api","daily_energy_background","daily_energy_test";
 GRANT EXECUTE ON FUNCTION "daily_energy"."resolve_c013_weekly_source_event"(text,uuid)
 TO "daily_energy_background","daily_energy_test";
 
--- Rollback: revoke both function grants and drop the C-013 functions. The
--- migration is additive and does not rewrite or delete user rows.
+-- Rollback: revoke the column UPDATE grant, restore the prior SQL-008 trigger
+-- body, revoke the function grants and drop the C-013 functions. The migration
+-- is additive and does not rewrite or delete user rows.

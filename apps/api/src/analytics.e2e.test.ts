@@ -65,6 +65,19 @@ async function app(store: AnalyticsAggregateStore) {
   return application;
 }
 
+async function appWithClock(
+  store: AnalyticsAggregateStore,
+  clock: { now(): Date },
+) {
+  const application = await createApiApplication(config(), {
+    analyticsAggregateStore: store,
+    productDateClock: clock,
+  });
+  await application.listen(0, "127.0.0.1");
+  applications.push(application);
+  return application;
+}
+
 const signal = {
   app_version: "1.4.2",
   event_name: "landing_viewed",
@@ -113,6 +126,25 @@ describe("C-015 first-party analytics signal endpoint", () => {
       .send(signal)
       .expect(202);
     expect(store.deltas[1]).toMatchObject({ eventCountDelta: 1 });
+  });
+
+  it("groups a cell across distinct server receipt timestamps", async () => {
+    const store = new RecordingAnalyticsStore();
+    let milliseconds = fixedNow.getTime();
+    const application = await appWithClock(store, {
+      now: () => new Date(milliseconds++),
+    });
+    for (let index = 0; index < 10; index += 1) {
+      await request(application.getHttpServer())
+        .post("/v1/analytics/signals")
+        .send({ ...signal, app_version: "0.1.0" })
+        .expect(202);
+    }
+    expect(store.deltas).toHaveLength(1);
+    expect(store.deltas[0]).toMatchObject({
+      eventCountDelta: 10,
+      generatedAt: new Date(fixedNow.getTime() + 9),
+    });
   });
 
   it("rejects identity, client date, arbitrary properties and authority facts", async () => {

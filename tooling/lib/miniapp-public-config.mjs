@@ -11,8 +11,14 @@ const environments = new Set([
 ]);
 const localEnvironments = new Set(["LOCAL", "MINIAPP_RUNNER"]);
 const localHostnames = new Set(["127.0.0.1", "localhost"]);
-const expectedKeys = ["apiOrigin", "environment", "schemaVersion"];
+const expectedKeys = [
+  "apiOrigin",
+  "appVersion",
+  "environment",
+  "schemaVersion",
+];
 const originPattern = /^(https?):\/\/([a-z0-9.-]+)(?::([0-9]{1,5}))?$/iu;
+const appVersionPattern = /^\d+\.\d+\.\d+$/u;
 
 function fail(code) {
   throw new Error(code);
@@ -37,7 +43,9 @@ export function parseMiniappPublicConfig(value) {
     value.schemaVersion !== schemaVersion ||
     !environments.has(value.environment) ||
     typeof value.apiOrigin !== "string" ||
-    value.apiOrigin.length > 200
+    value.apiOrigin.length > 200 ||
+    typeof value.appVersion !== "string" ||
+    !appVersionPattern.test(value.appVersion)
   ) {
     fail("MINIAPP_PUBLIC_CONFIG_VALUE");
   }
@@ -65,6 +73,7 @@ export function parseMiniappPublicConfig(value) {
 
   return Object.freeze({
     apiOrigin: value.apiOrigin,
+    appVersion: value.appVersion,
     environment: value.environment,
     schemaVersion: value.schemaVersion,
   });
@@ -73,6 +82,7 @@ export function parseMiniappPublicConfig(value) {
 export function miniappPublicConfigFingerprint(config) {
   const canonical = JSON.stringify({
     apiOrigin: config.apiOrigin,
+    appVersion: config.appVersion,
     environment: config.environment,
     schemaVersion: config.schemaVersion,
   });
@@ -93,6 +103,7 @@ export function renderMiniappPublicConfigSource(config) {
     "",
     "export const PUBLIC_BUILD_CONFIG: PublicBuildConfigInput = Object.freeze({",
     `  apiOrigin: ${JSON.stringify(config.apiOrigin)},`,
+    `  appVersion: ${JSON.stringify(config.appVersion)},`,
     `  environment: ${JSON.stringify(config.environment)},`,
     `  schemaVersion: ${JSON.stringify(config.schemaVersion)},`,
     "});",
@@ -109,6 +120,7 @@ export function renderMiniappPublicConfigRuntime(config) {
     'Object.defineProperty(exports, "__esModule", { value: true });',
     "exports.PUBLIC_BUILD_CONFIG = Object.freeze({",
     `  apiOrigin: ${JSON.stringify(config.apiOrigin)},`,
+    `  appVersion: ${JSON.stringify(config.appVersion)},`,
     `  environment: ${JSON.stringify(config.environment)},`,
     `  schemaVersion: ${JSON.stringify(config.schemaVersion)},`,
     "});",

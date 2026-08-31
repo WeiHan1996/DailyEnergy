@@ -9,6 +9,7 @@ export const PRIVACY_DATA_SCREEN_ID = "SET-004";
 
 Page({
   data: {
+    analyticsPageKey: "",
     error: false,
     exporting: false,
     latestExport: undefined as DataTaskView | undefined,
@@ -19,6 +20,10 @@ Page({
     tasks: [] as readonly DataTaskView[],
   },
   async onLoad() {
+    const analytics = getMiniappAppContext().analytics;
+    this.setData({
+      analyticsPageKey: analytics.beginPage(PRIVACY_DATA_SCREEN_ID),
+    });
     wx.getNetworkType({
       success: ({ networkType }) =>
         this.setData({ offline: networkType === "none" }),
@@ -141,5 +146,8 @@ Page({
       summary: result.summary,
       tasks: result.tasks.items,
     });
+    void getMiniappAppContext().analytics.dataRightsEntryViewed(
+      this.data.analyticsPageKey,
+    );
   },
 });

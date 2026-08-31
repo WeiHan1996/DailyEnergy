@@ -479,6 +479,13 @@ const AppVersionBucketSchema = z.union([
   z.literal("OTHER"),
   z.string().regex(/^\d+\.\d+$/u),
 ]);
+export const ClientAnalyticsAppVersionBucketValues = ["0.1", "OTHER"] as const;
+export const ClientAnalyticsSurfaceVersionBucketValues = [
+  "LANDING_V1",
+] as const;
+const ClientAnalyticsSurfaceVersionBucketSchema = z.enum(
+  ClientAnalyticsSurfaceVersionBucketValues,
+);
 const AnalyticsDimensionCodeSchema = z.union([
   VersionBucketSchema,
   AppVersionBucketSchema,
@@ -560,13 +567,13 @@ export const ClientAnalyticsSignalRequestSchema = z.discriminatedUnion(
       ...ClientSignalBase,
       event_name: z.literal("landing_viewed"),
       scene_code: AnalyticsSceneCodeSchema,
-      surface_version_bucket: VersionBucketSchema,
+      surface_version_bucket: ClientAnalyticsSurfaceVersionBucketSchema,
     }),
     z.strictObject({
       ...ClientSignalBase,
       event_name: z.literal("landing_primary_action_clicked"),
       scene_code: AnalyticsSceneCodeSchema,
-      surface_version_bucket: VersionBucketSchema,
+      surface_version_bucket: ClientAnalyticsSurfaceVersionBucketSchema,
     }),
     z.strictObject({
       ...ClientSignalBase,
@@ -717,6 +724,8 @@ export const MetricNotesCodeValues = [
   "BEST_EFFORT_SIGNAL",
   "POST_AGGREGATION_DELETION_NOT_RESTATED",
   "CHANNEL_UNAVAILABLE",
+  "SOURCE_INCOMPLETE",
+  "SOURCE_UNAVAILABLE",
 ] as const;
 
 export const MetricReportV1Schema = z

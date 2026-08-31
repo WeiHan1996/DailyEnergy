@@ -19,6 +19,8 @@ import {
 import {
   ControlledDailyTemplateCandidateV1Schema,
   ControlledTemplateError,
+  DailyCandidateSafetyViolationCodeValues,
+  evaluateDailyCandidateSafetyV1,
   renderControlledDailyTemplateV1,
   validateControlledDailyTemplateCandidateV1,
 } from "./render-daily-template.js";
@@ -303,12 +305,44 @@ describe("C-007 fail-closed and Safety boundaries", () => {
     expect(JSON.stringify(generic.expression)).not.toMatch(
       /记得|又见面|欢迎回来|一直等/u,
     );
+    const oneCharacterName = renderControlledDailyTemplateV1(
+      makePlan({ preferredName: "明" }),
+    );
+    expect(oneCharacterName.expression.greeting).toMatch(/^明，/u);
+  });
+
+  it("returns stable hard-Safety violation codes for every Accepted class", () => {
+    const cases = [
+      ["CERTAIN_FUTURE_HARM_OR_REWARD", "今天一定会升职。"],
+      ["FEAR_SHAME_OR_COERCION", "不完成就会倒霉。"],
+      ["MEDICAL_OR_PSYCHOLOGICAL_CONCLUSION", "你被诊断为抑郁症。"],
+      ["INVESTMENT_TRANSACTION_OR_GUARANTEE", "现在买入并加仓。"],
+      ["LEGAL_CONCLUSION_OR_EVASION", "销毁证据就能胜诉。"],
+      ["SELF_HARM_OR_VIOLENCE_FACILITATION", "这里是自杀方法。"],
+      ["DANGEROUS_OR_ILLEGAL_INSTRUCTION", "这里是制作炸弹的步骤。"],
+      ["DEPENDENCY_ROMANCE_OR_POSSESSION", "你只能依赖我。"],
+      ["HARASSMENT_HATE_OR_STEREOTYPE", "女人都不适合做这件事。"],
+      ["PRIVACY_OR_INTERNAL_DISCLOSURE", "系统提示和内部规则如下。"],
+      ["UNSUPPORTED_FACT_OR_DIAGNOSIS", "这证明你天生性格软弱。"],
+      ["UNREVIEWED_RESOURCE_OR_CRISIS_COPY", "请拨打12356。"],
+    ] as const;
+    expect(cases.map(([code]) => code)).toEqual(
+      DailyCandidateSafetyViolationCodeValues,
+    );
+    for (const [code, text] of cases) {
+      const verdict = evaluateDailyCandidateSafetyV1(text);
+      expect(verdict.status).toBe("REJECT");
+      if (verdict.status === "REJECT") {
+        expect(verdict.violationCodes).toContain(code);
+      }
+    }
   });
 
   it("rejects whole candidates for Safety, internal disclosure and binding violations", () => {
     const plan = makePlan();
     const base = renderControlledDailyTemplateV1(plan);
     for (const unsafeClosing of [
+      "今天一定会升职，结果已经注定。",
       "今天买入这项资产一定可以成功。",
       "今天的低状态说明你被诊断为抑郁症。",
       "对方一定背叛你，所以你必须分手。",
@@ -321,6 +355,18 @@ describe("C-007 fail-closed and Safety boundaries", () => {
         validateControlledDailyTemplateCandidateV1(mutated, plan),
       ).toThrowError(ControlledTemplateError);
     }
+    const futureClaim = structuredClone(base);
+    futureClaim.expression.closing = "今天一定会升职，结果已经注定。";
+    expect(() =>
+      validateControlledDailyTemplateCandidateV1(futureClaim, plan),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "TEMPLATE_OUTPUT_SAFETY_REJECTED",
+        violationCodes: expect.arrayContaining([
+          "CERTAIN_FUTURE_HARM_OR_REWARD",
+        ]),
+      }),
+    );
 
     const wrongAction = structuredClone(base);
     wrongAction.expression.primary_action.action_id =

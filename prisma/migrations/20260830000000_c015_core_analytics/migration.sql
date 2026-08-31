@@ -484,6 +484,42 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION "daily_energy"."set_c015_nonpublished_metric"(
+  p_metric_id TEXT,
+  p_product_date DATE,
+  p_environment TEXT,
+  p_status TEXT,
+  p_notes TEXT[],
+  p_aggregation_revision BIGINT,
+  p_generated_at TIMESTAMPTZ
+) RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO daily_energy, pg_catalog
+AS $$
+BEGIN
+  IF p_metric_id !~ '^S25-M(0[1-9]|1[0-9]|2[0-3])$' OR
+     p_status NOT IN ('BLOCKED','UNAVAILABLE') OR
+     p_aggregation_revision <= 0 THEN
+    RAISE EXCEPTION 'C015_METRIC_STATUS_INPUT_INVALID';
+  END IF;
+  INSERT INTO analytics_product_metric_snapshot
+    ("metricId","metricVersion","periodOrCohort","environment","status",
+     "notesCodes","sourceContractVersion","aggregationRevision","generatedAt","expiresAt")
+  VALUES (p_metric_id,1,p_product_date,p_environment,p_status,p_notes,
+          's25-metric-source-v1',p_aggregation_revision,p_generated_at,
+          (p_product_date::timestamp AT TIME ZONE 'UTC') + INTERVAL '13 months')
+  ON CONFLICT ("metricId","metricVersion","periodOrCohort","environment",
+               "dimension1Name","dimension1Code","dimension2Name","dimension2Code")
+  DO UPDATE SET "status"=EXCLUDED."status","numerator"=NULL,
+    "denominator"=NULL,"value"=NULL,"wilsonLow"=NULL,"wilsonHigh"=NULL,
+    "notesCodes"=EXCLUDED."notesCodes",
+    "sourceContractVersion"=EXCLUDED."sourceContractVersion",
+    "aggregationRevision"=EXCLUDED."aggregationRevision",
+    "generatedAt"=EXCLUDED."generatedAt","expiresAt"=EXCLUDED."expiresAt";
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION "daily_energy"."rebuild_c015_analytics_date"(
   p_product_date DATE,
   p_finalized_product_date DATE,
@@ -505,6 +541,11 @@ DECLARE
   v_gate_rows BIGINT;
   v_raw_matches BIGINT;
   v_ttl_breaches BIGINT;
+  v_contract_failures BIGINT;
+  v_small_cell_failures BIGINT;
+  v_data_task_breaches BIGINT;
+  v_usage_total BIGINT;
+  v_usage_known BIGINT;
 BEGIN
   IF p_environment NOT IN ('PROD','STAGING','TEST','DEV') OR
      p_aggregation_revision <= 0 OR p_finalized_product_date < p_product_date THEN
@@ -521,9 +562,11 @@ BEGIN
        'data_rights_entry_viewed'
      );
   DELETE FROM analytics_runtime_daily_aggregate
-   WHERE "productDate"=p_product_date AND "environment"=p_environment;
+   WHERE "productDate"=p_product_date AND "environment"=p_environment
+     AND "eventName" NOT IN ('raw_content_detector_outcome','release_contract_outcome');
   DELETE FROM analytics_governance_daily_aggregate
-   WHERE "productDate"=p_product_date AND "environment"=p_environment;
+   WHERE "productDate"=p_product_date AND "environment"=p_environment
+     AND "eventName" NOT IN ('data_task_sla_outcome','deleted_data_reactivation_blocked');
   DELETE FROM analytics_safety_daily_aggregate
    WHERE "productDate"=p_product_date AND "environment"=p_environment;
 
@@ -546,7 +589,13 @@ BEGIN
     SELECT DISTINCT c."accountId" AS owner_id
       FROM app_morning_checkin c
       JOIN app_user_account a ON a.id=c."accountId" AND a.state='ACTIVE'
-     WHERE c."productDate"=p_product_date;
+     WHERE c."productDate"=p_product_date
+       AND NOT EXISTS (
+         SELECT 1 FROM restricted_deletion_guard dg
+          WHERE dg."accountId"=c."accountId" AND dg."releasedAt" IS NULL
+            AND (dg.scope='ACCOUNT' OR
+              (dg.scope='DAY' AND dg."targetKey"=c."productDate"::text))
+       );
   CREATE TEMP TABLE c015_result ON COMMIT DROP AS
     SELECT DISTINCT r."accountId" AS owner_id,
       CASE WHEN EXISTS (
@@ -560,19 +609,51 @@ BEGIN
       JOIN app_generation_intent gi ON gi.id=r."generationIntentId"
       JOIN app_user_account a ON a.id=r."accountId" AND a.state='ACTIVE'
       LEFT JOIN app_published_result_visibility v ON v."resultId"=r.id
-     WHERE r."productDate"=p_product_date AND COALESCE(v.state,'AVAILABLE')='AVAILABLE';
+     WHERE r."productDate"=p_product_date AND COALESCE(v.state,'AVAILABLE')='AVAILABLE'
+       AND NOT EXISTS (
+         SELECT 1 FROM restricted_deletion_guard dg
+          WHERE dg."accountId"=r."accountId" AND dg."releasedAt" IS NULL
+            AND (dg.scope='ACCOUNT' OR
+              (dg.scope='DAY' AND dg."targetKey"=r."productDate"::text))
+       );
+  CREATE TEMP TABLE c015_first_result ON COMMIT DROP AS
+    SELECT r.owner_id FROM c015_result r
+     WHERE NOT EXISTS (
+       SELECT 1 FROM app_published_daily_result prior
+       LEFT JOIN app_published_result_visibility pv ON pv."resultId"=prior.id
+       WHERE prior."accountId"=r.owner_id AND prior."productDate"<p_product_date
+         AND COALESCE(pv.state,'AVAILABLE')='AVAILABLE'
+         AND NOT EXISTS (
+           SELECT 1 FROM restricted_deletion_guard dg
+            WHERE dg."accountId"=prior."accountId" AND dg."releasedAt" IS NULL
+              AND (dg.scope='ACCOUNT' OR
+                (dg.scope='DAY' AND dg."targetKey"=prior."productDate"::text))
+         )
+     );
   CREATE TEMP TABLE c015_light ON COMMIT DROP AS
     SELECT DISTINCT di."accountId" AS owner_id
       FROM app_daily_light_fact l
       JOIN app_daily_interaction di ON di.id=l."interactionId"
       JOIN app_user_account a ON a.id=di."accountId" AND a.state='ACTIVE'
-     WHERE di."productDate"=p_product_date;
+     WHERE di."productDate"=p_product_date
+       AND NOT EXISTS (
+         SELECT 1 FROM restricted_deletion_guard dg
+          WHERE dg."accountId"=di."accountId" AND dg."releasedAt" IS NULL
+            AND (dg.scope='ACCOUNT' OR
+              (dg.scope='DAY' AND dg."targetKey"=di."productDate"::text))
+       );
   CREATE TEMP TABLE c015_evening ON COMMIT DROP AS
     SELECT DISTINCT di."accountId" AS owner_id, e."firstSubmittedAt"
       FROM app_evening_feedback_record e
       JOIN app_daily_interaction di ON di.id=e."interactionId"
       JOIN app_user_account a ON a.id=di."accountId" AND a.state='ACTIVE'
-     WHERE di."productDate" BETWEEN p_product_date AND p_product_date+6;
+     WHERE di."productDate" BETWEEN p_product_date AND p_product_date+6
+       AND NOT EXISTS (
+         SELECT 1 FROM restricted_deletion_guard dg
+          WHERE dg."accountId"=di."accountId" AND dg."releasedAt" IS NULL
+            AND (dg.scope='ACCOUNT' OR
+              (dg.scope='DAY' AND dg."targetKey"=di."productDate"::text))
+       );
   CREATE TEMP TABLE c015_interaction ON COMMIT DROP AS
     SELECT di."accountId" AS owner_id, t.status AS task_status,
            (t.id IS NOT NULL) AS has_task, h.rating AS helpfulness
@@ -582,13 +663,25 @@ BEGIN
       LEFT JOIN app_published_result_visibility v ON v."resultId"=r.id
       LEFT JOIN app_daily_task_state t ON t."interactionId"=di.id
       LEFT JOIN app_daily_helpfulness_record h ON h."interactionId"=di.id
-     WHERE di."productDate"=p_product_date AND COALESCE(v.state,'AVAILABLE')='AVAILABLE';
+     WHERE di."productDate"=p_product_date AND COALESCE(v.state,'AVAILABLE')='AVAILABLE'
+       AND NOT EXISTS (
+         SELECT 1 FROM restricted_deletion_guard dg
+          WHERE dg."accountId"=di."accountId" AND dg."releasedAt" IS NULL
+            AND (dg.scope='ACCOUNT' OR
+              (dg.scope='DAY' AND dg."targetKey"=di."productDate"::text))
+       );
   CREATE TEMP TABLE c015_encounter ON COMMIT DROP AS
     SELECT rc.id AS cycle_id, rc."accountId" AS owner_id, el."productDate"
       FROM app_relationship_cycle rc
       JOIN app_relationship_encounter_link el ON el."cycleId"=rc.id
       JOIN app_user_account a ON a.id=rc."accountId" AND a.state='ACTIVE'
-     WHERE rc.state='ACTIVE';
+     WHERE rc.state='ACTIVE'
+       AND NOT EXISTS (
+         SELECT 1 FROM restricted_deletion_guard dg
+          WHERE dg."accountId"=rc."accountId" AND dg."releasedAt" IS NULL
+            AND (dg.scope IN ('ACCOUNT','RELATIONSHIP_DATA') OR
+              (dg.scope='DAY' AND dg."targetKey"=el."productDate"::text))
+       );
   CREATE TEMP TABLE c015_cycle ON COMMIT DROP AS
     SELECT cycle_id, MIN(owner_id::text)::uuid AS owner_id,
            MIN("productDate") AS d0,
@@ -662,8 +755,8 @@ BEGIN
   PERFORM set_c015_metric('S25-M04',p_product_date,p_finalized_product_date,p_environment,
     v_numerator,v_denominator,NULL,TRUE,ARRAY['TEMPLATE_INCLUDED','POST_AGGREGATION_DELETION_NOT_RESTATED'],p_aggregation_revision,p_generated_at);
   SELECT count(*) FILTER (WHERE l.owner_id IS NOT NULL),count(*)
-    INTO v_numerator,v_denominator FROM c015_cycle cy
-    JOIN c015_result r USING(owner_id) LEFT JOIN c015_light l USING(owner_id);
+    INTO v_numerator,v_denominator FROM c015_first_result r
+    LEFT JOIN c015_light l USING(owner_id);
   PERFORM set_c015_metric('S25-M05',p_product_date,p_finalized_product_date,p_environment,
     v_numerator,v_denominator,NULL,TRUE,ARRAY['TEMPLATE_INCLUDED','POST_AGGREGATION_DELETION_NOT_RESTATED'],p_aggregation_revision,p_generated_at);
   SELECT count(*) FILTER (WHERE l.owner_id IS NOT NULL),count(*)
@@ -715,44 +808,132 @@ BEGIN
   PERFORM set_c015_metric('S25-M17',p_product_date,p_finalized_product_date,p_environment,v_numerator,v_denominator,NULL,TRUE,ARRAY['POST_AGGREGATION_DELETION_NOT_RESTATED'],p_aggregation_revision,p_generated_at);
   SELECT COALESCE((SELECT sum("eventCount") FROM analytics_product_daily_aggregate WHERE "productDate"=p_product_date AND "environment"=p_environment AND "eventName"='weekly_summary_read'),0),count(*) INTO v_numerator,v_denominator FROM c015_cycle WHERE p_product_date+7<p_finalized_product_date;
   PERFORM set_c015_metric('S25-M18',p_product_date,p_finalized_product_date,p_environment,v_numerator,v_denominator,NULL,FALSE,ARRAY['BEST_EFFORT_SIGNAL','POST_AGGREGATION_DELETION_NOT_RESTATED'],p_aggregation_revision,p_generated_at);
-  SELECT count(DISTINCT cr."accountId"), (SELECT count(*) FROM c015_core_active) INTO v_numerator,v_denominator
-    FROM runtime_command_receipt cr WHERE cr."operationCode"='SHARE_INTENT_CREATE'
-      AND ((cr."acceptedAt" AT TIME ZONE 'Asia/Shanghai')-INTERVAL '4 hours')::date=p_product_date;
-  PERFORM set_c015_metric('S25-M19',p_product_date,p_finalized_product_date,p_environment,v_numerator,v_denominator,NULL,TRUE,ARRAY['POST_AGGREGATION_DELETION_NOT_RESTATED'],p_aggregation_revision,p_generated_at);
+  PERFORM set_c015_nonpublished_metric('S25-M19',p_product_date,p_environment,
+    'UNAVAILABLE',ARRAY['SOURCE_UNAVAILABLE','POST_AGGREGATION_DELETION_NOT_RESTATED'],
+    p_aggregation_revision,p_generated_at);
 
   SELECT count(*) FILTER (WHERE latency_ms<8000),count(*) INTO v_numerator,v_denominator FROM c015_result WHERE generation_mode='AI' AND latency_ms IS NOT NULL;
   PERFORM set_c015_metric('S25-M20',p_product_date,p_finalized_product_date,p_environment,v_numerator,v_denominator,NULL,TRUE,ARRAY['POST_AGGREGATION_DELETION_NOT_RESTATED'],p_aggregation_revision,p_generated_at);
   SELECT count(*) FILTER (WHERE generation_mode='CONTROLLED_TEMPLATE'),count(*) INTO v_numerator,v_denominator FROM c015_result;
   PERFORM set_c015_metric('S25-M21',p_product_date,p_finalized_product_date,p_environment,v_numerator,v_denominator,NULL,TRUE,ARRAY['TEMPLATE_INCLUDED','POST_AGGREGATION_DELETION_NOT_RESTATED'],p_aggregation_revision,p_generated_at);
-  SELECT COALESCE(sum(ga."costMicros"),0), (SELECT count(*) FROM c015_core_active) INTO v_numerator,v_denominator
-    FROM runtime_gateway_attempt ga JOIN runtime_gateway_invocation inv ON inv.id=ga."invocationId"
-    JOIN app_generation_intent gi ON gi.id=inv."generationIntentId"
-   WHERE gi."targetProductDate"=p_product_date AND ga.outcome IS NOT NULL AND ga."costMicros" IS NOT NULL;
-  PERFORM set_c015_metric('S25-M22',p_product_date,p_finalized_product_date,p_environment,v_numerator,v_denominator,
-    CASE WHEN v_denominator=0 THEN 0 ELSE v_numerator::numeric/1000000/v_denominator END,FALSE,
-    ARRAY['POST_AGGREGATION_DELETION_NOT_RESTATED'],p_aggregation_revision,p_generated_at);
-  SELECT count(*) FILTER (WHERE ga."costMicros" IS NOT NULL),count(*) INTO v_numerator,v_denominator
+  SELECT count(*),count(*) FILTER (WHERE ga."costMicros" IS NOT NULL),
+         COALESCE(sum(ga."costMicros") FILTER (WHERE ga."costMicros" IS NOT NULL),0)
+    INTO v_usage_total,v_usage_known,v_numerator
     FROM runtime_gateway_attempt ga JOIN runtime_gateway_invocation inv ON inv.id=ga."invocationId"
     JOIN app_generation_intent gi ON gi.id=inv."generationIntentId"
    WHERE gi."targetProductDate"=p_product_date AND ga.outcome IS NOT NULL;
+  SELECT count(*) INTO v_denominator FROM c015_core_active;
+  IF v_denominator>=10 AND
+     (v_usage_total=0 OR v_usage_known::numeric/v_usage_total<0.99) THEN
+    PERFORM set_c015_nonpublished_metric('S25-M22',p_product_date,p_environment,
+      'BLOCKED',ARRAY['SOURCE_INCOMPLETE','POST_AGGREGATION_DELETION_NOT_RESTATED'],
+      p_aggregation_revision,p_generated_at);
+  ELSE
+    PERFORM set_c015_metric('S25-M22',p_product_date,p_finalized_product_date,p_environment,v_numerator,v_denominator,
+      CASE WHEN v_denominator=0 THEN 0 ELSE v_numerator::numeric/1000000/v_denominator END,FALSE,
+      ARRAY['POST_AGGREGATION_DELETION_NOT_RESTATED'],p_aggregation_revision,p_generated_at);
+  END IF;
+  v_numerator:=v_usage_known;
+  v_denominator:=v_usage_total;
   PERFORM set_c015_metric('S25-M23',p_product_date,p_finalized_product_date,p_environment,v_numerator,v_denominator,NULL,TRUE,ARRAY['POST_AGGREGATION_DELETION_NOT_RESTATED'],p_aggregation_revision,p_generated_at);
 
-  SELECT count(*) INTO v_raw_matches FROM analytics_runtime_daily_aggregate
-    WHERE "productDate"=p_product_date AND "environment"=p_environment
-      AND "eventName"='raw_content_detector_outcome' AND "dimension1Code" IN ('MATCH','BLOCKED');
+  SELECT count(*) INTO v_contract_failures
+    FROM unnest(ARRAY['SCHEMA','API','EVENT','METRIC','DATABASE']) required(contract_group)
+   WHERE NOT EXISTS (
+     SELECT 1 FROM analytics_runtime_daily_aggregate evidence
+      WHERE evidence."productDate"=p_product_date
+        AND evidence."environment"=p_environment
+        AND evidence."eventName"='release_contract_outcome'
+        AND CASE WHEN evidence."dimension1Name"='contract_group'
+          THEN evidence."dimension1Code" ELSE evidence."dimension2Code" END=required.contract_group
+        AND CASE WHEN evidence."dimension1Name"='outcome_code'
+          THEN evidence."dimension1Code" ELSE evidence."dimension2Code" END='PASS'
+   );
+  SELECT v_contract_failures+count(*) INTO v_contract_failures
+    FROM analytics_runtime_daily_aggregate evidence
+   WHERE evidence."productDate"=p_product_date
+     AND evidence."environment"=p_environment
+     AND evidence."eventName"='release_contract_outcome'
+     AND CASE WHEN evidence."dimension1Name"='outcome_code'
+       THEN evidence."dimension1Code" ELSE evidence."dimension2Code" END='FAIL';
+
+  SELECT count(*) INTO v_raw_matches
+    FROM unnest(ARRAY['CONTRACT','QUEUE','LOG','AGGREGATE','EXPORT']) required(subsystem)
+   WHERE NOT EXISTS (
+     SELECT 1 FROM analytics_runtime_daily_aggregate evidence
+      WHERE evidence."productDate"=p_product_date
+        AND evidence."environment"=p_environment
+        AND evidence."eventName"='raw_content_detector_outcome'
+        AND CASE WHEN evidence."dimension1Name"='subsystem'
+          THEN evidence."dimension1Code" ELSE evidence."dimension2Code" END=required.subsystem
+        AND CASE WHEN evidence."dimension1Name"='outcome_code'
+          THEN evidence."dimension1Code" ELSE evidence."dimension2Code" END='CLEAN'
+   );
+  SELECT v_raw_matches+count(*) INTO v_raw_matches
+    FROM analytics_runtime_daily_aggregate evidence
+   WHERE evidence."productDate"=p_product_date
+     AND evidence."environment"=p_environment
+     AND evidence."eventName"='raw_content_detector_outcome'
+     AND CASE WHEN evidence."dimension1Name"='outcome_code'
+       THEN evidence."dimension1Code" ELSE evidence."dimension2Code" END IN ('MATCH','BLOCKED','FAILED');
+
+  SELECT count(*) INTO v_small_cell_failures FROM (
+    SELECT "eventCount","uniqueOwnerCount" FROM analytics_product_daily_aggregate
+    UNION ALL SELECT "eventCount","uniqueOwnerCount" FROM analytics_runtime_daily_aggregate
+    UNION ALL SELECT "eventCount","uniqueOwnerCount" FROM analytics_governance_daily_aggregate
+    UNION ALL SELECT "eventCount","uniqueOwnerCount" FROM analytics_safety_daily_aggregate
+  ) cells WHERE "eventCount"<10 OR
+    ("uniqueOwnerCount" IS NOT NULL AND "uniqueOwnerCount"<10);
+  IF has_table_privilege('daily_energy_api','daily_energy.analytics_product_daily_aggregate','SELECT') OR
+     has_table_privilege('daily_energy_api','daily_energy.analytics_runtime_daily_aggregate','SELECT') OR
+     has_table_privilege('daily_energy_api','daily_energy.analytics_governance_daily_aggregate','SELECT') OR
+     has_table_privilege('daily_energy_api','daily_energy.analytics_safety_daily_aggregate','SELECT') OR
+     has_table_privilege('daily_energy_background','daily_energy.analytics_product_daily_aggregate','SELECT') OR
+     has_table_privilege('daily_energy_background','daily_energy.analytics_runtime_daily_aggregate','SELECT') OR
+     has_table_privilege('daily_energy_background','daily_energy.analytics_governance_daily_aggregate','SELECT') OR
+     has_table_privilege('daily_energy_background','daily_energy.analytics_safety_daily_aggregate','SELECT') THEN
+    v_small_cell_failures:=v_small_cell_failures+1;
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM analytics_runtime_daily_aggregate evidence
+     WHERE evidence."productDate"=p_product_date
+       AND evidence."environment"=p_environment
+       AND evidence."eventName"='release_contract_outcome'
+       AND CASE WHEN evidence."dimension1Name"='contract_group'
+         THEN evidence."dimension1Code" ELSE evidence."dimension2Code" END='METRIC'
+       AND CASE WHEN evidence."dimension1Name"='outcome_code'
+         THEN evidence."dimension1Code" ELSE evidence."dimension2Code" END='PASS'
+  ) THEN
+    v_small_cell_failures:=v_small_cell_failures+1;
+  END IF;
+
   SELECT count(*) INTO v_ttl_breaches FROM (
     SELECT "expiresAt" FROM analytics_product_daily_aggregate UNION ALL
     SELECT "expiresAt" FROM analytics_runtime_daily_aggregate UNION ALL
     SELECT "expiresAt" FROM analytics_governance_daily_aggregate UNION ALL
     SELECT "expiresAt" FROM analytics_safety_daily_aggregate UNION ALL
-    SELECT "expiresAt" FROM analytics_product_metric_snapshot
+    SELECT "expiresAt" FROM analytics_product_metric_snapshot UNION ALL
+    SELECT "expiresAt" FROM analytics_gate_snapshot
   ) expired WHERE "expiresAt" <= p_generated_at;
+  SELECT count(*) INTO v_data_task_breaches FROM restricted_data_task task
+   WHERE (task.state NOT IN ('SUCCEEDED','CANCELLED') AND
+          task."requestedAt"+INTERVAL '7 days'<=p_generated_at)
+      OR (task.kind='DELETE' AND task."onlineErasedAt" IS NULL AND
+          task."requestedAt"+INTERVAL '72 hours'<=p_generated_at);
+  SELECT v_data_task_breaches+count(*) INTO v_data_task_breaches
+    FROM analytics_governance_daily_aggregate evidence
+   WHERE evidence."productDate"=p_product_date
+     AND evidence."environment"=p_environment
+     AND evidence."eventName"='data_task_sla_outcome'
+     AND CASE WHEN evidence."dimension1Name"='sla_outcome'
+       THEN evidence."dimension1Code" ELSE evidence."dimension2Code" END='BREACHED';
+  v_ttl_breaches:=v_ttl_breaches+v_data_task_breaches;
   INSERT INTO analytics_gate_snapshot
     ("gateId","environment","status","reasonCodes","aggregationRevision","generatedAt","expiresAt")
   VALUES
-    ('S25-G01',p_environment,'PASS',ARRAY[]::text[],p_aggregation_revision,p_generated_at,(p_product_date::timestamp AT TIME ZONE 'UTC')+INTERVAL '13 months'),
+    ('S25-G01',p_environment,CASE WHEN v_contract_failures=0 THEN 'PASS' ELSE 'BLOCKED' END,CASE WHEN v_contract_failures=0 THEN ARRAY[]::text[] ELSE ARRAY['CONTRACT_FAILURE'] END,p_aggregation_revision,p_generated_at,(p_product_date::timestamp AT TIME ZONE 'UTC')+INTERVAL '13 months'),
     ('S25-G02',p_environment,CASE WHEN v_raw_matches=0 THEN 'PASS' ELSE 'BLOCKED' END,CASE WHEN v_raw_matches=0 THEN ARRAY[]::text[] ELSE ARRAY['RAW_CONTENT_MATCH'] END,p_aggregation_revision,p_generated_at,(p_product_date::timestamp AT TIME ZONE 'UTC')+INTERVAL '13 months'),
-    ('S25-G03',p_environment,'PASS',ARRAY[]::text[],p_aggregation_revision,p_generated_at,(p_product_date::timestamp AT TIME ZONE 'UTC')+INTERVAL '13 months'),
+    ('S25-G03',p_environment,CASE WHEN v_small_cell_failures=0 THEN 'PASS' ELSE 'BLOCKED' END,CASE WHEN v_small_cell_failures=0 THEN ARRAY[]::text[] ELSE ARRAY['SMALL_CELL_OR_JOIN_PATH'] END,p_aggregation_revision,p_generated_at,(p_product_date::timestamp AT TIME ZONE 'UTC')+INTERVAL '13 months'),
     ('S25-G04',p_environment,CASE WHEN v_ttl_breaches=0 THEN 'PASS' ELSE 'BLOCKED' END,CASE WHEN v_ttl_breaches=0 THEN ARRAY[]::text[] ELSE ARRAY['DELETION_OR_TTL_BREACH'] END,p_aggregation_revision,p_generated_at,(p_product_date::timestamp AT TIME ZONE 'UTC')+INTERVAL '13 months')
   ON CONFLICT ("gateId","environment") DO UPDATE SET
     "status"=EXCLUDED."status","reasonCodes"=EXCLUDED."reasonCodes",
@@ -863,6 +1044,7 @@ ALTER FUNCTION upsert_c015_anonymous_aggregate(TEXT,DATE,TEXT,TEXT,JSONB,BIGINT,
 ALTER FUNCTION increment_c015_client_signal_aggregate(DATE,TEXT,TEXT,JSONB,BIGINT,TIMESTAMPTZ) OWNER TO daily_energy_owner;
 ALTER FUNCTION c015_wilson_bounds(BIGINT,BIGINT) OWNER TO daily_energy_owner;
 ALTER FUNCTION set_c015_metric(TEXT,DATE,DATE,TEXT,BIGINT,BIGINT,NUMERIC,BOOLEAN,TEXT[],BIGINT,TIMESTAMPTZ) OWNER TO daily_energy_owner;
+ALTER FUNCTION set_c015_nonpublished_metric(TEXT,DATE,TEXT,TEXT,TEXT[],BIGINT,TIMESTAMPTZ) OWNER TO daily_energy_owner;
 ALTER FUNCTION rebuild_c015_analytics_date(DATE,DATE,TEXT,BIGINT,TIMESTAMPTZ) OWNER TO daily_energy_owner;
 ALTER FUNCTION execute_c015_analytics_retention(BIGINT,TIMESTAMPTZ) OWNER TO daily_energy_owner;
 ALTER FUNCTION get_c015_metric_reports(DATE,TEXT) OWNER TO daily_energy_owner;
@@ -881,6 +1063,7 @@ REVOKE ALL ON FUNCTION upsert_c015_anonymous_aggregate(TEXT,DATE,TEXT,TEXT,JSONB
 REVOKE ALL ON FUNCTION increment_c015_client_signal_aggregate(DATE,TEXT,TEXT,JSONB,BIGINT,TIMESTAMPTZ) FROM PUBLIC;
 REVOKE ALL ON FUNCTION c015_wilson_bounds(BIGINT,BIGINT) FROM PUBLIC;
 REVOKE ALL ON FUNCTION set_c015_metric(TEXT,DATE,DATE,TEXT,BIGINT,BIGINT,NUMERIC,BOOLEAN,TEXT[],BIGINT,TIMESTAMPTZ) FROM PUBLIC;
+REVOKE ALL ON FUNCTION set_c015_nonpublished_metric(TEXT,DATE,TEXT,TEXT,TEXT[],BIGINT,TIMESTAMPTZ) FROM PUBLIC;
 REVOKE ALL ON FUNCTION rebuild_c015_analytics_date(DATE,DATE,TEXT,BIGINT,TIMESTAMPTZ) FROM PUBLIC;
 REVOKE ALL ON FUNCTION execute_c015_analytics_retention(BIGINT,TIMESTAMPTZ) FROM PUBLIC;
 REVOKE ALL ON FUNCTION get_c015_metric_reports(DATE,TEXT) FROM PUBLIC;

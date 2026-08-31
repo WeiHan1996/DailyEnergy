@@ -12,6 +12,7 @@ import {
 const schemaVersion = MINIAPP_PUBLIC_BUILD_CONFIG_SCHEMA_VERSION;
 const baseConfig = {
   apiOrigin: "https://api.daily-energy.example",
+  appVersion: "0.1.0",
   environment: "PRODUCTION",
   schemaVersion,
 };
@@ -93,6 +94,11 @@ const cases = [
     accepted: false,
     name: "unknown schema",
     value: { ...baseConfig, schemaVersion: "unknown" },
+  },
+  {
+    accepted: false,
+    name: "floating app version",
+    value: { ...baseConfig, appVersion: "latest" },
   },
   {
     accepted: false,

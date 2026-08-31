@@ -8,7 +8,30 @@
   "verified_status_head": "487a939914e7c18614634e313dab18c0e8c90e3f",
   "verified_status_ci_run": 33323187131,
   "verified_status_ci_checks": "11/11 SUCCESS",
-  "execution_status": "AUTOMATED_IMPLEMENTATION_COMPLETE_MANUAL_EVIDENCE_PENDING",
+  "remediation_branch": "agent/c004-c015-review-fixes",
+  "remediation_base_head": "fd04b787926127bda64fc6cb07cfcf356d85ed8b",
+  "remediation_head": "6fdb3f5a9a868bdac4d8ab025ad8c9eaf29da2ed",
+  "remediation_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/169",
+  "remediation_implementation_ci_run": 33357480285,
+  "remediation_status_head": "405f3c29fc916cfb314f9a665e8093df57911bf6",
+  "remediation_final_ci_run": 33357978808,
+  "remediation_final_ci_checks": "11/11 SUCCESS",
+  "stack_merge_strategy": "MERGE_COMMIT_PRESERVE_ANCESTRY_OWNER_APPROVED",
+  "stack_merge_strategy_head": "3d33a80df646097cc1fcef361e9c4a08703cd656",
+  "stack_merge_strategy_ci_run": 33368423171,
+  "stack_merge_strategy_ci_checks": "11/11 SUCCESS",
+  "repository_merge_commit_setting": "EXPLICITLY_APPROVED_TEMPORARY_CHANGE_PENDING",
+  "ruleset_change_approved_at_utc": "2026-08-31T07:57:27Z",
+  "ruleset_change_scope": "TEMPORARILY_REMOVE_REQUIRED_LINEAR_HISTORY_AND_ALLOW_ONLY_MERGE; PRESERVE_ALL_OTHER_RULES; RESTORE_ON_SUCCESS_OR_ABORT",
+  "merge_window_attempt": {
+    "pr_157_exact_head_verifier": "PASS / run 32456442334 / 11 checks",
+    "merge_result": "REJECTED_BY_REQUIRED_LINEAR_HISTORY_AND_SQUASH_ONLY_RULESET",
+    "pull_requests_merged": 0,
+    "repository_settings_restored": true,
+    "pr_157_restored_to_draft": true,
+    "main_unchanged": "97b7181ea172f86d0ac3fe37af464f6bd0f169d8"
+  },
+  "execution_status": "CONTROLLED_MERGE_WINDOW_APPROVED_EXTERNAL_EVIDENCE_PENDING",
   "pass_claim": "PROHIBITED",
   "synthetic_accounts_only": true,
   "accepted_scope": {
@@ -38,11 +61,20 @@
     "full_security_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED",
     "root_tests": "18/18 Turbo tasks PASS",
     "root_build": "9/9 Turbo tasks PASS",
-    "redis_8_bullmq_5_queue": "8/8 PASS"
+    "redis_8_bullmq_5_queue": "8/8 PASS",
+    "api_tests": "158/158 PASS",
+    "miniapp_tests": "87/87 PASS",
+    "server_core_tests": "65/65 PASS",
+    "server_adapter_tests": "57/57 PASS",
+    "prompt_library_tests": "12/12 PASS",
+    "deployment_contract_tests": "50/50 PASS",
+    "contract_fingerprint": "4f25a52e42831a6ecaee032c92a92244e262169e452cf8a25389c0ba450a89a5",
+    "product_date_tzdb_audit": "ACTUAL_RUNTIME_RELEASE_BOUND_TO_RUNTIME_EVIDENCE_SUPPLY_DIGEST_AND_RELEASE_MANIFEST",
+    "review_remediation": "C-004_THROUGH_C-015_REGRESSIONS_PASS"
   },
   "security_review": {
-    "status": "OWNER_REVIEW_PENDING",
-    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "status": "OWNER_CODE_AND_THREAT_REVIEW_APPROVED",
+    "threat_boundary_review": "OWNER_APPROVED_2026-08-31",
     "reviewed_boundaries": [
       "no raw event, user event history, persistent cohort membership, user hash, device, session, IP, page content, Prompt or Safety-category store exists",
       "PRODUCT, RUNTIME, GOVERNANCE and SAFETY_CONTROL use four physical T4 tables with no ordinary API or Background direct read grant",
@@ -52,10 +84,12 @@
       "database checks enforce k=10, at most two dimensions, exact 13-month expiry and no exact values for suppressed metrics",
       "same revision replaces rows and a later authority revision recomputes D1/D3/D7 without a persistent late-user list",
       "Q01/Q02, individual experiment assignment and channel-specific retention have explicit unavailable/disabled results",
-      "logs and operational telemetry do not become product analytics sources"
+      "logs and operational telemetry do not become product analytics sources",
+      "product date resolution reports only the process tzdb release; new release manifests bind the immutable server-image runtime evidence while legacy ReleaseManifestV1 remains readable",
+      "account, Safety and deletion races fail closed before C-012/C-014 writes; superseded weekly content expires on a fixed 30-day deadline",
+      "client analytics identity cells, metrics M05/M19/M22 and count-free G01-G04 evidence use their accepted closed contracts"
     ],
     "residual_evidence": [
-      "owner review of differential-query resistance and the four-plane role matrix",
       "WeChat DevTools network inspection confirming an offline signal is not persisted or replayed after restart",
       "production deployment inspection confirming no third-party analytics, BI, ad, replay or attribution SDK is bundled",
       "privacy/legal confirmation of the actual processing entity, production location and user notice",
@@ -67,6 +101,6 @@
     "ios_network_no_replay": "MANUAL_EVIDENCE_PENDING",
     "android_network_no_replay": "MANUAL_EVIDENCE_PENDING"
   },
-  "reviewer": null,
-  "reviewed_at_utc": null
+  "reviewer": "project-owner",
+  "reviewed_at_utc": "2026-08-31T06:30:54Z"
 }

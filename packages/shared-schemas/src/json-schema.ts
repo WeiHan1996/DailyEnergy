@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:6973ffa5d175eb947cad85cb0f0e9d73879a24a4d91dca78cc030f3839400eed
+// source-fingerprint: sha256:79c5124f5ad8f698e49c3ba193a1a99f32741b3ee830d6e66dd0cc0e60d730be
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:6973ffa5d175eb947cad85cb0f0e9d73879a24a4d91dca78cc030f3839400eed";
+  "sha256:79c5124f5ad8f698e49c3ba193a1a99f32741b3ee830d6e66dd0cc0e60d730be";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -7661,9 +7661,7 @@ export const jsonSchemas = {
             type: "string",
           },
           surface_version_bucket: {
-            maxLength: 32,
-            minLength: 1,
-            pattern: "^(?:[A-Z][A-Z0-9_]{0,30}|OTHER)$",
+            enum: ["LANDING_V1"],
             type: "string",
           },
         },
@@ -7708,9 +7706,7 @@ export const jsonSchemas = {
             type: "string",
           },
           surface_version_bucket: {
-            maxLength: 32,
-            minLength: 1,
-            pattern: "^(?:[A-Z][A-Z0-9_]{0,30}|OTHER)$",
+            enum: ["LANDING_V1"],
             type: "string",
           },
         },
@@ -8033,6 +8029,8 @@ export const jsonSchemas = {
             "BEST_EFFORT_SIGNAL",
             "POST_AGGREGATION_DELETION_NOT_RESTATED",
             "CHANNEL_UNAVAILABLE",
+            "SOURCE_INCOMPLETE",
+            "SOURCE_UNAVAILABLE",
           ],
           type: "string",
         },

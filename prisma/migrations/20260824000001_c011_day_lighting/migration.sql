@@ -125,12 +125,23 @@ AS $$
       end_product_date,
       interval '1 day'
     ) AS day("productDate")
+    LEFT JOIN LATERAL (
+      SELECT true AS blocked
+        FROM "daily_energy"."restricted_deletion_guard" guard
+       WHERE guard."accountId" = target_account_id
+         AND guard.scope = 'DAY'
+         AND guard."targetKey" = day."productDate"::date::text
+         AND guard."releasedAt" IS NULL
+       LIMIT 1
+    ) day_guard ON true
     LEFT JOIN "daily_energy"."app_morning_checkin" checkin
       ON checkin."accountId" = target_account_id
      AND checkin."productDate" = day."productDate"
+     AND day_guard.blocked IS NULL
     LEFT JOIN "daily_energy"."app_published_daily_result" result
       ON result."accountId" = target_account_id
      AND result."productDate" = day."productDate"
+     AND day_guard.blocked IS NULL
     LEFT JOIN "daily_energy"."app_published_result_visibility" visibility
       ON visibility."resultId" = result.id AND visibility.state = 'AVAILABLE'
     LEFT JOIN "daily_energy"."app_daily_interaction" interaction

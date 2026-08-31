@@ -11,6 +11,7 @@ const IMAGE_DIGEST = /^sha256:[a-f0-9]{64}$/u;
 const GIT_SHA = /^[a-f0-9]{40}$/u;
 const RUN_ID = /^\d{1,20}$/u;
 const RELEASE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{2,63}$/u;
+const TZDB_RELEASE = /^\d{4}[a-z]$/u;
 
 function fail(code, detail) {
   throw new Error(`${code}:${detail}`);
@@ -63,11 +64,16 @@ export function apiDeployConfigFingerprint(releaseId) {
 }
 
 export function validateDevRuntimeEvidence(value) {
-  exactKeys(
-    value,
-    ["evidence_version", "fingerprints", "release_id", "server_image"],
-    "DEV_RUNTIME_EVIDENCE_KEYS",
-  );
+  const expectedKeys = [
+    "evidence_version",
+    "fingerprints",
+    "release_id",
+    "server_image",
+  ];
+  if (Object.hasOwn(value ?? {}, "tzdb_release")) {
+    expectedKeys.push("tzdb_release");
+  }
+  exactKeys(value, expectedKeys, "DEV_RUNTIME_EVIDENCE_KEYS");
   if (
     value.evidence_version !== RUNTIME_EVIDENCE_VERSION ||
     !/^dev-[a-f0-9]{12}-\d{1,20}-\d{1,6}$/u.test(value.release_id) ||
@@ -96,6 +102,12 @@ export function validateDevRuntimeEvidence(value) {
     apiDeployConfigFingerprint(value.release_id)
   ) {
     fail("DEV_RUNTIME_FINGERPRINT_INVALID", "api-deploy-config");
+  }
+  if (
+    value.tzdb_release !== undefined &&
+    !TZDB_RELEASE.test(value.tzdb_release)
+  ) {
+    fail("DEV_RUNTIME_TZDB_RELEASE_INVALID", "tzdb-release");
   }
   return value;
 }
@@ -194,8 +206,18 @@ export async function collectDevRuntimeEvidence(
   const serverImage = `ghcr.io/weihan1996/dailyenergy-server@${digest}`;
   await pullImage(serverImage);
   let api;
+  let tzdbRelease;
   let workers;
   try {
+    tzdbRelease = runImage(
+      serverImage,
+      [
+        "--input-type=module",
+        "--eval",
+        "process.stdout.write(process.versions.tz??'')",
+      ],
+      { NODE_OPTIONS: "" },
+    );
     api = JSON.parse(
       runImage(
         serverImage,
@@ -254,6 +276,7 @@ export async function collectDevRuntimeEvidence(
     },
     release_id: releaseId,
     server_image: serverImage,
+    tzdb_release: tzdbRelease,
   });
 }
 

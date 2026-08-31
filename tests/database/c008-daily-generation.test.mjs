@@ -511,6 +511,22 @@ test(
         continued.status === "ACCEPTED" && continued.value.task.revision,
         4,
       );
+      await admin.query("BEGIN");
+      await admin.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1::text,$2::bigint))",
+        [accountId, 20_400],
+      );
+      const boundaryWait = dailyInteraction.updateTask({
+        ...interestedInput,
+        commandRef: "c010-task-lock-crosses-expiry",
+        expectedRevision: 4,
+        normalizedPayloadFingerprint: bytes("c010:task:lock-crosses-expiry"),
+        now: new Date("2026-08-24T20:29:59.950Z"),
+        status: "INTERESTED",
+      });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      await admin.query("COMMIT");
+      assert.equal((await boundaryWait).status, "VIEW_CONTINUATION_EXPIRED");
       assert.equal(
         (
           await dailyInteraction.updateTask({
@@ -949,6 +965,21 @@ test(
         ).status,
         "STATE_PRECONDITION_FAILED",
       );
+      const guardedHistory = await dailyInteraction.listHistory({
+        accountId,
+        productDate,
+      });
+      assert.equal(guardedHistory.status, "FOUND");
+      assert.deepEqual(
+        guardedHistory.status === "FOUND" && guardedHistory.value.items[0],
+        {
+          product_date: productDate,
+          state: "MISSING",
+          is_lit: false,
+          has_result: false,
+          has_evening_feedback: false,
+        },
+      );
 
       const safetyAccountId = await createReadyDay(
         stores,
@@ -1136,6 +1167,52 @@ test(
             `SELECT count(*)::int AS count FROM app_published_daily_result
               WHERE "generationIntentId"=$1`,
             [deletionIntentRef],
+          )
+          .then(({ rows }) => rows[0].count),
+        0,
+      );
+
+      const deadlineAccountId = await createReadyDay(
+        stores,
+        apiAdapters.protectDevelopmentSubject,
+        apiAdapters.DEVELOPMENT_SUBJECT_KEY_VERSION,
+        5,
+      );
+      const deadlineStart = await startGeneration(
+        generation,
+        deadlineAccountId,
+        5,
+        "c008:deadline:start",
+      );
+      assert.equal(deadlineStart.status, "ACCEPTED");
+      if (deadlineStart.status !== "ACCEPTED") {
+        throw new Error("C008_DEADLINE_INTENT_MISSING");
+      }
+      const deadlineIntentRef = deadlineStart.value.intent_ref;
+      await claimIntent(
+        queueStore,
+        acceptedHandler,
+        await acceptedEnvelope(admin, deadlineIntentRef),
+      );
+      await admin.query("BEGIN");
+      await admin.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1::text,$2::bigint))",
+        [deadlineAccountId, 20_400],
+      );
+      const deadlineBase = new Date("2026-08-24T20:14:59.500Z").getTime();
+      const deadlineWallStart = Date.now();
+      const deadlineOutcome = runtime.executeIntent(deadlineIntentRef, {
+        now: () => new Date(deadlineBase + (Date.now() - deadlineWallStart)),
+      });
+      await new Promise((resolve) => setTimeout(resolve, 700));
+      await admin.query("COMMIT");
+      assert.equal(await deadlineOutcome, "CANCELLED");
+      assert.equal(
+        await admin
+          .query(
+            `SELECT count(*)::int AS count FROM app_published_daily_result
+              WHERE "generationIntentId"=$1`,
+            [deadlineIntentRef],
           )
           .then(({ rows }) => rows[0].count),
         0,

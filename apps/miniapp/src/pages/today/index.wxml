@@ -73,23 +73,6 @@
         ></de-action-card>
       </view>
 
-      <view wx:if="{{!view.interaction.is_lit && lightEligible}}" class="today__light-action">
-        <de-action-button
-          block="{{true}}"
-          disabled="{{offline || lightBusy || lightPending || lightReadOnly || taskPending}}"
-          label="{{lightBusy ? '正在点亮' : '点亮今天'}}"
-          bind:press="lightDay"
-        ></de-action-button>
-      </view>
-
-      <de-inline-notice
-        wx:if="{{lightNotice}}"
-        action-label="{{lightNoticeAction}}"
-        message="{{lightNotice}}"
-        tone="{{view.interaction.is_lit ? 'success' : 'info'}}"
-        bind:action="retryLight"
-      ></de-inline-notice>
-
       <de-section-card heading="如果愿意">
         <view class="today__optional-task">{{view.content.optional_task.instruction}}</view>
         <de-state-selector
@@ -110,6 +93,23 @@
           bind:action="retryTask"
         ></de-inline-notice>
       </de-section-card>
+
+      <view wx:if="{{!view.interaction.is_lit && lightEligible}}" class="today__light-action">
+        <de-action-button
+          block="{{true}}"
+          disabled="{{offline || lightBusy || lightPending || lightReadOnly || taskPending}}"
+          label="{{lightBusy ? '正在点亮' : '点亮今天'}}"
+          bind:press="lightDay"
+        ></de-action-button>
+      </view>
+
+      <de-inline-notice
+        wx:if="{{lightNotice}}"
+        action-label="{{lightNoticeAction}}"
+        message="{{lightNotice}}"
+        tone="{{view.interaction.is_lit ? 'success' : 'info'}}"
+        bind:action="retryLight"
+      ></de-inline-notice>
 
       <de-inline-notice
         wx:if="{{view.interaction.is_lit}}"

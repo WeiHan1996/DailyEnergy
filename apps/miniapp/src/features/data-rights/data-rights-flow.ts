@@ -318,6 +318,14 @@ function deletionStatusGrant(value: StorageValue | undefined):
   ) {
     return undefined;
   }
+  const expiresAt = Date.parse(value.expiresAt);
+  if (
+    !Number.isFinite(expiresAt) ||
+    !/(?:Z|[+-]\d{2}:\d{2})$/u.test(value.expiresAt) ||
+    expiresAt <= Date.now()
+  ) {
+    return undefined;
+  }
   return {
     expiresAt: value.expiresAt,
     statusToken: value.statusToken,

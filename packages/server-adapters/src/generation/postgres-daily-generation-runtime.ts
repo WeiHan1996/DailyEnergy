@@ -172,20 +172,24 @@ export class PostgresDailyGenerationRuntime {
         derivation.controlledExpressionPlan,
       );
       await input.hooks?.beforePublish?.(intentRef);
-      const generatedAt = clock();
-      const result = assembleControlledTemplateDailyResultV1({
-        expression: candidate.expression,
-        generatedAt,
-        inputSnapshotRef: loaded.row.snapshotId,
-        productDate: loaded.row.targetProductDate,
-        resultId: randomUUID(),
-        resultVersion: loaded.row.resultVersion,
-        ruleFacts: derivation.ruleFacts,
-        safetyPolicyVersion: loaded.manifest.manifest.safety_contract_floor,
-        templateVersion: candidate.templateVersion,
-        userRef: loaded.row.accountId,
-      });
-      return this.#publish(loaded, result, generatedAt);
+      const resultId = randomUUID();
+      return this.#publish(
+        loaded,
+        (publishedAt) =>
+          assembleControlledTemplateDailyResultV1({
+            expression: candidate.expression,
+            generatedAt: publishedAt,
+            inputSnapshotRef: loaded.row.snapshotId,
+            productDate: loaded.row.targetProductDate,
+            resultId,
+            resultVersion: loaded.row.resultVersion,
+            ruleFacts: derivation.ruleFacts,
+            safetyPolicyVersion: loaded.manifest.manifest.safety_contract_floor,
+            templateVersion: candidate.templateVersion,
+            userRef: loaded.row.accountId,
+          }),
+        clock,
+      );
     } catch (error) {
       if (
         error instanceof DeterministicGenerationError ||
@@ -303,8 +307,8 @@ export class PostgresDailyGenerationRuntime {
 
   async #publish(
     loaded: LoadedGeneration,
-    result: PublishedDailyResult,
-    generatedAt: Date,
+    buildResult: (publishedAt: Date) => PublishedDailyResult,
+    clock: () => Date,
   ): Promise<GenerationExecutionOutcome> {
     return this.#transaction(async (client) => {
       await lockAccountGuard(client, loaded.row.accountId);
@@ -336,10 +340,14 @@ export class PostgresDailyGenerationRuntime {
       if (current === undefined) {
         throw new Error("GENERATION_INTENT_NOT_FOUND");
       }
+      // The completion fence is evaluated after all publication locks. A
+      // candidate that waited across 04:15 must not publish using an earlier
+      // render timestamp.
+      const publishedAt = clock();
       const decision = decideGenerationPublishV1({
         completionEligible: isGenerationCompletionEligible({
           intentCreatedAt: current.acceptedAt,
-          now: generatedAt,
+          now: publishedAt,
           targetProductDate: parseProductDate(loaded.row.targetProductDate),
         }),
         currentGuard,
@@ -360,7 +368,7 @@ export class PostgresDailyGenerationRuntime {
         await cancelIfActive(
           client,
           loaded.row.intentRef,
-          generatedAt,
+          publishedAt,
           decision.reasonCode,
         );
         return decision.outcome;
@@ -368,6 +376,7 @@ export class PostgresDailyGenerationRuntime {
       if (decision.outcome === "RETRYABLE") {
         throw new Error(decision.reasonCode);
       }
+      const result = buildResult(publishedAt);
       const fingerprint = dailyResultFingerprintV1(result);
       const interactionRef = randomUUID();
       await client.query(
@@ -388,7 +397,7 @@ export class PostgresDailyGenerationRuntime {
           loaded.row.targetProductDate,
           loaded.row.resultVersion,
           result.schema_version,
-          generatedAt,
+          publishedAt,
           JSON.stringify(result.facts),
           JSON.stringify(result.expression),
           JSON.stringify(result.provenance),
@@ -407,7 +416,7 @@ export class PostgresDailyGenerationRuntime {
         [
           result.identity.result_id,
           fingerprint,
-          generatedAt,
+          publishedAt,
           RETENTION_POLICY_VERSION,
         ],
       );
@@ -423,7 +432,7 @@ export class PostgresDailyGenerationRuntime {
           loaded.row.accountId,
           loaded.row.targetProductDate,
           result.identity.result_id,
-          generatedAt,
+          publishedAt,
           RETENTION_POLICY_VERSION,
         ],
       );
@@ -438,7 +447,7 @@ export class PostgresDailyGenerationRuntime {
           interactionRef,
           result.facts.optional_task_plan.task_id,
           result.facts.optional_task_plan.kind,
-          generatedAt,
+          publishedAt,
           RETENTION_POLICY_VERSION,
         ],
       );
@@ -451,7 +460,7 @@ export class PostgresDailyGenerationRuntime {
             AND state IN ('RUNNING','FALLBACK_RUNNING')`,
         [
           result.identity.result_id,
-          generatedAt,
+          publishedAt,
           loaded.row.intentRef,
           loaded.row.revision,
         ],
@@ -461,7 +470,7 @@ export class PostgresDailyGenerationRuntime {
       }
       await insertPublishedOutbox(client, {
         accountId: loaded.row.accountId,
-        generatedAt,
+        generatedAt: publishedAt,
         guard: currentGuard,
         intentRef: loaded.row.intentRef,
         resultId: result.identity.result_id,

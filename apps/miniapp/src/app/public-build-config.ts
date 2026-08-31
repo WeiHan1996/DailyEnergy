@@ -14,12 +14,14 @@ export type MiniappEnvironment = (typeof MINIAPP_ENVIRONMENTS)[number];
 
 export interface PublicBuildConfigInput {
   readonly apiOrigin: string;
+  readonly appVersion: string;
   readonly environment: string;
   readonly schemaVersion: string;
 }
 
 export interface PublicBuildConfig {
   readonly apiOrigin: string;
+  readonly appVersion: string;
   readonly environment: MiniappEnvironment;
   readonly schemaVersion: typeof MINIAPP_PUBLIC_BUILD_CONFIG_SCHEMA_VERSION;
 }
@@ -33,8 +35,14 @@ export class PublicBuildConfigError extends Error {
   }
 }
 
-const expectedKeys = ["apiOrigin", "environment", "schemaVersion"];
+const expectedKeys = [
+  "apiOrigin",
+  "appVersion",
+  "environment",
+  "schemaVersion",
+];
 const originPattern = /^(https?):\/\/([a-z0-9.-]+)(?::([0-9]{1,5}))?$/iu;
+const appVersionPattern = /^\d+\.\d+\.\d+$/u;
 const localHostnames = new Set(["127.0.0.1", "localhost"]);
 const localEnvironments = new Set<MiniappEnvironment>([
   "LOCAL",
@@ -93,9 +101,11 @@ export function parsePublicBuildConfig(value: unknown): PublicBuildConfig {
   }
   assertClosedObject(value);
 
-  const { apiOrigin, environment, schemaVersion } = value;
+  const { apiOrigin, appVersion, environment, schemaVersion } = value;
   if (
     typeof apiOrigin !== "string" ||
+    typeof appVersion !== "string" ||
+    !appVersionPattern.test(appVersion) ||
     typeof environment !== "string" ||
     typeof schemaVersion !== "string" ||
     schemaVersion !== MINIAPP_PUBLIC_BUILD_CONFIG_SCHEMA_VERSION ||
@@ -107,6 +117,7 @@ export function parsePublicBuildConfig(value: unknown): PublicBuildConfig {
   assertApiOrigin(apiOrigin, environment);
   return Object.freeze({
     apiOrigin,
+    appVersion,
     environment,
     schemaVersion,
   });

@@ -113,12 +113,14 @@ export class PostgresEveningSafetyStore implements EveningSafetyActivationStore 
         "SELECT pg_advisory_xact_lock(hashtextextended($1::text,$2::bigint))",
         [input.accountId, ACCOUNT_GUARD_LOCK_SEED],
       );
-      const account = await client.query(
-        `SELECT 1 FROM daily_energy.app_user_account WHERE id=$1::uuid`,
+      const account = await client.query<{ readonly state: string }>(
+        `SELECT state::text AS state
+           FROM daily_energy.app_user_account
+          WHERE id=$1::uuid`,
         [input.accountId],
       );
-      if (account.rowCount !== 1) {
-        throw new Error("EVENING_SAFETY_ACCOUNT_MISSING");
+      if (account.rows[0]?.state !== "ACTIVE") {
+        throw new Error("EVENING_SAFETY_ACCOUNT_NOT_ACTIVE");
       }
       const commandRef = commandRefStorageUuid(input.commandRef);
       const existingDecision = (

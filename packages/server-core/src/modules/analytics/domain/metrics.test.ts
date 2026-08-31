@@ -90,6 +90,27 @@ describe("C-015 S-25 metric contract and ten fixed fixtures", () => {
     });
   });
 
+  it("uses all first-result owners for M05, including owners who did not light", () => {
+    const owners = ownerFacts(20);
+    const source = emptySource({
+      encounters: owners.slice(0, 7).map((owner, index) => ({
+        ...owner,
+        cycleKey: `cycle-${index}`,
+      })),
+      lights: owners.slice(0, 7),
+      results: owners.map((owner) => ({
+        ...owner,
+        generationMode: "AI" as const,
+        latencyBucket: "1_2_99S" as const,
+      })),
+    });
+    expect(metric(source, "S25-M05")).toMatchObject({
+      denominator: 20,
+      numerator: 7,
+      value: 0.35,
+    });
+  });
+
   it("computes FX-04 exact mature D1/D3/D7 retention", () => {
     const encounters = ownerFacts(20).flatMap((owner, index) => [
       { ...owner, cycleKey: `cycle-${index}` },
@@ -225,19 +246,44 @@ describe("C-015 S-25 metric contract and ten fixed fixtures", () => {
           usageOutcome: "KNOWN",
           workload: "DAILY",
         },
-        {
-          generationMode: "AI",
-          productDate: D0,
-          terminal: true,
-          usageOutcome: "UNKNOWN",
-          workload: "DAILY",
-        },
       ],
     });
     expect(metric(source, "S25-M22")).toMatchObject({
       denominator: 80,
       numerator: 6_000_000,
       value: 0.075,
+    });
+  });
+
+  it("blocks M22 when cost completeness is below 99 percent", () => {
+    const source = emptySource({
+      checkins: ownerFacts(100),
+      gatewayUsage: Array.from({ length: 100 }, (_, index) => ({
+        ...(index < 98 ? { costMicros: 10_000 } : {}),
+        generationMode: "AI" as const,
+        productDate: D0,
+        terminal: true,
+        usageOutcome: index < 98 ? ("KNOWN" as const) : ("UNKNOWN" as const),
+        workload: "DAILY" as const,
+      })),
+    });
+    expect(metric(source, "S25-M22")).toMatchObject({
+      notes_code: expect.arrayContaining(["SOURCE_INCOMPLETE"]),
+      status: "BLOCKED",
+    });
+    expect(metric(source, "S25-M22")).not.toHaveProperty("value");
+  });
+
+  it("limits M19 share intents to CoreActiveUserDay owners", () => {
+    const active = ownerFacts(10);
+    const source = emptySource({
+      checkins: active,
+      shareIntents: [...active.slice(0, 5), ...ownerFacts(10, D0, "outside")],
+    });
+    expect(metric(source, "S25-M19")).toMatchObject({
+      denominator: 10,
+      numerator: 5,
+      value: 0.5,
     });
   });
 

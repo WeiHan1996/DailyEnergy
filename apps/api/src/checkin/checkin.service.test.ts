@@ -86,13 +86,54 @@ describe("C-004 check-in application service", () => {
     expect(submit).toHaveBeenCalledWith(
       expect.objectContaining({
         accountId: principal.accountId,
-        productDate: "2026-08-21",
-        productDatePolicyVersion: "product-date-v1",
+        resolveAcceptance: expect.any(Function),
       }),
     );
+    expect(submit.mock.calls[0]?.[0].resolveAcceptance?.()).toMatchObject({
+      now,
+      productDate: "2026-08-21",
+      productDatePolicyVersion: "product-date-v1",
+    });
     expect(JSON.stringify(submit.mock.calls[0]?.[0])).not.toContain(
       "product_date",
     );
+  });
+
+  it("resolves the product date when the store persistently accepts the command", async () => {
+    let clockNow = new Date("2026-08-20T19:59:59.999Z");
+    const submit = vi.fn<CheckinStore["submit"]>(async (input) => {
+      clockNow = new Date("2026-08-20T20:00:00.000Z");
+      const acceptance = input.resolveAcceptance?.();
+      if (acceptance === undefined) {
+        throw new Error("CHECKIN_ACCEPTANCE_MISSING");
+      }
+      return {
+        status: "ACCEPTED",
+        value: {
+          ...value,
+          productDate: acceptance.productDate,
+          updatedAt: acceptance.now,
+        },
+      };
+    });
+    const checkinService = new CheckinService(
+      fakeStore({ submit }),
+      { now: () => clockNow },
+      config(),
+    );
+
+    await expect(
+      checkinService.submit(principal, {
+        command_ref: "checkin-command-boundary",
+        energy: "STEADY",
+        expected_revision: 0,
+        mood: "GOOD",
+        sleep: "OKAY",
+      }),
+    ).resolves.toMatchObject({
+      resolution: { productDate: "2026-08-21" },
+      view: { product_date: "2026-08-21" },
+    });
   });
 
   it("maps duplicate replay and existing-value conflict without changing values", async () => {

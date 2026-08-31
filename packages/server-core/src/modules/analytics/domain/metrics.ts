@@ -74,6 +74,7 @@ export interface ComputeMetricInput {
 }
 
 interface Ratio {
+  readonly blocked?: boolean;
   readonly denominator: number;
   readonly numerator: number;
   readonly notes?: readonly MetricReportV1["notes_code"][number][];
@@ -103,6 +104,7 @@ export function computeC015MetricReports(
     ({ productDate }) => productDate === date,
   );
   const resultOwners = new Set(results.map(({ ownerKey }) => ownerKey));
+  const firstResultOwners = firstOwnerSet(source.results, date);
   const lights = ownerSet(source.lights, date);
   const evenings = ownerSet(source.evenings, date);
   const coreActive = new Set([...checkins, ...lights, ...evenings]);
@@ -148,6 +150,9 @@ export function computeC015MetricReports(
     (sum, { costMicros }) => sum + (costMicros ?? 0),
     0,
   );
+  const costSourceComplete =
+    terminalDaily.length > 0 &&
+    knownDailyUsage.length / terminalDaily.length >= 0.99;
 
   const ratios = new Map<(typeof MetricIdValues)[number], Ratio>([
     [
@@ -184,11 +189,8 @@ export function computeC015MetricReports(
     [
       "S25-M05",
       {
-        denominator: cycles.filter(({ ownerKey }) => resultOwners.has(ownerKey))
-          .length,
-        numerator: cycles.filter(
-          ({ ownerKey }) => resultOwners.has(ownerKey) && lights.has(ownerKey),
-        ).length,
+        denominator: firstResultOwners.size,
+        numerator: intersectionSize(firstResultOwners, lights),
         notes: ["TEMPLATE_INCLUDED"],
       },
     ],
@@ -293,11 +295,14 @@ export function computeC015MetricReports(
       "S25-M19",
       {
         denominator: coreActive.size,
-        numerator: new Set(
-          source.shareIntents
-            .filter(({ productDate }) => productDate === date)
-            .map(({ ownerKey }) => ownerKey),
-        ).size,
+        numerator: intersectionSize(
+          coreActive,
+          new Set(
+            source.shareIntents
+              .filter(({ productDate }) => productDate === date)
+              .map(({ ownerKey }) => ownerKey),
+          ),
+        ),
       },
     ],
     [
@@ -320,6 +325,7 @@ export function computeC015MetricReports(
     [
       "S25-M22",
       {
+        blocked: coreActive.size >= 10 && !costSourceComplete,
         denominator: coreActive.size,
         numerator: costMicros,
         valueOverride:
@@ -407,6 +413,13 @@ function reportFor(
     period_or_cohort: input.reportProductDate,
     source_contract_version: input.sourceContractVersion,
   } as const;
+  if (ratio.blocked === true) {
+    return MetricReportV1Schema.parse({
+      ...base,
+      notes_code: [...base.notes_code, "SOURCE_INCOMPLETE"],
+      status: "BLOCKED",
+    });
+  }
   if (ratio.denominator < 10) {
     return MetricReportV1Schema.parse({ ...base, status: "SUPPRESSED" });
   }
@@ -429,6 +442,24 @@ function reportFor(
       ? {}
       : { wilson_high: interval.high, wilson_low: interval.low }),
   });
+}
+
+function firstOwnerSet(
+  facts: readonly OwnerDateFact[],
+  productDate: string,
+): Set<string> {
+  const firstDates = new Map<string, string>();
+  for (const fact of facts) {
+    const current = firstDates.get(fact.ownerKey);
+    if (current === undefined || fact.productDate < current) {
+      firstDates.set(fact.ownerKey, fact.productDate);
+    }
+  }
+  return new Set(
+    [...firstDates]
+      .filter(([, firstDate]) => firstDate === productDate)
+      .map(([ownerKey]) => ownerKey),
+  );
 }
 
 function normalizeSource(source: MetricSourceSnapshot): MetricSourceSnapshot {

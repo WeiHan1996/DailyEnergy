@@ -217,6 +217,8 @@ test(
       resources.push(admin);
       const apiAdapters =
         await import("../../packages/server-adapters/dist/api/index.js");
+      const restrictedApiAdapters =
+        await import("../../packages/server-adapters/dist/api-restricted/index.js");
       const testingAdapters =
         await import("../../packages/server-adapters/dist/testing/index.js");
       const restrictedAdapters =
@@ -231,13 +233,19 @@ test(
         connectionString: loginUrls.api,
         expectedDatabaseRole: "daily_energy_api",
       });
+      const eveningSafety =
+        await restrictedApiAdapters.PostgresEveningSafetyStore.connect({
+          applicationName: "c014-evening-safety",
+          connectionString: loginUrls.safety,
+          expectedDatabaseRole: "daily_energy_safety",
+        });
       const queue = await testingAdapters.PostgresQueueStore.connect({
         applicationName: "c014-deletion-queue",
         connectionString: loginUrls.deletion,
         expectedDatabaseRole: "daily_energy_deletion",
         profile: "worker-restricted",
       });
-      resources.push(auth, rights, queue);
+      resources.push(auth, rights, eveningSafety, queue);
 
       await assert.rejects(
         connect(Client, loginUrls.api, "c014-api-forbidden").then(
@@ -251,6 +259,103 @@ test(
         ),
         /permission denied/iu,
       );
+
+      const raceSession = await createAccount(auth, "c014-account-fence-race");
+      const raceCheckinRef = randomUUID();
+      await admin.query(
+        `INSERT INTO app_morning_checkin
+          (id,"accountId","productDate","productDatePolicyVersion",revision,
+           mood,energy,sleep,"firstSubmittedAt","updatedAt","sourceCommandRef",
+           "retentionPolicyVersion","retentionScope","retentionAnchorAt")
+         VALUES ($1,$2,'2026-08-24','product-date-v1',1,'STEADY','STEADY','OKAY',
+           $3,$3,$4,'retention-policy-v1','DAY',$3)`,
+        [raceCheckinRef, raceSession.accountId, baseNow, randomUUID()],
+      );
+      await admin.query(
+        `INSERT INTO app_morning_checkin_revision
+          (id,"checkinId",revision,mood,energy,sleep,"commandRef",
+           "retentionPolicyVersion","retentionScope","retentionAnchorAt")
+         VALUES (gen_random_uuid(),$1,1,'STEADY','STEADY','OKAY',$2,
+           'retention-policy-v1','DAY',$3)`,
+        [raceCheckinRef, randomUUID(), baseNow],
+      );
+      const accountFence = await connect(
+        Client,
+        adminUrl,
+        "c014-account-fence-race",
+      );
+      resources.push(accountFence);
+      await accountFence.query("BEGIN");
+      await accountFence.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1::text,20400))",
+        [raceSession.accountId],
+      );
+      const dayAttempt = rights
+        .deleteDay({
+          accountId: raceSession.accountId,
+          commandRef: "c014-race-delete-day",
+          confirmationVersion: "data-rights-day-v1",
+          expectedRevision: 1,
+          fingerprint: bytes("c014-race-delete-day"),
+          now: new Date(baseNow.getTime() + 500),
+          productDate: "2026-08-24",
+        })
+        .then(
+          (value) => ({ value }),
+          (error) => ({ error }),
+        );
+      const safetyAttempt = eveningSafety
+        .activate({
+          accountId: raceSession.accountId,
+          categoryCodes: ["SELF_HARM"],
+          classifierVersion: "synthetic-classifier-v1",
+          commandRef: "c014-race-evening-safety",
+          irreversibleFingerprint: bytes("c014-race-evening-safety"),
+          now: new Date(baseNow.getTime() + 501),
+          policyVersion: "safety-v1",
+          ruleVersion: "safety-rules-v1",
+        })
+        .then(
+          (value) => ({ value }),
+          (error) => ({ error }),
+        );
+      await new Promise((resolve) => setImmediate(resolve));
+      await accountFence.query(
+        `UPDATE app_user_account
+            SET state='DELETING',revision=revision+1,"updatedAt"=$2
+          WHERE id=$1`,
+        [raceSession.accountId, new Date(baseNow.getTime() + 502)],
+      );
+      await accountFence.query("COMMIT");
+      const [dayOutcome, safetyOutcome] = await Promise.all([
+        dayAttempt,
+        safetyAttempt,
+      ]);
+      assert.equal(dayOutcome.error?.code, "ACCOUNT_DELETING");
+      assert.match(
+        safetyOutcome.error?.message ?? "",
+        /EVENING_SAFETY_ACCOUNT_NOT_ACTIVE/u,
+      );
+      const raceWrites = (
+        await admin.query(
+          `SELECT
+             (SELECT count(*)::int FROM restricted_data_task
+               WHERE "accountId"=$1) AS tasks,
+             (SELECT count(*)::int FROM restricted_deletion_guard
+               WHERE "accountId"=$1) AS guards,
+             (SELECT count(*)::int FROM restricted_safety_state
+               WHERE "accountId"=$1) AS safety_states,
+             (SELECT count(*)::int FROM restricted_safety_decision
+               WHERE "accountId"=$1) AS safety_decisions`,
+          [raceSession.accountId],
+        )
+      ).rows[0];
+      assert.deepEqual(raceWrites, {
+        guards: 0,
+        safety_decisions: 0,
+        safety_states: 0,
+        tasks: 0,
+      });
 
       const daySession = await createAccount(auth, "c014-day");
       const checkinRef = randomUUID();

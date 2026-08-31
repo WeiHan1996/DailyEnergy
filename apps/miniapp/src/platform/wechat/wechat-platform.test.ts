@@ -26,6 +26,7 @@ function createRuntime(overrides: Partial<WechatRuntime> = {}): WechatRuntime {
 
 const config = parsePublicBuildConfig({
   apiOrigin: "http://127.0.0.1:3000",
+  appVersion: "0.1.0",
   environment: "LOCAL",
   schemaVersion: MINIAPP_PUBLIC_BUILD_CONFIG_SCHEMA_VERSION,
 });

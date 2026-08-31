@@ -745,14 +745,33 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = "daily_energy", pg_catalog
 AS $$
-DECLARE task_id uuid; guard_epoch bigint;
+DECLARE
+  task_id uuid;
+  guard_epoch bigint;
+  account_state text;
+  active_account_count integer;
 BEGIN
   PERFORM pg_advisory_xact_lock(hashtextextended(target_account_id::text,20400));
+  SELECT state::text INTO account_state
+    FROM "daily_energy"."app_user_account" WHERE id=target_account_id;
+  IF account_state IS NULL OR account_state='DELETED' THEN
+    RAISE EXCEPTION USING ERRCODE='P0001',MESSAGE='C014_ACCOUNT_DELETED';
+  END IF;
+  IF account_state='DELETING' THEN
+    RAISE EXCEPTION USING ERRCODE='P0001',MESSAGE='C014_ACCOUNT_DELETING';
+  END IF;
+  IF account_state<>'ACTIVE' THEN
+    RAISE EXCEPTION USING ERRCODE='P0001',MESSAGE='C014_ACCOUNT_RESTRICTED';
+  END IF;
   UPDATE "daily_energy"."app_user_account"
     SET "lastActiveUseAt"=GREATEST("lastActiveUseAt",requested_at),
         "inactivityDeletionDueAt"=GREATEST("lastActiveUseAt",requested_at)+interval '24 months',
         "updatedAt"=GREATEST("updatedAt",requested_at)
     WHERE id=target_account_id AND state='ACTIVE';
+  GET DIAGNOSTICS active_account_count=ROW_COUNT;
+  IF active_account_count<>1 THEN
+    RAISE EXCEPTION USING ERRCODE='P0001',MESSAGE='C014_STATE_PRECONDITION';
+  END IF;
   task_id:=c014_existing_command_response(target_account_id,target_command_ref,
     target_operation,target_key,target_fingerprint);
   IF task_id IS NOT NULL THEN RETURN task_id; END IF;

@@ -64,13 +64,20 @@ interface CheckinValues {
   readonly sleep: StoredCheckinSleep;
 }
 
+interface CheckinCommandAcceptance {
+  readonly now: Date;
+  readonly productDate: string;
+  readonly productDatePolicyVersion: string;
+}
+
 interface CheckinCommandInput extends CheckinValues {
   readonly accountId: string;
   readonly commandRef: string;
   readonly normalizedPayloadFingerprint: Buffer;
-  readonly now: Date;
-  readonly productDate: string;
-  readonly productDatePolicyVersion: string;
+  readonly now?: Date;
+  readonly productDate?: string;
+  readonly productDatePolicyVersion?: string;
+  readonly resolveAcceptance?: () => CheckinCommandAcceptance;
 }
 
 export interface CheckinStore {
@@ -105,6 +112,7 @@ interface CheckinRow {
 }
 
 interface ReceiptRow {
+  readonly acceptedAt: Date;
   readonly normalizedPayloadFingerprint: Buffer;
   readonly operationCode: string;
   readonly productDatePolicyVersion: string | null;
@@ -113,9 +121,12 @@ interface ReceiptRow {
 }
 
 type CommandClaim =
-  | { readonly status: "NEW" }
+  | {
+      readonly acceptance: CheckinCommandAcceptance;
+      readonly status: "NEW";
+    }
   | { readonly status: "CONFLICT" }
-  | { readonly status: "DUPLICATE"; readonly responseRef: string | null };
+  | { readonly receipt: ReceiptRow; readonly status: "DUPLICATE" };
 
 export class PostgresCheckinStore implements CheckinStore {
   readonly #pool: Pool;
@@ -200,16 +211,50 @@ export class PostgresCheckinStore implements CheckinStore {
   ): Promise<CheckinMutationResult> {
     return this.#transaction(async (client) => {
       await lockAccountGuard(client, input.accountId);
-      await lockCheckin(client, input.accountId, input.productDate);
-      const guard = await checkGuard(
+      const existingReceipt = await findCommandReceipt(
         client,
         input.accountId,
-        input.productDate,
+        input.commandRef,
       );
-      if (guard !== "ALLOWED") {
-        return { status: guard };
+      if (
+        existingReceipt !== undefined &&
+        !commandReceiptMatches(
+          existingReceipt,
+          input.normalizedPayloadFingerprint,
+          "CHECKIN_SUBMIT",
+        )
+      ) {
+        return { status: "IDEMPOTENCY_CONFLICT" };
       }
-      const claim = await claimCommand(client, input, "CHECKIN_SUBMIT");
+      if (existingReceipt !== undefined) {
+        await lockCheckin(client, input.accountId, existingReceipt.targetKey);
+        const guard = await checkGuard(
+          client,
+          input.accountId,
+          existingReceipt.targetKey,
+        );
+        if (guard !== "ALLOWED") {
+          return { status: guard };
+        }
+        const revision = await requiredReceiptRevision(
+          client,
+          input.accountId,
+          existingReceipt.responseRef,
+        );
+        return { status: "DUPLICATE", value: checkinView(revision) };
+      }
+
+      const prepared = await prepareNewCommand(client, input);
+      if (prepared.status !== "READY") {
+        return { status: prepared.status };
+      }
+      const acceptance = prepared.acceptance;
+      const claim = await claimCommand(
+        client,
+        input,
+        "CHECKIN_SUBMIT",
+        acceptance,
+      );
       if (claim.status === "CONFLICT") {
         return { status: "IDEMPOTENCY_CONFLICT" };
       }
@@ -217,22 +262,24 @@ export class PostgresCheckinStore implements CheckinStore {
         const revision = await requiredReceiptRevision(
           client,
           input.accountId,
-          claim.responseRef,
+          claim.receipt.responseRef,
         );
-        const value = checkinView(revision);
-        return sameValues(revision, input)
-          ? { status: "DUPLICATE", value }
-          : { status: "CHECKIN_ALREADY_EXISTS", current: value };
+        return { status: "DUPLICATE", value: checkinView(revision) };
       }
 
       const current = await readCurrentCheckin(
         client,
         input.accountId,
-        input.productDate,
+        acceptance.productDate,
         true,
       );
       if (current !== undefined) {
-        await attachResponse(client, input, current.revisionRef);
+        await attachResponse(
+          client,
+          input,
+          acceptance.now,
+          current.revisionRef,
+        );
         const value = checkinView(current);
         return sameValues(current, input)
           ? { status: "DUPLICATE", value }
@@ -245,19 +292,19 @@ export class PostgresCheckinStore implements CheckinStore {
            (id, "accountId", "productDate", "productDatePolicyVersion",
             revision, mood, energy, sleep, "firstSubmittedAt", "updatedAt",
             "sourceCommandRef", "retentionPolicyVersion", "retentionScope",
-            "retentionAnchorAt")
+           "retentionAnchorAt")
          VALUES (gen_random_uuid(), $1, $2::date, $3, 1, $4, $5, $6,
                  $7::timestamptz, $7::timestamptz, $8::uuid, $9, 'DAY',
                  $7::timestamptz)
          RETURNING id AS "checkinRef"`,
         [
           input.accountId,
-          input.productDate,
-          input.productDatePolicyVersion,
+          acceptance.productDate,
+          acceptance.productDatePolicyVersion,
           input.mood,
           input.energy,
           input.sleep,
-          input.now,
+          acceptance.now,
           storageCommandRef,
           RETENTION_POLICY_VERSION,
         ],
@@ -268,20 +315,21 @@ export class PostgresCheckinStore implements CheckinStore {
       );
       const revisionRef = await insertRevision(client, {
         ...input,
+        acceptance,
         checkinRef,
         revision: 1,
       });
-      await attachResponse(client, input, revisionRef);
+      await attachResponse(client, input, acceptance.now, revisionRef);
       return {
         status: "ACCEPTED",
         value: {
           checkinRef,
           energy: input.energy,
           mood: input.mood,
-          productDate: input.productDate,
+          productDate: acceptance.productDate,
           revision: 1,
           sleep: input.sleep,
-          updatedAt: input.now,
+          updatedAt: acceptance.now,
         },
       };
     });
@@ -292,36 +340,82 @@ export class PostgresCheckinStore implements CheckinStore {
   ): Promise<CheckinMutationResult> {
     return this.#transaction(async (client) => {
       await lockAccountGuard(client, input.accountId);
-      await lockCheckin(client, input.accountId, input.productDate);
-      const guard = await checkGuard(
+      const existingReceipt = await findCommandReceipt(
         client,
         input.accountId,
-        input.productDate,
+        input.commandRef,
       );
-      if (guard !== "ALLOWED") {
-        return { status: guard };
-      }
-      const claim = await claimCommand(client, input, "CHECKIN_CORRECT");
-      if (claim.status === "CONFLICT") {
+      if (
+        existingReceipt !== undefined &&
+        !commandReceiptMatches(
+          existingReceipt,
+          input.normalizedPayloadFingerprint,
+          "CHECKIN_CORRECT",
+        )
+      ) {
         return { status: "IDEMPOTENCY_CONFLICT" };
+      }
+      let replayReceipt = existingReceipt;
+      let acceptance: CheckinCommandAcceptance;
+      if (existingReceipt !== undefined) {
+        await lockCheckin(client, input.accountId, existingReceipt.targetKey);
+        const guard = await checkGuard(
+          client,
+          input.accountId,
+          existingReceipt.targetKey,
+        );
+        if (guard !== "ALLOWED") {
+          return { status: guard };
+        }
+        acceptance = {
+          now: existingReceipt.acceptedAt,
+          productDate: existingReceipt.targetKey,
+          productDatePolicyVersion:
+            existingReceipt.productDatePolicyVersion ?? "product-date-v1",
+        };
+      } else {
+        const prepared = await prepareNewCommand(client, input);
+        if (prepared.status !== "READY") {
+          return { status: prepared.status };
+        }
+        acceptance = prepared.acceptance;
+        const claim = await claimCommand(
+          client,
+          input,
+          "CHECKIN_CORRECT",
+          acceptance,
+        );
+        if (claim.status === "CONFLICT") {
+          return { status: "IDEMPOTENCY_CONFLICT" };
+        }
+        if (claim.status === "DUPLICATE") {
+          replayReceipt = claim.receipt;
+          acceptance = {
+            now: claim.receipt.acceptedAt,
+            productDate: claim.receipt.targetKey,
+            productDatePolicyVersion:
+              claim.receipt.productDatePolicyVersion ??
+              acceptance.productDatePolicyVersion,
+          };
+        }
       }
       const current = await readCurrentCheckin(
         client,
         input.accountId,
-        input.productDate,
+        acceptance.productDate,
         true,
       );
       if (current === undefined) {
         return { status: "NOT_FOUND" };
       }
-      if (claim.status === "DUPLICATE") {
-        if (claim.responseRef === null) {
+      if (replayReceipt !== undefined) {
+        if (replayReceipt.responseRef === null) {
           return { status: "REVISION_CONFLICT", current: checkinView(current) };
         }
         const revision = await requiredReceiptRevision(
           client,
           input.accountId,
-          claim.responseRef,
+          replayReceipt.responseRef,
         );
         return {
           status: "DUPLICATE",
@@ -332,7 +426,12 @@ export class PostgresCheckinStore implements CheckinStore {
         return { status: "REVISION_CONFLICT", current: checkinView(current) };
       }
       if (sameValues(current, input)) {
-        await attachResponse(client, input, current.revisionRef);
+        await attachResponse(
+          client,
+          input,
+          acceptance.now,
+          current.revisionRef,
+        );
         return { status: "DUPLICATE", value: checkinView(current) };
       }
 
@@ -347,7 +446,7 @@ export class PostgresCheckinStore implements CheckinStore {
           input.mood,
           input.energy,
           input.sleep,
-          input.now,
+          acceptance.now,
           current.checkinRef,
           input.accountId,
           input.expectedRevision,
@@ -361,7 +460,7 @@ export class PostgresCheckinStore implements CheckinStore {
               await readCurrentCheckin(
                 client,
                 input.accountId,
-                input.productDate,
+                acceptance.productDate,
                 true,
               ),
             ),
@@ -370,13 +469,14 @@ export class PostgresCheckinStore implements CheckinStore {
       }
       const revisionRef = await insertRevision(client, {
         ...input,
+        acceptance,
         checkinRef: current.checkinRef,
         revision: nextRevision,
       });
       const weeklyGuard = await resolveGenerationGuardSnapshot(
         client,
         input.accountId,
-        input.productDate,
+        acceptance.productDate,
       );
       if (weeklyGuard.status !== "ALLOWED") {
         throw new Error("CHECKIN_CORRECTION_GUARD_CHANGED");
@@ -384,22 +484,22 @@ export class PostgresCheckinStore implements CheckinStore {
       await insertCheckinCorrectedOutbox(client, {
         checkinRef: current.checkinRef,
         deletionEpoch: weeklyGuard.deletionEpoch,
-        now: input.now,
-        productDate: input.productDate,
+        now: acceptance.now,
+        productDate: acceptance.productDate,
         revision: nextRevision,
         safetyEpoch: weeklyGuard.safetyEpoch,
       });
-      await attachResponse(client, input, revisionRef);
+      await attachResponse(client, input, acceptance.now, revisionRef);
       return {
         status: "ACCEPTED",
         value: {
           checkinRef: current.checkinRef,
           energy: input.energy,
           mood: input.mood,
-          productDate: input.productDate,
+          productDate: acceptance.productDate,
           revision: nextRevision,
           sleep: input.sleep,
-          updatedAt: input.now,
+          updatedAt: acceptance.now,
         },
       };
     });
@@ -542,6 +642,7 @@ async function claimCommand(
   client: PoolClient,
   input: CheckinCommandInput,
   operationCode: "CHECKIN_CORRECT" | "CHECKIN_SUBMIT",
+  acceptance: CheckinCommandAcceptance,
 ): Promise<CommandClaim> {
   const storageCommandRef = commandRefStorageUuid(input.commandRef);
   const inserted = await client.query(
@@ -559,40 +660,136 @@ async function claimCommand(
       input.accountId,
       storageCommandRef,
       operationCode,
-      input.productDate,
-      input.productDatePolicyVersion,
+      acceptance.productDate,
+      acceptance.productDatePolicyVersion,
       input.normalizedPayloadFingerprint,
-      input.now,
+      acceptance.now,
       RETENTION_POLICY_VERSION,
-      new Date(input.now.getTime() + COMMAND_RECEIPT_TTL_MS),
+      new Date(acceptance.now.getTime() + COMMAND_RECEIPT_TTL_MS),
     ],
   );
   if (inserted.rowCount === 1) {
-    return { status: "NEW" };
+    return { acceptance, status: "NEW" };
   }
-  const existing = await client.query<ReceiptRow>(
-    `SELECT "operationCode", "targetKey", "productDatePolicyVersion",
-            "normalizedPayloadFingerprint", "responseRef"
-       FROM daily_energy.runtime_command_receipt
-      WHERE "accountId" = $1::uuid AND "commandRef" = $2::uuid
-      FOR UPDATE`,
-    [input.accountId, storageCommandRef],
+  const row = await findCommandReceipt(
+    client,
+    input.accountId,
+    input.commandRef,
   );
-  const row = existing.rows[0];
   if (row === undefined) {
     throw new Error("CHECKIN_COMMAND_RECEIPT_MISSING");
   }
-  return row.operationCode === operationCode &&
-    row.targetKey === input.productDate &&
-    row.productDatePolicyVersion === input.productDatePolicyVersion &&
-    row.normalizedPayloadFingerprint.equals(input.normalizedPayloadFingerprint)
-    ? { status: "DUPLICATE", responseRef: row.responseRef }
+  return commandReceiptMatches(
+    row,
+    input.normalizedPayloadFingerprint,
+    operationCode,
+  )
+    ? { receipt: row, status: "DUPLICATE" }
     : { status: "CONFLICT" };
+}
+
+async function findCommandReceipt(
+  client: PoolClient,
+  accountId: string,
+  commandRef: string,
+): Promise<ReceiptRow | undefined> {
+  const existing = await client.query<ReceiptRow>(
+    `SELECT "acceptedAt", "operationCode", "targetKey",
+            "productDatePolicyVersion", "normalizedPayloadFingerprint",
+            "responseRef"
+       FROM daily_energy.runtime_command_receipt
+      WHERE "accountId" = $1::uuid AND "commandRef" = $2::uuid
+      FOR UPDATE`,
+    [accountId, commandRefStorageUuid(commandRef)],
+  );
+  return existing.rows[0];
+}
+
+function commandReceiptMatches(
+  receipt: ReceiptRow,
+  fingerprint: Buffer,
+  operationCode: "CHECKIN_CORRECT" | "CHECKIN_SUBMIT",
+): boolean {
+  return (
+    receipt.operationCode === operationCode &&
+    receipt.normalizedPayloadFingerprint.equals(fingerprint)
+  );
+}
+
+async function prepareNewCommand(
+  client: PoolClient,
+  input: CheckinCommandInput,
+): Promise<
+  | { readonly acceptance: CheckinCommandAcceptance; readonly status: "READY" }
+  | { readonly status: CheckinGuardFailure }
+> {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const beforeLock = resolveCommandAcceptance(input);
+    await lockCheckin(client, input.accountId, beforeLock.productDate);
+    const afterLock = resolveCommandAcceptance(input);
+    if (!sameAcceptanceTarget(beforeLock, afterLock)) {
+      continue;
+    }
+    const guard = await checkGuard(
+      client,
+      input.accountId,
+      afterLock.productDate,
+    );
+    if (guard !== "ALLOWED") {
+      return { status: guard };
+    }
+    const atPersistence = resolveCommandAcceptance(input);
+    if (!sameAcceptanceTarget(afterLock, atPersistence)) {
+      continue;
+    }
+    return { acceptance: atPersistence, status: "READY" };
+  }
+  throw new Error("CHECKIN_ACCEPTANCE_DATE_UNSTABLE");
+}
+
+function resolveCommandAcceptance(
+  input: CheckinCommandInput,
+): CheckinCommandAcceptance {
+  const acceptance =
+    input.resolveAcceptance?.() ??
+    (input.now === undefined ||
+    input.productDate === undefined ||
+    input.productDatePolicyVersion === undefined
+      ? undefined
+      : {
+          now: input.now,
+          productDate: input.productDate,
+          productDatePolicyVersion: input.productDatePolicyVersion,
+        });
+  if (
+    acceptance === undefined ||
+    !Number.isFinite(acceptance.now.getTime()) ||
+    !/^\d{4}-\d{2}-\d{2}$/u.test(acceptance.productDate) ||
+    acceptance.productDatePolicyVersion.length === 0
+  ) {
+    throw new Error("CHECKIN_ACCEPTANCE_INVALID");
+  }
+  return {
+    now: new Date(acceptance.now.getTime()),
+    productDate: acceptance.productDate,
+    productDatePolicyVersion: acceptance.productDatePolicyVersion,
+  };
+}
+
+function sameAcceptanceTarget(
+  left: CheckinCommandAcceptance,
+  right: CheckinCommandAcceptance,
+): boolean {
+  return (
+    left.productDate === right.productDate &&
+    left.productDatePolicyVersion === right.productDatePolicyVersion
+  );
 }
 
 async function attachResponse(
   client: PoolClient,
   input: CheckinCommandInput,
+  terminalAt: Date,
   responseRef: string,
 ): Promise<void> {
   await client.query(
@@ -601,7 +798,7 @@ async function attachResponse(
       WHERE "accountId" = $3::uuid AND "commandRef" = $4::uuid`,
     [
       responseRef,
-      input.now,
+      terminalAt,
       input.accountId,
       commandRefStorageUuid(input.commandRef),
     ],
@@ -656,6 +853,7 @@ async function requiredReceiptRevision(
 async function insertRevision(
   client: PoolClient,
   input: CheckinCommandInput & {
+    readonly acceptance: CheckinCommandAcceptance;
     readonly checkinRef: string;
     readonly revision: number;
   },
@@ -675,7 +873,7 @@ async function insertRevision(
       input.energy,
       input.sleep,
       commandRefStorageUuid(input.commandRef),
-      input.now,
+      input.acceptance.now,
       RETENTION_POLICY_VERSION,
     ],
   );

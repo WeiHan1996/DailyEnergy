@@ -134,6 +134,7 @@ test(
         dimension1Code: "DIRECT",
         expiry: "2027-09-20 00:00:00+00",
       });
+      await seedGateEvidence(admin, D0);
 
       const owners = [];
       for (let index = 0; index < 20; index += 1) {
@@ -149,6 +150,10 @@ test(
         if (index < 3) {
           await seedDay(admin, owner, "2026-08-27", index * 10 + 7);
         }
+      }
+      for (let index = 20; index < 30; index += 1) {
+        const owner = await seedOwner(admin, index);
+        await seedDay(admin, owner, D0, index * 10, { light: false });
       }
 
       const first = await background.query(
@@ -167,10 +172,16 @@ test(
         metrics.rows[0].reports.map((entry) => [entry.metric_id, entry]),
       );
       assert.deepEqual(pick(byId.get("S25-M02")), {
-        denominator: 20,
-        numerator: 20,
+        denominator: 30,
+        numerator: 30,
         status: "FINALIZED",
         value: 1,
+      });
+      assert.deepEqual(pick(byId.get("S25-M05")), {
+        denominator: 30,
+        numerator: 20,
+        status: "FINALIZED",
+        value: 0.6666666667,
       });
       assert.deepEqual(pick(byId.get("S25-M07")), {
         denominator: 20,
@@ -195,6 +206,16 @@ test(
       assert.equal("numerator" in suppressed, false);
       assert.equal("denominator" in suppressed, false);
       assert.equal("value" in suppressed, false);
+      assert.equal(byId.get("S25-M19").status, "UNAVAILABLE");
+      assert.deepEqual(byId.get("S25-M19").notes_code, [
+        "SOURCE_UNAVAILABLE",
+        "POST_AGGREGATION_DELETION_NOT_RESTATED",
+      ]);
+      assert.equal(byId.get("S25-M22").status, "BLOCKED");
+      assert.deepEqual(byId.get("S25-M22").notes_code, [
+        "SOURCE_INCOMPLETE",
+        "POST_AGGREGATION_DELETION_NOT_RESTATED",
+      ]);
 
       const research = await inspect.query(
         "SELECT daily_energy.get_c015_research_metric_status('S25-Q01') AS status",
@@ -208,6 +229,15 @@ test(
         "SELECT daily_energy.get_c015_gate_reports('TEST') AS reports",
       );
       assert.equal(gates.rows[0].reports.length, 4);
+      assert.deepEqual(
+        gates.rows[0].reports.map(({ gate_id, status }) => [gate_id, status]),
+        [
+          ["S25-G01", "PASS"],
+          ["S25-G02", "PASS"],
+          ["S25-G03", "PASS"],
+          ["S25-G04", "PASS"],
+        ],
+      );
       assert.equal(
         JSON.stringify(gates.rows[0].reports).match(/owner|count|cycle/giu),
         null,
@@ -249,6 +279,81 @@ test(
       assert.equal(d1.numerator, 8);
       assert.equal(d1.denominator, 20);
       assert.equal(d1.aggregation_revision, 2);
+
+      await upsertGateEvidence(admin, {
+        codes: [
+          ["subsystem", "AGGREGATE"],
+          ["outcome_code", "MATCH"],
+        ],
+        eventName: "raw_content_detector_outcome",
+        productDate: D0,
+      });
+      await background.query(
+        `SELECT daily_energy.rebuild_c015_analytics_date(
+           $1::date,$2::date,'TEST',3,$3::timestamptz
+         )`,
+        [D0, "2026-08-30", new Date("2026-08-30T06:15:00Z")],
+      );
+      const blockedGates = await inspect.query(
+        "SELECT daily_energy.get_c015_gate_reports('TEST') AS reports",
+      );
+      assert.deepEqual(
+        blockedGates.rows[0].reports.find(
+          ({ gate_id }) => gate_id === "S25-G02",
+        ),
+        {
+          aggregation_revision: 3,
+          gate_id: "S25-G02",
+          generated_at: "2026-08-30T06:15:00+00:00",
+          reason_codes: ["RAW_CONTENT_MATCH"],
+          status: "BLOCKED",
+        },
+      );
+      await admin.query(
+        `DELETE FROM daily_energy.analytics_runtime_daily_aggregate
+          WHERE "productDate"=$1 AND "environment"='TEST'
+            AND "eventName"='release_contract_outcome'
+            AND "dimension1Code"='DATABASE'`,
+        [D0],
+      );
+      await background.query(
+        `SELECT daily_energy.rebuild_c015_analytics_date(
+           $1::date,$2::date,'TEST',4,$3::timestamptz
+         )`,
+        [D0, "2026-08-30", new Date("2026-08-30T06:20:00Z")],
+      );
+      assert.equal(await gateStatus(inspect, "S25-G01"), "BLOCKED");
+      await admin.query(
+        `DELETE FROM daily_energy.analytics_runtime_daily_aggregate
+          WHERE "productDate"=$1 AND "environment"='TEST'
+            AND "eventName"='release_contract_outcome'
+            AND "dimension1Code"='METRIC'`,
+        [D0],
+      );
+      await background.query(
+        `SELECT daily_energy.rebuild_c015_analytics_date(
+           $1::date,$2::date,'TEST',5,$3::timestamptz
+         )`,
+        [D0, "2026-08-30", new Date("2026-08-30T06:25:00Z")],
+      );
+      assert.equal(await gateStatus(inspect, "S25-G03"), "BLOCKED");
+      await admin.query(
+        `INSERT INTO daily_energy.restricted_data_task
+          (id,"accountId",kind,scope,"targetType","targetKey","activeSlot",
+           state,revision,"confirmationVersion","requestedAt","failureScopeCodes",
+           "retentionPolicyVersion","retentionScope","retentionAnchorAt")
+         VALUES (gen_random_uuid(),$1,'EXPORT','EXPORT_ACCOUNT','ACCOUNT','SELF',
+           true,'FAILED',1,'data-rights-export-v1',$2::timestamptz,
+           ARRAY['SYNTHETIC_OVERDUE'],'retention-policy-v1','RUNTIME',$2::timestamptz)`,
+        [owners[0].accountId, new Date("2026-08-20T00:00:00Z")],
+      );
+      await background.query(
+        `SELECT daily_energy.rebuild_c015_analytics_date(
+           $1::date,$2::date,'TEST',6,$3::timestamptz
+         )`,
+        [D0, "2026-08-30", new Date("2026-08-30T06:30:00Z")],
+      );
+      assert.equal(await gateStatus(inspect, "S25-G04"), "BLOCKED");
 
       const forbiddenColumns = await inspect.query(
         `SELECT column_name FROM information_schema.columns
@@ -356,7 +461,13 @@ async function seedOwner(client, index) {
   return { accountId, cycleId };
 }
 
-async function seedDay(client, owner, productDate, ordinal) {
+async function seedDay(
+  client,
+  owner,
+  productDate,
+  ordinal,
+  { light = true } = {},
+) {
   const at = new Date(`${productDate}T08:00:00Z`);
   const checkinId = randomUUID();
   const intentId = randomUUID();
@@ -432,6 +543,9 @@ async function seedDay(client, owner, productDate, ordinal) {
      VALUES ($1,$2,$3,$4,1,$5,$5,'retention-policy-v1','DAY',$5)`,
     [interactionId, owner.accountId, productDate, resultId, at],
   );
+  if (!light) {
+    return;
+  }
   await client.query(
     `INSERT INTO daily_energy.app_daily_light_fact
       (id,"interactionId","sourceCommandRef","litAt","sourceValidityRevision",
@@ -446,4 +560,55 @@ async function seedDay(client, owner, productDate, ordinal) {
      VALUES ($1,$2,$3,$4,1,$5,$6,'retention-policy-v1','RELATIONSHIP_DATA',$6)`,
     [randomUUID(), owner.cycleId, lightId, productDate, randomUUID(), at],
   );
+}
+
+async function seedGateEvidence(client, productDate) {
+  for (const contractGroup of [
+    "SCHEMA",
+    "API",
+    "EVENT",
+    "METRIC",
+    "DATABASE",
+  ]) {
+    await upsertGateEvidence(client, {
+      codes: [
+        ["contract_group", contractGroup],
+        ["outcome_code", "PASS"],
+      ],
+      eventName: "release_contract_outcome",
+      productDate,
+    });
+  }
+  for (const subsystem of ["CONTRACT", "QUEUE", "LOG", "AGGREGATE", "EXPORT"]) {
+    await upsertGateEvidence(client, {
+      codes: [
+        ["subsystem", subsystem],
+        ["outcome_code", "CLEAN"],
+      ],
+      eventName: "raw_content_detector_outcome",
+      productDate,
+    });
+  }
+}
+
+async function upsertGateEvidence(client, { codes, eventName, productDate }) {
+  await client.query(
+    `SELECT daily_energy.upsert_c015_anonymous_aggregate(
+       'RUNTIME',$1::date,'TEST',$2,$3::jsonb,10,NULL,NULL,1,$4::timestamptz
+     )`,
+    [
+      productDate,
+      eventName,
+      JSON.stringify(codes.map(([name, code]) => ({ code, name }))),
+      new Date(`${productDate}T10:00:00Z`),
+    ],
+  );
+}
+
+async function gateStatus(client, gateId) {
+  const reports = await client.query(
+    "SELECT daily_energy.get_c015_gate_reports('TEST') AS reports",
+  );
+  return reports.rows[0].reports.find((entry) => entry.gate_id === gateId)
+    ?.status;
 }

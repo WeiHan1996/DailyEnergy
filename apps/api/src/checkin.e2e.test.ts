@@ -69,6 +69,10 @@ class HttpCheckinStore implements CheckinStore {
         ? ({ status: "DUPLICATE", value: receipt.value! } as const)
         : ({ status: "IDEMPOTENCY_CONFLICT" } as const);
     }
+    const acceptance = input.resolveAcceptance?.();
+    if (acceptance === undefined) {
+      throw new Error("CHECKIN_ACCEPTANCE_MISSING");
+    }
     if (this.current !== undefined) {
       this.receipts.set(input.commandRef, {
         fingerprint: input.normalizedPayloadFingerprint,
@@ -84,10 +88,10 @@ class HttpCheckinStore implements CheckinStore {
       checkinRef: "33333333-3333-4333-8333-333333333333",
       energy: input.energy,
       mood: input.mood,
-      productDate: input.productDate,
+      productDate: acceptance.productDate,
       revision: 1,
       sleep: input.sleep,
-      updatedAt: input.now,
+      updatedAt: acceptance.now,
     };
     this.receipts.set(input.commandRef, {
       fingerprint: input.normalizedPayloadFingerprint,
@@ -103,6 +107,10 @@ class HttpCheckinStore implements CheckinStore {
         ? ({ status: "DUPLICATE", value: receipt.value! } as const)
         : ({ status: "IDEMPOTENCY_CONFLICT" } as const);
     }
+    const acceptance = input.resolveAcceptance?.();
+    if (acceptance === undefined) {
+      throw new Error("CHECKIN_ACCEPTANCE_MISSING");
+    }
     if (this.current === undefined) {
       return { status: "NOT_FOUND" } as const;
     }
@@ -115,7 +123,7 @@ class HttpCheckinStore implements CheckinStore {
       mood: input.mood,
       revision: this.current.revision + 1,
       sleep: input.sleep,
-      updatedAt: input.now,
+      updatedAt: acceptance.now,
     };
     this.receipts.set(input.commandRef, {
       fingerprint: input.normalizedPayloadFingerprint,
@@ -153,13 +161,15 @@ function config() {
 async function testApplication(
   checkinStore: CheckinStore,
   events: OrdinaryLogEvent[] = [],
-  now: Date = fixedNow,
+  now: Date | (() => Date) = fixedNow,
 ) {
   const application = await createApiApplication(config(), {
     authStore,
     checkinStore,
     ordinaryLogSink: { write: (event) => events.push(event) },
-    productDateClock: { now: () => now },
+    productDateClock: {
+      now: () => (typeof now === "function" ? now() : now),
+    },
   });
   await application.listen(0, "127.0.0.1");
   applications.push(application);
@@ -203,6 +213,28 @@ describe("C-004 HTTP check-in flow", () => {
     expect(
       (await submit(after, "checkin-boundary-after")).body.data.product_date,
     ).toBe("2026-08-21");
+  });
+
+  it("replays the original accepted envelope after the product date changes", async () => {
+    const store = new HttpCheckinStore();
+    let clockNow = new Date("2026-08-20T19:59:59.999Z");
+    const application = await testApplication(store, [], () => clockNow);
+    const send = () =>
+      authenticated(
+        request(application.getHttpServer())
+          .post("/v1/daily/checkin/submit")
+          .set("Idempotency-Key", payload.command_ref)
+          .send(payload),
+      ).expect(200);
+
+    const accepted = await send();
+    clockNow = new Date("2026-08-20T20:00:00.000Z");
+    const replay = await send();
+
+    expect(accepted.body.data.product_date).toBe("2026-08-20");
+    expect(replay.body.data).toEqual(accepted.body.data);
+    expect(replay.body.product_date).toBe("2026-08-20");
+    expect(replay.body.server_now).toBe(clockNow.toISOString());
   });
 
   it("returns the authoritative product date when today's record is absent", async () => {

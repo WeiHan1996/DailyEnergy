@@ -385,17 +385,13 @@ async function grantGuardReason(
     return "SESSION_INVALID";
   }
 
-  const result = await client.query(
-    `SELECT 1
-       FROM daily_energy.app_published_daily_result result
-       JOIN daily_energy.app_published_result_visibility visibility
-         ON visibility."resultId"=result.id
-      WHERE result.id=$1::uuid AND result."accountId"=$2::uuid
-        AND result."productDate"=$3::date
-        AND visibility.state IN ('AVAILABLE', 'FALLBACK_ONLY')`,
+  const result = await client.query<{ allowed: boolean }>(
+    `SELECT daily_energy.resolve_c005_continuation_result_guard(
+       $1::uuid,$2::uuid,$3::date
+     ) AS allowed`,
     [grant.resultRef, grant.ownerRef, grant.productDate],
   );
-  return result.rowCount === 1 ? undefined : "RESULT_INVALID";
+  return result.rows[0]?.allowed === true ? undefined : "RESULT_INVALID";
 }
 
 function isGuardReason(

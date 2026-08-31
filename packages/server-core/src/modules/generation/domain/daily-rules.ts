@@ -416,6 +416,12 @@ export function validateRuleFactsV1(
     }
   }
   if (
+    facts.overall.score !==
+    overallScoreV1(facts.dimensions.map(({ score }) => score))
+  ) {
+    throw ruleFactsInvariant();
+  }
+  if (
     (facts.care_dimension_id !== undefined &&
       facts.care_dimension_id !== facts.focus_dimension_id) ||
     (facts.supporting_dimension_id !== undefined &&

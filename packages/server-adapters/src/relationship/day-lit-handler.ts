@@ -42,6 +42,12 @@ interface RelationshipGuardSnapshot {
   readonly deletionEpoch: string;
 }
 
+const TRANSIENT_SOURCE_GUARDS = new Set<GenerationGuardSnapshotV1["status"]>([
+  "ACCOUNT_RESTRICTED",
+  "CONSENT_REQUIRED",
+  "SAFETY_BLOCKED",
+]);
+
 type LinkFingerprintRow = Readonly<Record<string, unknown>> & {
   readonly productDate: string;
   readonly sourceLightId: string;
@@ -76,11 +82,15 @@ async function handleDayLit(
   }
   const guard = await readGuard(transaction, source);
   if (guard.status !== "ALLOWED") {
+    if (TRANSIENT_SOURCE_GUARDS.has(guard.status)) {
+      await deferDayLit(transaction, envelope, guard);
+      return "SOURCE_DEFERRED";
+    }
     return "SOURCE_BLOCKED";
   }
   if (
     envelope.aggregateRevision !== source.sourceValidityRevision ||
-    !epochsMatch(envelope.guardEpochs, guard)
+    !deletionEpochMatches(envelope.guardEpochs, guard)
   ) {
     return "SOURCE_STALE";
   }
@@ -112,7 +122,7 @@ async function handleDayLit(
     throw new QueueRetryableError("RELATIONSHIP_CYCLE_MISSING");
   }
   if (
-    source.litAt.getTime() < cycle.startedAt.getTime() ||
+    source.litAt.getTime() <= cycle.startedAt.getTime() ||
     BigInt(relationshipGuard.deletionEpoch) > BigInt(cycle.sourceCutoffEpoch)
   ) {
     return "SOURCE_BEFORE_CUTOFF";
@@ -160,6 +170,36 @@ async function handleDayLit(
     throw new QueueRetryableError("RELATIONSHIP_PROJECTION_CAS_LOST");
   }
   return "RELATIONSHIP_LINKED";
+}
+
+async function deferDayLit(
+  transaction: QueueTransaction,
+  envelope: VersionedJobEnvelope,
+  guard: GenerationGuardSnapshotV1,
+): Promise<void> {
+  await transaction.execute(
+    `WITH timing AS (SELECT clock_timestamp() AS now)
+     INSERT INTO daily_energy.runtime_outbox_event
+       (id,"aggregateType","aggregateRef","aggregateRevision","eventType",
+        "eventVersion","idempotencyKey","allowlistedPayload","guardEpochs",
+        state,"availableAt","attemptCount","createdAt","retentionPolicyVersion",
+        "retentionScope","retentionAnchorAt","expiresAt")
+     SELECT gen_random_uuid(),'DailyLight',$1::uuid,$2,'DayLit','v1',
+       decode(md5('c011:daylit-deferred:'||$3::text),'hex'),'{}'::jsonb,
+       jsonb_build_object('deletion',$4::text,'safety',$5::text),'PENDING',
+       timing.now+interval '1 hour',0,timing.now,$6,'RUNTIME',timing.now,
+       timing.now+interval '30 days'
+     FROM timing
+     ON CONFLICT ("idempotencyKey") DO NOTHING`,
+    [
+      envelope.aggregateRef,
+      envelope.aggregateRevision,
+      envelope.eventId,
+      guard.deletionEpoch.toString(),
+      guard.safetyEpoch.toString(),
+      RETENTION_POLICY_VERSION,
+    ],
+  );
 }
 
 async function readSource(
@@ -246,7 +286,7 @@ async function readActiveCycle(
   return result.rows[0];
 }
 
-function epochsMatch(
+function deletionEpochMatches(
   epochs: Readonly<Record<string, string>>,
   guard: GenerationGuardSnapshotV1,
 ): boolean {
@@ -255,9 +295,7 @@ function epochsMatch(
       (key) => key === "deletion" || key === "safety",
     ) &&
     (epochs.deletion === undefined ||
-      epochs.deletion === guard.deletionEpoch.toString()) &&
-    (epochs.safety === undefined ||
-      epochs.safety === guard.safetyEpoch.toString())
+      epochs.deletion === guard.deletionEpoch.toString())
   );
 }
 

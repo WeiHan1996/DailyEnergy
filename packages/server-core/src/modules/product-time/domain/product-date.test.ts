@@ -53,6 +53,11 @@ describe("C-005 product-date-v1", () => {
     }
   });
 
+  it("returns the exact tzdb release used for the resolution", () => {
+    const system = resolveProductDate(new Date("2026-07-20T20:00:00Z"));
+    expect(system.tzdbRelease).toBe(process.versions.tz);
+  });
+
   it("uses civil calendar arithmetic for every normative weekly window", () => {
     for (const vector of fixture.weekly_windows) {
       const end = parseProductDate(vector.window_end_date);

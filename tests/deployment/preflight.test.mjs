@@ -37,6 +37,7 @@ function evidence(options = {}) {
     },
     release_id: manifest.release_id,
     server_image: manifest.images.server,
+    tzdb_release: "2026b",
   };
   const imageSet = {
     created_at_utc: "2026-08-05T02:03:04.000Z",

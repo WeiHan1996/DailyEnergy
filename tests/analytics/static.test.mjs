@@ -96,3 +96,27 @@ test("C-015 persists only named T4 aggregate and metric tables", async () => {
     /CREATE TABLE "analytics_[^"]*(?:raw|event_store|subject|session|assignment|attribution)/iu,
   );
 });
+
+test("C-015 wires implemented Mini Program surfaces to the first-party sender", async () => {
+  const expectations = [
+    [
+      "apps/miniapp/src/pages/landing/index.ts",
+      ["landingViewed", "landingPrimaryActionClicked"],
+    ],
+    [
+      "apps/miniapp/src/pages/today/index.ts",
+      ["mainActionReached", "dimensionsExpanded"],
+    ],
+    ["apps/miniapp/src/pages/records/index.ts", ["weeklySummaryRead"]],
+    ["apps/miniapp/src/pages/privacy-data/index.ts", ["dataRightsEntryViewed"]],
+  ];
+  for (const [relativePath, methods] of expectations) {
+    const source = await readFile(path.join(root, relativePath), "utf8");
+    for (const method of methods) {
+      assert.match(
+        source,
+        new RegExp(`(?:\\.analytics|\\banalytics)\\.${method}\\(`, "u"),
+      );
+    }
+  }
+});
