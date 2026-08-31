@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c015-post-merge-handoff`
 - **修复基线**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)，remote head `fd04b787926127bda64fc6cb07cfcf356d85ed8b`，CI run `33323476723` 11/11 SUCCESS
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
-- **当前 PR**：[post-merge handoff Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170)；base=`main`，implementation head `047f9c2153c71f2473ce682a15012821b214f20f`，CI 待运行
+- **当前 PR**：[post-merge handoff Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170)；base=`main`，implementation head `047f9c2153c71f2473ce682a15012821b214f20f`，verified status head `b815c02f1dad5b372ba6a255a8dcef822ca38cf6`，CI run `33379323023` 11/11 SUCCESS
 - **合并状态**：main head `fec5c96d368f8d4427ecca861f8ce42adad7a270`，CI run `33374088290` 11/11 SUCCESS
 - **下一候选动作**：补齐 WeChat DevTools/真机 offline no-replay、生产 bundle 无第三方 SDK、处理主体/位置/用户说明证据；不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
@@ -21,6 +21,7 @@
 - 最终 PR #169 exact head `453eb55504dab35209c0886eefede51342547199`，CI run `33373613585` 11/11 SUCCESS；merged-main CI run `33374088290` 11/11 SUCCESS；
 - 一次性 merge window 完成后，repository `allow_merge_commit=false` 已恢复；main ruleset `21080906` 已恢复 deletion、non-fast-forward、required-linear-history、squash-only、11 strict checks、空 bypass；
 - post-merge 状态与证据通过 docs-only Draft PR #170 提交；该 PR 不改变业务行为，也不解除 C-015 blocker；
+- C-004～C-014 Issues #56/#57/#58/#59/#62/#60/#61/#63/#64/#70/#65 均已 CLOSED 并附 merge receipt；C-015 Issue #68 因外部证据 Pending 保持 OPEN；
 - owner 代码与 differential-query/four-plane threat-boundary 审核已通过；外部/真机证据仍 Pending，因此当前任务不标记 Done，Production/RC 保持 `NO_GO`。
 
 ## 0. 统一审核修复
