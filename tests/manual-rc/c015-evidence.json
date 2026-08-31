@@ -16,6 +16,8 @@
   "remediation_status_head": "405f3c29fc916cfb314f9a665e8093df57911bf6",
   "remediation_final_ci_run": 33357978808,
   "remediation_final_ci_checks": "11/11 SUCCESS",
+  "stack_merge_strategy": "MERGE_COMMIT_PRESERVE_ANCESTRY_OWNER_APPROVED",
+  "repository_merge_commit_setting": "TEMPORARY_ENABLE_AND_RESTORE_REQUIRED",
   "execution_status": "OWNER_CODE_AND_THREAT_REVIEW_APPROVED_EXTERNAL_EVIDENCE_PENDING",
   "pass_claim": "PROHIBITED",
   "synthetic_accounts_only": true,

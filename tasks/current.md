@@ -4,13 +4,13 @@
 - **最后更新**：2026-08-31
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-015 — C-004～C-015 统一审核修复
-- **任务状态**：In Review（项目所有者已通过代码与 threat-boundary 审核；外部/真机证据及 stacked merge 策略待完成）
+- **任务状态**：In Review（项目所有者已通过代码/threat-boundary 审核并选择 merge commit 保留 stack ancestry；受控合并与外部/真机证据待完成）
 - **任务 Profile**：`security`（幂等、Safety、删除不复活、隐私、确定性与 analytics 可信性）
 - **工作分支**：`agent/c004-c015-review-fixes`
 - **修复基线**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)，remote head `fd04b787926127bda64fc6cb07cfcf356d85ed8b`，CI run `33323476723` 11/11 SUCCESS
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
 - **当前 PR**：[统一修复 Draft PR #169](https://github.com/WeiHan1996/DailyEnergy/pull/169)；base=`agent/c015-core-analytics`，implementation head `6fdb3f5a9a868bdac4d8ab025ad8c9eaf29da2ed`，owner-reviewed head `405f3c29fc916cfb314f9a665e8093df57911bf6`，CI run `33357978808` 11/11 SUCCESS；PR #157～#168 保持 Draft，不改远端 stacked refs
-- **下一候选动作**：项目所有者选择 stacked squash 后的 branch rewrite 或其它合并策略，并补齐外部/真机证据；PR #169 保持 Draft，不启动 C-016
+- **下一候选动作**：临时启用仓库 merge commit，按 #157～#169 顺序执行 exact-head verifier 与 `--merge --match-head-commit`，完成后恢复仓库设置；不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 0. 统一审核修复
@@ -19,6 +19,7 @@
 - 项目所有者已明确授权基于 PR #168 创建统一修复 Draft PR；授权不包含 force-push、改写 #157～#168、运行 exact-head verifier、标记 Ready 或合并；
 - 统一修复 Draft PR #169 已基于 PR #168 精确 head 创建；verified status head `884a2050f19352bfb2371535a1c9f9abc29b2e6e` 的同一 CI run `33357674745` 已 11/11 SUCCESS；
 - 项目所有者于 2026-08-31 明确“审核通过”，接受 PR #169 的代码修复与 differential-query/four-plane threat boundary；该决定不替代真机、生产 bundle、处理主体/位置/用户说明证据，也不授权 force-push、错误 base merge 或 Production/RC；
+- 项目所有者随后明确选择 merge commit 保留 #157～#168 stack ancestry；仓库当前仅允许 squash，因此该一次性策略要求在受控合并窗口临时启用 `allow_merge_commit`，逐项 exact-head 合并后恢复为关闭，不执行 branch rewrite；
 - 修复范围只覆盖已报告的幂等与时间边界、continuation/DayLit 收敛、Safety/删除竞态、本地敏感缓存与期限、规则/template invariant，以及 C-015 信号、指标、Gate 和基数合同；
 - 不改变 Accepted 产品方向、框架、数据库或服务边界，不启动 C-016，不将人工证据或 Production/RC Gate 冒充完成；
 - 修复先在独立顶层分支完成并验证；未经项目所有者授权，不 force-push 或重写现有 stacked PR；
@@ -102,8 +103,8 @@
 
 1. 项目所有者已完成 differential-query/four-plane threat review；仍需 WeChat DevTools/真机 offline no-replay 与生产 bundle/主体/位置/用户说明证据；
 2. 统一修复 Draft PR #169 已在 `agent/c015-core-analytics` 精确 head `fd04b787926127bda64fc6cb07cfcf356d85ed8b` 之上创建，仅用于当前 stacked review；没有 force-push 或改写 #157～#168；
-3. #157～#168 使用 squash 时不会保留 stacked ancestry；开始合并前必须由项目所有者明确选择逐层 rebase + `force-with-lease`，或批准其它能保持可审差异的合并策略；不得把 PR #169 直接 merge 到 PR #168 分支后冒充 main 集成；
-4. 当前审核通过不自动授权上述 branch rewrite/合并策略；选择前不运行 verifier、不标记 Ready 或合并；所有 PR/Issues 保持 Draft/Open，Production/RC 保持 `NO_GO`，不启动 C-016。
+3. 项目所有者已选择 merge commit：临时把仓库 `allow_merge_commit` 从 `false` 设为 `true`，依次把 #157 merge 到 main、将下一个 PR retarget 到 main，再以 `--merge --match-head-commit` 合并至 #169；任一步 head/check/base/mergeability 漂移立即停止；
+4. #169 合并或流程中止后必须恢复 `allow_merge_commit=false`；该策略不授权 force-push、删除 branch、Production/RC 或补签外部证据；C-016 仍不启动。
 
 ## 9. C-015 后统一审核
 
