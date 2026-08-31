@@ -36,6 +36,10 @@
     {
       "name": "20260824000000_c008_daily_generation_publication",
       "sha256": "1d3c7908e4d0d82af9cc5524a58c63912ce3bfe1e41b045f3724de6c6fba4d40"
+    },
+    {
+      "name": "20260824000001_c011_day_lighting",
+      "sha256": "f43d7826d7cb7438e95c65287131565028054b39107f9e7d6922c2c73e03451e"
     }
   ]
 }

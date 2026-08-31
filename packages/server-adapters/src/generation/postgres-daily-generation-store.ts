@@ -539,6 +539,9 @@ export class PostgresDailyGenerationStore implements DailyGenerationStore {
                 ? "BECOMING_FAMILIAR"
                 : "FIRST_WEEK_RECORDED",
         encounter_day_count: relationshipCount,
+        ...(relationshipNodeToken(relationshipCount) === undefined
+          ? {}
+          : { display_token: relationshipNodeToken(relationshipCount) }),
       },
     });
     return { status: "FOUND", value: view };
@@ -640,8 +643,13 @@ async function readTodaySource(
            FROM daily_energy.app_relationship_cycle cycle
            LEFT JOIN daily_energy.app_relationship_encounter_link link
              ON link."cycleId"=cycle.id
+           LEFT JOIN daily_energy.app_daily_light_fact relationship_light
+             ON relationship_light.id=link."sourceLightId"
+            AND relationship_light."sourceValidityRevision"=link."sourceValidityRevision"
           WHERE cycle."accountId"=result."accountId"
             AND cycle."activeSlot" IS TRUE
+            AND cycle.state='ACTIVE'
+            AND (link.id IS NULL OR relationship_light.id IS NOT NULL)
           GROUP BY cycle.id
           LIMIT 1
        ) relationship ON TRUE
@@ -704,6 +712,21 @@ async function readTodaySource(
       row,
     },
   };
+}
+
+function relationshipNodeToken(count: number): string | undefined {
+  switch (count) {
+    case 1:
+      return "FIRST_MEETING";
+    case 3:
+      return "STYLE_CALIBRATION_AVAILABLE";
+    case 4:
+      return "IMPORTANT_MATTER_INVITE_AVAILABLE";
+    case 7:
+      return "FIRST_SEVEN_DAY_REVIEW_AVAILABLE";
+    default:
+      return undefined;
+  }
 }
 
 async function readHistorySource(

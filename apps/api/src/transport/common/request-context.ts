@@ -50,6 +50,8 @@ function operationFor(method: string, url: string): OperationCode {
     "POST /v1/daily/generation/start": "GENERATION_START",
     "GET /v1/daily/today": "DAILY_TODAY_READ",
     "GET /v1/daily/interaction": "DAILY_INTERACTION_READ",
+    "GET /v1/history/days": "HISTORY_LIST_READ",
+    "POST /v1/daily/interaction/light": "DAILY_LIGHT_CREATE",
     "POST /v1/daily/interaction/task": "DAILY_TASK_UPDATE",
     "GET /v1/consent/current": "CONSENT_CURRENT",
     "POST /v1/consent/accept": "CONSENT_ACCEPT",

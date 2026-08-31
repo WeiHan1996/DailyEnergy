@@ -370,6 +370,12 @@ describe("C-008 HTTP generation flow", () => {
       get: async () => {
         throw new Error("NOT_USED");
       },
+      lightDay: async () => {
+        throw new Error("NOT_USED");
+      },
+      listHistory: async () => {
+        throw new Error("NOT_USED");
+      },
       openToday: async (input) => {
         opened.push(input);
         return { status: "RECORDED" };

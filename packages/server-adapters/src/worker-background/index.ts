@@ -19,6 +19,7 @@ import {
   startTelemetryRuntime,
   type TelemetryTransportConfig,
 } from "../telemetry/runtime.js";
+import { createDayLitHandlers } from "../relationship/day-lit-handler.js";
 
 export type WorkerBackgroundDatabaseCapability =
   DatabaseCapability<"worker-background">;
@@ -52,6 +53,20 @@ export function startWorkerBackgroundInfrastructure(
     ...(telemetry ? { telemetry } : {}),
   });
 }
+
+export function startWorkerBackgroundRuntime(
+  config: WorkerInfrastructureConfig,
+  handlers: readonly QueueJobHandler[] = [],
+  telemetry?: QueueTelemetrySink,
+): Promise<WorkerInfrastructureRuntime> {
+  return startWorkerBackgroundInfrastructure(
+    config,
+    handlers.length > 0 ? handlers : createDayLitHandlers(),
+    telemetry,
+  );
+}
+
+export { createDayLitHandlers } from "../relationship/day-lit-handler.js";
 
 export function startWorkerBackgroundTelemetry(
   config: TelemetryTransportConfig,

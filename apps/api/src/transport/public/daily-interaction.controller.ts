@@ -11,7 +11,11 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import {
+  LightDayRequestSchema,
   TaskStateUpdateRequestSchema,
+  type DailyInteractionState,
+  type HistoryListView,
+  type LightDayRequest,
   type TaskStateUpdateRequest,
 } from "@daily-energy/shared-schemas";
 import type { Request } from "express";
@@ -43,6 +47,26 @@ export class DailyInteractionController {
     );
   }
 
+  @Get("history/days")
+  public async listHistory(@Req() request: Request) {
+    return this.#success(
+      await this.service.listHistory(sessionPrincipalFromRequest(request)),
+    );
+  }
+
+  @Post("daily/interaction/light")
+  @HttpCode(HttpStatus.OK)
+  public async lightDay(
+    @Req() request: Request,
+    @Headers("idempotency-key") idempotencyKey: string | undefined,
+    @Body(new ZodValidationPipe(LightDayRequestSchema)) body: LightDayRequest,
+  ) {
+    assertIdempotencyKey(idempotencyKey, body.command_ref);
+    return this.#success(
+      await this.service.lightDay(sessionPrincipalFromRequest(request), body),
+    );
+  }
+
   @Post("daily/interaction/task")
   @HttpCode(HttpStatus.OK)
   public async updateTask(
@@ -57,7 +81,9 @@ export class DailyInteractionController {
     );
   }
 
-  #success(result: DailyInteractionServiceResult) {
+  #success<View extends DailyInteractionState | HistoryListView>(
+    result: DailyInteractionServiceResult<View>,
+  ) {
     return {
       data: result.view,
       ok: true as const,

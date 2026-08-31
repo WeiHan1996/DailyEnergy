@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:bc934c42dc063703c4065403dc1dba4a76497ab76feff0ebcd17d88fec7e4c3e
+// source-fingerprint: sha256:9651c77c8236b964f559408648a8f4dd8208cd6406bdc882494d633d3a453b1c
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:bc934c42dc063703c4065403dc1dba4a76497ab76feff0ebcd17d88fec7e4c3e";
+  "sha256:9651c77c8236b964f559408648a8f4dd8208cd6406bdc882494d633d3a453b1c";
 
 export interface paths {
   "/auth/reauth/verify": {
@@ -824,13 +824,6 @@ export interface components {
       expected_revision: components["schemas"]["Revision"];
       rating: components["schemas"]["HelpfulnessRating"];
     };
-    HistoryDaySummaryView: {
-      has_evening_feedback: boolean;
-      has_result: boolean;
-      is_lit: boolean;
-      product_date: components["schemas"]["ProductDate"];
-      state: "RECORDED" | "MISSING";
-    };
     HistoryDayView: {
       checkin?: {
         checkin_ref: string;
@@ -964,7 +957,13 @@ export interface components {
       product_date: string;
     };
     HistoryListView: {
-      items: Array<components["schemas"]["HistoryDaySummaryView"]>;
+      items: Array<{
+        has_evening_feedback: boolean;
+        has_result: boolean;
+        is_lit: boolean;
+        product_date: string;
+        state: "RECORDED" | "MISSING";
+      }>;
       next_cursor?: string;
       page_info: {
         has_more: boolean;
@@ -1002,9 +1001,13 @@ export interface components {
       session_state: "VALID" | "REFRESHING" | "RECOVERABLE_FAILURE" | "INVALID";
     };
     LightDayRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      result_ref: components["schemas"]["OpaqueRef"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      product_date: string;
+      result_ref: string;
     };
     LogoutRequest: {
       client_context?: components["schemas"]["ClientContext"];

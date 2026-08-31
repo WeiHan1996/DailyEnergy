@@ -1,11 +1,11 @@
 # DailyEnergy API
 
 E-003 established the NestJS 11 + Express 5 composition root. C-001 through
-C-004 now add WeChat session persistence, consent/profile/onboarding and the
-daily check-in command/query surface. Check-in ownership and ProductDate are
-server-derived; command receipts, owner/date uniqueness, revision CAS and the
-restricted Safety/deletion guard are persisted in PostgreSQL. Generation,
-rules, AI and daily result publication remain separate downstream capabilities.
+C-011 now add WeChat sessions, consent/profile/onboarding, daily check-in,
+deterministic result publication, task state, idempotent point-lighting and the
+recent-history fact list. Owner/session/ProductDate and Safety/deletion guards
+remain server-authoritative; restricted rows are exposed only through bounded
+guard projections.
 
 ## Local synthetic start
 

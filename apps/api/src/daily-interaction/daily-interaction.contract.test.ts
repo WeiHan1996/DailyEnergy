@@ -3,6 +3,8 @@ import { resolve } from "node:path";
 
 import {
   DailyInteractionStateSchema,
+  HistoryListViewSchema,
+  LightDayRequestSchema,
   TaskStateUpdateRequestSchema,
 } from "@daily-energy/shared-schemas";
 import { parse } from "yaml";
@@ -91,6 +93,63 @@ describe("C-010 daily task transport contract", () => {
       category: "GUARD",
       retryable: false,
       status: 403,
+    });
+  });
+});
+
+describe("C-011 light and history transport contract", () => {
+  it("does not accept client reading-position or guard authority", () => {
+    const valid = {
+      command_ref: "light-command-0001",
+      product_date: "2026-08-24",
+      result_ref: "33333333-3333-4333-8333-333333333333",
+    };
+    expect(LightDayRequestSchema.safeParse(valid).success).toBe(true);
+    expect(
+      LightDayRequestSchema.safeParse({
+        ...valid,
+        main_action_reached: true,
+      }).success,
+    ).toBe(false);
+    expect(
+      HistoryListViewSchema.safeParse({
+        items: [
+          {
+            product_date: "2026-08-24",
+            state: "MISSING",
+            is_lit: false,
+            has_result: false,
+            has_evening_feedback: false,
+          },
+        ],
+        page_info: { has_more: false },
+      }).success,
+    ).toBe(true);
+  });
+
+  it("maps authenticated OpenAPI paths to executable schemas", async () => {
+    const document = parse(
+      await readFile(
+        resolve(import.meta.dirname, "../../../../openapi/openapi.yaml"),
+        "utf8",
+      ),
+    ) as {
+      paths: Record<string, Record<string, { security?: unknown[] }>>;
+      components: {
+        schemas: Record<string, { "x-source-contract"?: string }>;
+      };
+    };
+    expect(document.paths["/daily/interaction/light"]?.post?.security).toEqual([
+      { userBearerAuth: [] },
+    ]);
+    expect(document.paths["/history/days"]?.get?.security).toEqual([
+      { userBearerAuth: [] },
+    ]);
+    expect(document.components.schemas.LightDayRequest).toEqual({
+      "x-source-contract": "LightDayRequestSchema",
+    });
+    expect(document.components.schemas.HistoryListView).toEqual({
+      "x-source-contract": "HistoryListViewSchema",
     });
   });
 });

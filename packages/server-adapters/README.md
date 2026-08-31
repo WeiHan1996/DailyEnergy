@@ -3,10 +3,11 @@
 服务端基础设施 adapter 包。数据库连接与 Redis/BullMQ 队列通过
 profile-specific exports 暴露，client 和 server-core 不能直接导入具体 SDK。
 
-`./api` 当前还导出 C-001～C-004 的 PostgreSQL Auth、Consent/Profile 和
-Checkin stores。Checkin store 在同一事务处理 command receipt、owner/date
-唯一性和 revision CAS；普通 API 只执行返回稳定守卫码的受审函数，不能直接
-读取 Safety/删除受限表，也不能更新或删除签到 revision 历史。
+`./api` 当前还导出 C-001～C-011 已实现的 PostgreSQL stores。Daily interaction
+store 在同一事务处理点亮 command receipt、LightFact、aggregate revision 与
+DayLit outbox；普通 API 通过白名单函数读取历史/Safety/删除守卫，不直接读取
+受限表。`worker-background` 默认注册 DayLit handler，以 InboxReceipt、源有效性、
+关系 cycle unique slot 与 deletion cutoff 维护去重 EncounterLink。
 
 E-007 队列基线包括：
 
@@ -18,4 +19,5 @@ E-007 队列基线包括：
 - 独立 profile graceful drain 和不含正文/高基数 ref 的低基数 telemetry event。
 
 `worker-interactive`、`worker-background` 和 `worker-restricted` 是生产入口；
-`testing` 只供测试使用。E-007 不注册具体 Daily、Weekly、通知或删除 handler。
+`testing` 只供测试使用。除 C-008 Interactive generation 与 C-011 DayLit 关系
+handler 外，Weekly、通知和删除 handler 仍由后续任务交付。

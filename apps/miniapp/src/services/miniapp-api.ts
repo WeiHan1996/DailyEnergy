@@ -15,6 +15,7 @@ export type GenerationIntentView =
 export type TodayView = components["schemas"]["TodayView"];
 export type DailyInteractionView = TodayView["interaction"];
 export type HistoryDayView = components["schemas"]["HistoryDayView"];
+export type HistoryListView = components["schemas"]["HistoryListView"];
 type ConsentView = components["schemas"]["ConsentView"];
 export type ExpressionStyle = components["schemas"]["ExpressionStyle"];
 type ProfileView = components["schemas"]["ProfileView"];
@@ -65,6 +66,11 @@ export interface TodayEnvelope {
 
 export interface HistoryDayEnvelope {
   readonly history: HistoryDayView;
+  readonly productDate: string;
+}
+
+export interface HistoryListEnvelope {
+  readonly history: HistoryListView;
   readonly productDate: string;
 }
 
@@ -127,6 +133,16 @@ export interface C010Api {
     readonly status: DailyInteractionView["task"]["status"];
     readonly taskRef: string;
   }): Promise<DailyInteractionEnvelope>;
+}
+
+export interface C011Api {
+  getInteraction(): Promise<DailyInteractionEnvelope>;
+  lightDay(input: {
+    readonly commandRef: string;
+    readonly productDate: string;
+    readonly resultRef: string;
+  }): Promise<DailyInteractionEnvelope>;
+  listHistory(): Promise<HistoryListEnvelope>;
 }
 
 export class MiniappApiError extends Error {
@@ -803,6 +819,55 @@ export function projectHistoryDayView(
   });
 }
 
+export function projectHistoryListView(value: unknown): HistoryListView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, ["items", "next_cursor", "page_info"]) ||
+    !Array.isArray(value.items) ||
+    value.items.length < 1 ||
+    value.items.length > 50 ||
+    !isRecord(value.page_info) ||
+    !hasOnlyKeys(value.page_info, ["has_more"]) ||
+    typeof value.page_info.has_more !== "boolean" ||
+    (value.next_cursor !== undefined &&
+      (typeof value.next_cursor !== "string" ||
+        value.next_cursor.length < 1 ||
+        value.next_cursor.length > 512)) ||
+    value.page_info.has_more !== (value.next_cursor !== undefined)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  let previous = "9999-12-31";
+  const dates = new Set<string>();
+  for (const item of value.items) {
+    if (
+      !isRecord(item) ||
+      !hasOnlyKeys(item, [
+        "product_date",
+        "state",
+        "is_lit",
+        "has_result",
+        "has_evening_feedback",
+      ]) ||
+      !isProductDate(item.product_date) ||
+      !["RECORDED", "MISSING"].includes(String(item.state)) ||
+      typeof item.is_lit !== "boolean" ||
+      typeof item.has_result !== "boolean" ||
+      typeof item.has_evening_feedback !== "boolean" ||
+      item.product_date >= previous ||
+      dates.has(item.product_date) ||
+      (item.state === "MISSING" &&
+        (item.is_lit || item.has_result || item.has_evening_feedback)) ||
+      (item.is_lit && !item.has_result)
+    ) {
+      throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+    }
+    previous = item.product_date;
+    dates.add(item.product_date);
+  }
+  return freezeJson(value) as HistoryListView;
+}
+
 function freezeJson<T>(value: T): T {
   if (typeof value === "object" && value !== null) {
     Object.freeze(value);
@@ -846,10 +911,10 @@ function headers(sessionToken?: string, commandRef?: string) {
 
 export function createMiniappApi(
   network: NetworkPort,
-): C003Api & C004Api & C009Api & C010Api {
+): C003Api & C004Api & C009Api & C010Api & C011Api {
   let sessionToken: string | undefined;
 
-  const api: C003Api & C004Api & C009Api & C010Api = {
+  const api: C003Api & C004Api & C009Api & C010Api & C011Api = {
     async createSession(input): Promise<SessionEnvelope> {
       const response = await network.request({
         body: input as StorageValue,
@@ -1049,6 +1114,40 @@ export function createMiniappApi(
       const parsed = successData(response.data, response.statusCode);
       return Object.freeze({
         interaction: projectInteractionView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async lightDay(input): Promise<DailyInteractionEnvelope> {
+      if (!isProductDate(input.productDate) || !isOpaqueRef(input.resultRef)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          product_date: input.productDate,
+          result_ref: input.resultRef,
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/daily/interaction/light",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        interaction: projectInteractionView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async listHistory(): Promise<HistoryListEnvelope> {
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: "/v1/history/days",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        history: projectHistoryListView(parsed.data),
         productDate: parsed.productDate,
       });
     },

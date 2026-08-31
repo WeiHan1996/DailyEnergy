@@ -73,11 +73,28 @@
         ></de-action-card>
       </view>
 
+      <view wx:if="{{!view.interaction.is_lit && lightEligible}}" class="today__light-action">
+        <de-action-button
+          block="{{true}}"
+          disabled="{{offline || lightBusy || lightPending || lightReadOnly || taskPending}}"
+          label="{{lightBusy ? '正在点亮' : '点亮今天'}}"
+          bind:press="lightDay"
+        ></de-action-button>
+      </view>
+
+      <de-inline-notice
+        wx:if="{{lightNotice}}"
+        action-label="{{lightNoticeAction}}"
+        message="{{lightNotice}}"
+        tone="{{view.interaction.is_lit ? 'success' : 'info'}}"
+        bind:action="retryLight"
+      ></de-inline-notice>
+
       <de-section-card heading="如果愿意">
         <view class="today__optional-task">{{view.content.optional_task.instruction}}</view>
         <de-state-selector
           accessible-label="可选任务状态"
-          disabled="{{offline || taskBusy || taskPending || taskReadOnly}}"
+          disabled="{{offline || taskBusy || lightPending || taskPending || taskReadOnly}}"
           error="{{taskError}}"
           label="你想怎样标记"
           options="{{taskOptions}}"
@@ -100,6 +117,14 @@
         message="再次回来时，仍会看到同一个核心结果。"
         tone="success"
       ></de-inline-notice>
+
+      <view class="today__records-entry">
+        <de-action-button
+          label="查看最近记录"
+          variant="secondary"
+          bind:press="openRecords"
+        ></de-action-button>
+      </view>
 
       <de-section-card heading="再看看">
         <view class="today__dimension today__dimension--focus">
