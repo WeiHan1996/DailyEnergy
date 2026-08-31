@@ -1,0 +1,29 @@
+{
+  "evidence_version": "c-005-manual-evidence-v1",
+  "task_id": "C-005",
+  "execution_status": "MANUAL_EVIDENCE_PENDING",
+  "pass_claim": "PROHIBITED",
+  "synthetic_accounts_only": true,
+  "security_review": {
+    "status": "OWNER_REVIEW_PENDING",
+    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "reviewed_boundaries": [
+      "ProductDate uses the server-side product-date-v1 IANA policy and fails closed for invalid clocks, dates and unavailable timezone data",
+      "StableSubjectId, root seed, named choice material, digest and trace remain server-only and are absent from client, AI and ordinary logging contracts",
+      "seed-v1 uses fixed LP32 UTF-8 bytes, SHA-256, namespace isolation and unbiased U64 rejection sampling against Accepted vectors",
+      "generation manifests use canonical code-unit key order, immutable fingerprints, activation instants and exact historical version resolution without latest fallback",
+      "continuation grants bind owner, active session, surface, original ProductDate, result, policy, exact boundary, expiry, operation allowlist and revision",
+      "account, session and result locks serialize grant creation with logout, Safety, consent withdrawal, account/DAY deletion and result blocking",
+      "ordinary API capabilities cannot rewrite grant bindings or read restricted guard tables; Interactive can read but cannot mutate the version catalog",
+      "migration checksum, catalog fingerprint, PostgreSQL constraints, ACLs, triggers and drift checks are versioned and executable"
+    ],
+    "residual_evidence": [
+      "project owner threat-boundary review during the unified C-004 through C-015 audit",
+      "Production credential, environment and deployment authorization remain outside C-005",
+      "GenerationIntent uniqueness/publication fences remain owned by C-008 and are not claimed here"
+    ],
+    "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
+  },
+  "reviewer": null,
+  "reviewed_at_utc": null
+}

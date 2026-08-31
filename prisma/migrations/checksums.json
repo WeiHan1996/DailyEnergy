@@ -28,6 +28,10 @@
     {
       "name": "20260821000000_c004_checkin_guard",
       "sha256": "0f4503836a124cf0a3ba6f000dc2911523530f8a92efe0b1f153930535aae4e1"
+    },
+    {
+      "name": "20260821000001_c005_product_time_manifest",
+      "sha256": "f85fcf20552889dbfd723d5c84b1568762b1b428225843d86801d6e8f75bbb8d"
     }
   ]
 }

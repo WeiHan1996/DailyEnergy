@@ -1,0 +1,49 @@
+{
+  "manifest_version": "c-005-evidence-v1",
+  "scope": "C-005 product-date-v1, VIEW_CONTINUATION grants, StableSubjectId, seed-v1, named choice-v1 and immutable generation manifest selection",
+  "authority": [
+    "docs/decisions/ADR-0002-deterministic-daily-result.md",
+    "docs/data/domain-model.md",
+    "docs/ai/generation-engine.md",
+    "docs/ai/scoring-rules.md",
+    "docs/technical/database.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C005-CORE-001": {
+      "file": "packages/server-core/src/modules",
+      "selector": "C-005 deterministic product-time, seed-v1 and GenerationManifest suites",
+      "level": "UNIT",
+      "assertions": [
+        "every ADR-0002 date, weekly window, root seed, LP32 material, named choice and rejection-boundary vector is recomputed",
+        "stable subject, ProductDate, result version, namespace, candidate order and manifest inputs fail closed on invalid or ambiguous values",
+        "VIEW_CONTINUATION and GENERATION_COMPLETION close at exact left-closed/right-open boundaries without granting check-in writes",
+        "an existing manifest selection remains frozen when a newer active manifest appears"
+      ]
+    },
+    "T-C005-DB-001": {
+      "file": "tests/database/c005-product-time-seed.test.mjs",
+      "selector": "C-005 real PostgreSQL continuation fences and immutable manifest selection",
+      "level": "DB",
+      "assertions": [
+        "a real PostgreSQL 18 migration enforces exact grant policy, expiry, operation and immutable-column ACL constraints",
+        "account-level advisory, session-row and result-visibility fences serialize grant creation with Safety, logout, DAY deletion, consent withdrawal and result blocking",
+        "go-today CAS invalidation and database triggers make existing grants unusable without rewriting them to a new product date",
+        "active manifest selection is deterministic at the activation instant while exact historical selection keeps the original ref and fingerprint",
+        "a stored manifest whose canonical bytes disagree with its fingerprint fails closed with MANIFEST_FINGERPRINT_MISMATCH"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "D17-I06",
+      "status": "COVERED",
+      "proof_ids": ["T-C005-DB-001"]
+    },
+    {
+      "source_id": "D17-V01",
+      "status": "COVERED",
+      "proof_ids": ["T-C005-DB-001"]
+    }
+  ]
+}

@@ -250,6 +250,23 @@
       }
     },
     {
+      "case_id": "module-cross-module-internal-import",
+      "gate": "module-graph",
+      "expected_rule_id": "BOUNDARY_MODULE_INTERNAL",
+      "project": {
+        "files": [
+          {
+            "path": "packages/server-core/src/modules/daily/application/use-case.ts",
+            "content": "import { hidden } from \"../../identity/domain/model.js\";\nexport const value = hidden;\n"
+          },
+          {
+            "path": "packages/server-core/src/modules/identity/domain/model.ts",
+            "content": "export const hidden = \"synthetic\";\n"
+          }
+        ]
+      }
+    },
+    {
       "case_id": "module-cycle",
       "gate": "module-graph",
       "expected_rule_id": "BOUNDARY_MODULE_CYCLE",

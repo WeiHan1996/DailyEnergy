@@ -3,8 +3,31 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": {},
+  "exports": {
+    "./generation": {
+      "types": "./dist/modules/generation/public/index.d.ts",
+      "import": "./dist/modules/generation/public/index.js"
+    },
+    "./generation/spi": {
+      "types": "./dist/modules/generation/spi/index.d.ts",
+      "import": "./dist/modules/generation/spi/index.js"
+    },
+    "./product-time": {
+      "types": "./dist/modules/product-time/public/index.d.ts",
+      "import": "./dist/modules/product-time/public/index.js"
+    },
+    "./product-time/spi": {
+      "types": "./dist/modules/product-time/spi/index.d.ts",
+      "import": "./dist/modules/product-time/spi/index.js"
+    }
+  },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "format:check": "prettier --check README.md package.json tsconfig*.json src",
+    "lint": "eslint --max-warnings=0 src",
+    "prebuild": "node --eval \"import('node:fs/promises').then(({ rm }) => rm('dist', { force: true, recursive: true }))\"",
+    "pretest": "pnpm run build",
+    "test": "vitest run src",
     "typecheck": "node ../../tooling/typecheck-workspace.mjs"
   },
   "dailyEnergy": {
@@ -12,6 +35,7 @@
     "runtime": "server-core"
   },
   "devDependencies": {
-    "@daily-energy/typescript-config": "workspace:*"
+    "@daily-energy/typescript-config": "workspace:*",
+    "vitest": "catalog:"
   }
 }

@@ -7,7 +7,7 @@ This directory contains the PostgreSQL 18 / Prisma 7 migration and verification 
 - Prisma CLI and Client: `7.9.1` (same exact version; supplied by the root install)
 - PostgreSQL test image: `postgres:18.0-bookworm@sha256:3f55f8895c4ed50603e2fbdfc72fffeeaba3173321fee5cb825bbbeb30d9d854`
 - Application schema: `daily_energy`
-- Migration head: `20260802000000_e007_queue_inbox_permissions`
+- Migration head: `20260821000001_c005_product_time_manifest`
 
 `DATABASE_URL` is required by `prisma.config.ts`; no credential or production default is committed.
 
@@ -21,7 +21,7 @@ DATABASE_URL=... PRISMA_BIN=/absolute/path/to/prisma node tooling/database/migra
 DATABASE_URL=... node tooling/database/seed.mjs
 DATABASE_URL=... node tooling/database/check-drift.mjs
 DB_CATALOG_FINGERPRINT_WRITE=1 DATABASE_URL=... node tooling/database/write-catalog-fingerprint.mjs
-DATABASE_INTEGRATION=1 PRISMA_BIN=/absolute/path/to/prisma node --test tests/database/integration.test.mjs tests/database/transactions.test.mjs tests/database/auth-identity.test.mjs tests/database/c002-consent-profile.test.mjs tests/database/c004-checkin.test.mjs
+DATABASE_INTEGRATION=1 PRISMA_BIN=/absolute/path/to/prisma node --test --test-concurrency=1 tests/database/integration.test.mjs tests/database/transactions.test.mjs tests/database/auth-identity.test.mjs tests/database/c002-consent-profile.test.mjs tests/database/c004-checkin.test.mjs tests/database/c005-product-time-seed.test.mjs
 DATABASE_URL=... DB_RECOVERY_STAGE=isolated DB_RESTORE_LEDGER_CHECKPOINT=... \
   DB_RESTORE_LEDGER_FINGERPRINT=... DB_DELETED_DATA_DETECTOR_HOOK=/absolute/hook \
   node tooling/database/replay-restore-ledger.mjs

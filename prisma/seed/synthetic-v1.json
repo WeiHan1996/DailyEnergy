@@ -10,6 +10,33 @@
         "version": "product-date-v1",
         "compatibility": { "timezone": "Asia/Shanghai", "boundary": "04:00" },
         "fingerprint_hex": "7b1fc2c3d2cd3cb48016b76625a0da4cf122bb4f33677cff325325f0832bb7ad"
+      },
+      {
+        "catalog_type": "GENERATION_MANIFEST",
+        "version": "daily-v1",
+        "compatibility": {
+          "action_catalog_version": "action-catalog-v1",
+          "algorithm_version": "daily-score-v1",
+          "choice_policy_version": "choice-v1",
+          "content_catalog_version": "content-catalog-v1",
+          "daily_content_schema_version": "1.0.0",
+          "experiment_variant_version": "none-v1",
+          "expression_contract_version": "daily-expression-v1",
+          "input_snapshot_version": "input-v1",
+          "manifest_schema_version": "generation-manifest-v1",
+          "namespace_registry_version": "namespace-registry-v1",
+          "product_date_policy_version": "product-date-v1",
+          "result_version": "daily-v1",
+          "ritual_catalog_version": "ritual-catalog-v1",
+          "rule_version": "daily-rules-v1",
+          "safety_contract_floor": "safety-baseline-v1",
+          "seed_policy_version": "seed-v1",
+          "shared_schema_contract_version": "0.1.0",
+          "shared_schema_major": 0,
+          "task_catalog_version": "task-catalog-v1",
+          "template_compatibility_version": "daily-template-v1"
+        },
+        "fingerprint_hex": "48891a7bcbbbfc584170e7c06c1aa174cf978abbb88a2b5d0ed91c32d204a8f0"
       }
     ],
     "retention_policy": [

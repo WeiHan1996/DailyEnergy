@@ -1,7 +1,7 @@
 # Migrations
 
 Prisma versioned migration history. The current head is
-`20260819000000_c001_auth_column_permissions` and every migration SHA-256 is recorded in
+`20260821000001_c005_product_time_manifest` and every migration SHA-256 is recorded in
 `checksums.json`.
 
 Rules:
