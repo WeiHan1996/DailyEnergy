@@ -8,6 +8,7 @@ import type {
   ClientAnalyticsSignalAcceptedView,
   ClientAnalyticsSignalRequest,
 } from "@daily-energy/shared-schemas";
+import { ClientAnalyticsAppVersionBucketValues } from "@daily-energy/shared-schemas";
 
 import type { RuntimeConfig } from "../bootstrap/runtime-config.js";
 import {
@@ -23,7 +24,9 @@ import {
 
 const MINIMUM_CELL_COUNT = 10;
 const MAX_EPHEMERAL_CELLS = 2_048;
-const MAX_ACTIVE_APP_VERSION_BUCKETS = 8;
+const APPROVED_APP_VERSION_BUCKETS = new Set<string>(
+  ClientAnalyticsAppVersionBucketValues.filter((value) => value !== "OTHER"),
+);
 
 interface EphemeralCell {
   count: number;
@@ -38,7 +41,6 @@ export interface AnalyticsSignalServiceResult {
 @Injectable()
 export class AnalyticsService {
   readonly #cells = new Map<string, EphemeralCell>();
-  readonly #appVersionBuckets = new Set<string>();
 
   public constructor(
     @Inject(ANALYTICS_AGGREGATE_STORE)
@@ -55,17 +57,22 @@ export class AnalyticsService {
       request,
       this.#appVersionBucket(request.app_version),
     );
-    const input: Omit<ClientAggregateDelta, "eventCountDelta"> = {
+    const cellIdentity: Omit<
+      ClientAggregateDelta,
+      "eventCountDelta" | "generatedAt"
+    > = {
       dimensions,
       environment: analyticsEnvironment(this.config.environment),
       eventName: request.event_name,
-      generatedAt: resolution.now,
       productDate: resolution.productDate,
     };
-    const key = JSON.stringify(input);
-    const cell = this.#cells.get(key) ?? { count: 0, published: false };
+    const key = JSON.stringify(cellIdentity);
+    const existing = this.#cells.get(key);
+    const cell = existing ?? { count: 0, published: false };
     cell.count += 1;
-    this.#ensureCellCapacity();
+    if (existing === undefined) {
+      this.#ensureCellCapacity();
+    }
     this.#cells.set(key, cell);
 
     if (!cell.published && cell.count >= MINIMUM_CELL_COUNT) {
@@ -73,8 +80,9 @@ export class AnalyticsService {
       cell.count = 0;
       try {
         await this.store.publishClientSignalDelta({
-          ...input,
+          ...cellIdentity,
           eventCountDelta: delta,
+          generatedAt: resolution.now,
         });
         cell.published = true;
       } catch {
@@ -84,8 +92,9 @@ export class AnalyticsService {
       cell.count = 0;
       try {
         await this.store.publishClientSignalDelta({
-          ...input,
+          ...cellIdentity,
           eventCountDelta: 1,
+          generatedAt: resolution.now,
         });
       } catch {
         this.#cells.delete(key);
@@ -98,14 +107,7 @@ export class AnalyticsService {
   #appVersionBucket(version: string): string {
     const [major, minor] = version.split(".");
     const bucket = `${major}.${minor}`;
-    if (
-      this.#appVersionBuckets.has(bucket) ||
-      this.#appVersionBuckets.size < MAX_ACTIVE_APP_VERSION_BUCKETS - 1
-    ) {
-      this.#appVersionBuckets.add(bucket);
-      return bucket;
-    }
-    return "OTHER";
+    return APPROVED_APP_VERSION_BUCKETS.has(bucket) ? bucket : "OTHER";
   }
 
   #ensureCellCapacity(): void {

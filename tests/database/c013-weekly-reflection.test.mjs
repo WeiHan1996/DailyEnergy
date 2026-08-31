@@ -317,6 +317,24 @@ test(
       assert.equal(available.status, "FOUND");
       assert.equal(available.value.summary_status, "AVAILABLE");
       assert.equal(available.value.summary.revision, 1);
+      await assert.rejects(
+        connect(
+          Client,
+          loginUrls.background,
+          "c013-summary-content-denied",
+        ).then(async (client) => {
+          try {
+            await client.query(
+              `UPDATE app_published_weekly_summary_revision
+                    SET "summaryVersion"='tampered-version'
+                  WHERE revision=1`,
+            );
+          } finally {
+            await client.end();
+          }
+        }),
+        /permission denied|SQL-008/iu,
+      );
 
       const snapshot = (
         await admin.query(
@@ -366,6 +384,29 @@ test(
       assert.equal(invalidated.status, "FOUND");
       assert.equal(invalidated.value.summary_status, "INVALIDATED");
       assert.equal(invalidated.value.summary, undefined);
+      const firstRetention = (
+        await admin.query(
+          `SELECT snapshot."invalidatedAt" AS "snapshotInvalidatedAt",
+                  snapshot."expiresAt" AS "snapshotExpiresAt",
+                  summary."retentionAnchorAt" AS "summaryRetentionAnchorAt",
+                  summary."expiresAt" AS "summaryExpiresAt"
+             FROM app_weekly_source_snapshot snapshot
+             JOIN app_published_weekly_summary_revision summary
+               ON summary."windowId"=snapshot."windowId"
+              AND summary."sourceFingerprint"=snapshot."sourceFingerprint"
+            WHERE summary.revision=1`,
+        )
+      ).rows[0];
+      assert.equal(
+        firstRetention.snapshotExpiresAt.getTime() -
+          firstRetention.snapshotInvalidatedAt.getTime(),
+        30 * 24 * 60 * 60_000,
+      );
+      assert.equal(
+        firstRetention.summaryExpiresAt.getTime() -
+          firstRetention.summaryRetentionAnchorAt.getTime(),
+        30 * 24 * 60 * 60_000,
+      );
       const secondDue = (await queueStore.listWeeklyDue(10))[0];
 
       await correctCheckin(admin, currentCheckin, 3, {
@@ -383,6 +424,16 @@ test(
           )
         ).outcomeCode,
         "WEEKLY_SUMMARY_QUEUED",
+      );
+      const repeatedExpiry = (
+        await admin.query(
+          `SELECT "expiresAt" FROM app_published_weekly_summary_revision
+            WHERE revision=1`,
+        )
+      ).rows[0].expiresAt;
+      assert.equal(
+        repeatedExpiry.getTime(),
+        firstRetention.summaryExpiresAt.getTime(),
       );
       const thirdDue = (await queueStore.listWeeklyDue(10))[0];
       assert.notEqual(secondDue.aggregateRef, thirdDue.aggregateRef);
@@ -415,6 +466,31 @@ test(
       assert.equal(revised.status, "FOUND");
       assert.equal(revised.value.summary_status, "AVAILABLE");
       assert.equal(revised.value.summary.revision, 2);
+      const currentRetention = (
+        await admin.query(
+          `SELECT
+             (SELECT count(*)::int FROM app_weekly_source_snapshot
+               WHERE "invalidatedAt" IS NOT NULL
+                 AND "expiresAt"="invalidatedAt"+interval '30 days')
+               AS "boundedSnapshots",
+             (SELECT count(*)::int FROM app_weekly_source_snapshot
+               WHERE "invalidatedAt" IS NULL AND "expiresAt" IS NULL)
+               AS "currentSnapshots",
+             (SELECT count(*)::int FROM app_published_weekly_summary_revision
+               WHERE "expiresAt" IS NOT NULL
+                 AND "expiresAt"="retentionAnchorAt"+interval '30 days')
+               AS "boundedSummaries",
+             (SELECT count(*)::int FROM app_published_weekly_summary_revision
+               WHERE revision=2 AND "expiresAt" IS NULL)
+               AS "currentSummaries"`,
+        )
+      ).rows[0];
+      assert.deepEqual(currentRetention, {
+        boundedSnapshots: 2,
+        boundedSummaries: 1,
+        currentSnapshots: 1,
+        currentSummaries: 1,
+      });
 
       const taskRef = randomUUID();
       await admin.query(

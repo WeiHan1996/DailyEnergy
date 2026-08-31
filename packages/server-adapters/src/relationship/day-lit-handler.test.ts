@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import type { GenerationGuardSnapshotV1 } from "@daily-energy/server-core/generation";
 
 import type {
   QueueTransaction,
@@ -39,16 +40,21 @@ function result<Row extends Readonly<Record<string, unknown>>>(
 }
 
 function transaction(input: {
+  readonly cutoffAt?: Date;
+  readonly guardDeletionEpoch?: string;
+  readonly guardSafetyEpoch?: string;
+  readonly guardStatus?: GenerationGuardSnapshotV1["status"];
   readonly relationshipBlocked?: boolean;
   readonly relationshipEpoch?: string;
   readonly cycleCutoff?: string;
   readonly linkInserted?: boolean;
+  readonly sourceLitAt?: Date;
 }) {
   const execute = vi.fn();
   const source = {
     accountCreatedAt: new Date("2026-08-01T00:00:00.000Z"),
     accountId: ACCOUNT_REF,
-    litAt: new Date("2026-08-24T02:00:00.000Z"),
+    litAt: input.sourceLitAt ?? new Date("2026-08-24T02:00:00.000Z"),
     productDate: "2026-08-24",
     sourceValidityRevision: 1,
   };
@@ -66,11 +72,11 @@ function transaction(input: {
           {
             snapshot: {
               account_revision: 1,
-              deletion_epoch: "2",
+              deletion_epoch: input.guardDeletionEpoch ?? "2",
               deletion_revision: 2,
-              safety_epoch: "3",
+              safety_epoch: input.guardSafetyEpoch ?? "3",
               safety_revision: 3,
-              status: "ALLOWED",
+              status: input.guardStatus ?? "ALLOWED",
             },
           },
         ]) as unknown as QueueTransactionResult<Row>;
@@ -80,7 +86,9 @@ function transaction(input: {
           {
             snapshot: {
               blocked: input.relationshipBlocked ?? false,
-              cutoff_at: source.accountCreatedAt.toISOString(),
+              cutoff_at: (
+                input.cutoffAt ?? source.accountCreatedAt
+              ).toISOString(),
               deletion_epoch: input.relationshipEpoch ?? "0",
             },
           },
@@ -92,7 +100,7 @@ function transaction(input: {
             cycleId: CYCLE_REF,
             revision: 1,
             sourceCutoffEpoch: input.cycleCutoff ?? "0",
-            startedAt: source.accountCreatedAt,
+            startedAt: input.cutoffAt ?? source.accountCreatedAt,
           },
         ]) as unknown as QueueTransactionResult<Row>;
       }
@@ -171,6 +179,38 @@ describe("C-011 DayLit relationship handler", () => {
     });
     await expect(handler.handle(envelope(), cutoff.value)).resolves.toBe(
       "SOURCE_BEFORE_CUTOFF",
+    );
+
+    const exactCutoff = new Date("2026-08-24T02:00:00.000Z");
+    const equal = transaction({
+      cutoffAt: exactCutoff,
+      sourceLitAt: exactCutoff,
+    });
+    await expect(handler.handle(envelope(), equal.value)).resolves.toBe(
+      "SOURCE_BEFORE_CUTOFF",
+    );
+  });
+
+  it("retries reversible guards and converges after Safety clears", async () => {
+    const handler = createDayLitHandlers()[0]!;
+    for (const guardStatus of [
+      "SAFETY_BLOCKED",
+      "CONSENT_REQUIRED",
+      "ACCOUNT_RESTRICTED",
+    ] as const) {
+      const blocked = transaction({ guardStatus });
+      await expect(handler.handle(envelope(), blocked.value)).resolves.toBe(
+        "SOURCE_DEFERRED",
+      );
+      expect(blocked.execute).toHaveBeenCalledWith(
+        expect.stringContaining("runtime_outbox_event"),
+        expect.arrayContaining([LIGHT_REF, 1, EVENT_REF]),
+      );
+    }
+
+    const cleared = transaction({ guardSafetyEpoch: "4" });
+    await expect(handler.handle(envelope(), cleared.value)).resolves.toBe(
+      "RELATIONSHIP_LINKED",
     );
   });
 });

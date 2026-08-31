@@ -469,6 +469,7 @@ test(
         (await productTimeStore.createGrant(visibilityGrant)).status,
         "ACCEPTED",
       );
+      await privileged.query("BEGIN");
       await privileged.query(
         `UPDATE daily_energy.app_published_result_visibility
             SET state='BLOCKED', "blockedReasonCode"='SOURCE_DELETED',
@@ -476,6 +477,11 @@ test(
           WHERE id=$2`,
         [new Date("2026-08-21T19:59:31.000Z"), visibilityId],
       );
+      const visibilityRacedCreate = productTimeStore.createGrant(
+        makeGrant(sessions[2].sessionId, new Date("2026-08-21T19:59:32.000Z")),
+      );
+      await waitForApplicationLock(privileged, "c005-product-time-store");
+      await privileged.query("COMMIT");
       assert.ok(
         (
           await productTimeStore.getGrant({
@@ -485,15 +491,10 @@ test(
           })
         )?.invalidatedAt,
       );
-      assert.deepEqual(
-        await productTimeStore.createGrant(
-          makeGrant(
-            sessions[2].sessionId,
-            new Date("2026-08-21T19:59:32.000Z"),
-          ),
-        ),
-        { reason: "RESULT_INVALID", status: "GUARD_REJECTED" },
-      );
+      assert.deepEqual(await visibilityRacedCreate, {
+        reason: "RESULT_INVALID",
+        status: "GUARD_REJECTED",
+      });
 
       const invalidConstraintGrant = makeGrant(
         sessions[0].sessionId,

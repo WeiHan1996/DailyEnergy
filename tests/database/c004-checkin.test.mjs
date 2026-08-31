@@ -24,13 +24,16 @@ function bytes(value) {
 }
 
 function command(accountId, commandRef, fingerprint, values, offset = 0) {
+  const acceptedAt = new Date(baseNow.getTime() + offset);
   return {
     accountId,
     commandRef,
     normalizedPayloadFingerprint: bytes(fingerprint),
-    now: new Date(baseNow.getTime() + offset),
-    productDate: "2026-08-21",
-    productDatePolicyVersion: "product-date-v1",
+    resolveAcceptance: () => ({
+      now: acceptedAt,
+      productDate: "2026-08-21",
+      productDatePolicyVersion: "product-date-v1",
+    }),
     ...values,
   };
 }
@@ -217,6 +220,17 @@ test(
         10,
       );
       assert.equal((await checkinStore.submit(firstInput)).status, "DUPLICATE");
+      assert.equal(
+        (
+          await checkinStore.submit({
+            ...firstInput,
+            resolveAcceptance: () => {
+              throw new Error("C004_REPLAY_MUST_NOT_RESOLVE_A_NEW_DATE");
+            },
+          })
+        ).status,
+        "DUPLICATE",
+      );
       assert.equal(
         (
           await checkinStore.submit({

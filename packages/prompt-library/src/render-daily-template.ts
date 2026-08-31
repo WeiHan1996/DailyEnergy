@@ -28,13 +28,43 @@ export type ControlledTemplateErrorCode =
   | "TEMPLATE_OUTPUT_BINDING_INVALID"
   | "TEMPLATE_OUTPUT_SAFETY_REJECTED";
 
+export const DailyCandidateSafetyViolationCodeValues = [
+  "CERTAIN_FUTURE_HARM_OR_REWARD",
+  "FEAR_SHAME_OR_COERCION",
+  "MEDICAL_OR_PSYCHOLOGICAL_CONCLUSION",
+  "INVESTMENT_TRANSACTION_OR_GUARANTEE",
+  "LEGAL_CONCLUSION_OR_EVASION",
+  "SELF_HARM_OR_VIOLENCE_FACILITATION",
+  "DANGEROUS_OR_ILLEGAL_INSTRUCTION",
+  "DEPENDENCY_ROMANCE_OR_POSSESSION",
+  "HARASSMENT_HATE_OR_STEREOTYPE",
+  "PRIVACY_OR_INTERNAL_DISCLOSURE",
+  "UNSUPPORTED_FACT_OR_DIAGNOSIS",
+  "UNREVIEWED_RESOURCE_OR_CRISIS_COPY",
+] as const;
+
+export type DailyCandidateSafetyViolationCode =
+  (typeof DailyCandidateSafetyViolationCodeValues)[number];
+
+export type DailyCandidateSafetyVerdictV1 =
+  | { readonly status: "PASS" }
+  | {
+      readonly status: "REJECT";
+      readonly violationCodes: readonly DailyCandidateSafetyViolationCode[];
+    };
+
 export class ControlledTemplateError extends Error {
   readonly code: ControlledTemplateErrorCode;
+  readonly violationCodes: readonly DailyCandidateSafetyViolationCode[];
 
-  constructor(code: ControlledTemplateErrorCode) {
+  constructor(
+    code: ControlledTemplateErrorCode,
+    violationCodes: readonly DailyCandidateSafetyViolationCode[] = [],
+  ) {
     super(code);
     this.name = "ControlledTemplateError";
     this.code = code;
+    this.violationCodes = Object.freeze([...violationCodes]);
   }
 }
 
@@ -125,17 +155,99 @@ const UNSAFE_NAME_TOKENS = Object.freeze([
   "老婆",
   "我的女孩",
 ]);
-const SAFETY_PATTERNS = Object.freeze([
-  /(?:一定|必然|注定|百分之百).*(?:成功|发生|好运|坏事)/u,
-  /(?:转运|招财|避祸|横财|破财|灾祸|疾病预兆)/u,
-  /(?:买入|卖出|加仓|减仓|仓位|收益保证|赌博号码|胜诉)/u,
-  /(?:诊断为|抑郁症|焦虑症|停药|换药|治疗方案)/u,
-  /(?:背叛你|恶意针对|必须辞职|必须分手)/u,
-  /(?:为了我|只需要我|永远陪着你|属于我)/u,
-  /(?:废柴|没用|自律不够|必须完成|不做.*失去)/u,
-  /(?:伤害自己|伤害他人|自杀方法|暴力方法)/u,
-  /(?:http|www\.|action\.|task\.|ritual\.|checkin\.|PRIMARY_AI|BACKUP_AI|\.v1)/iu,
+const HARD_SAFETY_RULES: readonly {
+  readonly code: DailyCandidateSafetyViolationCode;
+  readonly patterns: readonly RegExp[];
+}[] = Object.freeze([
+  {
+    code: "CERTAIN_FUTURE_HARM_OR_REWARD",
+    patterns: [
+      /(?:一定|必然|注定|百分之百|肯定会).{0,24}(?:成功|失败|升职|发财|中奖|好运|坏事|灾祸|死亡|生病|疾病|破财|背叛|横财)/u,
+      /(?:成功|失败|升职|发财|中奖|好运|坏事|灾祸|死亡|生病|疾病|破财|背叛|横财).{0,12}(?:一定|必然|注定|百分之百)/u,
+      /(?:转运|招财|避祸|疾病预兆)/u,
+    ],
+  },
+  {
+    code: "FEAR_SHAME_OR_COERCION",
+    patterns: [
+      /(?:不做|不完成|错过).{0,20}(?:失去|倒霉|坏事|惩罚|后悔)/u,
+      /(?:废柴|没用|自律不够|必须完成|别浪费状态)/u,
+    ],
+  },
+  {
+    code: "MEDICAL_OR_PSYCHOLOGICAL_CONCLUSION",
+    patterns: [
+      /(?:诊断为|抑郁症|焦虑症|停药|换药|治疗方案|病因是|患有|得了抑郁|得了焦虑)/u,
+    ],
+  },
+  {
+    code: "INVESTMENT_TRANSACTION_OR_GUARANTEE",
+    patterns: [
+      /(?:买入|卖出|加仓|减仓|仓位|收益保证|稳赚|止盈|止损|赌博号码)/u,
+    ],
+  },
+  {
+    code: "LEGAL_CONCLUSION_OR_EVASION",
+    patterns: [/(?:胜诉|败诉|规避执法|销毁证据|隐瞒证据|法律上一定|肯定违法)/u],
+  },
+  {
+    code: "SELF_HARM_OR_VIOLENCE_FACILITATION",
+    patterns: [
+      /(?:伤害自己|伤害他人|自杀方法|暴力方法|如何自杀|如何杀人|自残步骤)/u,
+    ],
+  },
+  {
+    code: "DANGEROUS_OR_ILLEGAL_INSTRUCTION",
+    patterns: [
+      /(?:制作炸弹|制造武器|购买毒品|吸毒方法|犯罪步骤|过量服药|危险挑战)/u,
+    ],
+  },
+  {
+    code: "DEPENDENCY_ROMANCE_OR_POSSESSION",
+    patterns: [
+      /(?:为了我|只需要我|永远陪着你|属于我|你只能依赖我|我是你唯一|做我的恋人)/u,
+    ],
+  },
+  {
+    code: "HARASSMENT_HATE_OR_STEREOTYPE",
+    patterns: [/(?:小可怜|女人都|男人都|你们这种人|低状态很好笑|活该|蠢货)/u],
+  },
+  {
+    code: "PRIVACY_OR_INTERNAL_DISCLOSURE",
+    patterns: [
+      /(?:https?:\/\/|www\.|action\.|task\.|ritual\.|checkin\.|PRIMARY_AI|BACKUP_AI|\.v1)/iu,
+      /(?:系统提示|提示词|内部规则|其他用户|访问令牌|密钥|api[_ -]?key|secret|token)/iu,
+    ],
+  },
+  {
+    code: "UNSUPPORTED_FACT_OR_DIAGNOSIS",
+    patterns: [
+      /(?:因为你|说明你|这证明你).{0,20}(?:性格|人格|长期|总是|天生|有病)/u,
+      /(?:对方|伴侣|上司).{0,12}(?:一定|肯定|正在).{0,12}(?:想|恨|针对|背叛)/u,
+      /(?:恶意针对|背叛你)/u,
+    ],
+  },
+  {
+    code: "UNREVIEWED_RESOURCE_OR_CRISIS_COPY",
+    patterns: [
+      /(?:SAFE-001|危机热线|心理援助热线|拨打110|拨打120|拨打12356)/iu,
+    ],
+  },
 ]);
+
+export function evaluateDailyCandidateSafetyV1(
+  text: string,
+): DailyCandidateSafetyVerdictV1 {
+  const violationCodes = HARD_SAFETY_RULES.filter(({ patterns }) =>
+    patterns.some((pattern) => pattern.test(text)),
+  ).map(({ code }) => code);
+  return violationCodes.length === 0
+    ? Object.freeze({ status: "PASS" as const })
+    : Object.freeze({
+        status: "REJECT" as const,
+        violationCodes: Object.freeze(violationCodes),
+      });
+}
 
 export function renderControlledDailyTemplateV1(
   input: unknown,
@@ -147,47 +259,7 @@ export function renderControlledDailyTemplateV1(
   const plan = parsed.data;
   validatePlanCatalogBindings(plan);
 
-  const style = effectiveStyle(plan);
-  const styleCopy = DAILY_TEMPLATE_REGISTRY_V1.styles[style];
-  const actionCopy =
-    DAILY_TEMPLATE_REGISTRY_V1.actionCopyById[
-      plan.semantic_slots.selected_action.action_id
-    ];
-  if (actionCopy === undefined) {
-    throw new ControlledTemplateError("TEMPLATE_CATALOG_MISMATCH");
-  }
-  const safeName = projectPreferredName(plan.greeting_context.preferred_name);
-  const greeting = greetingWithOptionalName(styleCopy.greeting, safeName);
-  const expressionCandidate: ExpressionPayload = {
-    greeting,
-    state_response: renderStateResponse(plan, style),
-    overall_summary:
-      plan.semantic_slots.care_dimension_id === undefined
-        ? DAILY_TEMPLATE_REGISTRY_V1.overallSummary[
-            plan.semantic_slots.overall.band
-          ]
-        : DAILY_TEMPLATE_REGISTRY_V1.careOverallSummary,
-    core_tip: actionCopy.coreTip,
-    explanation_paragraphs: renderExplanationParagraphs(plan, style),
-    dimension_explanations: Object.fromEntries(
-      plan.semantic_slots.dimensions.map(({ id, band }) => [
-        id,
-        DAILY_TEMPLATE_REGISTRY_V1.dimensionGuidance[id][band],
-      ]),
-    ) as ExpressionPayload["dimension_explanations"],
-    primary_action: {
-      action_id: actionCopy.actionId,
-      instruction: actionCopy.instruction,
-      rationale: actionCopy.rationale,
-      constraint_label: actionCopy.constraintLabel,
-    },
-    optional_task: {
-      task_id: actionCopy.taskId,
-      instruction: actionCopy.taskInstruction,
-    },
-    ritual_notes: renderRitualNotes(plan),
-    closing: styleCopy.closing,
-  };
+  const expressionCandidate = renderExpectedExpression(plan);
   const expression = ExpressionPayloadSchema.safeParse(expressionCandidate);
   if (!expression.success) {
     throw new ControlledTemplateError("TEMPLATE_OUTPUT_SCHEMA_INVALID");
@@ -266,8 +338,12 @@ export function validateControlledDailyTemplateCandidateV1(
   }
 
   const text = expressionText(expression);
-  if (SAFETY_PATTERNS.some((pattern) => pattern.test(text))) {
-    throw new ControlledTemplateError("TEMPLATE_OUTPUT_SAFETY_REJECTED");
+  const safetyVerdict = evaluateDailyCandidateSafetyV1(text);
+  if (safetyVerdict.status === "REJECT") {
+    throw new ControlledTemplateError(
+      "TEMPLATE_OUTPUT_SAFETY_REJECTED",
+      safetyVerdict.violationCodes,
+    );
   }
   const humorCount = HUMOR_MARKERS.reduce(
     (count, marker) => count + occurrences(text, marker),
@@ -286,15 +362,66 @@ export function validateControlledDailyTemplateCandidateV1(
   ) {
     throw new ControlledTemplateError("TEMPLATE_OUTPUT_SAFETY_REJECTED");
   }
+  const expectedExpression = ExpressionPayloadSchema.parse(
+    renderExpectedExpression(plan),
+  );
+  if (JSON.stringify(expression) !== JSON.stringify(expectedExpression)) {
+    throw new ControlledTemplateError("TEMPLATE_OUTPUT_BINDING_INVALID");
+  }
   const safeName = projectPreferredName(plan.greeting_context.preferred_name);
-  if (
-    safeName !== undefined &&
-    (occurrences(text, safeName) > 1 ||
-      expressionTextExceptGreeting(expression).includes(safeName))
-  ) {
+  const expectedGreeting = greetingWithOptionalName(
+    DAILY_TEMPLATE_REGISTRY_V1.styles[effectiveStyle(plan)].greeting,
+    safeName,
+  );
+  if (expression.greeting !== expectedGreeting) {
     throw new ControlledTemplateError("TEMPLATE_OUTPUT_BINDING_INVALID");
   }
   return deepFreeze(value);
+}
+
+function renderExpectedExpression(
+  plan: ControlledExpressionPlanV1,
+): ExpressionPayload {
+  const style = effectiveStyle(plan);
+  const styleCopy = DAILY_TEMPLATE_REGISTRY_V1.styles[style];
+  const actionCopy =
+    DAILY_TEMPLATE_REGISTRY_V1.actionCopyById[
+      plan.semantic_slots.selected_action.action_id
+    ];
+  if (actionCopy === undefined) {
+    throw new ControlledTemplateError("TEMPLATE_CATALOG_MISMATCH");
+  }
+  const safeName = projectPreferredName(plan.greeting_context.preferred_name);
+  return {
+    greeting: greetingWithOptionalName(styleCopy.greeting, safeName),
+    state_response: renderStateResponse(plan, style),
+    overall_summary:
+      plan.semantic_slots.care_dimension_id === undefined
+        ? DAILY_TEMPLATE_REGISTRY_V1.overallSummary[
+            plan.semantic_slots.overall.band
+          ]
+        : DAILY_TEMPLATE_REGISTRY_V1.careOverallSummary,
+    core_tip: actionCopy.coreTip,
+    explanation_paragraphs: renderExplanationParagraphs(plan, style),
+    dimension_explanations: Object.fromEntries(
+      plan.semantic_slots.dimensions.map(({ id, band }) => [
+        id,
+        DAILY_TEMPLATE_REGISTRY_V1.dimensionGuidance[id][band],
+      ]),
+    ) as ExpressionPayload["dimension_explanations"],
+    primary_action: {
+      action_id: actionCopy.actionId,
+      instruction: actionCopy.instruction,
+      rationale: actionCopy.rationale,
+      constraint_label: actionCopy.constraintLabel,
+    },
+    optional_task: {
+      task_id: actionCopy.taskId,
+      instruction: actionCopy.taskInstruction,
+    },
+    ritual_notes: renderRitualNotes(plan),
+    closing: styleCopy.closing,
+  };
 }
 
 function validatePlanCatalogBindings(plan: ControlledExpressionPlanV1): void {
@@ -473,7 +600,7 @@ function projectPreferredName(value: string | undefined): string | undefined {
     UNSAFE_NAME_TOKENS.some((token) =>
       value.toLocaleLowerCase("zh-CN").includes(token),
     ) ||
-    SAFETY_PATTERNS.some((pattern) => pattern.test(value))
+    evaluateDailyCandidateSafetyV1(value).status === "REJECT"
   ) {
     return undefined;
   }

@@ -89,6 +89,7 @@ export interface RecordsViewModel {
 
 Page({
   data: {
+    analyticsPageKey: "",
     error: false,
     loading: true,
     model: undefined as RecordsViewModel | undefined,
@@ -98,6 +99,8 @@ Page({
     screenId: RECORDS_SCREEN_ID,
   },
   async onLoad() {
+    const analytics = getMiniappAppContext().analytics;
+    this.setData({ analyticsPageKey: analytics.beginPage(RECORDS_SCREEN_ID) });
     wx.getNetworkType({
       success: ({ networkType }) => {
         this.setData({ offline: networkType === "none" });
@@ -171,6 +174,11 @@ Page({
       noCacheOffline: false,
       offline: result.offline,
     });
+    if (result.view.summary_status === "AVAILABLE") {
+      void getMiniappAppContext().analytics.weeklySummaryRead(
+        this.data.analyticsPageKey,
+      );
+    }
   },
 });
 

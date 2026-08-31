@@ -96,6 +96,35 @@ $$;
 REVOKE ALL ON FUNCTION "daily_energy"."invalidate_view_grants_for_day"(uuid, text, timestamptz) FROM PUBLIC;
 REVOKE ALL ON FUNCTION "daily_energy"."invalidate_view_grants_for_result"(uuid, timestamptz) FROM PUBLIC;
 
+CREATE OR REPLACE FUNCTION "daily_energy"."resolve_c005_continuation_result_guard"(
+  target_result_id uuid,
+  target_account_id uuid,
+  target_product_date date
+)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = "daily_energy", pg_catalog
+AS $$
+DECLARE allowed boolean;
+BEGIN
+  SELECT true INTO allowed
+    FROM "daily_energy"."app_published_daily_result" result
+    JOIN "daily_energy"."app_published_result_visibility" visibility
+      ON visibility."resultId"=result.id
+   WHERE result.id=target_result_id
+     AND result."accountId"=target_account_id
+     AND result."productDate"=target_product_date
+     AND visibility.state IN ('AVAILABLE','FALLBACK_ONLY')
+   FOR SHARE OF result,visibility;
+  RETURN COALESCE(allowed,false);
+END
+$$;
+
+REVOKE ALL ON FUNCTION "daily_energy"."resolve_c005_continuation_result_guard"(uuid,uuid,date) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION "daily_energy"."resolve_c005_continuation_result_guard"(uuid,uuid,date)
+TO "daily_energy_api","daily_energy_test";
+
 CREATE OR REPLACE FUNCTION "daily_energy"."c005_invalidate_grants_on_account"()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -230,6 +259,7 @@ AFTER INSERT OR UPDATE OF state ON "daily_energy"."app_published_result_visibili
 FOR EACH ROW EXECUTE FUNCTION "daily_energy"."c005_invalidate_grants_on_visibility"();
 
 -- Rollback target: drop the six c005_* triggers, their trigger functions and
--- the three invalidate_view_grants_* functions; drop c005_view_grant_contract and the
+-- the three invalidate_view_grants_* functions and the continuation result guard;
+-- drop c005_view_grant_contract and the
 -- productDatePolicyVersion column; restore prior API UPDATE/DELETE grants only
 -- after a security review. No user content is transformed.

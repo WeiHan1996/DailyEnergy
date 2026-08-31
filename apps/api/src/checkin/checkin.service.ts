@@ -28,8 +28,17 @@ import {
 import { ApiException } from "../transport/common/api-exception.js";
 
 export interface CheckinServiceResult {
-  readonly resolution: ProductDateResolution;
+  readonly resolution: CheckinResponseResolution;
   readonly view: CheckinView;
+}
+
+interface CheckinResponseResolution {
+  readonly now: Date;
+  readonly productDate: string;
+}
+
+interface CheckinAcceptance extends CheckinResponseResolution {
+  readonly productDatePolicyVersion: string;
 }
 
 @Injectable()
@@ -62,7 +71,6 @@ export class CheckinService {
     principal: SessionPrincipal,
     request: CheckinSubmitRequest,
   ): Promise<CheckinServiceResult> {
-    const resolution = this.#resolve();
     const result = await this.#storeCall(() =>
       this.store.submit({
         accountId: principal.accountId,
@@ -75,12 +83,11 @@ export class CheckinService {
           mood: request.mood,
           sleep: request.sleep,
         }),
-        now: resolution.now,
-        productDate: resolution.productDate,
-        productDatePolicyVersion: this.config.productDatePolicyVersion,
+        resolveAcceptance: () => this.#resolveAcceptance(),
         sleep: request.sleep,
       }),
     );
+    const resolution = this.#mutationResolution(result);
     return { resolution, view: mutationView(result, resolution) };
   }
 
@@ -88,7 +95,6 @@ export class CheckinService {
     principal: SessionPrincipal,
     request: CheckinCorrectRequest,
   ): Promise<CheckinServiceResult> {
-    const resolution = this.#resolve();
     const result = await this.#storeCall(() =>
       this.store.correct({
         accountId: principal.accountId,
@@ -102,13 +108,35 @@ export class CheckinService {
           mood: request.mood,
           sleep: request.sleep,
         }),
-        now: resolution.now,
-        productDate: resolution.productDate,
-        productDatePolicyVersion: this.config.productDatePolicyVersion,
+        resolveAcceptance: () => this.#resolveAcceptance(),
         sleep: request.sleep,
       }),
     );
+    const resolution = this.#mutationResolution(result);
     return { resolution, view: mutationView(result, resolution) };
+  }
+
+  #resolveAcceptance(): CheckinAcceptance {
+    const resolution = this.#resolve();
+    return {
+      now: resolution.now,
+      productDate: resolution.productDate,
+      productDatePolicyVersion: this.config.productDatePolicyVersion,
+    };
+  }
+
+  #mutationResolution(
+    result: CheckinMutationResult,
+  ): CheckinResponseResolution {
+    const current = this.#resolve();
+    const productDate =
+      result.status === "ACCEPTED" || result.status === "DUPLICATE"
+        ? result.value.productDate
+        : result.status === "CHECKIN_ALREADY_EXISTS" ||
+            result.status === "REVISION_CONFLICT"
+          ? result.current.productDate
+          : current.productDate;
+    return { now: current.now, productDate };
   }
 
   #resolve(): ProductDateResolution {
@@ -146,7 +174,7 @@ function checkinView(value: StoredCheckinView): CheckinView {
 
 function mutationView(
   result: CheckinMutationResult,
-  resolution: ProductDateResolution,
+  resolution: CheckinResponseResolution,
 ): CheckinView {
   if (result.status === "ACCEPTED" || result.status === "DUPLICATE") {
     return checkinView(result.value);
@@ -174,7 +202,7 @@ function mutationView(
 
 function guardException(
   status: Exclude<CheckinQueryResult["status"], "FOUND" | "NOT_FOUND">,
-  resolution: ProductDateResolution,
+  resolution: CheckinResponseResolution,
 ): ApiException {
   return exceptionWithResolution(status, resolution);
 }
@@ -191,7 +219,7 @@ function exceptionWithResolution(
     | "RESOURCE_NOT_FOUND"
     | "SAFETY_BLOCKED"
     | "STATE_PRECONDITION_FAILED",
-  resolution: ProductDateResolution,
+  resolution: CheckinResponseResolution,
 ): ApiException {
   return new ApiException({
     code,

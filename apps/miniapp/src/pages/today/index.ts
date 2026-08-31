@@ -18,6 +18,7 @@ const taskOptions = Object.freeze([
 
 Page({
   data: {
+    analyticsPageKey: "",
     error: false,
     actionReason: "",
     expanded: false,
@@ -43,6 +44,8 @@ Page({
     view: undefined as TodayView | undefined,
   },
   async onLoad() {
+    const analytics = getMiniappAppContext().analytics;
+    this.setData({ analyticsPageKey: analytics.beginPage(TODAY_SCREEN_ID) });
     wx.getNetworkType({
       success: ({ networkType }) => {
         this.setData({ offline: networkType === "none" });
@@ -74,7 +77,13 @@ Page({
     await this.applyResult(await getMiniappAppContext().daily.loadToday());
   },
   toggleDimensions() {
-    this.setData({ expanded: !this.data.expanded });
+    const expanded = !this.data.expanded;
+    this.setData({ expanded });
+    if (expanded) {
+      void getMiniappAppContext().analytics.dimensionsExpanded(
+        this.data.analyticsPageKey,
+      );
+    }
   },
   showAction() {
     wx.pageScrollTo({
@@ -92,6 +101,9 @@ Page({
       .observe("#today-action", ({ intersectionRatio }) => {
         if (intersectionRatio >= 0.8) {
           this.setData({ lightEligible: true });
+          void getMiniappAppContext().analytics.mainActionReached(
+            this.data.analyticsPageKey,
+          );
           actionObserver?.disconnect();
           actionObserver = undefined;
         }

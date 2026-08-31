@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:062f9291880a9d0ce57b9923f31c2ebb8c05ed66d201eb407a591ce28cc7304e
+// source-fingerprint: sha256:4f25a52e42831a6ecaee032c92a92244e262169e452cf8a25389c0ba450a89a5
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:062f9291880a9d0ce57b9923f31c2ebb8c05ed66d201eb407a591ce28cc7304e";
+  "sha256:4f25a52e42831a6ecaee032c92a92244e262169e452cf8a25389c0ba450a89a5";
 
 export interface paths {
   "/analytics/signals": {
@@ -590,7 +590,7 @@ export interface components {
           locale: "zh-CN" | "other";
           scene_code:
             "DIRECT" | "CHANNEL_LANDING" | "SHARE" | "NOTIFICATION" | "OTHER";
-          surface_version_bucket: string;
+          surface_version_bucket: "LANDING_V1";
         }
       | {
           app_version: string;
@@ -599,7 +599,7 @@ export interface components {
           locale: "zh-CN" | "other";
           scene_code:
             "DIRECT" | "CHANNEL_LANDING" | "SHARE" | "NOTIFICATION" | "OTHER";
-          surface_version_bucket: string;
+          surface_version_bucket: "LANDING_V1";
         }
       | {
           app_version: string;

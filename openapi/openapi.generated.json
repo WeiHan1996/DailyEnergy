@@ -2630,9 +2630,9 @@
                 "type": "string"
               },
               "surface_version_bucket": {
-                "maxLength": 32,
-                "minLength": 1,
-                "pattern": "^(?:[A-Z][A-Z0-9_]{0,30}|OTHER)$",
+                "enum": [
+                  "LANDING_V1"
+                ],
                 "type": "string"
               }
             },
@@ -2683,9 +2683,9 @@
                 "type": "string"
               },
               "surface_version_bucket": {
-                "maxLength": 32,
-                "minLength": 1,
-                "pattern": "^(?:[A-Z][A-Z0-9_]{0,30}|OTHER)$",
+                "enum": [
+                  "LANDING_V1"
+                ],
                 "type": "string"
               }
             },
@@ -13161,6 +13161,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:062f9291880a9d0ce57b9923f31c2ebb8c05ed66d201eb407a591ce28cc7304e"
+    "source-fingerprint": "sha256:4f25a52e42831a6ecaee032c92a92244e262169e452cf8a25389c0ba450a89a5"
   }
 }

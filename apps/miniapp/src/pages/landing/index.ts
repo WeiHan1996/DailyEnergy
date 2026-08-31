@@ -10,6 +10,7 @@ function isNetworkFailure(route: C003Route): boolean {
 
 Page({
   data: {
+    analyticsPageKey: "",
     busy: false,
     consentChecked: false,
     consentExpanded: false,
@@ -18,6 +19,10 @@ Page({
     screenId: LANDING_SCREEN_ID,
   },
   onLoad() {
+    const analytics = getMiniappAppContext().analytics;
+    const analyticsPageKey = analytics.beginPage(LANDING_SCREEN_ID);
+    this.setData({ analyticsPageKey });
+    void analytics.landingViewed(analyticsPageKey);
     wx.getNetworkType({
       success: ({ networkType }) => {
         this.setData({ offline: networkType === "none" });
@@ -34,6 +39,9 @@ Page({
     if (this.data.offline) {
       return;
     }
+    void getMiniappAppContext().analytics.landingPrimaryActionClicked(
+      this.data.analyticsPageKey,
+    );
     this.setData({ consentExpanded: true, error: false });
   },
   toggleConsent() {

@@ -29,6 +29,7 @@ export interface ProductDateResolution {
   readonly policyVersion: "product-date-v1";
   readonly productDate: ProductDate;
   readonly timezoneId: "Asia/Shanghai";
+  readonly tzdbRelease: string;
 }
 
 interface CivilDate {
@@ -44,6 +45,7 @@ interface ZonedParts extends CivilDate {
 }
 
 const PRODUCT_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/u;
+const TZDB_RELEASE_PATTERN = /^\d{4}[a-z]$/u;
 
 export function parseProductDate(value: string): ProductDate {
   const match = PRODUCT_DATE_PATTERN.exec(value);
@@ -68,6 +70,7 @@ export function parseProductDate(value: string): ProductDate {
 
 export function resolveProductDate(now: Date): ProductDateResolution {
   assertInstant(now);
+  const tzdbRelease = systemTzdbRelease();
   const local = zonedParts(now, PRODUCT_DATE_POLICY_V1.timezoneId);
   const productCivil =
     local.hour >= 4
@@ -86,6 +89,7 @@ export function resolveProductDate(now: Date): ProductDateResolution {
     policyVersion: PRODUCT_DATE_POLICY_V1.policyVersion,
     productDate,
     timezoneId: PRODUCT_DATE_POLICY_V1.timezoneId,
+    tzdbRelease,
   });
 }
 
@@ -131,6 +135,21 @@ function assertInstant(value: Date): void {
   if (!Number.isFinite(value.getTime())) {
     throw new ProductTimeError("PRODUCT_DATE_TIMEZONE_UNAVAILABLE");
   }
+}
+
+function systemTzdbRelease(): string {
+  const tzdbRelease = process.versions.tz;
+  if (tzdbRelease === undefined) {
+    throw new ProductTimeError("PRODUCT_DATE_TIMEZONE_UNAVAILABLE");
+  }
+  return parseTzdbRelease(tzdbRelease);
+}
+
+function parseTzdbRelease(value: string): string {
+  if (!TZDB_RELEASE_PATTERN.test(value)) {
+    throw new ProductTimeError("PRODUCT_DATE_TIMEZONE_UNAVAILABLE");
+  }
+  return value;
 }
 
 function civilFromProductDate(value: ProductDate): CivilDate {

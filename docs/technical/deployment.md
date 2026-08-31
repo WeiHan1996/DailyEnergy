@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-08-20（E-016 公开仓库 CI 信任边界）
+- **最后更新**：2026-08-31（C-005 tzdb release 审计绑定）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
 - **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0007 临时 DEV 同机例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
@@ -320,6 +320,7 @@ ReleaseManifestV1 {
 约束：
 
 - manifest 只保存 ref、version、digest、时间和角色，不保存 secret、环境变量值、数据库 URL、用户内容或 provider payload；
+- server image 的独立 runtime evidence 显式保存实际 tzdb release；其 digest 进入 image set，ReleaseManifestV1 通过 `image_set_sha256` 绑定该证据，不能给已冻结的 V1 config 闭集新增键而破坏旧 rollback controller；
 - `release_id` 不可变；任何 image/config/migration/capability 变化创建新 release；
 - CI 发布的 `image_set_id` 只标识一组不可变镜像与供应链证据；materializer 以
   `image_set_id + database secret version + COS secret version + object config ref + object config fingerprint`

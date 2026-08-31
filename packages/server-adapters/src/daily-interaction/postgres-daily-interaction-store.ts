@@ -285,6 +285,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
     readonly resultRef: string;
     readonly sessionId: string;
   }): Promise<DailyLightMutationResult> {
+    const clock = transactionClock(input.now);
     return this.#transaction(async (client) => {
       await lockAccountGuard(client, input.accountId);
       const guard = await resolveGenerationGuardSnapshot(
@@ -305,7 +306,8 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
       if (current === undefined || current.resultId !== input.resultRef) {
         return { status: "NOT_FOUND" };
       }
-      const claim = await claimLightCommand(client, input);
+      const currentInput = { ...input, now: clock() };
+      const claim = await claimLightCommand(client, currentInput);
       if (claim.status === "CONFLICT") {
         return { status: "IDEMPOTENCY_CONFLICT" };
       }
@@ -316,12 +318,12 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
         return { status: "DUPLICATE", value: interactionView(current) };
       }
       if (current.lightId !== null) {
-        await attachCommandResponse(client, input, current.lightId);
+        await attachCommandResponse(client, currentInput, current.lightId);
         return { status: "DUPLICATE", value: interactionView(current) };
       }
       const windowFailure = await interactionWindowFailure(
         client,
-        input,
+        currentInput,
         current,
         "ILLUMINATE",
       );
@@ -340,7 +342,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
           lightId,
           current.interactionId,
           commandRefStorageUuid(input.commandRef),
-          input.now,
+          currentInput.now,
           RETENTION_POLICY_VERSION,
         ],
       );
@@ -349,7 +351,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
             SET "aggregateRevision"="aggregateRevision"+1,
                 "updatedAt"=$1::timestamptz
           WHERE id=$2::uuid AND "aggregateRevision"=$3`,
-        [input.now, current.interactionId, current.aggregateRevision],
+        [currentInput.now, current.interactionId, current.aggregateRevision],
       );
       if (aggregateUpdated.rowCount !== 1) {
         throw new Error("DAILY_LIGHT_AGGREGATE_CAS_LOST");
@@ -359,11 +361,11 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
         deletionEpoch: guard.deletionEpoch,
         interactionId: current.interactionId,
         lightId,
-        now: input.now,
+        now: currentInput.now,
         productDate: input.productDate,
         safetyEpoch: guard.safetyEpoch,
       });
-      await attachCommandResponse(client, input, lightId);
+      await attachCommandResponse(client, currentInput, lightId);
       return {
         status: "ACCEPTED",
         value: interactionView({
@@ -371,7 +373,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
           aggregateRevision: current.aggregateRevision + 1,
           isLit: true,
           lightId,
-          updatedAt: input.now,
+          updatedAt: currentInput.now,
         }),
       };
     });
@@ -384,17 +386,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
     readonly resultId: string;
     readonly sessionId: string;
   }): Promise<{ readonly status: "RECORDED" | DailyInteractionGuardFailure }> {
-    const grant = createViewContinuationGrant({
-      grantRef: commandRefStorageUuid(
-        `c010:view:DLY-003:${input.sessionId}:${input.resultId}`,
-      ),
-      openedAt: input.openedAt,
-      ownerRef: input.accountId,
-      productDate: parseProductDate(input.productDate),
-      resultRef: input.resultId,
-      sessionRef: input.sessionId,
-      surface: "DLY-003",
-    });
+    const clock = transactionClock(input.openedAt);
     return this.#transaction(async (client) => {
       await lockAccountGuard(client, input.accountId);
       const guard = await resolveGenerationGuardSnapshot(
@@ -405,6 +397,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
       if (guard.status !== "ALLOWED") {
         return { status: guard.status };
       }
+      const openedAt = clock();
       const binding = await client.query(
         `SELECT 1
            FROM daily_energy.app_daily_interaction interaction
@@ -423,11 +416,27 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
           input.accountId,
           input.productDate,
           input.sessionId,
-          input.openedAt,
+          openedAt,
           input.resultId,
         ],
       );
       if (binding.rowCount !== 1) {
+        return { status: "STATE_PRECONDITION_FAILED" };
+      }
+      let grant: ViewContinuationGrant;
+      try {
+        grant = createViewContinuationGrant({
+          grantRef: commandRefStorageUuid(
+            `c010:view:DLY-003:${input.sessionId}:${input.resultId}`,
+          ),
+          openedAt,
+          ownerRef: input.accountId,
+          productDate: parseProductDate(input.productDate),
+          resultRef: input.resultId,
+          sessionRef: input.sessionId,
+          surface: "DLY-003",
+        });
+      } catch {
         return { status: "STATE_PRECONDITION_FAILED" };
       }
       await client.query(
@@ -459,6 +468,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
     readonly status: TaskStatus;
     readonly taskRef: string;
   }): Promise<DailyTaskMutationResult> {
+    const clock = transactionClock(input.now);
     return this.#transaction(async (client) => {
       await lockAccountGuard(client, input.accountId);
       const guard = await resolveGenerationGuardSnapshot(
@@ -479,7 +489,8 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
       if (current === undefined) {
         return { status: "NOT_FOUND" };
       }
-      const claim = await claimCommand(client, input);
+      const currentInput = { ...input, now: clock() };
+      const claim = await claimCommand(client, currentInput);
       if (claim.status === "CONFLICT") {
         return { status: "IDEMPOTENCY_CONFLICT" };
       }
@@ -489,7 +500,11 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
         }
         return { status: "DUPLICATE", value: interactionView(current) };
       }
-      const windowFailure = await taskWindowFailure(client, input, current);
+      const windowFailure = await taskWindowFailure(
+        client,
+        currentInput,
+        current,
+      );
       if (windowFailure !== undefined) {
         return { status: windowFailure };
       }
@@ -500,7 +515,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
         };
       }
       if (current.taskStatus === input.status) {
-        await attachCommandResponse(client, input, current.taskStateId);
+        await attachCommandResponse(client, currentInput, current.taskStateId);
         return { status: "DUPLICATE", value: interactionView(current) };
       }
       const nextRevision = current.taskRevision + 1;
@@ -511,7 +526,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
         [
           input.status,
           nextRevision,
-          input.now,
+          currentInput.now,
           current.taskStateId,
           input.expectedRevision,
         ],
@@ -537,7 +552,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
             SET "aggregateRevision"="aggregateRevision"+1,
                 "updatedAt"=$1::timestamptz
           WHERE id=$2::uuid AND "aggregateRevision"=$3`,
-        [input.now, current.interactionId, current.aggregateRevision],
+        [currentInput.now, current.interactionId, current.aggregateRevision],
       );
       if (aggregateUpdated.rowCount !== 1) {
         throw new Error("DAILY_INTERACTION_AGGREGATE_CAS_LOST");
@@ -546,11 +561,11 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
         aggregateRevision: current.aggregateRevision + 1,
         deletionEpoch: guard.deletionEpoch,
         interactionId: current.interactionId,
-        now: input.now,
+        now: currentInput.now,
         productDate: input.productDate,
         safetyEpoch: guard.safetyEpoch,
       });
-      await attachCommandResponse(client, input, current.taskStateId);
+      await attachCommandResponse(client, currentInput, current.taskStateId);
       return {
         status: "ACCEPTED",
         value: interactionView({
@@ -558,7 +573,7 @@ export class PostgresDailyInteractionStore implements DailyInteractionStore {
           aggregateRevision: current.aggregateRevision + 1,
           taskRevision: nextRevision,
           taskStatus: input.status,
-          updatedAt: input.now,
+          updatedAt: currentInput.now,
         }),
       };
     });
@@ -1041,6 +1056,18 @@ function grantParameters(grant: ViewContinuationGrant): unknown[] {
     grant.createdAt,
     RETENTION_POLICY_VERSION,
   ];
+}
+
+function transactionClock(baseNow: Date): () => Date {
+  const startedAt = process.hrtime.bigint();
+  return () => {
+    const elapsedNanoseconds = process.hrtime.bigint() - startedAt;
+    const elapsedMilliseconds = Math.max(
+      0,
+      Math.floor(Number(elapsedNanoseconds) / 1_000_000),
+    );
+    return new Date(baseNow.getTime() + elapsedMilliseconds);
+  };
 }
 
 async function lockAccountGuard(

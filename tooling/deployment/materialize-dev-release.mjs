@@ -18,6 +18,7 @@ import {
 import { apiDeployConfigFingerprint } from "./runtime-evidence.mjs";
 
 const VERSION_REF = /^[a-z0-9][a-z0-9-]{2,63}$/u;
+const TZDB_RELEASE = /^\d{4}[a-z]$/u;
 
 function fail(code, detail) {
   throw new Error(`${code}:${detail}`);
@@ -70,6 +71,9 @@ export function materializeDevelopmentRelease({
   selection,
   supplyEvidence,
 }) {
+  if (!TZDB_RELEASE.test(runtimeEvidence.tzdb_release ?? "")) {
+    fail("DEV_RELEASE_TZDB_EVIDENCE_REQUIRED", "tzdb-release");
+  }
   validateDevPublicationEvidence(imageSet, supplyEvidence, runtimeEvidence);
   const selected = validateDevelopmentReleaseSelection(selection);
   if (currentManifest !== null) {

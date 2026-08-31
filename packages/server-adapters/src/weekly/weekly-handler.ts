@@ -180,9 +180,23 @@ async function handleSourceChanged(
   );
   await transaction.execute(
     `UPDATE daily_energy.app_weekly_source_snapshot
-        SET "invalidatedAt"=$2::timestamptz
-      WHERE "windowId"=$1::uuid AND "sourceFingerprint"<>$3
-        AND "invalidatedAt" IS NULL`,
+        SET "invalidatedAt"=COALESCE("invalidatedAt",$2::timestamptz),
+            "retentionAnchorAt"=CASE WHEN "expiresAt" IS NULL
+              THEN $2::timestamptz ELSE "retentionAnchorAt" END,
+            "expiresAt"=COALESCE(
+              "expiresAt",$2::timestamptz+interval '30 days'
+            )
+      WHERE "windowId"=$1::uuid AND "sourceFingerprint"<>$3`,
+    [window.windowId, now, fingerprint],
+  );
+  await transaction.execute(
+    `UPDATE daily_energy.app_published_weekly_summary_revision
+        SET "retentionAnchorAt"=CASE WHEN "expiresAt" IS NULL
+              THEN $2::timestamptz ELSE "retentionAnchorAt" END,
+            "expiresAt"=COALESCE(
+              "expiresAt",$2::timestamptz+interval '30 days'
+            )
+      WHERE "windowId"=$1::uuid AND "sourceFingerprint"<>$3`,
     [window.windowId, now, fingerprint],
   );
   await transaction.execute(

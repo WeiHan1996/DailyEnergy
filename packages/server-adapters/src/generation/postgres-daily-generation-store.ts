@@ -649,7 +649,15 @@ async function readTodaySource(
           WHERE cycle."accountId"=result."accountId"
             AND cycle."activeSlot" IS TRUE
             AND cycle.state='ACTIVE'
-            AND (link.id IS NULL OR relationship_light.id IS NOT NULL)
+            AND (
+              link.id IS NULL
+              OR (
+                relationship_light.id IS NOT NULL
+                AND daily_energy.resolve_generation_guard_snapshot(
+                  result."accountId",link."productDate",'necessary-consent-v1'
+                )->>'status'='ALLOWED'
+              )
+            )
           GROUP BY cycle.id
           LIMIT 1
        ) relationship ON TRUE

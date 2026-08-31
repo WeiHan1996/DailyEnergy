@@ -8,7 +8,11 @@
   "verified_status_head": "487a939914e7c18614634e313dab18c0e8c90e3f",
   "verified_status_ci_run": 33323187131,
   "verified_status_ci_checks": "11/11 SUCCESS",
-  "execution_status": "AUTOMATED_IMPLEMENTATION_COMPLETE_MANUAL_EVIDENCE_PENDING",
+  "remediation_branch": "agent/c004-c015-review-fixes",
+  "remediation_base_head": "fd04b787926127bda64fc6cb07cfcf356d85ed8b",
+  "remediation_head": null,
+  "remediation_pr": null,
+  "execution_status": "AUTOMATED_REMEDIATION_COMPLETE_MANUAL_EVIDENCE_PENDING",
   "pass_claim": "PROHIBITED",
   "synthetic_accounts_only": true,
   "accepted_scope": {
@@ -38,7 +42,16 @@
     "full_security_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED",
     "root_tests": "18/18 Turbo tasks PASS",
     "root_build": "9/9 Turbo tasks PASS",
-    "redis_8_bullmq_5_queue": "8/8 PASS"
+    "redis_8_bullmq_5_queue": "8/8 PASS",
+    "api_tests": "158/158 PASS",
+    "miniapp_tests": "87/87 PASS",
+    "server_core_tests": "65/65 PASS",
+    "server_adapter_tests": "57/57 PASS",
+    "prompt_library_tests": "12/12 PASS",
+    "deployment_contract_tests": "50/50 PASS",
+    "contract_fingerprint": "4f25a52e42831a6ecaee032c92a92244e262169e452cf8a25389c0ba450a89a5",
+    "product_date_tzdb_audit": "ACTUAL_RUNTIME_RELEASE_BOUND_TO_RUNTIME_EVIDENCE_SUPPLY_DIGEST_AND_RELEASE_MANIFEST",
+    "review_remediation": "C-004_THROUGH_C-015_REGRESSIONS_PASS"
   },
   "security_review": {
     "status": "OWNER_REVIEW_PENDING",
@@ -52,7 +65,10 @@
       "database checks enforce k=10, at most two dimensions, exact 13-month expiry and no exact values for suppressed metrics",
       "same revision replaces rows and a later authority revision recomputes D1/D3/D7 without a persistent late-user list",
       "Q01/Q02, individual experiment assignment and channel-specific retention have explicit unavailable/disabled results",
-      "logs and operational telemetry do not become product analytics sources"
+      "logs and operational telemetry do not become product analytics sources",
+      "product date resolution reports only the process tzdb release; new release manifests bind the immutable server-image runtime evidence while legacy ReleaseManifestV1 remains readable",
+      "account, Safety and deletion races fail closed before C-012/C-014 writes; superseded weekly content expires on a fixed 30-day deadline",
+      "client analytics identity cells, metrics M05/M19/M22 and count-free G01-G04 evidence use their accepted closed contracts"
     ],
     "residual_evidence": [
       "owner review of differential-query resistance and the four-plane role matrix",

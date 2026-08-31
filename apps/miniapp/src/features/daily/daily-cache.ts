@@ -107,6 +107,7 @@ export class DailyViewCache {
   public async saveToday(view: TodayView): Promise<void> {
     const current = await this.#load();
     await this.#save({
+      ...(current === undefined ? {} : { expiresAt: current.expiresAt }),
       histories: current?.histories ?? {},
       ...(current?.historyList === undefined
         ? {}
@@ -117,9 +118,10 @@ export class DailyViewCache {
 
   public async saveHistory(view: HistoryDayView): Promise<void> {
     const current = await this.#load();
+    const cacheableView = historyCacheProjection(view);
     const histories = {
       ...(current?.histories ?? {}),
-      [view.product_date]: view,
+      [cacheableView.product_date]: cacheableView,
     };
     const dates = Object.keys(histories).sort().slice(-7);
     const retained: Record<string, HistoryDayView> = {};
@@ -127,6 +129,7 @@ export class DailyViewCache {
       retained[date] = histories[date]!;
     }
     await this.#save({
+      ...(current === undefined ? {} : { expiresAt: current.expiresAt }),
       histories: retained,
       ...(current?.historyList === undefined
         ? {}
@@ -143,6 +146,7 @@ export class DailyViewCache {
     const histories = { ...current.histories };
     delete histories[productDate];
     await this.#save({
+      expiresAt: current.expiresAt,
       histories,
       ...(current.historyList === undefined
         ? {}
@@ -153,10 +157,23 @@ export class DailyViewCache {
 
   public async saveHistoryList(view: HistoryListView): Promise<void> {
     const current = await this.#load();
+    const missingDates = new Set(
+      view.items
+        .filter((item) => item.state === "MISSING")
+        .map((item) => item.product_date),
+    );
+    const histories = { ...(current?.histories ?? {}) };
+    for (const productDate of missingDates) {
+      delete histories[productDate];
+    }
+    const today = current?.today;
     await this.#save({
-      histories: current?.histories ?? {},
+      ...(current === undefined ? {} : { expiresAt: current.expiresAt }),
+      histories,
       historyList: view,
-      ...(current?.today === undefined ? {} : { today: current.today }),
+      ...(today === undefined || missingDates.has(today.content.product_date)
+        ? {}
+        : { today }),
     });
   }
 
@@ -169,6 +186,7 @@ export class DailyViewCache {
         readonly histories: Readonly<Record<string, HistoryDayView>>;
         readonly historyList?: HistoryListView;
         readonly today?: TodayView;
+        readonly expiresAt: number;
       }
     | undefined
   > {
@@ -189,7 +207,11 @@ export class DailyViewCache {
     try {
       const histories: Record<string, HistoryDayView> = {};
       for (const [date, history] of Object.entries(value.histories)) {
-        if (!isProductDate(date) || !isRecord(history)) {
+        if (
+          !isProductDate(date) ||
+          !isRecord(history) ||
+          historyContainsNote(history)
+        ) {
           throw new Error("DAILY_HISTORY_CACHE_INVALID");
         }
         histories[date] = projectHistoryDayView(history);
@@ -201,6 +223,7 @@ export class DailyViewCache {
         ? projectHistoryListView(value.historyList)
         : undefined;
       return Object.freeze({
+        expiresAt: value.expiresAt,
         histories: Object.freeze(histories),
         ...(historyList === undefined ? {} : { historyList }),
         ...(today === undefined ? {} : { today }),
@@ -212,12 +235,13 @@ export class DailyViewCache {
   }
 
   async #save(input: {
+    readonly expiresAt?: number;
     readonly histories: Readonly<Record<string, HistoryDayView>>;
     readonly historyList?: HistoryListView;
     readonly today?: TodayView;
   }): Promise<void> {
     const stored: StoredViews = {
-      expiresAt: this.now() + DAILY_VIEW_CACHE_TTL_MS,
+      expiresAt: input.expiresAt ?? this.now() + DAILY_VIEW_CACHE_TTL_MS,
       histories: storageValue(input.histories) as Readonly<
         Record<string, StorageValue>
       >,
@@ -232,6 +256,24 @@ export class DailyViewCache {
     };
     await this.storage.set(VIEW_CACHE_KEY, stored);
   }
+}
+
+function historyCacheProjection(view: HistoryDayView): HistoryDayView {
+  const candidate = JSON.parse(JSON.stringify(view)) as Record<string, unknown>;
+  const evening = candidate.evening;
+  if (isRecord(evening) && isRecord(evening.feedback)) {
+    delete evening.feedback.note;
+  }
+  return projectHistoryDayView(candidate);
+}
+
+function historyContainsNote(value: Record<string, unknown>): boolean {
+  const evening = value.evening;
+  return (
+    isRecord(evening) &&
+    isRecord(evening.feedback) &&
+    Object.prototype.hasOwnProperty.call(evening.feedback, "note")
+  );
 }
 
 export class PendingLightCommandStore {

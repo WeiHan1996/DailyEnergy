@@ -643,5 +643,29 @@ describe("C-006 integer, catalog and property invariants", () => {
     ).toThrowError(
       expect.objectContaining({ code: "RULE_FACTS_INVARIANT_FAILED" }),
     );
+
+    const inconsistentOverallScore =
+      facts.overall.band === "LOW"
+        ? facts.overall.score === 0
+          ? 1
+          : facts.overall.score - 1
+        : facts.overall.band === "STEADY"
+          ? facts.overall.score === 40
+            ? 41
+            : facts.overall.score - 1
+          : facts.overall.score === 70
+            ? 71
+            : facts.overall.score - 1;
+    expect(() =>
+      validateRuleFactsV1({
+        ...facts,
+        overall: {
+          score: inconsistentOverallScore,
+          ...scoreBandV1(inconsistentOverallScore),
+        },
+      }),
+    ).toThrowError(
+      expect.objectContaining({ code: "RULE_FACTS_INVARIANT_FAILED" }),
+    );
   });
 });

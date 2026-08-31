@@ -175,4 +175,27 @@ describe("C-014 data-rights flow", () => {
       taskRef: accountTask.task_ref,
     });
   });
+
+  it("removes an expired account status grant before any network request", async () => {
+    const state = fixtures();
+    const statusToken = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG";
+    state.values.set("data-rights:deletion-status-v1", {
+      expiresAt: "2020-01-01T00:00:00.000Z",
+      statusToken,
+      taskRef: pendingTask.task_ref,
+    });
+    state.api.getDeletionStatus = vi.fn();
+    const coordinator = new DataRightsCoordinator(
+      state.login,
+      state.storage,
+      state.api,
+    );
+
+    await expect(coordinator.loadDeletionStatus()).resolves.toEqual({
+      kind: "recovery",
+      reasonCode: "DELETION_STATUS_GRANT_INVALID",
+    });
+    expect(state.values.has("data-rights:deletion-status-v1")).toBe(false);
+    expect(state.api.getDeletionStatus).not.toHaveBeenCalled();
+  });
 });

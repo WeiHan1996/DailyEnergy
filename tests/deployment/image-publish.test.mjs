@@ -71,6 +71,7 @@ function runtimeEvidence(releaseId) {
     },
     release_id: releaseId,
     server_image: `ghcr.io/weihan1996/dailyenergy-server@sha256:${"4".repeat(64)}`,
+    tzdb_release: "2026b",
   };
 }
 
@@ -225,6 +226,7 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
     materialized.release_id,
   );
   assert.deepEqual(materialized.compatibility.accepted_generations, [1, 2]);
+  assert.equal(Object.hasOwn(materialized.config, "tzdb_release"), false);
   assert.deepEqual(
     validateManifestRuntimeEvidence(
       materialized,
@@ -488,6 +490,31 @@ test("T-E012-IMAGE-001 binds the API deploy fingerprint to the materialized rele
     ),
   );
 
+  const tzdbDrift = structuredClone(publicationRuntimeEvidence);
+  tzdbDrift.tzdb_release = "2026a";
+  assert.throws(
+    () => validateManifestRuntimeEvidence(manifest, imageSet, tzdbDrift),
+    /DEV_RUNTIME_EVIDENCE_MANIFEST_DRIFT/u,
+  );
+
+  const legacyRuntimeEvidence = structuredClone(publicationRuntimeEvidence);
+  delete legacyRuntimeEvidence.tzdb_release;
+  assert.equal(
+    validateDevRuntimeEvidence(legacyRuntimeEvidence),
+    legacyRuntimeEvidence,
+  );
+  assert.throws(
+    () =>
+      materializeDevelopmentRelease({
+        imageSet,
+        objectConfigSource: "COS_BUCKET=not-read-before-tzdb-check\n",
+        runtimeEvidence: legacyRuntimeEvidence,
+        selection: RELEASE_SELECTION_V1,
+        supplyEvidence: evidence,
+      }),
+    /DEV_RELEASE_TZDB_EVIDENCE_REQUIRED/u,
+  );
+
   const publicationFingerprintReuse = structuredClone(manifest);
   publicationFingerprintReuse.config.runtime_fingerprints.api_deploy_config =
     publicationRuntimeEvidence.fingerprints.api_deploy_config;
@@ -534,8 +561,12 @@ test("T-E012-IMAGE-001 binds runtime fingerprints and CI supply evidence to the 
     },
     {
       pullImage: (image) => pulledImages.push(image),
-      runImage: (_image, arguments_, environment) =>
-        arguments_.join(" ").includes("runtime-config")
+      runImage: (_image, arguments_, environment) => {
+        if (arguments_.join(" ").includes("process.versions.tz")) {
+          assert.equal(environment.NODE_OPTIONS, "");
+          return "2026b";
+        }
+        return arguments_.join(" ").includes("runtime-config")
           ? JSON.stringify({
               capabilityFingerprint: "a".repeat(64),
               deployConfigFingerprint: apiDeployConfigFingerprint(
@@ -547,11 +578,13 @@ test("T-E012-IMAGE-001 binds runtime fingerprints and CI supply evidence to the 
               background: "c".repeat(64),
               interactive: "d".repeat(64),
               restricted: "e".repeat(64),
-            }),
+            });
+      },
     },
   );
   assert.equal(validateDevRuntimeEvidence(runtime), runtime);
   assert.equal(runtime.release_id, releaseId);
+  assert.equal(runtime.tzdb_release, "2026b");
   assert.deepEqual(pulledImages, [runtime.server_image]);
   const driftedRuntimeFingerprint = structuredClone(runtime);
   driftedRuntimeFingerprint.fingerprints.api_deploy_config = "b".repeat(64);
@@ -559,7 +592,12 @@ test("T-E012-IMAGE-001 binds runtime fingerprints and CI supply evidence to the 
     () => validateDevRuntimeEvidence(driftedRuntimeFingerprint),
     /DEV_RUNTIME_FINGERPRINT_INVALID:api-deploy-config/u,
   );
-
+  const invalidTzdbRelease = structuredClone(runtime);
+  invalidTzdbRelease.tzdb_release = "synthetic-tzdb";
+  assert.throws(
+    () => validateDevRuntimeEvidence(invalidTzdbRelease),
+    /DEV_RUNTIME_TZDB_RELEASE_INVALID/u,
+  );
   const supplyDirectory = path.join(directory, "supply");
   const migrationsDirectory = path.join(directory, "migrations");
   await mkdir(supplyDirectory);
