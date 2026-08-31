@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-31
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：[C-015 统一审核修复](./current.md)：#157～#169 已以 merge commit 合入 main，ruleset 已恢复；C-015 等待外部/真机证据，Production/RC 保持 `NO_GO`
+- **当前任务**：[C-015 统一审核修复](./current.md)：#157～#169 已合入 main，ruleset 已恢复；[Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 记录 merge 收据；C-015 等待外部/真机证据
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则

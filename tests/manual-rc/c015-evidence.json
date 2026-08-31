@@ -61,6 +61,12 @@
     "ruleset_restored": "LINEAR_HISTORY / SQUASH_ONLY / 11 STRICT CHECKS / NO BYPASS"
   },
   "execution_status": "IMPLEMENTATION_MERGED_EXTERNAL_EVIDENCE_PENDING",
+  "post_merge_handoff": {
+    "branch": "agent/c015-post-merge-handoff",
+    "implementation_head": "047f9c2153c71f2473ce682a15012821b214f20f",
+    "pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/170",
+    "status": "DRAFT_CI_PENDING"
+  },
   "pass_claim": "PROHIBITED",
   "synthetic_accounts_only": true,
   "accepted_scope": {
