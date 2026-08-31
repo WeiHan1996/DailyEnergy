@@ -1,10 +1,107 @@
-<de-page-shell labelled-by="checkin-handoff-title">
-  <view class="checkin-handoff" data-screen-id="{{screenId}}">
-    <view id="checkin-handoff-title" class="checkin-handoff__title">正在读取今天的状态</view>
+<de-page-shell labelled-by="checkin-title">
+  <view slot="header" class="checkin__eyebrow">今日签到</view>
+
+  <view class="checkin" data-screen-id="{{screenId}}">
+    <view class="checkin__intro">
+      <view class="checkin__meta">{{productDate || '今天'}} · 你的真实记录</view>
+      <view id="checkin-title" class="checkin__title">现在的你，是什么状态？</view>
+      <view class="checkin__subtitle">没有好坏，也不用判断得很准。选一个最接近此刻的答案就好。</view>
+    </view>
+
     <de-loading-skeleton
-      label="正在进入今日签到"
-      lines="4"
+      wx:if="{{loading}}"
+      label="正在读取今日签到"
+      lines="5"
       variant="card"
     ></de-loading-skeleton>
+
+    <block wx:else>
+      <de-offline-state
+        wx:if="{{offline}}"
+        message="选择仍保留在这台设备上，恢复网络后才能保存。"
+        bind:retry="retry"
+      ></de-offline-state>
+
+      <de-recoverable-error
+        wx:if="{{error}}"
+        message="刚才的结果还不能确认。你的选择仍在，重试会先读取今天的正式记录。"
+        bind:retry="retry"
+      ></de-recoverable-error>
+
+      <de-inline-notice
+        wx:if="{{dateChanged}}"
+        title="新的一天已经开始"
+        message="上一产品日未提交的选择已清理，请按此刻的状态重新选择。"
+        tone="warning"
+      ></de-inline-notice>
+
+      <de-inline-notice
+        wx:if="{{saved}}"
+        title="今天的真实状态已保存"
+        message="如果刚才选错了，可以在今天修改；修改不会改变已经生成的核心结果。"
+        tone="success"
+      ></de-inline-notice>
+
+      <de-section-card heading="此刻的情绪">
+        <view class="checkin__choices" aria-label="此刻的情绪" aria-role="radiogroup">
+          <de-choice-chip
+            wx:for="{{moodOptions}}"
+            wx:key="value"
+            accessible-label="情绪：{{item.label}}"
+            data-field="mood"
+            disabled="{{busy}}"
+            label="{{item.label}}"
+            selected="{{mood === item.value}}"
+            value="{{item.value}}"
+            bind:select="selectValue"
+          ></de-choice-chip>
+        </view>
+      </de-section-card>
+
+      <de-section-card heading="此刻的精力">
+        <view class="checkin__choices" aria-label="此刻的精力" aria-role="radiogroup">
+          <de-choice-chip
+            wx:for="{{energyOptions}}"
+            wx:key="value"
+            accessible-label="精力：{{item.label}}"
+            data-field="energy"
+            disabled="{{busy}}"
+            label="{{item.label}}"
+            selected="{{energy === item.value}}"
+            value="{{item.value}}"
+            bind:select="selectValue"
+          ></de-choice-chip>
+        </view>
+      </de-section-card>
+
+      <de-section-card heading="昨晚的睡眠">
+        <view class="checkin__choices" aria-label="昨晚的睡眠" aria-role="radiogroup">
+          <de-choice-chip
+            wx:for="{{sleepOptions}}"
+            wx:key="value"
+            accessible-label="睡眠：{{item.label}}"
+            data-field="sleep"
+            disabled="{{busy}}"
+            label="{{item.label}}"
+            selected="{{sleep === item.value}}"
+            value="{{item.value}}"
+            bind:select="selectValue"
+          ></de-choice-chip>
+        </view>
+      </de-section-card>
+
+      <view class="checkin__help" aria-live="polite">
+        {{mood && energy && sleep ? '三项都已选择。' : '选完情绪、精力和睡眠后就可以继续。'}}
+      </view>
+
+      <de-action-button
+        block="{{true}}"
+        disabled="{{!canSubmit || offline}}"
+        label="{{current ? '保存修改' : '生成今天'}}"
+        loading="{{busy}}"
+        loading-label="正在保存"
+        bind:press="submit"
+      ></de-action-button>
+    </block>
   </view>
 </de-page-shell>

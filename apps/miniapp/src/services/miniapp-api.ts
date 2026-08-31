@@ -6,6 +6,10 @@ import type { NetworkPort, StorageValue } from "../platform/ports.js";
 
 type ApiErrorBody = components["schemas"]["ApiErrorBody"];
 type CommandReceiptView = components["schemas"]["CommandReceiptView"];
+export type CheckinView = components["schemas"]["CheckinView"];
+export type CheckinMood = components["schemas"]["Mood"];
+export type CheckinEnergy = components["schemas"]["Energy"];
+export type CheckinSleep = components["schemas"]["Sleep"];
 type ConsentView = components["schemas"]["ConsentView"];
 export type ExpressionStyle = components["schemas"]["ExpressionStyle"];
 type ProfileView = components["schemas"]["ProfileView"];
@@ -39,6 +43,11 @@ export interface ProfileEnvelope {
   readonly profile: ProfileView;
 }
 
+export interface CheckinEnvelope {
+  readonly checkin: CheckinView;
+  readonly productDate: string;
+}
+
 export interface C003Api {
   acceptConsent(input: {
     readonly commandRef: string;
@@ -57,6 +66,23 @@ export interface C003Api {
   getProfile(): Promise<ProfileEnvelope>;
 }
 
+export interface C004Api {
+  correctCheckin(input: {
+    readonly commandRef: string;
+    readonly energy: CheckinEnergy;
+    readonly expectedRevision: number;
+    readonly mood: CheckinMood;
+    readonly sleep: CheckinSleep;
+  }): Promise<CheckinEnvelope>;
+  getTodayCheckin(): Promise<CheckinEnvelope>;
+  submitCheckin(input: {
+    readonly commandRef: string;
+    readonly energy: CheckinEnergy;
+    readonly mood: CheckinMood;
+    readonly sleep: CheckinSleep;
+  }): Promise<CheckinEnvelope>;
+}
+
 export class MiniappApiError extends Error {
   public constructor(
     public readonly code: string,
@@ -64,6 +90,7 @@ export class MiniappApiError extends Error {
     public readonly retryable: boolean,
     public readonly requestId?: string,
     public readonly safetyView?: SafetyView,
+    public readonly productDate?: string,
   ) {
     super(code);
     this.name = "MiniappApiError";
@@ -110,7 +137,17 @@ function apiError(body: unknown, status: number): MiniappApiError {
     typeof envelope?.request_id === "string" ? envelope.request_id : undefined;
   const safetyCandidate = error === undefined ? undefined : error.safety_view;
   const safetyView = projectSafetyView(safetyCandidate);
-  return new MiniappApiError(code, status, retryable, requestId, safetyView);
+  const productDate = isProductDate(envelope?.product_date)
+    ? envelope.product_date
+    : undefined;
+  return new MiniappApiError(
+    code,
+    status,
+    retryable,
+    requestId,
+    safetyView,
+    productDate,
+  );
 }
 
 function projectSafetyView(value: unknown): SafetyView | undefined {
@@ -270,6 +307,87 @@ function profileView(data: Record<string, unknown>): ProfileView {
   });
 }
 
+const checkinMoods = new Set<CheckinMood>([
+  "VERY_LOW",
+  "LOW",
+  "STEADY",
+  "GOOD",
+  "LIGHT",
+  "UNSURE",
+]);
+const checkinEnergies = new Set<CheckinEnergy>([
+  "EMPTY",
+  "LOW",
+  "STEADY",
+  "HIGH",
+  "FULL",
+  "UNSURE",
+]);
+const checkinSleeps = new Set<CheckinSleep>([
+  "POOR",
+  "LOW",
+  "OKAY",
+  "GOOD",
+  "UNSURE",
+]);
+
+export function isCheckinMood(value: unknown): value is CheckinMood {
+  return typeof value === "string" && checkinMoods.has(value as CheckinMood);
+}
+
+export function isCheckinEnergy(value: unknown): value is CheckinEnergy {
+  return (
+    typeof value === "string" && checkinEnergies.has(value as CheckinEnergy)
+  );
+}
+
+export function isCheckinSleep(value: unknown): value is CheckinSleep {
+  return typeof value === "string" && checkinSleeps.has(value as CheckinSleep);
+}
+
+function checkinView(data: Record<string, unknown>): CheckinView {
+  const allowedKeys = new Set([
+    "checkin_ref",
+    "energy",
+    "mood",
+    "product_date",
+    "revision",
+    "sleep",
+    "updated_at",
+    "write_window",
+  ]);
+  if (
+    Object.keys(data).some((key) => !allowedKeys.has(key)) ||
+    typeof data.checkin_ref !== "string" ||
+    !/^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/iu.test(
+      data.checkin_ref,
+    ) ||
+    !isProductDate(data.product_date) ||
+    typeof data.revision !== "number" ||
+    !Number.isInteger(data.revision) ||
+    data.revision < 1 ||
+    !isCheckinMood(data.mood) ||
+    !isCheckinEnergy(data.energy) ||
+    !isCheckinSleep(data.sleep) ||
+    !["OPEN", "CONTINUATION_ONLY", "CLOSED"].includes(
+      String(data.write_window),
+    ) ||
+    typeof data.updated_at !== "string"
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return Object.freeze({
+    checkin_ref: data.checkin_ref,
+    energy: data.energy,
+    mood: data.mood,
+    product_date: data.product_date,
+    revision: data.revision,
+    sleep: data.sleep,
+    updated_at: data.updated_at,
+    write_window: data.write_window as CheckinView["write_window"],
+  });
+}
+
 function commandReceipt(data: Record<string, unknown>): CommandReceiptView {
   if (
     typeof data.command_ref !== "string" ||
@@ -301,10 +419,10 @@ function headers(sessionToken?: string, commandRef?: string) {
   });
 }
 
-export function createMiniappApi(network: NetworkPort): C003Api {
+export function createMiniappApi(network: NetworkPort): C003Api & C004Api {
   let sessionToken: string | undefined;
 
-  const api: C003Api = {
+  const api: C003Api & C004Api = {
     async createSession(input): Promise<SessionEnvelope> {
       const response = await network.request({
         body: input as StorageValue,
@@ -377,6 +495,59 @@ export function createMiniappApi(network: NetworkPort): C003Api {
       return Object.freeze({
         productDate: parsed.productDate,
         profile: profileView(parsed.data),
+      });
+    },
+
+    async getTodayCheckin(): Promise<CheckinEnvelope> {
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: "/v1/daily/today/checkin",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        checkin: checkinView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async submitCheckin(input): Promise<CheckinEnvelope> {
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          energy: input.energy,
+          expected_revision: 0,
+          mood: input.mood,
+          sleep: input.sleep,
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/daily/checkin/submit",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        checkin: checkinView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async correctCheckin(input): Promise<CheckinEnvelope> {
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          energy: input.energy,
+          expected_revision: input.expectedRevision,
+          mood: input.mood,
+          sleep: input.sleep,
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/daily/checkin/correct",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        checkin: checkinView(parsed.data),
+        productDate: parsed.productDate,
       });
     },
   };

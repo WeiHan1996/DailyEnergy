@@ -1,0 +1,131 @@
+{
+  "manifest_version": "c-004-evidence-v1",
+  "scope": "C-004 check-in Schema, authoritative ProductDate, command receipts, PostgreSQL uniqueness/CAS/guards, DLY-001 draft and unknown-outcome recovery",
+  "authority": [
+    "docs/decisions/ADR-0002-deterministic-daily-result.md",
+    "docs/data/domain-model.md",
+    "docs/design/developer-handoff.md",
+    "docs/operations/privacy-data-map.md",
+    "docs/product/business-rules.md",
+    "docs/product/state-machine.md",
+    "docs/technical/api.md",
+    "docs/technical/database.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C004-CONTRACT-001": {
+      "file": "apps/api/src/checkin/checkin.contract.test.ts",
+      "selector": "C-004 check-in transport contract",
+      "level": "CONTRACT",
+      "assertions": [
+        "submit/correct/view use strict shared Zod contracts and reject client owner, product date, Safety and deletion fields",
+        "OpenAPI paths remain authenticated and project the same shared contracts",
+        "stable conflict, guard and Safety errors are registered"
+      ]
+    },
+    "T-C004-E2E-001": {
+      "file": "apps/api/src/checkin.e2e.test.ts",
+      "selector": "C-004 HTTP check-in flow",
+      "level": "E2E",
+      "assertions": [
+        "03:59:59.999 and 04:00:00.000 are bound to different server ProductDates",
+        "same ref/same payload replays the original view while a changed payload conflicts",
+        "a second different submit requires correct and stale CAS returns the latest closed CheckinView",
+        "two independent HTTP clients correcting the same revision produce one winner and one latest-value conflict",
+        "Safety blocks before ordinary storage and ordinary logs contain no state values or account identifier"
+      ]
+    },
+    "T-C004-DB-001": {
+      "file": "tests/database/c004-checkin.test.mjs",
+      "selector": "C-004 real PostgreSQL check-in idempotency, CAS and restricted guards",
+      "level": "DB",
+      "assertions": [
+        "two real PostgreSQL connections leave one owner/date check-in and one initial revision",
+        "command receipts distinguish replay and payload conflict and survive unknown outcome",
+        "two CAS corrections have one winner and one latest-value conflict",
+        "a frozen generation snapshot remains on check-in revision 1 after current revision advances",
+        "the API executes a stable Safety/deletion guard without direct restricted table SELECT and cannot update/delete revision history",
+        "an account-level advisory fence serializes Safety activation with ordinary check-in reads and writes"
+      ]
+    },
+    "T-C004-MINIAPP-001": {
+      "file": "apps/miniapp/src/features/checkin/checkin-flow.test.ts",
+      "selector": "C-004 check-in coordinator",
+      "level": "UNIT",
+      "assertions": [
+        "same-date draft restoration is scoped to the current local session",
+        "cross-date drafts are deleted instead of copied",
+        "network timeout recovery reads the formal record before replaying the original command",
+        "multi-device revision conflict preserves the user's explicit draft and exposes the latest record",
+        "UNSURE is accepted as a complete formal selection"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "D17-I05",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-E2E-001"]
+    },
+    {
+      "source_id": "D17-D01",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-DB-001"]
+    },
+    {
+      "source_id": "D17-D02",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-DB-001", "T-C004-E2E-001"]
+    },
+    {
+      "source_id": "D17-D03",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-DB-001", "T-C004-E2E-001"]
+    },
+    {
+      "source_id": "D17-D04",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-DB-001", "T-C004-MINIAPP-001"]
+    },
+    {
+      "source_id": "D17-D05",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-DB-001"]
+    },
+    {
+      "source_id": "D17-D06",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-CONTRACT-001", "T-C004-DB-001"]
+    },
+    {
+      "source_id": "PDM-C03",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-CONTRACT-001", "T-C004-E2E-001"]
+    },
+    {
+      "source_id": "PDM-O07",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-E2E-001"]
+    },
+    {
+      "source_id": "S19-DB-056",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-DB-001"]
+    },
+    {
+      "source_id": "S20-D01",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-CONTRACT-001", "T-C004-E2E-001"]
+    },
+    {
+      "source_id": "S20-D06",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-CONTRACT-001", "T-C004-E2E-001"]
+    },
+    {
+      "source_id": "S31-TEST-036",
+      "status": "COVERED",
+      "proof_ids": ["T-C004-E2E-001"]
+    }
+  ]
+}

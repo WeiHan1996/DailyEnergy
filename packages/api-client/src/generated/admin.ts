@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:6ad35944c6bceb6f55769e5cc5f9e3fc4b45e4754a2c4dcb22e9a3d16ec5350e
+// source-fingerprint: sha256:28397a2acd043bad4ffc8adacc810edded6b6df749234d647f32ba0ee15d6cf5
 // do not edit; run `pnpm codegen`.
 
 export const ADMIN_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:6ad35944c6bceb6f55769e5cc5f9e3fc4b45e4754a2c4dcb22e9a3d16ec5350e";
+  "sha256:28397a2acd043bad4ffc8adacc810edded6b6df749234d647f32ba0ee15d6cf5";
 
 export interface paths {
   "/admin/auth/login": {
@@ -188,14 +188,14 @@ export interface components {
       server_now: string;
     };
     CheckinView: {
-      checkin_ref: components["schemas"]["OpaqueRef"];
-      energy: components["schemas"]["Energy"];
-      mood: components["schemas"]["Mood"];
-      product_date: components["schemas"]["ProductDate"];
-      revision: components["schemas"]["PositiveRevision"];
-      sleep: components["schemas"]["Sleep"];
+      checkin_ref: string;
+      energy: "EMPTY" | "LOW" | "STEADY" | "HIGH" | "FULL" | "UNSURE";
+      mood: "VERY_LOW" | "LOW" | "STEADY" | "GOOD" | "LIGHT" | "UNSURE";
+      product_date: string;
+      revision: number;
+      sleep: "POOR" | "LOW" | "OKAY" | "GOOD" | "UNSURE";
       updated_at: string;
-      write_window: components["schemas"]["WriteWindow"];
+      write_window: "OPEN" | "CONTINUATION_ONLY" | "CLOSED";
     };
     ClientContext: {
       app_version?: string;
@@ -257,7 +257,6 @@ export interface components {
       task_ref: components["schemas"]["OpaqueRef"];
       updated_at: string;
     };
-    Energy: "EMPTY" | "LOW" | "STEADY" | "HIGH" | "FULL" | "UNSURE";
     ErrorCurrentView:
       | components["schemas"]["CheckinView"]
       | components["schemas"]["ProfileView"]
@@ -349,7 +348,6 @@ export interface components {
       updated_at: string;
       weekly_use_enabled: boolean;
     };
-    Mood: "VERY_LOW" | "LOW" | "STEADY" | "GOOD" | "LIGHT" | "UNSURE";
     NotificationSettingsView: {
       evening_enabled: boolean;
       morning_enabled: boolean;
@@ -405,9 +403,7 @@ export interface components {
     SafetyView:
       | components["schemas"]["SafetyClearView"]
       | components["schemas"]["SafetyOverlayView"];
-    Sleep: "POOR" | "LOW" | "OKAY" | "GOOD" | "UNSURE";
     VersionToken: string;
-    WriteWindow: "OPEN" | "CONTINUATION_ONLY" | "CLOSED";
   };
 }
 

@@ -203,3 +203,126 @@ describe("C-003 miniapp API bridge", () => {
     });
   });
 });
+
+describe("C-004 miniapp API bridge", () => {
+  it("sends only closed check-in fields with the matching idempotency key", async () => {
+    const requests: NetworkRequest[] = [];
+    const checkin = {
+      checkin_ref: "11111111-1111-4111-8111-111111111111",
+      energy: "STEADY",
+      mood: "GOOD",
+      product_date: "2026-08-21",
+      revision: 1,
+      sleep: "OKAY",
+      updated_at: "2026-08-21T00:00:00.000Z",
+      write_window: "OPEN",
+    };
+    const replies = [
+      response(
+        success({
+          account_state: "ACTIVE",
+          consent_required: false,
+          expires_at: "2026-09-20T00:00:00.000Z",
+          onboarding_required: false,
+          refresh_after: "2026-09-05T00:00:00.000Z",
+          session_token: "s".repeat(43),
+        }),
+      ),
+      response(success(checkin)),
+      response(success(checkin)),
+      response(success({ ...checkin, revision: 2 })),
+    ];
+    const api = createMiniappApi({
+      request: async <T>(request: NetworkRequest) => {
+        requests.push(request);
+        return replies.shift()! as NetworkResponse<T>;
+      },
+    });
+    await api.createSession({ code: "wechat-code" });
+    await api.getTodayCheckin();
+    await api.submitCheckin({
+      commandRef: "checkin-command-0001",
+      energy: "STEADY",
+      mood: "GOOD",
+      sleep: "OKAY",
+    });
+    await api.correctCheckin({
+      commandRef: "checkin-correct-0001",
+      energy: "HIGH",
+      expectedRevision: 1,
+      mood: "LIGHT",
+      sleep: "GOOD",
+    });
+
+    expect(requests[1]).toMatchObject({
+      method: "GET",
+      path: "/v1/daily/today/checkin",
+    });
+    expect(requests[2]).toMatchObject({
+      body: {
+        command_ref: "checkin-command-0001",
+        energy: "STEADY",
+        expected_revision: 0,
+        mood: "GOOD",
+        sleep: "OKAY",
+      },
+      headers: { "Idempotency-Key": "checkin-command-0001" },
+      path: "/v1/daily/checkin/submit",
+    });
+    expect(requests[2]?.body).not.toHaveProperty("product_date");
+    expect(requests[2]?.body).not.toHaveProperty("account_id");
+    expect(requests[3]).toMatchObject({
+      body: {
+        command_ref: "checkin-correct-0001",
+        expected_revision: 1,
+      },
+      headers: { "Idempotency-Key": "checkin-correct-0001" },
+      path: "/v1/daily/checkin/correct",
+    });
+  });
+
+  it("preserves the authoritative date on an absent-record error", async () => {
+    const api = createMiniappApi({
+      request: async <T>() =>
+        response(
+          {
+            error: {
+              code: "RESOURCE_NOT_FOUND",
+              retryable: false,
+            },
+            ok: false,
+            product_date: "2026-08-21",
+            request_id: "request-one",
+            server_now: "2026-08-21T00:00:00.000Z",
+          },
+          404,
+        ) as NetworkResponse<T>,
+    });
+    await expect(api.getTodayCheckin()).rejects.toMatchObject({
+      code: "RESOURCE_NOT_FOUND",
+      productDate: "2026-08-21",
+    });
+  });
+
+  it("rejects malformed or internal check-in response fields", async () => {
+    const api = createMiniappApi({
+      request: async <T>() =>
+        response(
+          success({
+            account_id: "internal",
+            checkin_ref: "not-a-checkin",
+            energy: "STEADY",
+            mood: "GOOD",
+            product_date: "2026-08-21",
+            revision: 1,
+            sleep: "OKAY",
+            updated_at: "2026-08-21T00:00:00.000Z",
+            write_window: "OPEN",
+          }),
+        ) as NetworkResponse<T>,
+    });
+    await expect(api.getTodayCheckin()).rejects.toMatchObject({
+      code: "CONTRACT_VIOLATION",
+    });
+  });
+});

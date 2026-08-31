@@ -1,16 +1,17 @@
 # DailyEnergy Miniapp
 
-E-004 提供微信原生小程序 TypeScript 运行骨架。D-002 在该 client-safe
-边界内增加正式 Design Tokens 和首批共享组件。当前仍只有 `SYS-001`
-启动路由占位和 `SYS-003` 维护/恢复占位，不包含首次认识、签到、今日内容、
-点亮、反馈或趋势业务。
+E-004 提供微信原生小程序 TypeScript 运行骨架，D-002 在该 client-safe
+边界内增加正式 Design Tokens 和首批共享组件。C-003 已实现承接、必要同意和
+第一次认识；C-004 已实现 DLY-001 每日签到、同日草稿、三项结构化选择、
+提交/更正、Offline/Error/Disabled/跨日和 Unknown outcome 恢复。今日生成、
+内容、点亮、反馈和趋势仍由后续 C 系列任务交付。
 
 ## 目录边界
 
 - `src/app`：公开构建配置校验和应用上下文；
-- `src/pages`：启动与恢复占位页面；
+- `src/pages`：启动、承接、首次认识、每日签到、安全与恢复页面；
 - `src/components`：D-002 的 15 个微信原生组件目录，对应 17 个逻辑组件合同；
-- `src/features`：后续按业务能力组织的纯客户端逻辑；
+- `src/features`：onboarding/checkin 的纯客户端草稿与恢复编排；
 - `src/platform`：微信 login、storage、network、share、subscription
   adapter 与可替换 port；
 - `src/services`：E-008 交付 API Client 后的调用编排入口；

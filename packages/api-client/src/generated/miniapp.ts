@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:6ad35944c6bceb6f55769e5cc5f9e3fc4b45e4754a2c4dcb22e9a3d16ec5350e
+// source-fingerprint: sha256:28397a2acd043bad4ffc8adacc810edded6b6df749234d647f32ba0ee15d6cf5
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:6ad35944c6bceb6f55769e5cc5f9e3fc4b45e4754a2c4dcb22e9a3d16ec5350e";
+  "sha256:28397a2acd043bad4ffc8adacc810edded6b6df749234d647f32ba0ee15d6cf5";
 
 export interface paths {
   "/auth/reauth/verify": {
@@ -460,12 +460,15 @@ export interface components {
       server_now: string;
     };
     CheckinCorrectRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      energy: components["schemas"]["Energy"];
-      expected_revision: components["schemas"]["PositiveRevision"];
-      mood: components["schemas"]["Mood"];
-      sleep: components["schemas"]["Sleep"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      energy: "EMPTY" | "LOW" | "STEADY" | "HIGH" | "FULL" | "UNSURE";
+      expected_revision: number;
+      mood: "VERY_LOW" | "LOW" | "STEADY" | "GOOD" | "LIGHT" | "UNSURE";
+      sleep: "POOR" | "LOW" | "OKAY" | "GOOD" | "UNSURE";
     };
     CheckinRebuildRequest: {
       client_context?: components["schemas"]["ClientContext"];
@@ -479,22 +482,25 @@ export interface components {
       sleep: components["schemas"]["Sleep"];
     };
     CheckinSubmitRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      energy: components["schemas"]["Energy"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      energy: "EMPTY" | "LOW" | "STEADY" | "HIGH" | "FULL" | "UNSURE";
       expected_revision: 0;
-      mood: components["schemas"]["Mood"];
-      sleep: components["schemas"]["Sleep"];
+      mood: "VERY_LOW" | "LOW" | "STEADY" | "GOOD" | "LIGHT" | "UNSURE";
+      sleep: "POOR" | "LOW" | "OKAY" | "GOOD" | "UNSURE";
     };
     CheckinView: {
-      checkin_ref: components["schemas"]["OpaqueRef"];
-      energy: components["schemas"]["Energy"];
-      mood: components["schemas"]["Mood"];
-      product_date: components["schemas"]["ProductDate"];
-      revision: components["schemas"]["PositiveRevision"];
-      sleep: components["schemas"]["Sleep"];
+      checkin_ref: string;
+      energy: "EMPTY" | "LOW" | "STEADY" | "HIGH" | "FULL" | "UNSURE";
+      mood: "VERY_LOW" | "LOW" | "STEADY" | "GOOD" | "LIGHT" | "UNSURE";
+      product_date: string;
+      revision: number;
+      sleep: "POOR" | "LOW" | "OKAY" | "GOOD" | "UNSURE";
       updated_at: string;
-      write_window: components["schemas"]["WriteWindow"];
+      write_window: "OPEN" | "CONTINUATION_ONLY" | "CLOSED";
     };
     ClientContext: {
       app_version?: string;
@@ -1271,7 +1277,6 @@ export interface components {
       window_id: string;
       window_start_date: string;
     };
-    WriteWindow: "OPEN" | "CONTINUATION_ONLY" | "CLOSED";
   };
 }
 

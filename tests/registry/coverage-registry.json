@@ -1,15 +1,28 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 226, "NA_WITH_REASON": 0, "PLANNED": 558 },
+  "counts": { "COVERED": 242, "NA_WITH_REASON": 0, "PLANNED": 545 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a frozen generation snapshot remains on check-in revision 1 after current revision advances",
+            "an account-level advisory fence serializes Safety activation with ordinary check-in reads and writes",
+            "command receipts distinguish replay and payload conflict and survive unknown outcome",
+            "the API executes a stable Safety/deletion guard without direct restricted table SELECT and cannot update/delete revision history",
+            "two CAS corrections have one winner and one latest-value conflict",
+            "two real PostgreSQL connections leave one owner/date check-in and one initial revision"
+          ],
+          "file": "tests/database/c004-checkin.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 real PostgreSQL check-in idempotency, CAS and restricted guards",
+          "test_id": "T-C004-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -18,11 +31,38 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a frozen generation snapshot remains on check-in revision 1 after current revision advances",
+            "an account-level advisory fence serializes Safety activation with ordinary check-in reads and writes",
+            "command receipts distinguish replay and payload conflict and survive unknown outcome",
+            "the API executes a stable Safety/deletion guard without direct restricted table SELECT and cannot update/delete revision history",
+            "two CAS corrections have one winner and one latest-value conflict",
+            "two real PostgreSQL connections leave one owner/date check-in and one initial revision"
+          ],
+          "file": "tests/database/c004-checkin.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 real PostgreSQL check-in idempotency, CAS and restricted guards",
+          "test_id": "T-C004-DB-001"
+        },
+        {
+          "assertions": [
+            "03:59:59.999 and 04:00:00.000 are bound to different server ProductDates",
+            "a second different submit requires correct and stale CAS returns the latest closed CheckinView",
+            "Safety blocks before ordinary storage and ordinary logs contain no state values or account identifier",
+            "same ref/same payload replays the original view while a changed payload conflicts",
+            "two independent HTTP clients correcting the same revision produce one winner and one latest-value conflict"
+          ],
+          "file": "apps/api/src/checkin.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 HTTP check-in flow",
+          "test_id": "T-C004-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -31,11 +71,38 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a frozen generation snapshot remains on check-in revision 1 after current revision advances",
+            "an account-level advisory fence serializes Safety activation with ordinary check-in reads and writes",
+            "command receipts distinguish replay and payload conflict and survive unknown outcome",
+            "the API executes a stable Safety/deletion guard without direct restricted table SELECT and cannot update/delete revision history",
+            "two CAS corrections have one winner and one latest-value conflict",
+            "two real PostgreSQL connections leave one owner/date check-in and one initial revision"
+          ],
+          "file": "tests/database/c004-checkin.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 real PostgreSQL check-in idempotency, CAS and restricted guards",
+          "test_id": "T-C004-DB-001"
+        },
+        {
+          "assertions": [
+            "03:59:59.999 and 04:00:00.000 are bound to different server ProductDates",
+            "a second different submit requires correct and stale CAS returns the latest closed CheckinView",
+            "Safety blocks before ordinary storage and ordinary logs contain no state values or account identifier",
+            "same ref/same payload replays the original view while a changed payload conflicts",
+            "two independent HTTP clients correcting the same revision produce one winner and one latest-value conflict"
+          ],
+          "file": "apps/api/src/checkin.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 HTTP check-in flow",
+          "test_id": "T-C004-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -44,11 +111,38 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a frozen generation snapshot remains on check-in revision 1 after current revision advances",
+            "an account-level advisory fence serializes Safety activation with ordinary check-in reads and writes",
+            "command receipts distinguish replay and payload conflict and survive unknown outcome",
+            "the API executes a stable Safety/deletion guard without direct restricted table SELECT and cannot update/delete revision history",
+            "two CAS corrections have one winner and one latest-value conflict",
+            "two real PostgreSQL connections leave one owner/date check-in and one initial revision"
+          ],
+          "file": "tests/database/c004-checkin.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 real PostgreSQL check-in idempotency, CAS and restricted guards",
+          "test_id": "T-C004-DB-001"
+        },
+        {
+          "assertions": [
+            "cross-date drafts are deleted instead of copied",
+            "multi-device revision conflict preserves the user's explicit draft and exposes the latest record",
+            "network timeout recovery reads the formal record before replaying the original command",
+            "same-date draft restoration is scoped to the current local session",
+            "UNSURE is accepted as a complete formal selection"
+          ],
+          "file": "apps/miniapp/src/features/checkin/checkin-flow.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 check-in coordinator",
+          "test_id": "T-C004-MINIAPP-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -57,11 +151,24 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a frozen generation snapshot remains on check-in revision 1 after current revision advances",
+            "an account-level advisory fence serializes Safety activation with ordinary check-in reads and writes",
+            "command receipts distinguish replay and payload conflict and survive unknown outcome",
+            "the API executes a stable Safety/deletion guard without direct restricted table SELECT and cannot update/delete revision history",
+            "two CAS corrections have one winner and one latest-value conflict",
+            "two real PostgreSQL connections leave one owner/date check-in and one initial revision"
+          ],
+          "file": "tests/database/c004-checkin.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 real PostgreSQL check-in idempotency, CAS and restricted guards",
+          "test_id": "T-C004-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -70,11 +177,36 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "OpenAPI paths remain authenticated and project the same shared contracts",
+            "stable conflict, guard and Safety errors are registered",
+            "submit/correct/view use strict shared Zod contracts and reject client owner, product date, Safety and deletion fields"
+          ],
+          "file": "apps/api/src/checkin/checkin.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 check-in transport contract",
+          "test_id": "T-C004-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a frozen generation snapshot remains on check-in revision 1 after current revision advances",
+            "an account-level advisory fence serializes Safety activation with ordinary check-in reads and writes",
+            "command receipts distinguish replay and payload conflict and survive unknown outcome",
+            "the API executes a stable Safety/deletion guard without direct restricted table SELECT and cannot update/delete revision history",
+            "two CAS corrections have one winner and one latest-value conflict",
+            "two real PostgreSQL connections leave one owner/date check-in and one initial revision"
+          ],
+          "file": "tests/database/c004-checkin.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 real PostgreSQL check-in idempotency, CAS and restricted guards",
+          "test_id": "T-C004-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -275,11 +407,23 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "03:59:59.999 and 04:00:00.000 are bound to different server ProductDates",
+            "a second different submit requires correct and stale CAS returns the latest closed CheckinView",
+            "Safety blocks before ordinary storage and ordinary logs contain no state values or account identifier",
+            "same ref/same payload replays the original view while a changed payload conflicts",
+            "two independent HTTP clients correcting the same revision produce one winner and one latest-value conflict"
+          ],
+          "file": "apps/api/src/checkin.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 HTTP check-in flow",
+          "test_id": "T-C004-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -3307,11 +3451,35 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "OpenAPI paths remain authenticated and project the same shared contracts",
+            "stable conflict, guard and Safety errors are registered",
+            "submit/correct/view use strict shared Zod contracts and reject client owner, product date, Safety and deletion fields"
+          ],
+          "file": "apps/api/src/checkin/checkin.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 check-in transport contract",
+          "test_id": "T-C004-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "03:59:59.999 and 04:00:00.000 are bound to different server ProductDates",
+            "a second different submit requires correct and stale CAS returns the latest closed CheckinView",
+            "Safety blocks before ordinary storage and ordinary logs contain no state values or account identifier",
+            "same ref/same payload replays the original view while a changed payload conflicts",
+            "two independent HTTP clients correcting the same revision produce one winner and one latest-value conflict"
+          ],
+          "file": "apps/api/src/checkin.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 HTTP check-in flow",
+          "test_id": "T-C004-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -3638,11 +3806,23 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "03:59:59.999 and 04:00:00.000 are bound to different server ProductDates",
+            "a second different submit requires correct and stale CAS returns the latest closed CheckinView",
+            "Safety blocks before ordinary storage and ordinary logs contain no state values or account identifier",
+            "same ref/same payload replays the original view while a changed payload conflicts",
+            "two independent HTTP clients correcting the same revision produce one winner and one latest-value conflict"
+          ],
+          "file": "apps/api/src/checkin.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 HTTP check-in flow",
+          "test_id": "T-C004-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -5247,11 +5427,24 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a frozen generation snapshot remains on check-in revision 1 after current revision advances",
+            "an account-level advisory fence serializes Safety activation with ordinary check-in reads and writes",
+            "command receipts distinguish replay and payload conflict and survive unknown outcome",
+            "the API executes a stable Safety/deletion guard without direct restricted table SELECT and cannot update/delete revision history",
+            "two CAS corrections have one winner and one latest-value conflict",
+            "two real PostgreSQL connections leave one owner/date check-in and one initial revision"
+          ],
+          "file": "tests/database/c004-checkin.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 real PostgreSQL check-in idempotency, CAS and restricted guards",
+          "test_id": "T-C004-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-056",
       "source_sets": ["s19-database"]
@@ -5806,11 +5999,35 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "OpenAPI paths remain authenticated and project the same shared contracts",
+            "stable conflict, guard and Safety errors are registered",
+            "submit/correct/view use strict shared Zod contracts and reject client owner, product date, Safety and deletion fields"
+          ],
+          "file": "apps/api/src/checkin/checkin.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 check-in transport contract",
+          "test_id": "T-C004-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "03:59:59.999 and 04:00:00.000 are bound to different server ProductDates",
+            "a second different submit requires correct and stale CAS returns the latest closed CheckinView",
+            "Safety blocks before ordinary storage and ordinary logs contain no state values or account identifier",
+            "same ref/same payload replays the original view while a changed payload conflicts",
+            "two independent HTTP clients correcting the same revision produce one winner and one latest-value conflict"
+          ],
+          "file": "apps/api/src/checkin.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 HTTP check-in flow",
+          "test_id": "T-C004-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-D01",
       "source_sets": ["s20-api"]
@@ -5861,11 +6078,35 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "OpenAPI paths remain authenticated and project the same shared contracts",
+            "stable conflict, guard and Safety errors are registered",
+            "submit/correct/view use strict shared Zod contracts and reject client owner, product date, Safety and deletion fields"
+          ],
+          "file": "apps/api/src/checkin/checkin.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 check-in transport contract",
+          "test_id": "T-C004-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "03:59:59.999 and 04:00:00.000 are bound to different server ProductDates",
+            "a second different submit requires correct and stale CAS returns the latest closed CheckinView",
+            "Safety blocks before ordinary storage and ordinary logs contain no state values or account identifier",
+            "same ref/same payload replays the original view while a changed payload conflicts",
+            "two independent HTTP clients correcting the same revision produce one winner and one latest-value conflict"
+          ],
+          "file": "apps/api/src/checkin.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 HTTP check-in flow",
+          "test_id": "T-C004-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-D06",
       "source_sets": ["s20-api"]
@@ -9278,11 +9519,23 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "03:59:59.999 and 04:00:00.000 are bound to different server ProductDates",
+            "a second different submit requires correct and stale CAS returns the latest closed CheckinView",
+            "Safety blocks before ordinary storage and ordinary logs contain no state values or account identifier",
+            "same ref/same payload replays the original view while a changed payload conflicts",
+            "two independent HTTP clients correcting the same revision produce one winner and one latest-value conflict"
+          ],
+          "file": "apps/api/src/checkin.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c004-evidence-manifest.json",
+          "selector": "C-004 HTTP check-in flow",
+          "test_id": "T-C004-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["E2E", "RESILIENCE"] }],
       "source_id": "S31-TEST-036",
       "source_sets": ["s31-testing"]
@@ -13142,6 +13395,93 @@
       "evidence": [
         {
           "assertions": [
+            "urn:dailyenergy:schema:checkin-correct-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:checkin-correct-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:checkin-correct-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:checkin-submit-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:checkin-submit-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:checkin-submit-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:checkin-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:checkin-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:checkin-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
             "urn:dailyenergy:schema:client-daily-content-view:1.0.0 participates in the executable contract drift Gate"
           ],
           "file": "tooling/check-contracts.mjs",
@@ -13157,7 +13497,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13186,7 +13526,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13215,7 +13555,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13244,7 +13584,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13273,7 +13613,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13302,7 +13642,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13331,7 +13671,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13360,7 +13700,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13389,7 +13729,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13418,7 +13758,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13447,7 +13787,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13476,7 +13816,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13505,7 +13845,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13534,7 +13874,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13563,7 +13903,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13592,7 +13932,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13621,7 +13961,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13650,7 +13990,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13679,7 +14019,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13708,7 +14048,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 20 stable, unique JSON Schema IDs",
+          "selector": "exports 23 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],

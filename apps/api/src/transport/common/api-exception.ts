@@ -1,5 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 import {
+  CheckinViewSchema,
   MemoryPreferencesViewSchema,
   NotificationSettingsViewSchema,
   ProfileViewSchema,
@@ -26,6 +27,20 @@ interface ApiErrorDefinition {
 }
 
 export const API_ERROR_CATALOG = {
+  ACCOUNT_DELETED: {
+    category: "GUARD",
+    message: "当前账户已经结束，无法继续此操作。",
+    messageKey: "error.account_deleted",
+    retryable: false,
+    status: HttpStatus.FORBIDDEN,
+  },
+  ACCOUNT_DELETING: {
+    category: "GUARD",
+    message: "数据正在处理中，暂时无法继续此操作。",
+    messageKey: "error.account_deleting",
+    retryable: false,
+    status: HttpStatus.FORBIDDEN,
+  },
   ACCOUNT_RESTRICTED: {
     category: "GUARD",
     message: "当前账户状态不允许继续此操作。",
@@ -67,6 +82,13 @@ export const API_ERROR_CATALOG = {
     messageKey: "error.auth_wechat_code_invalid",
     retryable: false,
     status: HttpStatus.BAD_REQUEST,
+  },
+  CHECKIN_ALREADY_EXISTS: {
+    category: "CONFLICT",
+    message: "今天的状态已经保存，请读取最新记录后修改。",
+    messageKey: "error.checkin_already_exists",
+    retryable: false,
+    status: HttpStatus.CONFLICT,
   },
   DEPENDENCY_UNAVAILABLE: {
     category: "TRANSIENT",
@@ -145,6 +167,20 @@ export const API_ERROR_CATALOG = {
     retryable: false,
     status: HttpStatus.CONFLICT,
   },
+  SAFETY_BLOCKED: {
+    category: "SAFETY",
+    message: "当前普通流程已暂停。",
+    messageKey: "error.safety_blocked",
+    retryable: false,
+    status: HttpStatus.CONFLICT,
+  },
+  STATE_PRECONDITION_FAILED: {
+    category: "CONFLICT",
+    message: "当前状态不允许继续此操作。",
+    messageKey: "error.state_precondition_failed",
+    retryable: false,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+  },
   UPSTREAM_TRANSIENT: {
     category: "TRANSIENT",
     message: "连接暂时不稳定，请稍后再试。",
@@ -187,6 +223,7 @@ export type RetryAfterErrorDetails = z.infer<
 const RevisionErrorDetailsSchema = z.strictObject({
   current_revision: z.number().int().positive(),
   current: z.union([
+    CheckinViewSchema,
     ProfileViewSchema,
     MemoryPreferencesViewSchema,
     NotificationSettingsViewSchema,
@@ -196,7 +233,7 @@ export type RevisionErrorDetails = z.infer<typeof RevisionErrorDetailsSchema>;
 export type ApiErrorDetails =
   ValidationErrorDetails | RetryAfterErrorDetails | RevisionErrorDetails;
 
-type ApiExceptionOptions = {
+type ApiExceptionCodeOptions = {
   [Code in ApiErrorCode]: Code extends "VALIDATION_FAILED"
     ? {
         readonly code: Code;
@@ -218,6 +255,11 @@ type ApiExceptionOptions = {
             readonly details?: never;
           };
 }[ApiErrorCode];
+
+type ApiExceptionOptions = ApiExceptionCodeOptions & {
+  readonly productDate?: string;
+  readonly serverNow?: Date;
+};
 
 function isApiErrorCode(value: unknown): value is ApiErrorCode {
   return (
@@ -257,7 +299,9 @@ export class ApiException extends Error {
   public readonly code: ApiErrorCode;
   public readonly details: ApiErrorDetails | undefined;
   public readonly messageKey: string;
+  public readonly productDate: string | undefined;
   public readonly retryable: boolean;
+  public readonly serverNow: Date | undefined;
   public readonly status: HttpStatus;
 
   public constructor(options: ApiExceptionOptions) {
@@ -275,7 +319,12 @@ export class ApiException extends Error {
       (options as { readonly details?: unknown }).details,
     );
     this.messageKey = definition.messageKey;
+    this.productDate = options.productDate;
     this.retryable = definition.retryable;
+    this.serverNow =
+      options.serverNow === undefined
+        ? undefined
+        : new Date(options.serverNow.getTime());
     this.status = definition.status;
   }
 }

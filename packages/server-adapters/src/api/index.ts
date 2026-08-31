@@ -57,6 +57,20 @@ export {
 } from "../auth/postgres-auth-store.js";
 
 export {
+  PostgresCheckinStore,
+  UNAVAILABLE_CHECKIN_STORE,
+  type CheckinGuardFailure,
+  type CheckinMutationResult,
+  type CheckinQueryResult,
+  type CheckinStore,
+  type PostgresCheckinStoreConfig,
+  type StoredCheckinEnergy,
+  type StoredCheckinMood,
+  type StoredCheckinSleep,
+  type StoredCheckinView,
+} from "../checkin/postgres-checkin-store.js";
+
+export {
   CURRENT_NECESSARY_CONSENT_NOTICE_VERSION,
   PostgresConsentProfileStore,
   UNAVAILABLE_CONSENT_PROFILE_STORE,

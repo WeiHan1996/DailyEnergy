@@ -1923,7 +1923,7 @@ test(
           const retention = await client.query(
             `SELECT count(*)::int AS count FROM ${schema}.system_retention_policy_entry WHERE "policyVersion"='retention-policy-v1' AND "dataTypeCode"='SYNTHETIC_RUNTIME'`,
           );
-          assert.equal(migrations.rows[0].count, 6);
+          assert.equal(migrations.rows[0].count, 7);
           assert.equal(versions.rows[0].count, 1);
           assert.equal(retention.rows[0].count, 1);
         } finally {
@@ -2004,6 +2004,7 @@ test(
                 "20260802000000_e007_queue_inbox_permissions",
                 "20260819000000_c001_auth_column_permissions",
                 "20260820000000_c002_consent_profile_permissions",
+                "20260821000000_c004_checkin_guard",
               ],
             );
           } finally {

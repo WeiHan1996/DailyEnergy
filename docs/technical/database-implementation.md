@@ -21,7 +21,7 @@ DATABASE_URL=... PRISMA_BIN=/absolute/path/to/prisma node tooling/database/migra
 DATABASE_URL=... node tooling/database/seed.mjs
 DATABASE_URL=... node tooling/database/check-drift.mjs
 DB_CATALOG_FINGERPRINT_WRITE=1 DATABASE_URL=... node tooling/database/write-catalog-fingerprint.mjs
-DATABASE_INTEGRATION=1 PRISMA_BIN=/absolute/path/to/prisma node --test tests/database/integration.test.mjs tests/database/transactions.test.mjs
+DATABASE_INTEGRATION=1 PRISMA_BIN=/absolute/path/to/prisma node --test tests/database/integration.test.mjs tests/database/transactions.test.mjs tests/database/auth-identity.test.mjs tests/database/c002-consent-profile.test.mjs tests/database/c004-checkin.test.mjs
 DATABASE_URL=... DB_RECOVERY_STAGE=isolated DB_RESTORE_LEDGER_CHECKPOINT=... \
   DB_RESTORE_LEDGER_FINGERPRINT=... DB_DELETED_DATA_DETECTOR_HOOK=/absolute/hook \
   node tooling/database/replay-restore-ledger.mjs

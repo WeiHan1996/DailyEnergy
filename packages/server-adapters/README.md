@@ -3,6 +3,11 @@
 服务端基础设施 adapter 包。数据库连接与 Redis/BullMQ 队列通过
 profile-specific exports 暴露，client 和 server-core 不能直接导入具体 SDK。
 
+`./api` 当前还导出 C-001～C-004 的 PostgreSQL Auth、Consent/Profile 和
+Checkin stores。Checkin store 在同一事务处理 command receipt、owner/date
+唯一性和 revision CAS；普通 API 只执行返回稳定守卫码的受审函数，不能直接
+读取 Safety/删除受限表，也不能更新或删除签到 revision 历史。
+
 E-007 队列基线包括：
 
 - Redis 8 major attestation、BullMQ 5 versioned queue 和最多 5 次 bounded retry；

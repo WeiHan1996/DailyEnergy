@@ -94,6 +94,11 @@ test("T-DB-STATIC-003 migration checksum changes on mutation", async () => {
       "20260820000000_c002_consent_profile_permissions",
     );
     await mkdir(consentProfileDirectory);
+    const checkinDirectory = path.join(
+      temporaryRoot,
+      "20260821000000_c004_checkin_guard",
+    );
+    await mkdir(checkinDirectory);
     const target = path.join(targetDirectory, "migration.sql");
     await copyFile(migrationFile, target);
     await copyFile(
@@ -130,6 +135,13 @@ test("T-DB-STATIC-003 migration checksum changes on mutation", async () => {
         "prisma/migrations/20260820000000_c002_consent_profile_permissions/migration.sql",
       ),
       path.join(consentProfileDirectory, "migration.sql"),
+    );
+    await copyFile(
+      path.join(
+        root,
+        "prisma/migrations/20260821000000_c004_checkin_guard/migration.sql",
+      ),
+      path.join(checkinDirectory, "migration.sql"),
     );
     const before = await migrationChecksums(temporaryRoot);
     await writeFile(
@@ -178,6 +190,11 @@ test("T-DB-STATIC-004 checksum manifest gate rejects a changed migration", async
       "20260820000000_c002_consent_profile_permissions",
     );
     await mkdir(consentProfileDirectory);
+    const checkinDirectory = path.join(
+      temporaryRoot,
+      "20260821000000_c004_checkin_guard",
+    );
+    await mkdir(checkinDirectory);
     const target = path.join(targetDirectory, "migration.sql");
     await copyFile(migrationFile, target);
     await copyFile(
@@ -214,6 +231,13 @@ test("T-DB-STATIC-004 checksum manifest gate rejects a changed migration", async
         "prisma/migrations/20260820000000_c002_consent_profile_permissions/migration.sql",
       ),
       path.join(consentProfileDirectory, "migration.sql"),
+    );
+    await copyFile(
+      path.join(
+        root,
+        "prisma/migrations/20260821000000_c004_checkin_guard/migration.sql",
+      ),
+      path.join(checkinDirectory, "migration.sql"),
     );
     const manifestPath = path.join(temporaryRoot, "checksums.json");
     await copyFile(

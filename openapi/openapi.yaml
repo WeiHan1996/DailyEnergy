@@ -2311,51 +2311,9 @@ components:
       - expected_revision
       - expression_style
     CheckinSubmitRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: '#/components/schemas/CommandRef'
-        client_context:
-          $ref: '#/components/schemas/ClientContext'
-        expected_revision:
-          type: integer
-          enum:
-          - 0
-        mood:
-          $ref: '#/components/schemas/Mood'
-        energy:
-          $ref: '#/components/schemas/Energy'
-        sleep:
-          $ref: '#/components/schemas/Sleep'
-      additionalProperties: false
-      required:
-      - command_ref
-      - expected_revision
-      - mood
-      - energy
-      - sleep
+      x-source-contract: CheckinSubmitRequestSchema
     CheckinCorrectRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: '#/components/schemas/CommandRef'
-        client_context:
-          $ref: '#/components/schemas/ClientContext'
-        expected_revision:
-          $ref: '#/components/schemas/PositiveRevision'
-        mood:
-          $ref: '#/components/schemas/Mood'
-        energy:
-          $ref: '#/components/schemas/Energy'
-        sleep:
-          $ref: '#/components/schemas/Sleep'
-      additionalProperties: false
-      required:
-      - command_ref
-      - expected_revision
-      - mood
-      - energy
-      - sleep
+      x-source-contract: CheckinCorrectRequestSchema
     CheckinRebuildRequest:
       type: object
       properties:
@@ -3238,35 +3196,7 @@ components:
       - onboarding_completed
       - updated_at
     CheckinView:
-      type: object
-      properties:
-        checkin_ref:
-          $ref: '#/components/schemas/OpaqueRef'
-        product_date:
-          $ref: '#/components/schemas/ProductDate'
-        revision:
-          $ref: '#/components/schemas/PositiveRevision'
-        mood:
-          $ref: '#/components/schemas/Mood'
-        energy:
-          $ref: '#/components/schemas/Energy'
-        sleep:
-          $ref: '#/components/schemas/Sleep'
-        write_window:
-          $ref: '#/components/schemas/WriteWindow'
-        updated_at:
-          type: string
-          format: date-time
-      additionalProperties: false
-      required:
-      - checkin_ref
-      - product_date
-      - revision
-      - mood
-      - energy
-      - sleep
-      - write_window
-      - updated_at
+      x-source-contract: CheckinViewSchema
     GenerationIntentView:
       type: object
       properties:
