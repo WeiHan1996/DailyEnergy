@@ -7,6 +7,7 @@ import {
   GenerationInputSnapshotSchema,
   GenerationIntentViewSchema,
   GenerationStartRequestSchema,
+  HistoryDayViewSchema,
   ProductDateSchema,
   PublishedDailyResultSchema,
   Rfc3339TimestampSchema,
@@ -235,5 +236,37 @@ describe("daily content contracts", () => {
         },
       }).success,
     ).toBe(true);
+
+    const history = {
+      product_date: clientDailyContentViewFixture.product_date,
+      content: clientDailyContentViewFixture,
+      interaction: {
+        contract: "daily-interaction-state",
+        schema_version: "1.0.0",
+        result_id: clientDailyContentViewFixture.result_id,
+        product_date: clientDailyContentViewFixture.product_date,
+        is_lit: false,
+        task: {
+          task_id: clientDailyContentViewFixture.optional_task.task_id,
+          revision: 1,
+          status: "UNMARKED",
+        },
+        helpfulness: { revision: 0, rating: "UNRATED" },
+        updated_at: "2026-07-20T08:10:00Z",
+      },
+    };
+    expect(HistoryDayViewSchema.safeParse(history).success).toBe(true);
+    expect(
+      HistoryDayViewSchema.safeParse({
+        ...history,
+        seed: "forbidden",
+      }).success,
+    ).toBe(false);
+    expect(
+      HistoryDayViewSchema.safeParse({
+        ...history,
+        product_date: "2026-07-19",
+      }).success,
+    ).toBe(false);
   });
 });

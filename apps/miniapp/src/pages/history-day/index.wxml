@@ -1,0 +1,96 @@
+<de-page-shell labelled-by="history-title">
+  <de-app-header
+    slot="header"
+    back-label="返回今天"
+    show-back="{{true}}"
+    title="这一天"
+    subtitle="{{productDate}}"
+    bind:back="back"
+  ></de-app-header>
+
+  <view class="history" data-screen-id="{{screenId}}">
+    <de-loading-skeleton
+      wx:if="{{loading && !view}}"
+      label="正在读取这一天"
+      lines="5"
+      variant="card"
+    ></de-loading-skeleton>
+
+    <de-offline-state
+      wx:elif="{{offline && !view}}"
+      message="这台设备没有可读的历史缓存，恢复网络后再试。"
+      bind:retry="retry"
+    ></de-offline-state>
+
+    <de-recoverable-error
+      wx:elif="{{error && !view}}"
+      message="暂时没能读取这一天。历史内容不会按新版本重新生成。"
+      bind:retry="retry"
+    ></de-recoverable-error>
+
+    <view wx:elif="{{missing}}" class="history__missing" aria-live="polite">
+      <view id="history-title" class="history__missing-title">这一天没有可展示的记录</view>
+      <view class="history__missing-copy">记录可能已被删除，缺失会如实保留，不会用其它日期补齐。</view>
+    </view>
+
+    <block wx:elif="{{view}}">
+      <de-offline-state
+        wx:if="{{offline}}"
+        message="这是最后同步的只读历史内容；离线时不能执行数据操作。"
+        bind:retry="retry"
+      ></de-offline-state>
+
+      <view id="history-title" class="history__title">这一天，当时就是这样。</view>
+
+      <de-section-card heading="你的真实记录">
+        <view wx:if="{{checkinRows.length}}" class="history__checkin-list">
+          <view wx:for="{{checkinRows}}" wx:key="label" class="history__checkin-row">
+            <text>{{item.label}}</text>
+            <text class="history__checkin-value">{{item.value}}</text>
+          </view>
+        </view>
+        <view wx:else class="history__empty-copy">这一天没有留下晨间状态。</view>
+      </de-section-card>
+
+      <view wx:if="{{view.content}}" class="history__content">
+        <view class="history__section-label">当时的娱乐与行动参考</view>
+        <de-energy-summary
+          context="娱乐与行动参考"
+          detail="{{view.content.overall.summary}}"
+          label="整体能量"
+          level="{{view.content.overall.band_label}}"
+          offline="{{offline}}"
+          show-score="{{false}}"
+        ></de-energy-summary>
+
+        <de-friend-message
+          label="当时想对你说"
+          title="{{view.content.state_response}}"
+          body="{{explanationText}}"
+        ></de-friend-message>
+
+        <de-action-card
+          action="{{view.content.primary_action.instruction}}"
+          label="当时的行动"
+          reason="{{actionReason}}"
+          show-button="{{false}}"
+        ></de-action-card>
+      </view>
+
+      <de-section-card wx:if="{{view.interaction}}" heading="留下的状态" variant="subtle">
+        <view class="history__fact-row">
+          <text>点亮</text>
+          <text>{{view.interaction.is_lit ? '已留下' : '未留下'}}</text>
+        </view>
+        <view class="history__fact-row">
+          <text>可选任务</text>
+          <text>{{taskStatusLabel}}</text>
+        </view>
+      </de-section-card>
+
+      <de-section-card wx:if="{{!view.evening}}" heading="晚间记录" variant="subtle">
+        <view class="history__empty-copy">这一天没有留下晚间记录。</view>
+      </de-section-card>
+    </block>
+  </view>
+</de-page-shell>

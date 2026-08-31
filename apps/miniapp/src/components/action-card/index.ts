@@ -24,6 +24,10 @@ Component({
       type: String,
       value: "",
     },
+    showButton: {
+      type: Boolean,
+      value: true,
+    },
   },
   methods: {
     handlePress() {

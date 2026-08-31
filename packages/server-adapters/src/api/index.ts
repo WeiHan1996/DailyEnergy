@@ -66,6 +66,7 @@ export {
   UNAVAILABLE_DAILY_GENERATION_STORE,
   type DailyGenerationStore,
   type GenerationGuardFailure,
+  type HistoryDayQueryResult,
   type GenerationIntentQueryResult,
   type GenerationStartResult,
   type PostgresDailyGenerationStoreConfig,

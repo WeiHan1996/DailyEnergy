@@ -6,12 +6,14 @@ import {
   CheckinViewSchema,
   GenerationInputSnapshotSchema,
   GenerationIntentViewSchema,
+  HistoryDayViewSchema,
   PublishedDailyResultSchema,
   TodayViewSchema,
   type CheckinView,
   type GenerationInputSnapshot,
   type GenerationIntentStatus,
   type GenerationIntentView,
+  type HistoryDayView,
   type TodayView,
 } from "@daily-energy/shared-schemas";
 import {
@@ -82,8 +84,16 @@ export type TodayQueryResult =
         | GenerationGuardFailure;
     };
 
+export type HistoryDayQueryResult =
+  | { readonly status: "FOUND"; readonly value: HistoryDayView }
+  | { readonly status: "NOT_FOUND" | GenerationGuardFailure };
+
 export interface DailyGenerationStore {
   close(): Promise<void>;
+  getByDate(input: {
+    readonly accountId: string;
+    readonly productDate: string;
+  }): Promise<HistoryDayQueryResult>;
   getIntent(input: {
     readonly accountId: string;
     readonly intentRef: string;
@@ -183,6 +193,10 @@ interface TodaySource {
   readonly guard: GenerationGuardSnapshotV1;
   readonly publishedResult: ReturnType<typeof PublishedDailyResultSchema.parse>;
   readonly row: TodayRow;
+}
+
+interface HistorySource extends TodaySource {
+  readonly checkin: CheckinRow;
 }
 
 export class PostgresDailyGenerationStore implements DailyGenerationStore {
@@ -428,6 +442,51 @@ export class PostgresDailyGenerationStore implements DailyGenerationStore {
     });
   }
 
+  public async getByDate(input: {
+    readonly accountId: string;
+    readonly productDate: string;
+  }): Promise<HistoryDayQueryResult> {
+    const source = await this.#transaction((client) =>
+      readHistorySource(client, input.accountId, input.productDate),
+    );
+    if (source.status !== "FOUND") {
+      return source;
+    }
+    let content = await this.#cache.get(source.value.cacheIdentity);
+    if (
+      content === undefined ||
+      content.result_id !== source.value.row.resultId
+    ) {
+      content = projectClientDailyContentViewV1(source.value.publishedResult);
+    }
+    const currentGuard = await this.#transaction(async (client) => {
+      await lockAccountGuard(client, input.accountId);
+      return resolveGenerationGuardSnapshot(
+        client,
+        input.accountId,
+        input.productDate,
+      );
+    });
+    if (!sameGenerationGuardSnapshot(currentGuard, source.value.guard)) {
+      return {
+        status:
+          currentGuard.status === "ALLOWED"
+            ? "STATE_PRECONDITION_FAILED"
+            : currentGuard.status,
+      };
+    }
+    await this.#cache.set(source.value.cacheIdentity, content);
+    return {
+      status: "FOUND",
+      value: HistoryDayViewSchema.parse({
+        product_date: source.value.row.productDate,
+        checkin: checkinView(source.value.checkin, "CLOSED"),
+        content,
+        interaction: interactionView(source.value.row),
+      }),
+    };
+  }
+
   public async getToday(input: {
     readonly accountId: string;
     readonly productDate: string;
@@ -469,26 +528,7 @@ export class PostgresDailyGenerationStore implements DailyGenerationStore {
     const relationshipCount = row.relationshipCount;
     const view = TodayViewSchema.parse({
       content,
-      interaction: {
-        contract: "daily-interaction-state",
-        schema_version: "1.0.0",
-        result_id: row.resultId,
-        product_date: row.productDate,
-        is_lit: row.isLit,
-        task: {
-          task_id: row.taskDefinitionId,
-          revision: row.taskRevision,
-          status: row.taskStatus,
-        },
-        helpfulness:
-          row.helpfulnessRating === null
-            ? { revision: 0, rating: "UNRATED" }
-            : {
-                revision: row.helpfulnessRevision,
-                rating: row.helpfulnessRating,
-              },
-        updated_at: row.updatedAt.toISOString(),
-      },
+      interaction: interactionView(row),
       relationship: {
         stage:
           relationshipCount === 0
@@ -538,6 +578,9 @@ export class PostgresDailyGenerationStore implements DailyGenerationStore {
 export const UNAVAILABLE_DAILY_GENERATION_STORE: DailyGenerationStore =
   Object.freeze({
     async close() {},
+    async getByDate() {
+      throw new Error("DAILY_GENERATION_STORE_UNAVAILABLE");
+    },
     async getIntent() {
       throw new Error("DAILY_GENERATION_STORE_UNAVAILABLE");
     },
@@ -663,6 +706,43 @@ async function readTodaySource(
   };
 }
 
+async function readHistorySource(
+  client: PoolClient,
+  accountId: string,
+  productDate: string,
+): Promise<
+  | { readonly status: "FOUND"; readonly value: HistorySource }
+  | Exclude<HistoryDayQueryResult, { readonly status: "FOUND" }>
+> {
+  const source = await readTodaySource(client, accountId, productDate);
+  if (source.status !== "FOUND") {
+    switch (source.status) {
+      case "GENERATION_FAILED_RETRYABLE":
+      case "GENERATION_FAILED_TERMINAL":
+      case "GENERATION_PENDING":
+        return { status: "NOT_FOUND" };
+      case "NOT_FOUND":
+        return { status: "NOT_FOUND" };
+      case "ACCOUNT_DELETED":
+      case "ACCOUNT_DELETING":
+      case "ACCOUNT_RESTRICTED":
+      case "CONSENT_REQUIRED":
+      case "ONBOARDING_REQUIRED":
+      case "SAFETY_BLOCKED":
+      case "STATE_PRECONDITION_FAILED":
+        return { status: source.status };
+    }
+  }
+  const checkin = await readCheckin(client, accountId, productDate);
+  if (checkin === undefined) {
+    throw new Error("HISTORY_CHECKIN_MISSING");
+  }
+  return {
+    status: "FOUND",
+    value: { ...source.value, checkin },
+  };
+}
+
 async function readCheckin(
   client: PoolClient,
   accountId: string,
@@ -756,7 +836,10 @@ function intentView(row: IntentRow): GenerationIntentView {
   });
 }
 
-function checkinView(row: CheckinRow): CheckinView {
+function checkinView(
+  row: CheckinRow,
+  writeWindow: "OPEN" | "CLOSED" = "OPEN",
+): CheckinView {
   return CheckinViewSchema.parse({
     checkin_ref: row.checkinRef,
     product_date: row.productDate,
@@ -764,9 +847,35 @@ function checkinView(row: CheckinRow): CheckinView {
     mood: row.mood,
     energy: row.energy,
     sleep: row.sleep,
-    write_window: "OPEN",
+    write_window: writeWindow,
     updated_at: row.updatedAt.toISOString(),
   });
+}
+
+function interactionView(row: TodayRow) {
+  if (row.helpfulnessRating !== null && row.helpfulnessRevision === null) {
+    throw new Error("DAILY_HELPFULNESS_REVISION_MISSING");
+  }
+  return {
+    contract: "daily-interaction-state" as const,
+    schema_version: "1.0.0",
+    result_id: row.resultId,
+    product_date: row.productDate,
+    is_lit: row.isLit,
+    task: {
+      task_id: row.taskDefinitionId,
+      revision: row.taskRevision,
+      status: row.taskStatus,
+    },
+    helpfulness:
+      row.helpfulnessRating === null
+        ? ({ revision: 0, rating: "UNRATED" } as const)
+        : {
+            revision: row.helpfulnessRevision!,
+            rating: row.helpfulnessRating,
+          },
+    updated_at: row.updatedAt.toISOString(),
+  };
 }
 
 async function claimCommand(

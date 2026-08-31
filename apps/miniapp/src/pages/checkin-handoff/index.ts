@@ -165,15 +165,9 @@ Page({
       return;
     }
     if (result.kind === "saved") {
-      this.setData({
-        current: result.view,
-        dateChanged: false,
-        error: false,
-        loading: false,
-        productDate: result.productDate,
-        saved: true,
+      wx.reLaunch({
+        url: `/pages/generation/index?checkinRevision=${result.view.revision}`,
       });
-      this.setSelections(result.view);
       return;
     }
     this.setData({

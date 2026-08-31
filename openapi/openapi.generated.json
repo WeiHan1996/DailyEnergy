@@ -3986,25 +3986,716 @@
         "additionalProperties": false,
         "properties": {
           "checkin": {
-            "$ref": "#/components/schemas/CheckinView"
+            "additionalProperties": false,
+            "properties": {
+              "checkin_ref": {
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+                "type": "string"
+              },
+              "energy": {
+                "enum": [
+                  "EMPTY",
+                  "LOW",
+                  "STEADY",
+                  "HIGH",
+                  "FULL",
+                  "UNSURE"
+                ],
+                "type": "string"
+              },
+              "mood": {
+                "enum": [
+                  "VERY_LOW",
+                  "LOW",
+                  "STEADY",
+                  "GOOD",
+                  "LIGHT",
+                  "UNSURE"
+                ],
+                "type": "string"
+              },
+              "product_date": {
+                "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                "type": "string"
+              },
+              "revision": {
+                "exclusiveMinimum": true,
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "sleep": {
+                "enum": [
+                  "POOR",
+                  "LOW",
+                  "OKAY",
+                  "GOOD",
+                  "UNSURE"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "write_window": {
+                "enum": [
+                  "OPEN",
+                  "CONTINUATION_ONLY",
+                  "CLOSED"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "checkin_ref",
+              "product_date",
+              "revision",
+              "energy",
+              "mood",
+              "sleep",
+              "write_window",
+              "updated_at"
+            ],
+            "type": "object"
           },
           "content": {
-            "$ref": "#/components/schemas/ClientDailyContentView"
+            "additionalProperties": false,
+            "properties": {
+              "closing": {
+                "type": "string"
+              },
+              "content_label": {
+                "enum": [
+                  "娱乐与行动参考"
+                ],
+                "type": "string"
+              },
+              "contract": {
+                "enum": [
+                  "daily-content-view"
+                ],
+                "type": "string"
+              },
+              "core_tip": {
+                "type": "string"
+              },
+              "dimensions": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "band": {
+                      "enum": [
+                        "LOW",
+                        "STEADY",
+                        "HIGH"
+                      ],
+                      "type": "string"
+                    },
+                    "band_label": {
+                      "type": "string"
+                    },
+                    "explanation": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "enum": [
+                        "pace",
+                        "action",
+                        "connection",
+                        "resources",
+                        "recovery"
+                      ],
+                      "type": "string"
+                    },
+                    "is_focus": {
+                      "type": "boolean"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "label",
+                    "band",
+                    "band_label",
+                    "explanation",
+                    "is_focus"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 5,
+                "minItems": 5,
+                "type": "array"
+              },
+              "explanation_paragraphs": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 2,
+                "minItems": 1,
+                "type": "array"
+              },
+              "focus_dimension_id": {
+                "enum": [
+                  "pace",
+                  "action",
+                  "connection",
+                  "resources",
+                  "recovery"
+                ],
+                "type": "string"
+              },
+              "generated_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              },
+              "greeting": {
+                "type": "string"
+              },
+              "optional_task": {
+                "additionalProperties": false,
+                "properties": {
+                  "instruction": {
+                    "type": "string"
+                  },
+                  "task_id": {
+                    "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id",
+                  "instruction"
+                ],
+                "type": "object"
+              },
+              "overall": {
+                "additionalProperties": false,
+                "properties": {
+                  "band": {
+                    "enum": [
+                      "LOW",
+                      "STEADY",
+                      "HIGH"
+                    ],
+                    "type": "string"
+                  },
+                  "band_label": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "band",
+                  "band_label",
+                  "summary"
+                ],
+                "type": "object"
+              },
+              "personalization_notice": {
+                "enum": [
+                  "NONE",
+                  "PERSONALIZATION_REDUCED"
+                ],
+                "type": "string"
+              },
+              "primary_action": {
+                "additionalProperties": false,
+                "properties": {
+                  "action_id": {
+                    "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                    "type": "string"
+                  },
+                  "constraint_label": {
+                    "type": "string"
+                  },
+                  "instruction": {
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "action_id",
+                  "instruction"
+                ],
+                "type": "object"
+              },
+              "product_date": {
+                "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                "type": "string"
+              },
+              "result_id": {
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
+              },
+              "result_version": {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                "type": "string"
+              },
+              "rituals": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "display_value": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "COLOR",
+                        "NUMBER"
+                      ],
+                      "type": "string"
+                    },
+                    "note": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "display_value",
+                    "note"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 2,
+                "type": "array"
+              },
+              "schema_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "state_response": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract",
+              "schema_version",
+              "result_id",
+              "product_date",
+              "result_version",
+              "generated_at",
+              "content_label",
+              "greeting",
+              "state_response",
+              "overall",
+              "focus_dimension_id",
+              "dimensions",
+              "core_tip",
+              "explanation_paragraphs",
+              "primary_action",
+              "optional_task",
+              "rituals",
+              "closing",
+              "personalization_notice"
+            ],
+            "type": "object"
           },
           "evening": {
-            "$ref": "#/components/schemas/EveningView"
+            "additionalProperties": false,
+            "properties": {
+              "availability": {
+                "enum": [
+                  "UNAVAILABLE",
+                  "EDITABLE_EMPTY",
+                  "EDITABLE_SUBMITTED",
+                  "READ_ONLY_SUBMITTED",
+                  "READ_ONLY_EMPTY"
+                ],
+                "type": "string"
+              },
+              "completion_message": {
+                "type": "string"
+              },
+              "contract": {
+                "enum": [
+                  "evening-feedback-view"
+                ],
+                "type": "string"
+              },
+              "feedback": {
+                "additionalProperties": false,
+                "properties": {
+                  "first_submitted_at": {
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                    "type": "string"
+                  },
+                  "note": {
+                    "type": "string"
+                  },
+                  "overall_feeling": {
+                    "enum": [
+                      "VERY_HEAVY",
+                      "SOMEWHAT_HEAVY",
+                      "STEADY",
+                      "PRETTY_GOOD",
+                      "LIGHT",
+                      "UNSURE"
+                    ],
+                    "type": "string"
+                  },
+                  "revision": {
+                    "exclusiveMinimum": true,
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "updated_at": {
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "revision",
+                  "overall_feeling",
+                  "first_submitted_at",
+                  "updated_at"
+                ],
+                "type": "object"
+              },
+              "helpfulness": {
+                "additionalProperties": false,
+                "properties": {
+                  "rating": {
+                    "enum": [
+                      "UNRATED",
+                      "HELPFUL",
+                      "NEUTRAL",
+                      "NOT_HELPFUL",
+                      "NOT_USED"
+                    ],
+                    "type": "string"
+                  },
+                  "revision": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "revision",
+                  "rating"
+                ],
+                "type": "object"
+              },
+              "note_max_characters": {
+                "enum": [
+                  80
+                ],
+                "type": "number"
+              },
+              "options": {
+                "additionalProperties": false,
+                "properties": {
+                  "helpfulness": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "HELPFUL"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "NEUTRAL"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "NOT_HELPFUL"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "NOT_USED"
+                          ],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "maxItems": 4,
+                    "minItems": 4,
+                    "type": "array"
+                  },
+                  "overall_feeling": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "VERY_HEAVY"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "SOMEWHAT_HEAVY"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "STEADY"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "PRETTY_GOOD"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "LIGHT"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "UNSURE"
+                          ],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "maxItems": 6,
+                    "minItems": 6,
+                    "type": "array"
+                  },
+                  "task_status": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "enum": [
+                            "UNMARKED"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "INTERESTED"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "COMPLETED"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "enum": [
+                            "SKIPPED"
+                          ],
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "maxItems": 4,
+                    "minItems": 4,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "overall_feeling",
+                  "helpfulness",
+                  "task_status"
+                ],
+                "type": "object"
+              },
+              "primary_action": {
+                "enum": [
+                  "SAVE",
+                  "SAVE_CHANGES",
+                  "READ_ONLY"
+                ],
+                "type": "string"
+              },
+              "product_date": {
+                "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                "type": "string"
+              },
+              "schema_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "task": {
+                "additionalProperties": false,
+                "properties": {
+                  "instruction": {
+                    "type": "string"
+                  },
+                  "revision": {
+                    "exclusiveMinimum": true,
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "status": {
+                    "enum": [
+                      "UNMARKED",
+                      "INTERESTED",
+                      "COMPLETED",
+                      "SKIPPED"
+                    ],
+                    "type": "string"
+                  },
+                  "task_id": {
+                    "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id",
+                  "instruction",
+                  "revision",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "unavailable_message": {
+                "type": "string"
+              },
+              "write_window": {
+                "enum": [
+                  "OPEN",
+                  "CONTINUATION_ONLY",
+                  "CLOSED"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract",
+              "schema_version",
+              "product_date",
+              "availability",
+              "write_window",
+              "helpfulness",
+              "options",
+              "note_max_characters",
+              "primary_action",
+              "completion_message"
+            ],
+            "type": "object"
           },
           "interaction": {
-            "$ref": "#/components/schemas/DailyInteractionView"
+            "additionalProperties": false,
+            "properties": {
+              "contract": {
+                "enum": [
+                  "daily-interaction-state"
+                ],
+                "type": "string"
+              },
+              "helpfulness": {
+                "additionalProperties": false,
+                "properties": {
+                  "rating": {
+                    "enum": [
+                      "UNRATED",
+                      "HELPFUL",
+                      "NEUTRAL",
+                      "NOT_HELPFUL",
+                      "NOT_USED"
+                    ],
+                    "type": "string"
+                  },
+                  "revision": {
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "revision",
+                  "rating"
+                ],
+                "type": "object"
+              },
+              "is_lit": {
+                "type": "boolean"
+              },
+              "product_date": {
+                "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                "type": "string"
+              },
+              "result_id": {
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
+              },
+              "schema_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "task": {
+                "additionalProperties": false,
+                "properties": {
+                  "revision": {
+                    "exclusiveMinimum": true,
+                    "maximum": 9007199254740991,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "status": {
+                    "enum": [
+                      "UNMARKED",
+                      "INTERESTED",
+                      "COMPLETED",
+                      "SKIPPED"
+                    ],
+                    "type": "string"
+                  },
+                  "task_id": {
+                    "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id",
+                  "revision",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "updated_at": {
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "contract",
+              "schema_version",
+              "result_id",
+              "product_date",
+              "is_lit",
+              "task",
+              "helpfulness",
+              "updated_at"
+            ],
+            "type": "object"
           },
           "product_date": {
-            "$ref": "#/components/schemas/ProductDate"
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           }
         },
         "required": [
           "product_date"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "HistoryDayViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "HistoryListView": {
         "additionalProperties": false,
@@ -9723,6 +10414,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:3b2f6bbc3972d3af739d5b1453f4b4f094f0812dd96d2927a4a222aa3fcc48f4"
+    "source-fingerprint": "sha256:d82b7eb1e090872dc1452fd9681d327ad044831aba378c6a3a83e09b1efc359e"
   }
 }

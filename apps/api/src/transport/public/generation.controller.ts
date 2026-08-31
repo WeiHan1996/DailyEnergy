@@ -13,6 +13,7 @@ import {
 } from "@nestjs/common";
 import {
   GenerationStartRequestSchema,
+  ProductDateSchema,
   type GenerationStartRequest,
 } from "@daily-energy/shared-schemas";
 import type { Request } from "express";
@@ -70,6 +71,20 @@ export class GenerationController {
   public async getToday(@Req() request: Request) {
     return this.#success(
       await this.service.getToday(sessionPrincipalFromRequest(request)),
+    );
+  }
+
+  @Get("daily/by-date/:product_date")
+  public async getByDate(
+    @Req() request: Request,
+    @Param("product_date", new ZodValidationPipe(ProductDateSchema))
+    productDate: string,
+  ) {
+    return this.#success(
+      await this.service.getByDate(
+        sessionPrincipalFromRequest(request),
+        productDate,
+      ),
     );
   }
 

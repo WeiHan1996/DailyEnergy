@@ -1,0 +1,116 @@
+{
+  "manifest_version": "c-009-evidence-v1",
+  "scope": "C-009 DLY-002/DLY-003/REC-002 contracts, owner-guarded history read, Mini Program recovery coordinator, validated offline cache and D-002/D-004 implementation boundary",
+  "authority": [
+    "docs/design/screen-specs.md",
+    "docs/design/content-layout.md",
+    "docs/design/interaction-states.md",
+    "docs/design/developer-handoff.md",
+    "docs/design/design-system.md",
+    "docs/data/domain-model.md",
+    "docs/technical/api.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C009-HISTORY-CONTRACT-001": {
+      "file": "packages/shared-schemas/test/daily-content.test.ts",
+      "selector": "daily content contracts",
+      "level": "CONTRACT",
+      "assertions": [
+        "HistoryDayView is closed and binds product date and result identity across checkin/content/interaction",
+        "unknown seed/internal fields and mismatched historical dates are rejected"
+      ]
+    },
+    "T-C009-API-001": {
+      "file": "apps/api/src/generation.e2e.test.ts",
+      "selector": "C-008 HTTP generation flow / historical projection",
+      "level": "E2E",
+      "assertions": [
+        "a past owner-scoped day returns a closed HistoryDayView",
+        "current/future and malformed dates do not expose historical content",
+        "history output contains no account, seed, fingerprint or epoch fields"
+      ]
+    },
+    "T-C009-MINIAPP-API-001": {
+      "file": "apps/miniapp/src/services/miniapp-api-c009.test.ts",
+      "selector": "C-009 miniapp API bridge",
+      "level": "CONTRACT",
+      "assertions": [
+        "start/status/today/history requests carry only the session and required idempotency fields",
+        "strict runtime projectors reject unknown/internal fields and unsupported schema major",
+        "bounded Retry-After survives the transport adapter without exposing server internals"
+      ]
+    },
+    "T-C009-CACHE-001": {
+      "file": "apps/miniapp/src/features/daily/daily-cache.test.ts",
+      "selector": "C-009 daily view cache",
+      "level": "CONTRACT",
+      "assertions": [
+        "only validated session-scoped Today/History views survive the 24-hour cache",
+        "scope mismatch, expiry and unknown fields remove the cache instead of rendering it",
+        "one command/intent identity is retained for unknown-outcome recovery"
+      ]
+    },
+    "T-C009-FLOW-001": {
+      "file": "apps/miniapp/src/features/daily/daily-flow.test.ts",
+      "selector": "C-009 daily coordinator",
+      "level": "MODULE",
+      "assertions": [
+        "network failure after start reuses the same command and then the same intent",
+        "polling converges to one authoritative Today without a second start",
+        "offline reads use only validated cache while Safety/guard clears ordinary cache",
+        "authoritative historical MISSING removes a previously cached deleted day"
+      ]
+    },
+    "T-C009-BUNDLE-001": {
+      "file": "tooling/lib/miniapp-bundle-check.mjs",
+      "selector": "Miniapp bundle Gate",
+      "level": "STATIC",
+      "assertions": [
+        "DLY-002, DLY-003 and REC-002 are registered in the ordered page boundary",
+        "the compiled bundle contains no Node, server, provider, Prompt or secret dependency",
+        "all page/component files are present without a TabBar"
+      ]
+    },
+    "T-C009-CODEGEN-001": {
+      "file": "tooling/generate-contracts.mjs",
+      "selector": "contract codegen drift Gate",
+      "level": "STATIC",
+      "assertions": [
+        "HistoryDayView JSON Schema, OpenAPI and generated miniapp client share one source fingerprint",
+        "clean regeneration produces no generated client diff"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "D17-X05",
+      "status": "COVERED",
+      "proof_ids": ["T-C009-CACHE-001", "T-C009-FLOW-001"]
+    },
+    {
+      "source_id": "D17-V02",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-C009-HISTORY-CONTRACT-001",
+        "T-C009-API-001",
+        "T-C009-MINIAPP-API-001"
+      ]
+    },
+    {
+      "source_id": "D17-V06",
+      "status": "COVERED",
+      "proof_ids": ["T-C009-MINIAPP-API-001"]
+    },
+    {
+      "source_id": "S28-STACK-007",
+      "status": "COVERED",
+      "proof_ids": ["T-C009-BUNDLE-001"]
+    },
+    {
+      "source_id": "S30-REPO-022",
+      "status": "COVERED",
+      "proof_ids": ["T-C009-CODEGEN-001"]
+    }
+  ]
+}

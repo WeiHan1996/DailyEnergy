@@ -1,0 +1,50 @@
+<de-page-shell labelled-by="generation-title">
+  <view slot="header" class="generation__eyebrow">今天的内容</view>
+
+  <view class="generation" data-screen-id="{{screenId}}">
+    <view class="generation__intro">
+      <view id="generation-title" class="generation__title">正在整理你刚刚选择的状态</view>
+      <view class="generation__subtitle">生成完成后，今天的核心内容会保持不变。</view>
+    </view>
+
+    <de-offline-state
+      wx:if="{{offline}}"
+      message="当前没有网络。已经提交的请求仍会保持同一个，恢复后先读取它的状态。"
+      bind:retry="retry"
+    ></de-offline-state>
+
+    <de-recoverable-error
+      wx:elif="{{error}}"
+      message="暂时没能完成今天的内容。重试会继续同一个请求，不会重新生成一份。"
+      bind:retry="retry"
+    ></de-recoverable-error>
+
+    <block wx:else>
+      <view class="generation__motion" aria-hidden="true">
+        <view class="generation__pulse"></view>
+      </view>
+
+      <view class="generation__status" aria-live="polite" aria-role="status">
+        <view class="generation__status-title">{{statusLabel}}</view>
+        <view class="generation__status-copy">把注意力留给今天真正重要的一件事。</view>
+      </view>
+
+      <de-inline-notice
+        wx:if="{{fallback}}"
+        title="今天先用简洁版本"
+        message="核心结果和行动不变，内容准备好后会直接进入今天。"
+      ></de-inline-notice>
+
+      <view wx:if="{{canLeave}}" class="generation__leave-copy">
+        可以先离开，稍后回来仍会读取同一个今日结果。
+      </view>
+      <de-action-button
+        wx:if="{{canLeave}}"
+        block="{{true}}"
+        label="稍后来看"
+        variant="secondary"
+        bind:press="leave"
+      ></de-action-button>
+    </block>
+  </view>
+</de-page-shell>

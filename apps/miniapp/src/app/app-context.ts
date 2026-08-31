@@ -4,6 +4,7 @@ import {
   OnboardingCoordinator,
 } from "../features/onboarding/onboarding-flow.js";
 import { CheckinCoordinator } from "../features/checkin/checkin-flow.js";
+import { DailyCoordinator } from "../features/daily/daily-flow.js";
 import type { MiniappPlatform } from "../platform/ports.js";
 import {
   createWechatPlatform,
@@ -19,6 +20,7 @@ import {
 export interface MiniappAppContext {
   readonly checkin: CheckinCoordinator;
   readonly config: PublicBuildConfig;
+  readonly daily: DailyCoordinator;
   getSafetyView(): SafetyView | undefined;
   readonly onboarding: OnboardingCoordinator;
   readonly platform: MiniappPlatform;
@@ -38,10 +40,15 @@ export function createMiniappAppContext(
     sessionScope,
   );
   const checkin = new CheckinCoordinator(platform.storage, api, sessionScope);
+  const daily = new DailyCoordinator(platform.storage, api, sessionScope);
   return Object.freeze({
     checkin,
     config,
-    getSafetyView: () => checkin.getSafetyView() ?? onboarding.getSafetyView(),
+    daily,
+    getSafetyView: () =>
+      daily.getSafetyView() ??
+      checkin.getSafetyView() ??
+      onboarding.getSafetyView(),
     onboarding,
     platform,
   });

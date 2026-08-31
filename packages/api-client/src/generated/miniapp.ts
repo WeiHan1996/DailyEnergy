@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:3b2f6bbc3972d3af739d5b1453f4b4f094f0812dd96d2927a4a222aa3fcc48f4
+// source-fingerprint: sha256:d82b7eb1e090872dc1452fd9681d327ad044831aba378c6a3a83e09b1efc359e
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:3b2f6bbc3972d3af739d5b1453f4b4f094f0812dd96d2927a4a222aa3fcc48f4";
+  "sha256:d82b7eb1e090872dc1452fd9681d327ad044831aba378c6a3a83e09b1efc359e";
 
 export interface paths {
   "/auth/reauth/verify": {
@@ -506,51 +506,6 @@ export interface components {
       app_version?: string;
       scene?: string;
     };
-    ClientDailyContentView: {
-      closing: string;
-      content_label: "娱乐与行动参考";
-      contract: "daily-content-view";
-      core_tip: string;
-      dimensions: Array<{
-        band: "LOW" | "STEADY" | "HIGH";
-        band_label: string;
-        explanation: string;
-        id: "pace" | "action" | "connection" | "resources" | "recovery";
-        is_focus: boolean;
-        label: string;
-      }>;
-      explanation_paragraphs: Array<string>;
-      focus_dimension_id:
-        "pace" | "action" | "connection" | "resources" | "recovery";
-      generated_at: string;
-      greeting: string;
-      optional_task: {
-        instruction: string;
-        task_id: string;
-      };
-      overall: {
-        band: "LOW" | "STEADY" | "HIGH";
-        band_label: string;
-        summary: string;
-      };
-      personalization_notice: "NONE" | "PERSONALIZATION_REDUCED";
-      primary_action: {
-        action_id: string;
-        constraint_label?: string;
-        instruction: string;
-        rationale?: string;
-      };
-      product_date: string;
-      result_id: string;
-      result_version: string;
-      rituals: Array<{
-        display_value: string;
-        kind: "COLOR" | "NUMBER";
-        note: string;
-      }>;
-      schema_version: string;
-      state_response: string;
-    };
     CommandReceiptView: {
       command_ref: components["schemas"]["CommandRef"];
       operation: components["schemas"]["VersionToken"];
@@ -877,11 +832,136 @@ export interface components {
       state: "RECORDED" | "MISSING";
     };
     HistoryDayView: {
-      checkin?: components["schemas"]["CheckinView"];
-      content?: components["schemas"]["ClientDailyContentView"];
-      evening?: components["schemas"]["EveningView"];
-      interaction?: components["schemas"]["DailyInteractionView"];
-      product_date: components["schemas"]["ProductDate"];
+      checkin?: {
+        checkin_ref: string;
+        energy: "EMPTY" | "LOW" | "STEADY" | "HIGH" | "FULL" | "UNSURE";
+        mood: "VERY_LOW" | "LOW" | "STEADY" | "GOOD" | "LIGHT" | "UNSURE";
+        product_date: string;
+        revision: number;
+        sleep: "POOR" | "LOW" | "OKAY" | "GOOD" | "UNSURE";
+        updated_at: string;
+        write_window: "OPEN" | "CONTINUATION_ONLY" | "CLOSED";
+      };
+      content?: {
+        closing: string;
+        content_label: "娱乐与行动参考";
+        contract: "daily-content-view";
+        core_tip: string;
+        dimensions: Array<{
+          band: "LOW" | "STEADY" | "HIGH";
+          band_label: string;
+          explanation: string;
+          id: "pace" | "action" | "connection" | "resources" | "recovery";
+          is_focus: boolean;
+          label: string;
+        }>;
+        explanation_paragraphs: Array<string>;
+        focus_dimension_id:
+          "pace" | "action" | "connection" | "resources" | "recovery";
+        generated_at: string;
+        greeting: string;
+        optional_task: {
+          instruction: string;
+          task_id: string;
+        };
+        overall: {
+          band: "LOW" | "STEADY" | "HIGH";
+          band_label: string;
+          summary: string;
+        };
+        personalization_notice: "NONE" | "PERSONALIZATION_REDUCED";
+        primary_action: {
+          action_id: string;
+          constraint_label?: string;
+          instruction: string;
+          rationale?: string;
+        };
+        product_date: string;
+        result_id: string;
+        result_version: string;
+        rituals: Array<{
+          display_value: string;
+          kind: "COLOR" | "NUMBER";
+          note: string;
+        }>;
+        schema_version: string;
+        state_response: string;
+      };
+      evening?: {
+        availability:
+          | "UNAVAILABLE"
+          | "EDITABLE_EMPTY"
+          | "EDITABLE_SUBMITTED"
+          | "READ_ONLY_SUBMITTED"
+          | "READ_ONLY_EMPTY";
+        completion_message: string;
+        contract: "evening-feedback-view";
+        feedback?: {
+          first_submitted_at: string;
+          note?: string;
+          overall_feeling:
+            | "VERY_HEAVY"
+            | "SOMEWHAT_HEAVY"
+            | "STEADY"
+            | "PRETTY_GOOD"
+            | "LIGHT"
+            | "UNSURE";
+          revision: number;
+          updated_at: string;
+        };
+        helpfulness: {
+          rating:
+            "UNRATED" | "HELPFUL" | "NEUTRAL" | "NOT_HELPFUL" | "NOT_USED";
+          revision: number;
+        };
+        note_max_characters: 80;
+        options: {
+          helpfulness: Array<
+            "HELPFUL" | "NEUTRAL" | "NOT_HELPFUL" | "NOT_USED"
+          >;
+          overall_feeling: Array<
+            | "VERY_HEAVY"
+            | "SOMEWHAT_HEAVY"
+            | "STEADY"
+            | "PRETTY_GOOD"
+            | "LIGHT"
+            | "UNSURE"
+          >;
+          task_status: Array<
+            "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED"
+          >;
+        };
+        primary_action: "SAVE" | "SAVE_CHANGES" | "READ_ONLY";
+        product_date: string;
+        schema_version: string;
+        task?: {
+          instruction: string;
+          revision: number;
+          status: "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED";
+          task_id: string;
+        };
+        unavailable_message?: string;
+        write_window: "OPEN" | "CONTINUATION_ONLY" | "CLOSED";
+      };
+      interaction?: {
+        contract: "daily-interaction-state";
+        helpfulness: {
+          rating:
+            "UNRATED" | "HELPFUL" | "NEUTRAL" | "NOT_HELPFUL" | "NOT_USED";
+          revision: number;
+        };
+        is_lit: boolean;
+        product_date: string;
+        result_id: string;
+        schema_version: string;
+        task: {
+          revision: number;
+          status: "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED";
+          task_id: string;
+        };
+        updated_at: string;
+      };
+      product_date: string;
     };
     HistoryListView: {
       items: Array<components["schemas"]["HistoryDaySummaryView"]>;

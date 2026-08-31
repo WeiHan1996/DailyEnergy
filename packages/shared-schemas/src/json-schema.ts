@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:2fa98239cc761da70f4e28a076185245c6958f333c5d35351229d0a57fc24c0d
+// source-fingerprint: sha256:9cb36413f37e0099a70bec6eefaa2e3570b5de001bf70cb7640c7637a116a4df
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:2fa98239cc761da70f4e28a076185245c6958f333c5d35351229d0a57fc24c0d";
+  "sha256:9cb36413f37e0099a70bec6eefaa2e3570b5de001bf70cb7640c7637a116a4df";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -44,6 +44,7 @@ export const JSON_SCHEMA_IDS = {
   generationIntentView: "urn:dailyenergy:schema:generation-intent-view:1.0.0",
   relationshipView: "urn:dailyenergy:schema:relationship-view:1.0.0",
   todayView: "urn:dailyenergy:schema:today-view:1.0.0",
+  historyDayView: "urn:dailyenergy:schema:history-day-view:1.0.0",
 } as const;
 
 export const jsonSchemas = {
@@ -4512,6 +4513,579 @@ export const jsonSchemas = {
       },
     },
     required: ["content", "interaction", "relationship"],
+    type: "object",
+  },
+  historyDayView: {
+    $id: "urn:dailyenergy:schema:history-day-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      checkin: {
+        additionalProperties: false,
+        properties: {
+          checkin_ref: {
+            format: "uuid",
+            pattern:
+              "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+            type: "string",
+          },
+          energy: {
+            enum: ["EMPTY", "LOW", "STEADY", "HIGH", "FULL", "UNSURE"],
+            type: "string",
+          },
+          mood: {
+            enum: ["VERY_LOW", "LOW", "STEADY", "GOOD", "LIGHT", "UNSURE"],
+            type: "string",
+          },
+          product_date: {
+            pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            type: "string",
+          },
+          revision: {
+            exclusiveMinimum: 0,
+            maximum: 9007199254740991,
+            type: "integer",
+          },
+          sleep: {
+            enum: ["POOR", "LOW", "OKAY", "GOOD", "UNSURE"],
+            type: "string",
+          },
+          updated_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          write_window: {
+            enum: ["OPEN", "CONTINUATION_ONLY", "CLOSED"],
+            type: "string",
+          },
+        },
+        required: [
+          "checkin_ref",
+          "product_date",
+          "revision",
+          "energy",
+          "mood",
+          "sleep",
+          "write_window",
+          "updated_at",
+        ],
+        type: "object",
+      },
+      content: {
+        additionalProperties: false,
+        properties: {
+          closing: {
+            type: "string",
+          },
+          content_label: {
+            const: "娱乐与行动参考",
+            type: "string",
+          },
+          contract: {
+            const: "daily-content-view",
+            type: "string",
+          },
+          core_tip: {
+            type: "string",
+          },
+          dimensions: {
+            items: {
+              additionalProperties: false,
+              properties: {
+                band: {
+                  enum: ["LOW", "STEADY", "HIGH"],
+                  type: "string",
+                },
+                band_label: {
+                  type: "string",
+                },
+                explanation: {
+                  type: "string",
+                },
+                id: {
+                  enum: [
+                    "pace",
+                    "action",
+                    "connection",
+                    "resources",
+                    "recovery",
+                  ],
+                  type: "string",
+                },
+                is_focus: {
+                  type: "boolean",
+                },
+                label: {
+                  type: "string",
+                },
+              },
+              required: [
+                "id",
+                "label",
+                "band",
+                "band_label",
+                "explanation",
+                "is_focus",
+              ],
+              type: "object",
+            },
+            maxItems: 5,
+            minItems: 5,
+            type: "array",
+          },
+          explanation_paragraphs: {
+            items: {
+              type: "string",
+            },
+            maxItems: 2,
+            minItems: 1,
+            type: "array",
+          },
+          focus_dimension_id: {
+            enum: ["pace", "action", "connection", "resources", "recovery"],
+            type: "string",
+          },
+          generated_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          greeting: {
+            type: "string",
+          },
+          optional_task: {
+            additionalProperties: false,
+            properties: {
+              instruction: {
+                type: "string",
+              },
+              task_id: {
+                pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                type: "string",
+              },
+            },
+            required: ["task_id", "instruction"],
+            type: "object",
+          },
+          overall: {
+            additionalProperties: false,
+            properties: {
+              band: {
+                enum: ["LOW", "STEADY", "HIGH"],
+                type: "string",
+              },
+              band_label: {
+                type: "string",
+              },
+              summary: {
+                type: "string",
+              },
+            },
+            required: ["band", "band_label", "summary"],
+            type: "object",
+          },
+          personalization_notice: {
+            enum: ["NONE", "PERSONALIZATION_REDUCED"],
+            type: "string",
+          },
+          primary_action: {
+            additionalProperties: false,
+            properties: {
+              action_id: {
+                pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                type: "string",
+              },
+              constraint_label: {
+                type: "string",
+              },
+              instruction: {
+                type: "string",
+              },
+              rationale: {
+                type: "string",
+              },
+            },
+            required: ["action_id", "instruction"],
+            type: "object",
+          },
+          product_date: {
+            pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            type: "string",
+          },
+          result_id: {
+            pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            type: "string",
+          },
+          result_version: {
+            pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            type: "string",
+          },
+          rituals: {
+            items: {
+              additionalProperties: false,
+              properties: {
+                display_value: {
+                  type: "string",
+                },
+                kind: {
+                  enum: ["COLOR", "NUMBER"],
+                  type: "string",
+                },
+                note: {
+                  type: "string",
+                },
+              },
+              required: ["kind", "display_value", "note"],
+              type: "object",
+            },
+            maxItems: 2,
+            type: "array",
+          },
+          schema_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          state_response: {
+            type: "string",
+          },
+        },
+        required: [
+          "contract",
+          "schema_version",
+          "result_id",
+          "product_date",
+          "result_version",
+          "generated_at",
+          "content_label",
+          "greeting",
+          "state_response",
+          "overall",
+          "focus_dimension_id",
+          "dimensions",
+          "core_tip",
+          "explanation_paragraphs",
+          "primary_action",
+          "optional_task",
+          "rituals",
+          "closing",
+          "personalization_notice",
+        ],
+        type: "object",
+      },
+      evening: {
+        additionalProperties: false,
+        properties: {
+          availability: {
+            enum: [
+              "UNAVAILABLE",
+              "EDITABLE_EMPTY",
+              "EDITABLE_SUBMITTED",
+              "READ_ONLY_SUBMITTED",
+              "READ_ONLY_EMPTY",
+            ],
+            type: "string",
+          },
+          completion_message: {
+            type: "string",
+          },
+          contract: {
+            const: "evening-feedback-view",
+            type: "string",
+          },
+          feedback: {
+            additionalProperties: false,
+            properties: {
+              first_submitted_at: {
+                pattern:
+                  "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                type: "string",
+              },
+              note: {
+                type: "string",
+              },
+              overall_feeling: {
+                enum: [
+                  "VERY_HEAVY",
+                  "SOMEWHAT_HEAVY",
+                  "STEADY",
+                  "PRETTY_GOOD",
+                  "LIGHT",
+                  "UNSURE",
+                ],
+                type: "string",
+              },
+              revision: {
+                exclusiveMinimum: 0,
+                maximum: 9007199254740991,
+                type: "integer",
+              },
+              updated_at: {
+                pattern:
+                  "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                type: "string",
+              },
+            },
+            required: [
+              "revision",
+              "overall_feeling",
+              "first_submitted_at",
+              "updated_at",
+            ],
+            type: "object",
+          },
+          helpfulness: {
+            additionalProperties: false,
+            properties: {
+              rating: {
+                enum: [
+                  "UNRATED",
+                  "HELPFUL",
+                  "NEUTRAL",
+                  "NOT_HELPFUL",
+                  "NOT_USED",
+                ],
+                type: "string",
+              },
+              revision: {
+                maximum: 9007199254740991,
+                minimum: 0,
+                type: "integer",
+              },
+            },
+            required: ["revision", "rating"],
+            type: "object",
+          },
+          note_max_characters: {
+            const: 80,
+            type: "number",
+          },
+          options: {
+            additionalProperties: false,
+            properties: {
+              helpfulness: {
+                prefixItems: [
+                  {
+                    const: "HELPFUL",
+                    type: "string",
+                  },
+                  {
+                    const: "NEUTRAL",
+                    type: "string",
+                  },
+                  {
+                    const: "NOT_HELPFUL",
+                    type: "string",
+                  },
+                  {
+                    const: "NOT_USED",
+                    type: "string",
+                  },
+                ],
+                type: "array",
+              },
+              overall_feeling: {
+                prefixItems: [
+                  {
+                    const: "VERY_HEAVY",
+                    type: "string",
+                  },
+                  {
+                    const: "SOMEWHAT_HEAVY",
+                    type: "string",
+                  },
+                  {
+                    const: "STEADY",
+                    type: "string",
+                  },
+                  {
+                    const: "PRETTY_GOOD",
+                    type: "string",
+                  },
+                  {
+                    const: "LIGHT",
+                    type: "string",
+                  },
+                  {
+                    const: "UNSURE",
+                    type: "string",
+                  },
+                ],
+                type: "array",
+              },
+              task_status: {
+                prefixItems: [
+                  {
+                    const: "UNMARKED",
+                    type: "string",
+                  },
+                  {
+                    const: "INTERESTED",
+                    type: "string",
+                  },
+                  {
+                    const: "COMPLETED",
+                    type: "string",
+                  },
+                  {
+                    const: "SKIPPED",
+                    type: "string",
+                  },
+                ],
+                type: "array",
+              },
+            },
+            required: ["overall_feeling", "helpfulness", "task_status"],
+            type: "object",
+          },
+          primary_action: {
+            enum: ["SAVE", "SAVE_CHANGES", "READ_ONLY"],
+            type: "string",
+          },
+          product_date: {
+            pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            type: "string",
+          },
+          schema_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          task: {
+            additionalProperties: false,
+            properties: {
+              instruction: {
+                type: "string",
+              },
+              revision: {
+                exclusiveMinimum: 0,
+                maximum: 9007199254740991,
+                type: "integer",
+              },
+              status: {
+                enum: ["UNMARKED", "INTERESTED", "COMPLETED", "SKIPPED"],
+                type: "string",
+              },
+              task_id: {
+                pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                type: "string",
+              },
+            },
+            required: ["task_id", "instruction", "revision", "status"],
+            type: "object",
+          },
+          unavailable_message: {
+            type: "string",
+          },
+          write_window: {
+            enum: ["OPEN", "CONTINUATION_ONLY", "CLOSED"],
+            type: "string",
+          },
+        },
+        required: [
+          "contract",
+          "schema_version",
+          "product_date",
+          "availability",
+          "write_window",
+          "helpfulness",
+          "options",
+          "note_max_characters",
+          "primary_action",
+          "completion_message",
+        ],
+        type: "object",
+      },
+      interaction: {
+        additionalProperties: false,
+        properties: {
+          contract: {
+            const: "daily-interaction-state",
+            type: "string",
+          },
+          helpfulness: {
+            additionalProperties: false,
+            properties: {
+              rating: {
+                enum: [
+                  "UNRATED",
+                  "HELPFUL",
+                  "NEUTRAL",
+                  "NOT_HELPFUL",
+                  "NOT_USED",
+                ],
+                type: "string",
+              },
+              revision: {
+                maximum: 9007199254740991,
+                minimum: 0,
+                type: "integer",
+              },
+            },
+            required: ["revision", "rating"],
+            type: "object",
+          },
+          is_lit: {
+            type: "boolean",
+          },
+          product_date: {
+            pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            type: "string",
+          },
+          result_id: {
+            pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            type: "string",
+          },
+          schema_version: {
+            pattern:
+              "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+            type: "string",
+          },
+          task: {
+            additionalProperties: false,
+            properties: {
+              revision: {
+                exclusiveMinimum: 0,
+                maximum: 9007199254740991,
+                type: "integer",
+              },
+              status: {
+                enum: ["UNMARKED", "INTERESTED", "COMPLETED", "SKIPPED"],
+                type: "string",
+              },
+              task_id: {
+                pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                type: "string",
+              },
+            },
+            required: ["task_id", "revision", "status"],
+            type: "object",
+          },
+          updated_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+        },
+        required: [
+          "contract",
+          "schema_version",
+          "result_id",
+          "product_date",
+          "is_lit",
+          "task",
+          "helpfulness",
+          "updated_at",
+        ],
+        type: "object",
+      },
+      product_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+    },
+    required: ["product_date"],
     type: "object",
   },
 } as const;

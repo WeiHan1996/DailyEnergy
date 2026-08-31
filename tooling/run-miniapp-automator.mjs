@@ -44,6 +44,24 @@ const smokeCases = Object.freeze([
     url: "/pages/checkin-handoff/index",
   },
   {
+    expectedPath: "pages/generation/index",
+    expectedScreenId: "DLY-002",
+    label: "DLY-002",
+    url: "/pages/generation/index?checkinRevision=1",
+  },
+  {
+    expectedPath: "pages/today/index",
+    expectedScreenId: "DLY-003",
+    label: "DLY-003",
+    url: "/pages/today/index",
+  },
+  {
+    expectedPath: "pages/history-day/index",
+    expectedScreenId: "REC-002",
+    label: "REC-002",
+    url: "/pages/history-day/index?date=2026-08-23",
+  },
+  {
     expectedPath: "pages/safety/index",
     expectedScreenId: "SAFE-001",
     label: "SAFE-001",
@@ -142,7 +160,7 @@ async function main() {
   }
 
   console.log(
-    `Miniapp DevTools smoke passed ${smokeCases.length} C-003 page and route cases.`,
+    `Miniapp DevTools smoke passed ${smokeCases.length} registered page and route cases.`,
   );
 }
 

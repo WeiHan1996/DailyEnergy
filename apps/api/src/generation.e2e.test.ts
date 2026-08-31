@@ -4,6 +4,7 @@ import type {
   DailyGenerationStore,
 } from "@daily-energy/server-adapters/api";
 import type { TodayView } from "@daily-energy/shared-schemas";
+import type { HistoryDayView } from "@daily-energy/shared-schemas";
 import request from "supertest";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -150,6 +151,29 @@ class HttpGenerationStore implements DailyGenerationStore {
   intent?: ReturnType<HttpGenerationStore["intentView"]>;
   published?: TodayView;
   readonly receipts = new Map<string, Buffer>();
+
+  public async getByDate(
+    input: Parameters<DailyGenerationStore["getByDate"]>[0],
+  ) {
+    return input.productDate === "2026-08-23"
+      ? ({
+          status: "FOUND",
+          value: {
+            product_date: "2026-08-23",
+            checkin: {
+              checkin_ref: "55555555-5555-4555-8555-555555555555",
+              energy: "STEADY",
+              mood: "GOOD",
+              product_date: "2026-08-23",
+              revision: 1,
+              sleep: "OKAY",
+              updated_at: "2026-08-23T02:00:00.000Z",
+              write_window: "CLOSED",
+            },
+          } satisfies HistoryDayView,
+        } as const)
+      : ({ status: "NOT_FOUND" } as const);
+  }
 
   public async start(input: Parameters<DailyGenerationStore["start"]>[0]) {
     if (this.guard !== undefined) {
@@ -394,5 +418,28 @@ describe("C-008 HTTP generation flow", () => {
       const response = await operation.expect(409);
       expect(response.body.error.code).toBe("SAFETY_BLOCKED");
     }
+  });
+
+  it("returns a closed historical projection and rejects current/future dates", async () => {
+    const application = await testApplication(new HttpGenerationStore());
+    const history = await authenticated(
+      request(application.getHttpServer()).get("/v1/daily/by-date/2026-08-23"),
+    ).expect(200);
+    expect(history.body.data).toMatchObject({
+      checkin: { write_window: "CLOSED" },
+      product_date: "2026-08-23",
+    });
+    expect(JSON.stringify(history.body.data)).not.toMatch(
+      /account|seed|fingerprint|epoch/iu,
+    );
+    await authenticated(
+      request(application.getHttpServer()).get("/v1/daily/by-date/2026-08-24"),
+    ).expect(404);
+    await authenticated(
+      request(application.getHttpServer()).get("/v1/daily/by-date/not-a-date"),
+    ).expect(400);
+    await authenticated(
+      request(application.getHttpServer()).get("/v1/daily/by-date/2026-02-30"),
+    ).expect(400);
   });
 });

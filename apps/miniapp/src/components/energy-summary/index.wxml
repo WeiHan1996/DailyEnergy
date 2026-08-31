@@ -1,7 +1,7 @@
 <view
   class="de-energy-summary {{loading ? 'de-energy-summary--loading' : ''}}"
   aria-busy="{{loading}}"
-  aria-label="{{label}}，{{score}}，{{level}}。{{context}}"
+  aria-label="{{label}}，{{showScore ? score + '，' : ''}}{{level}}。{{context}}"
   aria-role="article"
 >
   <view class="de-energy-summary__meta">
@@ -11,7 +11,7 @@
   <view class="de-energy-summary__label">{{label}}</view>
   <view wx:if="{{loading}}" class="de-energy-summary__skeleton" aria-hidden="true"></view>
   <view wx:else class="de-energy-summary__value-row">
-    <text class="de-energy-summary__score">{{score}}</text>
+    <text wx:if="{{showScore}}" class="de-energy-summary__score">{{score}}</text>
     <view class="de-energy-summary__meaning">
       <text class="de-energy-summary__level">{{level}}</text>
       <text wx:if="{{detail}}" class="de-energy-summary__detail">{{detail}}</text>

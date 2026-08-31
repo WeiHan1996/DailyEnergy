@@ -79,10 +79,10 @@ describe("public and JSON Schema exports", () => {
     }
   });
 
-  it("exports 27 stable, unique JSON Schema IDs", () => {
-    expect(Object.keys(jsonSchemas)).toHaveLength(27);
-    expect(Object.keys(JSON_SCHEMA_IDS)).toHaveLength(27);
-    expect(new Set(Object.values(JSON_SCHEMA_IDS)).size).toBe(27);
+  it("exports 28 stable, unique JSON Schema IDs", () => {
+    expect(Object.keys(jsonSchemas)).toHaveLength(28);
+    expect(Object.keys(JSON_SCHEMA_IDS)).toHaveLength(28);
+    expect(new Set(Object.values(JSON_SCHEMA_IDS)).size).toBe(28);
     for (const name of Object.keys(jsonSchemas) as Array<
       keyof typeof jsonSchemas
     >) {

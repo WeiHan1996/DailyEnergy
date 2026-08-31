@@ -14,7 +14,7 @@ import {
 import type { components, operations } from "./generated/miniapp.js";
 
 export function mapDailyContentView(
-  value: components["schemas"]["ClientDailyContentView"],
+  value: components["schemas"]["TodayView"]["content"],
 ): ClientDailyContentView {
   return ClientDailyContentViewSchema.parse(value);
 }

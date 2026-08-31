@@ -1,0 +1,119 @@
+{
+  "evidence_version": "c-009-manual-evidence-v1",
+  "task_id": "C-009",
+  "execution_status": "MANUAL_EVIDENCE_PENDING",
+  "pass_claim": "PROHIBITED",
+  "synthetic_accounts_only": true,
+  "design_source": {
+    "status": "AVAILABLE_READ_ONLY",
+    "figma_file": "T5HS32Ciz6LZh81KbqhFGo",
+    "figma_version": "D-004 Accepted 2026-08-19 via PR #145",
+    "frame_ids": [
+      "220:16",
+      "220:17",
+      "220:18",
+      "220:19",
+      "220:20",
+      "220:21",
+      "220:22",
+      "220:23",
+      "220:24",
+      "220:25",
+      "220:26",
+      "220:27",
+      "220:28",
+      "220:29",
+      "220:30",
+      "220:31"
+    ],
+    "visual_qa_baselines": [
+      "303:279",
+      "303:280",
+      "303:281",
+      "303:282",
+      "303:287",
+      "303:288",
+      "303:289",
+      "303:290"
+    ],
+    "source_inspection": "BROWSER_READ_ONLY_VERIFIED_2026-08-24"
+  },
+  "implementation_states": {
+    "dly_002_loading": "MANUAL_EVIDENCE_PENDING",
+    "dly_002_fallback": "MANUAL_EVIDENCE_PENDING",
+    "dly_002_recoverable_error": "MANUAL_EVIDENCE_PENDING",
+    "dly_002_offline": "MANUAL_EVIDENCE_PENDING",
+    "dly_003_normal": "MANUAL_EVIDENCE_PENDING",
+    "dly_003_loading": "MANUAL_EVIDENCE_PENDING",
+    "dly_003_fallback": "MANUAL_EVIDENCE_PENDING",
+    "dly_003_recoverable_error": "MANUAL_EVIDENCE_PENDING",
+    "dly_003_offline": "MANUAL_EVIDENCE_PENDING",
+    "dly_003_completed": "MANUAL_EVIDENCE_PENDING",
+    "dly_003_safety": "MANUAL_EVIDENCE_PENDING",
+    "rec_002_normal": "MANUAL_EVIDENCE_PENDING",
+    "rec_002_loading": "MANUAL_EVIDENCE_PENDING",
+    "rec_002_empty": "MANUAL_EVIDENCE_PENDING",
+    "rec_002_recoverable_error": "MANUAL_EVIDENCE_PENDING",
+    "rec_002_offline": "MANUAL_EVIDENCE_PENDING",
+    "large_text_125": "MANUAL_EVIDENCE_PENDING",
+    "reduced_motion": "MANUAL_EVIDENCE_PENDING"
+  },
+  "devtools": {
+    "status": "INFRA_BLOCKED",
+    "reason_code": "MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT",
+    "cli_path_verified": true,
+    "runner_version": null,
+    "base_library_version": "3.7.12",
+    "screen_ids": ["DLY-002", "DLY-003", "REC-002"]
+  },
+  "design_review": {
+    "token_and_component_reuse": "AUTOMATED_GATE_AVAILABLE",
+    "component_mapping": [
+      "DE / PageShell",
+      "DE / AppHeader",
+      "DE / EnergySummary",
+      "DE / FriendMessage",
+      "DE / ActionCard",
+      "DE / SectionCard",
+      "DE / Button / Primary and Secondary",
+      "DE / InlineNotice",
+      "DE / LoadingSkeleton",
+      "DE / OfflineState",
+      "DE / RecoverableError"
+    ],
+    "recorded_differences": [
+      "DLY-003 omits the Figma numeric score because the Accepted C-008 ClientDailyContentView exposes only band and band_label, not raw/internal scores",
+      "C-010 task writes and C-011 day-lighting controls are not activated in C-009; the read-only action and optional task remain in the Accepted content order",
+      "REC-002 delete confirmation and command wiring remain owned by C-014; C-009 implements history read and authoritative MISSING only",
+      "implementation screenshots are unavailable while the DevTools runner is INFRA_BLOCKED"
+    ],
+    "visual_and_interaction_review": "C009_UNIFIED_REVIEW_PENDING",
+    "user_acceptance": "C009_UNIFIED_REVIEW_PENDING"
+  },
+  "security_review": {
+    "status": "OWNER_REVIEW_PENDING",
+    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "reviewed_boundaries": [
+      "start/status/today/history bridge accepts only generated client-safe fields and rejects unsupported schema major",
+      "unknown start outcome persists one command and resumes one intent",
+      "offline cache is session-scoped, TTL-bounded and strict-projection validated",
+      "Safety and account/deletion guards clear ordinary cache before routing away",
+      "history MISSING removes cached deleted content and never regenerates from a new version",
+      "Mini Program bundle has no server/provider/Prompt/secret dependency"
+    ],
+    "residual_evidence": [
+      "owner D-004 visual and interaction review during the unified C-004 through C-015 audit",
+      "WeChat DevTools route/screenshot evidence after the launch-timeout infrastructure issue is resolved",
+      "iOS/Android large-text, reduced-motion, safe-area and screen-reader evidence",
+      "Production WeChat publication and deployment authorization remain outside C-009"
+    ],
+    "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
+  },
+  "real_device": {
+    "ios": "MANUAL_EVIDENCE_PENDING",
+    "android": "MANUAL_EVIDENCE_PENDING",
+    "matrix": []
+  },
+  "reviewer": null,
+  "reviewed_at_utc": null
+}

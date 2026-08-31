@@ -338,6 +338,12 @@ test(
         JSON.stringify(today.value),
         /score|provenance|user_ref|seed|fingerprint/iu,
       );
+      const history = await generation.getByDate({ accountId, productDate });
+      assert.equal(history.status, "FOUND");
+      assert.equal(
+        history.status === "FOUND" && history.value.checkin?.write_window,
+        "CLOSED",
+      );
       assert.equal(
         (await startGeneration(generation, accountId, 1, "c008:start:a"))
           .status,
@@ -453,6 +459,15 @@ test(
       assert.equal(
         await generation
           .getToday({
+            accountId: deletionAccountId,
+            productDate,
+          })
+          .then(({ status }) => status),
+        "STATE_PRECONDITION_FAILED",
+      );
+      assert.equal(
+        await generation
+          .getByDate({
             accountId: deletionAccountId,
             productDate,
           })

@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 283, "NA_WITH_REASON": 0, "PLANNED": 508 },
+  "counts": { "COVERED": 289, "NA_WITH_REASON": 0, "PLANNED": 503 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -716,11 +716,44 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a past owner-scoped day returns a closed HistoryDayView",
+            "current/future and malformed dates do not expose historical content",
+            "history output contains no account, seed, fingerprint or epoch fields"
+          ],
+          "file": "apps/api/src/generation.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c009-evidence-manifest.json",
+          "selector": "C-008 HTTP generation flow / historical projection",
+          "test_id": "T-C009-API-001"
+        },
+        {
+          "assertions": [
+            "HistoryDayView is closed and binds product date and result identity across checkin/content/interaction",
+            "unknown seed/internal fields and mismatched historical dates are rejected"
+          ],
+          "file": "packages/shared-schemas/test/daily-content.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c009-evidence-manifest.json",
+          "selector": "daily content contracts",
+          "test_id": "T-C009-HISTORY-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "bounded Retry-After survives the transport adapter without exposing server internals",
+            "start/status/today/history requests carry only the session and required idempotency fields",
+            "strict runtime projectors reject unknown/internal fields and unsupported schema major"
+          ],
+          "file": "apps/miniapp/src/services/miniapp-api-c009.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c009-evidence-manifest.json",
+          "selector": "C-009 miniapp API bridge",
+          "test_id": "T-C009-MINIAPP-API-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -768,11 +801,21 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "bounded Retry-After survives the transport adapter without exposing server internals",
+            "start/status/today/history requests carry only the session and required idempotency fields",
+            "strict runtime projectors reject unknown/internal fields and unsupported schema major"
+          ],
+          "file": "apps/miniapp/src/services/miniapp-api-c009.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c009-evidence-manifest.json",
+          "selector": "C-009 miniapp API bridge",
+          "test_id": "T-C009-MINIAPP-API-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -833,11 +876,34 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "one command/intent identity is retained for unknown-outcome recovery",
+            "only validated session-scoped Today/History views survive the 24-hour cache",
+            "scope mismatch, expiry and unknown fields remove the cache instead of rendering it"
+          ],
+          "file": "apps/miniapp/src/features/daily/daily-cache.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c009-evidence-manifest.json",
+          "selector": "C-009 daily view cache",
+          "test_id": "T-C009-CACHE-001"
+        },
+        {
+          "assertions": [
+            "authoritative historical MISSING removes a previously cached deleted day",
+            "network failure after start reuses the same command and then the same intent",
+            "offline reads use only validated cache while Safety/guard clears ordinary cache",
+            "polling converges to one authoritative Today without a second start"
+          ],
+          "file": "apps/miniapp/src/features/daily/daily-flow.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/c009-evidence-manifest.json",
+          "selector": "C-009 daily coordinator",
+          "test_id": "T-C009-FLOW-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -7170,11 +7236,21 @@
     },
     {
       "authority_paths": ["docs/decisions/ADR-0006-monorepo-and-stack.md"],
-      "planned": {
-        "owner": "E-010 and the owning Phase 1 implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all page/component files are present without a TabBar",
+            "DLY-002, DLY-003 and REC-002 are registered in the ordered page boundary",
+            "the compiled bundle contains no Node, server, provider, Prompt or secret dependency"
+          ],
+          "file": "tooling/lib/miniapp-bundle-check.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/c009-evidence-manifest.json",
+          "selector": "Miniapp bundle Gate",
+          "test_id": "T-C009-BUNDLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "INTEGRATION", "STATIC"] }
       ],
@@ -9082,11 +9158,20 @@
     },
     {
       "authority_paths": ["docs/technical/repository-structure.md"],
-      "planned": {
-        "owner": "E-010 or E-011 according to the missing runner or Gate",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "clean regeneration produces no generated client diff",
+            "HistoryDayView JSON Schema, OpenAPI and generated miniapp client share one source fingerprint"
+          ],
+          "file": "tooling/generate-contracts.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/c009-evidence-manifest.json",
+          "selector": "contract codegen drift Gate",
+          "test_id": "T-C009-CODEGEN-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "STATIC"] }
       ],
@@ -14152,7 +14237,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14181,7 +14266,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14210,7 +14295,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14239,7 +14324,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14268,7 +14353,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14297,7 +14382,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14326,7 +14411,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14355,7 +14440,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14384,7 +14469,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14413,7 +14498,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14442,7 +14527,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14471,7 +14556,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14500,7 +14585,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14529,7 +14614,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14558,7 +14643,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14587,7 +14672,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14616,13 +14701,42 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:generation-start-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:history-day-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:history-day-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:history-day-view:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {
@@ -14645,7 +14759,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14674,7 +14788,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14703,7 +14817,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14732,7 +14846,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14761,7 +14875,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14790,7 +14904,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14819,7 +14933,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14848,7 +14962,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14877,7 +14991,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14906,7 +15020,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "selector": "exports 28 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
