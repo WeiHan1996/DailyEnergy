@@ -1,0 +1,10 @@
+{
+  "usingComponents": {
+    "de-action-button": "../../components/action-button/index",
+    "de-app-header": "../../components/app-header/index",
+    "de-inline-notice": "../../components/inline-notice/index",
+    "de-page-shell": "../../components/page-shell/index",
+    "de-section-card": "../../components/section-card/index"
+  },
+  "navigationStyle": "custom"
+}

@@ -19,6 +19,7 @@ import {
   startTelemetryRuntime,
   type TelemetryTransportConfig,
 } from "../telemetry/runtime.js";
+export { createDataTaskHandlers } from "../data-rights/data-task-handler.js";
 
 export type WorkerRestrictedDatabaseCapability =
   DatabaseCapability<"worker-restricted">;

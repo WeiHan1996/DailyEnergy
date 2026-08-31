@@ -104,6 +104,24 @@ export {
   type WeeklyStore,
 } from "../weekly/postgres-weekly-store.js";
 export {
+  DataRightsStoreError,
+  PostgresDataRightsStore,
+  UNAVAILABLE_DATA_RIGHTS_STORE,
+  type DataRightsStore,
+  type DataRightsStoreErrorCode,
+  type PostgresDataRightsStoreConfig,
+  type StoredAccountDeletionAccepted,
+} from "../data-rights/postgres-data-rights-store.js";
+export type {
+  ExportArtifactReadResult,
+  ProtectedExportText,
+  StoredDataExportSource,
+  StoredExportDay,
+  StoredExportEvening,
+  StoredExportMatter,
+  StoredExportProfile,
+} from "../data-rights/data-export-source.js";
+export {
   RedisDailyContentCache,
   UNAVAILABLE_DAILY_CONTENT_CACHE,
   type DailyContentCache,

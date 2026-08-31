@@ -901,6 +901,23 @@ export type EnumDataTaskStateWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumDataTaskStateFilter<$PrismaModel>
 }
 
+export type EnumExportArtifactStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.ExportArtifactState | Prisma.EnumExportArtifactStateFieldRefInput<$PrismaModel>
+  in?: $Enums.ExportArtifactState[] | Prisma.ListEnumExportArtifactStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ExportArtifactState[] | Prisma.ListEnumExportArtifactStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumExportArtifactStateFilter<$PrismaModel> | $Enums.ExportArtifactState
+}
+
+export type EnumExportArtifactStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ExportArtifactState | Prisma.EnumExportArtifactStateFieldRefInput<$PrismaModel>
+  in?: $Enums.ExportArtifactState[] | Prisma.ListEnumExportArtifactStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ExportArtifactState[] | Prisma.ListEnumExportArtifactStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumExportArtifactStateWithAggregatesFilter<$PrismaModel> | $Enums.ExportArtifactState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumExportArtifactStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumExportArtifactStateFilter<$PrismaModel>
+}
+
 export type EnumDeletionStepStateFilter<$PrismaModel = never> = {
   equals?: $Enums.DeletionStepState | Prisma.EnumDeletionStepStateFieldRefInput<$PrismaModel>
   in?: $Enums.DeletionStepState[] | Prisma.ListEnumDeletionStepStateFieldRefInput<$PrismaModel>
@@ -1894,6 +1911,23 @@ export type NestedEnumDataTaskStateWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumDataTaskStateFilter<$PrismaModel>
   _max?: Prisma.NestedEnumDataTaskStateFilter<$PrismaModel>
+}
+
+export type NestedEnumExportArtifactStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.ExportArtifactState | Prisma.EnumExportArtifactStateFieldRefInput<$PrismaModel>
+  in?: $Enums.ExportArtifactState[] | Prisma.ListEnumExportArtifactStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ExportArtifactState[] | Prisma.ListEnumExportArtifactStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumExportArtifactStateFilter<$PrismaModel> | $Enums.ExportArtifactState
+}
+
+export type NestedEnumExportArtifactStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ExportArtifactState | Prisma.EnumExportArtifactStateFieldRefInput<$PrismaModel>
+  in?: $Enums.ExportArtifactState[] | Prisma.ListEnumExportArtifactStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ExportArtifactState[] | Prisma.ListEnumExportArtifactStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumExportArtifactStateWithAggregatesFilter<$PrismaModel> | $Enums.ExportArtifactState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumExportArtifactStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumExportArtifactStateFilter<$PrismaModel>
 }
 
 export type NestedEnumDeletionStepStateFilter<$PrismaModel = never> = {

@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:69c0954588bcabe1fc243301c31112094638dc113d9ee463dcab03d6250d7505
+// source-fingerprint: sha256:19ea05b7a98a1570e6e1af833cca5d79fa805cbc44b4e7b54fdedc70bd0b8e88
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:69c0954588bcabe1fc243301c31112094638dc113d9ee463dcab03d6250d7505";
+  "sha256:19ea05b7a98a1570e6e1af833cca5d79fa805cbc44b4e7b54fdedc70bd0b8e88";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -47,6 +47,37 @@ export const JSON_SCHEMA_IDS = {
   relationshipView: "urn:dailyenergy:schema:relationship-view:1.0.0",
   todayView: "urn:dailyenergy:schema:today-view:1.0.0",
   historyDayView: "urn:dailyenergy:schema:history-day-view:1.0.0",
+  reauthVerifyRequest: "urn:dailyenergy:schema:reauth-verify-request:1.0.0",
+  exportRequest: "urn:dailyenergy:schema:export-request:1.0.0",
+  deleteDayRequest: "urn:dailyenergy:schema:delete-day-request:1.0.0",
+  deleteMatterRequest: "urn:dailyenergy:schema:delete-matter-request:1.0.0",
+  dayExpectedRevision: "urn:dailyenergy:schema:day-expected-revision:1.0.0",
+  relationshipDeletionTarget:
+    "urn:dailyenergy:schema:relationship-deletion-target:1.0.0",
+  deleteRelationshipPrepareRequest:
+    "urn:dailyenergy:schema:delete-relationship-prepare-request:1.0.0",
+  deleteRelationshipConfirmRequest:
+    "urn:dailyenergy:schema:delete-relationship-confirm-request:1.0.0",
+  deleteAccountPrepareRequest:
+    "urn:dailyenergy:schema:delete-account-prepare-request:1.0.0",
+  deleteAccountConfirmRequest:
+    "urn:dailyenergy:schema:delete-account-confirm-request:1.0.0",
+  dataTaskCancelRequest:
+    "urn:dailyenergy:schema:data-task-cancel-request:1.0.0",
+  dataTaskView: "urn:dailyenergy:schema:data-task-view:1.0.0",
+  dataTaskListView: "urn:dailyenergy:schema:data-task-list-view:1.0.0",
+  dataRightsSummaryView:
+    "urn:dailyenergy:schema:data-rights-summary-view:1.0.0",
+  exportArtifactView: "urn:dailyenergy:schema:export-artifact-view:1.0.0",
+  deletionStatusGrantView:
+    "urn:dailyenergy:schema:deletion-status-grant-view:1.0.0",
+  accountDeletionAcceptedView:
+    "urn:dailyenergy:schema:account-deletion-accepted-view:1.0.0",
+  dataExportDocument: "urn:dailyenergy:schema:data-export-document:1.0.0",
+  deletionConfirmationView:
+    "urn:dailyenergy:schema:deletion-confirmation-view:1.0.0",
+  identityVerificationView:
+    "urn:dailyenergy:schema:identity-verification-view:1.0.0",
 } as const;
 
 export const jsonSchemas = {
@@ -5145,6 +5176,2135 @@ export const jsonSchemas = {
       },
     },
     required: ["product_date"],
+    type: "object",
+  },
+  reauthVerifyRequest: {
+    $id: "urn:dailyenergy:schema:reauth-verify-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      confirmation_challenge_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+      wechat_code: {
+        maxLength: 256,
+        minLength: 1,
+        type: "string",
+      },
+    },
+    required: ["command_ref", "confirmation_challenge_ref", "wechat_code"],
+    type: "object",
+  },
+  exportRequest: {
+    $id: "urn:dailyenergy:schema:export-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      confirmation_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      export_format: {
+        const: "JSON",
+        type: "string",
+      },
+    },
+    required: ["command_ref", "export_format", "confirmation_version"],
+    type: "object",
+  },
+  deleteDayRequest: {
+    $id: "urn:dailyenergy:schema:delete-day-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      confirmation_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      confirmed: {
+        const: true,
+        type: "boolean",
+      },
+      expected_revision: {
+        maximum: 9007199254740991,
+        minimum: 0,
+        type: "integer",
+      },
+      scope: {
+        const: "DAY",
+        type: "string",
+      },
+      target: {
+        additionalProperties: false,
+        properties: {
+          product_date: {
+            pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            type: "string",
+          },
+        },
+        required: ["product_date"],
+        type: "object",
+      },
+    },
+    required: [
+      "command_ref",
+      "scope",
+      "target",
+      "confirmation_version",
+      "confirmed",
+      "expected_revision",
+    ],
+    type: "object",
+  },
+  deleteMatterRequest: {
+    $id: "urn:dailyenergy:schema:delete-matter-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      confirmation_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      confirmed: {
+        const: true,
+        type: "boolean",
+      },
+      expected_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      scope: {
+        const: "MATTER",
+        type: "string",
+      },
+      target: {
+        additionalProperties: false,
+        properties: {
+          matter_ref: {
+            pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            type: "string",
+          },
+        },
+        required: ["matter_ref"],
+        type: "object",
+      },
+    },
+    required: [
+      "command_ref",
+      "scope",
+      "target",
+      "confirmation_version",
+      "confirmed",
+      "expected_revision",
+    ],
+    type: "object",
+  },
+  dayExpectedRevision: {
+    $id: "urn:dailyenergy:schema:day-expected-revision:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      expected_revision: {
+        maximum: 9007199254740991,
+        minimum: 0,
+        type: "integer",
+      },
+      product_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+    },
+    required: ["product_date", "expected_revision"],
+    type: "object",
+  },
+  relationshipDeletionTarget: {
+    $id: "urn:dailyenergy:schema:relationship-deletion-target:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      included_day_product_dates: {
+        items: {
+          pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+          type: "string",
+        },
+        maxItems: 45,
+        type: "array",
+      },
+      relationship_scope: {
+        const: "CURRENT_CYCLE_AND_HISTORY",
+        type: "string",
+      },
+    },
+    required: ["relationship_scope", "included_day_product_dates"],
+    type: "object",
+  },
+  deleteRelationshipPrepareRequest: {
+    $id: "urn:dailyenergy:schema:delete-relationship-prepare-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      confirmation_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      expected_relationship_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      included_day_expected_revisions: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            expected_revision: {
+              maximum: 9007199254740991,
+              minimum: 0,
+              type: "integer",
+            },
+            product_date: {
+              pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+              type: "string",
+            },
+          },
+          required: ["product_date", "expected_revision"],
+          type: "object",
+        },
+        maxItems: 45,
+        type: "array",
+      },
+      scope: {
+        const: "RELATIONSHIP_DATA",
+        type: "string",
+      },
+      target: {
+        additionalProperties: false,
+        properties: {
+          included_day_product_dates: {
+            items: {
+              pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+              type: "string",
+            },
+            maxItems: 45,
+            type: "array",
+          },
+          relationship_scope: {
+            const: "CURRENT_CYCLE_AND_HISTORY",
+            type: "string",
+          },
+        },
+        required: ["relationship_scope", "included_day_product_dates"],
+        type: "object",
+      },
+    },
+    required: [
+      "command_ref",
+      "scope",
+      "target",
+      "expected_relationship_revision",
+      "included_day_expected_revisions",
+      "confirmation_version",
+    ],
+    type: "object",
+  },
+  deleteRelationshipConfirmRequest: {
+    $id: "urn:dailyenergy:schema:delete-relationship-confirm-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      confirmation_challenge_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+      confirmation_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      confirmed: {
+        const: true,
+        type: "boolean",
+      },
+      expected_relationship_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      identity_verification_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+      included_day_expected_revisions: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            expected_revision: {
+              maximum: 9007199254740991,
+              minimum: 0,
+              type: "integer",
+            },
+            product_date: {
+              pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+              type: "string",
+            },
+          },
+          required: ["product_date", "expected_revision"],
+          type: "object",
+        },
+        maxItems: 45,
+        type: "array",
+      },
+      scope: {
+        const: "RELATIONSHIP_DATA",
+        type: "string",
+      },
+      target: {
+        additionalProperties: false,
+        properties: {
+          included_day_product_dates: {
+            items: {
+              pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+              type: "string",
+            },
+            maxItems: 45,
+            type: "array",
+          },
+          relationship_scope: {
+            const: "CURRENT_CYCLE_AND_HISTORY",
+            type: "string",
+          },
+        },
+        required: ["relationship_scope", "included_day_product_dates"],
+        type: "object",
+      },
+    },
+    required: [
+      "command_ref",
+      "confirmation_challenge_ref",
+      "scope",
+      "target",
+      "expected_relationship_revision",
+      "included_day_expected_revisions",
+      "confirmation_version",
+      "confirmed",
+    ],
+    type: "object",
+  },
+  deleteAccountPrepareRequest: {
+    $id: "urn:dailyenergy:schema:delete-account-prepare-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      confirmation_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      expected_account_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      scope: {
+        const: "ACCOUNT",
+        type: "string",
+      },
+      target: {
+        additionalProperties: false,
+        properties: {
+          subject: {
+            const: "SELF",
+            type: "string",
+          },
+        },
+        required: ["subject"],
+        type: "object",
+      },
+    },
+    required: [
+      "command_ref",
+      "scope",
+      "target",
+      "expected_account_revision",
+      "confirmation_version",
+    ],
+    type: "object",
+  },
+  deleteAccountConfirmRequest: {
+    $id: "urn:dailyenergy:schema:delete-account-confirm-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      confirmation_challenge_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+      confirmation_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      confirmed: {
+        const: true,
+        type: "boolean",
+      },
+      expected_account_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      identity_verification_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+      scope: {
+        const: "ACCOUNT",
+        type: "string",
+      },
+      target: {
+        additionalProperties: false,
+        properties: {
+          subject: {
+            const: "SELF",
+            type: "string",
+          },
+        },
+        required: ["subject"],
+        type: "object",
+      },
+    },
+    required: [
+      "command_ref",
+      "confirmation_challenge_ref",
+      "scope",
+      "target",
+      "expected_account_revision",
+      "confirmation_version",
+      "confirmed",
+      "identity_verification_ref",
+    ],
+    type: "object",
+  },
+  dataTaskCancelRequest: {
+    $id: "urn:dailyenergy:schema:data-task-cancel-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      expected_task_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+    },
+    required: ["command_ref", "expected_task_revision"],
+    type: "object",
+  },
+  dataTaskView: {
+    $id: "urn:dailyenergy:schema:data-task-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      backup_purge_deadline: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      can_cancel: {
+        type: "boolean",
+      },
+      created_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      export_artifact: {
+        oneOf: [
+          {
+            additionalProperties: false,
+            properties: {
+              format: {
+                const: "JSON",
+                type: "string",
+              },
+              state: {
+                const: "PREPARING",
+                type: "string",
+              },
+            },
+            required: ["state", "format"],
+            type: "object",
+          },
+          {
+            additionalProperties: false,
+            properties: {
+              download_ref: {
+                pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                type: "string",
+              },
+              expires_at: {
+                pattern:
+                  "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                type: "string",
+              },
+              format: {
+                const: "JSON",
+                type: "string",
+              },
+              ready_at: {
+                pattern:
+                  "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                type: "string",
+              },
+              state: {
+                const: "READY",
+                type: "string",
+              },
+            },
+            required: [
+              "state",
+              "format",
+              "download_ref",
+              "ready_at",
+              "expires_at",
+            ],
+            type: "object",
+          },
+          {
+            additionalProperties: false,
+            properties: {
+              format: {
+                const: "JSON",
+                type: "string",
+              },
+              state: {
+                enum: ["EXPIRED", "INVALIDATED"],
+                type: "string",
+              },
+            },
+            required: ["state", "format"],
+            type: "object",
+          },
+        ],
+      },
+      failure_summary_code: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      kind: {
+        enum: ["EXPORT", "DELETE"],
+        type: "string",
+      },
+      online_erased_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      scope: {
+        enum: ["DAY", "MATTER", "RELATIONSHIP_DATA", "ACCOUNT"],
+        type: "string",
+      },
+      status: {
+        enum: ["PENDING", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"],
+        type: "string",
+      },
+      target_summary: {
+        type: "string",
+      },
+      task_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+      updated_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+    },
+    required: [
+      "task_ref",
+      "revision",
+      "kind",
+      "scope",
+      "target_summary",
+      "status",
+      "can_cancel",
+      "created_at",
+      "updated_at",
+    ],
+    type: "object",
+  },
+  dataTaskListView: {
+    $id: "urn:dailyenergy:schema:data-task-list-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      items: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            backup_purge_deadline: {
+              pattern:
+                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              type: "string",
+            },
+            can_cancel: {
+              type: "boolean",
+            },
+            created_at: {
+              pattern:
+                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              type: "string",
+            },
+            export_artifact: {
+              oneOf: [
+                {
+                  additionalProperties: false,
+                  properties: {
+                    format: {
+                      const: "JSON",
+                      type: "string",
+                    },
+                    state: {
+                      const: "PREPARING",
+                      type: "string",
+                    },
+                  },
+                  required: ["state", "format"],
+                  type: "object",
+                },
+                {
+                  additionalProperties: false,
+                  properties: {
+                    download_ref: {
+                      pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                      type: "string",
+                    },
+                    expires_at: {
+                      pattern:
+                        "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                      type: "string",
+                    },
+                    format: {
+                      const: "JSON",
+                      type: "string",
+                    },
+                    ready_at: {
+                      pattern:
+                        "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                      type: "string",
+                    },
+                    state: {
+                      const: "READY",
+                      type: "string",
+                    },
+                  },
+                  required: [
+                    "state",
+                    "format",
+                    "download_ref",
+                    "ready_at",
+                    "expires_at",
+                  ],
+                  type: "object",
+                },
+                {
+                  additionalProperties: false,
+                  properties: {
+                    format: {
+                      const: "JSON",
+                      type: "string",
+                    },
+                    state: {
+                      enum: ["EXPIRED", "INVALIDATED"],
+                      type: "string",
+                    },
+                  },
+                  required: ["state", "format"],
+                  type: "object",
+                },
+              ],
+            },
+            failure_summary_code: {
+              pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+              type: "string",
+            },
+            kind: {
+              enum: ["EXPORT", "DELETE"],
+              type: "string",
+            },
+            online_erased_at: {
+              pattern:
+                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              type: "string",
+            },
+            revision: {
+              exclusiveMinimum: 0,
+              maximum: 9007199254740991,
+              type: "integer",
+            },
+            scope: {
+              enum: ["DAY", "MATTER", "RELATIONSHIP_DATA", "ACCOUNT"],
+              type: "string",
+            },
+            status: {
+              enum: ["PENDING", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"],
+              type: "string",
+            },
+            target_summary: {
+              type: "string",
+            },
+            task_ref: {
+              pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+              type: "string",
+            },
+            updated_at: {
+              pattern:
+                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              type: "string",
+            },
+          },
+          required: [
+            "task_ref",
+            "revision",
+            "kind",
+            "scope",
+            "target_summary",
+            "status",
+            "can_cancel",
+            "created_at",
+            "updated_at",
+          ],
+          type: "object",
+        },
+        maxItems: 50,
+        type: "array",
+      },
+      next_cursor: {
+        maxLength: 512,
+        minLength: 1,
+        type: "string",
+      },
+      page_info: {
+        additionalProperties: false,
+        properties: {
+          has_more: {
+            type: "boolean",
+          },
+        },
+        required: ["has_more"],
+        type: "object",
+      },
+    },
+    required: ["items", "page_info"],
+    type: "object",
+  },
+  dataRightsSummaryView: {
+    $id: "urn:dailyenergy:schema:data-rights-summary-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      account: {
+        additionalProperties: false,
+        properties: {
+          expected_revision: {
+            exclusiveMinimum: 0,
+            maximum: 9007199254740991,
+            type: "integer",
+          },
+          state: {
+            const: "ACTIVE",
+            type: "string",
+          },
+        },
+        required: ["expected_revision", "state"],
+        type: "object",
+      },
+      backup_max_days: {
+        const: 35,
+        type: "number",
+      },
+      capabilities: {
+        additionalProperties: false,
+        properties: {
+          delete_account: {
+            type: "boolean",
+          },
+          delete_day: {
+            type: "boolean",
+          },
+          delete_matter: {
+            type: "boolean",
+          },
+          delete_relationship_data: {
+            type: "boolean",
+          },
+          export_account: {
+            type: "boolean",
+          },
+        },
+        required: [
+          "export_account",
+          "delete_day",
+          "delete_matter",
+          "delete_relationship_data",
+          "delete_account",
+        ],
+        type: "object",
+      },
+      confirmation_versions: {
+        additionalProperties: false,
+        properties: {
+          delete_account: {
+            const: "data-rights-account-v1",
+            type: "string",
+          },
+          delete_day: {
+            const: "data-rights-day-v1",
+            type: "string",
+          },
+          delete_matter: {
+            const: "data-rights-matter-v1",
+            type: "string",
+          },
+          delete_relationship_data: {
+            const: "data-rights-relationship-v1",
+            type: "string",
+          },
+          export_account: {
+            const: "data-export-v1",
+            type: "string",
+          },
+        },
+        required: [
+          "export_account",
+          "delete_day",
+          "delete_matter",
+          "delete_relationship_data",
+          "delete_account",
+        ],
+        type: "object",
+      },
+      online_erasure_sla_hours: {
+        const: 72,
+        type: "number",
+      },
+      relationship: {
+        additionalProperties: false,
+        properties: {
+          expected_revision: {
+            exclusiveMinimum: 0,
+            maximum: 9007199254740991,
+            type: "integer",
+          },
+          state: {
+            const: "PRESENT",
+            type: "string",
+          },
+        },
+        required: ["expected_revision", "state"],
+        type: "object",
+      },
+    },
+    required: [
+      "account",
+      "capabilities",
+      "confirmation_versions",
+      "online_erasure_sla_hours",
+      "backup_max_days",
+    ],
+    type: "object",
+  },
+  exportArtifactView: {
+    $id: "urn:dailyenergy:schema:export-artifact-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    oneOf: [
+      {
+        additionalProperties: false,
+        properties: {
+          format: {
+            const: "JSON",
+            type: "string",
+          },
+          state: {
+            const: "PREPARING",
+            type: "string",
+          },
+        },
+        required: ["state", "format"],
+        type: "object",
+      },
+      {
+        additionalProperties: false,
+        properties: {
+          download_ref: {
+            pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            type: "string",
+          },
+          expires_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          format: {
+            const: "JSON",
+            type: "string",
+          },
+          ready_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          state: {
+            const: "READY",
+            type: "string",
+          },
+        },
+        required: ["state", "format", "download_ref", "ready_at", "expires_at"],
+        type: "object",
+      },
+      {
+        additionalProperties: false,
+        properties: {
+          format: {
+            const: "JSON",
+            type: "string",
+          },
+          state: {
+            enum: ["EXPIRED", "INVALIDATED"],
+            type: "string",
+          },
+        },
+        required: ["state", "format"],
+        type: "object",
+      },
+    ],
+  },
+  deletionStatusGrantView: {
+    $id: "urn:dailyenergy:schema:deletion-status-grant-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      expires_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      status_token: {
+        maxLength: 256,
+        minLength: 32,
+        pattern: "^[A-Za-z0-9_-]+$",
+        type: "string",
+      },
+      task_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+    },
+    required: ["task_ref", "status_token", "expires_at"],
+    type: "object",
+  },
+  accountDeletionAcceptedView: {
+    $id: "urn:dailyenergy:schema:account-deletion-accepted-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      status_grant: {
+        additionalProperties: false,
+        properties: {
+          expires_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          status_token: {
+            maxLength: 256,
+            minLength: 32,
+            pattern: "^[A-Za-z0-9_-]+$",
+            type: "string",
+          },
+          task_ref: {
+            pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            type: "string",
+          },
+        },
+        required: ["task_ref", "status_token", "expires_at"],
+        type: "object",
+      },
+      task: {
+        additionalProperties: false,
+        properties: {
+          backup_purge_deadline: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          can_cancel: {
+            type: "boolean",
+          },
+          created_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          export_artifact: {
+            oneOf: [
+              {
+                additionalProperties: false,
+                properties: {
+                  format: {
+                    const: "JSON",
+                    type: "string",
+                  },
+                  state: {
+                    const: "PREPARING",
+                    type: "string",
+                  },
+                },
+                required: ["state", "format"],
+                type: "object",
+              },
+              {
+                additionalProperties: false,
+                properties: {
+                  download_ref: {
+                    pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                    type: "string",
+                  },
+                  expires_at: {
+                    pattern:
+                      "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                    type: "string",
+                  },
+                  format: {
+                    const: "JSON",
+                    type: "string",
+                  },
+                  ready_at: {
+                    pattern:
+                      "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                    type: "string",
+                  },
+                  state: {
+                    const: "READY",
+                    type: "string",
+                  },
+                },
+                required: [
+                  "state",
+                  "format",
+                  "download_ref",
+                  "ready_at",
+                  "expires_at",
+                ],
+                type: "object",
+              },
+              {
+                additionalProperties: false,
+                properties: {
+                  format: {
+                    const: "JSON",
+                    type: "string",
+                  },
+                  state: {
+                    enum: ["EXPIRED", "INVALIDATED"],
+                    type: "string",
+                  },
+                },
+                required: ["state", "format"],
+                type: "object",
+              },
+            ],
+          },
+          failure_summary_code: {
+            pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            type: "string",
+          },
+          kind: {
+            enum: ["EXPORT", "DELETE"],
+            type: "string",
+          },
+          online_erased_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          revision: {
+            exclusiveMinimum: 0,
+            maximum: 9007199254740991,
+            type: "integer",
+          },
+          scope: {
+            enum: ["DAY", "MATTER", "RELATIONSHIP_DATA", "ACCOUNT"],
+            type: "string",
+          },
+          status: {
+            enum: ["PENDING", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"],
+            type: "string",
+          },
+          target_summary: {
+            type: "string",
+          },
+          task_ref: {
+            pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            type: "string",
+          },
+          updated_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+        },
+        required: [
+          "task_ref",
+          "revision",
+          "kind",
+          "scope",
+          "target_summary",
+          "status",
+          "can_cancel",
+          "created_at",
+          "updated_at",
+        ],
+        type: "object",
+      },
+    },
+    required: ["task", "status_grant"],
+    type: "object",
+  },
+  dataExportDocument: {
+    $id: "urn:dailyenergy:schema:data-export-document:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      consent_summary: {
+        additionalProperties: false,
+        properties: {
+          accepted_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          notice_version: {
+            pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            type: "string",
+          },
+          state: {
+            enum: ["MISSING", "ACCEPTED", "WITHDRAWN"],
+            type: "string",
+          },
+        },
+        required: ["state", "notice_version"],
+        type: "object",
+      },
+      data_task_summaries: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            backup_purge_deadline: {
+              pattern:
+                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              type: "string",
+            },
+            created_at: {
+              pattern:
+                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              type: "string",
+            },
+            failure_summary_code: {
+              pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+              type: "string",
+            },
+            kind: {
+              enum: ["EXPORT", "DELETE"],
+              type: "string",
+            },
+            online_erased_at: {
+              pattern:
+                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              type: "string",
+            },
+            revision: {
+              exclusiveMinimum: 0,
+              maximum: 9007199254740991,
+              type: "integer",
+            },
+            scope: {
+              enum: ["DAY", "MATTER", "RELATIONSHIP_DATA", "ACCOUNT"],
+              type: "string",
+            },
+            status: {
+              enum: ["PENDING", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"],
+              type: "string",
+            },
+            target_summary: {
+              type: "string",
+            },
+            updated_at: {
+              pattern:
+                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              type: "string",
+            },
+          },
+          required: [
+            "revision",
+            "kind",
+            "scope",
+            "target_summary",
+            "status",
+            "created_at",
+            "updated_at",
+          ],
+          type: "object",
+        },
+        maxItems: 1000,
+        type: "array",
+      },
+      days: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            checkin: {
+              additionalProperties: false,
+              properties: {
+                energy: {
+                  enum: ["EMPTY", "LOW", "STEADY", "HIGH", "FULL", "UNSURE"],
+                  type: "string",
+                },
+                mood: {
+                  enum: [
+                    "VERY_LOW",
+                    "LOW",
+                    "STEADY",
+                    "GOOD",
+                    "LIGHT",
+                    "UNSURE",
+                  ],
+                  type: "string",
+                },
+                revision: {
+                  exclusiveMinimum: 0,
+                  maximum: 9007199254740991,
+                  type: "integer",
+                },
+                sleep: {
+                  enum: ["POOR", "LOW", "OKAY", "GOOD", "UNSURE"],
+                  type: "string",
+                },
+                updated_at: {
+                  pattern:
+                    "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  type: "string",
+                },
+              },
+              required: ["revision", "mood", "energy", "sleep", "updated_at"],
+              type: "object",
+            },
+            content: {
+              additionalProperties: false,
+              properties: {
+                closing: {
+                  type: "string",
+                },
+                content_label: {
+                  const: "娱乐与行动参考",
+                  type: "string",
+                },
+                contract: {
+                  const: "daily-content-view",
+                  type: "string",
+                },
+                core_tip: {
+                  type: "string",
+                },
+                dimensions: {
+                  items: {
+                    additionalProperties: false,
+                    properties: {
+                      band: {
+                        enum: ["LOW", "STEADY", "HIGH"],
+                        type: "string",
+                      },
+                      band_label: {
+                        type: "string",
+                      },
+                      explanation: {
+                        type: "string",
+                      },
+                      id: {
+                        enum: [
+                          "pace",
+                          "action",
+                          "connection",
+                          "resources",
+                          "recovery",
+                        ],
+                        type: "string",
+                      },
+                      is_focus: {
+                        type: "boolean",
+                      },
+                      label: {
+                        type: "string",
+                      },
+                    },
+                    required: [
+                      "id",
+                      "label",
+                      "band",
+                      "band_label",
+                      "explanation",
+                      "is_focus",
+                    ],
+                    type: "object",
+                  },
+                  maxItems: 5,
+                  minItems: 5,
+                  type: "array",
+                },
+                explanation_paragraphs: {
+                  items: {
+                    type: "string",
+                  },
+                  maxItems: 2,
+                  minItems: 1,
+                  type: "array",
+                },
+                focus_dimension_id: {
+                  enum: [
+                    "pace",
+                    "action",
+                    "connection",
+                    "resources",
+                    "recovery",
+                  ],
+                  type: "string",
+                },
+                generated_at: {
+                  pattern:
+                    "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  type: "string",
+                },
+                greeting: {
+                  type: "string",
+                },
+                optional_task: {
+                  additionalProperties: false,
+                  properties: {
+                    instruction: {
+                      type: "string",
+                    },
+                    task_id: {
+                      pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                      type: "string",
+                    },
+                  },
+                  required: ["task_id", "instruction"],
+                  type: "object",
+                },
+                overall: {
+                  additionalProperties: false,
+                  properties: {
+                    band: {
+                      enum: ["LOW", "STEADY", "HIGH"],
+                      type: "string",
+                    },
+                    band_label: {
+                      type: "string",
+                    },
+                    summary: {
+                      type: "string",
+                    },
+                  },
+                  required: ["band", "band_label", "summary"],
+                  type: "object",
+                },
+                personalization_notice: {
+                  enum: ["NONE", "PERSONALIZATION_REDUCED"],
+                  type: "string",
+                },
+                primary_action: {
+                  additionalProperties: false,
+                  properties: {
+                    action_id: {
+                      pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                      type: "string",
+                    },
+                    constraint_label: {
+                      type: "string",
+                    },
+                    instruction: {
+                      type: "string",
+                    },
+                    rationale: {
+                      type: "string",
+                    },
+                  },
+                  required: ["action_id", "instruction"],
+                  type: "object",
+                },
+                product_date: {
+                  pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  type: "string",
+                },
+                result_id: {
+                  pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                  type: "string",
+                },
+                result_version: {
+                  pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                  type: "string",
+                },
+                rituals: {
+                  items: {
+                    additionalProperties: false,
+                    properties: {
+                      display_value: {
+                        type: "string",
+                      },
+                      kind: {
+                        enum: ["COLOR", "NUMBER"],
+                        type: "string",
+                      },
+                      note: {
+                        type: "string",
+                      },
+                    },
+                    required: ["kind", "display_value", "note"],
+                    type: "object",
+                  },
+                  maxItems: 2,
+                  type: "array",
+                },
+                schema_version: {
+                  pattern:
+                    "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                  type: "string",
+                },
+                state_response: {
+                  type: "string",
+                },
+              },
+              required: [
+                "contract",
+                "schema_version",
+                "result_id",
+                "product_date",
+                "result_version",
+                "generated_at",
+                "content_label",
+                "greeting",
+                "state_response",
+                "overall",
+                "focus_dimension_id",
+                "dimensions",
+                "core_tip",
+                "explanation_paragraphs",
+                "primary_action",
+                "optional_task",
+                "rituals",
+                "closing",
+                "personalization_notice",
+              ],
+              type: "object",
+            },
+            evening: {
+              additionalProperties: false,
+              properties: {
+                note: {
+                  maxLength: 80,
+                  type: "string",
+                },
+                overall_feeling: {
+                  enum: [
+                    "VERY_HEAVY",
+                    "SOMEWHAT_HEAVY",
+                    "STEADY",
+                    "PRETTY_GOOD",
+                    "LIGHT",
+                    "UNSURE",
+                  ],
+                  type: "string",
+                },
+                revision: {
+                  exclusiveMinimum: 0,
+                  maximum: 9007199254740991,
+                  type: "integer",
+                },
+                updated_at: {
+                  pattern:
+                    "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  type: "string",
+                },
+              },
+              required: ["revision", "overall_feeling", "updated_at"],
+              type: "object",
+            },
+            interaction: {
+              additionalProperties: false,
+              properties: {
+                helpfulness: {
+                  additionalProperties: false,
+                  properties: {
+                    rating: {
+                      enum: [
+                        "UNRATED",
+                        "HELPFUL",
+                        "NEUTRAL",
+                        "NOT_HELPFUL",
+                        "NOT_USED",
+                      ],
+                      type: "string",
+                    },
+                    revision: {
+                      maximum: 9007199254740991,
+                      minimum: 0,
+                      type: "integer",
+                    },
+                  },
+                  required: ["revision", "rating"],
+                  type: "object",
+                },
+                is_lit: {
+                  type: "boolean",
+                },
+                task: {
+                  additionalProperties: false,
+                  properties: {
+                    revision: {
+                      exclusiveMinimum: 0,
+                      maximum: 9007199254740991,
+                      type: "integer",
+                    },
+                    status: {
+                      enum: ["UNMARKED", "INTERESTED", "COMPLETED", "SKIPPED"],
+                      type: "string",
+                    },
+                  },
+                  required: ["revision", "status"],
+                  type: "object",
+                },
+                updated_at: {
+                  pattern:
+                    "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  type: "string",
+                },
+              },
+              required: ["is_lit", "task", "helpfulness", "updated_at"],
+              type: "object",
+            },
+            product_date: {
+              pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+              type: "string",
+            },
+          },
+          required: ["product_date"],
+          type: "object",
+        },
+        maxItems: 10000,
+        type: "array",
+      },
+      generated_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      matters: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            daily_use_granted: {
+              type: "boolean",
+            },
+            revision: {
+              exclusiveMinimum: 0,
+              maximum: 9007199254740991,
+              type: "integer",
+            },
+            status: {
+              enum: ["ACTIVE", "PAUSED", "COMPLETED", "EXPIRED"],
+              type: "string",
+            },
+            target_date: {
+              pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+              type: "string",
+            },
+            title: {
+              type: "string",
+            },
+            updated_at: {
+              pattern:
+                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              type: "string",
+            },
+            weekly_use_granted: {
+              type: "boolean",
+            },
+          },
+          required: [
+            "revision",
+            "title",
+            "status",
+            "daily_use_granted",
+            "weekly_use_granted",
+            "updated_at",
+          ],
+          type: "object",
+        },
+        maxItems: 1000,
+        type: "array",
+      },
+      notification_preferences: {
+        additionalProperties: false,
+        properties: {
+          items: {
+            items: {
+              additionalProperties: false,
+              properties: {
+                enabled: {
+                  type: "boolean",
+                },
+                notification_type: {
+                  pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                  type: "string",
+                },
+                revision: {
+                  exclusiveMinimum: 0,
+                  maximum: 9007199254740991,
+                  type: "integer",
+                },
+                updated_at: {
+                  pattern:
+                    "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  type: "string",
+                },
+              },
+              required: [
+                "notification_type",
+                "enabled",
+                "revision",
+                "updated_at",
+              ],
+              type: "object",
+            },
+            maxItems: 50,
+            type: "array",
+          },
+        },
+        required: ["items"],
+        type: "object",
+      },
+      profile: {
+        additionalProperties: false,
+        properties: {
+          expression_style: {
+            enum: ["BALANCED", "GENTLE", "LIGHT_HUMOR", "CLEAR_DIRECT"],
+            type: "string",
+          },
+          onboarding_completed: {
+            type: "boolean",
+          },
+          preferred_name: {
+            type: "string",
+          },
+          revision: {
+            exclusiveMinimum: 0,
+            maximum: 9007199254740991,
+            type: "integer",
+          },
+          updated_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+        },
+        required: [
+          "revision",
+          "expression_style",
+          "onboarding_completed",
+          "updated_at",
+        ],
+        type: "object",
+      },
+      relationship_summary: {
+        additionalProperties: false,
+        properties: {
+          encounter_day_count: {
+            maximum: 9007199254740991,
+            minimum: 0,
+            type: "integer",
+          },
+          revision: {
+            exclusiveMinimum: 0,
+            maximum: 9007199254740991,
+            type: "integer",
+          },
+          stage: {
+            enum: [
+              "BEFORE_FIRST_MEETING",
+              "NEWLY_MET",
+              "BECOMING_FAMILIAR",
+              "FIRST_WEEK_RECORDED",
+            ],
+            type: "string",
+          },
+          state: {
+            const: "PRESENT",
+            type: "string",
+          },
+          updated_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+        },
+        required: [
+          "revision",
+          "state",
+          "stage",
+          "encounter_day_count",
+          "updated_at",
+        ],
+        type: "object",
+      },
+      safety_summary: {
+        additionalProperties: false,
+        properties: {
+          revision: {
+            exclusiveMinimum: 0,
+            maximum: 9007199254740991,
+            type: "integer",
+          },
+          state: {
+            enum: ["CLEAR", "ACTIVE", "RECOVERY_PENDING"],
+            type: "string",
+          },
+          updated_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+        },
+        required: ["state", "revision", "updated_at"],
+        type: "object",
+      },
+      schema_version: {
+        const: "data-export-v1",
+        type: "string",
+      },
+    },
+    required: [
+      "schema_version",
+      "generated_at",
+      "consent_summary",
+      "days",
+      "matters",
+      "notification_preferences",
+      "data_task_summaries",
+    ],
+    type: "object",
+  },
+  deletionConfirmationView: {
+    $id: "urn:dailyenergy:schema:deletion-confirmation-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    oneOf: [
+      {
+        additionalProperties: false,
+        properties: {
+          backup_max_days: {
+            const: 35,
+            type: "number",
+          },
+          confirmation_challenge_ref: {
+            pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            type: "string",
+          },
+          confirmation_version: {
+            pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            type: "string",
+          },
+          derived_effects: {
+            items: {
+              type: "string",
+            },
+            maxItems: 12,
+            type: "array",
+          },
+          expected_day_revisions: {
+            items: {
+              additionalProperties: false,
+              properties: {
+                expected_revision: {
+                  maximum: 9007199254740991,
+                  minimum: 0,
+                  type: "integer",
+                },
+                product_date: {
+                  pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  type: "string",
+                },
+              },
+              required: ["product_date", "expected_revision"],
+              type: "object",
+            },
+            maxItems: 45,
+            type: "array",
+          },
+          expected_revision: {
+            exclusiveMinimum: 0,
+            maximum: 9007199254740991,
+            type: "integer",
+          },
+          expires_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          identity_reverification_required: {
+            type: "boolean",
+          },
+          immediate_effects: {
+            items: {
+              type: "string",
+            },
+            maxItems: 12,
+            minItems: 1,
+            type: "array",
+          },
+          online_erasure_sla_hours: {
+            const: 72,
+            type: "number",
+          },
+          scope: {
+            const: "RELATIONSHIP_DATA",
+            type: "string",
+          },
+          target: {
+            additionalProperties: false,
+            properties: {
+              included_day_product_dates: {
+                items: {
+                  pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  type: "string",
+                },
+                maxItems: 45,
+                type: "array",
+              },
+              relationship_scope: {
+                const: "CURRENT_CYCLE_AND_HISTORY",
+                type: "string",
+              },
+            },
+            required: ["relationship_scope", "included_day_product_dates"],
+            type: "object",
+          },
+        },
+        required: [
+          "confirmation_challenge_ref",
+          "confirmation_version",
+          "expected_revision",
+          "immediate_effects",
+          "derived_effects",
+          "online_erasure_sla_hours",
+          "backup_max_days",
+          "identity_reverification_required",
+          "expires_at",
+          "scope",
+          "target",
+          "expected_day_revisions",
+        ],
+        type: "object",
+      },
+      {
+        additionalProperties: false,
+        properties: {
+          backup_max_days: {
+            const: 35,
+            type: "number",
+          },
+          confirmation_challenge_ref: {
+            pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            type: "string",
+          },
+          confirmation_version: {
+            pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            type: "string",
+          },
+          derived_effects: {
+            items: {
+              type: "string",
+            },
+            maxItems: 12,
+            type: "array",
+          },
+          expected_day_revisions: {
+            not: {},
+          },
+          expected_revision: {
+            exclusiveMinimum: 0,
+            maximum: 9007199254740991,
+            type: "integer",
+          },
+          expires_at: {
+            pattern:
+              "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+            type: "string",
+          },
+          identity_reverification_required: {
+            const: true,
+            type: "boolean",
+          },
+          immediate_effects: {
+            items: {
+              type: "string",
+            },
+            maxItems: 12,
+            minItems: 1,
+            type: "array",
+          },
+          online_erasure_sla_hours: {
+            const: 72,
+            type: "number",
+          },
+          scope: {
+            const: "ACCOUNT",
+            type: "string",
+          },
+          target: {
+            additionalProperties: false,
+            properties: {
+              subject: {
+                const: "SELF",
+                type: "string",
+              },
+            },
+            required: ["subject"],
+            type: "object",
+          },
+        },
+        required: [
+          "confirmation_challenge_ref",
+          "confirmation_version",
+          "expected_revision",
+          "immediate_effects",
+          "derived_effects",
+          "online_erasure_sla_hours",
+          "backup_max_days",
+          "identity_reverification_required",
+          "expires_at",
+          "scope",
+          "target",
+        ],
+        type: "object",
+      },
+    ],
+  },
+  identityVerificationView: {
+    $id: "urn:dailyenergy:schema:identity-verification-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      confirmation_challenge_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+      expires_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      identity_verification_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+    },
+    required: [
+      "identity_verification_ref",
+      "confirmation_challenge_ref",
+      "expires_at",
+    ],
     type: "object",
   },
 } as const;

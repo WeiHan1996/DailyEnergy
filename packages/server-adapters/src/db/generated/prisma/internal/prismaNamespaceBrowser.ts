@@ -105,6 +105,10 @@ export const ModelName = {
   NotificationIntent: 'NotificationIntent',
   NotificationDeliveryAttempt: 'NotificationDeliveryAttempt',
   DataTask: 'DataTask',
+  ExportManifest: 'ExportManifest',
+  DeletionStatusGrant: 'DeletionStatusGrant',
+  DeletionConfirmationChallenge: 'DeletionConfirmationChallenge',
+  IdentityVerification: 'IdentityVerification',
   DeletionGuard: 'DeletionGuard',
   DeletionStepCheckpoint: 'DeletionStepCheckpoint',
   DayErasureGuard: 'DayErasureGuard',
@@ -1188,6 +1192,80 @@ export const DataTaskScalarFieldEnum = {
 } as const
 
 export type DataTaskScalarFieldEnum = (typeof DataTaskScalarFieldEnum)[keyof typeof DataTaskScalarFieldEnum]
+
+
+export const ExportManifestScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  sourceRevisionVector: 'sourceRevisionVector',
+  sourceFingerprint: 'sourceFingerprint',
+  schemaVersion: 'schemaVersion',
+  policyVersion: 'policyVersion',
+  downloadRef: 'downloadRef',
+  state: 'state',
+  readyAt: 'readyAt',
+  expiresAt: 'expiresAt',
+  invalidatedAt: 'invalidatedAt',
+  expiredAt: 'expiredAt',
+  updatedAt: 'updatedAt',
+  retentionPolicyVersion: 'retentionPolicyVersion',
+  retentionScope: 'retentionScope',
+  retentionAnchorAt: 'retentionAnchorAt'
+} as const
+
+export type ExportManifestScalarFieldEnum = (typeof ExportManifestScalarFieldEnum)[keyof typeof ExportManifestScalarFieldEnum]
+
+
+export const DeletionStatusGrantScalarFieldEnum = {
+  id: 'id',
+  taskId: 'taskId',
+  tokenHash: 'tokenHash',
+  failedAttemptCount: 'failedAttemptCount',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  terminalObservedAt: 'terminalObservedAt',
+  retentionPolicyVersion: 'retentionPolicyVersion',
+  retentionScope: 'retentionScope',
+  retentionAnchorAt: 'retentionAnchorAt'
+} as const
+
+export type DeletionStatusGrantScalarFieldEnum = (typeof DeletionStatusGrantScalarFieldEnum)[keyof typeof DeletionStatusGrantScalarFieldEnum]
+
+
+export const DeletionConfirmationChallengeScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  commandRef: 'commandRef',
+  scope: 'scope',
+  targetKey: 'targetKey',
+  frozenPayload: 'frozenPayload',
+  expectedRevision: 'expectedRevision',
+  confirmationVersion: 'confirmationVersion',
+  identityReverificationRequired: 'identityReverificationRequired',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  retentionPolicyVersion: 'retentionPolicyVersion',
+  retentionScope: 'retentionScope',
+  retentionAnchorAt: 'retentionAnchorAt'
+} as const
+
+export type DeletionConfirmationChallengeScalarFieldEnum = (typeof DeletionConfirmationChallengeScalarFieldEnum)[keyof typeof DeletionConfirmationChallengeScalarFieldEnum]
+
+
+export const IdentityVerificationScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  challengeId: 'challengeId',
+  verifiedAt: 'verifiedAt',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  retentionPolicyVersion: 'retentionPolicyVersion',
+  retentionScope: 'retentionScope',
+  retentionAnchorAt: 'retentionAnchorAt'
+} as const
+
+export type IdentityVerificationScalarFieldEnum = (typeof IdentityVerificationScalarFieldEnum)[keyof typeof IdentityVerificationScalarFieldEnum]
 
 
 export const DeletionGuardScalarFieldEnum = {

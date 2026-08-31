@@ -101,6 +101,13 @@ export const API_ERROR_CATALOG = {
     retryable: true,
     status: HttpStatus.SERVICE_UNAVAILABLE,
   },
+  DELETION_STATUS_GRANT_INVALID: {
+    category: "AUTH",
+    message: "删除状态凭证无效或已经到期。",
+    messageKey: "error.deletion_status_grant_invalid",
+    retryable: false,
+    status: HttpStatus.UNAUTHORIZED,
+  },
   CONSENT_REQUIRED: {
     category: "GUARD",
     message: "请先阅读并确认当前必要告知。",
@@ -121,6 +128,34 @@ export const API_ERROR_CATALOG = {
     messageKey: "error.feature_disabled",
     retryable: false,
     status: HttpStatus.FORBIDDEN,
+  },
+  EXPORT_ARTIFACT_EXPIRED: {
+    category: "GUARD",
+    message: "导出文件已经到期，请重新发起导出。",
+    messageKey: "error.export_artifact_expired",
+    retryable: false,
+    status: HttpStatus.FORBIDDEN,
+  },
+  EXPORT_NOT_READY: {
+    category: "TRANSIENT",
+    message: "导出文件仍在准备中，请稍后再试。",
+    messageKey: "error.export_not_ready",
+    retryable: true,
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+  },
+  EXPORT_SOURCE_CHANGED: {
+    category: "CONFLICT",
+    message: "导出后数据已经变化，请重新发起导出。",
+    messageKey: "error.export_source_changed",
+    retryable: false,
+    status: HttpStatus.CONFLICT,
+  },
+  EXPORT_TOO_LARGE: {
+    category: "TERMINAL",
+    message: "当前数据超过本版本的导出上限，未生成不完整文件。",
+    messageKey: "error.export_too_large",
+    retryable: false,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
   },
   GENERATION_FAILED_RETRYABLE: {
     category: "TRANSIENT",

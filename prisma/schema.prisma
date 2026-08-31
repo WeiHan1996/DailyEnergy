@@ -190,6 +190,14 @@ enum DataTaskState {
   RUNNING
   FAILED
   SUCCEEDED
+  CANCELLED
+}
+
+enum ExportArtifactState {
+  PREPARING
+  READY
+  EXPIRED
+  INVALIDATED
 }
 
 enum DeletionStepState {
@@ -321,6 +329,8 @@ model UserAccount {
   notificationIntents     NotificationIntent[]
   dataTasks               DataTask[]
   deletionGuards          DeletionGuard[]
+  deletionChallenges      DeletionConfirmationChallenge[]
+  identityVerifications   IdentityVerification[]
 
   @@index([state, inactivityDeletionDueAt])
   @@index([expiresAt])
@@ -1562,14 +1572,104 @@ model DataTask {
   retentionAnchorAt       DateTime       @db.Timestamptz(3)
   expiresAt               DateTime?      @db.Timestamptz(3)
 
-  account     UserAccount              @relation(fields: [accountId], references: [id], onDelete: Restrict)
-  checkpoints DeletionStepCheckpoint[]
+  account             UserAccount              @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  checkpoints         DeletionStepCheckpoint[]
+  exportManifest      ExportManifest?
+  deletionStatusGrant DeletionStatusGrant?
 
   @@unique([accountId, kind, scope, targetKey, activeSlot])
   @@index([state, requestedAt])
   @@index([accountId, kind, requestedAt(sort: Desc)])
   @@index([expiresAt])
   @@map("restricted_data_task")
+}
+
+model ExportManifest {
+  id                     String              @id @default(uuid()) @db.Uuid
+  taskId                 String              @unique @db.Uuid
+  sourceRevisionVector   Json                @db.JsonB
+  sourceFingerprint      Bytes
+  schemaVersion          String              @db.VarChar(64)
+  policyVersion          String              @db.VarChar(64)
+  downloadRef            String              @unique @db.Uuid
+  state                  ExportArtifactState @default(PREPARING)
+  readyAt                DateTime?           @db.Timestamptz(3)
+  expiresAt              DateTime            @db.Timestamptz(3)
+  invalidatedAt          DateTime?           @db.Timestamptz(3)
+  expiredAt              DateTime?           @db.Timestamptz(3)
+  updatedAt              DateTime            @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion String              @db.VarChar(64)
+  retentionScope         RetentionScope      @default(EXPORT)
+  retentionAnchorAt      DateTime            @db.Timestamptz(3)
+
+  task DataTask @relation(fields: [taskId], references: [id], onDelete: Restrict)
+
+  @@index([state, expiresAt])
+  @@index([retentionAnchorAt])
+  @@map("restricted_export_manifest")
+}
+
+model DeletionStatusGrant {
+  id                     String         @id @default(uuid()) @db.Uuid
+  taskId                 String         @unique @db.Uuid
+  tokenHash              Bytes          @unique
+  failedAttemptCount     Int            @default(0)
+  createdAt              DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+  terminalObservedAt     DateTime?      @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(RUNTIME)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+
+  task DataTask @relation(fields: [taskId], references: [id], onDelete: Restrict)
+
+  @@index([expiresAt])
+  @@map("restricted_deletion_status_grant")
+}
+
+model DeletionConfirmationChallenge {
+  id                             String         @id @default(uuid()) @db.Uuid
+  accountId                      String         @db.Uuid
+  commandRef                     String         @db.Uuid
+  scope                          DataTaskScope
+  targetKey                      String         @db.VarChar(160)
+  frozenPayload                  Json           @db.JsonB
+  expectedRevision               Int
+  confirmationVersion            String         @db.VarChar(64)
+  identityReverificationRequired Boolean
+  createdAt                      DateTime       @db.Timestamptz(3)
+  expiresAt                      DateTime       @db.Timestamptz(3)
+  consumedAt                     DateTime?      @db.Timestamptz(3)
+  retentionPolicyVersion         String         @db.VarChar(64)
+  retentionScope                 RetentionScope @default(RUNTIME)
+  retentionAnchorAt              DateTime       @db.Timestamptz(3)
+
+  account      UserAccount           @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  verification IdentityVerification?
+
+  @@unique([accountId, commandRef])
+  @@index([accountId, scope, expiresAt], map: "restricted_del_challenge_account_scope_expiry_idx")
+  @@index([expiresAt])
+  @@map("restricted_deletion_confirmation_challenge")
+}
+
+model IdentityVerification {
+  id                     String         @id @default(uuid()) @db.Uuid
+  accountId              String         @db.Uuid
+  challengeId            String         @unique @db.Uuid
+  verifiedAt             DateTime       @db.Timestamptz(3)
+  expiresAt              DateTime       @db.Timestamptz(3)
+  consumedAt             DateTime?      @db.Timestamptz(3)
+  retentionPolicyVersion String         @db.VarChar(64)
+  retentionScope         RetentionScope @default(RUNTIME)
+  retentionAnchorAt      DateTime       @db.Timestamptz(3)
+
+  account   UserAccount                   @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  challenge DeletionConfirmationChallenge @relation(fields: [challengeId], references: [id], onDelete: Restrict)
+
+  @@index([accountId, expiresAt])
+  @@index([expiresAt])
+  @@map("restricted_identity_verification")
 }
 
 model DeletionGuard {

@@ -7,7 +7,7 @@ This directory contains the PostgreSQL 18 / Prisma 7 migration and verification 
 - Prisma CLI and Client: `7.9.1` (same exact version; supplied by the root install)
 - PostgreSQL test image: `postgres:18.0-bookworm@sha256:3f55f8895c4ed50603e2fbdfc72fffeeaba3173321fee5cb825bbbeb30d9d854`
 - Application schema: `daily_energy`
-- Migration head: `20260821000001_c005_product_time_manifest`
+- Migration head: `20260825000000_c014_data_rights` (14 committed migrations)
 
 `DATABASE_URL` is required by `prisma.config.ts`; no credential or production default is committed.
 
@@ -21,7 +21,7 @@ DATABASE_URL=... PRISMA_BIN=/absolute/path/to/prisma node tooling/database/migra
 DATABASE_URL=... node tooling/database/seed.mjs
 DATABASE_URL=... node tooling/database/check-drift.mjs
 DB_CATALOG_FINGERPRINT_WRITE=1 DATABASE_URL=... node tooling/database/write-catalog-fingerprint.mjs
-DATABASE_INTEGRATION=1 PRISMA_BIN=/absolute/path/to/prisma node --test --test-concurrency=1 tests/database/integration.test.mjs tests/database/transactions.test.mjs tests/database/auth-identity.test.mjs tests/database/c002-consent-profile.test.mjs tests/database/c004-checkin.test.mjs tests/database/c005-product-time-seed.test.mjs
+DATABASE_INTEGRATION=1 PRISMA_BIN=/absolute/path/to/prisma node --test --test-concurrency=1 tests/database/integration.test.mjs tests/database/transactions.test.mjs tests/database/auth-identity.test.mjs tests/database/c002-consent-profile.test.mjs tests/database/c004-checkin.test.mjs tests/database/c005-product-time-seed.test.mjs tests/database/c008-daily-generation.test.mjs tests/database/c013-weekly-reflection.test.mjs tests/database/c014-data-rights.test.mjs
 DATABASE_URL=... DB_RECOVERY_STAGE=isolated DB_RESTORE_LEDGER_CHECKPOINT=... \
   DB_RESTORE_LEDGER_FINGERPRINT=... DB_DELETED_DATA_DETECTOR_HOOK=/absolute/hook \
   node tooling/database/replay-restore-ledger.mjs
@@ -91,8 +91,9 @@ capability drift all fail startup. Relation capability probes use catalog OIDs r
 permission-dependent qualified-name resolution, so losing inherited schema usage still produces a
 stable role mismatch instead of aborting the identity query. The API Safety role can write the
 allowlisted Safety facts and TX-05 outbox event; the deletion role can write deletion-task evidence
-and the TX-09 outbox event, and delete allowlisted user facts, but cannot write Safety state or
-evaluation data.
+and the TX-09 outbox event, read only the indexed C-014 manifest/status-grant deadlines needed for
+due reconstruction, and delete allowlisted user facts; it cannot read export bodies (none exist),
+write Safety state, or access evaluation data.
 
 Deferred SQL-007/012/013/014 constraint functions remain `SECURITY INVOKER`. Their helper
 functions are closed to `PUBLIC` and grant `EXECUTE` only to the writer/test roles that can reach
@@ -137,7 +138,7 @@ recovery ledger ordering, detector failure, and readiness closure. It also execu
 must-fail fixtures for SQL-001 through SQL-020 and the transaction suite:
 
 - clean migration deployment, idempotent re-application, deterministic synthetic seed, and
-  70-table / 35-enum / SQL-ID drift checks;
+  exact current 74 application tables / 36 enum types / 72 functions / SQL-ID drift checks;
 - normalized catalog fingerprints for columns/type/default/nullability, direct column ACLs,
   ordered enum labels, constraint/index/trigger/function definitions, object owners,
   schema/relation/function ACLs, default privileges, group-role attributes, and owner membership;
@@ -159,6 +160,7 @@ must-fail fixtures for SQL-001 through SQL-020 and the transaction suite:
 - a conflicting table lock that makes the real second Prisma migration fail near five seconds with
   a stable redacted error, followed by successful roll-forward;
 - TX-01 through TX-09 atomic commit, rollback, replay, compare-and-swap, lock-claim, and concurrent-winner behavior using multiple PostgreSQL connections and deterministic barriers;
+- C-014 summary revision discovery, four-scope cleanup, zero-body READY export manifest, repeated deterministic source reads, correction invalidation, exact 24-hour expiry, PostgreSQL retention due reconstruction, hash-only deletion status grant, legal-hold FAILED retry and de-identified ACCOUNT completion;
 - migration checksum mutation and the repository-level rejection of `prisma db push`.
 
 The harness uses only synthetic identities and data. It does not connect to production, use

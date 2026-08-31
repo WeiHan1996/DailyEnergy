@@ -84,6 +84,13 @@ export class AuthService implements SessionResolver {
     return sessionResponse(token, now, result.session);
   }
 
+  public async reverifyWechatIdentity(
+    code: string,
+  ): Promise<ProtectedExternalIdentity> {
+    const identity = await this.#exchangeWechatCode(code);
+    return protectIdentity(identity.providerCode, identity.subject);
+  }
+
   public async refresh(principal: SessionPrincipal): Promise<SessionResponse> {
     const now = new Date();
     const token = newSessionToken();

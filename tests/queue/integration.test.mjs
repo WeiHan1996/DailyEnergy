@@ -1246,6 +1246,11 @@ test(
               "e007-redis-replacement",
             );
             try {
+              const restrictedDue = await restrictedStore.listDataTasksDue(10);
+              assert.equal(restrictedDue.length, 1);
+              assert.equal(restrictedDue[0].aggregateRef, validDataTask);
+              assert.notEqual(restrictedDue[0].eventId, validDataTask);
+              const validDataTaskEvent = restrictedDue[0].eventId;
               const results = await Promise.all([
                 new RedisLossRebuilder({
                   manifest: INTERACTIVE_WORKER_MANIFEST,
@@ -1287,7 +1292,7 @@ test(
                 ["interactive", validGeneration],
                 ["background", validNotification],
                 ["background", publishedEvent],
-                ["restricted", validDataTask],
+                ["restricted", validDataTaskEvent],
               ]) {
                 assert.ok(await producer.getJob(family, eventId));
               }
@@ -1304,8 +1309,9 @@ test(
               }
               const restrictedJob = await producer.getJob(
                 "restricted",
-                validDataTask,
+                validDataTaskEvent,
               );
+              assert.equal(restrictedJob.data.aggregateRef, validDataTask);
               assert.deepEqual(restrictedJob.data.guardEpochs, {
                 deletion: "3",
               });

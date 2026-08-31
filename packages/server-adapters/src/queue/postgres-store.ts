@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 
 import { Pool, type PoolClient } from "pg";
 
@@ -452,32 +452,59 @@ export class PostgresQueueStore {
     this.#assertProfile("worker-restricted");
     const result = await this.#pool.query<{
       deletionEpoch: string | null;
+      eventType: "DataRightsRetentionDue" | "DataTaskDue";
       id: string;
       requestedAt: Date;
       revision: number;
     }>(
-      `SELECT task.id, task.revision, task."requestedAt",
-              guard."deletionEpoch"::text AS "deletionEpoch"
-       FROM daily_energy.restricted_data_task task
-       JOIN daily_energy.app_user_account account ON account.id = task."accountId"
-       LEFT JOIN daily_energy.restricted_deletion_guard guard
-         ON guard."taskRef" = task.id AND guard."releasedAt" IS NULL
-       WHERE task."activeSlot" IS TRUE
-         AND task.state IN ('QUEUED', 'RUNNING', 'FAILED')
-         AND account.state <> 'DELETED'
-         AND (task."expiresAt" IS NULL OR task."expiresAt" > now())
-         AND (task.kind = 'EXPORT' OR guard.id IS NOT NULL)
-       ORDER BY task."requestedAt", task.id
-       LIMIT $1`,
+      `WITH candidates AS (
+         SELECT task.id,task.revision,task."requestedAt",
+                guard."deletionEpoch"::text AS "deletionEpoch",
+                'DataTaskDue'::text AS "eventType",1 AS priority
+           FROM daily_energy.restricted_data_task task
+           JOIN daily_energy.app_user_account account ON account.id=task."accountId"
+           LEFT JOIN daily_energy.restricted_deletion_guard guard
+             ON guard."taskRef"=task.id AND guard."releasedAt" IS NULL
+          WHERE task."activeSlot" IS TRUE
+            AND task.state IN ('QUEUED','RUNNING','FAILED')
+            AND account.state<>'DELETED'
+            AND (task."expiresAt" IS NULL OR task."expiresAt">now())
+            AND (task.kind='EXPORT' OR guard.id IS NOT NULL)
+         UNION ALL
+         SELECT task.id,task.revision,status_grant."expiresAt",NULL::text,
+                'DataRightsRetentionDue',0
+           FROM daily_energy.restricted_deletion_status_grant status_grant
+           JOIN daily_energy.restricted_data_task task ON task.id=status_grant."taskId"
+          WHERE status_grant."expiresAt"<=now()
+         UNION ALL
+         SELECT task.id,task.revision,manifest."expiresAt",NULL::text,
+                'DataRightsRetentionDue',0
+           FROM daily_energy.restricted_export_manifest manifest
+           JOIN daily_energy.restricted_data_task task ON task.id=manifest."taskId"
+          WHERE manifest.state='READY' AND manifest."expiresAt"<=now()
+         UNION ALL
+         SELECT task.id,task.revision,task."expiresAt",NULL::text,
+                'DataRightsRetentionDue',0
+           FROM daily_energy.restricted_data_task task
+          WHERE task.kind='EXPORT' AND task."activeSlot" IS NULL
+            AND task."expiresAt" IS NOT NULL AND task."expiresAt"<=now()
+       ), selected AS (
+         SELECT DISTINCT ON (id) id,revision,"requestedAt","deletionEpoch","eventType"
+           FROM candidates
+          ORDER BY id,priority,"requestedAt"
+       )
+       SELECT id,revision,"requestedAt","deletionEpoch","eventType"
+         FROM selected ORDER BY "requestedAt",id LIMIT $1`,
       [limit],
     );
     return result.rows.map((row) =>
       dueEnvelope(
-        "DataTaskDue",
+        row.eventType,
         row.id,
         row.revision,
         row.requestedAt,
         row.deletionEpoch ? { deletion: row.deletionEpoch } : {},
+        revisionScopedEventId(row.id, row.revision),
       ),
     );
   }
@@ -539,18 +566,33 @@ function dueEnvelope(
   aggregateRevision: number,
   occurredAt: Date,
   guardEpochs: Readonly<Record<string, string>> = {},
+  eventId: string = aggregateRef,
 ): VersionedJobEnvelope {
   return parseVersionedJobEnvelope({
     aggregateRef,
     aggregateRevision,
     contract: "dailyenergy.job",
-    eventId: aggregateRef,
+    eventId,
     eventType,
     eventVersion: "v1",
     guardEpochs,
     occurredAt: occurredAt.toISOString(),
     queueVersion: 1,
   });
+}
+
+function revisionScopedEventId(
+  aggregateRef: string,
+  aggregateRevision: number,
+): string {
+  const bytes = createHash("sha256")
+    .update(`dailyenergy-due:${aggregateRef}:${aggregateRevision}`, "utf8")
+    .digest()
+    .subarray(0, 16);
+  bytes[6] = (bytes[6]! & 0x0f) | 0x50;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+  const hex = bytes.toString("hex");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
 function normalizeGuardEpochs(value: unknown): Record<string, string> {

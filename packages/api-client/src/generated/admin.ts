@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:64ae0b2b9320ea9b00bb4b16f64952e09f91a4dc175adec387eab8a7ff2e6605
+// source-fingerprint: sha256:1479280a50b42254b8de63769f559a8cbbe93395f5b6d7db8d379b52b4c67c87
 // do not edit; run `pnpm codegen`.
 
 export const ADMIN_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:64ae0b2b9320ea9b00bb4b16f64952e09f91a4dc175adec387eab8a7ff2e6605";
+  "sha256:1479280a50b42254b8de63769f559a8cbbe93395f5b6d7db8d379b52b4c67c87";
 
 export interface paths {
   "/admin/auth/login": {
@@ -103,8 +103,12 @@ export interface components {
         | "DAY_REBUILD_TASK_FAILED"
         | "DAY_REBUILD_TASK_PENDING"
         | "DAY_REBUILD_VERSION_UNAVAILABLE"
+        | "DELETION_STATUS_GRANT_INVALID"
         | "DEPENDENCY_UNAVAILABLE"
+        | "EXPORT_ARTIFACT_EXPIRED"
         | "EXPORT_NOT_READY"
+        | "EXPORT_SOURCE_CHANGED"
+        | "EXPORT_TOO_LARGE"
         | "FEATURE_DISABLED"
         | "GENERATION_FAILED_RETRYABLE"
         | "GENERATION_FAILED_TERMINAL"
@@ -237,7 +241,36 @@ export interface components {
       updated_at: string;
     };
     DataTaskListView: {
-      items: Array<components["schemas"]["DataTaskView"]>;
+      items: Array<{
+        backup_purge_deadline?: string;
+        can_cancel: boolean;
+        created_at: string;
+        export_artifact?:
+          | {
+              format: "JSON";
+              state: "PREPARING";
+            }
+          | {
+              download_ref: string;
+              expires_at: string;
+              format: "JSON";
+              ready_at: string;
+              state: "READY";
+            }
+          | {
+              format: "JSON";
+              state: "EXPIRED" | "INVALIDATED";
+            };
+        failure_summary_code?: string;
+        kind: "EXPORT" | "DELETE";
+        online_erased_at?: string;
+        revision: number;
+        scope: "DAY" | "MATTER" | "RELATIONSHIP_DATA" | "ACCOUNT";
+        status: "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELLED";
+        target_summary: string;
+        task_ref: string;
+        updated_at: string;
+      }>;
       next_cursor?: string;
       page_info: {
         has_more: boolean;
@@ -247,14 +280,30 @@ export interface components {
       backup_purge_deadline?: string;
       can_cancel: boolean;
       created_at: string;
-      failure_summary_code?: components["schemas"]["VersionToken"];
+      export_artifact?:
+        | {
+            format: "JSON";
+            state: "PREPARING";
+          }
+        | {
+            download_ref: string;
+            expires_at: string;
+            format: "JSON";
+            ready_at: string;
+            state: "READY";
+          }
+        | {
+            format: "JSON";
+            state: "EXPIRED" | "INVALIDATED";
+          };
+      failure_summary_code?: string;
       kind: "EXPORT" | "DELETE";
       online_erased_at?: string;
-      revision: components["schemas"]["PositiveRevision"];
+      revision: number;
       scope: "DAY" | "MATTER" | "RELATIONSHIP_DATA" | "ACCOUNT";
       status: "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELLED";
       target_summary: string;
-      task_ref: components["schemas"]["OpaqueRef"];
+      task_ref: string;
       updated_at: string;
     };
     ErrorCurrentView:

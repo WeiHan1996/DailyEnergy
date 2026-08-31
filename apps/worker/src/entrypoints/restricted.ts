@@ -8,6 +8,7 @@ import type {
 } from "@daily-energy/server-adapters/worker-restricted";
 import {
   createWorkerRestrictedDatabaseFactory,
+  createDataTaskHandlers,
   fingerprintCapabilityManifest,
   startWorkerRestrictedInfrastructure,
   startWorkerRestrictedTelemetry,
@@ -44,7 +45,7 @@ export function createRestrictedWorkerEntrypoint(
     unknown
   > = createWorkerRestrictedDatabaseFactory(),
   infrastructureStarter: WorkerInfrastructureStarter = startWorkerRestrictedInfrastructure,
-  handlers: readonly QueueJobHandler[] = [],
+  handlers: readonly QueueJobHandler[] = createDataTaskHandlers(),
 ): WorkerEntrypoint {
   return Object.freeze({
     capabilityFingerprint: fingerprintCapabilityManifest(

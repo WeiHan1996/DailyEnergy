@@ -346,6 +346,8 @@ export type DataTaskWhereInput = {
   expiresAt?: Prisma.DateTimeNullableFilter<"DataTask"> | Date | string | null
   account?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   checkpoints?: Prisma.DeletionStepCheckpointListRelationFilter
+  exportManifest?: Prisma.XOR<Prisma.ExportManifestNullableScalarRelationFilter, Prisma.ExportManifestWhereInput> | null
+  deletionStatusGrant?: Prisma.XOR<Prisma.DeletionStatusGrantNullableScalarRelationFilter, Prisma.DeletionStatusGrantWhereInput> | null
 }
 
 export type DataTaskOrderByWithRelationInput = {
@@ -373,6 +375,8 @@ export type DataTaskOrderByWithRelationInput = {
   expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   account?: Prisma.UserAccountOrderByWithRelationInput
   checkpoints?: Prisma.DeletionStepCheckpointOrderByRelationAggregateInput
+  exportManifest?: Prisma.ExportManifestOrderByWithRelationInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantOrderByWithRelationInput
 }
 
 export type DataTaskWhereUniqueInput = Prisma.AtLeast<{
@@ -404,6 +408,8 @@ export type DataTaskWhereUniqueInput = Prisma.AtLeast<{
   expiresAt?: Prisma.DateTimeNullableFilter<"DataTask"> | Date | string | null
   account?: Prisma.XOR<Prisma.UserAccountScalarRelationFilter, Prisma.UserAccountWhereInput>
   checkpoints?: Prisma.DeletionStepCheckpointListRelationFilter
+  exportManifest?: Prisma.XOR<Prisma.ExportManifestNullableScalarRelationFilter, Prisma.ExportManifestWhereInput> | null
+  deletionStatusGrant?: Prisma.XOR<Prisma.DeletionStatusGrantNullableScalarRelationFilter, Prisma.DeletionStatusGrantWhereInput> | null
 }, "id" | "accountId_kind_scope_targetKey_activeSlot">
 
 export type DataTaskOrderByWithAggregationInput = {
@@ -488,6 +494,8 @@ export type DataTaskCreateInput = {
   expiresAt?: Date | string | null
   account: Prisma.UserAccountCreateNestedOneWithoutDataTasksInput
   checkpoints?: Prisma.DeletionStepCheckpointCreateNestedManyWithoutTaskInput
+  exportManifest?: Prisma.ExportManifestCreateNestedOneWithoutTaskInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantCreateNestedOneWithoutTaskInput
 }
 
 export type DataTaskUncheckedCreateInput = {
@@ -514,6 +522,8 @@ export type DataTaskUncheckedCreateInput = {
   retentionAnchorAt: Date | string
   expiresAt?: Date | string | null
   checkpoints?: Prisma.DeletionStepCheckpointUncheckedCreateNestedManyWithoutTaskInput
+  exportManifest?: Prisma.ExportManifestUncheckedCreateNestedOneWithoutTaskInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUncheckedCreateNestedOneWithoutTaskInput
 }
 
 export type DataTaskUpdateInput = {
@@ -540,6 +550,8 @@ export type DataTaskUpdateInput = {
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   account?: Prisma.UserAccountUpdateOneRequiredWithoutDataTasksNestedInput
   checkpoints?: Prisma.DeletionStepCheckpointUpdateManyWithoutTaskNestedInput
+  exportManifest?: Prisma.ExportManifestUpdateOneWithoutTaskNestedInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUpdateOneWithoutTaskNestedInput
 }
 
 export type DataTaskUncheckedUpdateInput = {
@@ -566,6 +578,8 @@ export type DataTaskUncheckedUpdateInput = {
   retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   checkpoints?: Prisma.DeletionStepCheckpointUncheckedUpdateManyWithoutTaskNestedInput
+  exportManifest?: Prisma.ExportManifestUncheckedUpdateOneWithoutTaskNestedInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUncheckedUpdateOneWithoutTaskNestedInput
 }
 
 export type DataTaskCreateManyInput = {
@@ -807,6 +821,34 @@ export type DataTaskUpdatefailureScopeCodesInput = {
   push?: string | string[]
 }
 
+export type DataTaskCreateNestedOneWithoutExportManifestInput = {
+  create?: Prisma.XOR<Prisma.DataTaskCreateWithoutExportManifestInput, Prisma.DataTaskUncheckedCreateWithoutExportManifestInput>
+  connectOrCreate?: Prisma.DataTaskCreateOrConnectWithoutExportManifestInput
+  connect?: Prisma.DataTaskWhereUniqueInput
+}
+
+export type DataTaskUpdateOneRequiredWithoutExportManifestNestedInput = {
+  create?: Prisma.XOR<Prisma.DataTaskCreateWithoutExportManifestInput, Prisma.DataTaskUncheckedCreateWithoutExportManifestInput>
+  connectOrCreate?: Prisma.DataTaskCreateOrConnectWithoutExportManifestInput
+  upsert?: Prisma.DataTaskUpsertWithoutExportManifestInput
+  connect?: Prisma.DataTaskWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DataTaskUpdateToOneWithWhereWithoutExportManifestInput, Prisma.DataTaskUpdateWithoutExportManifestInput>, Prisma.DataTaskUncheckedUpdateWithoutExportManifestInput>
+}
+
+export type DataTaskCreateNestedOneWithoutDeletionStatusGrantInput = {
+  create?: Prisma.XOR<Prisma.DataTaskCreateWithoutDeletionStatusGrantInput, Prisma.DataTaskUncheckedCreateWithoutDeletionStatusGrantInput>
+  connectOrCreate?: Prisma.DataTaskCreateOrConnectWithoutDeletionStatusGrantInput
+  connect?: Prisma.DataTaskWhereUniqueInput
+}
+
+export type DataTaskUpdateOneRequiredWithoutDeletionStatusGrantNestedInput = {
+  create?: Prisma.XOR<Prisma.DataTaskCreateWithoutDeletionStatusGrantInput, Prisma.DataTaskUncheckedCreateWithoutDeletionStatusGrantInput>
+  connectOrCreate?: Prisma.DataTaskCreateOrConnectWithoutDeletionStatusGrantInput
+  upsert?: Prisma.DataTaskUpsertWithoutDeletionStatusGrantInput
+  connect?: Prisma.DataTaskWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DataTaskUpdateToOneWithWhereWithoutDeletionStatusGrantInput, Prisma.DataTaskUpdateWithoutDeletionStatusGrantInput>, Prisma.DataTaskUncheckedUpdateWithoutDeletionStatusGrantInput>
+}
+
 export type DataTaskCreateNestedOneWithoutCheckpointsInput = {
   create?: Prisma.XOR<Prisma.DataTaskCreateWithoutCheckpointsInput, Prisma.DataTaskUncheckedCreateWithoutCheckpointsInput>
   connectOrCreate?: Prisma.DataTaskCreateOrConnectWithoutCheckpointsInput
@@ -844,6 +886,8 @@ export type DataTaskCreateWithoutAccountInput = {
   retentionAnchorAt: Date | string
   expiresAt?: Date | string | null
   checkpoints?: Prisma.DeletionStepCheckpointCreateNestedManyWithoutTaskInput
+  exportManifest?: Prisma.ExportManifestCreateNestedOneWithoutTaskInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantCreateNestedOneWithoutTaskInput
 }
 
 export type DataTaskUncheckedCreateWithoutAccountInput = {
@@ -869,6 +913,8 @@ export type DataTaskUncheckedCreateWithoutAccountInput = {
   retentionAnchorAt: Date | string
   expiresAt?: Date | string | null
   checkpoints?: Prisma.DeletionStepCheckpointUncheckedCreateNestedManyWithoutTaskInput
+  exportManifest?: Prisma.ExportManifestUncheckedCreateNestedOneWithoutTaskInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUncheckedCreateNestedOneWithoutTaskInput
 }
 
 export type DataTaskCreateOrConnectWithoutAccountInput = {
@@ -925,6 +971,254 @@ export type DataTaskScalarWhereInput = {
   expiresAt?: Prisma.DateTimeNullableFilter<"DataTask"> | Date | string | null
 }
 
+export type DataTaskCreateWithoutExportManifestInput = {
+  id?: string
+  kind: $Enums.DataTaskKind
+  scope: $Enums.DataTaskScope
+  targetType: string
+  targetKey: string
+  activeSlot?: boolean | null
+  state?: $Enums.DataTaskState
+  revision?: number
+  confirmationVersion: string
+  requestedAt: Date | string
+  guardedAt?: Date | string | null
+  startedAt?: Date | string | null
+  onlineErasedAt?: Date | string | null
+  finishedAt?: Date | string | null
+  failureScopeCodes?: Prisma.DataTaskCreatefailureScopeCodesInput | string[]
+  backupPurgeDeadline?: Date | string | null
+  providerExpiryDeadlines?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  retentionPolicyVersion: string
+  retentionScope?: $Enums.RetentionScope
+  retentionAnchorAt: Date | string
+  expiresAt?: Date | string | null
+  account: Prisma.UserAccountCreateNestedOneWithoutDataTasksInput
+  checkpoints?: Prisma.DeletionStepCheckpointCreateNestedManyWithoutTaskInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantCreateNestedOneWithoutTaskInput
+}
+
+export type DataTaskUncheckedCreateWithoutExportManifestInput = {
+  id?: string
+  accountId: string
+  kind: $Enums.DataTaskKind
+  scope: $Enums.DataTaskScope
+  targetType: string
+  targetKey: string
+  activeSlot?: boolean | null
+  state?: $Enums.DataTaskState
+  revision?: number
+  confirmationVersion: string
+  requestedAt: Date | string
+  guardedAt?: Date | string | null
+  startedAt?: Date | string | null
+  onlineErasedAt?: Date | string | null
+  finishedAt?: Date | string | null
+  failureScopeCodes?: Prisma.DataTaskCreatefailureScopeCodesInput | string[]
+  backupPurgeDeadline?: Date | string | null
+  providerExpiryDeadlines?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  retentionPolicyVersion: string
+  retentionScope?: $Enums.RetentionScope
+  retentionAnchorAt: Date | string
+  expiresAt?: Date | string | null
+  checkpoints?: Prisma.DeletionStepCheckpointUncheckedCreateNestedManyWithoutTaskInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUncheckedCreateNestedOneWithoutTaskInput
+}
+
+export type DataTaskCreateOrConnectWithoutExportManifestInput = {
+  where: Prisma.DataTaskWhereUniqueInput
+  create: Prisma.XOR<Prisma.DataTaskCreateWithoutExportManifestInput, Prisma.DataTaskUncheckedCreateWithoutExportManifestInput>
+}
+
+export type DataTaskUpsertWithoutExportManifestInput = {
+  update: Prisma.XOR<Prisma.DataTaskUpdateWithoutExportManifestInput, Prisma.DataTaskUncheckedUpdateWithoutExportManifestInput>
+  create: Prisma.XOR<Prisma.DataTaskCreateWithoutExportManifestInput, Prisma.DataTaskUncheckedCreateWithoutExportManifestInput>
+  where?: Prisma.DataTaskWhereInput
+}
+
+export type DataTaskUpdateToOneWithWhereWithoutExportManifestInput = {
+  where?: Prisma.DataTaskWhereInput
+  data: Prisma.XOR<Prisma.DataTaskUpdateWithoutExportManifestInput, Prisma.DataTaskUncheckedUpdateWithoutExportManifestInput>
+}
+
+export type DataTaskUpdateWithoutExportManifestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumDataTaskKindFieldUpdateOperationsInput | $Enums.DataTaskKind
+  scope?: Prisma.EnumDataTaskScopeFieldUpdateOperationsInput | $Enums.DataTaskScope
+  targetType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetKey?: Prisma.StringFieldUpdateOperationsInput | string
+  activeSlot?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  state?: Prisma.EnumDataTaskStateFieldUpdateOperationsInput | $Enums.DataTaskState
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  confirmationVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  onlineErasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureScopeCodes?: Prisma.DataTaskUpdatefailureScopeCodesInput | string[]
+  backupPurgeDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerExpiryDeadlines?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  retentionPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  retentionScope?: Prisma.EnumRetentionScopeFieldUpdateOperationsInput | $Enums.RetentionScope
+  retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  account?: Prisma.UserAccountUpdateOneRequiredWithoutDataTasksNestedInput
+  checkpoints?: Prisma.DeletionStepCheckpointUpdateManyWithoutTaskNestedInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUpdateOneWithoutTaskNestedInput
+}
+
+export type DataTaskUncheckedUpdateWithoutExportManifestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumDataTaskKindFieldUpdateOperationsInput | $Enums.DataTaskKind
+  scope?: Prisma.EnumDataTaskScopeFieldUpdateOperationsInput | $Enums.DataTaskScope
+  targetType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetKey?: Prisma.StringFieldUpdateOperationsInput | string
+  activeSlot?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  state?: Prisma.EnumDataTaskStateFieldUpdateOperationsInput | $Enums.DataTaskState
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  confirmationVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  onlineErasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureScopeCodes?: Prisma.DataTaskUpdatefailureScopeCodesInput | string[]
+  backupPurgeDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerExpiryDeadlines?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  retentionPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  retentionScope?: Prisma.EnumRetentionScopeFieldUpdateOperationsInput | $Enums.RetentionScope
+  retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkpoints?: Prisma.DeletionStepCheckpointUncheckedUpdateManyWithoutTaskNestedInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUncheckedUpdateOneWithoutTaskNestedInput
+}
+
+export type DataTaskCreateWithoutDeletionStatusGrantInput = {
+  id?: string
+  kind: $Enums.DataTaskKind
+  scope: $Enums.DataTaskScope
+  targetType: string
+  targetKey: string
+  activeSlot?: boolean | null
+  state?: $Enums.DataTaskState
+  revision?: number
+  confirmationVersion: string
+  requestedAt: Date | string
+  guardedAt?: Date | string | null
+  startedAt?: Date | string | null
+  onlineErasedAt?: Date | string | null
+  finishedAt?: Date | string | null
+  failureScopeCodes?: Prisma.DataTaskCreatefailureScopeCodesInput | string[]
+  backupPurgeDeadline?: Date | string | null
+  providerExpiryDeadlines?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  retentionPolicyVersion: string
+  retentionScope?: $Enums.RetentionScope
+  retentionAnchorAt: Date | string
+  expiresAt?: Date | string | null
+  account: Prisma.UserAccountCreateNestedOneWithoutDataTasksInput
+  checkpoints?: Prisma.DeletionStepCheckpointCreateNestedManyWithoutTaskInput
+  exportManifest?: Prisma.ExportManifestCreateNestedOneWithoutTaskInput
+}
+
+export type DataTaskUncheckedCreateWithoutDeletionStatusGrantInput = {
+  id?: string
+  accountId: string
+  kind: $Enums.DataTaskKind
+  scope: $Enums.DataTaskScope
+  targetType: string
+  targetKey: string
+  activeSlot?: boolean | null
+  state?: $Enums.DataTaskState
+  revision?: number
+  confirmationVersion: string
+  requestedAt: Date | string
+  guardedAt?: Date | string | null
+  startedAt?: Date | string | null
+  onlineErasedAt?: Date | string | null
+  finishedAt?: Date | string | null
+  failureScopeCodes?: Prisma.DataTaskCreatefailureScopeCodesInput | string[]
+  backupPurgeDeadline?: Date | string | null
+  providerExpiryDeadlines?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  retentionPolicyVersion: string
+  retentionScope?: $Enums.RetentionScope
+  retentionAnchorAt: Date | string
+  expiresAt?: Date | string | null
+  checkpoints?: Prisma.DeletionStepCheckpointUncheckedCreateNestedManyWithoutTaskInput
+  exportManifest?: Prisma.ExportManifestUncheckedCreateNestedOneWithoutTaskInput
+}
+
+export type DataTaskCreateOrConnectWithoutDeletionStatusGrantInput = {
+  where: Prisma.DataTaskWhereUniqueInput
+  create: Prisma.XOR<Prisma.DataTaskCreateWithoutDeletionStatusGrantInput, Prisma.DataTaskUncheckedCreateWithoutDeletionStatusGrantInput>
+}
+
+export type DataTaskUpsertWithoutDeletionStatusGrantInput = {
+  update: Prisma.XOR<Prisma.DataTaskUpdateWithoutDeletionStatusGrantInput, Prisma.DataTaskUncheckedUpdateWithoutDeletionStatusGrantInput>
+  create: Prisma.XOR<Prisma.DataTaskCreateWithoutDeletionStatusGrantInput, Prisma.DataTaskUncheckedCreateWithoutDeletionStatusGrantInput>
+  where?: Prisma.DataTaskWhereInput
+}
+
+export type DataTaskUpdateToOneWithWhereWithoutDeletionStatusGrantInput = {
+  where?: Prisma.DataTaskWhereInput
+  data: Prisma.XOR<Prisma.DataTaskUpdateWithoutDeletionStatusGrantInput, Prisma.DataTaskUncheckedUpdateWithoutDeletionStatusGrantInput>
+}
+
+export type DataTaskUpdateWithoutDeletionStatusGrantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumDataTaskKindFieldUpdateOperationsInput | $Enums.DataTaskKind
+  scope?: Prisma.EnumDataTaskScopeFieldUpdateOperationsInput | $Enums.DataTaskScope
+  targetType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetKey?: Prisma.StringFieldUpdateOperationsInput | string
+  activeSlot?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  state?: Prisma.EnumDataTaskStateFieldUpdateOperationsInput | $Enums.DataTaskState
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  confirmationVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  onlineErasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureScopeCodes?: Prisma.DataTaskUpdatefailureScopeCodesInput | string[]
+  backupPurgeDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerExpiryDeadlines?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  retentionPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  retentionScope?: Prisma.EnumRetentionScopeFieldUpdateOperationsInput | $Enums.RetentionScope
+  retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  account?: Prisma.UserAccountUpdateOneRequiredWithoutDataTasksNestedInput
+  checkpoints?: Prisma.DeletionStepCheckpointUpdateManyWithoutTaskNestedInput
+  exportManifest?: Prisma.ExportManifestUpdateOneWithoutTaskNestedInput
+}
+
+export type DataTaskUncheckedUpdateWithoutDeletionStatusGrantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumDataTaskKindFieldUpdateOperationsInput | $Enums.DataTaskKind
+  scope?: Prisma.EnumDataTaskScopeFieldUpdateOperationsInput | $Enums.DataTaskScope
+  targetType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetKey?: Prisma.StringFieldUpdateOperationsInput | string
+  activeSlot?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  state?: Prisma.EnumDataTaskStateFieldUpdateOperationsInput | $Enums.DataTaskState
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  confirmationVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  onlineErasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failureScopeCodes?: Prisma.DataTaskUpdatefailureScopeCodesInput | string[]
+  backupPurgeDeadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  providerExpiryDeadlines?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  retentionPolicyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  retentionScope?: Prisma.EnumRetentionScopeFieldUpdateOperationsInput | $Enums.RetentionScope
+  retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  checkpoints?: Prisma.DeletionStepCheckpointUncheckedUpdateManyWithoutTaskNestedInput
+  exportManifest?: Prisma.ExportManifestUncheckedUpdateOneWithoutTaskNestedInput
+}
+
 export type DataTaskCreateWithoutCheckpointsInput = {
   id?: string
   kind: $Enums.DataTaskKind
@@ -948,6 +1242,8 @@ export type DataTaskCreateWithoutCheckpointsInput = {
   retentionAnchorAt: Date | string
   expiresAt?: Date | string | null
   account: Prisma.UserAccountCreateNestedOneWithoutDataTasksInput
+  exportManifest?: Prisma.ExportManifestCreateNestedOneWithoutTaskInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantCreateNestedOneWithoutTaskInput
 }
 
 export type DataTaskUncheckedCreateWithoutCheckpointsInput = {
@@ -973,6 +1269,8 @@ export type DataTaskUncheckedCreateWithoutCheckpointsInput = {
   retentionScope?: $Enums.RetentionScope
   retentionAnchorAt: Date | string
   expiresAt?: Date | string | null
+  exportManifest?: Prisma.ExportManifestUncheckedCreateNestedOneWithoutTaskInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUncheckedCreateNestedOneWithoutTaskInput
 }
 
 export type DataTaskCreateOrConnectWithoutCheckpointsInput = {
@@ -1014,6 +1312,8 @@ export type DataTaskUpdateWithoutCheckpointsInput = {
   retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   account?: Prisma.UserAccountUpdateOneRequiredWithoutDataTasksNestedInput
+  exportManifest?: Prisma.ExportManifestUpdateOneWithoutTaskNestedInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUpdateOneWithoutTaskNestedInput
 }
 
 export type DataTaskUncheckedUpdateWithoutCheckpointsInput = {
@@ -1039,6 +1339,8 @@ export type DataTaskUncheckedUpdateWithoutCheckpointsInput = {
   retentionScope?: Prisma.EnumRetentionScopeFieldUpdateOperationsInput | $Enums.RetentionScope
   retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  exportManifest?: Prisma.ExportManifestUncheckedUpdateOneWithoutTaskNestedInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUncheckedUpdateOneWithoutTaskNestedInput
 }
 
 export type DataTaskCreateManyAccountInput = {
@@ -1088,6 +1390,8 @@ export type DataTaskUpdateWithoutAccountInput = {
   retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   checkpoints?: Prisma.DeletionStepCheckpointUpdateManyWithoutTaskNestedInput
+  exportManifest?: Prisma.ExportManifestUpdateOneWithoutTaskNestedInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUpdateOneWithoutTaskNestedInput
 }
 
 export type DataTaskUncheckedUpdateWithoutAccountInput = {
@@ -1113,6 +1417,8 @@ export type DataTaskUncheckedUpdateWithoutAccountInput = {
   retentionAnchorAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   checkpoints?: Prisma.DeletionStepCheckpointUncheckedUpdateManyWithoutTaskNestedInput
+  exportManifest?: Prisma.ExportManifestUncheckedUpdateOneWithoutTaskNestedInput
+  deletionStatusGrant?: Prisma.DeletionStatusGrantUncheckedUpdateOneWithoutTaskNestedInput
 }
 
 export type DataTaskUncheckedUpdateManyWithoutAccountInput = {
@@ -1195,6 +1501,8 @@ export type DataTaskSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   expiresAt?: boolean
   account?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   checkpoints?: boolean | Prisma.DataTask$checkpointsArgs<ExtArgs>
+  exportManifest?: boolean | Prisma.DataTask$exportManifestArgs<ExtArgs>
+  deletionStatusGrant?: boolean | Prisma.DataTask$deletionStatusGrantArgs<ExtArgs>
   _count?: boolean | Prisma.DataTaskCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["dataTask"]>
 
@@ -1279,6 +1587,8 @@ export type DataTaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type DataTaskInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   account?: boolean | Prisma.UserAccountDefaultArgs<ExtArgs>
   checkpoints?: boolean | Prisma.DataTask$checkpointsArgs<ExtArgs>
+  exportManifest?: boolean | Prisma.DataTask$exportManifestArgs<ExtArgs>
+  deletionStatusGrant?: boolean | Prisma.DataTask$deletionStatusGrantArgs<ExtArgs>
   _count?: boolean | Prisma.DataTaskCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DataTaskIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1293,6 +1603,8 @@ export type $DataTaskPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     account: Prisma.$UserAccountPayload<ExtArgs>
     checkpoints: Prisma.$DeletionStepCheckpointPayload<ExtArgs>[]
+    exportManifest: Prisma.$ExportManifestPayload<ExtArgs> | null
+    deletionStatusGrant: Prisma.$DeletionStatusGrantPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1713,6 +2025,8 @@ export interface Prisma__DataTaskClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   account<T extends Prisma.UserAccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAccountDefaultArgs<ExtArgs>>): Prisma.Prisma__UserAccountClient<runtime.Types.Result.GetResult<Prisma.$UserAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   checkpoints<T extends Prisma.DataTask$checkpointsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DataTask$checkpointsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeletionStepCheckpointPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  exportManifest<T extends Prisma.DataTask$exportManifestArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DataTask$exportManifestArgs<ExtArgs>>): Prisma.Prisma__ExportManifestClient<runtime.Types.Result.GetResult<Prisma.$ExportManifestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  deletionStatusGrant<T extends Prisma.DataTask$deletionStatusGrantArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DataTask$deletionStatusGrantArgs<ExtArgs>>): Prisma.Prisma__DeletionStatusGrantClient<runtime.Types.Result.GetResult<Prisma.$DeletionStatusGrantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2186,6 +2500,44 @@ export type DataTask$checkpointsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.DeletionStepCheckpointScalarFieldEnum | Prisma.DeletionStepCheckpointScalarFieldEnum[]
+}
+
+/**
+ * DataTask.exportManifest
+ */
+export type DataTask$exportManifestArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ExportManifest
+   */
+  select?: Prisma.ExportManifestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ExportManifest
+   */
+  omit?: Prisma.ExportManifestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExportManifestInclude<ExtArgs> | null
+  where?: Prisma.ExportManifestWhereInput
+}
+
+/**
+ * DataTask.deletionStatusGrant
+ */
+export type DataTask$deletionStatusGrantArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DeletionStatusGrant
+   */
+  select?: Prisma.DeletionStatusGrantSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DeletionStatusGrant
+   */
+  omit?: Prisma.DeletionStatusGrantOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DeletionStatusGrantInclude<ExtArgs> | null
+  where?: Prisma.DeletionStatusGrantWhereInput
 }
 
 /**

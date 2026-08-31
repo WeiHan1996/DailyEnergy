@@ -105,6 +105,34 @@
       <de-section-card wx:else heading="晚间记录" variant="subtle">
         <view class="history__empty-copy">这一天没有留下晚间记录。</view>
       </de-section-card>
+
+      <de-inline-notice
+        wx:if="{{deleteError}}"
+        title="删除请求没有提交"
+        message="原记录仍保持不变；联网后可以重新确认。"
+        tone="error"
+      ></de-inline-notice>
+      <view class="history__danger-action">
+        <de-action-button
+          block="{{true}}"
+          disabled="{{offline}}"
+          label="删除这一天"
+          variant="danger"
+          bind:press="openDeleteConfirm"
+        ></de-action-button>
+      </view>
     </block>
   </view>
+
+  <de-confirm-sheet
+    cancel-label="取消"
+    confirm-label="确认删除"
+    danger="{{true}}"
+    impact="删除后这一天会显示为缺失，相关七天趋势和总结会重新计算；在线记录进入清理后不能恢复。"
+    loading="{{deleting}}"
+    open="{{showDeleteConfirm}}"
+    title="删除 {{productDate}} 的记录？"
+    bind:cancel="cancelDelete"
+    bind:confirm="confirmDelete"
+  ></de-confirm-sheet>
 </de-page-shell>

@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-08-21
+- **最后更新**：2026-08-28
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -149,15 +149,16 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 ### 7.4 数据与接口
 
-| 文件                                                        | 状态     | 目的                                                    | 主要依赖                                           |
-| ----------------------------------------------------------- | -------- | ------------------------------------------------------- | -------------------------------------------------- |
-| [docs/data/domain-model.md](./data/domain-model.md)         | Accepted | 领域上下文、聚合、实体、关系、唯一性、修订与失效        | state-machine、schemas、memory、safety、evaluation |
-| [docs/technical/database.md](./technical/database.md)       | Accepted | PostgreSQL 表、索引、约束、事务、迁移和删除规格         | domain-model、ADR-0005                             |
-| [prisma/schema.prisma](../prisma/schema.prisma)             | Accepted | Prisma ORM 7 / PostgreSQL 可执行结构草案                | database spec                                      |
-| [docs/technical/api.md](./technical/api.md)                 | Accepted | 小程序、后端和后台接口契约                              | domain、schemas、database                          |
-| [docs/technical/error-codes.md](./technical/error-codes.md) | Accepted | 错误、恢复和降级语义                                    | API、interaction-states                            |
-| [openapi/openapi.yaml](../openapi/openapi.yaml)             | Accepted | OpenAPI 3 可执行路径草案                                | api.md                                             |
-| [packages/api-client](../packages/api-client/README.md)     | Draft    | E-008 Public/Admin 生成客户端、mapper 与 drift 使用说明 | shared-schemas、OpenAPI、error-codes               |
+| 文件                                                                                              | 状态     | 目的                                                    | 主要依赖                                           |
+| ------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------- | -------------------------------------------------- |
+| [docs/data/domain-model.md](./data/domain-model.md)                                               | Accepted | 领域上下文、聚合、实体、关系、唯一性、修订与失效        | state-machine、schemas、memory、safety、evaluation |
+| [docs/technical/database.md](./technical/database.md)                                             | Accepted | PostgreSQL 表、索引、约束、事务、迁移和删除规格         | domain-model、ADR-0005                             |
+| [prisma/schema.prisma](../prisma/schema.prisma)                                                   | Accepted | Prisma ORM 7 / PostgreSQL 可执行结构草案                | database spec                                      |
+| [docs/technical/api.md](./technical/api.md)                                                       | Accepted | 小程序、后端和后台接口契约                              | domain、schemas、database                          |
+| [docs/technical/data-rights-contract-amendment.md](./technical/data-rights-contract-amendment.md) | Accepted | C-014 revision、短期导出和删除状态续读修订              | ADR-0005、ADR-0008、API                            |
+| [docs/technical/error-codes.md](./technical/error-codes.md)                                       | Accepted | 错误、恢复和降级语义                                    | API、interaction-states                            |
+| [openapi/openapi.yaml](../openapi/openapi.yaml)                                                   | Accepted | OpenAPI 3 可执行路径草案                                | api.md                                             |
+| [packages/api-client](../packages/api-client/README.md)                                           | Draft    | E-008 Public/Admin 生成客户端、mapper 与 drift 使用说明 | shared-schemas、OpenAPI、error-codes               |
 
 ### 7.5 数据分析、隐私与运营
 
@@ -205,8 +206,12 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [ADR-0005-data-retention-and-deletion.md](./decisions/ADR-0005-data-retention-and-deletion.md)           | Accepted | 保存期限、删除、备份、受托方和受限证据                  | 数据库开发前      |
 | [ADR-0006-monorepo-and-stack.md](./decisions/ADR-0006-monorepo-and-stack.md)                             | Accepted | pnpm/Turbo 单仓、运行时、框架、数据与版本治理           | 工程初始化前      |
 | [ADR-0007-development-colocation-exception.md](./decisions/ADR-0007-development-colocation-exception.md) | Accepted | 临时 DEV 同机 PostgreSQL/Redis、私有 COS 与生产退出边界 | E-012 开工前      |
+| [ADR-0008-data-rights-delivery-and-status.md](./decisions/ADR-0008-data-rights-delivery-and-status.md)   | Accepted | revision discovery、短期导出与删除状态续读              | C-014 恢复前      |
 
 如果实际决策发生变化，应调整 ADR 名称和顺序，不为填满编号而创建无价值文档。
+
+C-014 的 [数据权利传输契约修订](./technical/data-rights-contract-amendment.md) 已于
+2026-08-28 随 ADR-0008 一并接受，成为 API/OpenAPI、共享 Schema 与实现的权威增量合同。
 
 ## 9. 实施阶段文档
 
@@ -286,7 +291,7 @@ E-007 已随 [PR #113](https://github.com/WeiHan1996/DailyEnergy/pull/113) squas
 [D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
 [D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
 [D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 已纳入
-Phase 2；D-001～D-005 与 C-003 已进入 Done；C-003 已随 PR #154 squash 合并为 `bd00fbe5911b64b643071294f77d0957725e954d`，Issue #55 已关闭。项目所有者于 2026-08-21 授权按依赖顺序连续完成 C-004～C-015、逐项执行任务 Gate，并在 C-015 后统一审核；C-004 [Draft PR #157](https://github.com/WeiHan1996/DailyEnergy/pull/157) final head `9a902a5` 的 CI run `32456442334`、C-005 [Draft PR #158](https://github.com/WeiHan1996/DailyEnergy/pull/158) final head `e038393` 的 CI run `32463505126`、C-006 [Draft PR #159](https://github.com/WeiHan1996/DailyEnergy/pull/159) final head `743e1d8` 的 CI run `32468906982`、C-007 [Draft PR #160](https://github.com/WeiHan1996/DailyEnergy/pull/160) final head `4fdf0b5` 的 CI run `32680445291`、C-008 [Draft PR #161](https://github.com/WeiHan1996/DailyEnergy/pull/161) final head `7e4a6e1` 的 CI run `32688523258`、C-009 [Draft PR #162](https://github.com/WeiHan1996/DailyEnergy/pull/162) final head `941c302` 的 CI run `32692776724`、C-010 [Draft PR #163](https://github.com/WeiHan1996/DailyEnergy/pull/163) final head `e6dc371` 的 CI run `32697952655`、C-011 [Draft PR #164](https://github.com/WeiHan1996/DailyEnergy/pull/164) final head `3ca1105` 的 CI run `32705520165`、C-012 [stacked Draft PR #165](https://github.com/WeiHan1996/DailyEnergy/pull/165) final head `b70b9e3` 的 CI run `32728000420` 均已取得 11/11 SUCCESS；C-004～C-012 保持 In Review，人工证据留待统一审核。C-013 [stacked Draft PR #166](https://github.com/WeiHan1996/DailyEnergy/pull/166)已完成七日真实聚合、TX-07、本地模板、REC-001、PG18/Redis8 与自动 Gate，等待 final-head CI。D-004 是 C-003、C-004、C-009 的直接前置；D-005 是 C-012、C-013、C-014 的直接前置，相关设计前置均已满足。
+Phase 2；D-001～D-005 与 C-003 已进入 Done；C-003 已随 PR #154 squash 合并为 `bd00fbe5911b64b643071294f77d0957725e954d`，Issue #55 已关闭。项目所有者于 2026-08-21 授权按依赖顺序连续完成 C-004～C-015、逐项执行任务 Gate，并在 C-015 后统一审核；C-004 [Draft PR #157](https://github.com/WeiHan1996/DailyEnergy/pull/157) final head `9a902a5` 的 CI run `32456442334`、C-005 [Draft PR #158](https://github.com/WeiHan1996/DailyEnergy/pull/158) final head `e038393` 的 CI run `32463505126`、C-006 [Draft PR #159](https://github.com/WeiHan1996/DailyEnergy/pull/159) final head `743e1d8` 的 CI run `32468906982`、C-007 [Draft PR #160](https://github.com/WeiHan1996/DailyEnergy/pull/160) final head `4fdf0b5` 的 CI run `32680445291`、C-008 [Draft PR #161](https://github.com/WeiHan1996/DailyEnergy/pull/161) final head `7e4a6e1` 的 CI run `32688523258`、C-009 [Draft PR #162](https://github.com/WeiHan1996/DailyEnergy/pull/162) final head `941c302` 的 CI run `32692776724`、C-010 [Draft PR #163](https://github.com/WeiHan1996/DailyEnergy/pull/163) final head `e6dc371` 的 CI run `32697952655`、C-011 [Draft PR #164](https://github.com/WeiHan1996/DailyEnergy/pull/164) final head `3ca1105` 的 CI run `32705520165`、C-012 [stacked Draft PR #165](https://github.com/WeiHan1996/DailyEnergy/pull/165) final head `b70b9e3` 的 CI run `32728000420`、C-013 [stacked Draft PR #166](https://github.com/WeiHan1996/DailyEnergy/pull/166) final head `e43e75b` 的 CI run `32742512307` 均已取得 11/11 SUCCESS；C-004～C-013 保持 In Review，人工证据留待统一审核。C-014 已从 C-013 verified head 启动。D-004 是 C-003、C-004、C-009 的直接前置；D-005 是 C-012、C-013、C-014 的直接前置，相关设计前置均已满足。
 正式 Source-ID registry 已由 E-010 实现；E-011 已接入 CI、artifact、cache、
 telemetry 与供应链 evidence 且不改变原有证据层级，未实现项继续为 `PLANNED`。
 CI workflow/artifacts 已由 E-011 交付；E-016 经项目所有者明确授权把仓库设为 public，并接受

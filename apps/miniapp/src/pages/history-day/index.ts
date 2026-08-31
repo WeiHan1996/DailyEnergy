@@ -58,6 +58,8 @@ Page({
     actionReason: "",
     checkinRows: [] as ReadonlyArray<{ label: string; value: string }>,
     error: false,
+    deleteError: false,
+    deleting: false,
     explanationText: "",
     loading: true,
     eveningFeelingLabel: "",
@@ -65,6 +67,7 @@ Page({
     missing: false,
     offline: false,
     productDate: "",
+    showDeleteConfirm: false,
     screenId: HISTORY_DAY_SCREEN_ID,
     taskStatusLabel: "",
     view: undefined as HistoryDayView | undefined,
@@ -114,6 +117,43 @@ Page({
     await this.applyResult(
       await getMiniappAppContext().daily.loadHistory(this.data.productDate),
     );
+  },
+  openDeleteConfirm() {
+    if (this.data.offline || this.data.view === undefined) {
+      return;
+    }
+    this.setData({ deleteError: false, showDeleteConfirm: true });
+  },
+  cancelDelete() {
+    if (!this.data.deleting) {
+      this.setData({ showDeleteConfirm: false });
+    }
+  },
+  async confirmDelete() {
+    const view = this.data.view;
+    if (view === undefined || this.data.offline || this.data.deleting) {
+      return;
+    }
+    this.setData({ deleteError: false, deleting: true });
+    const result = await getMiniappAppContext().dataRights.deleteDay({
+      expectedRevision: view.checkin?.revision ?? 0,
+      productDate: this.data.productDate,
+    });
+    if (result.kind === "task") {
+      this.setData({
+        deleting: false,
+        missing: true,
+        showDeleteConfirm: false,
+        view: undefined,
+      });
+      wx.showToast({ icon: "success", title: "已进入删除处理" });
+      return;
+    }
+    this.setData({
+      deleteError: true,
+      deleting: false,
+      showDeleteConfirm: false,
+    });
   },
   async applyResult(result: DailyFlowResult) {
     if (result.kind === "safety") {

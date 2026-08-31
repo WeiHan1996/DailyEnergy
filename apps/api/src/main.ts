@@ -8,6 +8,7 @@ import {
   PostgresConsentProfileStore,
   PostgresDailyGenerationStore,
   PostgresDailyInteractionStore,
+  PostgresDataRightsStore,
   PostgresEveningStore,
   PostgresWeeklyStore,
   RedisDailyContentCache,
@@ -18,6 +19,7 @@ import {
   type ConsentProfileStore,
   type DailyGenerationStore,
   type DailyInteractionStore,
+  type DataRightsStore,
   type EveningStore,
   type WeeklyStore,
   type TelemetryRuntime,
@@ -68,6 +70,7 @@ async function main(): Promise<void> {
   let consentProfileStore: ConsentProfileStore | undefined;
   let dailyGenerationStore: DailyGenerationStore | undefined;
   let dailyInteractionStore: DailyInteractionStore | undefined;
+  let dataRightsStore: DataRightsStore | undefined;
   let eveningStore: EveningStore | undefined;
   let weeklyStore: WeeklyStore | undefined;
   try {
@@ -136,6 +139,12 @@ async function main(): Promise<void> {
           connectionString,
           expectedDatabaseRole: "daily_energy_api",
         });
+        dataRightsStore = await PostgresDataRightsStore.connect({
+          applicationName: "daily-energy:api:data-rights",
+          connectionLimit: 4,
+          connectionString,
+          expectedDatabaseRole: "daily_energy_api",
+        });
         eveningStore = await PostgresEveningStore.connect({
           applicationName: "daily-energy:api:evening",
           connectionLimit: 4,
@@ -159,6 +168,7 @@ async function main(): Promise<void> {
       ...(consentProfileStore === undefined ? {} : { consentProfileStore }),
       ...(dailyGenerationStore === undefined ? {} : { dailyGenerationStore }),
       ...(dailyInteractionStore === undefined ? {} : { dailyInteractionStore }),
+      ...(dataRightsStore === undefined ? {} : { dataRightsStore }),
       ...(eveningStore === undefined ? {} : { eveningStore }),
       ...(weeklyStore === undefined ? {} : { weeklyStore }),
       readinessChecks,
@@ -178,6 +188,9 @@ async function main(): Promise<void> {
         ...(dailyInteractionStore === undefined
           ? []
           : [{ drain: () => dailyInteractionStore?.close() }]),
+        ...(dataRightsStore === undefined
+          ? []
+          : [{ drain: () => dataRightsStore?.close() }]),
         ...(eveningStore === undefined
           ? []
           : [{ drain: () => eveningStore?.close() }]),
@@ -205,6 +218,7 @@ async function main(): Promise<void> {
     await consentProfileStore?.close().catch(() => undefined);
     await dailyGenerationStore?.close().catch(() => undefined);
     await dailyInteractionStore?.close().catch(() => undefined);
+    await dataRightsStore?.close().catch(() => undefined);
     await eveningStore?.close().catch(() => undefined);
     await weeklyStore?.close().catch(() => undefined);
     await telemetry?.shutdown().catch(() => undefined);

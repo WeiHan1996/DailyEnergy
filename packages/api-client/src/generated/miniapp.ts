@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:64ae0b2b9320ea9b00bb4b16f64952e09f91a4dc175adec387eab8a7ff2e6605
+// source-fingerprint: sha256:1479280a50b42254b8de63769f559a8cbbe93395f5b6d7db8d379b52b4c67c87
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:64ae0b2b9320ea9b00bb4b16f64952e09f91a4dc175adec387eab8a7ff2e6605";
+  "sha256:1479280a50b42254b8de63769f559a8cbbe93395f5b6d7db8d379b52b4c67c87";
 
 export interface paths {
   "/auth/reauth/verify": {
@@ -85,8 +85,17 @@ export interface paths {
   "/data-rights/delete/relationship/prepare": {
     post: operations["prepareRelationshipDeletion"];
   };
+  "/data-rights/deletion-status/{task_ref}": {
+    get: operations["getAccountDeletionStatus"];
+  };
   "/data-rights/export": {
     post: operations["createExportTask"];
+  };
+  "/data-rights/exports/{task_ref}/artifacts/{download_ref}": {
+    get: operations["downloadDataExportArtifact"];
+  };
+  "/data-rights/summary": {
+    get: operations["getDataRightsSummary"];
   };
   "/data-rights/tasks": {
     get: operations["listDataTasks"];
@@ -185,6 +194,43 @@ export interface paths {
 
 export interface components {
   schemas: {
+    AccountDeletionAcceptedView: {
+      status_grant: {
+        expires_at: string;
+        status_token: string;
+        task_ref: string;
+      };
+      task: {
+        backup_purge_deadline?: string;
+        can_cancel: boolean;
+        created_at: string;
+        export_artifact?:
+          | {
+              format: "JSON";
+              state: "PREPARING";
+            }
+          | {
+              download_ref: string;
+              expires_at: string;
+              format: "JSON";
+              ready_at: string;
+              state: "READY";
+            }
+          | {
+              format: "JSON";
+              state: "EXPIRED" | "INVALIDATED";
+            };
+        failure_summary_code?: string;
+        kind: "EXPORT" | "DELETE";
+        online_erased_at?: string;
+        revision: number;
+        scope: "DAY" | "MATTER" | "RELATIONSHIP_DATA" | "ACCOUNT";
+        status: "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELLED";
+        target_summary: string;
+        task_ref: string;
+        updated_at: string;
+      };
+    };
     ApiError: {
       category:
         | "AUTH"
@@ -223,8 +269,12 @@ export interface components {
         | "DAY_REBUILD_TASK_FAILED"
         | "DAY_REBUILD_TASK_PENDING"
         | "DAY_REBUILD_VERSION_UNAVAILABLE"
+        | "DELETION_STATUS_GRANT_INVALID"
         | "DEPENDENCY_UNAVAILABLE"
+        | "EXPORT_ARTIFACT_EXPIRED"
         | "EXPORT_NOT_READY"
+        | "EXPORT_SOURCE_CHANGED"
+        | "EXPORT_TOO_LARGE"
         | "FEATURE_DISABLED"
         | "GENERATION_FAILED_RETRYABLE"
         | "GENERATION_FAILED_TERMINAL"
@@ -267,6 +317,14 @@ export interface components {
       request_id: components["schemas"]["RequestId"];
       server_now: string;
     };
+    ApiSuccessAccountDeletionAccepted: {
+      data: components["schemas"]["AccountDeletionAcceptedView"];
+      ok: true;
+      product_date: components["schemas"]["ProductDate"];
+      product_date_policy_version: components["schemas"]["VersionToken"];
+      request_id: components["schemas"]["RequestId"];
+      server_now: string;
+    };
     ApiSuccessCheckin: {
       data: components["schemas"]["CheckinView"];
       ok: true;
@@ -285,6 +343,14 @@ export interface components {
     };
     ApiSuccessConsent: {
       data: components["schemas"]["ConsentView"];
+      ok: true;
+      product_date: components["schemas"]["ProductDate"];
+      product_date_policy_version: components["schemas"]["VersionToken"];
+      request_id: components["schemas"]["RequestId"];
+      server_now: string;
+    };
+    ApiSuccessDataRightsSummary: {
+      data: components["schemas"]["DataRightsSummaryView"];
       ok: true;
       product_date: components["schemas"]["ProductDate"];
       product_date_policy_version: components["schemas"]["VersionToken"];
@@ -556,13 +622,213 @@ export interface components {
       };
       updated_at: string;
     };
+    DataExportDocument: {
+      consent_summary: {
+        accepted_at?: string;
+        notice_version: string;
+        state: "MISSING" | "ACCEPTED" | "WITHDRAWN";
+      };
+      data_task_summaries: Array<{
+        backup_purge_deadline?: string;
+        created_at: string;
+        failure_summary_code?: string;
+        kind: "EXPORT" | "DELETE";
+        online_erased_at?: string;
+        revision: number;
+        scope: "DAY" | "MATTER" | "RELATIONSHIP_DATA" | "ACCOUNT";
+        status: "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELLED";
+        target_summary: string;
+        updated_at: string;
+      }>;
+      days: Array<{
+        checkin?: {
+          energy: "EMPTY" | "LOW" | "STEADY" | "HIGH" | "FULL" | "UNSURE";
+          mood: "VERY_LOW" | "LOW" | "STEADY" | "GOOD" | "LIGHT" | "UNSURE";
+          revision: number;
+          sleep: "POOR" | "LOW" | "OKAY" | "GOOD" | "UNSURE";
+          updated_at: string;
+        };
+        content?: {
+          closing: string;
+          content_label: "娱乐与行动参考";
+          contract: "daily-content-view";
+          core_tip: string;
+          dimensions: Array<{
+            band: "LOW" | "STEADY" | "HIGH";
+            band_label: string;
+            explanation: string;
+            id: "pace" | "action" | "connection" | "resources" | "recovery";
+            is_focus: boolean;
+            label: string;
+          }>;
+          explanation_paragraphs: Array<string>;
+          focus_dimension_id:
+            "pace" | "action" | "connection" | "resources" | "recovery";
+          generated_at: string;
+          greeting: string;
+          optional_task: {
+            instruction: string;
+            task_id: string;
+          };
+          overall: {
+            band: "LOW" | "STEADY" | "HIGH";
+            band_label: string;
+            summary: string;
+          };
+          personalization_notice: "NONE" | "PERSONALIZATION_REDUCED";
+          primary_action: {
+            action_id: string;
+            constraint_label?: string;
+            instruction: string;
+            rationale?: string;
+          };
+          product_date: string;
+          result_id: string;
+          result_version: string;
+          rituals: Array<{
+            display_value: string;
+            kind: "COLOR" | "NUMBER";
+            note: string;
+          }>;
+          schema_version: string;
+          state_response: string;
+        };
+        evening?: {
+          note?: string;
+          overall_feeling:
+            | "VERY_HEAVY"
+            | "SOMEWHAT_HEAVY"
+            | "STEADY"
+            | "PRETTY_GOOD"
+            | "LIGHT"
+            | "UNSURE";
+          revision: number;
+          updated_at: string;
+        };
+        interaction?: {
+          helpfulness: {
+            rating:
+              "UNRATED" | "HELPFUL" | "NEUTRAL" | "NOT_HELPFUL" | "NOT_USED";
+            revision: number;
+          };
+          is_lit: boolean;
+          task: {
+            revision: number;
+            status: "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED";
+          };
+          updated_at: string;
+        };
+        product_date: string;
+      }>;
+      generated_at: string;
+      matters: Array<{
+        daily_use_granted: boolean;
+        revision: number;
+        status: "ACTIVE" | "PAUSED" | "COMPLETED" | "EXPIRED";
+        target_date?: string;
+        title: string;
+        updated_at: string;
+        weekly_use_granted: boolean;
+      }>;
+      notification_preferences: {
+        items: Array<{
+          enabled: boolean;
+          notification_type: string;
+          revision: number;
+          updated_at: string;
+        }>;
+      };
+      profile?: {
+        expression_style:
+          "BALANCED" | "GENTLE" | "LIGHT_HUMOR" | "CLEAR_DIRECT";
+        onboarding_completed: boolean;
+        preferred_name?: string;
+        revision: number;
+        updated_at: string;
+      };
+      relationship_summary?: {
+        encounter_day_count: number;
+        revision: number;
+        stage:
+          | "BEFORE_FIRST_MEETING"
+          | "NEWLY_MET"
+          | "BECOMING_FAMILIAR"
+          | "FIRST_WEEK_RECORDED";
+        state: "PRESENT";
+        updated_at: string;
+      };
+      safety_summary?: {
+        revision: number;
+        state: "CLEAR" | "ACTIVE" | "RECOVERY_PENDING";
+        updated_at: string;
+      };
+      schema_version: "data-export-v1";
+    };
+    DataRightsSummaryView: {
+      account: {
+        expected_revision: number;
+        state: "ACTIVE";
+      };
+      backup_max_days: 35;
+      capabilities: {
+        delete_account: boolean;
+        delete_day: boolean;
+        delete_matter: boolean;
+        delete_relationship_data: boolean;
+        export_account: boolean;
+      };
+      confirmation_versions: {
+        delete_account: "data-rights-account-v1";
+        delete_day: "data-rights-day-v1";
+        delete_matter: "data-rights-matter-v1";
+        delete_relationship_data: "data-rights-relationship-v1";
+        export_account: "data-export-v1";
+      };
+      online_erasure_sla_hours: 72;
+      relationship?: {
+        expected_revision: number;
+        state: "PRESENT";
+      };
+    };
     DataTaskCancelRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      expected_task_revision: components["schemas"]["PositiveRevision"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      expected_task_revision: number;
     };
     DataTaskListView: {
-      items: Array<components["schemas"]["DataTaskView"]>;
+      items: Array<{
+        backup_purge_deadline?: string;
+        can_cancel: boolean;
+        created_at: string;
+        export_artifact?:
+          | {
+              format: "JSON";
+              state: "PREPARING";
+            }
+          | {
+              download_ref: string;
+              expires_at: string;
+              format: "JSON";
+              ready_at: string;
+              state: "READY";
+            }
+          | {
+              format: "JSON";
+              state: "EXPIRED" | "INVALIDATED";
+            };
+        failure_summary_code?: string;
+        kind: "EXPORT" | "DELETE";
+        online_erased_at?: string;
+        revision: number;
+        scope: "DAY" | "MATTER" | "RELATIONSHIP_DATA" | "ACCOUNT";
+        status: "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELLED";
+        target_summary: string;
+        task_ref: string;
+        updated_at: string;
+      }>;
       next_cursor?: string;
       page_info: {
         has_more: boolean;
@@ -572,113 +838,165 @@ export interface components {
       backup_purge_deadline?: string;
       can_cancel: boolean;
       created_at: string;
-      failure_summary_code?: components["schemas"]["VersionToken"];
+      export_artifact?:
+        | {
+            format: "JSON";
+            state: "PREPARING";
+          }
+        | {
+            download_ref: string;
+            expires_at: string;
+            format: "JSON";
+            ready_at: string;
+            state: "READY";
+          }
+        | {
+            format: "JSON";
+            state: "EXPIRED" | "INVALIDATED";
+          };
+      failure_summary_code?: string;
       kind: "EXPORT" | "DELETE";
       online_erased_at?: string;
-      revision: components["schemas"]["PositiveRevision"];
+      revision: number;
       scope: "DAY" | "MATTER" | "RELATIONSHIP_DATA" | "ACCOUNT";
       status: "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELLED";
       target_summary: string;
-      task_ref: components["schemas"]["OpaqueRef"];
+      task_ref: string;
       updated_at: string;
     };
-    DayExpectedRevision: {
-      expected_revision: components["schemas"]["Revision"];
-      product_date: components["schemas"]["ProductDate"];
-    };
     DeleteAccountConfirmRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      confirmation_challenge_ref: components["schemas"]["OpaqueRef"];
-      confirmation_version: components["schemas"]["VersionToken"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      confirmation_challenge_ref: string;
+      confirmation_version: string;
       confirmed: true;
-      expected_account_revision: components["schemas"]["PositiveRevision"];
-      identity_verification_ref: components["schemas"]["OpaqueRef"];
+      expected_account_revision: number;
+      identity_verification_ref: string;
       scope: "ACCOUNT";
       target: {
         subject: "SELF";
       };
     };
     DeleteAccountPrepareRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      confirmation_version: components["schemas"]["VersionToken"];
-      expected_account_revision: components["schemas"]["PositiveRevision"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      confirmation_version: string;
+      expected_account_revision: number;
       scope: "ACCOUNT";
       target: {
         subject: "SELF";
       };
     };
     DeleteDayRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      confirmation_version: components["schemas"]["VersionToken"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      confirmation_version: string;
       confirmed: true;
-      expected_revision: components["schemas"]["Revision"];
+      expected_revision: number;
       scope: "DAY";
       target: {
-        product_date: components["schemas"]["ProductDate"];
+        product_date: string;
       };
     };
     DeleteMatterRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      confirmation_version: components["schemas"]["VersionToken"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      confirmation_version: string;
       confirmed: true;
-      expected_revision: components["schemas"]["PositiveRevision"];
+      expected_revision: number;
       scope: "MATTER";
       target: {
-        matter_ref: components["schemas"]["OpaqueRef"];
+        matter_ref: string;
       };
     };
     DeleteRelationshipConfirmRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      confirmation_challenge_ref: components["schemas"]["OpaqueRef"];
-      confirmation_version: components["schemas"]["VersionToken"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      confirmation_challenge_ref: string;
+      confirmation_version: string;
       confirmed: true;
-      expected_relationship_revision: components["schemas"]["PositiveRevision"];
-      identity_verification_ref?: components["schemas"]["OpaqueRef"];
-      included_day_expected_revisions: Array<
-        components["schemas"]["DayExpectedRevision"]
-      >;
-      scope: "RELATIONSHIP_DATA";
-      target: components["schemas"]["RelationshipDeletionTarget"];
-    };
-    DeleteRelationshipPrepareRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      confirmation_version: components["schemas"]["VersionToken"];
-      expected_relationship_revision: components["schemas"]["PositiveRevision"];
-      included_day_expected_revisions: Array<
-        components["schemas"]["DayExpectedRevision"]
-      >;
+      expected_relationship_revision: number;
+      identity_verification_ref?: string;
+      included_day_expected_revisions: Array<{
+        expected_revision: number;
+        product_date: string;
+      }>;
       scope: "RELATIONSHIP_DATA";
       target: {
-        included_day_product_dates: Array<components["schemas"]["ProductDate"]>;
+        included_day_product_dates: Array<string>;
         relationship_scope: "CURRENT_CYCLE_AND_HISTORY";
       };
     };
-    DeletionConfirmationView: {
-      backup_max_days: 35;
-      confirmation_challenge_ref: components["schemas"]["OpaqueRef"];
-      confirmation_version: components["schemas"]["VersionToken"];
-      derived_effects: Array<string>;
-      expected_day_revisions?: Array<
-        components["schemas"]["DayExpectedRevision"]
-      >;
-      expected_revision: components["schemas"]["PositiveRevision"];
-      expires_at: string;
-      identity_reverification_required: boolean;
-      immediate_effects: Array<string>;
-      online_erasure_sla_hours: 72;
-      scope: "RELATIONSHIP_DATA" | "ACCOUNT";
-      target:
-        | components["schemas"]["RelationshipDeletionTarget"]
-        | {
+    DeleteRelationshipPrepareRequest: {
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      confirmation_version: string;
+      expected_relationship_revision: number;
+      included_day_expected_revisions: Array<{
+        expected_revision: number;
+        product_date: string;
+      }>;
+      scope: "RELATIONSHIP_DATA";
+      target: {
+        included_day_product_dates: Array<string>;
+        relationship_scope: "CURRENT_CYCLE_AND_HISTORY";
+      };
+    };
+    DeletionConfirmationView:
+      | {
+          backup_max_days: 35;
+          confirmation_challenge_ref: string;
+          confirmation_version: string;
+          derived_effects: Array<string>;
+          expected_day_revisions: Array<{
+            expected_revision: number;
+            product_date: string;
+          }>;
+          expected_revision: number;
+          expires_at: string;
+          identity_reverification_required: boolean;
+          immediate_effects: Array<string>;
+          online_erasure_sla_hours: 72;
+          scope: "RELATIONSHIP_DATA";
+          target: {
+            included_day_product_dates: Array<string>;
+            relationship_scope: "CURRENT_CYCLE_AND_HISTORY";
+          };
+        }
+      | {
+          backup_max_days: 35;
+          confirmation_challenge_ref: string;
+          confirmation_version: string;
+          derived_effects: Array<string>;
+          expected_day_revisions?: unknown;
+          expected_revision: number;
+          expires_at: string;
+          identity_reverification_required: true;
+          immediate_effects: Array<string>;
+          online_erasure_sla_hours: 72;
+          scope: "ACCOUNT";
+          target: {
             subject: "SELF";
           };
-    };
+        };
     Energy: "EMPTY" | "LOW" | "STEADY" | "HIGH" | "FULL" | "UNSURE";
     ErrorCurrentView:
       | components["schemas"]["CheckinView"]
@@ -791,9 +1109,12 @@ export interface components {
       write_window: "OPEN" | "CONTINUATION_ONLY" | "CLOSED";
     };
     ExportRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      confirmation_version: components["schemas"]["VersionToken"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      confirmation_version: string;
       export_format: "JSON";
     };
     ExpressionStyle: "BALANCED" | "GENTLE" | "LIGHT_HUMOR" | "CLEAR_DIRECT";
@@ -986,9 +1307,9 @@ export interface components {
       };
     };
     IdentityVerificationView: {
-      confirmation_challenge_ref: components["schemas"]["OpaqueRef"];
+      confirmation_challenge_ref: string;
       expires_at: string;
-      identity_verification_ref: components["schemas"]["OpaqueRef"];
+      identity_verification_ref: string;
     };
     LaunchStateSnapshot: {
       account_state: "ACTIVE" | "RESTRICTED" | "DELETING" | "DELETED";
@@ -1135,14 +1456,13 @@ export interface components {
       updated_at: string;
     };
     ReauthVerifyRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      confirmation_challenge_ref: components["schemas"]["OpaqueRef"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      confirmation_challenge_ref: string;
       wechat_code: string;
-    };
-    RelationshipDeletionTarget: {
-      included_day_product_dates: Array<components["schemas"]["ProductDate"]>;
-      relationship_scope: "CURRENT_CYCLE_AND_HISTORY";
     };
     RequestId: string;
     Revision: number;
@@ -1685,7 +2005,7 @@ export interface operations {
     responses: {
       "202": {
         content: {
-          "application/json": components["schemas"]["ApiSuccessDataTask"];
+          "application/json": components["schemas"]["ApiSuccessAccountDeletionAccepted"];
         };
       };
       "400": {
@@ -2282,6 +2602,100 @@ export interface operations {
       };
     };
   };
+  downloadDataExportArtifact: {
+    parameters: {
+      header?: {
+        "Accept-Language"?: "zh-CN";
+        "X-Request-Id"?: components["schemas"]["RequestId"];
+      };
+      path: {
+        download_ref: components["schemas"]["OpaqueRef"];
+        task_ref: components["schemas"]["OpaqueRef"];
+      };
+    };
+
+    responses: {
+      "200": {
+        content: {
+          "application/json": components["schemas"]["DataExportDocument"];
+        };
+      };
+      "401": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "403": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "404": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "409": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "422": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "429": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "503": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  getAccountDeletionStatus: {
+    parameters: {
+      header?: {
+        "Accept-Language"?: "zh-CN";
+        "X-Request-Id"?: components["schemas"]["RequestId"];
+      };
+      path: {
+        task_ref: components["schemas"]["OpaqueRef"];
+      };
+    };
+
+    responses: {
+      "200": {
+        content: {
+          "application/json": components["schemas"]["ApiSuccessDataTask"];
+        };
+      };
+      "401": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "404": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "429": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "503": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   getCurrentConsent: {
     parameters?: {
       header?: {
@@ -2374,6 +2788,42 @@ export interface operations {
       "200": {
         content: {
           "application/json": components["schemas"]["ApiSuccessInteraction"];
+        };
+      };
+      "401": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "403": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "429": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      "503": {
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  getDataRightsSummary: {
+    parameters?: {
+      header?: {
+        "Accept-Language"?: "zh-CN";
+        "X-Request-Id"?: components["schemas"]["RequestId"];
+      };
+    };
+
+    responses: {
+      "200": {
+        content: {
+          "application/json": components["schemas"]["ApiSuccessDataRightsSummary"];
         };
       };
       "401": {
@@ -4495,9 +4945,18 @@ export const MINIAPP_OPERATIONS = {
   deleteDay: { method: "POST", path: "/v1/data-rights/delete/day" },
   deleteMatter: { method: "POST", path: "/v1/matters/{matter_ref}/delete" },
   deleteMatterScope: { method: "POST", path: "/v1/data-rights/delete/matter" },
+  downloadDataExportArtifact: {
+    method: "GET",
+    path: "/v1/data-rights/exports/{task_ref}/artifacts/{download_ref}",
+  },
+  getAccountDeletionStatus: {
+    method: "GET",
+    path: "/v1/data-rights/deletion-status/{task_ref}",
+  },
   getCurrentConsent: { method: "GET", path: "/v1/consent/current" },
   getDailyByDate: { method: "GET", path: "/v1/daily/by-date/{product_date}" },
   getDailyInteraction: { method: "GET", path: "/v1/daily/interaction" },
+  getDataRightsSummary: { method: "GET", path: "/v1/data-rights/summary" },
   getDataTask: { method: "GET", path: "/v1/data-rights/tasks/{task_ref}" },
   getEveningToday: { method: "GET", path: "/v1/evening/today" },
   getFaq: { method: "GET", path: "/v1/support/faq" },

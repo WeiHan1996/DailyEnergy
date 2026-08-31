@@ -1,9 +1,12 @@
 {
   "usingComponents": {
     "de-action-card": "../../components/action-card/index",
+    "de-action-button": "../../components/action-button/index",
     "de-app-header": "../../components/app-header/index",
     "de-energy-summary": "../../components/energy-summary/index",
     "de-friend-message": "../../components/friend-message/index",
+    "de-confirm-sheet": "../../components/confirm-sheet/index",
+    "de-inline-notice": "../../components/inline-notice/index",
     "de-loading-skeleton": "../../components/loading-skeleton/index",
     "de-offline-state": "../../components/offline-state/index",
     "de-page-shell": "../../components/page-shell/index",

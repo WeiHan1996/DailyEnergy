@@ -1,0 +1,169 @@
+{
+  "evidence_version": "c-014-manual-evidence-v1",
+  "task_id": "C-014",
+  "draft_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/167",
+  "execution_status": "AUTOMATED_IMPLEMENTATION_COMPLETE_MANUAL_EVIDENCE_PENDING",
+  "pass_claim": "PROHIBITED",
+  "synthetic_accounts_only": true,
+  "decision_boundary": {
+    "status": "ACCEPTED_2026_08_28",
+    "accepted_adr": "docs/decisions/ADR-0008-data-rights-delivery-and-status.md",
+    "accepted_contract": "docs/technical/data-rights-contract-amendment.md",
+    "implemented_capabilities": [
+      "24-hour export manifest and download",
+      "account and relationship revision discovery",
+      "account deletion status continuation after session revocation",
+      "2 MiB whole-response export limit without truncation"
+    ],
+    "preserved_fail_closed_behavior": [
+      "SET-004 submits only server-advertised export capability and downloads only READY owner artifacts",
+      "SET-006 uses DataRightsSummary revisions and never hardcodes account or relationship revision",
+      "source change, expiry, wrong grant, account deletion and oversize exports return stable whole-operation failure",
+      "C-015 does not start before C-014 final-head CI"
+    ]
+  },
+  "design_source": {
+    "status": "AVAILABLE_READ_ONLY / OWNER_REVIEW_PENDING",
+    "figma_file": "T5HS32Ciz6LZh81KbqhFGo",
+    "figma_version": "D-005 Accepted 2026-08-19 via PR #146",
+    "frame_ids": [
+      "495:234",
+      "495:235",
+      "495:236",
+      "495:237",
+      "495:238",
+      "495:239",
+      "495:240",
+      "495:241",
+      "495:242",
+      "495:243",
+      "495:244",
+      "495:245",
+      "495:246",
+      "495:247",
+      "495:248",
+      "507:5",
+      "507:7"
+    ],
+    "visual_snapshot_ids": [
+      "515:533",
+      "515:536",
+      "515:539",
+      "515:542",
+      "515:545",
+      "515:548"
+    ],
+    "source_inspection": "REPOSITORY_HANDOFF_ONLY / CURRENT_BRANCH_SCREENSHOT_PENDING",
+    "observed_boundaries": [
+      "REC-002 DAY deletion must show irreversible loss, a real missing date and trend/summary recalculation",
+      "SET-004 separates export from deletion and never queues data-rights operations offline",
+      "SET-006 requires identity verification and shows guard-first deletion, online cleanup and backup deadlines without emotional retention copy",
+      "Completed describes online erasure and real provider/backup deadlines rather than instant byte erasure",
+      "Large Text and Reduced Motion must remain understandable without clipped effects or spinner-only progress"
+    ]
+  },
+  "implementation_states": {
+    "rec002_delete_confirm": "MANUAL_EVIDENCE_PENDING",
+    "rec002_guarded_missing": "MANUAL_EVIDENCE_PENDING",
+    "set004_normal": "MANUAL_EVIDENCE_PENDING",
+    "set004_loading": "MANUAL_EVIDENCE_PENDING",
+    "set004_recoverable_error": "MANUAL_EVIDENCE_PENDING",
+    "set004_offline_no_queue": "MANUAL_EVIDENCE_PENDING",
+    "set004_export_processing": "MANUAL_EVIDENCE_PENDING",
+    "set004_export_failed": "MANUAL_EVIDENCE_PENDING",
+    "set004_export_ready_download": "MANUAL_EVIDENCE_PENDING",
+    "set004_deletion_task_active": "MANUAL_EVIDENCE_PENDING",
+    "set006_normal": "MANUAL_EVIDENCE_PENDING",
+    "set006_verification_loading": "MANUAL_EVIDENCE_PENDING",
+    "set006_verify_required": "MANUAL_EVIDENCE_PENDING",
+    "set006_recoverable_error": "MANUAL_EVIDENCE_PENDING",
+    "set006_deleting": "MANUAL_EVIDENCE_PENDING",
+    "set006_completed": "MANUAL_EVIDENCE_PENDING",
+    "large_text_125": "MANUAL_EVIDENCE_PENDING",
+    "reduced_motion": "MANUAL_EVIDENCE_PENDING",
+    "screen_reader": "MANUAL_EVIDENCE_PENDING"
+  },
+  "automated_evidence": {
+    "shared_schema_tests": "59/59 PASS",
+    "api_tests": "149/149 PASS",
+    "server_adapter_tests": "53/53 PASS",
+    "worker_tests": "10/10 PASS",
+    "miniapp_tests": "78/78 PASS",
+    "postgresql_18_c014": "PASS including summary, READY, correction invalidation, 24-hour expiry and status grant",
+    "postgresql_18_drift_lifecycle": "89/89 PASS",
+    "contract_codegen": "PASS",
+    "source_registry": "343/813 COVERED; 470 PLANNED; 0 NA_WITH_REASON",
+    "miniapp_build": "PASS",
+    "root_tests": "18/18 Turbo tasks PASS",
+    "root_build": "9/9 Turbo tasks PASS",
+    "agent_prepare": "READY / remote, dependencies, toolchain and GitHub PASS",
+    "agent_changed_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED (changed→full)",
+    "agent_task_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED",
+    "agent_full_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED",
+    "redis_8_bullmq_5_queue": "8/8 PASS"
+  },
+  "devtools": {
+    "status": "INFRA_BLOCKED_NOT_RERUN_FOR_BLOCKED_BRANCH",
+    "reason_code": "PRIOR_MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT",
+    "cli_path_verified": true,
+    "runner_version": null,
+    "base_library_version": "3.7.12",
+    "screen_ids": ["REC-002", "SET-004", "SET-006", "SAFE-001"]
+  },
+  "design_review": {
+    "token_and_component_reuse": "AUTOMATED_GATE_PASS",
+    "component_mapping": [
+      "DE / PageShell",
+      "DE / AppHeader",
+      "DE / Button / Primary, Secondary, Danger and Text",
+      "DE / InlineNotice",
+      "DE / SectionCard",
+      "DE / ConfirmSheet",
+      "DE / LoadingSkeleton"
+    ],
+    "recorded_differences": [
+      "SET-004 now renders Processing, Failed, Ready, Expired and Invalidated from the Accepted artifact state and writes a local JSON file only after authenticated download",
+      "REC-002 DAY deletion remains actionable because HistoryDayView already exposes its required checkin revision and the synchronous guard is implemented",
+      "SET-006 now obtains revisions from DataRightsSummary, uses challenge-scoped reauth for ACCOUNT and preserves an empty explicit DAY vector for RELATIONSHIP_DATA",
+      "implementation screenshots remain unavailable until WeChat DevTools launches"
+    ],
+    "visual_and_interaction_review": "C014_UNIFIED_REVIEW_PENDING",
+    "user_acceptance": "ADR_0008_ACCEPTED / C014_UNIFIED_REVIEW_PENDING"
+  },
+  "security_review": {
+    "status": "OWNER_REVIEW_PENDING",
+    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "reviewed_boundaries": [
+      "ordinary API cannot directly read restricted challenge, verification, task, guard, checkpoint, receipt or restore-deny tables",
+      "DAY/MATTER create one explicit scoped task; RELATIONSHIP_DATA with no selected dates preserves all real DAY records",
+      "MATTER and RELATIONSHIP_DATA delete source dependencies and their ciphertext fragments only after safe fallback/blocking pointers are applied",
+      "ACCOUNT confirmation requires challenge-scoped WeChat identity verification and synchronously revokes ordinary sessions; verification command replay cannot extend TTL or cross challenges",
+      "TX-09 commits DataTask, guard and allowlisted outbox before asynchronous cleanup",
+      "Restricted Worker receives only task ref, revision, guard epoch and time; checkpoint failures never release the guard",
+      "active legal hold keeps the original ACCOUNT task FAILED and account DELETING; a later revision-scoped due event retries the same task without Inbox conflict",
+      "a deterministic third-step restricted-evidence failure leaves ACCOUNT DELETING and the same task FAILED after online cleanup; restart retries the same task and clears the stable checkpoint on success",
+      "DAY completion writes the 45-day minimal erasure guard; deletion completion writes restore deny and a minimal six-month receipt",
+      "ACCOUNT completion removes external identity and replaces stable subject material; its receipt contains no blinded subject token",
+      "offline client operations are not queued and synchronous DAY guard acceptance clears local daily/evening/weekly caches",
+      "export Worker stores only a minimal revision vector, SHA-256 fingerprint, schema/policy, opaque download ref and timestamps; the body has no DB/object/cache/queue persistence",
+      "download requires an active owner session, returns no-store attachment bytes, fails whole above 2 MiB and invalidates on source change",
+      "ACCOUNT confirm stores only a status-token hash; ordinary Bearer cannot use the status endpoint, wrong-task/token/expiry fail closed, and SUCCEEDED consumes the grant",
+      "DataRightsRetentionDue rebuilds 24-hour/7-day/30-day cleanup from PostgreSQL after Redis loss"
+    ],
+    "residual_evidence": [
+      "owner threat review of download authorization, source invalidation, 2 MiB boundary and deletion-status token storage",
+      "WeChat DevTools route/layout/accessibility/weak-network evidence for REC-002, SET-004 and SET-006",
+      "iOS/Android large-text, screen-reader, secure storage, safe-area and Reduced Motion evidence",
+      "provider/object cleanup, 20-day backup restore and deleted-data resurrection exercise remain pending",
+      "Production publication, provider and deployment authorization remain outside C-014"
+    ],
+    "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
+  },
+  "real_device": {
+    "ios": "MANUAL_EVIDENCE_PENDING",
+    "android": "MANUAL_EVIDENCE_PENDING",
+    "matrix": []
+  },
+  "reviewer": null,
+  "reviewed_at_utc": null
+}
