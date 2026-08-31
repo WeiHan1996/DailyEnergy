@@ -61,7 +61,10 @@ let fixture: Fixture;
 beforeAll(async () => {
   fixture = JSON.parse(
     await readFile(
-      resolve(process.cwd(), "../../docs/decisions/adr-0002-test-vectors.json"),
+      resolve(
+        import.meta.dirname,
+        "../../../../../../docs/decisions/adr-0002-test-vectors.json",
+      ),
       "utf8",
     ),
   ) as Fixture;
@@ -85,10 +88,16 @@ describe("C-005 seed-v1", () => {
   it("produces identical bytes in a separate Node process", async () => {
     const vector = fixture.seed_policy.root_vectors[0]!;
     const moduleUrl = pathToFileURL(
-      resolve(process.cwd(), "dist/modules/generation/public/index.js"),
+      resolve(
+        import.meta.dirname,
+        "../../../../dist/modules/generation/public/index.js",
+      ),
     ).href;
     const productTimeUrl = pathToFileURL(
-      resolve(process.cwd(), "dist/modules/product-time/public/index.js"),
+      resolve(
+        import.meta.dirname,
+        "../../../../dist/modules/product-time/public/index.js",
+      ),
     ).href;
     const script = `
       const generation = await import(${JSON.stringify(moduleUrl)});

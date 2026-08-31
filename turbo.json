@@ -47,7 +47,7 @@
       "outputs": []
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["build", "^build"],
       "cache": false,
       "inputs": [
         "$TURBO_DEFAULT$",

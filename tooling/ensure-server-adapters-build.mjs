@@ -5,6 +5,7 @@ import path from "node:path";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const requiredOutputs = [
+  "packages/shared-schemas/dist/index.d.ts",
   "packages/server-core/dist/modules/generation/public/index.d.ts",
   "packages/server-core/dist/modules/generation/spi/index.d.ts",
   "packages/server-core/dist/modules/product-time/public/index.d.ts",
@@ -21,16 +22,12 @@ try {
     requiredOutputs.map((file) => access(path.join(repositoryRoot, file))),
   );
 } catch {
-  for (const packageName of [
-    "@daily-energy/server-core",
-    "@daily-energy/server-adapters",
-  ]) {
-    const result = spawnSync("pnpm", ["--filter", packageName, "build"], {
-      cwd: repositoryRoot,
-      stdio: "inherit",
-    });
-    if (result.status !== 0) {
-      throw new Error("SERVER_ADAPTERS_BUILD_FAILED");
-    }
+  const result = spawnSync(
+    "pnpm",
+    ["--filter", "@daily-energy/server-adapters...", "build"],
+    { cwd: repositoryRoot, stdio: "inherit" },
+  );
+  if (result.status !== 0) {
+    throw new Error("SERVER_ADAPTERS_BUILD_FAILED");
   }
 }

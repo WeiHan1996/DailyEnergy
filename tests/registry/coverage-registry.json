@@ -8918,6 +8918,20 @@
       "evidence": [
         {
           "assertions": [
+            "all 180 legal mood-energy-sleep combinations terminate with one to three canonical action candidates and pass RuleFactsSchema",
+            "all five complete daily golden cases and two focused rule cases are recomputed from the Accepted S-11 fixture",
+            "duplicate and empty catalogs plus score-band mismatch fail with stable deterministic codes",
+            "every known adjacent ordinal increase is monotonic across all five integer scores",
+            "profile, relationship, context, catalog storage order and an unconsumed namespace do not perturb RuleFacts or existing choices"
+          ],
+          "file": "packages/server-core/src/modules/generation/domain/daily-rules.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/c006-evidence-manifest.json",
+          "selector": "C-006 daily-rules-v1 golden vectors and integer/catalog properties",
+          "test_id": "T-C006-RULES-001"
+        },
+        {
+          "assertions": [
             "fixture identities, time and random sources are synthetic and replayable",
             "golden provenance must name an Accepted contract rather than current implementation output",
             "property failures require a replay seed and fixture version"

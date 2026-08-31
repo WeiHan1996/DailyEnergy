@@ -11,6 +11,13 @@ C-005 建立首批 public subpath：
   canonical candidate order、GenerationManifest 与冻结版本选择；
 - `@daily-energy/server-core/generation/spi`：不可变 manifest registry port。
 
+C-006 在 `generation` public subpath 增加 `daily-rules-v1` / `daily-score-v1`：
+
+- strict GenerationInputSnapshot、manifest 与 root-seed binding；
+- 五维整数评分、focus/care/support、行动/任务/仪式目录和具名选择；
+- 严格 RuleFacts 与 ControlledExpressionPlanV1；
+- server-only 有限 choice trace，不含 root seed、digest 或用户身份。
+
 本包不得导入 Nest、Prisma、Redis、BullMQ、provider SDK、环境变量或客户端代码。
 PostgreSQL 和运行 profile 实现位于 `@daily-energy/server-adapters` 的显式 capability
 subpath。C-005 不实现评分、表达、发布或 GenerationIntent HTTP 命令。

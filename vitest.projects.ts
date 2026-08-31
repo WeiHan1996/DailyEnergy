@@ -61,6 +61,7 @@ export default defineConfig({
         "test/**/*.test.ts",
       ]),
       nodeProject("api-client", "packages/api-client", ["test/**/*.test.ts"]),
+      nodeProject("server-core", "packages/server-core", ["src/**/*.test.ts"]),
       nodeProject("server-adapters", "packages/server-adapters", [
         "src/**/*.test.ts",
       ]),

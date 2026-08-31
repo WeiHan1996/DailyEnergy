@@ -1,0 +1,44 @@
+{
+  "manifest_version": "c-006-evidence-v1",
+  "scope": "C-006 daily-rules-v1 integer scoring, deterministic candidates, RuleFacts, ControlledExpressionPlanV1 and limited choice trace",
+  "authority": [
+    "docs/ai/generation-engine.md",
+    "docs/ai/scoring-rules.md",
+    "docs/ai/daily-content-schema.md",
+    "docs/ai/s11-test-vectors.json",
+    "packages/shared-schemas/src/daily-content.ts",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C006-RULES-001": {
+      "file": "packages/server-core/src/modules/generation/domain/daily-rules.test.ts",
+      "selector": "C-006 daily-rules-v1 golden vectors and integer/catalog properties",
+      "level": "UNIT",
+      "assertions": [
+        "all five complete daily golden cases and two focused rule cases are recomputed from the Accepted S-11 fixture",
+        "all 180 legal mood-energy-sleep combinations terminate with one to three canonical action candidates and pass RuleFactsSchema",
+        "every known adjacent ordinal increase is monotonic across all five integer scores",
+        "profile, relationship, context, catalog storage order and an unconsumed namespace do not perturb RuleFacts or existing choices",
+        "duplicate and empty catalogs plus score-band mismatch fail with stable deterministic codes"
+      ]
+    },
+    "T-C006-BINDING-001": {
+      "file": "packages/server-core/src/modules/generation/application/derive-daily-rules.test.ts",
+      "selector": "C-006 daily snapshot, manifest and root-seed bindings",
+      "level": "UNIT",
+      "assertions": [
+        "strict snapshot unknown, missing, invalid enum, context date, style and unregistered product inputs fail closed",
+        "snapshot version, result binding, manifest fingerprint/closure and root seed mismatch return stable terminal codes",
+        "ControlledExpressionPlanV1 is frozen, keeps context slots empty and contains no raw score, root seed, manifest fingerprint or choice trace",
+        "the public choice trace contains only namespace, candidate count, counter, index and hashed state"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S31-TEST-003",
+      "status": "COVERED",
+      "proof_ids": ["T-C006-RULES-001"]
+    }
+  ]
+}

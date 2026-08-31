@@ -800,7 +800,7 @@ S-12 完成后，再依据实际 Issue 数量制定：
 - E-012/E-013 已完成；E-014 已随 PR #138 squash 合并为 `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`，Phase 1 已结束；
 - Phase 2 development 已按 `CONDITIONAL_GO_FOR_PHASE_2` 开始，Production/RC 保持 `NO_GO`；
 - D-001～D-005 已分别完成并获接受；C-003 已随 PR #154 合并并进入 Done；
-- 项目所有者于 2026-08-21 授权恢复开发；C-004 Draft PR #157 与 C-005 stacked Draft PR #158 已完成自动 Gate 并进入统一审核批次；C-006～C-015 继续逐项推进并在 C-015 后统一审核；
+- 项目所有者于 2026-08-21 授权恢复开发；C-004 Draft PR #157、C-005 stacked Draft PR #158 与 C-006 stacked Draft PR #159 已完成自动 Gate 并进入统一审核批次；C-007～C-015 后续继续逐项推进；
 - C-003、C-004、C-009 的 D-004 设计前置已满足；
 - C-012、C-013、C-014 的 D-005 设计前置已满足；
 - 所有新会话通过仓库恢复上下文，不依赖聊天记忆。

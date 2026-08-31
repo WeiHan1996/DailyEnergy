@@ -39,3 +39,15 @@ export type {
 } from "../domain/manifest.js";
 
 export { selectFrozenGenerationManifest } from "../application/select-manifest.js";
+
+export { deriveDailyRulesV1 } from "../application/derive-daily-rules.js";
+export type { DeriveDailyRulesV1Input } from "../application/derive-daily-rules.js";
+export {
+  DAILY_RULE_VERSION,
+  DAILY_SCORE_VERSION,
+} from "../domain/daily-rules.js";
+export type {
+  ControlledExpressionPlanV1,
+  DailyChoiceTrace,
+  DailyRuleDerivation,
+} from "../domain/daily-rules.js";
