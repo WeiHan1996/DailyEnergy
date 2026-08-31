@@ -76,6 +76,7 @@ export {
   ConsentAcceptRequestSchema,
   ConsentViewSchema,
   ConsentWithdrawRequestSchema,
+  GenerationStartRequestSchema,
   MemoryPreferencesUpdateRequestSchema,
   MemoryPreferencesViewSchema,
   NotificationPermissionSyncRequestSchema,
@@ -95,6 +96,7 @@ export type {
   ConsentAcceptRequest,
   ConsentView,
   ConsentWithdrawRequest,
+  GenerationStartRequest,
   MemoryPreferencesUpdateRequest,
   MemoryPreferencesView,
   NotificationPermissionSyncRequest,
@@ -110,10 +112,19 @@ export type {
 export {
   ClientDailyContentViewSchema,
   DailyInteractionStateSchema,
+  GenerationIntentStatusSchema,
+  GenerationIntentStatusValues,
+  GenerationIntentViewSchema,
+  RelationshipViewSchema,
+  TodayViewSchema,
 } from "./client-daily-content.js";
 export type {
   ClientDailyContentView,
   DailyInteractionState,
+  GenerationIntentStatus,
+  GenerationIntentView,
+  RelationshipView,
+  TodayView,
 } from "./client-daily-content.js";
 
 export {

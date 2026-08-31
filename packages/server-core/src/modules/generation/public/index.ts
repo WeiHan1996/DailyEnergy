@@ -51,3 +51,14 @@ export type {
   DailyRuleDerivation,
 } from "../domain/daily-rules.js";
 export type { ControlledExpressionPlanV1 } from "@daily-energy/shared-schemas";
+
+export {
+  decideGenerationClaimV1,
+  decideGenerationPublishV1,
+  sameGenerationGuardV1,
+} from "../domain/lifecycle.js";
+export type {
+  GenerationClaimDecision,
+  GenerationGuardSnapshotV1,
+  GenerationPublishDecision,
+} from "../domain/lifecycle.js";

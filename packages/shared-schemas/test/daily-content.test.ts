@@ -5,10 +5,13 @@ import {
   DailyInteractionStateSchema,
   ExpressionPayloadSchema,
   GenerationInputSnapshotSchema,
+  GenerationIntentViewSchema,
+  GenerationStartRequestSchema,
   ProductDateSchema,
   PublishedDailyResultSchema,
   Rfc3339TimestampSchema,
   RuleFactsSchema,
+  TodayViewSchema,
 } from "../src/index.js";
 import {
   clientDailyContentViewFixture,
@@ -171,5 +174,66 @@ describe("daily content contracts", () => {
     const client = cloneFixture(clientDailyContentViewFixture);
     (client.dimensions[0] as Record<string, unknown>).score = 43;
     expect(ClientDailyContentViewSchema.safeParse(client).success).toBe(false);
+  });
+
+  it("enforces closed C-008 generation start, intent, and today views", () => {
+    expect(
+      GenerationStartRequestSchema.safeParse({
+        command_ref: "command:c008:0001",
+        expected_checkin_revision: 1,
+      }).success,
+    ).toBe(true);
+    expect(
+      GenerationStartRequestSchema.safeParse({
+        command_ref: "command:c008:0001",
+        expected_checkin_revision: 1,
+        owner_ref: "forbidden",
+      }).success,
+    ).toBe(false);
+
+    const running = {
+      intent_ref: "intent-c008-0001",
+      product_date: "2026-08-24",
+      status: "RUNNING",
+      retry_after_seconds: 2,
+      updated_at: "2026-08-24T01:00:00Z",
+    };
+    expect(GenerationIntentViewSchema.safeParse(running).success).toBe(true);
+    expect(
+      GenerationIntentViewSchema.safeParse({
+        ...running,
+        status: "SUCCEEDED",
+      }).success,
+    ).toBe(false);
+    expect(
+      GenerationIntentViewSchema.safeParse({
+        ...running,
+        result_ref: "result-c008-0001",
+      }).success,
+    ).toBe(false);
+
+    expect(
+      TodayViewSchema.safeParse({
+        content: clientDailyContentViewFixture,
+        interaction: {
+          contract: "daily-interaction-state",
+          schema_version: "1.0.0",
+          result_id: clientDailyContentViewFixture.result_id,
+          product_date: clientDailyContentViewFixture.product_date,
+          is_lit: false,
+          task: {
+            task_id: clientDailyContentViewFixture.optional_task.task_id,
+            revision: 1,
+            status: "UNMARKED",
+          },
+          helpfulness: { revision: 0, rating: "UNRATED" },
+          updated_at: "2026-08-24T01:00:00Z",
+        },
+        relationship: {
+          stage: "BEFORE_FIRST_MEETING",
+          encounter_day_count: 0,
+        },
+      }).success,
+    ).toBe(true);
   });
 });

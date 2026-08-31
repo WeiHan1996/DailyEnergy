@@ -119,6 +119,18 @@ const SCHEMA_EXPORTS = [
     "checkin-correct-request",
   ],
   ["checkinView", "CheckinViewSchema", "checkin-view"],
+  [
+    "generationStartRequest",
+    "GenerationStartRequestSchema",
+    "generation-start-request",
+  ],
+  [
+    "generationIntentView",
+    "GenerationIntentViewSchema",
+    "generation-intent-view",
+  ],
+  ["relationshipView", "RelationshipViewSchema", "relationship-view"],
+  ["todayView", "TodayViewSchema", "today-view"],
 ];
 
 const SCHEMA_SOURCE_PATHS = [

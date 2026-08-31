@@ -66,6 +66,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
+      api_data:
       interactive_data:
       background_data:
       restricted_data:
@@ -195,6 +196,8 @@ services:
       DAILYENERGY_MAINTENANCE_MODE: "OFF"
       DAILYENERGY_PORT: "3000"
       DAILYENERGY_PRODUCT_DATE_POLICY_VERSION: product-date-v1
+      DAILYENERGY_REDIS_KEY_PREFIX: ${DAILYENERGY_REDIS_KEY_PREFIX:?run pnpm compose:prepare}
+      DAILYENERGY_REDIS_URL: ${DAILYENERGY_API_REDIS_URL:-redis://redis:6379}
       DAILYENERGY_RELEASE_ID: ${DAILYENERGY_RELEASE_ID:?run pnpm compose:prepare}
       DAILYENERGY_RUNTIME_PROFILE: API
       DAILYENERGY_SHUTDOWN_GRACE_MS: "5000"

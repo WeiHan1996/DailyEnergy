@@ -118,6 +118,27 @@ export const API_ERROR_CATALOG = {
     retryable: false,
     status: HttpStatus.FORBIDDEN,
   },
+  GENERATION_FAILED_RETRYABLE: {
+    category: "TRANSIENT",
+    message: "今日内容暂时还没准备好，请稍后再试。",
+    messageKey: "error.generation_failed_retryable",
+    retryable: true,
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+  },
+  GENERATION_FAILED_TERMINAL: {
+    category: "TERMINAL",
+    message: "今天暂时无法生成完整内容，请稍后从今日入口重试。",
+    messageKey: "error.generation_failed_terminal",
+    retryable: false,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+  },
+  GENERATION_PENDING: {
+    category: "TRANSIENT",
+    message: "今日内容正在准备中，请稍后再看。",
+    messageKey: "error.generation_pending",
+    retryable: true,
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+  },
   INTERNAL_TERMINAL: {
     category: "TERMINAL",
     message: "暂时无法完成请求，请稍后再试。",
@@ -245,7 +266,11 @@ type ApiExceptionCodeOptions = {
           readonly details?: RevisionErrorDetails;
         }
       : Code extends
-            "RATE_LIMITED" | "DEPENDENCY_UNAVAILABLE" | "UPSTREAM_TRANSIENT"
+            | "RATE_LIMITED"
+            | "DEPENDENCY_UNAVAILABLE"
+            | "UPSTREAM_TRANSIENT"
+            | "GENERATION_FAILED_RETRYABLE"
+            | "GENERATION_PENDING"
         ? {
             readonly code: Code;
             readonly details?: RetryAfterErrorDetails;
@@ -282,6 +307,8 @@ function projectDetails(
             "RATE_LIMITED",
             "DEPENDENCY_UNAVAILABLE",
             "UPSTREAM_TRANSIENT",
+            "GENERATION_FAILED_RETRYABLE",
+            "GENERATION_PENDING",
           ].includes(code)
         ? RetryAfterErrorDetailsSchema
         : code === "REVISION_CONFLICT"

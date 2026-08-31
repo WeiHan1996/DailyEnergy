@@ -413,9 +413,15 @@ importers:
 
   packages/server-adapters:
     dependencies:
+      '@daily-energy/prompt-library':
+        specifier: workspace:*
+        version: link:../prompt-library
       '@daily-energy/server-core':
         specifier: workspace:*
         version: link:../server-core
+      '@daily-energy/shared-schemas':
+        specifier: workspace:*
+        version: link:../shared-schemas
       '@opentelemetry/api':
         specifier: 'catalog:'
         version: 1.9.1
@@ -450,9 +456,6 @@ importers:
         specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
-      '@daily-energy/prompt-library':
-        specifier: workspace:*
-        version: link:../prompt-library
       '@daily-energy/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config

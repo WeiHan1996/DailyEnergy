@@ -119,6 +119,13 @@ export const CheckinCorrectRequestSchema = z
   })
   .strict();
 
+export const GenerationStartRequestSchema = z
+  .object({
+    ...CommandShape,
+    expected_checkin_revision: PositiveRevisionSchema,
+  })
+  .strict();
+
 export const MemoryPreferencesUpdateRequestSchema = z
   .object({
     ...CommandShape,
@@ -216,6 +223,9 @@ export type StyleCalibrationRequest = z.infer<
 >;
 export type CheckinSubmitRequest = z.infer<typeof CheckinSubmitRequestSchema>;
 export type CheckinCorrectRequest = z.infer<typeof CheckinCorrectRequestSchema>;
+export type GenerationStartRequest = z.infer<
+  typeof GenerationStartRequestSchema
+>;
 export type MemoryPreferencesUpdateRequest = z.infer<
   typeof MemoryPreferencesUpdateRequestSchema
 >;

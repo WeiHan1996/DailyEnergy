@@ -1,0 +1,33 @@
+{
+  "evidence_version": "c-008-manual-evidence-v1",
+  "task_id": "C-008",
+  "execution_status": "MANUAL_EVIDENCE_PENDING",
+  "pass_claim": "PROHIBITED",
+  "synthetic_accounts_only": true,
+  "security_review": {
+    "status": "OWNER_REVIEW_PENDING",
+    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "review_scope": [
+      "confirm PostgreSQL AVAILABLE remains the only daily-result authority and Redis/BullMQ cannot create, replace or recover business facts",
+      "confirm account, Safety, deletion, consent, onboarding, revision and completion-window guards are re-read at claim/read/publish boundaries",
+      "confirm DAY deletion and Safety activation linearize against an in-flight candidate and no late result becomes AVAILABLE",
+      "confirm API reads remain owner-scoped and no seed, epoch, fingerprint, protected subject, provider or internal provenance reaches the client",
+      "confirm command receipt, intent, snapshot, inbox and outbox retention/cleanup boundaries are acceptable for unified C-004 through C-015 review"
+    ],
+    "automated_evidence": [
+      "real PostgreSQL 18 unique intent, snapshot, receipt, publication, ACL and advisory-lock tests",
+      "real Redis 8/BullMQ 5 outbox, inbox, commit-before-ACK and FLUSHALL recovery tests",
+      "strict shared Zod/OpenAPI/client projection and HTTP error-envelope tests",
+      "Safety and DAY deletion late-candidate rejection with zero published result",
+      "Compose internal-network and deploy-fingerprint policy tests"
+    ],
+    "residual_evidence": [
+      "project owner threat-boundary and deletion-recovery review during the unified C-004 through C-015 audit",
+      "Production credentials, real provider callbacks, PITR restore and production deployment authorization remain outside C-008",
+      "C-009 must separately prove DLY-002/DLY-003 miniapp loading, recovery, offline and visual behavior"
+    ],
+    "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
+  },
+  "reviewer": null,
+  "reviewed_at_utc": null
+}

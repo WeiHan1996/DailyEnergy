@@ -19,6 +19,8 @@ import {
   startTelemetryRuntime,
   type TelemetryTransportConfig,
 } from "../telemetry/runtime.js";
+import { createInteractiveGenerationHandlers } from "../generation/interactive-generation-handler.js";
+import { PostgresDailyGenerationRuntime } from "../generation/postgres-daily-generation-runtime.js";
 
 export type WorkerInteractiveDatabaseCapability =
   DatabaseCapability<"worker-interactive">;
@@ -50,6 +52,59 @@ export function startWorkerInteractiveInfrastructure(
     handlers,
     manifest: INTERACTIVE_WORKER_MANIFEST,
     ...(telemetry ? { telemetry } : {}),
+  });
+}
+
+export async function startWorkerInteractiveRuntime(
+  config: WorkerInfrastructureConfig,
+  handlers: readonly QueueJobHandler[] = [],
+  telemetry?: QueueTelemetrySink,
+): Promise<WorkerInfrastructureRuntime> {
+  if (handlers.length > 0) {
+    return startWorkerInteractiveInfrastructure(config, handlers, telemetry);
+  }
+  const generation = await PostgresDailyGenerationRuntime.connect({
+    applicationName: `${config.database.applicationName ?? "daily-energy:worker-interactive"}:generation`,
+    connectionString: config.database.connectionString,
+    expectedDatabaseRole: INTERACTIVE_WORKER_MANIFEST.databaseRole,
+    ...(config.database.connectionLimit === undefined
+      ? {}
+      : { connectionLimit: config.database.connectionLimit }),
+  });
+  let infrastructure: WorkerInfrastructureRuntime;
+  try {
+    infrastructure = await startWorkerInteractiveInfrastructure(
+      config,
+      createInteractiveGenerationHandlers(generation),
+      telemetry,
+    );
+  } catch (error) {
+    await generation.close();
+    throw error;
+  }
+  let closed = false;
+  return Object.freeze({
+    manifest: infrastructure.manifest,
+    async drain(): Promise<void> {
+      if (closed) {
+        return;
+      }
+      closed = true;
+      try {
+        await infrastructure.drain();
+      } finally {
+        await generation.close();
+      }
+    },
+    rebuild(limit?: number) {
+      return infrastructure.rebuild(limit);
+    },
+    relayOnce(options?: {
+      readonly batchSize?: number;
+      readonly maxAttempts?: number;
+    }) {
+      return infrastructure.relayOnce(options);
+    },
   });
 }
 

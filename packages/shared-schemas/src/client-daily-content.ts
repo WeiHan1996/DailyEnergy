@@ -6,6 +6,7 @@ import {
   OpaqueIdSchema,
   PositiveRevisionSchema,
   ProductDateSchema,
+  RelationshipStageSchema,
   Rfc3339TimestampSchema,
   RitualKindSchema,
   SemverSchema,
@@ -180,3 +181,78 @@ export const DailyInteractionStateSchema = z
     }
   });
 export type DailyInteractionState = z.infer<typeof DailyInteractionStateSchema>;
+
+export const GenerationIntentStatusValues = [
+  "QUEUED",
+  "RUNNING",
+  "FALLBACK_RUNNING",
+  "RETRYABLE_FAILED",
+  "SUCCEEDED",
+  "TERMINAL_FAILED",
+  "CANCELLED",
+] as const;
+export const GenerationIntentStatusSchema = z.enum(
+  GenerationIntentStatusValues,
+);
+export type GenerationIntentStatus = z.infer<
+  typeof GenerationIntentStatusSchema
+>;
+
+export const GenerationIntentViewSchema = z
+  .object({
+    intent_ref: OpaqueIdSchema,
+    product_date: ProductDateSchema,
+    status: GenerationIntentStatusSchema,
+    result_ref: OpaqueIdSchema.optional(),
+    retry_after_seconds: z.number().int().min(0).max(3_600).optional(),
+    updated_at: Rfc3339TimestampSchema,
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.status === "SUCCEEDED" && value.result_ref === undefined) {
+      addCustomIssue(
+        context,
+        ["result_ref"],
+        "is required when status is SUCCEEDED",
+      );
+    }
+    if (value.status !== "SUCCEEDED" && value.result_ref !== undefined) {
+      addCustomIssue(
+        context,
+        ["result_ref"],
+        "is forbidden unless status is SUCCEEDED",
+      );
+    }
+    const running = [
+      "QUEUED",
+      "RUNNING",
+      "FALLBACK_RUNNING",
+      "RETRYABLE_FAILED",
+    ].includes(value.status);
+    if (!running && value.retry_after_seconds !== undefined) {
+      addCustomIssue(
+        context,
+        ["retry_after_seconds"],
+        "is only allowed for a recoverable in-progress status",
+      );
+    }
+  });
+export type GenerationIntentView = z.infer<typeof GenerationIntentViewSchema>;
+
+export const RelationshipViewSchema = z
+  .object({
+    stage: RelationshipStageSchema,
+    encounter_day_count: z.number().int().nonnegative(),
+    display_token: VersionTokenSchema.optional(),
+  })
+  .strict();
+export type RelationshipView = z.infer<typeof RelationshipViewSchema>;
+
+export const TodayViewSchema = z
+  .object({
+    content: ClientDailyContentViewSchema,
+    interaction: DailyInteractionStateSchema,
+    relationship: RelationshipViewSchema,
+  })
+  .strict();
+export type TodayView = z.infer<typeof TodayViewSchema>;

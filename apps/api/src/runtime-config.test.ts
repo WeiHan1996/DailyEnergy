@@ -70,9 +70,44 @@ describe("RuntimeConfig", () => {
     );
   });
 
+  it("binds paired Redis cache settings into the deploy fingerprint", () => {
+    const withoutRedis = calculateRuntimeFingerprints(validEnvironment());
+    const withRedis = calculateRuntimeFingerprints({
+      ...validEnvironment(),
+      DAILYENERGY_REDIS_KEY_PREFIX: "dailyenergy-ci",
+      DAILYENERGY_REDIS_URL: "redis://redis:6379",
+    });
+
+    expect(withRedis.deployConfigFingerprint).not.toBe(
+      withoutRedis.deployConfigFingerprint,
+    );
+    expect(
+      loadRuntimeConfig({
+        ...validEnvironment(),
+        DAILYENERGY_REDIS_KEY_PREFIX: "dailyenergy-ci",
+        DAILYENERGY_REDIS_URL: "redis://redis:6379",
+      }).redisCache,
+    ).toEqual({
+      keyPrefix: "dailyenergy-ci",
+      redisUrl: "redis://redis:6379",
+    });
+  });
+
+  it("rejects a partial Redis cache configuration", () => {
+    expect(() =>
+      loadRuntimeConfig({
+        ...validEnvironment(),
+        DAILYENERGY_REDIS_URL: "redis://redis:6379",
+      }),
+    ).toThrowError(new RuntimeConfigError("RUNTIME_CONFIG_INVALID"));
+  });
+
   it("binds the Safety continuation maintenance allowlist into the API capability manifest", () => {
     expect(API_CAPABILITY_MANIFEST.capabilities).toContain(
       "SAFETY_CONTINUATION_MAINTENANCE_ALLOWLIST",
+    );
+    expect(API_CAPABILITY_MANIFEST.capabilities).toContain(
+      "REDIS_DAILY_CONTENT_CACHE",
     );
     expect(
       API_CAPABILITY_MANIFEST.privileged_route_allowlists

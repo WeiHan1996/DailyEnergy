@@ -23,6 +23,12 @@ interface RequestContext {
 function operationFor(method: string, url: string): OperationCode {
   const path = url.split("?", 1)[0];
   const key = `${method.toUpperCase()} ${path}`;
+  if (
+    method.toUpperCase() === "GET" &&
+    /^\/v1\/daily\/generation\/[^/]+$/u.test(path ?? "")
+  ) {
+    return "GENERATION_STATUS";
+  }
   const operations: Readonly<Record<string, OperationCode>> = {
     "GET /health/live": "HEALTH_LIVE",
     "GET /health/ready": "HEALTH_READY",
@@ -35,6 +41,8 @@ function operationFor(method: string, url: string): OperationCode {
     "GET /v1/daily/today/checkin": "CHECKIN_READ",
     "POST /v1/daily/checkin/submit": "CHECKIN_SUBMIT",
     "POST /v1/daily/checkin/correct": "CHECKIN_CORRECT",
+    "POST /v1/daily/generation/start": "GENERATION_START",
+    "GET /v1/daily/today": "DAILY_TODAY_READ",
     "GET /v1/consent/current": "CONSENT_CURRENT",
     "POST /v1/consent/accept": "CONSENT_ACCEPT",
     "POST /v1/consent/withdraw": "CONSENT_WITHDRAW",

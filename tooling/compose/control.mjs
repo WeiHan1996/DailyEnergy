@@ -186,7 +186,7 @@ function runImage(image, arguments_, environment = {}) {
   );
 }
 
-function apiRuntimeEnvironment(mode, observability = false) {
+function apiRuntimeEnvironment(mode, observability = false, fault = false) {
   const selected = modes[mode];
   return {
     DAILYENERGY_CONFIG_SCHEMA_VERSION: "api-runtime-config-v1",
@@ -198,6 +198,10 @@ function apiRuntimeEnvironment(mode, observability = false) {
     DAILYENERGY_MAINTENANCE_MODE: "OFF",
     DAILYENERGY_PORT: "3000",
     DAILYENERGY_PRODUCT_DATE_POLICY_VERSION: "product-date-v1",
+    DAILYENERGY_REDIS_KEY_PREFIX: `daily-energy-e009-${mode}`,
+    DAILYENERGY_REDIS_URL: fault
+      ? "redis://fault-proxy:16379"
+      : "redis://redis:6379",
     DAILYENERGY_RELEASE_ID: `e009-${mode}-v1`,
     DAILYENERGY_RUNTIME_PROFILE: "API",
     DAILYENERGY_SHUTDOWN_GRACE_MS: "5000",
@@ -208,7 +212,7 @@ function apiRuntimeEnvironment(mode, observability = false) {
   };
 }
 
-function calculateFingerprints(serverImage, mode, observability) {
+function calculateFingerprints(serverImage, mode, observability, fault) {
   const api = JSON.parse(
     runImage(
       serverImage,
@@ -217,7 +221,7 @@ function calculateFingerprints(serverImage, mode, observability) {
         "--eval",
         "import('/app/api/dist/bootstrap/runtime-config.js').then(m=>process.stdout.write(JSON.stringify(m.calculateRuntimeFingerprints(process.env))))",
       ],
-      apiRuntimeEnvironment(mode, observability),
+      apiRuntimeEnvironment(mode, observability, fault),
     ),
   );
   const workers = JSON.parse(
@@ -269,6 +273,7 @@ async function prepare(options) {
     images.server,
     options.mode,
     options.observability,
+    options.fault,
   );
   const values = {
     DAILYENERGY_ADMIN_HOST_PORT: selected.adminPort,
@@ -279,6 +284,9 @@ async function prepare(options) {
     DAILYENERGY_API_DEPLOY_FINGERPRINT:
       fingerprints.api.deployConfigFingerprint,
     DAILYENERGY_API_HOST_PORT: selected.apiPort,
+    DAILYENERGY_API_REDIS_URL: options.fault
+      ? "redis://fault-proxy:16379"
+      : "redis://redis:6379",
     DAILYENERGY_LOG_LEVEL: selected.logLevel,
     DAILYENERGY_MIGRATION_IMAGE: images.migration,
     DAILYENERGY_PROXY_CONTROL_HOST_PORT: 19_091,

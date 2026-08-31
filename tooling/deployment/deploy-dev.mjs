@@ -344,6 +344,7 @@ export function developmentComposeEnvironment(
     DAILYENERGY_ADMIN_IMAGE: manifest.images.admin,
     DAILYENERGY_API_CAPABILITY_FINGERPRINT: fingerprints.api_capability,
     DAILYENERGY_API_DEPLOY_FINGERPRINT: fingerprints.api_deploy_config,
+    DAILYENERGY_API_REDIS_URL: "redis://redis:6379",
     DAILYENERGY_CONFIG_DIR: `${DEVELOPMENT_ROOT}/config`,
     DAILYENERGY_COS_CONFIG_REF: manifest.topology.object_config_ref,
     DAILYENERGY_COS_SECRET_DIR: `${DEVELOPMENT_ROOT}/secrets/${manifest.config.secret_ref_versions.cos_secret_id}`,

@@ -95,6 +95,7 @@ export interface QueueEnqueueOptions {
 }
 
 export interface QueueConsumerFaultHooks {
+  afterInboxCommitBeforeExternalWork?(eventId: string): Promise<void>;
   afterInboxCommitBeforeAck?(eventId: string): Promise<void>;
 }
 
@@ -317,6 +318,12 @@ export class BullMqConsumer {
             envelope,
             (transaction) => handler.handle(envelope, transaction),
           );
+          if (!result.terminal && handler.afterCommit !== undefined) {
+            await faultHooks.afterInboxCommitBeforeExternalWork?.(
+              envelope.eventId,
+            );
+            await handler.afterCommit(envelope, result.outcomeCode);
+          }
           try {
             await faultHooks.afterInboxCommitBeforeAck?.(envelope.eventId);
           } catch {

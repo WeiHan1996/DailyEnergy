@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 271, "NA_WITH_REASON": 0, "PLANNED": 516 },
+  "counts": { "COVERED": 283, "NA_WITH_REASON": 0, "PLANNED": 508 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -4003,11 +4003,37 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "cache-miss Today rebuilds the client projection from the authoritative PostgreSQL AVAILABLE result",
+            "deterministic failure becomes terminal and Today exposes only the stable terminal outcome",
+            "non-owner reads are not found and API/Interactive roles keep their reviewed ACL boundaries",
+            "Safety and DAY deletion arriving before publish cancel the intent and create no result",
+            "two concurrent publishers leave one immutable result and the loser returns existing",
+            "two starts create one owner/date intent, snapshot and accepted outbox event"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C008-DB-001"
+        },
+        {
+          "assertions": [
+            "a live DAY deletion guard blocks a previously cached Today projection",
+            "commit-before-ACK retry reuses one InboxReceipt and one published result",
+            "real PostgreSQL outbox relays through Redis 8 and BullMQ 5 into the Interactive Inbox handler",
+            "Redis FLUSHALL loses no business fact and Today rebuilds the same projection from PostgreSQL"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 outbox/inbox publishes once and Redis cache loss rebuilds from PostgreSQL",
+          "test_id": "T-C008-QUEUE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -6201,6 +6227,32 @@
           "origin": "tests/registry/c002-evidence-manifest.json",
           "selector": "C-002 consent/profile HTTP E2E",
           "test_id": "T-C002-E2E-001"
+        },
+        {
+          "assertions": [
+            "OpenAPI start/status/today paths bind the shared request and client-view contracts",
+            "pending, retryable and terminal generation outcomes remain stable typed API errors",
+            "strict start input rejects owner, product date, result version, root seed and guard epoch fields"
+          ],
+          "file": "apps/api/src/generation/generation.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 generation transport contract",
+          "test_id": "T-C008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "all three routes use stable low-cardinality operation codes",
+            "double start and same-command replay return one intent while changed payload conflicts",
+            "Safety blocks start, status and Today before ordinary views are exposed",
+            "status and today use owner-scoped resources and expose bounded Retry-After polling",
+            "Today returns only the allowlisted content, interaction and relationship projection"
+          ],
+          "file": "apps/api/src/generation.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 HTTP generation flow",
+          "test_id": "T-C008-E2E-001"
         }
       ],
       "status": "COVERED",
@@ -6242,11 +6294,35 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "OpenAPI start/status/today paths bind the shared request and client-view contracts",
+            "pending, retryable and terminal generation outcomes remain stable typed API errors",
+            "strict start input rejects owner, product date, result version, root seed and guard epoch fields"
+          ],
+          "file": "apps/api/src/generation/generation.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 generation transport contract",
+          "test_id": "T-C008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "all three routes use stable low-cardinality operation codes",
+            "double start and same-command replay return one intent while changed payload conflicts",
+            "Safety blocks start, status and Today before ordinary views are exposed",
+            "status and today use owner-scoped resources and expose bounded Retry-After polling",
+            "Today returns only the allowlisted content, interaction and relationship projection"
+          ],
+          "file": "apps/api/src/generation.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 HTTP generation flow",
+          "test_id": "T-C008-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-C03",
       "source_sets": ["s20-api"]
@@ -6362,6 +6438,32 @@
           "origin": "tests/registry/c002-evidence-manifest.json",
           "selector": "C-002 consent/profile HTTP E2E",
           "test_id": "T-C002-E2E-001"
+        },
+        {
+          "assertions": [
+            "OpenAPI start/status/today paths bind the shared request and client-view contracts",
+            "pending, retryable and terminal generation outcomes remain stable typed API errors",
+            "strict start input rejects owner, product date, result version, root seed and guard epoch fields"
+          ],
+          "file": "apps/api/src/generation/generation.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 generation transport contract",
+          "test_id": "T-C008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "all three routes use stable low-cardinality operation codes",
+            "double start and same-command replay return one intent while changed payload conflicts",
+            "Safety blocks start, status and Today before ordinary views are exposed",
+            "status and today use owner-scoped resources and expose bounded Retry-After polling",
+            "Today returns only the allowlisted content, interaction and relationship projection"
+          ],
+          "file": "apps/api/src/generation.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 HTTP generation flow",
+          "test_id": "T-C008-E2E-001"
         }
       ],
       "status": "COVERED",
@@ -6401,6 +6503,32 @@
           "origin": "tests/registry/c002-evidence-manifest.json",
           "selector": "C-002 consent/profile HTTP E2E",
           "test_id": "T-C002-E2E-001"
+        },
+        {
+          "assertions": [
+            "OpenAPI start/status/today paths bind the shared request and client-view contracts",
+            "pending, retryable and terminal generation outcomes remain stable typed API errors",
+            "strict start input rejects owner, product date, result version, root seed and guard epoch fields"
+          ],
+          "file": "apps/api/src/generation/generation.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 generation transport contract",
+          "test_id": "T-C008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "all three routes use stable low-cardinality operation codes",
+            "double start and same-command replay return one intent while changed payload conflicts",
+            "Safety blocks start, status and Today before ordinary views are exposed",
+            "status and today use owner-scoped resources and expose bounded Retry-After polling",
+            "Today returns only the allowlisted content, interaction and relationship projection"
+          ],
+          "file": "apps/api/src/generation.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 HTTP generation flow",
+          "test_id": "T-C008-E2E-001"
         }
       ],
       "status": "COVERED",
@@ -6445,22 +6573,83 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "OpenAPI start/status/today paths bind the shared request and client-view contracts",
+            "pending, retryable and terminal generation outcomes remain stable typed API errors",
+            "strict start input rejects owner, product date, result version, root seed and guard epoch fields"
+          ],
+          "file": "apps/api/src/generation/generation.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 generation transport contract",
+          "test_id": "T-C008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "all three routes use stable low-cardinality operation codes",
+            "double start and same-command replay return one intent while changed payload conflicts",
+            "Safety blocks start, status and Today before ordinary views are exposed",
+            "status and today use owner-scoped resources and expose bounded Retry-After polling",
+            "Today returns only the allowlisted content, interaction and relationship projection"
+          ],
+          "file": "apps/api/src/generation.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 HTTP generation flow",
+          "test_id": "T-C008-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-D02",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "OpenAPI start/status/today paths bind the shared request and client-view contracts",
+            "pending, retryable and terminal generation outcomes remain stable typed API errors",
+            "strict start input rejects owner, product date, result version, root seed and guard epoch fields"
+          ],
+          "file": "apps/api/src/generation/generation.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 generation transport contract",
+          "test_id": "T-C008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "all three routes use stable low-cardinality operation codes",
+            "double start and same-command replay return one intent while changed payload conflicts",
+            "Safety blocks start, status and Today before ordinary views are exposed",
+            "status and today use owner-scoped resources and expose bounded Retry-After polling",
+            "Today returns only the allowlisted content, interaction and relationship projection"
+          ],
+          "file": "apps/api/src/generation.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 HTTP generation flow",
+          "test_id": "T-C008-E2E-001"
+        },
+        {
+          "assertions": [
+            "a live DAY deletion guard blocks a previously cached Today projection",
+            "commit-before-ACK retry reuses one InboxReceipt and one published result",
+            "real PostgreSQL outbox relays through Redis 8 and BullMQ 5 into the Interactive Inbox handler",
+            "Redis FLUSHALL loses no business fact and Today rebuilds the same projection from PostgreSQL"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 outbox/inbox publishes once and Redis cache loss rebuilds from PostgreSQL",
+          "test_id": "T-C008-QUEUE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-D03",
       "source_sets": ["s20-api"]
@@ -6535,33 +6724,148 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "OpenAPI start/status/today paths bind the shared request and client-view contracts",
+            "pending, retryable and terminal generation outcomes remain stable typed API errors",
+            "strict start input rejects owner, product date, result version, root seed and guard epoch fields"
+          ],
+          "file": "apps/api/src/generation/generation.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 generation transport contract",
+          "test_id": "T-C008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "all three routes use stable low-cardinality operation codes",
+            "double start and same-command replay return one intent while changed payload conflicts",
+            "Safety blocks start, status and Today before ordinary views are exposed",
+            "status and today use owner-scoped resources and expose bounded Retry-After polling",
+            "Today returns only the allowlisted content, interaction and relationship projection"
+          ],
+          "file": "apps/api/src/generation.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 HTTP generation flow",
+          "test_id": "T-C008-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-D08",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "OpenAPI start/status/today paths bind the shared request and client-view contracts",
+            "pending, retryable and terminal generation outcomes remain stable typed API errors",
+            "strict start input rejects owner, product date, result version, root seed and guard epoch fields"
+          ],
+          "file": "apps/api/src/generation/generation.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 generation transport contract",
+          "test_id": "T-C008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "cache-miss Today rebuilds the client projection from the authoritative PostgreSQL AVAILABLE result",
+            "deterministic failure becomes terminal and Today exposes only the stable terminal outcome",
+            "non-owner reads are not found and API/Interactive roles keep their reviewed ACL boundaries",
+            "Safety and DAY deletion arriving before publish cancel the intent and create no result",
+            "two concurrent publishers leave one immutable result and the loser returns existing",
+            "two starts create one owner/date intent, snapshot and accepted outbox event"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C008-DB-001"
+        },
+        {
+          "assertions": [
+            "all three routes use stable low-cardinality operation codes",
+            "double start and same-command replay return one intent while changed payload conflicts",
+            "Safety blocks start, status and Today before ordinary views are exposed",
+            "status and today use owner-scoped resources and expose bounded Retry-After polling",
+            "Today returns only the allowlisted content, interaction and relationship projection"
+          ],
+          "file": "apps/api/src/generation.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 HTTP generation flow",
+          "test_id": "T-C008-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-D09",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "OpenAPI start/status/today paths bind the shared request and client-view contracts",
+            "pending, retryable and terminal generation outcomes remain stable typed API errors",
+            "strict start input rejects owner, product date, result version, root seed and guard epoch fields"
+          ],
+          "file": "apps/api/src/generation/generation.contract.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 generation transport contract",
+          "test_id": "T-C008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "cache-miss Today rebuilds the client projection from the authoritative PostgreSQL AVAILABLE result",
+            "deterministic failure becomes terminal and Today exposes only the stable terminal outcome",
+            "non-owner reads are not found and API/Interactive roles keep their reviewed ACL boundaries",
+            "Safety and DAY deletion arriving before publish cancel the intent and create no result",
+            "two concurrent publishers leave one immutable result and the loser returns existing",
+            "two starts create one owner/date intent, snapshot and accepted outbox event"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C008-DB-001"
+        },
+        {
+          "assertions": [
+            "all three routes use stable low-cardinality operation codes",
+            "double start and same-command replay return one intent while changed payload conflicts",
+            "Safety blocks start, status and Today before ordinary views are exposed",
+            "status and today use owner-scoped resources and expose bounded Retry-After polling",
+            "Today returns only the allowlisted content, interaction and relationship projection"
+          ],
+          "file": "apps/api/src/generation.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 HTTP generation flow",
+          "test_id": "T-C008-E2E-001"
+        },
+        {
+          "assertions": [
+            "a live DAY deletion guard blocks a previously cached Today projection",
+            "commit-before-ACK retry reuses one InboxReceipt and one published result",
+            "real PostgreSQL outbox relays through Redis 8 and BullMQ 5 into the Interactive Inbox handler",
+            "Redis FLUSHALL loses no business fact and Today rebuilds the same projection from PostgreSQL"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 outbox/inbox publishes once and Redis cache loss rebuilds from PostgreSQL",
+          "test_id": "T-C008-QUEUE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-D10",
       "source_sets": ["s20-api"]
@@ -9650,11 +9954,24 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "cache-miss Today rebuilds the client projection from the authoritative PostgreSQL AVAILABLE result",
+            "deterministic failure becomes terminal and Today exposes only the stable terminal outcome",
+            "non-owner reads are not found and API/Interactive roles keep their reviewed ACL boundaries",
+            "Safety and DAY deletion arriving before publish cancel the intent and create no result",
+            "two concurrent publishers leave one immutable result and the loser returns existing",
+            "two starts create one owner/date intent, snapshot and accepted outbox event"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/c008-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-C008-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S31-TEST-022",
       "source_sets": ["s31-testing"]
@@ -13835,7 +14152,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13864,7 +14181,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13893,7 +14210,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13922,7 +14239,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13951,7 +14268,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -13980,7 +14297,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14009,7 +14326,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14038,7 +14355,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14067,7 +14384,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14096,7 +14413,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14125,7 +14442,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14154,7 +14471,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14183,7 +14500,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14212,7 +14529,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14241,13 +14558,71 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:generation-input-snapshot:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:generation-intent-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:generation-intent-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:generation-intent-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:generation-start-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:generation-start-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:generation-start-request:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {
@@ -14270,7 +14645,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14299,13 +14674,42 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:published-weekly-summary:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:relationship-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:relationship-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:relationship-view:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {
@@ -14328,13 +14732,42 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:rule-facts:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:today-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:today-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:today-view:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {
@@ -14357,7 +14790,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14386,7 +14819,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14415,7 +14848,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14444,7 +14877,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -14473,7 +14906,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 23 stable, unique JSON Schema IDs",
+          "selector": "exports 27 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
