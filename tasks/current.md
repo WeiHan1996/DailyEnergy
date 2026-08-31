@@ -4,19 +4,20 @@
 - **最后更新**：2026-08-31
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-015 — C-004～C-015 统一审核修复
-- **任务状态**：In Progress（统一审核 findings 已修复且 full security Gate 自动化通过；项目所有者已授权创建 Draft PR）
+- **任务状态**：In Review（统一修复 Draft PR #169 已创建；final-head CI 与 owner manual evidence 待完成）
 - **任务 Profile**：`security`（幂等、Safety、删除不复活、隐私、确定性与 analytics 可信性）
 - **工作分支**：`agent/c004-c015-review-fixes`
 - **修复基线**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)，remote head `fd04b787926127bda64fc6cb07cfcf356d85ed8b`，CI run `33323476723` 11/11 SUCCESS
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
-- **当前 PR**：尚未创建；PR #157～#168 保持 Draft，不改远端 stacked refs
-- **下一候选动作**：提交并创建基于 PR #168 的统一修复 Draft PR，随后等待 owner manual evidence；不启动 C-016
+- **当前 PR**：[统一修复 Draft PR #169](https://github.com/WeiHan1996/DailyEnergy/pull/169)；base=`agent/c015-core-analytics`，implementation head `6fdb3f5a9a868bdac4d8ab025ad8c9eaf29da2ed`，initial CI run `33357480285`；状态 handoff commit 与 final-head CI 待生成；PR #157～#168 保持 Draft，不改远端 stacked refs
+- **下一候选动作**：等待 PR #169 exact-head CI 与 owner manual evidence；不标记 Ready、不合并、不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 0. 统一审核修复
 
 - 项目所有者于 2026-08-31 明确要求修复 C-004～C-015 统一审核发现；该安全/正确性缺陷批次中断原 In Review 状态；
 - 项目所有者已明确授权基于 PR #168 创建统一修复 Draft PR；授权不包含 force-push、改写 #157～#168、运行 exact-head verifier、标记 Ready 或合并；
+- 统一修复 Draft PR #169 已基于 PR #168 精确 head 创建；implementation CI run `33357480285` 会被状态 handoff commit 取代，不能冒充最终 exact-head CI；
 - 修复范围只覆盖已报告的幂等与时间边界、continuation/DayLit 收敛、Safety/删除竞态、本地敏感缓存与期限、规则/template invariant，以及 C-015 信号、指标、Gate 和基数合同；
 - 不改变 Accepted 产品方向、框架、数据库或服务边界，不启动 C-016，不将人工证据或 Production/RC Gate 冒充完成；
 - 修复先在独立顶层分支完成并验证；未经项目所有者授权，不 force-push 或重写现有 stacked PR；
@@ -97,9 +98,9 @@
 ## 8. 精确下一动作
 
 1. 项目所有者完成 differential-query/four-plane threat review、WeChat DevTools/真机 offline no-replay 与生产 bundle/主体/位置/用户说明证据；
-2. 已获授权在 `agent/c015-core-analytics` 的精确 head `fd04b787926127bda64fc6cb07cfcf356d85ed8b` 之上创建一个新的统一修复 Draft PR，仅用于当前 stacked review；这样不 force-push、不改写 #157～#168，修复差异保持单一可审；
+2. 统一修复 Draft PR #169 已在 `agent/c015-core-analytics` 精确 head `fd04b787926127bda64fc6cb07cfcf356d85ed8b` 之上创建，仅用于当前 stacked review；没有 force-push 或改写 #157～#168；
 3. #157～#168 依次 squash merge 后，不直接 retarget 预审 PR；从最新 main 创建替代分支，cherry-pick 单一 remediation commit，重新跑 full/exact-head Gate 并创建面向 main 的替代 Draft PR，随后关联并关闭预审 PR；
-4. 当前授权仅覆盖 remediation commit、push 新分支和创建 Draft PR；不运行 exact-head verifier，不标记 Ready 或合并；所有 PR/Issues 保持 Draft/Open，Production/RC 保持 `NO_GO`，不启动 C-016。
+4. 当前授权已用于 remediation commit、push 新分支和创建 Draft PR；后续只等待 exact-head CI 与人工审核，不运行 verifier、不标记 Ready 或合并；所有 PR/Issues 保持 Draft/Open，Production/RC 保持 `NO_GO`，不启动 C-016。
 
 ## 9. C-015 后统一审核
 
