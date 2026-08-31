@@ -4,14 +4,23 @@
 - **最后更新**：2026-08-31
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-015 — C-004～C-015 统一审核修复
-- **任务状态**：In Progress（项目所有者已明确批准一次性 main ruleset 安全控制变更；受控 merge-commit 合并待执行）
+- **任务状态**：Blocked（C-004～C-015 实现与统一修复已 merge；等待真机、生产 bundle 与隐私主体/位置/用户说明证据）
 - **任务 Profile**：`security`（幂等、Safety、删除不复活、隐私、确定性与 analytics 可信性）
-- **工作分支**：`agent/c004-c015-review-fixes`
+- **工作分支**：`agent/c015-post-merge-handoff`
 - **修复基线**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)，remote head `fd04b787926127bda64fc6cb07cfcf356d85ed8b`，CI run `33323476723` 11/11 SUCCESS
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
-- **当前 PR**：[统一修复 Draft PR #169](https://github.com/WeiHan1996/DailyEnergy/pull/169)；base=`agent/c015-core-analytics`，strategy head `3d33a80df646097cc1fcef361e9c4a08703cd656`，CI run `33368423171` 11/11 SUCCESS；PR #157～#169 均保持 Draft/Open
-- **下一候选动作**：临时变更 main ruleset，按 #157～#169 顺序执行 exact-head merge commit，完成或中止后原样恢复；不启动 C-016
+- **当前 PR**：#157～#169 均已 merge；post-merge handoff PR 待创建
+- **合并状态**：main head `fec5c96d368f8d4427ecca861f8ce42adad7a270`，CI run `33374088290` 11/11 SUCCESS
+- **下一候选动作**：补齐 WeChat DevTools/真机 offline no-replay、生产 bundle 无第三方 SDK、处理主体/位置/用户说明证据；不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
+
+## Post-merge receipt
+
+- #157～#169 均先通过 exact-head verifier，再以 `--merge --match-head-commit` 合入 main；13 个原 PR head 均已验证为最终 main 的祖先，13 个 merge commit 均为双父；
+- merge commits：#157 `4ac2009b`、#158 `38138a78`、#159 `aad63032`、#160 `873bcc24`、#161 `7d6d5cb9`、#162 `2e8935ed`、#163 `812595cf`、#164 `0ee0e66c`、#165 `90e8e23c`、#166 `6ee5e9fd`、#167 `2fa0df61`、#168 `d7411c18`、#169 `fec5c96d`；
+- 最终 PR #169 exact head `453eb55504dab35209c0886eefede51342547199`，CI run `33373613585` 11/11 SUCCESS；merged-main CI run `33374088290` 11/11 SUCCESS；
+- 一次性 merge window 完成后，repository `allow_merge_commit=false` 已恢复；main ruleset `21080906` 已恢复 deletion、non-fast-forward、required-linear-history、squash-only、11 strict checks、空 bypass；
+- owner 代码与 differential-query/four-plane threat-boundary 审核已通过；外部/真机证据仍 Pending，因此当前任务不标记 Done，Production/RC 保持 `NO_GO`。
 
 ## 0. 统一审核修复
 
@@ -105,10 +114,10 @@
 
 ## 8. 精确下一动作
 
-1. 项目所有者已完成 differential-query/four-plane threat review；仍需 WeChat DevTools/真机 offline no-replay 与生产 bundle/主体/位置/用户说明证据；
-2. 统一修复 Draft PR #169 已在 `agent/c015-core-analytics` 精确 head `fd04b787926127bda64fc6cb07cfcf356d85ed8b` 之上创建，仅用于当前 stacked review；没有 force-push 或改写 #157～#168；
-3. **解锁条件已满足**：项目所有者已明确批准一次性把仓库 `allow_merge_commit` 设为 `true`，从 main ruleset `21080906` 临时移除 `required_linear_history`，并把 `pull_request.allowed_merge_methods` 从 `["squash"]` 改为仅 `["merge"]`；deletion、non-fast-forward、review 参数、11 strict checks 与空 bypass 必须逐字节保留；
-4. 依次把 #157 merge 到 main、将下一个 PR retarget/update 到 main，再以 exact-head verifier + `--merge --match-head-commit` 合并至 #169；任一步漂移立即停止；流程完成或中止后原样恢复 ruleset 与 `allow_merge_commit=false` 并验证；不授权 force-push、删除 branch、Production/RC 或补签外部证据。
+1. **解锁条件**：提供 WeChat DevTools/真机网络证据，证明 offline signal 不持久化、不跨重启 replay；
+2. 提供生产 bundle 检查，证明不含第三方 analytics/BI/ad/replay/attribution SDK；
+3. 提供实际处理主体、生产位置与用户说明的 privacy/legal 确认；生产 scheduler 与 incident threshold 继续留在 Production Gate；
+4. 证据齐备并获 owner 接受前，C-015 保持 Blocked、Issue #68 保持 Open、C-016 不启动、Production/RC 保持 `NO_GO`。
 
 ## 9. C-015 后统一审核
 
