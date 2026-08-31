@@ -21,6 +21,12 @@ import {
 } from "../telemetry/runtime.js";
 import { createDayLitHandlers } from "../relationship/day-lit-handler.js";
 import { createWeeklyHandlers } from "../weekly/weekly-handler.js";
+import { createAnalyticsHandlers } from "../analytics/analytics-handler.js";
+export {
+  PostgresAnalyticsStore,
+  type AnalyticsBatchStore,
+  type PostgresAnalyticsStoreConfig,
+} from "../analytics/postgres-analytics-store.js";
 
 export type WorkerBackgroundDatabaseCapability =
   DatabaseCapability<"worker-background">;
@@ -69,9 +75,14 @@ export function startWorkerBackgroundRuntime(
 
 export { createDayLitHandlers } from "../relationship/day-lit-handler.js";
 export { createWeeklyHandlers } from "../weekly/weekly-handler.js";
+export { createAnalyticsHandlers } from "../analytics/analytics-handler.js";
 
 export function createWorkerBackgroundHandlers(): readonly QueueJobHandler[] {
-  return Object.freeze([...createDayLitHandlers(), ...createWeeklyHandlers()]);
+  return Object.freeze([
+    ...createAnalyticsHandlers(),
+    ...createDayLitHandlers(),
+    ...createWeeklyHandlers(),
+  ]);
 }
 
 export function startWorkerBackgroundTelemetry(

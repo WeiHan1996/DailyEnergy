@@ -36,6 +36,7 @@ function operationFor(method: string, url: string): OperationCode {
     return "DAILY_HISTORY_READ";
   }
   const operations: Readonly<Record<string, OperationCode>> = {
+    "POST /v1/analytics/signals": "ANALYTICS_SIGNAL_SUBMIT",
     "GET /health/live": "HEALTH_LIVE",
     "GET /health/ready": "HEALTH_READY",
     "GET /health/startup": "HEALTH_STARTUP",

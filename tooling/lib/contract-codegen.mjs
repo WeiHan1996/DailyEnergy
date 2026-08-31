@@ -201,10 +201,33 @@ const SCHEMA_EXPORTS = [
     "IdentityVerificationViewSchema",
     "identity-verification-view",
   ],
+  [
+    "analyticsProjectionV1",
+    "AnalyticsProjectionV1Schema",
+    "analytics-projection-v1",
+  ],
+  [
+    "anonymousDailyAggregateV1",
+    "AnonymousDailyAggregateV1Schema",
+    "anonymous-daily-aggregate-v1",
+  ],
+  [
+    "clientAnalyticsSignalRequest",
+    "ClientAnalyticsSignalRequestSchema",
+    "client-analytics-signal-request",
+  ],
+  [
+    "clientAnalyticsSignalAcceptedView",
+    "ClientAnalyticsSignalAcceptedViewSchema",
+    "client-analytics-signal-accepted-view",
+  ],
+  ["metricReportV1", "MetricReportV1Schema", "metric-report-v1"],
+  ["metricGateReportV1", "MetricGateReportV1Schema", "metric-gate-report-v1"],
 ];
 
 const SCHEMA_SOURCE_PATHS = [
   "packages/shared-schemas/src/client.ts",
+  "packages/shared-schemas/src/analytics.ts",
   "packages/shared-schemas/src/client-daily-content.ts",
   "packages/shared-schemas/src/client-evening-feedback.ts",
   "packages/shared-schemas/src/client-history.ts",

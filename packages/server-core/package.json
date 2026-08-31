@@ -27,6 +27,10 @@
     "./weekly-reflection": {
       "types": "./dist/modules/weekly-reflection/public/index.d.ts",
       "import": "./dist/modules/weekly-reflection/public/index.js"
+    },
+    "./analytics": {
+      "types": "./dist/modules/analytics/public/index.d.ts",
+      "import": "./dist/modules/analytics/public/index.js"
     }
   },
   "scripts": {

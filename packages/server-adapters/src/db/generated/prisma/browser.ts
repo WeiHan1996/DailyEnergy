@@ -387,3 +387,33 @@ export type EvaluationRun = Prisma.EvaluationRunModel
  * 
  */
 export type EvaluationSample = Prisma.EvaluationSampleModel
+/**
+ * Model AnalyticsProductDailyAggregate
+ *
+ */
+export type AnalyticsProductDailyAggregate = Prisma.AnalyticsProductDailyAggregateModel
+/**
+ * Model AnalyticsRuntimeDailyAggregate
+ *
+ */
+export type AnalyticsRuntimeDailyAggregate = Prisma.AnalyticsRuntimeDailyAggregateModel
+/**
+ * Model AnalyticsGovernanceDailyAggregate
+ *
+ */
+export type AnalyticsGovernanceDailyAggregate = Prisma.AnalyticsGovernanceDailyAggregateModel
+/**
+ * Model AnalyticsSafetyDailyAggregate
+ *
+ */
+export type AnalyticsSafetyDailyAggregate = Prisma.AnalyticsSafetyDailyAggregateModel
+/**
+ * Model AnalyticsProductMetricSnapshot
+ *
+ */
+export type AnalyticsProductMetricSnapshot = Prisma.AnalyticsProductMetricSnapshotModel
+/**
+ * Model AnalyticsGateSnapshot
+ *
+ */
+export type AnalyticsGateSnapshot = Prisma.AnalyticsGateSnapshotModel

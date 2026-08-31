@@ -256,6 +256,21 @@
           }
         }
       },
+      "SuccessAnalyticsSignal": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiSuccessAnalyticsSignal"
+            }
+          }
+        },
+        "description": "Accepted best-effort analytics signal",
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/RequestIdResponseHeader"
+          }
+        }
+      },
       "SuccessCheckin": {
         "content": {
           "application/json": {
@@ -1320,6 +1335,42 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/AdminSessionView"
+          },
+          "ok": {
+            "enum": [
+              true
+            ],
+            "type": "boolean"
+          },
+          "product_date": {
+            "$ref": "#/components/schemas/ProductDate"
+          },
+          "product_date_policy_version": {
+            "$ref": "#/components/schemas/VersionToken"
+          },
+          "request_id": {
+            "$ref": "#/components/schemas/RequestId"
+          },
+          "server_now": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "request_id",
+          "server_now",
+          "product_date",
+          "product_date_policy_version",
+          "data"
+        ],
+        "type": "object"
+      },
+      "ApiSuccessAnalyticsSignal": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ClientAnalyticsSignalAcceptedView"
           },
           "ok": {
             "enum": [
@@ -2521,6 +2572,359 @@
         ],
         "type": "object",
         "x-source-contract": "CheckinViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
+      },
+      "ClientAnalyticsSignalAcceptedView": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted": {
+            "enum": [
+              true
+            ],
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accepted"
+        ],
+        "type": "object",
+        "x-source-contract": "ClientAnalyticsSignalAcceptedViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
+      },
+      "ClientAnalyticsSignalRequest": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "event_name": {
+                "enum": [
+                  "landing_viewed"
+                ],
+                "type": "string"
+              },
+              "event_schema_version": {
+                "enum": [
+                  1
+                ],
+                "type": "number"
+              },
+              "locale": {
+                "enum": [
+                  "zh-CN",
+                  "other"
+                ],
+                "type": "string"
+              },
+              "scene_code": {
+                "enum": [
+                  "DIRECT",
+                  "CHANNEL_LANDING",
+                  "SHARE",
+                  "NOTIFICATION",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              "surface_version_bucket": {
+                "maxLength": 32,
+                "minLength": 1,
+                "pattern": "^(?:[A-Z][A-Z0-9_]{0,30}|OTHER)$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "app_version",
+              "event_schema_version",
+              "locale",
+              "event_name",
+              "scene_code",
+              "surface_version_bucket"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "event_name": {
+                "enum": [
+                  "landing_primary_action_clicked"
+                ],
+                "type": "string"
+              },
+              "event_schema_version": {
+                "enum": [
+                  1
+                ],
+                "type": "number"
+              },
+              "locale": {
+                "enum": [
+                  "zh-CN",
+                  "other"
+                ],
+                "type": "string"
+              },
+              "scene_code": {
+                "enum": [
+                  "DIRECT",
+                  "CHANNEL_LANDING",
+                  "SHARE",
+                  "NOTIFICATION",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              "surface_version_bucket": {
+                "maxLength": 32,
+                "minLength": 1,
+                "pattern": "^(?:[A-Z][A-Z0-9_]{0,30}|OTHER)$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "app_version",
+              "event_schema_version",
+              "locale",
+              "event_name",
+              "scene_code",
+              "surface_version_bucket"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "event_name": {
+                "enum": [
+                  "main_action_reached"
+                ],
+                "type": "string"
+              },
+              "event_schema_version": {
+                "enum": [
+                  1
+                ],
+                "type": "number"
+              },
+              "locale": {
+                "enum": [
+                  "zh-CN",
+                  "other"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "app_version",
+              "event_schema_version",
+              "locale",
+              "event_name"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "event_name": {
+                "enum": [
+                  "dimensions_expanded"
+                ],
+                "type": "string"
+              },
+              "event_schema_version": {
+                "enum": [
+                  1
+                ],
+                "type": "number"
+              },
+              "locale": {
+                "enum": [
+                  "zh-CN",
+                  "other"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "app_version",
+              "event_schema_version",
+              "locale",
+              "event_name"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "event_name": {
+                "enum": [
+                  "weekly_summary_read"
+                ],
+                "type": "string"
+              },
+              "event_schema_version": {
+                "enum": [
+                  1
+                ],
+                "type": "number"
+              },
+              "locale": {
+                "enum": [
+                  "zh-CN",
+                  "other"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "app_version",
+              "event_schema_version",
+              "locale",
+              "event_name"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "event_name": {
+                "enum": [
+                  "settings_viewed"
+                ],
+                "type": "string"
+              },
+              "event_schema_version": {
+                "enum": [
+                  1
+                ],
+                "type": "number"
+              },
+              "locale": {
+                "enum": [
+                  "zh-CN",
+                  "other"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "app_version",
+              "event_schema_version",
+              "locale",
+              "event_name"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "event_name": {
+                "enum": [
+                  "faq_opened"
+                ],
+                "type": "string"
+              },
+              "event_schema_version": {
+                "enum": [
+                  1
+                ],
+                "type": "number"
+              },
+              "faq_category_code": {
+                "enum": [
+                  "PRODUCT",
+                  "PRIVACY",
+                  "SAFETY",
+                  "DATA_RIGHTS",
+                  "ACCOUNT",
+                  "NOTIFICATIONS",
+                  "SUPPORT",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              "locale": {
+                "enum": [
+                  "zh-CN",
+                  "other"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "app_version",
+              "event_schema_version",
+              "locale",
+              "event_name",
+              "faq_category_code"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
+              },
+              "event_name": {
+                "enum": [
+                  "data_rights_entry_viewed"
+                ],
+                "type": "string"
+              },
+              "event_schema_version": {
+                "enum": [
+                  1
+                ],
+                "type": "number"
+              },
+              "locale": {
+                "enum": [
+                  "zh-CN",
+                  "other"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "app_version",
+              "event_schema_version",
+              "locale",
+              "event_name"
+            ],
+            "type": "object"
+          }
+        ],
+        "x-source-contract": "ClientAnalyticsSignalRequestSchema",
         "x-source-projection": "zod-openapi-3.0"
       },
       "ClientContext": {
@@ -9186,6 +9590,51 @@
         ]
       }
     },
+    "/analytics/signals": {
+      "post": {
+        "operationId": "submitAnalyticsSignal",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RequestIdHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientAnalyticsSignalRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/SuccessAnalyticsSignal"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        },
+        "security": [],
+        "summary": "Submit one best-effort first-party signal without identity or offline replay",
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
     "/auth/reauth/verify": {
       "post": {
         "operationId": "verifyDeletionIdentity",
@@ -12698,6 +13147,10 @@
       "name": "Support"
     },
     {
+      "description": "First-party, best-effort, identity-free client signals",
+      "name": "Analytics"
+    },
+    {
       "description": "Admin operations",
       "name": "Admin"
     }
@@ -12708,6 +13161,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:1479280a50b42254b8de63769f559a8cbbe93395f5b6d7db8d379b52b4c67c87"
+    "source-fingerprint": "sha256:062f9291880a9d0ce57b9923f31c2ebb8c05ed66d201eb407a591ce28cc7304e"
   }
 }

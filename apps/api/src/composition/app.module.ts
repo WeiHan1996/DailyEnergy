@@ -1,5 +1,6 @@
 import { Module, type DynamicModule, type Provider } from "@nestjs/common";
 import {
+  UNAVAILABLE_ANALYTICS_AGGREGATE_STORE,
   UNAVAILABLE_CHECKIN_STORE,
   UNAVAILABLE_CONSENT_PROFILE_STORE,
   UNAVAILABLE_DAILY_GENERATION_STORE,
@@ -8,6 +9,9 @@ import {
   UNAVAILABLE_EVENING_STORE,
   UNAVAILABLE_WEEKLY_STORE,
 } from "@daily-energy/server-adapters/api";
+
+import { AnalyticsSignalLimiter } from "../analytics/analytics-signal-limiter.js";
+import { AnalyticsService } from "../analytics/analytics.service.js";
 
 import { AuthAttemptLimiter } from "../auth/auth-attempt-limiter.js";
 import { AuthService } from "../auth/auth.service.js";
@@ -59,6 +63,7 @@ import { HttpLoggingInterceptor } from "../transport/common/http-logging.interce
 import { MaintenanceGuard } from "../transport/common/maintenance.guard.js";
 import { RequestContextStore } from "../transport/common/request-context.js";
 import { AuthController } from "../transport/public/auth.controller.js";
+import { AnalyticsController } from "../transport/public/analytics.controller.js";
 import { CheckinController } from "../transport/public/checkin.controller.js";
 import { ConsentProfileController } from "../transport/public/consent-profile.controller.js";
 import { HealthController } from "../transport/public/health.controller.js";
@@ -75,6 +80,7 @@ import { PublicController } from "../transport/public/public.controller.js";
 import { SessionGuard } from "../transport/public/session.guard.js";
 import {
   ADMIN_AUDIENCE_VERIFIER,
+  ANALYTICS_AGGREGATE_STORE,
   AUTH_STORE,
   CHECKIN_STORE,
   CONSENT_PROFILE_STORE,
@@ -135,6 +141,12 @@ export class ApiModule {
       : UNAVAILABLE_DELETION_STATUS_TOKEN_ISSUER;
     const providers: Provider[] = [
       { provide: RUNTIME_CONFIG, useValue: composition.config },
+      {
+        provide: ANALYTICS_AGGREGATE_STORE,
+        useValue:
+          composition.overrides?.analyticsAggregateStore ??
+          UNAVAILABLE_ANALYTICS_AGGREGATE_STORE,
+      },
       {
         provide: AUTH_STORE,
         useValue: composition.overrides?.authStore ?? UNAVAILABLE_AUTH_STORE,
@@ -258,6 +270,8 @@ export class ApiModule {
           composition.overrides?.telemetryRuntime ?? NOOP_TELEMETRY_RUNTIME,
       },
       AdminAudienceGuard,
+      AnalyticsSignalLimiter,
+      AnalyticsService,
       ApiTelemetry,
       ApiExceptionFilter,
       AuthAttemptLimiter,
@@ -283,6 +297,7 @@ export class ApiModule {
     return {
       controllers: [
         AdminController,
+        AnalyticsController,
         AuthController,
         CheckinController,
         ConsentProfileController,

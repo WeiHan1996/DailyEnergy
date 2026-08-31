@@ -175,6 +175,14 @@ export type {
 } from "../db/internal/contracts.js";
 
 export {
+  PostgresAnalyticsStore,
+  UNAVAILABLE_ANALYTICS_AGGREGATE_STORE,
+  type AnalyticsAggregateStore,
+  type ClientAggregateDelta,
+  type PostgresAnalyticsStoreConfig,
+} from "../analytics/postgres-analytics-store.js";
+
+export {
   DEVELOPMENT_SUBJECT_KEY_VERSION,
   developmentSubjectLookupToken,
   protectDevelopmentSubject,

@@ -3,6 +3,7 @@ import "reflect-metadata";
 import { readFile } from "node:fs/promises";
 import type { AddressInfo } from "node:net";
 import {
+  PostgresAnalyticsStore,
   PostgresAuthStore,
   PostgresCheckinStore,
   PostgresConsentProfileStore,
@@ -15,6 +16,7 @@ import {
   UNAVAILABLE_DAILY_CONTENT_CACHE,
   startApiTelemetry,
   type AuthStore,
+  type AnalyticsAggregateStore,
   type CheckinStore,
   type ConsentProfileStore,
   type DailyGenerationStore,
@@ -66,6 +68,7 @@ function writeStartupFailure(reasonCode: StartupFailureReason): void {
 async function main(): Promise<void> {
   let telemetry: TelemetryRuntime | undefined;
   let authStore: AuthStore | undefined;
+  let analyticsAggregateStore: AnalyticsAggregateStore | undefined;
   let checkinStore: CheckinStore | undefined;
   let consentProfileStore: ConsentProfileStore | undefined;
   let dailyGenerationStore: DailyGenerationStore | undefined;
@@ -101,6 +104,13 @@ async function main(): Promise<void> {
         throw new ApiStartupError("API_DATABASE_NOT_READY");
       }
       try {
+        analyticsAggregateStore = await PostgresAnalyticsStore.connect({
+          applicationName: "daily-energy:api:analytics",
+          connectionLimit: 2,
+          connectionString,
+          expectedDatabaseRole: "daily_energy_api",
+          profile: "api",
+        });
         authStore = await PostgresAuthStore.connect({
           applicationName: "daily-energy:api:auth",
           connectionLimit: 4,
@@ -163,6 +173,9 @@ async function main(): Promise<void> {
       readinessChecks.push(databaseReadiness);
     }
     const application = await createApiApplication(config, {
+      ...(analyticsAggregateStore === undefined
+        ? {}
+        : { analyticsAggregateStore }),
       ...(authStore === undefined ? {} : { authStore }),
       ...(checkinStore === undefined ? {} : { checkinStore }),
       ...(consentProfileStore === undefined ? {} : { consentProfileStore }),
@@ -173,6 +186,9 @@ async function main(): Promise<void> {
       ...(weeklyStore === undefined ? {} : { weeklyStore }),
       readinessChecks,
       shutdownDrainHooks: [
+        ...(analyticsAggregateStore === undefined
+          ? []
+          : [{ drain: () => analyticsAggregateStore?.close() }]),
         ...(authStore === undefined
           ? []
           : [{ drain: () => authStore?.close() }]),
@@ -213,6 +229,7 @@ async function main(): Promise<void> {
       reason_code: address === null ? "LISTENER_UNKNOWN" : "LISTENER_READY",
     });
   } catch (error) {
+    await analyticsAggregateStore?.close().catch(() => undefined);
     await authStore?.close().catch(() => undefined);
     await checkinStore?.close().catch(() => undefined);
     await consentProfileStore?.close().catch(() => undefined);

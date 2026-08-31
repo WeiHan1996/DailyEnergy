@@ -470,7 +470,13 @@ export const ModelName = {
   InboxReceipt: 'InboxReceipt',
   VersionCatalogEntry: 'VersionCatalogEntry',
   EvaluationRun: 'EvaluationRun',
-  EvaluationSample: 'EvaluationSample'
+  EvaluationSample: 'EvaluationSample',
+  AnalyticsProductDailyAggregate: 'AnalyticsProductDailyAggregate',
+  AnalyticsRuntimeDailyAggregate: 'AnalyticsRuntimeDailyAggregate',
+  AnalyticsGovernanceDailyAggregate: 'AnalyticsGovernanceDailyAggregate',
+  AnalyticsSafetyDailyAggregate: 'AnalyticsSafetyDailyAggregate',
+  AnalyticsProductMetricSnapshot: 'AnalyticsProductMetricSnapshot',
+  AnalyticsGateSnapshot: 'AnalyticsGateSnapshot'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -486,7 +492,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userAccount" | "externalIdentity" | "sessionCredential" | "necessaryConsentRecord" | "userProfile" | "userProfileRevision" | "onboardingCompletion" | "viewContinuationGrant" | "commandReceipt" | "morningCheckin" | "morningCheckinRevision" | "generationIntent" | "generationInputSnapshot" | "gatewayInvocation" | "gatewayAttempt" | "gatewayCandidate" | "publishedDailyResult" | "publishedResultVisibility" | "resultContentSlot" | "personalizedContentFragment" | "sourceDependency" | "dailyInteraction" | "dailyLightFact" | "dailyTaskState" | "dailyHelpfulnessRecord" | "eveningFeedbackRecord" | "eveningFeedbackRevision" | "relationshipCycle" | "relationshipEncounterLink" | "relationshipNodeReceipt" | "importantMatter" | "importantMatterRevision" | "memoryPurposeGrant" | "memoryMasterPreference" | "memoryMentionReceipt" | "memoryContextSnapshot" | "weeklyWindow" | "weeklySourceSnapshot" | "weeklySummaryIntent" | "publishedWeeklySummaryRevision" | "weeklyContentSlot" | "weeklyPersonalizedContentFragment" | "weeklySourceDependency" | "safetyState" | "safetyDecision" | "safetyEvent" | "safetyResponsePlan" | "safetyResourceEntry" | "recoveryCommandReceipt" | "notificationPreference" | "platformPermissionSnapshot" | "notificationIntent" | "notificationDeliveryAttempt" | "dataTask" | "exportManifest" | "deletionStatusGrant" | "deletionConfirmationChallenge" | "identityVerification" | "deletionGuard" | "deletionStepCheckpoint" | "dayErasureGuard" | "deletionReceipt" | "providerDeletionRequest" | "backupCatalogEntry" | "restoreDenyRecord" | "retentionPolicyEntry" | "providerDataHandlingProfile" | "legalHold" | "restrictedAuditEvent" | "outboxEvent" | "inboxReceipt" | "versionCatalogEntry" | "evaluationRun" | "evaluationSample"
+    modelProps: "userAccount" | "externalIdentity" | "sessionCredential" | "necessaryConsentRecord" | "userProfile" | "userProfileRevision" | "onboardingCompletion" | "viewContinuationGrant" | "commandReceipt" | "morningCheckin" | "morningCheckinRevision" | "generationIntent" | "generationInputSnapshot" | "gatewayInvocation" | "gatewayAttempt" | "gatewayCandidate" | "publishedDailyResult" | "publishedResultVisibility" | "resultContentSlot" | "personalizedContentFragment" | "sourceDependency" | "dailyInteraction" | "dailyLightFact" | "dailyTaskState" | "dailyHelpfulnessRecord" | "eveningFeedbackRecord" | "eveningFeedbackRevision" | "relationshipCycle" | "relationshipEncounterLink" | "relationshipNodeReceipt" | "importantMatter" | "importantMatterRevision" | "memoryPurposeGrant" | "memoryMasterPreference" | "memoryMentionReceipt" | "memoryContextSnapshot" | "weeklyWindow" | "weeklySourceSnapshot" | "weeklySummaryIntent" | "publishedWeeklySummaryRevision" | "weeklyContentSlot" | "weeklyPersonalizedContentFragment" | "weeklySourceDependency" | "safetyState" | "safetyDecision" | "safetyEvent" | "safetyResponsePlan" | "safetyResourceEntry" | "recoveryCommandReceipt" | "notificationPreference" | "platformPermissionSnapshot" | "notificationIntent" | "notificationDeliveryAttempt" | "dataTask" | "exportManifest" | "deletionStatusGrant" | "deletionConfirmationChallenge" | "identityVerification" | "deletionGuard" | "deletionStepCheckpoint" | "dayErasureGuard" | "deletionReceipt" | "providerDeletionRequest" | "backupCatalogEntry" | "restoreDenyRecord" | "retentionPolicyEntry" | "providerDataHandlingProfile" | "legalHold" | "restrictedAuditEvent" | "outboxEvent" | "inboxReceipt" | "versionCatalogEntry" | "evaluationRun" | "evaluationSample" | "analyticsProductDailyAggregate" | "analyticsRuntimeDailyAggregate" | "analyticsGovernanceDailyAggregate" | "analyticsSafetyDailyAggregate" | "analyticsProductMetricSnapshot" | "analyticsGateSnapshot"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -5966,6 +5972,450 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AnalyticsProductDailyAggregate: {
+      payload: Prisma.$AnalyticsProductDailyAggregatePayload<ExtArgs>
+      fields: Prisma.AnalyticsProductDailyAggregateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AnalyticsProductDailyAggregateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AnalyticsProductDailyAggregateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload>
+        }
+        findFirst: {
+          args: Prisma.AnalyticsProductDailyAggregateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AnalyticsProductDailyAggregateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload>
+        }
+        findMany: {
+          args: Prisma.AnalyticsProductDailyAggregateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload>[]
+        }
+        create: {
+          args: Prisma.AnalyticsProductDailyAggregateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload>
+        }
+        createMany: {
+          args: Prisma.AnalyticsProductDailyAggregateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AnalyticsProductDailyAggregateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload>[]
+        }
+        delete: {
+          args: Prisma.AnalyticsProductDailyAggregateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload>
+        }
+        update: {
+          args: Prisma.AnalyticsProductDailyAggregateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload>
+        }
+        deleteMany: {
+          args: Prisma.AnalyticsProductDailyAggregateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AnalyticsProductDailyAggregateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AnalyticsProductDailyAggregateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload>[]
+        }
+        upsert: {
+          args: Prisma.AnalyticsProductDailyAggregateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductDailyAggregatePayload>
+        }
+        aggregate: {
+          args: Prisma.AnalyticsProductDailyAggregateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAnalyticsProductDailyAggregate>
+        }
+        groupBy: {
+          args: Prisma.AnalyticsProductDailyAggregateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsProductDailyAggregateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AnalyticsProductDailyAggregateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsProductDailyAggregateCountAggregateOutputType> | number
+        }
+      }
+    }
+    AnalyticsRuntimeDailyAggregate: {
+      payload: Prisma.$AnalyticsRuntimeDailyAggregatePayload<ExtArgs>
+      fields: Prisma.AnalyticsRuntimeDailyAggregateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload>
+        }
+        findFirst: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload>
+        }
+        findMany: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload>[]
+        }
+        create: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload>
+        }
+        createMany: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload>[]
+        }
+        delete: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload>
+        }
+        update: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload>
+        }
+        deleteMany: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload>[]
+        }
+        upsert: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsRuntimeDailyAggregatePayload>
+        }
+        aggregate: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAnalyticsRuntimeDailyAggregate>
+        }
+        groupBy: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsRuntimeDailyAggregateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AnalyticsRuntimeDailyAggregateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsRuntimeDailyAggregateCountAggregateOutputType> | number
+        }
+      }
+    }
+    AnalyticsGovernanceDailyAggregate: {
+      payload: Prisma.$AnalyticsGovernanceDailyAggregatePayload<ExtArgs>
+      fields: Prisma.AnalyticsGovernanceDailyAggregateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload>
+        }
+        findFirst: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload>
+        }
+        findMany: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload>[]
+        }
+        create: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload>
+        }
+        createMany: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload>[]
+        }
+        delete: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload>
+        }
+        update: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload>
+        }
+        deleteMany: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload>[]
+        }
+        upsert: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGovernanceDailyAggregatePayload>
+        }
+        aggregate: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAnalyticsGovernanceDailyAggregate>
+        }
+        groupBy: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsGovernanceDailyAggregateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AnalyticsGovernanceDailyAggregateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsGovernanceDailyAggregateCountAggregateOutputType> | number
+        }
+      }
+    }
+    AnalyticsSafetyDailyAggregate: {
+      payload: Prisma.$AnalyticsSafetyDailyAggregatePayload<ExtArgs>
+      fields: Prisma.AnalyticsSafetyDailyAggregateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AnalyticsSafetyDailyAggregateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AnalyticsSafetyDailyAggregateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload>
+        }
+        findFirst: {
+          args: Prisma.AnalyticsSafetyDailyAggregateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AnalyticsSafetyDailyAggregateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload>
+        }
+        findMany: {
+          args: Prisma.AnalyticsSafetyDailyAggregateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload>[]
+        }
+        create: {
+          args: Prisma.AnalyticsSafetyDailyAggregateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload>
+        }
+        createMany: {
+          args: Prisma.AnalyticsSafetyDailyAggregateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AnalyticsSafetyDailyAggregateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload>[]
+        }
+        delete: {
+          args: Prisma.AnalyticsSafetyDailyAggregateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload>
+        }
+        update: {
+          args: Prisma.AnalyticsSafetyDailyAggregateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload>
+        }
+        deleteMany: {
+          args: Prisma.AnalyticsSafetyDailyAggregateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AnalyticsSafetyDailyAggregateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AnalyticsSafetyDailyAggregateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload>[]
+        }
+        upsert: {
+          args: Prisma.AnalyticsSafetyDailyAggregateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsSafetyDailyAggregatePayload>
+        }
+        aggregate: {
+          args: Prisma.AnalyticsSafetyDailyAggregateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAnalyticsSafetyDailyAggregate>
+        }
+        groupBy: {
+          args: Prisma.AnalyticsSafetyDailyAggregateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsSafetyDailyAggregateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AnalyticsSafetyDailyAggregateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsSafetyDailyAggregateCountAggregateOutputType> | number
+        }
+      }
+    }
+    AnalyticsProductMetricSnapshot: {
+      payload: Prisma.$AnalyticsProductMetricSnapshotPayload<ExtArgs>
+      fields: Prisma.AnalyticsProductMetricSnapshotFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AnalyticsProductMetricSnapshotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AnalyticsProductMetricSnapshotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload>
+        }
+        findFirst: {
+          args: Prisma.AnalyticsProductMetricSnapshotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AnalyticsProductMetricSnapshotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload>
+        }
+        findMany: {
+          args: Prisma.AnalyticsProductMetricSnapshotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload>[]
+        }
+        create: {
+          args: Prisma.AnalyticsProductMetricSnapshotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload>
+        }
+        createMany: {
+          args: Prisma.AnalyticsProductMetricSnapshotCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AnalyticsProductMetricSnapshotCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload>[]
+        }
+        delete: {
+          args: Prisma.AnalyticsProductMetricSnapshotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload>
+        }
+        update: {
+          args: Prisma.AnalyticsProductMetricSnapshotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload>
+        }
+        deleteMany: {
+          args: Prisma.AnalyticsProductMetricSnapshotDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AnalyticsProductMetricSnapshotUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AnalyticsProductMetricSnapshotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload>[]
+        }
+        upsert: {
+          args: Prisma.AnalyticsProductMetricSnapshotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsProductMetricSnapshotPayload>
+        }
+        aggregate: {
+          args: Prisma.AnalyticsProductMetricSnapshotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAnalyticsProductMetricSnapshot>
+        }
+        groupBy: {
+          args: Prisma.AnalyticsProductMetricSnapshotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsProductMetricSnapshotGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AnalyticsProductMetricSnapshotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsProductMetricSnapshotCountAggregateOutputType> | number
+        }
+      }
+    }
+    AnalyticsGateSnapshot: {
+      payload: Prisma.$AnalyticsGateSnapshotPayload<ExtArgs>
+      fields: Prisma.AnalyticsGateSnapshotFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AnalyticsGateSnapshotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AnalyticsGateSnapshotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload>
+        }
+        findFirst: {
+          args: Prisma.AnalyticsGateSnapshotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AnalyticsGateSnapshotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload>
+        }
+        findMany: {
+          args: Prisma.AnalyticsGateSnapshotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload>[]
+        }
+        create: {
+          args: Prisma.AnalyticsGateSnapshotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload>
+        }
+        createMany: {
+          args: Prisma.AnalyticsGateSnapshotCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AnalyticsGateSnapshotCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload>[]
+        }
+        delete: {
+          args: Prisma.AnalyticsGateSnapshotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload>
+        }
+        update: {
+          args: Prisma.AnalyticsGateSnapshotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload>
+        }
+        deleteMany: {
+          args: Prisma.AnalyticsGateSnapshotDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AnalyticsGateSnapshotUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AnalyticsGateSnapshotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload>[]
+        }
+        upsert: {
+          args: Prisma.AnalyticsGateSnapshotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnalyticsGateSnapshotPayload>
+        }
+        aggregate: {
+          args: Prisma.AnalyticsGateSnapshotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAnalyticsGateSnapshot>
+        }
+        groupBy: {
+          args: Prisma.AnalyticsGateSnapshotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsGateSnapshotGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AnalyticsGateSnapshotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnalyticsGateSnapshotCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -7446,6 +7896,134 @@ export const EvaluationSampleScalarFieldEnum = {
 export type EvaluationSampleScalarFieldEnum = (typeof EvaluationSampleScalarFieldEnum)[keyof typeof EvaluationSampleScalarFieldEnum]
 
 
+export const AnalyticsProductDailyAggregateScalarFieldEnum = {
+  id: 'id',
+  productDate: 'productDate',
+  environment: 'environment',
+  eventName: 'eventName',
+  eventSchemaVersion: 'eventSchemaVersion',
+  dimension1Name: 'dimension1Name',
+  dimension1Code: 'dimension1Code',
+  dimension2Name: 'dimension2Name',
+  dimension2Code: 'dimension2Code',
+  eventCount: 'eventCount',
+  uniqueOwnerCount: 'uniqueOwnerCount',
+  sumValue: 'sumValue',
+  aggregationRevision: 'aggregationRevision',
+  sourceContractVersion: 'sourceContractVersion',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsProductDailyAggregateScalarFieldEnum = (typeof AnalyticsProductDailyAggregateScalarFieldEnum)[keyof typeof AnalyticsProductDailyAggregateScalarFieldEnum]
+
+
+export const AnalyticsRuntimeDailyAggregateScalarFieldEnum = {
+  id: 'id',
+  productDate: 'productDate',
+  environment: 'environment',
+  eventName: 'eventName',
+  eventSchemaVersion: 'eventSchemaVersion',
+  dimension1Name: 'dimension1Name',
+  dimension1Code: 'dimension1Code',
+  dimension2Name: 'dimension2Name',
+  dimension2Code: 'dimension2Code',
+  eventCount: 'eventCount',
+  uniqueOwnerCount: 'uniqueOwnerCount',
+  sumValue: 'sumValue',
+  aggregationRevision: 'aggregationRevision',
+  sourceContractVersion: 'sourceContractVersion',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsRuntimeDailyAggregateScalarFieldEnum = (typeof AnalyticsRuntimeDailyAggregateScalarFieldEnum)[keyof typeof AnalyticsRuntimeDailyAggregateScalarFieldEnum]
+
+
+export const AnalyticsGovernanceDailyAggregateScalarFieldEnum = {
+  id: 'id',
+  productDate: 'productDate',
+  environment: 'environment',
+  eventName: 'eventName',
+  eventSchemaVersion: 'eventSchemaVersion',
+  dimension1Name: 'dimension1Name',
+  dimension1Code: 'dimension1Code',
+  dimension2Name: 'dimension2Name',
+  dimension2Code: 'dimension2Code',
+  eventCount: 'eventCount',
+  uniqueOwnerCount: 'uniqueOwnerCount',
+  sumValue: 'sumValue',
+  aggregationRevision: 'aggregationRevision',
+  sourceContractVersion: 'sourceContractVersion',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsGovernanceDailyAggregateScalarFieldEnum = (typeof AnalyticsGovernanceDailyAggregateScalarFieldEnum)[keyof typeof AnalyticsGovernanceDailyAggregateScalarFieldEnum]
+
+
+export const AnalyticsSafetyDailyAggregateScalarFieldEnum = {
+  id: 'id',
+  productDate: 'productDate',
+  environment: 'environment',
+  eventName: 'eventName',
+  eventSchemaVersion: 'eventSchemaVersion',
+  dimension1Name: 'dimension1Name',
+  dimension1Code: 'dimension1Code',
+  dimension2Name: 'dimension2Name',
+  dimension2Code: 'dimension2Code',
+  eventCount: 'eventCount',
+  uniqueOwnerCount: 'uniqueOwnerCount',
+  sumValue: 'sumValue',
+  aggregationRevision: 'aggregationRevision',
+  sourceContractVersion: 'sourceContractVersion',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsSafetyDailyAggregateScalarFieldEnum = (typeof AnalyticsSafetyDailyAggregateScalarFieldEnum)[keyof typeof AnalyticsSafetyDailyAggregateScalarFieldEnum]
+
+
+export const AnalyticsProductMetricSnapshotScalarFieldEnum = {
+  id: 'id',
+  metricId: 'metricId',
+  metricVersion: 'metricVersion',
+  periodOrCohort: 'periodOrCohort',
+  environment: 'environment',
+  status: 'status',
+  numerator: 'numerator',
+  denominator: 'denominator',
+  value: 'value',
+  wilsonLow: 'wilsonLow',
+  wilsonHigh: 'wilsonHigh',
+  dimension1Name: 'dimension1Name',
+  dimension1Code: 'dimension1Code',
+  dimension2Name: 'dimension2Name',
+  dimension2Code: 'dimension2Code',
+  notesCodes: 'notesCodes',
+  sourceContractVersion: 'sourceContractVersion',
+  aggregationRevision: 'aggregationRevision',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsProductMetricSnapshotScalarFieldEnum = (typeof AnalyticsProductMetricSnapshotScalarFieldEnum)[keyof typeof AnalyticsProductMetricSnapshotScalarFieldEnum]
+
+
+export const AnalyticsGateSnapshotScalarFieldEnum = {
+  id: 'id',
+  gateId: 'gateId',
+  environment: 'environment',
+  status: 'status',
+  reasonCodes: 'reasonCodes',
+  aggregationRevision: 'aggregationRevision',
+  generatedAt: 'generatedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type AnalyticsGateSnapshotScalarFieldEnum = (typeof AnalyticsGateSnapshotScalarFieldEnum)[keyof typeof AnalyticsGateSnapshotScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -8096,6 +8674,20 @@ export type ListEnumEvaluationRunStateFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -8333,6 +8925,12 @@ export type GlobalOmitConfig = {
   versionCatalogEntry?: Prisma.VersionCatalogEntryOmit
   evaluationRun?: Prisma.EvaluationRunOmit
   evaluationSample?: Prisma.EvaluationSampleOmit
+  analyticsProductDailyAggregate?: Prisma.AnalyticsProductDailyAggregateOmit
+  analyticsRuntimeDailyAggregate?: Prisma.AnalyticsRuntimeDailyAggregateOmit
+  analyticsGovernanceDailyAggregate?: Prisma.AnalyticsGovernanceDailyAggregateOmit
+  analyticsSafetyDailyAggregate?: Prisma.AnalyticsSafetyDailyAggregateOmit
+  analyticsProductMetricSnapshot?: Prisma.AnalyticsProductMetricSnapshotOmit
+  analyticsGateSnapshot?: Prisma.AnalyticsGateSnapshotOmit
 }
 
 /* Types for Logging */

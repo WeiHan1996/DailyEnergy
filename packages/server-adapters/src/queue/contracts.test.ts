@@ -107,4 +107,15 @@ describe("worker capability manifests", () => {
     expect(BACKGROUND_WORKER_MANIFEST.egressAllowlist).toContain("ai.weekly");
     expect(INTERACTIVE_WORKER_MANIFEST.egressAllowlist).toContain("ai.daily");
   });
+
+  it("routes anonymous batch aggregation and TTL only to Background", () => {
+    expect(routeForEvent("AnalyticsAggregationDue", "v1")).toMatchObject({
+      capability: { consumerCode: "background-analytics" },
+      queueFamily: "background",
+    });
+    expect(routeForEvent("AnalyticsRetentionDue", "v1")).toMatchObject({
+      capability: { consumerCode: "background-analytics" },
+      queueFamily: "background",
+    });
+  });
 });

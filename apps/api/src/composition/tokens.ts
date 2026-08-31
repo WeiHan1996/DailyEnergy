@@ -1,4 +1,5 @@
 import type {
+  AnalyticsAggregateStore,
   AuthStore,
   CheckinStore,
   ConsentProfileStore,
@@ -33,6 +34,7 @@ import type {
 
 export const RUNTIME_CONFIG = Symbol("RUNTIME_CONFIG");
 export const AUTH_STORE = Symbol("AUTH_STORE");
+export const ANALYTICS_AGGREGATE_STORE = Symbol("ANALYTICS_AGGREGATE_STORE");
 export const CHECKIN_STORE = Symbol("CHECKIN_STORE");
 export const CONSENT_PROFILE_STORE = Symbol("CONSENT_PROFILE_STORE");
 export const DAILY_GENERATION_STORE = Symbol("DAILY_GENERATION_STORE");
@@ -62,6 +64,7 @@ export const TELEMETRY_RUNTIME = Symbol("TELEMETRY_RUNTIME");
 
 export interface ApiCompositionOverrides {
   readonly adminAudienceVerifier?: AudienceVerifier;
+  readonly analyticsAggregateStore?: AnalyticsAggregateStore;
   readonly authStore?: AuthStore;
   readonly checkinStore?: CheckinStore;
   readonly consentProfileStore?: ConsentProfileStore;

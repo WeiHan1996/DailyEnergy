@@ -58,6 +58,7 @@ export {
   type DailyGenerationExecutor,
 } from "../generation/interactive-generation-handler.js";
 export { createDayLitHandlers } from "../relationship/day-lit-handler.js";
+export { createAnalyticsHandlers } from "../analytics/analytics-handler.js";
 export {
   PostgresDailyGenerationRuntime,
   type GenerationExecutionHooks,
@@ -99,3 +100,10 @@ export type {
   WorkerInfrastructureConfig,
   WorkerInfrastructureRuntime,
 } from "../queue/worker-runtime.js";
+export {
+  PostgresAnalyticsStore,
+  UNAVAILABLE_ANALYTICS_AGGREGATE_STORE,
+  type AnalyticsAggregateStore,
+  type AnalyticsBatchStore,
+  type ClientAggregateDelta,
+} from "../analytics/postgres-analytics-store.js";
