@@ -13,9 +13,10 @@
   "remediation_head": "6fdb3f5a9a868bdac4d8ab025ad8c9eaf29da2ed",
   "remediation_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/169",
   "remediation_implementation_ci_run": 33357480285,
-  "remediation_status_head": null,
-  "remediation_final_ci_run": null,
-  "execution_status": "DRAFT_PR_CREATED_FINAL_HEAD_CI_AND_MANUAL_EVIDENCE_PENDING",
+  "remediation_status_head": "884a2050f19352bfb2371535a1c9f9abc29b2e6e",
+  "remediation_final_ci_run": 33357674745,
+  "remediation_final_ci_checks": "11/11 SUCCESS",
+  "execution_status": "DRAFT_PR_VERIFIED_STATUS_HEAD_CI_PASS_MANUAL_EVIDENCE_PENDING",
   "pass_claim": "PROHIBITED",
   "synthetic_accounts_only": true,
   "accepted_scope": {
