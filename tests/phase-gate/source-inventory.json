@@ -3,9 +3,9 @@
   "registry_version": "e-010-source-registry-v1",
   "snapshot_base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
   "counts": {
-    "total": 792,
-    "COVERED": 289,
-    "PLANNED": 503,
+    "total": 793,
+    "COVERED": 291,
+    "PLANNED": 502,
     "NA_WITH_REASON": 0
   },
   "planned_policy": {
@@ -67,7 +67,7 @@
       "set_id": "s20-api",
       "authority_path": "docs/technical/api.md",
       "owner": "Owning API or business implementation issue",
-      "counts": { "COVERED": 17, "PLANNED": 31, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 18, "PLANNED": 30, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s12-gateway",
@@ -91,7 +91,7 @@
       "set_id": "shared-schemas",
       "authority_path": "packages/shared-schemas/src/json-schema.ts",
       "owner": "E-008 contract maintenance",
-      "counts": { "COVERED": 28, "PLANNED": 0, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 29, "PLANNED": 0, "NA_WITH_REASON": 0 }
     }
   ]
 }

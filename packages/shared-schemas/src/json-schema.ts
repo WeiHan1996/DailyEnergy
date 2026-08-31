@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:9cb36413f37e0099a70bec6eefaa2e3570b5de001bf70cb7640c7637a116a4df
+// source-fingerprint: sha256:cbf337f98a0cdf8d1b0db7664d983167967f7bd77ff046e4ca6edcb72089426a
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:9cb36413f37e0099a70bec6eefaa2e3570b5de001bf70cb7640c7637a116a4df";
+  "sha256:cbf337f98a0cdf8d1b0db7664d983167967f7bd77ff046e4ca6edcb72089426a";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -41,6 +41,8 @@ export const JSON_SCHEMA_IDS = {
   checkinView: "urn:dailyenergy:schema:checkin-view:1.0.0",
   generationStartRequest:
     "urn:dailyenergy:schema:generation-start-request:1.0.0",
+  taskStateUpdateRequest:
+    "urn:dailyenergy:schema:task-state-update-request:1.0.0",
   generationIntentView: "urn:dailyenergy:schema:generation-intent-view:1.0.0",
   relationshipView: "urn:dailyenergy:schema:relationship-view:1.0.0",
   todayView: "urn:dailyenergy:schema:today-view:1.0.0",
@@ -4124,6 +4126,58 @@ export const jsonSchemas = {
       },
     },
     required: ["command_ref", "expected_checkin_revision"],
+    type: "object",
+  },
+  taskStateUpdateRequest: {
+    $id: "urn:dailyenergy:schema:task-state-update-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      expected_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      product_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+      status: {
+        enum: ["UNMARKED", "INTERESTED", "COMPLETED", "SKIPPED"],
+        type: "string",
+      },
+      task_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+    },
+    required: [
+      "command_ref",
+      "expected_revision",
+      "product_date",
+      "status",
+      "task_ref",
+    ],
     type: "object",
   },
   generationIntentView: {

@@ -125,6 +125,11 @@ const SCHEMA_EXPORTS = [
     "generation-start-request",
   ],
   [
+    "taskStateUpdateRequest",
+    "TaskStateUpdateRequestSchema",
+    "task-state-update-request",
+  ],
+  [
     "generationIntentView",
     "GenerationIntentViewSchema",
     "generation-intent-view",

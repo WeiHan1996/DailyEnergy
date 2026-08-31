@@ -2,6 +2,7 @@ import type { INestApplication } from "@nestjs/common";
 import type {
   AuthStore,
   DailyGenerationStore,
+  DailyInteractionStore,
 } from "@daily-energy/server-adapters/api";
 import type { TodayView } from "@daily-energy/shared-schemas";
 import type { HistoryDayView } from "@daily-energy/shared-schemas";
@@ -265,10 +266,14 @@ function config() {
 async function testApplication(
   store: DailyGenerationStore,
   events: OrdinaryLogEvent[] = [],
+  interactionStore?: DailyInteractionStore,
 ) {
   const application = await createApiApplication(config(), {
     authStore,
     dailyGenerationStore: store,
+    ...(interactionStore === undefined
+      ? {}
+      : { dailyInteractionStore: interactionStore }),
     ordinaryLogSink: { write: (event) => events.push(event) },
     productDateClock: { now: () => fixedNow },
   });
@@ -359,7 +364,21 @@ describe("C-008 HTTP generation flow", () => {
 
   it("returns bounded polling guidance until Today becomes available", async () => {
     const store = new HttpGenerationStore();
-    const application = await testApplication(store);
+    const opened: Parameters<DailyInteractionStore["openToday"]>[0][] = [];
+    const interactionStore: DailyInteractionStore = {
+      close: async () => undefined,
+      get: async () => {
+        throw new Error("NOT_USED");
+      },
+      openToday: async (input) => {
+        opened.push(input);
+        return { status: "RECORDED" };
+      },
+      updateTask: async () => {
+        throw new Error("NOT_USED");
+      },
+    };
+    const application = await testApplication(store, [], interactionStore);
     await authenticated(
       request(application.getHttpServer())
         .post("/v1/daily/generation/start")
@@ -393,6 +412,15 @@ describe("C-008 HTTP generation flow", () => {
     expect(JSON.stringify(today.body.data)).not.toMatch(
       /score|provenance|user_ref|seed|fingerprint/iu,
     );
+    expect(opened).toEqual([
+      {
+        accountId,
+        openedAt: fixedNow,
+        productDate: "2026-08-24",
+        resultId: resultRef,
+        sessionId: "22222222-2222-4222-8222-222222222222",
+      },
+    ]);
   });
 
   it("applies Safety before start, status and cached Today reads", async () => {

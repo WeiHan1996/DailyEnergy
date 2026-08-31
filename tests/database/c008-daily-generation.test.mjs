@@ -226,6 +226,13 @@ test(
           expectedDatabaseRole: "daily_energy_api",
         },
       );
+      const dailyInteraction =
+        await apiAdapters.PostgresDailyInteractionStore.connect({
+          applicationName: "c010-daily-interaction-store",
+          connectionLimit: 8,
+          connectionString: loginUrls.api,
+          expectedDatabaseRole: "daily_energy_api",
+        });
       const runtime =
         await testingAdapters.PostgresDailyGenerationRuntime.connect({
           applicationName: "c008-generation-runtime",
@@ -240,7 +247,15 @@ test(
         expectedDatabaseRole: "daily_energy_interactive",
         profile: "worker-interactive",
       });
-      resources.push(auth, consent, checkin, generation, runtime, queueStore);
+      resources.push(
+        auth,
+        consent,
+        checkin,
+        generation,
+        dailyInteraction,
+        runtime,
+        queueStore,
+      );
       const stores = { auth, consent, checkin };
       const handlers =
         testingAdapters.createInteractiveGenerationHandlers(runtime);
@@ -353,6 +368,172 @@ test(
         (await startGeneration(generation, accountId, 1, "c008:start:conflict"))
           .status,
         "IDEMPOTENCY_CONFLICT",
+      );
+
+      const sessionId = (
+        await admin.query(
+          `SELECT id FROM app_session_credential
+            WHERE "accountId"=$1 ORDER BY "issuedAt" DESC,id LIMIT 1`,
+          [accountId],
+        )
+      ).rows[0]?.id;
+      assert.equal(typeof sessionId, "string");
+      assert.deepEqual(
+        await dailyInteraction.openToday({
+          accountId,
+          openedAt: new Date("2026-08-24T19:59:00.000Z"),
+          productDate,
+          resultId: today.value.interaction.result_id,
+          sessionId,
+        }),
+        { status: "RECORDED" },
+      );
+      const interestedInput = {
+        accountId,
+        commandRef: "c010-task-interested",
+        expectedRevision: 1,
+        normalizedPayloadFingerprint: bytes("c010:task:interested"),
+        now: new Date(baseNow.getTime() + 3_000),
+        productDate,
+        productDatePolicyVersion: "product-date-v1",
+        sessionId,
+        status: "INTERESTED",
+        taskRef: today.value.interaction.task.task_id,
+      };
+      const interested = await dailyInteraction.updateTask(interestedInput);
+      assert.equal(interested.status, "ACCEPTED");
+      assert.equal(
+        interested.status === "ACCEPTED" && interested.value.task.revision,
+        2,
+      );
+      assert.equal(
+        interested.status === "ACCEPTED" && interested.value.is_lit,
+        false,
+      );
+      assert.equal(
+        (await dailyInteraction.updateTask(interestedInput)).status,
+        "DUPLICATE",
+      );
+      assert.equal(
+        (
+          await dailyInteraction.updateTask({
+            ...interestedInput,
+            normalizedPayloadFingerprint: bytes("c010:task:changed-payload"),
+          })
+        ).status,
+        "IDEMPOTENCY_CONFLICT",
+      );
+
+      const concurrentTaskUpdates = await Promise.all([
+        dailyInteraction.updateTask({
+          ...interestedInput,
+          commandRef: "c010-task-completed",
+          expectedRevision: 2,
+          normalizedPayloadFingerprint: bytes("c010:task:completed"),
+          status: "COMPLETED",
+        }),
+        dailyInteraction.updateTask({
+          ...interestedInput,
+          commandRef: "c010-task-skipped",
+          expectedRevision: 2,
+          normalizedPayloadFingerprint: bytes("c010:task:skipped"),
+          status: "SKIPPED",
+        }),
+      ]);
+      assert.deepEqual(
+        concurrentTaskUpdates.map(({ status }) => status).sort(),
+        ["ACCEPTED", "REVISION_CONFLICT"],
+      );
+      const currentInteraction = await dailyInteraction.get({
+        accountId,
+        productDate,
+      });
+      assert.equal(currentInteraction.status, "FOUND");
+      if (currentInteraction.status !== "FOUND") {
+        throw new Error("C010_INTERACTION_MISSING");
+      }
+      assert.equal(currentInteraction.value.task.revision, 3);
+      assert.equal(currentInteraction.value.is_lit, false);
+      assert.equal(
+        (
+          await dailyInteraction.updateTask({
+            ...interestedInput,
+            commandRef: "c010-task-noop",
+            expectedRevision: 3,
+            normalizedPayloadFingerprint: bytes("c010:task:noop"),
+            status: currentInteraction.value.task.status,
+          })
+        ).status,
+        "DUPLICATE",
+      );
+      const continued = await dailyInteraction.updateTask({
+        ...interestedInput,
+        commandRef: "c010-task-continuation",
+        expectedRevision: 3,
+        normalizedPayloadFingerprint: bytes("c010:task:continuation"),
+        now: new Date("2026-08-24T20:05:00.000Z"),
+        status: "UNMARKED",
+      });
+      assert.equal(continued.status, "ACCEPTED");
+      assert.equal(
+        continued.status === "ACCEPTED" && continued.value.task.revision,
+        4,
+      );
+      assert.equal(
+        (
+          await dailyInteraction.updateTask({
+            ...interestedInput,
+            commandRef: "c010-task-expired",
+            expectedRevision: 4,
+            normalizedPayloadFingerprint: bytes("c010:task:expired"),
+            now: new Date("2026-08-24T20:31:00.000Z"),
+            status: "INTERESTED",
+          })
+        ).status,
+        "VIEW_CONTINUATION_EXPIRED",
+      );
+      const taskHistory = await generation.getByDate({
+        accountId,
+        productDate,
+      });
+      assert.equal(taskHistory.status, "FOUND");
+      assert.equal(
+        taskHistory.status === "FOUND" &&
+          taskHistory.value.interaction?.task.status,
+        "UNMARKED",
+      );
+
+      const c010DeletionTaskRef = randomUUID();
+      await admin.query(
+        `INSERT INTO restricted_data_task
+          (id,"accountId",kind,scope,"targetType","targetKey","activeSlot",
+           state,revision,"confirmationVersion","requestedAt",
+           "failureScopeCodes","retentionPolicyVersion","retentionAnchorAt")
+         VALUES ($1,$2,'DELETE','DAY','DAY',$3,true,'QUEUED',1,
+                 'confirmation-v1',$4,ARRAY[]::text[],
+                 'retention-policy-v1',$4)`,
+        [c010DeletionTaskRef, accountId, productDate, baseNow],
+      );
+      await deletion.query(
+        `INSERT INTO restricted_deletion_guard
+          (id,"accountId",scope,"targetKey",revision,"deletionEpoch",
+           "taskRef","semanticBlockedAt","retentionPolicyVersion",
+           "retentionAnchorAt")
+         VALUES (gen_random_uuid(),$1,'DAY',$2,1,1,$3,$4,
+                 'retention-policy-v1',$4)`,
+        [accountId, productDate, c010DeletionTaskRef, baseNow],
+      );
+      assert.equal(
+        (
+          await dailyInteraction.updateTask({
+            ...interestedInput,
+            commandRef: "c010-task-after-delete",
+            expectedRevision: 4,
+            normalizedPayloadFingerprint: bytes("c010:task:after-delete"),
+            status: "COMPLETED",
+          })
+        ).status,
+        "STATE_PRECONDITION_FAILED",
       );
 
       const blockedAccountId = await createReadyDay(

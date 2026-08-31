@@ -5896,28 +5896,59 @@
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "expected_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "product_date": {
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           },
           "status": {
-            "$ref": "#/components/schemas/TaskStatus"
+            "enum": [
+              "UNMARKED",
+              "INTERESTED",
+              "COMPLETED",
+              "SKIPPED"
+            ],
+            "type": "string"
           },
           "task_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           }
         },
         "required": [
           "command_ref",
-          "task_ref",
           "expected_revision",
-          "status"
+          "product_date",
+          "status",
+          "task_ref"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "TaskStateUpdateRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "TaskStatus": {
         "enum": [
@@ -10414,6 +10445,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:d82b7eb1e090872dc1452fd9681d327ad044831aba378c6a3a83e09b1efc359e"
+    "source-fingerprint": "sha256:bc934c42dc063703c4065403dc1dba4a76497ab76feff0ebcd17d88fec7e4c3e"
   }
 }

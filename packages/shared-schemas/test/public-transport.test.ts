@@ -7,6 +7,7 @@ import {
   NotificationPermissionSyncRequestSchema,
   OnboardingCompleteRequestSchema,
   ProfileUpdateRequestSchema,
+  TaskStateUpdateRequestSchema,
 } from "../src/index.js";
 import { describe, expect, it } from "vitest";
 
@@ -90,6 +91,32 @@ describe("C-002 public transport schemas", () => {
         observed_permission: "GRANTED",
       }).success,
     ).toBe(false);
+  });
+});
+
+describe("C-010 task transport schema", () => {
+  const valid = {
+    command_ref: "01JABCDEFGHJKMNPQRSTVWXYZ",
+    expected_revision: 1,
+    product_date: "2026-08-24",
+    status: "INTERESTED" as const,
+    task_ref: "task.close-one-distraction.v1",
+  };
+
+  it("binds one explicit task state transition to its original product date", () => {
+    expect(TaskStateUpdateRequestSchema.safeParse(valid).success).toBe(true);
+    for (const mutation of [
+      { product_date: "2026-02-30" },
+      { expected_revision: 0 },
+      { status: "FAILED" },
+      { task_ref: "" },
+      { account_id: "forged" },
+    ]) {
+      expect(
+        TaskStateUpdateRequestSchema.safeParse({ ...valid, ...mutation })
+          .success,
+      ).toBe(false);
+    }
   });
 });
 

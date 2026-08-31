@@ -4,6 +4,8 @@ import {
   MiniappApiError,
   type C004Api,
   type C009Api,
+  type C010Api,
+  type DailyInteractionView,
   type GenerationIntentView,
   type HistoryDayView,
   type SafetyView,
@@ -13,8 +15,16 @@ import { createCommandRef } from "../onboarding/onboarding-flow.js";
 import {
   DailyViewCache,
   PendingGenerationStore,
+  PendingTaskUpdateStore,
   type PendingGeneration,
+  type PendingTaskUpdate,
 } from "./daily-cache.js";
+
+export type DailyNoticeCode =
+  | "TASK_CONFLICT"
+  | "TASK_OUTCOME_PENDING"
+  | "TASK_UPDATED"
+  | "TASK_WINDOW_CLOSED";
 
 export type DailyFlowResult =
   | {
@@ -26,6 +36,7 @@ export type DailyFlowResult =
   | {
       readonly kind: "today";
       readonly offline: boolean;
+      readonly noticeCode?: DailyNoticeCode;
       readonly productDate: string;
       readonly view: TodayView;
     }
@@ -56,18 +67,21 @@ const guardCodes = new Set([
 export class DailyCoordinator {
   readonly #cache: DailyViewCache;
   readonly #pending: PendingGenerationStore;
+  readonly #pendingTask: PendingTaskUpdateStore;
   #busy = false;
+  #taskBusy = false;
   #safetyView?: SafetyView;
 
   public constructor(
     storage: StoragePort,
-    private readonly api: C004Api & C009Api,
+    private readonly api: C004Api & C009Api & C010Api,
     sessionScope: string,
     now: () => number = Date.now,
     private readonly commandRef: (prefix: string) => string = createCommandRef,
   ) {
     this.#cache = new DailyViewCache(storage, sessionScope, now);
     this.#pending = new PendingGenerationStore(storage, sessionScope, now);
+    this.#pendingTask = new PendingTaskUpdateStore(storage, sessionScope, now);
   }
 
   public async beginGeneration(
@@ -80,7 +94,7 @@ export class DailyCoordinator {
     try {
       const available = await this.#readToday(false);
       if (available !== undefined) {
-        return available;
+        return this.#withPendingTaskState(available);
       }
       return await this.#resumeOrStart(expectedCheckinRevision);
     } catch (error) {
@@ -106,9 +120,62 @@ export class DailyCoordinator {
 
   public async loadToday(): Promise<DailyFlowResult> {
     try {
-      return (await this.#readToday(true))!;
+      return await this.#withPendingTaskState((await this.#readToday(true))!);
     } catch (error) {
       return this.#failure(error, true);
+    }
+  }
+
+  public async updateTask(input: {
+    readonly expectedRevision: number;
+    readonly productDate: string;
+    readonly status: DailyInteractionView["task"]["status"];
+    readonly taskRef: string;
+  }): Promise<DailyFlowResult> {
+    if (this.#taskBusy) {
+      return { kind: "recovery", reasonCode: "WRITE_IN_PROGRESS" };
+    }
+    this.#taskBusy = true;
+    try {
+      const existing = await this.#pendingTask.load();
+      const pending =
+        existing ??
+        ({
+          commandRef: this.commandRef("task"),
+          expectedRevision: input.expectedRevision,
+          productDate: input.productDate,
+          status: input.status,
+          taskRef: input.taskRef,
+        } satisfies PendingTaskUpdate);
+      if (
+        existing !== undefined &&
+        (existing.expectedRevision !== input.expectedRevision ||
+          existing.productDate !== input.productDate ||
+          existing.status !== input.status ||
+          existing.taskRef !== input.taskRef)
+      ) {
+        return this.#cachedToday("TASK_OUTCOME_PENDING", false);
+      }
+      await this.#pendingTask.save(pending);
+      return await this.#submitPendingTask(pending);
+    } finally {
+      this.#taskBusy = false;
+    }
+  }
+
+  public async retryTask(): Promise<DailyFlowResult> {
+    const pending = await this.#pendingTask.load();
+    if (pending === undefined) {
+      return this.loadToday();
+    }
+    if (this.#taskBusy) {
+      return { kind: "recovery", reasonCode: "WRITE_IN_PROGRESS" };
+    }
+    this.#taskBusy = true;
+    try {
+      return await this.#submitPendingTask(pending);
+    } finally {
+      this.#taskBusy = false;
     }
   }
 
@@ -173,6 +240,119 @@ export class DailyCoordinator {
       }
       throw error;
     }
+  }
+
+  async #withPendingTaskState(
+    result: DailyFlowResult,
+  ): Promise<DailyFlowResult> {
+    if (result.kind !== "today") {
+      return result;
+    }
+    const pending = await this.#pendingTask.load();
+    if (pending === undefined) {
+      return result;
+    }
+    const task = result.view.interaction.task;
+    if (pending.productDate !== result.view.interaction.product_date) {
+      await this.#pendingTask.clear();
+      return result;
+    }
+    if (
+      task.task_id === pending.taskRef &&
+      task.status === pending.status &&
+      task.revision >= pending.expectedRevision
+    ) {
+      await this.#pendingTask.clear();
+      return { ...result, noticeCode: "TASK_UPDATED" };
+    }
+    return { ...result, noticeCode: "TASK_OUTCOME_PENDING" };
+  }
+
+  async #submitPendingTask(
+    pending: PendingTaskUpdate,
+  ): Promise<DailyFlowResult> {
+    try {
+      const envelope = await this.api.updateTask(pending);
+      if (
+        envelope.interaction.product_date !== pending.productDate ||
+        envelope.interaction.task.task_id !== pending.taskRef
+      ) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+      }
+      await this.#pendingTask.clear();
+      return this.#cachedTodayWithInteraction(
+        envelope.interaction,
+        "TASK_UPDATED",
+        false,
+      );
+    } catch (error) {
+      if (
+        error instanceof MiniappApiError &&
+        error.code === "REVISION_CONFLICT" &&
+        error.currentInteraction !== undefined
+      ) {
+        await this.#pendingTask.clear();
+        return this.#cachedTodayWithInteraction(
+          error.currentInteraction,
+          "TASK_CONFLICT",
+          false,
+        );
+      }
+      if (
+        error instanceof MiniappApiError &&
+        ["VIEW_CONTINUATION_EXPIRED", "WRITE_WINDOW_CLOSED"].includes(
+          error.code,
+        )
+      ) {
+        await this.#pendingTask.clear();
+        return this.#cachedToday("TASK_WINDOW_CLOSED", false);
+      }
+      if (isNetworkFailure(error)) {
+        return this.#cachedToday("TASK_OUTCOME_PENDING", true);
+      }
+      await this.#pendingTask.clear();
+      return this.#failure(error, true);
+    }
+  }
+
+  async #cachedToday(
+    noticeCode: DailyNoticeCode,
+    offline: boolean,
+  ): Promise<DailyFlowResult> {
+    const cached = await this.#cache.loadToday();
+    return cached === undefined
+      ? { kind: "recovery", reasonCode: "DAILY_CACHE_REQUIRED" }
+      : {
+          kind: "today",
+          noticeCode,
+          offline,
+          productDate: cached.content.product_date,
+          view: cached,
+        };
+  }
+
+  async #cachedTodayWithInteraction(
+    interaction: DailyInteractionView,
+    noticeCode: DailyNoticeCode,
+    offline: boolean,
+  ): Promise<DailyFlowResult> {
+    const cached = await this.#cache.loadToday();
+    if (
+      cached === undefined ||
+      cached.content.result_id !== interaction.result_id ||
+      cached.content.product_date !== interaction.product_date
+    ) {
+      return { kind: "recovery", reasonCode: "DAILY_CACHE_REQUIRED" };
+    }
+    const view = Object.freeze({ ...cached, interaction });
+    await this.#cache.saveToday(view);
+    return {
+      kind: "today",
+      noticeCode,
+      offline,
+      productDate: interaction.product_date,
+      view,
+    };
   }
 
   async #resumeOrStart(
@@ -251,11 +431,19 @@ export class DailyCoordinator {
         if (error.safetyView !== undefined) {
           this.#safetyView = error.safetyView;
         }
-        await Promise.all([this.#cache.clear(), this.#pending.clear()]);
+        await Promise.all([
+          this.#cache.clear(),
+          this.#pending.clear(),
+          this.#pendingTask.clear(),
+        ]);
         return { kind: "safety", reasonCode: error.code };
       }
       if (guardCodes.has(error.code)) {
-        await Promise.all([this.#cache.clear(), this.#pending.clear()]);
+        await Promise.all([
+          this.#cache.clear(),
+          this.#pending.clear(),
+          this.#pendingTask.clear(),
+        ]);
         return { kind: "recovery", reasonCode: error.code };
       }
     }

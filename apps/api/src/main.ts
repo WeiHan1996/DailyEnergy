@@ -7,6 +7,7 @@ import {
   PostgresCheckinStore,
   PostgresConsentProfileStore,
   PostgresDailyGenerationStore,
+  PostgresDailyInteractionStore,
   RedisDailyContentCache,
   UNAVAILABLE_DAILY_CONTENT_CACHE,
   startApiTelemetry,
@@ -14,6 +15,7 @@ import {
   type CheckinStore,
   type ConsentProfileStore,
   type DailyGenerationStore,
+  type DailyInteractionStore,
   type TelemetryRuntime,
 } from "@daily-energy/server-adapters/api";
 
@@ -61,6 +63,7 @@ async function main(): Promise<void> {
   let checkinStore: CheckinStore | undefined;
   let consentProfileStore: ConsentProfileStore | undefined;
   let dailyGenerationStore: DailyGenerationStore | undefined;
+  let dailyInteractionStore: DailyInteractionStore | undefined;
   try {
     const config = loadRuntimeConfig(process.env);
     telemetry = startApiTelemetrySafely(startApiTelemetry, {
@@ -121,6 +124,12 @@ async function main(): Promise<void> {
           connectionString,
           expectedDatabaseRole: "daily_energy_api",
         });
+        dailyInteractionStore = await PostgresDailyInteractionStore.connect({
+          applicationName: "daily-energy:api:daily-interaction",
+          connectionLimit: 4,
+          connectionString,
+          expectedDatabaseRole: "daily_energy_api",
+        });
       } catch {
         throw new ApiStartupError("API_DATABASE_NOT_READY");
       }
@@ -131,6 +140,7 @@ async function main(): Promise<void> {
       ...(checkinStore === undefined ? {} : { checkinStore }),
       ...(consentProfileStore === undefined ? {} : { consentProfileStore }),
       ...(dailyGenerationStore === undefined ? {} : { dailyGenerationStore }),
+      ...(dailyInteractionStore === undefined ? {} : { dailyInteractionStore }),
       readinessChecks,
       shutdownDrainHooks: [
         ...(authStore === undefined
@@ -145,6 +155,9 @@ async function main(): Promise<void> {
         ...(dailyGenerationStore === undefined
           ? []
           : [{ drain: () => dailyGenerationStore?.close() }]),
+        ...(dailyInteractionStore === undefined
+          ? []
+          : [{ drain: () => dailyInteractionStore?.close() }]),
         { drain: () => telemetry?.shutdown() },
       ],
       telemetryRuntime: telemetry,
@@ -165,6 +178,7 @@ async function main(): Promise<void> {
     await checkinStore?.close().catch(() => undefined);
     await consentProfileStore?.close().catch(() => undefined);
     await dailyGenerationStore?.close().catch(() => undefined);
+    await dailyInteractionStore?.close().catch(() => undefined);
     await telemetry?.shutdown().catch(() => undefined);
     writeStartupFailure(
       error instanceof RuntimeConfigError

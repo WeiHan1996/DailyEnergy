@@ -4,10 +4,12 @@ import {
   EnergySchema,
   ExpressionStyleSchema,
   MoodSchema,
+  OpaqueIdSchema,
   PositiveRevisionSchema,
   ProductDateSchema,
   Rfc3339TimestampSchema,
   SleepSchema,
+  TaskStatusSchema,
   VersionTokenSchema,
   WriteWindowSchema,
   singleLineTextSchema,
@@ -126,6 +128,16 @@ export const GenerationStartRequestSchema = z
   })
   .strict();
 
+export const TaskStateUpdateRequestSchema = z
+  .object({
+    ...CommandShape,
+    expected_revision: PositiveRevisionSchema,
+    product_date: ProductDateSchema,
+    status: TaskStatusSchema,
+    task_ref: OpaqueIdSchema,
+  })
+  .strict();
+
 export const MemoryPreferencesUpdateRequestSchema = z
   .object({
     ...CommandShape,
@@ -225,6 +237,9 @@ export type CheckinSubmitRequest = z.infer<typeof CheckinSubmitRequestSchema>;
 export type CheckinCorrectRequest = z.infer<typeof CheckinCorrectRequestSchema>;
 export type GenerationStartRequest = z.infer<
   typeof GenerationStartRequestSchema
+>;
+export type TaskStateUpdateRequest = z.infer<
+  typeof TaskStateUpdateRequestSchema
 >;
 export type MemoryPreferencesUpdateRequest = z.infer<
   typeof MemoryPreferencesUpdateRequestSchema

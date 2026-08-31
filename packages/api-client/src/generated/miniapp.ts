@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:d82b7eb1e090872dc1452fd9681d327ad044831aba378c6a3a83e09b1efc359e
+// source-fingerprint: sha256:bc934c42dc063703c4065403dc1dba4a76497ab76feff0ebcd17d88fec7e4c3e
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:d82b7eb1e090872dc1452fd9681d327ad044831aba378c6a3a83e09b1efc359e";
+  "sha256:bc934c42dc063703c4065403dc1dba4a76497ab76feff0ebcd17d88fec7e4c3e";
 
 export interface paths {
   "/auth/reauth/verify": {
@@ -1234,11 +1234,15 @@ export interface components {
       description?: string;
     };
     TaskStateUpdateRequest: {
-      client_context?: components["schemas"]["ClientContext"];
-      command_ref: components["schemas"]["CommandRef"];
-      expected_revision: components["schemas"]["PositiveRevision"];
-      status: components["schemas"]["TaskStatus"];
-      task_ref: components["schemas"]["OpaqueRef"];
+      client_context?: {
+        app_version?: string;
+        scene?: string;
+      };
+      command_ref: string;
+      expected_revision: number;
+      product_date: string;
+      status: "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED";
+      task_ref: string;
     };
     TaskStatus: "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED";
     TodayView: {

@@ -72,6 +72,16 @@ export {
   type PostgresDailyGenerationStoreConfig,
   type TodayQueryResult,
 } from "../generation/postgres-daily-generation-store.js";
+
+export {
+  PostgresDailyInteractionStore,
+  UNAVAILABLE_DAILY_INTERACTION_STORE,
+  type DailyInteractionGuardFailure,
+  type DailyInteractionQueryResult,
+  type DailyInteractionStore,
+  type DailyTaskMutationResult,
+  type PostgresDailyInteractionStoreConfig,
+} from "../daily-interaction/postgres-daily-interaction-store.js";
 export {
   RedisDailyContentCache,
   UNAVAILABLE_DAILY_CONTENT_CACHE,

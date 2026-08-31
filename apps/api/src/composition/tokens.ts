@@ -3,6 +3,7 @@ import type {
   CheckinStore,
   ConsentProfileStore,
   DailyGenerationStore,
+  DailyInteractionStore,
   TelemetryRuntime,
 } from "@daily-energy/server-adapters/api";
 
@@ -23,6 +24,7 @@ export const AUTH_STORE = Symbol("AUTH_STORE");
 export const CHECKIN_STORE = Symbol("CHECKIN_STORE");
 export const CONSENT_PROFILE_STORE = Symbol("CONSENT_PROFILE_STORE");
 export const DAILY_GENERATION_STORE = Symbol("DAILY_GENERATION_STORE");
+export const DAILY_INTERACTION_STORE = Symbol("DAILY_INTERACTION_STORE");
 export const PREFERRED_NAME_CODEC = Symbol("PREFERRED_NAME_CODEC");
 export const PRODUCT_DATE_CLOCK = Symbol("PRODUCT_DATE_CLOCK");
 export const WECHAT_CODE_EXCHANGE = Symbol("WECHAT_CODE_EXCHANGE");
@@ -42,6 +44,7 @@ export interface ApiCompositionOverrides {
   readonly checkinStore?: CheckinStore;
   readonly consentProfileStore?: ConsentProfileStore;
   readonly dailyGenerationStore?: DailyGenerationStore;
+  readonly dailyInteractionStore?: DailyInteractionStore;
   readonly ordinaryLogSink?: OrdinaryLogSink;
   readonly telemetryRuntime?: TelemetryRuntime;
   readonly publicAudienceVerifier?: AudienceVerifier;

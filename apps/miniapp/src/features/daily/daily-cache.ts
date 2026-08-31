@@ -9,6 +9,7 @@ import {
 
 const VIEW_CACHE_KEY = "daily:views";
 const GENERATION_KEY = "daily:generation";
+const TASK_KEY = "daily:task-command";
 export const DAILY_VIEW_CACHE_TTL_MS = 24 * 60 * 60 * 1_000;
 
 export interface PendingGeneration {
@@ -16,6 +17,14 @@ export interface PendingGeneration {
   readonly expectedCheckinRevision: number;
   readonly intentRef?: string;
   readonly productDate: string;
+}
+
+export interface PendingTaskUpdate {
+  readonly commandRef: string;
+  readonly expectedRevision: number;
+  readonly productDate: string;
+  readonly status: TodayView["interaction"]["task"]["status"];
+  readonly taskRef: string;
 }
 
 interface StoredViews extends Record<string, StorageValue> {
@@ -33,6 +42,17 @@ interface StoredGeneration extends Record<string, StorageValue> {
   readonly intentRef?: string;
   readonly productDate: string;
   readonly scope: string;
+  readonly version: 1;
+}
+
+interface StoredTaskUpdate extends Record<string, StorageValue> {
+  readonly commandRef: string;
+  readonly expectedRevision: number;
+  readonly expiresAt: number;
+  readonly productDate: string;
+  readonly scope: string;
+  readonly status: PendingTaskUpdate["status"];
+  readonly taskRef: string;
   readonly version: 1;
 }
 
@@ -216,5 +236,64 @@ export class PendingGenerationStore {
 
   public clear(): Promise<void> {
     return this.storage.remove(GENERATION_KEY);
+  }
+}
+
+export class PendingTaskUpdateStore {
+  public constructor(
+    private readonly storage: StoragePort,
+    private readonly scope: string,
+    private readonly now: () => number = Date.now,
+  ) {}
+
+  public async load(): Promise<PendingTaskUpdate | undefined> {
+    const value = await this.storage.get(TASK_KEY);
+    if (
+      !isRecord(value) ||
+      value.version !== 1 ||
+      value.scope !== this.scope ||
+      typeof value.expiresAt !== "number" ||
+      value.expiresAt <= this.now() ||
+      typeof value.commandRef !== "string" ||
+      typeof value.expectedRevision !== "number" ||
+      !Number.isInteger(value.expectedRevision) ||
+      value.expectedRevision < 1 ||
+      !isProductDate(value.productDate) ||
+      !["UNMARKED", "INTERESTED", "COMPLETED", "SKIPPED"].includes(
+        String(value.status),
+      ) ||
+      typeof value.taskRef !== "string" ||
+      value.taskRef.length < 1
+    ) {
+      if (value !== undefined) {
+        await this.clear();
+      }
+      return undefined;
+    }
+    return Object.freeze({
+      commandRef: value.commandRef,
+      expectedRevision: value.expectedRevision,
+      productDate: value.productDate,
+      status: value.status as PendingTaskUpdate["status"],
+      taskRef: value.taskRef,
+    });
+  }
+
+  public async save(value: PendingTaskUpdate): Promise<void> {
+    const stored: StoredTaskUpdate = {
+      commandRef: value.commandRef,
+      expectedRevision: value.expectedRevision,
+      expiresAt: this.now() + DAILY_VIEW_CACHE_TTL_MS,
+      productDate: value.productDate,
+      scope: this.scope,
+      status: value.status,
+      taskRef: value.taskRef,
+      version: 1,
+    };
+    await this.storage.set(TASK_KEY, stored);
+  }
+
+  public clear(): Promise<void> {
+    return this.storage.remove(TASK_KEY);
   }
 }
