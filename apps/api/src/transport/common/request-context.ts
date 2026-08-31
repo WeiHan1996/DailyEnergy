@@ -53,6 +53,8 @@ function operationFor(method: string, url: string): OperationCode {
     "GET /v1/history/days": "HISTORY_LIST_READ",
     "POST /v1/daily/interaction/light": "DAILY_LIGHT_CREATE",
     "POST /v1/daily/interaction/task": "DAILY_TASK_UPDATE",
+    "GET /v1/evening/today": "EVENING_READ",
+    "POST /v1/evening/save": "EVENING_SAVE",
     "GET /v1/consent/current": "CONSENT_CURRENT",
     "POST /v1/consent/accept": "CONSENT_ACCEPT",
     "POST /v1/consent/withdraw": "CONSENT_WITHDRAW",

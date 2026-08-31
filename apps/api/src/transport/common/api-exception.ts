@@ -1,10 +1,13 @@
 import { HttpStatus } from "@nestjs/common";
 import {
   CheckinViewSchema,
+  ClientEveningFeedbackViewSchema,
   DailyInteractionStateSchema,
   MemoryPreferencesViewSchema,
   NotificationSettingsViewSchema,
   ProfileViewSchema,
+  SafetyOverlayViewSchema,
+  type SafetyOverlayView,
 } from "@daily-energy/shared-schemas";
 import { z } from "zod";
 
@@ -196,6 +199,20 @@ export const API_ERROR_CATALOG = {
     retryable: false,
     status: HttpStatus.CONFLICT,
   },
+  SAFETY_OVERLAY: {
+    category: "SAFETY",
+    message: "当前普通流程已暂停，请先查看现实帮助。",
+    messageKey: "error.safety_overlay",
+    retryable: false,
+    status: HttpStatus.CONFLICT,
+  },
+  SAFETY_INDETERMINATE: {
+    category: "SAFETY",
+    message: "暂时无法安全处理可选文字，整份记录尚未保存。",
+    messageKey: "error.safety_indeterminate",
+    retryable: true,
+    status: HttpStatus.SERVICE_UNAVAILABLE,
+  },
   STATE_PRECONDITION_FAILED: {
     category: "CONFLICT",
     message: "当前状态不允许继续此操作。",
@@ -257,10 +274,11 @@ export type RetryAfterErrorDetails = z.infer<
   typeof RetryAfterErrorDetailsSchema
 >;
 const RevisionErrorDetailsSchema = z.strictObject({
-  current_revision: z.number().int().positive(),
+  current_revision: z.number().int().nonnegative(),
   current: z.union([
     CheckinViewSchema,
     DailyInteractionStateSchema,
+    ClientEveningFeedbackViewSchema,
     ProfileViewSchema,
     MemoryPreferencesViewSchema,
     NotificationSettingsViewSchema,
@@ -299,6 +317,7 @@ type ApiExceptionCodeOptions = {
 
 type ApiExceptionOptions = ApiExceptionCodeOptions & {
   readonly productDate?: string;
+  readonly safetyView?: SafetyOverlayView;
   readonly serverNow?: Date;
 };
 
@@ -344,6 +363,7 @@ export class ApiException extends Error {
   public readonly messageKey: string;
   public readonly productDate: string | undefined;
   public readonly retryable: boolean;
+  public readonly safetyView: SafetyOverlayView | undefined;
   public readonly serverNow: Date | undefined;
   public readonly status: HttpStatus;
 
@@ -364,6 +384,10 @@ export class ApiException extends Error {
     this.messageKey = definition.messageKey;
     this.productDate = options.productDate;
     this.retryable = definition.retryable;
+    const safetyView = SafetyOverlayViewSchema.safeParse(
+      (options as { readonly safetyView?: unknown }).safetyView,
+    );
+    this.safetyView = safetyView.success ? safetyView.data : undefined;
     this.serverNow =
       options.serverNow === undefined
         ? undefined

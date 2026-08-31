@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-24
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：[C-011 点亮与连续记录](./current.md)已提交 [stacked Draft PR #164](https://github.com/WeiHan1996/DailyEnergy/pull/164)并完成自动 Gate，等待 final-head CI；C-004～C-010 保持 stacked Draft PR 并等待统一审核
+- **当前任务**：[C-012 晚间反馈](./current.md)已提交 [stacked Draft PR #165](https://github.com/WeiHan1996/DailyEnergy/pull/165)并完成自动 Gate，等待 final-head CI；C-004～C-011 保持 stacked Draft PR 并等待统一审核
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -212,8 +212,8 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | In Review | [Draft PR #161](https://github.com/WeiHan1996/DailyEnergy/pull/161)；等待统一审核                  |
 | [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面       | In Review | [Draft PR #162](https://github.com/WeiHan1996/DailyEnergy/pull/162)；等待统一审核                  |
 | [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务           | In Review | [Draft PR #163](https://github.com/WeiHan1996/DailyEnergy/pull/163)；等待统一审核                  |
-| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | In Review | [Draft PR #164](https://github.com/WeiHan1996/DailyEnergy/pull/164)；等待 final-head CI 与统一审核 |
-| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈           | Planned   | 真实状态和帮助度                                                                                   |
+| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | In Review | [Draft PR #164](https://github.com/WeiHan1996/DailyEnergy/pull/164)；等待统一审核                  |
+| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈           | In Review | [Draft PR #165](https://github.com/WeiHan1996/DailyEnergy/pull/165)；等待 final-head CI 与统一审核 |
 | [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势           | Planned   | 真实数据和缺失处理                                                                                 |
 | [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | Planned   | 用户权利闭环                                                                                       |
 | [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 核心埋点           | Planned   | D1/D3/D7 可计算                                                                                    |

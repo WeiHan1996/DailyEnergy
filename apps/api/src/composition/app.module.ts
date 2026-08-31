@@ -4,6 +4,7 @@ import {
   UNAVAILABLE_CONSENT_PROFILE_STORE,
   UNAVAILABLE_DAILY_GENERATION_STORE,
   UNAVAILABLE_DAILY_INTERACTION_STORE,
+  UNAVAILABLE_EVENING_STORE,
 } from "@daily-energy/server-adapters/api";
 
 import { AuthAttemptLimiter } from "../auth/auth-attempt-limiter.js";
@@ -18,6 +19,15 @@ import { CheckinService } from "../checkin/checkin.service.js";
 import { ConsentProfileService } from "../consent-profile/consent-profile.service.js";
 import { GenerationService } from "../generation/generation.service.js";
 import { DailyInteractionService } from "../daily-interaction/daily-interaction.service.js";
+import { EveningService } from "../evening/evening.service.js";
+import {
+  developmentEveningNoteCodec,
+  UNAVAILABLE_EVENING_NOTE_CODEC,
+} from "../evening/evening-note-codec.js";
+import {
+  UNAVAILABLE_EVENING_SAFETY_GATE,
+  UNAVAILABLE_EVENING_SAFETY_STORE,
+} from "../evening/evening-safety.js";
 import {
   developmentPreferredNameCodec,
   UNAVAILABLE_PREFERRED_NAME_CODEC,
@@ -43,6 +53,7 @@ import { ConsentProfileController } from "../transport/public/consent-profile.co
 import { HealthController } from "../transport/public/health.controller.js";
 import { GenerationController } from "../transport/public/generation.controller.js";
 import { DailyInteractionController } from "../transport/public/daily-interaction.controller.js";
+import { EveningController } from "../transport/public/evening.controller.js";
 import { HealthService } from "../transport/public/health.service.js";
 import { LaunchAudienceGuard } from "../transport/public/launch-audience.guard.js";
 import { PublicAudienceGuard } from "../transport/public/public-audience.guard.js";
@@ -55,6 +66,10 @@ import {
   CONSENT_PROFILE_STORE,
   DAILY_GENERATION_STORE,
   DAILY_INTERACTION_STORE,
+  EVENING_NOTE_CODEC,
+  EVENING_SAFETY_GATE,
+  EVENING_SAFETY_STORE,
+  EVENING_STORE,
   type ApiComposition,
   ORDINARY_LOG_SINK,
   PREFERRED_NAME_CODEC,
@@ -85,6 +100,11 @@ export class ApiModule {
     )
       ? developmentPreferredNameCodec()
       : UNAVAILABLE_PREFERRED_NAME_CODEC;
+    const developmentNoteCodec = ["LOCAL", "CI", "DEV"].includes(
+      composition.config.environment,
+    )
+      ? developmentEveningNoteCodec()
+      : UNAVAILABLE_EVENING_NOTE_CODEC;
     const providers: Provider[] = [
       { provide: RUNTIME_CONFIG, useValue: composition.config },
       {
@@ -113,6 +133,28 @@ export class ApiModule {
         useValue:
           composition.overrides?.dailyInteractionStore ??
           UNAVAILABLE_DAILY_INTERACTION_STORE,
+      },
+      {
+        provide: EVENING_STORE,
+        useValue:
+          composition.overrides?.eveningStore ?? UNAVAILABLE_EVENING_STORE,
+      },
+      {
+        provide: EVENING_NOTE_CODEC,
+        useValue:
+          composition.overrides?.eveningNoteCodec ?? developmentNoteCodec,
+      },
+      {
+        provide: EVENING_SAFETY_GATE,
+        useValue:
+          composition.overrides?.eveningSafetyGate ??
+          UNAVAILABLE_EVENING_SAFETY_GATE,
+      },
+      {
+        provide: EVENING_SAFETY_STORE,
+        useValue:
+          composition.overrides?.eveningSafetyStore ??
+          UNAVAILABLE_EVENING_SAFETY_STORE,
       },
       {
         provide: PREFERRED_NAME_CODEC,
@@ -173,6 +215,7 @@ export class ApiModule {
       CheckinService,
       ConsentProfileService,
       DailyInteractionService,
+      EveningService,
       GenerationService,
       HealthService,
       HttpLoggingInterceptor,
@@ -191,6 +234,7 @@ export class ApiModule {
         CheckinController,
         ConsentProfileController,
         DailyInteractionController,
+        EveningController,
         GenerationController,
         HealthController,
         PublicController,

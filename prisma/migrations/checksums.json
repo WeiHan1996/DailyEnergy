@@ -40,6 +40,10 @@
     {
       "name": "20260824000001_c011_day_lighting",
       "sha256": "f43d7826d7cb7438e95c65287131565028054b39107f9e7d6922c2c73e03451e"
+    },
+    {
+      "name": "20260824000002_c012_evening_feedback_permissions",
+      "sha256": "1ac248dc8b4bd180ebe4790024947f439f852287ec052a31a9335b157f0f1090"
     }
   ]
 }

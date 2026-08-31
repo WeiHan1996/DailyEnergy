@@ -4,12 +4,18 @@ import type {
   ConsentProfileStore,
   DailyGenerationStore,
   DailyInteractionStore,
+  EveningStore,
   TelemetryRuntime,
 } from "@daily-energy/server-adapters/api";
 
 import type { RuntimeConfig } from "../bootstrap/runtime-config.js";
 import type { WechatCodeExchange } from "../auth/contracts.js";
 import type { PreferredNameCodec } from "../consent-profile/preferred-name-codec.js";
+import type { EveningNoteCodec } from "../evening/evening-note-codec.js";
+import type {
+  EveningSafetyInputGate,
+  EveningSafetyStore,
+} from "../evening/evening-safety.js";
 import type { OrdinaryLogSink } from "../observability/ordinary-log.types.js";
 import type { ProductDateClock } from "../product-date/product-date.js";
 import type {
@@ -25,6 +31,10 @@ export const CHECKIN_STORE = Symbol("CHECKIN_STORE");
 export const CONSENT_PROFILE_STORE = Symbol("CONSENT_PROFILE_STORE");
 export const DAILY_GENERATION_STORE = Symbol("DAILY_GENERATION_STORE");
 export const DAILY_INTERACTION_STORE = Symbol("DAILY_INTERACTION_STORE");
+export const EVENING_STORE = Symbol("EVENING_STORE");
+export const EVENING_NOTE_CODEC = Symbol("EVENING_NOTE_CODEC");
+export const EVENING_SAFETY_GATE = Symbol("EVENING_SAFETY_GATE");
+export const EVENING_SAFETY_STORE = Symbol("EVENING_SAFETY_STORE");
 export const PREFERRED_NAME_CODEC = Symbol("PREFERRED_NAME_CODEC");
 export const PRODUCT_DATE_CLOCK = Symbol("PRODUCT_DATE_CLOCK");
 export const WECHAT_CODE_EXCHANGE = Symbol("WECHAT_CODE_EXCHANGE");
@@ -45,6 +55,10 @@ export interface ApiCompositionOverrides {
   readonly consentProfileStore?: ConsentProfileStore;
   readonly dailyGenerationStore?: DailyGenerationStore;
   readonly dailyInteractionStore?: DailyInteractionStore;
+  readonly eveningStore?: EveningStore;
+  readonly eveningNoteCodec?: EveningNoteCodec;
+  readonly eveningSafetyGate?: EveningSafetyInputGate;
+  readonly eveningSafetyStore?: EveningSafetyStore;
   readonly ordinaryLogSink?: OrdinaryLogSink;
   readonly telemetryRuntime?: TelemetryRuntime;
   readonly publicAudienceVerifier?: AudienceVerifier;

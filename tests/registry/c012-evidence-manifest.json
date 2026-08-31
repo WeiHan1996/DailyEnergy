@@ -1,0 +1,116 @@
+{
+  "manifest_version": "c-012-evidence-v1",
+  "scope": "C-012 strict evening view/save, atomic feedback/helpfulness/task revisions, encrypted optional note, Safety input diversion, continuation, history projection and Mini Program unknown-outcome recovery",
+  "authority": [
+    "docs/ai/evening-feedback-schema.md",
+    "docs/ai/safety.md",
+    "docs/product/business-rules.md",
+    "docs/design/phase2-remaining-handoff.md",
+    "docs/technical/api.md",
+    "docs/technical/database.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C012-CONTRACT-001": {
+      "file": "apps/api/src/evening/evening.contract.test.ts",
+      "selector": "C-012 evening transport contract",
+      "level": "CONTRACT",
+      "assertions": [
+        "strict coordinated input binds feedback/helpfulness/task revisions and rejects owner, guard, window and relationship authority",
+        "note SET/CLEAR shapes, real-state enums, client view and Safety overlay are closed executable schemas",
+        "authenticated OpenAPI evening paths resolve to the shared request and view contracts"
+      ]
+    },
+    "T-C012-API-001": {
+      "file": "apps/api/src/evening.e2e.test.ts",
+      "selector": "C-012 HTTP evening flow",
+      "level": "E2E",
+      "assertions": [
+        "one command saves and replays one allowlisted evening view while changed payload conflicts",
+        "HIGH_RISK returns SAFETY_OVERLAY and never invokes the ordinary EveningStore",
+        "HTTP responses and ordinary logs contain no note, ciphertext, account, guard or fingerprint"
+      ]
+    },
+    "T-C012-DB-001": {
+      "file": "tests/database/c008-daily-generation.test.mjs",
+      "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+      "level": "DB",
+      "assertions": [
+        "real PostgreSQL 18 commits feedback, helpfulness, optional task and aggregate revisions together",
+        "one stale component revision leaves all component and aggregate revisions unchanged",
+        "optional note persists only as ciphertext/key version and never enters the outbox payload",
+        "api-safety pool writes one minimal decision/event/plan/state and same-command replay is idempotent",
+        "a changed high-risk command fingerprint conflicts and no ordinary evening row is created for the Safety account",
+        "UNRATED remains no helpfulness row and an EVE empty continuation grant legally binds revision zero"
+      ]
+    },
+    "T-C012-SERVICE-001": {
+      "file": "apps/api/src/evening/evening.service.test.ts",
+      "selector": "C-012 evening service",
+      "level": "MODULE",
+      "assertions": [
+        "CLEAR note is protected before the ordinary store receives it",
+        "HIGH_RISK activates the dedicated Safety port before any ordinary transaction",
+        "INDETERMINATE free-text classification fails closed without saving"
+      ]
+    },
+    "T-C012-MINIAPP-001": {
+      "file": "apps/miniapp/src/features/evening/evening-flow.test.ts",
+      "selector": "C-012 evening coordinator",
+      "level": "MODULE",
+      "assertions": [
+        "unknown save outcome keeps one command and reads authoritative state before retry",
+        "an already accepted unknown command is not submitted a second time",
+        "component conflict replaces stale revisions with the strict current view",
+        "Safety overlay clears ordinary cache and never reports ordinary success"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "D17-R03",
+      "status": "COVERED",
+      "proof_ids": ["T-C012-DB-001", "T-C012-API-001"]
+    },
+    {
+      "source_id": "D17-R04",
+      "status": "COVERED",
+      "proof_ids": ["T-C012-DB-001", "T-C012-SERVICE-001"]
+    },
+    {
+      "source_id": "S19-DB-017",
+      "status": "COVERED",
+      "proof_ids": ["T-C012-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-018",
+      "status": "COVERED",
+      "proof_ids": ["T-C012-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-019",
+      "status": "COVERED",
+      "proof_ids": ["T-C012-DB-001", "T-C012-SERVICE-001"]
+    },
+    {
+      "source_id": "S19-DB-020",
+      "status": "COVERED",
+      "proof_ids": ["T-C012-DB-001"]
+    },
+    {
+      "source_id": "S20-E01",
+      "status": "COVERED",
+      "proof_ids": ["T-C012-CONTRACT-001", "T-C012-API-001"]
+    },
+    {
+      "source_id": "S20-E02",
+      "status": "COVERED",
+      "proof_ids": ["T-C012-CONTRACT-001", "T-C012-API-001"]
+    },
+    {
+      "source_id": "S20-E03",
+      "status": "COVERED",
+      "proof_ids": ["T-C012-CONTRACT-001", "T-C012-API-001"]
+    }
+  ]
+}

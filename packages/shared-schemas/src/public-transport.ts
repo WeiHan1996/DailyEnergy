@@ -3,17 +3,21 @@ import * as z from "zod";
 import {
   EnergySchema,
   ExpressionStyleSchema,
+  HelpfulnessRatingSchema,
   MoodSchema,
   OpaqueIdSchema,
+  OverallFeelingSchema,
   PositiveRevisionSchema,
   ProductDateSchema,
   Rfc3339TimestampSchema,
+  SemverSchema,
   SleepSchema,
   TaskStatusSchema,
   VersionTokenSchema,
   WriteWindowSchema,
   singleLineTextSchema,
 } from "./common.js";
+import { NotePatchSchema } from "./client-evening-feedback.js";
 
 const COMMAND_REF = /^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$/u;
 
@@ -146,6 +150,38 @@ export const TaskStateUpdateRequestSchema = z
   })
   .strict();
 
+export const EveningSaveRequestSchema = z
+  .object({
+    ...CommandShape,
+    product_date: ProductDateSchema,
+    expected_feedback_revision: z.number().int().nonnegative(),
+    expected_helpfulness_revision: z.number().int().nonnegative(),
+    overall_feeling: OverallFeelingSchema,
+    helpfulness_rating: HelpfulnessRatingSchema,
+    task_patch: z
+      .object({
+        task_ref: OpaqueIdSchema,
+        expected_revision: PositiveRevisionSchema,
+        status: TaskStatusSchema,
+      })
+      .strict()
+      .optional(),
+    note_patch: NotePatchSchema.optional(),
+    client_context: z
+      .object({
+        app_version: z.string().min(1).max(64).optional(),
+        entry_source: z.enum([
+          "TODAY_SECONDARY",
+          "TODAY_EVENING_CARD",
+          "REMINDER_DEEP_LINK",
+          "EDIT_EXISTING",
+        ]),
+        view_schema_version: SemverSchema,
+      })
+      .strict(),
+  })
+  .strict();
+
 export const MemoryPreferencesUpdateRequestSchema = z
   .object({
     ...CommandShape,
@@ -250,6 +286,7 @@ export type LightDayRequest = z.infer<typeof LightDayRequestSchema>;
 export type TaskStateUpdateRequest = z.infer<
   typeof TaskStateUpdateRequestSchema
 >;
+export type EveningSaveRequest = z.infer<typeof EveningSaveRequestSchema>;
 export type MemoryPreferencesUpdateRequest = z.infer<
   typeof MemoryPreferencesUpdateRequestSchema
 >;

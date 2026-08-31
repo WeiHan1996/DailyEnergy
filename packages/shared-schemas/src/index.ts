@@ -77,6 +77,7 @@ export {
   ConsentViewSchema,
   ConsentWithdrawRequestSchema,
   GenerationStartRequestSchema,
+  EveningSaveRequestSchema,
   LightDayRequestSchema,
   MemoryPreferencesUpdateRequestSchema,
   MemoryPreferencesViewSchema,
@@ -99,6 +100,7 @@ export type {
   ConsentView,
   ConsentWithdrawRequest,
   GenerationStartRequest,
+  EveningSaveRequest,
   LightDayRequest,
   MemoryPreferencesUpdateRequest,
   MemoryPreferencesView,
@@ -112,6 +114,14 @@ export type {
   TaskStateUpdateRequest,
   WechatSessionRequest,
 } from "./public-transport.js";
+
+export {
+  SafetyBlockViewSchema,
+  SafetyOverlayViewSchema,
+  SafetyResourceViewSchema,
+  SafetyViewSchema,
+} from "./safety-view.js";
+export type { SafetyOverlayView, SafetyView } from "./safety-view.js";
 
 export {
   ClientDailyContentViewSchema,

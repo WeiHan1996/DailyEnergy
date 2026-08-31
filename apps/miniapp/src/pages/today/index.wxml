@@ -120,6 +120,11 @@
 
       <view class="today__records-entry">
         <de-action-button
+          label="回看今天"
+          variant="secondary"
+          bind:press="openEvening"
+        ></de-action-button>
+        <de-action-button
           label="查看最近记录"
           variant="secondary"
           bind:press="openRecords"

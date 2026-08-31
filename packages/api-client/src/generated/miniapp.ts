@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:9651c77c8236b964f559408648a8f4dd8208cd6406bdc882494d633d3a453b1c
+// source-fingerprint: sha256:64ae0b2b9320ea9b00bb4b16f64952e09f91a4dc175adec387eab8a7ff2e6605
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:9651c77c8236b964f559408648a8f4dd8208cd6406bdc882494d633d3a453b1c";
+  "sha256:64ae0b2b9320ea9b00bb4b16f64952e09f91a4dc175adec387eab8a7ff2e6605";
 
 export interface paths {
   "/auth/reauth/verify": {
@@ -701,27 +701,43 @@ export interface components {
     EveningSaveRequest: {
       client_context: {
         app_version?: string;
-        entry_source: components["schemas"]["VersionToken"];
-        view_schema_version: components["schemas"]["Semver"];
+        entry_source:
+          | "TODAY_SECONDARY"
+          | "TODAY_EVENING_CARD"
+          | "REMINDER_DEEP_LINK"
+          | "EDIT_EXISTING";
+        view_schema_version: string;
       };
-      command_ref: components["schemas"]["CommandRef"];
-      expected_feedback_revision: components["schemas"]["Revision"];
-      expected_helpfulness_revision: components["schemas"]["Revision"];
-      helpfulness_rating: components["schemas"]["HelpfulnessRating"];
-      note_patch?: components["schemas"]["NotePatch"];
-      overall_feeling: components["schemas"]["OverallFeeling"];
-      product_date: components["schemas"]["ProductDate"];
-      task_patch?: components["schemas"]["EveningTaskPatch"];
+      command_ref: string;
+      expected_feedback_revision: number;
+      expected_helpfulness_revision: number;
+      helpfulness_rating: "HELPFUL" | "NEUTRAL" | "NOT_HELPFUL" | "NOT_USED";
+      note_patch?:
+        | {
+            operation: "SET";
+            value: string;
+          }
+        | {
+            operation: "CLEAR";
+          };
+      overall_feeling:
+        | "VERY_HEAVY"
+        | "SOMEWHAT_HEAVY"
+        | "STEADY"
+        | "PRETTY_GOOD"
+        | "LIGHT"
+        | "UNSURE";
+      product_date: string;
+      task_patch?: {
+        expected_revision: number;
+        status: "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED";
+        task_ref: string;
+      };
     };
     EveningSkipRequest: {
       client_context?: components["schemas"]["ClientContext"];
       command_ref: components["schemas"]["CommandRef"];
       product_date: components["schemas"]["ProductDate"];
-    };
-    EveningTaskPatch: {
-      expected_revision: components["schemas"]["PositiveRevision"];
-      status: components["schemas"]["TaskStatus"];
-      task_ref: components["schemas"]["OpaqueRef"];
     };
     EveningView: {
       availability:
@@ -1074,14 +1090,6 @@ export interface components {
       weekly_use_enabled: boolean;
     };
     Mood: "VERY_LOW" | "LOW" | "STEADY" | "GOOD" | "LIGHT" | "UNSURE";
-    NotePatch:
-      | {
-          operation: "SET";
-          value: string;
-        }
-      | {
-          operation: "CLEAR";
-        };
     NotificationPermissionSyncRequest: {
       client_context?: components["schemas"]["ClientContext"];
       command_ref: components["schemas"]["CommandRef"];
@@ -1109,13 +1117,6 @@ export interface components {
       preferred_name?: string;
     };
     OpaqueRef: string;
-    OverallFeeling:
-      | "VERY_HEAVY"
-      | "SOMEWHAT_HEAVY"
-      | "STEADY"
-      | "PRETTY_GOOD"
-      | "LIGHT"
-      | "UNSURE";
     PositiveRevision: number;
     ProductDate: string;
     ProfileUpdateRequest: {
@@ -1194,7 +1195,6 @@ export interface components {
     SafetyView:
       | components["schemas"]["SafetyClearView"]
       | components["schemas"]["SafetyOverlayView"];
-    Semver: string;
     SessionView: {
       account_state: "ACTIVE" | "RESTRICTED" | "DELETING" | "DELETED";
       consent_required: boolean;
@@ -1247,7 +1247,6 @@ export interface components {
       status: "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED";
       task_ref: string;
     };
-    TaskStatus: "UNMARKED" | "INTERESTED" | "COMPLETED" | "SKIPPED";
     TodayView: {
       content: {
         closing: string;

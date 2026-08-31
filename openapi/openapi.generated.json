@@ -3343,10 +3343,17 @@
                 "type": "string"
               },
               "entry_source": {
-                "$ref": "#/components/schemas/VersionToken"
+                "enum": [
+                  "TODAY_SECONDARY",
+                  "TODAY_EVENING_CARD",
+                  "REMINDER_DEEP_LINK",
+                  "EDIT_EXISTING"
+                ],
+                "type": "string"
               },
               "view_schema_version": {
-                "$ref": "#/components/schemas/Semver"
+                "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+                "type": "string"
               }
             },
             "required": [
@@ -3356,42 +3363,124 @@
             "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "expected_feedback_revision": {
-            "$ref": "#/components/schemas/Revision"
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "expected_helpfulness_revision": {
-            "$ref": "#/components/schemas/Revision"
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "helpfulness_rating": {
-            "$ref": "#/components/schemas/HelpfulnessRating"
+            "enum": [
+              "HELPFUL",
+              "NEUTRAL",
+              "NOT_HELPFUL",
+              "NOT_USED"
+            ],
+            "type": "string"
           },
           "note_patch": {
-            "$ref": "#/components/schemas/NotePatch"
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "operation": {
+                    "enum": [
+                      "SET"
+                    ],
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "operation",
+                  "value"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "operation": {
+                    "enum": [
+                      "CLEAR"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "operation"
+                ],
+                "type": "object"
+              }
+            ]
           },
           "overall_feeling": {
-            "$ref": "#/components/schemas/OverallFeeling"
+            "enum": [
+              "VERY_HEAVY",
+              "SOMEWHAT_HEAVY",
+              "STEADY",
+              "PRETTY_GOOD",
+              "LIGHT",
+              "UNSURE"
+            ],
+            "type": "string"
           },
           "product_date": {
-            "$ref": "#/components/schemas/ProductDate"
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           },
           "task_patch": {
-            "$ref": "#/components/schemas/EveningTaskPatch"
+            "additionalProperties": false,
+            "properties": {
+              "expected_revision": {
+                "exclusiveMinimum": true,
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "status": {
+                "enum": [
+                  "UNMARKED",
+                  "INTERESTED",
+                  "COMPLETED",
+                  "SKIPPED"
+                ],
+                "type": "string"
+              },
+              "task_ref": {
+                "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "task_ref",
+              "expected_revision",
+              "status"
+            ],
+            "type": "object"
           }
         },
         "required": [
           "command_ref",
+          "client_context",
           "product_date",
           "expected_feedback_revision",
           "expected_helpfulness_revision",
           "overall_feeling",
-          "helpfulness_rating",
-          "client_context"
+          "helpfulness_rating"
         ],
         "type": "object",
-        "x-source-contract": "EveningReflectionSubmissionSchema",
-        "x-source-mapper": "mapEveningSaveRequestToSubmission"
+        "x-source-contract": "EveningSaveRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "EveningSkipRequest": {
         "additionalProperties": false,
@@ -10504,6 +10593,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:9651c77c8236b964f559408648a8f4dd8208cd6406bdc882494d633d3a453b1c"
+    "source-fingerprint": "sha256:64ae0b2b9320ea9b00bb4b16f64952e09f91a4dc175adec387eab8a7ff2e6605"
   }
 }

@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:f70a5d272f4235fd03cf8d4c67fdc5189d24c70bc2db0057c3271982478ed6f8
+// source-fingerprint: sha256:69c0954588bcabe1fc243301c31112094638dc113d9ee463dcab03d6250d7505
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:f70a5d272f4235fd03cf8d4c67fdc5189d24c70bc2db0057c3271982478ed6f8";
+  "sha256:69c0954588bcabe1fc243301c31112094638dc113d9ee463dcab03d6250d7505";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -1479,7 +1479,12 @@ export const jsonSchemas = {
         additionalProperties: false,
         properties: {
           entry_source: {
-            pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            enum: [
+              "TODAY_SECONDARY",
+              "TODAY_EVENING_CARD",
+              "REMINDER_DEEP_LINK",
+              "EDIT_EXISTING",
+            ],
             type: "string",
           },
           view_schema_version: {
@@ -1566,8 +1571,8 @@ export const jsonSchemas = {
         additionalProperties: false,
         properties: {
           expected_revision: {
+            exclusiveMinimum: 0,
             maximum: 9007199254740991,
-            minimum: 0,
             type: "integer",
           },
           status: {

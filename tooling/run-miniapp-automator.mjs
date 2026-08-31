@@ -56,6 +56,12 @@ const smokeCases = Object.freeze([
     url: "/pages/today/index",
   },
   {
+    expectedPath: "pages/evening/index",
+    expectedScreenId: "EVE-001",
+    label: "EVE-001",
+    url: "/pages/evening/index",
+  },
+  {
     expectedPath: "pages/records/index",
     expectedScreenId: "REC-001",
     label: "REC-001",

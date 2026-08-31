@@ -3,7 +3,7 @@
 服务端基础设施 adapter 包。数据库连接与 Redis/BullMQ 队列通过
 profile-specific exports 暴露，client 和 server-core 不能直接导入具体 SDK。
 
-`./api` 当前还导出 C-001～C-011 已实现的 PostgreSQL stores。Daily interaction
+`./api` 当前还导出 C-001～C-012 已实现的 PostgreSQL stores。Daily interaction
 store 在同一事务处理点亮 command receipt、LightFact、aggregate revision 与
 DayLit outbox；普通 API 通过白名单函数读取历史/Safety/删除守卫，不直接读取
 受限表。`worker-background` 默认注册 DayLit handler，以 InboxReceipt、源有效性、
@@ -21,3 +21,8 @@ E-007 队列基线包括：
 `worker-interactive`、`worker-background` 和 `worker-restricted` 是生产入口；
 `testing` 只供测试使用。除 C-008 Interactive generation 与 C-011 DayLit 关系
 handler 外，Weekly、通知和删除 handler 仍由后续任务交付。
+
+C-012 新增 ordinary EveningStore 与 `api-restricted` Evening Safety store：前者
+原子提交 feedback/helpfulness/task、密文 note、revision 与无正文 outbox；后者只用
+`daily_energy_safety` role 提交最小 decision/event/plan/state。分类器通过封闭 port
+注入，INDETERMINATE 自由文本 fail closed，不在 adapter 内实现关键词分类。

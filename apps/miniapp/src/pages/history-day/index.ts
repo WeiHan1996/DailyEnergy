@@ -37,6 +37,21 @@ const taskLabels = {
   COMPLETED: "已完成",
   SKIPPED: "今天先不做",
 } as const;
+const overallFeelingLabels = {
+  VERY_HEAVY: "很费力",
+  SOMEWHAT_HEAVY: "有点费力",
+  STEADY: "平稳",
+  PRETTY_GOOD: "还不错",
+  LIGHT: "很轻松",
+  UNSURE: "说不准",
+} as const;
+const helpfulnessLabels = {
+  UNRATED: "未评分",
+  HELPFUL: "有帮助",
+  NEUTRAL: "一般",
+  NOT_HELPFUL: "没帮助",
+  NOT_USED: "未使用",
+} as const;
 
 Page({
   data: {
@@ -45,6 +60,8 @@ Page({
     error: false,
     explanationText: "",
     loading: true,
+    eveningFeelingLabel: "",
+    eveningHelpfulnessLabel: "",
     missing: false,
     offline: false,
     productDate: "",
@@ -135,6 +152,14 @@ Page({
             ],
       error: false,
       explanationText: content?.explanation_paragraphs.join("\n\n") ?? "",
+      eveningFeelingLabel:
+        result.view.evening?.feedback === undefined
+          ? ""
+          : overallFeelingLabels[result.view.evening.feedback.overall_feeling],
+      eveningHelpfulnessLabel:
+        result.view.evening === undefined
+          ? ""
+          : helpfulnessLabels[result.view.evening.helpfulness.rating],
       loading: false,
       missing: false,
       offline: result.offline,

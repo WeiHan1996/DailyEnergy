@@ -27,3 +27,10 @@ export type {
   DatabaseFactory,
   DatabaseFactoryConfig,
 } from "../db/internal/contracts.js";
+
+export {
+  PostgresEveningSafetyStore,
+  type EveningSafetyActivationResult,
+  type EveningSafetyActivationStore,
+  type PostgresEveningSafetyStoreConfig,
+} from "../safety/postgres-evening-safety-store.js";
