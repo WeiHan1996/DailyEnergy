@@ -132,7 +132,7 @@
       "forbidden_sdk_name_matches": 0,
       "build_output_files": 5406,
       "sbom_packages": 750,
-      "artifact_scan": "PASS",
+      "artifact_scan": "CI RUN 33579547592 / SUPPLY-CHAIN PASS",
       "production_binding": "PENDING / NO PRODUCTION API ORIGIN, OCI IMAGE SET OR RELEASE MANIFEST"
     },
     "dependency_audit_remediation": {
@@ -140,7 +140,16 @@
       "affected_resolution": "mysql2@3.15.3",
       "fixed_resolution": "mysql2@3.22.0",
       "post_fix_audit": "critical=0/high=0",
-      "full_gate": "PENDING"
+      "full_gate": "CI RUN 33579547592 / 11 OF 11 SUCCESS"
+    },
+    "database_due_time_remediation": {
+      "first_ci_head": "284f707f9534c51ff1818a3bd1efca1d3373dc03",
+      "first_ci_run": 33578319675,
+      "failure": "C014 REAL POSTGRESQL / RETENTION_NOT_DUE INSTEAD OF RESTRICTED_LEGAL_HOLD",
+      "root_cause": "FIXED BUSINESS CLOCK MIXED WITH DATABASE WALL CLOCK AFTER STATUS GRANT EXPIRY",
+      "fixed_head": "9022e5b713d838196c14e6280d481f444e65cb15",
+      "fixed_ci_run": 33579547592,
+      "fixed_ci_checks": "11/11 SUCCESS"
     },
     "external_inputs": {
       "synthetic_https_backend": "PENDING",
