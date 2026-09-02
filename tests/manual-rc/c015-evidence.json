@@ -112,6 +112,45 @@
     "product_date_tzdb_audit": "ACTUAL_RUNTIME_RELEASE_BOUND_TO_RUNTIME_EVIDENCE_SUPPLY_DIGEST_AND_RELEASE_MANIFEST",
     "review_remediation": "C-004_THROUGH_C-015_REGRESSIONS_PASS"
   },
+  "evidence_preparation": {
+    "status": "IN_PROGRESS_EXTERNAL_INPUT_REQUIRED",
+    "authorized_on": "2026-09-02",
+    "devtools": {
+      "version": "Stable v2.01.2510290",
+      "base_library_version": "3.7.12",
+      "existing_project_appid": "VERIFIED_LOCAL_ONLY_NOT_PERSISTED",
+      "project_import": "PASS",
+      "page_runtime": "PASS / SYS-003 rendered",
+      "automation": "INFRA_BLOCKED / MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT",
+      "unlock": "OWNER_CONFIRM_LOCAL_SERVICE_PORT_ENABLEMENT"
+    },
+    "candidate_bundle": {
+      "environment": "LOCAL_ONLY",
+      "source_fingerprint": "f73bc61f8498cfdc16a02591bee4edf0bd8a1b9fa94db7aa1c9ced609baa2eb4",
+      "miniapp_bundle_gate": "PASS",
+      "analytics_static_test": "3/3 PASS",
+      "forbidden_sdk_name_matches": 0,
+      "build_output_files": 5406,
+      "sbom_packages": 750,
+      "artifact_scan": "PASS",
+      "production_binding": "PENDING / NO PRODUCTION API ORIGIN, OCI IMAGE SET OR RELEASE MANIFEST"
+    },
+    "dependency_audit_remediation": {
+      "advisory": "GHSA-3f6p-5ww8-9rcr",
+      "affected_resolution": "mysql2@3.15.3",
+      "fixed_resolution": "mysql2@3.22.0",
+      "post_fix_audit": "critical=0/high=0",
+      "full_gate": "PENDING"
+    },
+    "external_inputs": {
+      "synthetic_https_backend": "PENDING",
+      "ios_device": "PENDING",
+      "android_device": "PENDING",
+      "processing_entity": "PENDING_PRIVACY_LEGAL_OWNER",
+      "production_location_and_processors": "PENDING_PRIVACY_LEGAL_OWNER",
+      "final_user_notice": "PENDING_PRIVACY_LEGAL_OWNER"
+    }
+  },
   "security_review": {
     "status": "OWNER_CODE_AND_THREAT_REVIEW_APPROVED",
     "threat_boundary_review": "OWNER_APPROVED_2026-08-31",

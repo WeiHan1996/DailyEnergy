@@ -80,6 +80,7 @@ overrides:
   "deepmerge-ts@<8.0.0": 8.0.0
   "fast-uri@>=3.0.0 <3.1.5": 3.1.5
   "mkdirp@0.5.1>minimist": 0.2.4
+  "mysql2@<3.22.0": 3.22.0
   "nanoid@>=3.0.0 <3.3.18": 3.3.18
 
 minimumReleaseAgeExclude:

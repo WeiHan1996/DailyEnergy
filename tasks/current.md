@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-08-31
+- **最后更新**：2026-09-02
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-015 — C-004～C-015 统一审核修复
 - **任务状态**：Blocked（C-004～C-015 实现与统一修复已 merge；等待真机、生产 bundle 与隐私主体/位置/用户说明证据）
@@ -13,6 +13,15 @@
 - **合并状态**：main head `fec5c96d368f8d4427ecca861f8ce42adad7a270`，CI run `33374088290` 11/11 SUCCESS
 - **下一候选动作**：补齐 WeChat DevTools/真机 offline no-replay、生产 bundle 无第三方 SDK、处理主体/位置/用户说明证据；不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
+
+## 2026-09-02 外部证据补齐进度
+
+- 项目所有者已授权 Agent 准备 C-015 剩余证据，并在微信开发者工具中提供“见见今天”的既有 AppID；AppID 只用于本机忽略配置和 IDE 项目，不写入仓库或证据正文；
+- 微信开发者工具 `Stable v2.01.2510290` 已导入并运行当前项目，基础库为 `3.7.12`；自动 runner 因 IDE 本地服务端口未开启继续返回 `MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT`，等待 owner 明确允许开启该安全相关设置；iOS/Android offline no-replay 仍未执行；
+- 当前 head 的 LOCAL 候选 bundle build、Mini Program bundle Gate、C-015 analytics static test、已构建产物与 lockfile 禁止 SDK 名称扫描均通过；使用 Node `24.18.0` 生成的 supply-chain evidence 为 `5406` 个 build files、`750` 个 SBOM packages，artifact scanner PASS；这些结果未绑定实际 PRODUCTION API origin 或生产 OCI image，不能升级为生产 bundle PASS；
+- 2026-09-02 npm 官方 audit 新报告 transitive optional `mysql2@3.15.3` 的 high advisory `GHSA-3f6p-5ww8-9rcr`；当前分支用最小 override `mysql2@3.22.0` 修复，复核为 `critical=0/high=0`，完整 Gate 与 final-head CI 尚待执行；
+- GitHub 当前只有 `development` environment，仓库和该环境均无 Actions variable/secret；没有可绑定的 STAGING/PRODUCTION API origin、生产 image set 或 Release Manifest；
+- 仍需 owner 提供或确认：允许开启 DevTools 本地服务端口、可供真机访问的合成 HTTPS backend、iOS/Android 测试设备，以及实际处理主体、生产组件/受托方/region/跨境矩阵和最终用户说明 reviewer。
 
 ## Post-merge receipt
 
