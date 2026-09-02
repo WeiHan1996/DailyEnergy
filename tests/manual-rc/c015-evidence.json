@@ -113,7 +113,7 @@
     "review_remediation": "C-004_THROUGH_C-015_REGRESSIONS_PASS"
   },
   "evidence_preparation": {
-    "status": "IN_PROGRESS_EXTERNAL_INPUT_REQUIRED",
+    "status": "IN_PROGRESS_ANDROID_PRODUCTION_PRIVACY_PENDING",
     "authorized_on": "2026-09-02",
     "devtools": {
       "version": "Stable v2.01.2510290",
@@ -121,8 +121,15 @@
       "existing_project_appid": "VERIFIED_LOCAL_ONLY_NOT_PERSISTED",
       "project_import": "PASS",
       "page_runtime": "PASS / SYS-003 rendered",
-      "automation": "INFRA_BLOCKED / MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT",
-      "unlock": "OWNER_CONFIRM_LOCAL_SERVICE_PORT_ENABLEMENT"
+      "automation": "PASS / 11 REGISTERED ROUTES",
+      "offline_no_replay": "PASS / DEVTOOLS_ENDPOINT_UNREACHABLE_NO_REPLAY",
+      "restart_replay_count": 0,
+      "fresh_dimensions_expanded_count": 1,
+      "storage_keyword_matches": 0,
+      "storage_digest_changes": 0,
+      "runner_sha256": "cd45cb561944b6e717d7029fed6bb920565cd8cab6f992b125855bced3c18b0d",
+      "local_service_port_after_test": "DISABLED",
+      "login_ticket_and_default_trust": "DISABLED"
     },
     "candidate_bundle": {
       "environment": "LOCAL_ONLY",
@@ -134,6 +141,20 @@
       "sbom_packages": 750,
       "artifact_scan": "CI RUN 33579547592 / SUPPLY-CHAIN PASS",
       "production_binding": "PENDING / NO PRODUCTION API ORIGIN, OCI IMAGE SET OR RELEASE MANIFEST"
+    },
+    "ios_no_replay": {
+      "status": "EXECUTION_PASS / WECHAT_EXACT_VERSION_PENDING",
+      "device": "iPhone 17",
+      "os_version": "iOS 26.5",
+      "wechat_version": "LATEST_UNPINNED_NEEDS_EXACT_VERSION",
+      "mode": "TRUE_DEVICE_DEBUG / ENT-001",
+      "staging_bundle_fingerprint": "d10ea8053a53c0fc05ef16a4423ec18a5b0ff4a04545e1befe717d84ee882a82",
+      "formal_offline_restart_count": 0,
+      "network_resume_without_new_load_count": 0,
+      "fresh_debug_reload": "POSITIVE_CONTROL_REACHED_RECORDER",
+      "temporary_domain_check": "GIT_IGNORED_ONLY / RESTORED_TRUE",
+      "temporary_tunnel": "TERMINATED / NOT_PRODUCTION_EVIDENCE",
+      "receipt_sha256": "6483c63f9fe1a1b905f99212e1d7a24528ebe8782153342bb51026c0f4e9d5d9"
     },
     "dependency_audit_remediation": {
       "advisory": "GHSA-3f6p-5ww8-9rcr",
@@ -152,8 +173,8 @@
       "fixed_ci_checks": "11/11 SUCCESS"
     },
     "external_inputs": {
-      "synthetic_https_backend": "PENDING",
-      "ios_device": "PENDING",
+      "synthetic_https_backend": "EXECUTED_AND_TERMINATED / SYNTHETIC_ONLY",
+      "ios_device": "EXECUTION_PASS / WECHAT_EXACT_VERSION_PENDING",
       "android_device": "PENDING",
       "processing_entity": "PENDING_PRIVACY_LEGAL_OWNER",
       "production_location_and_processors": "PENDING_PRIVACY_LEGAL_OWNER",
@@ -178,7 +199,7 @@
       "client analytics identity cells, metrics M05/M19/M22 and count-free G01-G04 evidence use their accepted closed contracts"
     ],
     "residual_evidence": [
-      "WeChat DevTools network inspection confirming an offline signal is not persisted or replayed after restart",
+      "exact iOS WeChat version and Android network no-replay evidence",
       "production deployment inspection confirming no third-party analytics, BI, ad, replay or attribution SDK is bundled",
       "privacy/legal confirmation of the actual processing entity, production location and user notice",
       "production scheduler authorization and incident thresholds remain outside automated C-015 evidence"
@@ -186,7 +207,7 @@
     "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
   },
   "real_device": {
-    "ios_network_no_replay": "MANUAL_EVIDENCE_PENDING",
+    "ios_network_no_replay": "EXECUTION_PASS / WECHAT_EXACT_VERSION_PENDING",
     "android_network_no_replay": "MANUAL_EVIDENCE_PENDING"
   },
   "reviewer": "project-owner",

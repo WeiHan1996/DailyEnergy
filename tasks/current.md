@@ -4,26 +4,28 @@
 - **最后更新**：2026-09-02
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-015 — C-004～C-015 统一审核修复
-- **任务状态**：Blocked（C-004～C-015 实现与统一修复已 merge；等待真机、生产 bundle 与隐私主体/位置/用户说明证据）
+- **任务状态**：Blocked（实现与统一修复已 merge；DevTools/iOS no-replay 已执行，等待 Android、生产 bundle 与 Privacy/Legal 证据）
 - **任务 Profile**：`security`（幂等、Safety、删除不复活、隐私、确定性与 analytics 可信性）
 - **工作分支**：`agent/c015-post-merge-handoff`
 - **修复基线**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)，remote head `fd04b787926127bda64fc6cb07cfcf356d85ed8b`，CI run `33323476723` 11/11 SUCCESS
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
 - **当前 PR**：[C-015 外部证据准备 Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170)；base=`main`，verified implementation head `9022e5b713d838196c14e6280d481f444e65cb15`，CI run `33579547592` 11/11 SUCCESS
 - **合并状态**：main head `fec5c96d368f8d4427ecca861f8ce42adad7a270`，CI run `33374088290` 11/11 SUCCESS
-- **下一候选动作**：补齐 WeChat DevTools/真机 offline no-replay、生产 bundle 无第三方 SDK、处理主体/位置/用户说明证据；不启动 C-016
+- **下一候选动作**：补 iOS 微信精确版本与 Android no-replay；绑定实际生产 origin/image/manifest；完成处理主体、位置/受托方/跨境与最终用户说明审核；不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-02 外部证据补齐进度
 
 - 项目所有者已授权 Agent 准备 C-015 剩余证据，并在微信开发者工具中提供“见见今天”的既有 AppID；AppID 只用于本机忽略配置和 IDE 项目，不写入仓库或证据正文；
-- 微信开发者工具 `Stable v2.01.2510290` 已导入并运行当前项目，基础库为 `3.7.12`；自动 runner 因 IDE 本地服务端口未开启继续返回 `MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT`，等待 owner 明确允许开启该安全相关设置；iOS/Android offline no-replay 仍未执行；
+- 微信开发者工具 `Stable v2.01.2510290` / 基础库 `3.7.12` 已通过 11 路由 smoke；owner 明确允许后仅开启本地服务端口，登录票据、默认信任和多端插件端口保持关闭；增强 no-replay runner 证明 `dimensions_expanded` 的 restart replay=`0`、fresh signal=`1`、storage keyword/digest change=`0`，完成后服务端口已恢复关闭；
+- iPhone 17 / iOS 26.5 使用 ENT-001 真机调试和只接收合成 `landing_viewed` 的临时 HTTPS recorder：正向通路先验证，正式清零后离线重启=`0`、恢复网络缓存恢复=`0`、显式新调试刷新产生正向事件；AppID 未持久化，私有 `urlCheck` 已恢复 `true`，Quick Tunnel 与 recorder 已终止；微信精确版本和 Android 证据仍 Pending；
 - 当前 head 的 LOCAL 候选 bundle build、Mini Program bundle Gate、C-015 analytics static test、已构建产物与 lockfile 禁止 SDK 名称扫描均通过；使用 Node `24.18.0` 生成的 supply-chain evidence 为 `5406` 个 build files、`750` 个 SBOM packages，artifact scanner PASS；这些结果未绑定实际 PRODUCTION API origin 或生产 OCI image，不能升级为生产 bundle PASS；
 - 2026-09-02 npm 官方 audit 新报告 transitive optional `mysql2@3.15.3` 的 high advisory `GHSA-3f6p-5ww8-9rcr`；当前分支用最小 override `mysql2@3.22.0` 修复，复核为 `critical=0/high=0`，完整自动 Gate 已在 `9022e5b` 通过；
 - 首次修复 head `284f707` 的 CI 暴露 C-014 固定 2026-08-25 业务时钟与 queue `now()` 混用，导致 2026-09-02 后 status retention 抢先；`9022e5b` 为 due query 增加默认服务端当前时间、测试可注入的 `asOf`，真实 PostgreSQL 18 回归和 CI db-integration 均通过；
 - `9022e5b` 的 CI run `33579547592` 为 11/11 SUCCESS，覆盖 docs/static/unit-contract/db/queue/API/Admin/resilience/AI/supply-chain/full Gate；这些自动证据仍不替代 DevTools/真机和 Privacy/Legal 人工证据；
 - GitHub 当前只有 `development` environment，仓库和该环境均无 Actions variable/secret；没有可绑定的 STAGING/PRODUCTION API origin、生产 image set 或 Release Manifest；
-- 仍需 owner 提供或确认：允许开启 DevTools 本地服务端口、可供真机访问的合成 HTTPS backend、iOS/Android 测试设备，以及实际处理主体、生产组件/受托方/region/跨境矩阵和最终用户说明 reviewer。
+- 本地脱敏 receipt 为 `.artifacts/c015/evidence-receipt.json`，SHA-256=`6483c63f9fe1a1b905f99212e1d7a24528ebe8782153342bb51026c0f4e9d5d9`；该 ignored artifact 不替代 tracked 摘要、owner 接受或 CI；
+- 仍需 owner 提供或确认：iOS 微信精确版本、Android 设备，以及实际处理主体、生产组件/受托方/region/跨境矩阵、最终用户说明和 Privacy/Legal reviewer。
 
 ## Post-merge receipt
 
@@ -31,7 +33,7 @@
 - merge commits：#157 `4ac2009b`、#158 `38138a78`、#159 `aad63032`、#160 `873bcc24`、#161 `7d6d5cb9`、#162 `2e8935ed`、#163 `812595cf`、#164 `0ee0e66c`、#165 `90e8e23c`、#166 `6ee5e9fd`、#167 `2fa0df61`、#168 `d7411c18`、#169 `fec5c96d`；
 - 最终 PR #169 exact head `453eb55504dab35209c0886eefede51342547199`，CI run `33373613585` 11/11 SUCCESS；merged-main CI run `33374088290` 11/11 SUCCESS；
 - 一次性 merge window 完成后，repository `allow_merge_commit=false` 已恢复；main ruleset `21080906` 已恢复 deletion、non-fast-forward、required-linear-history、squash-only、11 strict checks、空 bypass；
-- post-merge 状态与证据通过 docs-only Draft PR #170 提交；该 PR 不改变业务行为，也不解除 C-015 blocker；
+- post-merge 状态最初通过 docs-only Draft PR #170 提交；owner 后续授权在同一 C-015 PR 完成证据准备、供应链 high 修复和固定时钟回归，PR 继续保持 Draft 且不解除剩余人工/生产 blocker；
 - C-004～C-014 Issues #56/#57/#58/#59/#62/#60/#61/#63/#64/#70/#65 均已 CLOSED 并附 merge receipt；C-015 Issue #68 因外部证据 Pending 保持 OPEN；
 - owner 代码与 differential-query/four-plane threat-boundary 审核已通过；外部/真机证据仍 Pending，因此当前任务不标记 Done，Production/RC 保持 `NO_GO`。
 
