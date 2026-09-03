@@ -2,24 +2,25 @@
   "evidence_version": "e-017-dev-lite-manual-evidence-v1",
   "task_id": "E-017",
   "issue": "https://github.com/WeiHan1996/DailyEnergy/issues/171",
-  "pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/172",
-  "branch": "agent/e017-dev-lite",
+  "pull_request": "PENDING_HOST_EVIDENCE_PR",
+  "implementation_pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/172",
+  "branch": "agent/e017-dev-lite-host-evidence",
   "stacked_base_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/170",
   "owner_decision": "ACCEPTED_2026-09-03 / DEV_LITE / SYNTHETIC_ONLY / PRODUCTION_AND_RC_NO_GO",
   "pass_claim": "PROHIBITED_UNTIL_REAL_HOST_EXERCISE_COMPLETES",
   "host_admission": {
-    "status": "PARTIAL_READ_ONLY_PASS / BOOTSTRAP_PENDING",
+    "status": "BOOTSTRAP_PASS / FRESH_SECRET_PENDING",
     "provider_region": "ALIBABA_CLOUD / CHINA_EAST_2_SHANGHAI",
     "console_security_verification": "COMPLETED_2026-09-03",
     "host_identity": "LOCAL_ONLY / PUBLIC_IP_INSTANCE_ID_AND_HOST_KEY_NOT_TRACKED",
     "ssh_key_pair": "IMPORTED_BOUND_AND_NORMAL_RESTARTED / ROOT_BATCHMODE_PASS",
     "os_arch": "UBUNTU_24_04_4 / X86_64 / PASS",
-    "capacity": "2_CPU / MEMTOTAL_1651684_KB / ROOT_40_GIB / FREE_APPROX_35_GIB",
+    "capacity": "2_CPU / MEMTOTAL_1651684_KB / ROOT_40_GIB / FREE_34187255808_BYTES_AFTER_BOOTSTRAP",
     "time": "ASIA_SHANGHAI / NTP_SYNCHRONIZED / PASS",
-    "swap": "PENDING / OBSERVED_ZERO",
-    "docker": "PENDING / NOT_INSTALLED",
-    "compose": "PENDING / NOT_INSTALLED",
-    "firewall": "PENDING_HARDENING / UFW_INACTIVE / ONLY_SSH_OBSERVED_LISTENING"
+    "swap": "PASS / 2097148_KIB_TOTAL_AND_FREE / PERSISTENT_SWAPFILE",
+    "docker": "PASS / 29.7.2 / ACTIVE_AND_ENABLED / ZERO_CONTAINERS_ZERO_IMAGES",
+    "compose": "PASS / 5.5.0",
+    "firewall": "PASS / UFW_ACTIVE / SSH_22_ONLY / PROTECTED_PORTS_NOT_LISTENING"
   },
   "automated_evidence": {
     "release_manifest_v2": "PASS / T-E017-MANIFEST-001",
@@ -30,16 +31,25 @@
     "local_synthetic_object": "PASS / T-E017-LOCAL-OBJECT-001 / LOCAL_ONLY",
     "preflight": "PASS / T-E017-PREFLIGHT-001",
     "bundle_v3": "PASS / T-E017-BUNDLE-001",
+    "runtime_fingerprint_parity": "PASS / STANDARD_AND_DEV_LITE / COMPILED_API_VS_DEPLOYMENT_HELPER",
     "transition_and_rollback": "PASS / T-E017-MANIFEST-001 / T-E017-DEPLOY-001",
-    "task_gate": "AUTOMATED_PASS / FULL_SECURITY_GATE / MANUAL_EVIDENCE_REQUIRED"
+    "task_gate": "AUTOMATED_PASS_AFTER_RUNTIME_FINGERPRINT_FIX / FULL_SECURITY_GATE / MANUAL_EVIDENCE_REQUIRED"
   },
   "pull_request_ci": {
-    "status": "EXACT_HEAD_11_OF_11_SUCCESS / FORMAL_MERGE_VERIFIER_PENDING_DRAFT_STACKED_BASE",
-    "head_sha": "7923c84520608dfd8a81e4b20d6a3fad1cf59c16",
-    "run_id": "33720679810"
+    "status": "IMPLEMENTATION_EXACT_HEAD_VERIFIED_AND_MERGED / MERGED_MAIN_11_OF_11_SUCCESS",
+    "head_sha": "1be36235bf3050b3d0925c2fabfdd1319336ff6f",
+    "run_id": "33737332264",
+    "merge_sha": "9db168528ffc9e25e476f6390be85c9403dc7252",
+    "merged_main_run_id": "33737657223"
+  },
+  "publication": {
+    "first_run_id": "33738800444",
+    "first_run_status": "REJECTED / DEV_RUNTIME_IMAGE_PROBE_INVALID_API_DEPLOY_CONFIG / NO_BUNDLE_UPLOADED",
+    "first_run_images": "FIVE_ROLE_TAGS_PUSHED_BUT_PROHIBITED_FROM_INSTALL_OR_DEPLOY",
+    "replacement_run": "PENDING_AFTER_FIX_MERGE"
   },
   "real_host_exercise": {
-    "immutable_bundle": "PENDING_MAIN_BOUND_PUBLICATION",
+    "immutable_bundle": "PENDING_VALID_REPUBLICATION",
     "fresh_state_and_seed": "PENDING",
     "deploy_phases": "PENDING",
     "reconcile_phases": "PENDING",

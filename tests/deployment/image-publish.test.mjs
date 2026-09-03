@@ -577,6 +577,29 @@ test("T-E012-IMAGE-001 binds runtime fingerprints and CI supply evidence to the 
           assert.equal(environment.NODE_OPTIONS, "");
           return "2026b";
         }
+        if (arguments_.join(" ").includes("runtime-config")) {
+          assert.deepEqual(
+            {
+              redisKeyPrefix: environment.DAILYENERGY_REDIS_KEY_PREFIX,
+              redisUrl: environment.DAILYENERGY_REDIS_URL,
+              telemetryEnabled: environment.DAILYENERGY_TELEMETRY_ENABLED,
+              telemetryMetricsHost:
+                environment.DAILYENERGY_TELEMETRY_METRICS_HOST,
+              telemetryMetricsPort:
+                environment.DAILYENERGY_TELEMETRY_METRICS_PORT,
+              telemetryOtlpTraceUrl:
+                environment.DAILYENERGY_TELEMETRY_OTLP_TRACE_URL,
+            },
+            {
+              redisKeyPrefix: "dailyenergy-dev",
+              redisUrl: "redis://redis:6379",
+              telemetryEnabled: "false",
+              telemetryMetricsHost: "0.0.0.0",
+              telemetryMetricsPort: "9464",
+              telemetryOtlpTraceUrl: "http://collector:4318/v1/traces",
+            },
+          );
+        }
         return arguments_.join(" ").includes("runtime-config")
           ? JSON.stringify({
               capabilityFingerprint: "a".repeat(64),
@@ -929,6 +952,16 @@ test("T-E017-BUNDLE-001 builds and installs V3 DEV_LITE without COS material", a
   );
   assert.equal(releaseManifest.manifest_version, "ReleaseManifestV2");
   assert.equal(releaseManifest.config.deployment_profile, "DEV_LITE");
+  assert.equal(
+    releaseManifest.config.runtime_fingerprints.api_deploy_config,
+    apiDeployConfigFingerprint(releaseManifest.release_id, {
+      deploymentProfile: "DEV_LITE",
+    }),
+  );
+  assert.notEqual(
+    releaseManifest.config.runtime_fingerprints.api_deploy_config,
+    apiDeployConfigFingerprint(releaseManifest.release_id),
+  );
   assert.equal(releaseManifest.topology.production_eligible, false);
   assert.equal(JSON.stringify(releaseManifest).includes("cos_secret"), false);
   assert.equal(

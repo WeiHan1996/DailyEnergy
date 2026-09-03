@@ -170,7 +170,9 @@ export function materializeDevelopmentRelease({
       product_date_policy_version: "product-date-v1",
       runtime_fingerprints: {
         ...runtimeEvidence.fingerprints,
-        api_deploy_config: apiDeployConfigFingerprint(materializedReleaseId),
+        api_deploy_config: apiDeployConfigFingerprint(materializedReleaseId, {
+          deploymentProfile: developmentLite ? "DEV_LITE" : "STANDARD",
+        }),
         object_config: objectConfig.config_sha256,
       },
       secret_ref_versions: {

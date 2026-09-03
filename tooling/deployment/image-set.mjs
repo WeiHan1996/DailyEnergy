@@ -241,7 +241,12 @@ export function validateManifestRuntimeEvidence(
     Object.entries(runtimeEvidence.fingerprints).some(([name, fingerprint]) =>
       name === "api_deploy_config"
         ? manifest.config.runtime_fingerprints[name] !==
-          apiDeployConfigFingerprint(manifest.release_id)
+          apiDeployConfigFingerprint(manifest.release_id, {
+            deploymentProfile:
+              manifest.config.deployment_profile === "DEV_LITE"
+                ? "DEV_LITE"
+                : "STANDARD",
+          })
         : manifest.config.runtime_fingerprints[name] !== fingerprint,
     )
   ) {

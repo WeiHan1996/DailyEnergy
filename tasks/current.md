@@ -4,15 +4,15 @@
 - **最后更新**：2026-09-03
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：E-017 — 2C2G DEV_LITE 可回滚部署
-- **任务状态**：In Review（owner threat-boundary 审核通过；PR #170 已合并，#172 正在更新 main 基线，final CI/verifier/merge 与真实部署 Pending）
+- **任务状态**：In Progress（PR #170/#172 已验证并合并；main-bound publication、阿里云 bootstrap 与真实部署证据进行中）
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
-- **工作分支**：`agent/e017-dev-lite`
+- **工作分支**：`agent/e017-dev-lite-host-evidence`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：[E-017 PR #172](https://github.com/WeiHan1996/DailyEnergy/pull/172)；base 已改为 `main`，implementation commit `ea5d479a2285afeed33bcabd867e7ed61da6e49`；stacked head `3efb67f8e2a616022933e26ac4dfe75b686870f1` 的 CI run `33721033780` 为 11/11 SUCCESS，合并 main 后的新 head/CI/verifier Pending
+- **当前 PR**：Pending（真实主机 evidence 分支尚未推送）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
-- **合并状态**：main head `0de26bf56f226246825a9a34fdd2a8967574dcda`，CI run `33736831445` 11/11 SUCCESS；E-017 尚未进入 main
-- **下一候选动作**：完成 #172 的 main merge commit、final 11/11 与 exact-head verifier 后 squash 合并；merged-main CI 通过后生成 main-bound immutable bundle 并执行真实主机演练
+- **合并状态**：main head `9db168528ffc9e25e476f6390be85c9403dc7252`，CI run `33737657223` 11/11 SUCCESS；E-017 实现已进入 main，任务仍等待真实主机证据
+- **下一候选动作**：触发 main-bound `Publish DEV images`，完成阿里云 DEV_LITE bootstrap、fresh deploy/reconcile/N→N+1/rollback/redeploy/soak，并提交脱敏 host evidence
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-03 E-017 启动
@@ -24,6 +24,11 @@
 - 约 1.6 GiB 实际 RAM 禁止九服务常驻：只保留 PostgreSQL、Redis、dependency stub、API、TLS core；Admin、Interactive、Background、Restricted 与一次性 job 按锁保护的窗口逐个启动并立即停止；swap 仅作突发缓冲，不替代资源预算；
 - 不复制腾讯云 DEV volume、dump、release state、object、secret 或 credential；服务器不 checkout、不现场 build，只接受 main-bound、同 run CI 通过且 digest 固定的 bundle；
 - 只读安全审查发现并修复旧 bundle 安装、跨 topology dirty state、阶段 service set/one-shot、pull recovery 与 Admin TLS 边界；Node 24.18.0 与官方 npm registry 下，最终 `pnpm agent:validate --mode=full --task=E-017` 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`，部署测试 `74/74`，Source registry 为 `1004 total / 538 COVERED / 466 PLANNED`；Gate 生成的 15 个 Prisma 非语义格式副作用已按 owner 授权恢复；
+- owner 已审核通过 PR #172 的 DEV_LITE threat boundary，并授权依赖顺序合并 #170/#172；两者均经正式 exact-head verifier、squash merge 与 merged-main 11/11。owner 另行授权触发 `main@9db16852` publication，并对阿里云空实例创建 2 GiB swap、安装 Docker/Compose 和固定 Node、启用仅 SSH 入站 UFW、创建 fresh synthetic secrets；继续禁止腾讯云状态/凭据迁移、公网 80/443 和 Production/RC；
+- E-017 implementation PR #172 已在 exact head `1be36235bf3050b3d0925c2fabfdd1319336ff6f` / CI run `33737332264` / 11 checks 验证后 squash 合并为 `9db168528ffc9e25e476f6390be85c9403dc7252`；merged-main CI run `33737657223` 11/11 SUCCESS；
+- main-bound publication run `33738800444` 已通过 source/CI gate 并推送五个 role image，但真实 image probe 以 `DEV_RUNTIME_IMAGE_PROBE_INVALID:api-deploy-config` 拒绝，未生成或上传 bundle；根因是 E-013 后 Redis/telemetry fingerprint 字段未同步，且 DEV_LITE prefix 需要 profile 绑定。该 run 的 tag 禁止安装/部署，修复必须重新走完整 PR/main Gate 后产生新 run；
+- 阿里云 bootstrap 已完成：2 GiB persistent swap、Docker `29.7.2`、Compose `5.5.0`、固定 Node `24.18.0`；UFW active 且仅允许 SSH，Docker active/enabled、零容器/零镜像，`/srv/dailyenergy` 仍不存在，受保护端口无非 loopback 监听；Docker 官方 CDN 在上海 reset 后改用 Docker 官方签名 key 验证的阿里云 Docker CE 镜像完成安装；
+- runtime fingerprint 修复已将 Redis/telemetry 字段与 STANDARD/DEV_LITE prefix 绑定到 deployment helper、image probe、materializer 与 manifest validator；编译后 API parity 为 2/2，部署测试 `74/74`，Node 24.18.0 + 官方 npm registry 下 full security Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；本次 15 个 Prisma 非语义生成副作用已按 owner 授权恢复；
 - 在 E-017 完成和返回 C-015 前，不启动 C-016；C-015 的生产 bundle、主体/位置/受托方/跨境和 Legal review 继续阻塞 Production/RC。
 
 ## 2026-09-02～09-03 外部证据补齐进度

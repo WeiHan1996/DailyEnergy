@@ -39,8 +39,14 @@ export function developmentReleaseId({
   return `dev-${commitSha.slice(0, 12)}-${publicationRunId}-${publicationRunAttempt}`;
 }
 
-export function apiDeployConfigFingerprint(releaseId) {
-  if (!RELEASE_ID.test(releaseId ?? "")) {
+export function apiDeployConfigFingerprint(
+  releaseId,
+  { deploymentProfile = "STANDARD" } = {},
+) {
+  if (
+    !RELEASE_ID.test(releaseId ?? "") ||
+    !["DEV_LITE", "STANDARD"].includes(deploymentProfile)
+  ) {
     fail("DEV_RUNTIME_CONTEXT_INVALID", "api-release-id");
   }
   return createHash("sha256")
@@ -55,9 +61,18 @@ export function apiDeployConfigFingerprint(releaseId) {
         maintenance_mode: "OFF",
         port: 3000,
         product_date_policy_version: "product-date-v1",
+        redis_key_prefix:
+          deploymentProfile === "DEV_LITE"
+            ? "dailyenergy-dev-lite"
+            : "dailyenergy-dev",
+        redis_url: "redis://redis:6379",
         release_id: releaseId,
         runtime_profile: "API",
         shutdown_grace_ms: 5000,
+        telemetry_enabled: false,
+        telemetry_metrics_host: "0.0.0.0",
+        telemetry_metrics_port: 9464,
+        telemetry_otlp_trace_url: "http://collector:4318/v1/traces",
       }),
     )
     .digest("hex");
@@ -241,6 +256,11 @@ export async function collectDevRuntimeEvidence(
           DAILYENERGY_RELEASE_ID: releaseId,
           DAILYENERGY_RUNTIME_PROFILE: "API",
           DAILYENERGY_SHUTDOWN_GRACE_MS: "5000",
+          DAILYENERGY_TELEMETRY_ENABLED: "false",
+          DAILYENERGY_TELEMETRY_METRICS_HOST: "0.0.0.0",
+          DAILYENERGY_TELEMETRY_METRICS_PORT: "9464",
+          DAILYENERGY_TELEMETRY_OTLP_TRACE_URL:
+            "http://collector:4318/v1/traces",
         },
       ),
     );
