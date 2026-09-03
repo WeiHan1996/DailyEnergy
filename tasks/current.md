@@ -9,7 +9,7 @@
 - **工作分支**：`agent/c015-post-merge-handoff`
 - **修复基线**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)，remote head `fd04b787926127bda64fc6cb07cfcf356d85ed8b`，CI run `33323476723` 11/11 SUCCESS
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
-- **当前 PR**：[C-015 外部证据准备 Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170)；base=`main`，verified implementation head `9022e5b713d838196c14e6280d481f444e65cb15`，CI run `33579547592` 11/11 SUCCESS
+- **当前 PR**：[C-015 外部证据准备 Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170)；base=`main`，verified implementation head `9022e5b713d838196c14e6280d481f444e65cb15`，CI run `33579547592` 11/11 SUCCESS；latest evidence/security head `d1997f2e2e84feec91d7c4f07821f421c9f69da4`，CI run `33698970649` 11/11 SUCCESS
 - **合并状态**：main head `fec5c96d368f8d4427ecca861f8ce42adad7a270`，CI run `33374088290` 11/11 SUCCESS
 - **下一候选动作**：执行 Android no-replay；修复并绑定实际生产 origin/image/manifest；完成处理主体、位置/受托方/跨境与最终用户说明审核；不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
@@ -22,7 +22,7 @@
 - Android 设备已确认为 Xiaomi MIX 2S / Android 10 / MIUI 12.5.1 / 微信 `8.0.76`；2026-09-03 已构建 STAGING 合成包并生成 Android 真机调试二维码，但 DevTools session 持续报告微信 websocket 域名解析失败且未建立真机会话；模拟器产生的两条正向事件已排除，no-replay 仍为 `INFRA_BLOCKED / PENDING_EXECUTION`，Quick Tunnel 与 recorder 已终止并恢复 LOCAL 配置；
 - 当前 head 的 LOCAL 候选 bundle build、Mini Program bundle Gate、C-015 analytics static test、已构建产物与 lockfile 禁止 SDK 名称扫描均通过；使用 Node `24.18.0` 生成的 supply-chain evidence 为 `5406` 个 build files、`750` 个 SBOM packages，artifact scanner PASS；这些结果未绑定实际 PRODUCTION API origin 或生产 OCI image，不能升级为生产 bundle PASS；
 - 2026-09-02 npm 官方 audit 新报告 transitive optional `mysql2@3.15.3` 的 high advisory `GHSA-3f6p-5ww8-9rcr`；当前分支用最小 override `mysql2@3.22.0` 修复，复核为 `critical=0/high=0`，完整自动 Gate 已在 `9022e5b` 通过；
-- 2026-09-03 npm 官方 audit 新报告 transitive optional `fast-uri@3.1.5` 的四个 high advisory（`GHSA-5jgf-p345-68v8`、`GHSA-f65p-4m7j-42xc`、`GHSA-fph4-wmhf-6fwf`、`GHSA-jqff-g426-hqxp`）；当前分支将既有最小 override 提升到 `fast-uri@3.1.6`，唯一生产解析版本与 frozen lockfile 策略通过，官方 audit 复核为 `critical=0/high=0`；Node `24.18.0` 下 `changed→full` Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；
+- 2026-09-03 npm 官方 audit 新报告 transitive optional `fast-uri@3.1.5` 的四个 high advisory（`GHSA-5jgf-p345-68v8`、`GHSA-f65p-4m7j-42xc`、`GHSA-fph4-wmhf-6fwf`、`GHSA-jqff-g426-hqxp`）；当前分支将既有最小 override 提升到 `fast-uri@3.1.6`，唯一生产解析版本与 frozen lockfile 策略通过，官方 audit 复核为 `critical=0/high=0`；Node `24.18.0` 下 `changed→full` Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`，exact-head CI run `33698970649` 为 11/11 SUCCESS；
 - 首次修复 head `284f707` 的 CI 暴露 C-014 固定 2026-08-25 业务时钟与 queue `now()` 混用，导致 2026-09-02 后 status retention 抢先；`9022e5b` 为 due query 增加默认服务端当前时间、测试可注入的 `asOf`，真实 PostgreSQL 18 回归和 CI db-integration 均通过；
 - `9022e5b` 的 CI run `33579547592` 为 11/11 SUCCESS，覆盖 docs/static/unit-contract/db/queue/API/Admin/resilience/AI/supply-chain/full Gate；这些自动证据仍不替代 DevTools/真机和 Privacy/Legal 人工证据；
 - GitHub 当前只有 `development` environment，仓库和该环境均无 Actions variable/secret；没有可绑定的 STAGING/PRODUCTION API origin、生产 image set 或 Release Manifest；
