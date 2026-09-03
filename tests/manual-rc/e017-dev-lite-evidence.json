@@ -2,6 +2,7 @@
   "evidence_version": "e-017-dev-lite-manual-evidence-v1",
   "task_id": "E-017",
   "issue": "https://github.com/WeiHan1996/DailyEnergy/issues/171",
+  "pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/172",
   "branch": "agent/e017-dev-lite",
   "stacked_base_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/170",
   "owner_decision": "ACCEPTED_2026-09-03 / DEV_LITE / SYNTHETIC_ONLY / PRODUCTION_AND_RC_NO_GO",
