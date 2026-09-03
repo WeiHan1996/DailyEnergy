@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-08-31
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：[C-015 统一审核修复](./current.md)：owner 已批准一次性 main ruleset/merge setting 变更；等待 #157～#169 受控 exact-head merge commit 与外部证据
+- **当前任务**：[C-015 统一审核修复](./current.md)：#157～#169 已合入 main，ruleset 已恢复；[Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 记录 merge 收据；C-015 等待外部/真机证据
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -200,25 +200,25 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 ### 5.2 确定性核心实现
 
-| ID                                                           | 任务               | 状态        | 主要结果                                                                                                        |
-| ------------------------------------------------------------ | ------------------ | ----------- | --------------------------------------------------------------------------------------------------------------- |
-| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Done        | 安全会话与身份边界；PR #147 合并为 `505a926`                                                                    |
-| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Done        | 最小授权和可修改资料；PR #152 合并为 `56695b5`                                                                  |
-| [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | Done        | 称呼和表达偏好；PR #154 合并为 `bd00fbe`                                                                        |
-| [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | In Review   | [Draft PR #157](https://github.com/WeiHan1996/DailyEnergy/pull/157)；等待 C-015 后统一审核                      |
-| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | In Review   | [Draft PR #158](https://github.com/WeiHan1996/DailyEnergy/pull/158)；等待统一审核                               |
-| [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎           | In Review   | [Draft PR #159](https://github.com/WeiHan1996/DailyEnergy/pull/159)；等待统一审核                               |
-| [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容       | In Review   | [Draft PR #160](https://github.com/WeiHan1996/DailyEnergy/pull/160)；等待统一审核                               |
-| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | In Review   | [Draft PR #161](https://github.com/WeiHan1996/DailyEnergy/pull/161)；等待统一审核                               |
-| [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面       | In Review   | [Draft PR #162](https://github.com/WeiHan1996/DailyEnergy/pull/162)；等待统一审核                               |
-| [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务           | In Review   | [Draft PR #163](https://github.com/WeiHan1996/DailyEnergy/pull/163)；等待统一审核                               |
-| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | In Review   | [Draft PR #164](https://github.com/WeiHan1996/DailyEnergy/pull/164)；等待统一审核                               |
-| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈           | In Review   | [Draft PR #165](https://github.com/WeiHan1996/DailyEnergy/pull/165)；final-head 11/11 CI；等待统一审核          |
-| [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势           | In Review   | [Draft PR #166](https://github.com/WeiHan1996/DailyEnergy/pull/166)；final-head 11/11 CI；等待统一审核          |
-| [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | In Review   | [Draft PR #167](https://github.com/WeiHan1996/DailyEnergy/pull/167)；final-head 11/11 CI；等待统一审核          |
-| [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 统一审核修复       | In Progress | owner 已批准临时 ruleset 变更；等待 #157～#169 exact-head merge commit；外部证据 Pending，Production/RC `NO_GO` |
-| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Planned     | 首次到七天全路径                                                                                                |
-| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | Planned     | 不依赖 AI 完成核心闭环                                                                                          |
+| ID                                                           | 任务               | 状态    | 主要结果                                                                             |
+| ------------------------------------------------------------ | ------------------ | ------- | ------------------------------------------------------------------------------------ |
+| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Done    | 安全会话与身份边界；PR #147 合并为 `505a926`                                         |
+| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Done    | 最小授权和可修改资料；PR #152 合并为 `56695b5`                                       |
+| [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | Done    | 称呼和表达偏好；PR #154 合并为 `bd00fbe`                                             |
+| [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | Done    | PR #157 merge commit `4ac2009b`；统一审核通过                                        |
+| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | Done    | PR #158 merge commit `38138a78`；统一审核通过                                        |
+| [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎           | Done    | PR #159 merge commit `aad63032`；统一审核通过                                        |
+| [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容       | Done    | PR #160 merge commit `873bcc24`；统一审核通过                                        |
+| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | Done    | PR #161 merge commit `7d6d5cb9`；统一审核通过                                        |
+| [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面       | Done    | PR #162 merge commit `2e8935ed`；统一审核通过                                        |
+| [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务           | Done    | PR #163 merge commit `812595cf`；统一审核通过                                        |
+| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | Done    | PR #164 merge commit `0ee0e66c`；统一审核通过                                        |
+| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈           | Done    | PR #165 merge commit `90e8e23c`；统一审核通过                                        |
+| [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势           | Done    | PR #166 merge commit `6ee5e9fd`；统一审核通过                                        |
+| [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | Done    | PR #167 merge commit `2fa0df61`；统一审核通过                                        |
+| [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 统一审核修复       | Blocked | PR #168/#169 merged；实现/威胁审核通过；外部/真机证据 Pending，Production/RC `NO_GO` |
+| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Planned | 首次到七天全路径                                                                     |
+| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | Planned | 不依赖 AI 完成核心闭环                                                               |
 
 ## 6. Phase 3：AI 陪伴层
 

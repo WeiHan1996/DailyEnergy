@@ -448,6 +448,7 @@ export class PostgresQueueStore {
 
   async listDataTasksDue(
     limit: number,
+    asOf: Date = new Date(),
   ): Promise<readonly VersionedJobEnvelope[]> {
     this.#assertProfile("worker-restricted");
     const result = await this.#pool.query<{
@@ -468,26 +469,27 @@ export class PostgresQueueStore {
           WHERE task."activeSlot" IS TRUE
             AND task.state IN ('QUEUED','RUNNING','FAILED')
             AND account.state<>'DELETED'
-            AND (task."expiresAt" IS NULL OR task."expiresAt">now())
+            AND (task."expiresAt" IS NULL OR task."expiresAt">$2::timestamptz)
             AND (task.kind='EXPORT' OR guard.id IS NOT NULL)
          UNION ALL
          SELECT task.id,task.revision,status_grant."expiresAt",NULL::text,
                 'DataRightsRetentionDue',0
            FROM daily_energy.restricted_deletion_status_grant status_grant
            JOIN daily_energy.restricted_data_task task ON task.id=status_grant."taskId"
-          WHERE status_grant."expiresAt"<=now()
+          WHERE status_grant."expiresAt"<=$2::timestamptz
          UNION ALL
          SELECT task.id,task.revision,manifest."expiresAt",NULL::text,
                 'DataRightsRetentionDue',0
            FROM daily_energy.restricted_export_manifest manifest
            JOIN daily_energy.restricted_data_task task ON task.id=manifest."taskId"
-          WHERE manifest.state='READY' AND manifest."expiresAt"<=now()
+          WHERE manifest.state='READY' AND manifest."expiresAt"<=$2::timestamptz
          UNION ALL
          SELECT task.id,task.revision,task."expiresAt",NULL::text,
                 'DataRightsRetentionDue',0
            FROM daily_energy.restricted_data_task task
           WHERE task.kind='EXPORT' AND task."activeSlot" IS NULL
-            AND task."expiresAt" IS NOT NULL AND task."expiresAt"<=now()
+            AND task."expiresAt" IS NOT NULL
+            AND task."expiresAt"<=$2::timestamptz
        ), selected AS (
          SELECT DISTINCT ON (id) id,revision,"requestedAt","deletionEpoch","eventType"
            FROM candidates
@@ -495,7 +497,7 @@ export class PostgresQueueStore {
        )
        SELECT id,revision,"requestedAt","deletionEpoch","eventType"
          FROM selected ORDER BY "requestedAt",id LIMIT $1`,
-      [limit],
+      [limit, asOf],
     );
     return result.rows.map((row) =>
       dueEnvelope(

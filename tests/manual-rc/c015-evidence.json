@@ -13,17 +13,17 @@
   "remediation_head": "6fdb3f5a9a868bdac4d8ab025ad8c9eaf29da2ed",
   "remediation_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/169",
   "remediation_implementation_ci_run": 33357480285,
-  "remediation_status_head": "405f3c29fc916cfb314f9a665e8093df57911bf6",
-  "remediation_final_ci_run": 33357978808,
+  "remediation_status_head": "453eb55504dab35209c0886eefede51342547199",
+  "remediation_final_ci_run": 33373613585,
   "remediation_final_ci_checks": "11/11 SUCCESS",
   "stack_merge_strategy": "MERGE_COMMIT_PRESERVE_ANCESTRY_OWNER_APPROVED",
   "stack_merge_strategy_head": "3d33a80df646097cc1fcef361e9c4a08703cd656",
   "stack_merge_strategy_ci_run": 33368423171,
   "stack_merge_strategy_ci_checks": "11/11 SUCCESS",
-  "repository_merge_commit_setting": "EXPLICITLY_APPROVED_TEMPORARY_CHANGE_PENDING",
+  "repository_merge_commit_setting": "RESTORED_FALSE_AFTER_SUCCESSFUL_MERGE_WINDOW",
   "ruleset_change_approved_at_utc": "2026-08-31T07:57:27Z",
   "ruleset_change_scope": "TEMPORARILY_REMOVE_REQUIRED_LINEAR_HISTORY_AND_ALLOW_ONLY_MERGE; PRESERVE_ALL_OTHER_RULES; RESTORE_ON_SUCCESS_OR_ABORT",
-  "merge_window_attempt": {
+  "initial_merge_window_attempt": {
     "pr_157_exact_head_verifier": "PASS / run 32456442334 / 11 checks",
     "merge_result": "REJECTED_BY_REQUIRED_LINEAR_HISTORY_AND_SQUASH_ONLY_RULESET",
     "pull_requests_merged": 0,
@@ -31,7 +31,47 @@
     "pr_157_restored_to_draft": true,
     "main_unchanged": "97b7181ea172f86d0ac3fe37af464f6bd0f169d8"
   },
-  "execution_status": "CONTROLLED_MERGE_WINDOW_APPROVED_EXTERNAL_EVIDENCE_PENDING",
+  "merge_window_receipt": {
+    "ruleset_id": 21080906,
+    "opened_at_utc": "2026-08-31T08:02:28Z",
+    "closed_at_utc": "2026-08-31T08:42:48Z",
+    "merge_method": "MERGE_COMMIT",
+    "pull_requests_merged": 13,
+    "merge_commits": {
+      "157": "4ac2009ba89f0309fc4e32245786cfa09fd82f81",
+      "158": "38138a78ec01a44437fb2a4fad739346d1e064f8",
+      "159": "aad63032f1ba44da7979b542344284c4f42616e2",
+      "160": "873bcc24a7782c99e98840d31cb2bcd0757a6229",
+      "161": "7d6d5cb94ef5c5a4473fd3225d154b52d90f48ae",
+      "162": "2e8935edb5b432188f874f6a408ea0f1df945894",
+      "163": "812595cf0127cc1c51a0702d0528a48a5c109ad7",
+      "164": "0ee0e66cf3e0c0872e782666a9a37792088700bf",
+      "165": "90e8e23c1f6b8afdd842d097d8f111f4c3d8bde0",
+      "166": "6ee5e9fd1f7a49e48afdd04b9623c72277effe22",
+      "167": "2fa0df61450cefa022ce8ad8dd0660335da39c3d",
+      "168": "d7411c184b27036d3ae9cf52d9e19806b798d81f",
+      "169": "fec5c96d368f8d4427ecca861f8ce42adad7a270"
+    },
+    "all_original_heads_are_main_ancestors": true,
+    "all_merge_commits_have_two_parents": true,
+    "final_main_head": "fec5c96d368f8d4427ecca861f8ce42adad7a270",
+    "merged_main_ci_run": 33374088290,
+    "merged_main_ci_checks": "11/11 SUCCESS",
+    "repository_allow_merge_commit_restored": false,
+    "ruleset_restored": "LINEAR_HISTORY / SQUASH_ONLY / 11 STRICT CHECKS / NO BYPASS"
+  },
+  "execution_status": "IMPLEMENTATION_MERGED_EXTERNAL_EVIDENCE_PENDING",
+  "post_merge_handoff": {
+    "branch": "agent/c015-post-merge-handoff",
+    "implementation_head": "047f9c2153c71f2473ce682a15012821b214f20f",
+    "pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/170",
+    "verified_status_head": "d1997f2e2e84feec91d7c4f07821f421c9f69da4",
+    "ci_run": 33698970649,
+    "ci_checks": "11/11 SUCCESS",
+    "completed_issues": [56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 70],
+    "open_issue": 68,
+    "status": "DRAFT_VERIFIED_STATUS_HEAD_CI_PASS"
+  },
   "pass_claim": "PROHIBITED",
   "synthetic_accounts_only": true,
   "accepted_scope": {
@@ -72,6 +112,126 @@
     "product_date_tzdb_audit": "ACTUAL_RUNTIME_RELEASE_BOUND_TO_RUNTIME_EVIDENCE_SUPPLY_DIGEST_AND_RELEASE_MANIFEST",
     "review_remediation": "C-004_THROUGH_C-015_REGRESSIONS_PASS"
   },
+  "evidence_preparation": {
+    "status": "IN_PROGRESS_PRODUCTION_LEGAL_PENDING",
+    "authorized_on": "2026-09-02",
+    "devtools": {
+      "version": "Stable v2.01.2510290",
+      "base_library_version": "3.7.12",
+      "existing_project_appid": "VERIFIED_LOCAL_ONLY_NOT_PERSISTED",
+      "project_import": "PASS",
+      "page_runtime": "PASS / SYS-003 rendered",
+      "automation": "PASS / 11 REGISTERED ROUTES",
+      "offline_no_replay": "PASS / DEVTOOLS_ENDPOINT_UNREACHABLE_NO_REPLAY",
+      "restart_replay_count": 0,
+      "fresh_dimensions_expanded_count": 1,
+      "storage_keyword_matches": 0,
+      "storage_digest_changes": 0,
+      "runner_sha256": "cd45cb561944b6e717d7029fed6bb920565cd8cab6f992b125855bced3c18b0d",
+      "local_service_port_after_test": "DISABLED",
+      "login_ticket_and_default_trust": "DISABLED"
+    },
+    "candidate_bundle": {
+      "environment": "LOCAL_ONLY",
+      "source_fingerprint": "f73bc61f8498cfdc16a02591bee4edf0bd8a1b9fa94db7aa1c9ced609baa2eb4",
+      "miniapp_bundle_gate": "PASS",
+      "analytics_static_test": "3/3 PASS",
+      "forbidden_sdk_name_matches": 0,
+      "build_output_files": 5406,
+      "sbom_packages": 750,
+      "artifact_scan": "CI RUN 33698970649 / SUPPLY-CHAIN PASS",
+      "production_binding": "PENDING / NO PRODUCTION API ORIGIN, OCI IMAGE SET OR RELEASE MANIFEST"
+    },
+    "ios_no_replay": {
+      "status": "EXECUTION_PASS",
+      "device": "iPhone 17",
+      "os_version": "iOS 26.5",
+      "wechat_version": "8.0.76",
+      "mode": "TRUE_DEVICE_DEBUG / ENT-001",
+      "staging_bundle_fingerprint": "d10ea8053a53c0fc05ef16a4423ec18a5b0ff4a04545e1befe717d84ee882a82",
+      "formal_offline_restart_count": 0,
+      "network_resume_without_new_load_count": 0,
+      "fresh_debug_reload": "POSITIVE_CONTROL_REACHED_RECORDER",
+      "temporary_domain_check": "GIT_IGNORED_ONLY / RESTORED_TRUE",
+      "temporary_tunnel": "TERMINATED / NOT_PRODUCTION_EVIDENCE",
+      "receipt_sha256": "b1ea6a47128af3bdb7353ff10fdac26df49bd15c22ee91df7b6e1c28efc5a582"
+    },
+    "android_no_replay": {
+      "status": "EXECUTION_PASS",
+      "device": "Xiaomi MIX 2S",
+      "os_version": "Android 10 / MIUI 12.5.1",
+      "wechat_version": "8.0.76",
+      "completed_at_utc": "2026-09-03T02:21:27Z",
+      "bundle_environment": "STAGING / SYNTHETIC_ONLY",
+      "bundle_source_fingerprint": "0e07142cd495e5d8ab7c3e4650e192a8c9649f85a89f3a0300863fa00188267a",
+      "debug_qr": "TRUE_DEVICE_DEBUG / ENT-001",
+      "devtools_session": "READY / PRIOR_WEBSOCKET_DNS_FAILURE_CLEARED_AFTER_RESTART",
+      "pre_reset_simulator_baseline": 1,
+      "positive_control_after_device_connect": 2,
+      "device_positive_delta": 1,
+      "formal_reset_count": 0,
+      "offline_restart_count": 0,
+      "network_resume_without_new_load_count": 0,
+      "explicit_reload_without_new_process_count": 0,
+      "cold_process_explicit_qr_count": 1,
+      "conclusion": "NO OFFLINE EVENT REPLAYED; EXPLICIT COLD-PROCESS QR LOAD REACHED RECORDER",
+      "temporary_tunnel": "TERMINATED / NOT_PRODUCTION_EVIDENCE",
+      "local_configuration_after_attempt": "URL_CHECK_TRUE / LOCAL_BUILD_RESTORED"
+    },
+    "production_readiness": {
+      "api_origin": "https://api.weihan.ltd",
+      "authoritative_dns": "VERIFIED_A_RECORD_PUBLISHED / NO_AAAA_OR_CNAME",
+      "public_https": "FAIL / TCP_443_TIMEOUT / TLS_HANDSHAKE_NOT_OBSERVED",
+      "public_http": "FAIL / TCP_80_TIMEOUT",
+      "legacy_tencent_host": "DEV_ONLY_EXPIRING",
+      "legacy_tencent_ssh": "READ_ONLY_AUDIT_PASS / DEV_ONLY_EXPIRING",
+      "legacy_tencent_runtime": "UBUNTU_24_04_X86_64 / 4_CPU / APPROX_8_GIB / 178_GIB / NTP_SYNC / DOCKER_AND_COMPOSE_PASS / 9_HEALTHY_SYNTHETIC_DEV_CONTAINERS",
+      "legacy_tencent_stateful_services": "LOCAL_DEV_POSTGRESQL_18_AND_REDIS_8 / NOT_PRODUCTION_ELIGIBLE",
+      "legacy_tencent_ingress": "HOST_80_443_NOT_LISTENING / UFW_OPENSSH_ONLY / TLS_PROXY_LOOPBACK_ONLY / PRODUCTION_SNI_FAIL",
+      "alibaba_host": "PURCHASED / DEV_LITE_CANDIDATE / ADR_PENDING / PRODUCTION_INELIGIBLE",
+      "alibaba_host_capacity": "UBUNTU_24_04 / 2_VCPU / 2_GIB / 40_GIB / 3_MBPS / SHANGHAI",
+      "alibaba_ssh": "PORT_22_AND_HOST_KEY_OBSERVED / EXISTING_PUBLIC_KEY_NOT_BOUND / ROOT_BATCHMODE_AUTH_REJECTED / HOST_UNMODIFIED",
+      "production_bundle_binding": "PENDING"
+    },
+    "dependency_audit_remediation": {
+      "advisory": "GHSA-3f6p-5ww8-9rcr",
+      "affected_resolution": "mysql2@3.15.3",
+      "fixed_resolution": "mysql2@3.22.0",
+      "post_fix_audit": "critical=0/high=0",
+      "full_gate": "CI RUN 33579547592 / 11 OF 11 SUCCESS"
+    },
+    "fast_uri_audit_remediation": {
+      "advisories": [
+        "GHSA-5jgf-p345-68v8",
+        "GHSA-f65p-4m7j-42xc",
+        "GHSA-fph4-wmhf-6fwf",
+        "GHSA-jqff-g426-hqxp"
+      ],
+      "affected_resolution": "fast-uri@3.1.5",
+      "fixed_resolution": "fast-uri@3.1.6",
+      "production_resolution_count": 1,
+      "frozen_lockfile_policy": "PASS",
+      "post_fix_audit": "critical=0/high=0",
+      "full_gate": "LOCAL CHANGED_TO_FULL AUTOMATED_PASS / CI RUN 33698970649 11 OF 11 SUCCESS / MANUAL_EVIDENCE_REQUIRED"
+    },
+    "database_due_time_remediation": {
+      "first_ci_head": "284f707f9534c51ff1818a3bd1efca1d3373dc03",
+      "first_ci_run": 33578319675,
+      "failure": "C014 REAL POSTGRESQL / RETENTION_NOT_DUE INSTEAD OF RESTRICTED_LEGAL_HOLD",
+      "root_cause": "FIXED BUSINESS CLOCK MIXED WITH DATABASE WALL CLOCK AFTER STATUS GRANT EXPIRY",
+      "fixed_head": "9022e5b713d838196c14e6280d481f444e65cb15",
+      "fixed_ci_run": 33579547592,
+      "fixed_ci_checks": "11/11 SUCCESS"
+    },
+    "external_inputs": {
+      "synthetic_https_backend": "EXECUTED_AND_TERMINATED / SYNTHETIC_ONLY",
+      "ios_device": "EXECUTION_PASS",
+      "android_device": "EXECUTION_PASS",
+      "processing_entity": "OWNER_INPUT_AND_JURISDICTION_CAPTURED_LOCALLY / PRIVACY_AND_LEGAL_REVIEW_PENDING",
+      "production_location_and_processors": "PENDING_PRIVACY_LEGAL_OWNER",
+      "final_user_notice": "PENDING_PRIVACY_LEGAL_OWNER"
+    }
+  },
   "security_review": {
     "status": "OWNER_CODE_AND_THREAT_REVIEW_APPROVED",
     "threat_boundary_review": "OWNER_APPROVED_2026-08-31",
@@ -90,7 +250,6 @@
       "client analytics identity cells, metrics M05/M19/M22 and count-free G01-G04 evidence use their accepted closed contracts"
     ],
     "residual_evidence": [
-      "WeChat DevTools network inspection confirming an offline signal is not persisted or replayed after restart",
       "production deployment inspection confirming no third-party analytics, BI, ad, replay or attribution SDK is bundled",
       "privacy/legal confirmation of the actual processing entity, production location and user notice",
       "production scheduler authorization and incident thresholds remain outside automated C-015 evidence"
@@ -98,8 +257,8 @@
     "production_authorization": "NOT_APPLICABLE / PRODUCTION_NO_GO"
   },
   "real_device": {
-    "ios_network_no_replay": "MANUAL_EVIDENCE_PENDING",
-    "android_network_no_replay": "MANUAL_EVIDENCE_PENDING"
+    "ios_network_no_replay": "EXECUTION_PASS",
+    "android_network_no_replay": "EXECUTION_PASS"
   },
   "reviewer": "project-owner",
   "reviewed_at_utc": "2026-08-31T06:30:54Z"

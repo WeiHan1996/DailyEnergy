@@ -394,7 +394,10 @@ test(
         )
       ).rows[0];
       assert.equal(guard.epoch, "1");
-      const due = await queue.listDataTasksDue(10);
+      const due = await queue.listDataTasksDue(
+        10,
+        new Date(baseNow.getTime() + 2_000),
+      );
       const dayEnvelope = due.find(
         (item) => item.aggregateRef === dayTask.task_ref,
       );
@@ -472,9 +475,9 @@ test(
         matterRef,
         now: new Date(baseNow.getTime() + 3_000),
       });
-      const matterDue = (await queue.listDataTasksDue(20)).find(
-        (item) => item.aggregateRef === matterTask.task_ref,
-      );
+      const matterDue = (
+        await queue.listDataTasksDue(20, new Date(baseNow.getTime() + 4_000))
+      ).find((item) => item.aggregateRef === matterTask.task_ref);
       assert.ok(matterDue);
       const matterHandler = restrictedAdapters
         .createDataTaskHandlers(() => new Date(baseNow.getTime() + 4_000))
@@ -605,9 +608,9 @@ test(
         frozenPayload: frozenRelationship,
         now: new Date(baseNow.getTime() + 6_000),
       });
-      const relationshipDue = (await queue.listDataTasksDue(20)).find(
-        (item) => item.aggregateRef === relationshipTask.task_ref,
-      );
+      const relationshipDue = (
+        await queue.listDataTasksDue(20, new Date(baseNow.getTime() + 7_000))
+      ).find((item) => item.aggregateRef === relationshipTask.task_ref);
       assert.ok(relationshipDue);
       const relationshipHandler = restrictedAdapters
         .createDataTaskHandlers(() => new Date(baseNow.getTime() + 7_000))
@@ -654,9 +657,9 @@ test(
         now: new Date(baseNow.getTime() + 8_001),
       });
       assert.equal(exportReplay.task_ref, exportTask.task_ref);
-      const exportDue = (await queue.listDataTasksDue(20)).find(
-        (item) => item.aggregateRef === exportTask.task_ref,
-      );
+      const exportDue = (
+        await queue.listDataTasksDue(20, new Date(baseNow.getTime() + 9_000))
+      ).find((item) => item.aggregateRef === exportTask.task_ref);
       assert.ok(exportDue);
       const exportHandler = restrictedAdapters
         .createDataTaskHandlers(() => new Date(baseNow.getTime() + 9_000))
@@ -740,9 +743,9 @@ test(
         fingerprint: bytes("c014-export-expiry"),
         now: new Date(baseNow.getTime() + 12_000),
       });
-      const expiryDue = (await queue.listDataTasksDue(20)).find(
-        (item) => item.aggregateRef === expiryTask.task_ref,
-      );
+      const expiryDue = (
+        await queue.listDataTasksDue(20, new Date(baseNow.getTime() + 13_000))
+      ).find((item) => item.aggregateRef === expiryTask.task_ref);
       assert.ok(expiryDue);
       assert.equal(
         (
@@ -763,9 +766,12 @@ test(
         expiryTask.task_ref,
         new Date(baseNow.getTime() + 13_500),
       );
-      const exportRetentionDue = (await queue.listDataTasksDue(20)).find(
-        (item) => item.aggregateRef === expiryTask.task_ref,
+      const retentionNow = new Date(
+        baseNow.getTime() + 13_000 + 24 * 60 * 60_000,
       );
+      const exportRetentionDue = (
+        await queue.listDataTasksDue(20, retentionNow)
+      ).find((item) => item.aggregateRef === expiryTask.task_ref);
       assert.ok(exportRetentionDue);
       assert.equal(exportRetentionDue.eventType, "DataRightsRetentionDue");
       assert.equal(
@@ -773,9 +779,7 @@ test(
           await consume(
             queue,
             restrictedAdapters
-              .createDataTaskHandlers(
-                () => new Date(baseNow.getTime() + 13_000 + 24 * 60 * 60_000),
-              )
+              .createDataTaskHandlers(() => retentionNow)
               .find((item) => item.eventType === "DataRightsRetentionDue"),
             exportRetentionDue,
           )
@@ -786,13 +790,13 @@ test(
         await rights.readExportArtifact({
           accountId: relationshipSession.accountId,
           downloadRef: expiringExport.export_artifact.download_ref,
-          now: new Date(baseNow.getTime() + 13_000 + 24 * 60 * 60_000),
+          now: retentionNow,
           taskRef: expiryTask.task_ref,
         }),
         { status: "EXPIRED" },
       );
       assert.equal(
-        (await queue.listDataTasksDue(20)).some(
+        (await queue.listDataTasksDue(20, retentionNow)).some(
           (item) => item.aggregateRef === exportTask.task_ref,
         ),
         false,
@@ -896,9 +900,9 @@ test(
         ).status,
         "REVOKED",
       );
-      const accountDue = (await queue.listDataTasksDue(10)).find(
-        (item) => item.aggregateRef === accountTask.task_ref,
-      );
+      const accountDue = (
+        await queue.listDataTasksDue(10, new Date(baseNow.getTime() + 6_000))
+      ).find((item) => item.aggregateRef === accountTask.task_ref);
       assert.ok(accountDue);
       const accountOwnerToken = (
         await admin.query(
@@ -972,9 +976,9 @@ test(
         BEFORE INSERT ON restricted_restore_deny_record
         FOR EACH ROW EXECUTE FUNCTION c014_fail_restricted_evidence();
       `);
-      const accountRetryDue = (await queue.listDataTasksDue(10)).find(
-        (item) => item.aggregateRef === accountTask.task_ref,
-      );
+      const accountRetryDue = (
+        await queue.listDataTasksDue(10, new Date(baseNow.getTime() + 7_000))
+      ).find((item) => item.aggregateRef === accountTask.task_ref);
       assert.ok(accountRetryDue);
       assert.notEqual(accountRetryDue.eventId, accountDue.eventId);
       assert.equal(accountRetryDue.aggregateRef, accountDue.aggregateRef);
@@ -1015,9 +1019,9 @@ test(
           ON restricted_restore_deny_record;
         DROP FUNCTION c014_fail_restricted_evidence();
       `);
-      const accountEvidenceRetryDue = (await queue.listDataTasksDue(10)).find(
-        (item) => item.aggregateRef === accountTask.task_ref,
-      );
+      const accountEvidenceRetryDue = (
+        await queue.listDataTasksDue(10, new Date(baseNow.getTime() + 8_000))
+      ).find((item) => item.aggregateRef === accountTask.task_ref);
       assert.ok(accountEvidenceRetryDue);
       assert.notEqual(accountEvidenceRetryDue.eventId, accountRetryDue.eventId);
       assert.equal(
