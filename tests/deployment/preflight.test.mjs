@@ -7,7 +7,10 @@ import {
 } from "../../tooling/deployment/preflight.mjs";
 import { devImageSetDigest } from "../../tooling/deployment/image-set.mjs";
 import { materializeDevelopmentRelease } from "../../tooling/deployment/materialize-dev-release.mjs";
-import { devRuntimeEvidenceDigest } from "../../tooling/deployment/runtime-evidence.mjs";
+import {
+  apiDeployConfigFingerprint,
+  devRuntimeEvidenceDigest,
+} from "../../tooling/deployment/runtime-evidence.mjs";
 import {
   DEVELOPMENT_LITE_OBJECT_FINGERPRINT,
   validateReleaseManifest,
@@ -42,7 +45,7 @@ function evidence(options = {}) {
     evidence_version: "DevRuntimeEvidenceV1",
     fingerprints: {
       api_capability: manifest.config.runtime_fingerprints.api_capability,
-      api_deploy_config: manifest.config.runtime_fingerprints.api_deploy_config,
+      api_deploy_config: apiDeployConfigFingerprint(manifest.release_id),
       worker_background: manifest.config.runtime_fingerprints.worker_background,
       worker_interactive:
         manifest.config.runtime_fingerprints.worker_interactive,
