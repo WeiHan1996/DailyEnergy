@@ -33,6 +33,11 @@
     "transition_and_rollback": "PASS / T-E017-MANIFEST-001 / T-E017-DEPLOY-001",
     "task_gate": "AUTOMATED_PASS / FULL_SECURITY_GATE / MANUAL_EVIDENCE_REQUIRED"
   },
+  "pull_request_ci": {
+    "status": "EXACT_HEAD_11_OF_11_SUCCESS / FORMAL_MERGE_VERIFIER_PENDING_DRAFT_STACKED_BASE",
+    "head_sha": "7923c84520608dfd8a81e4b20d6a3fad1cf59c16",
+    "run_id": "33720679810"
+  },
   "real_host_exercise": {
     "immutable_bundle": "PENDING_MAIN_BOUND_PUBLICATION",
     "fresh_state_and_seed": "PENDING",

@@ -4,15 +4,15 @@
 - **最后更新**：2026-09-03
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：E-017 — 2C2G DEV_LITE 可回滚部署
-- **任务状态**：In Review（Draft PR #172；本地 full Gate 自动 PASS，exact-head CI、owner 审核与真实部署 Pending）
+- **任务状态**：In Review（Draft PR #172；本地 full Gate 与 exact-head CI 11/11，owner 审核、正式 merge verifier 与真实部署 Pending）
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
 - **工作分支**：`agent/e017-dev-lite`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：[E-017 Draft PR #172](https://github.com/WeiHan1996/DailyEnergy/pull/172)；base=`agent/c015-post-merge-handoff`，implementation commit `ea5d479a2285afeed33bcabd867e7ed61da6e49`
+- **当前 PR**：[E-017 Draft PR #172](https://github.com/WeiHan1996/DailyEnergy/pull/172)；base=`agent/c015-post-merge-handoff`，implementation commit `ea5d479a2285afeed33bcabd867e7ed61da6e49`；head `7923c84520608dfd8a81e4b20d6a3fad1cf59c16` 的 CI run `33720679810` 为 11/11 SUCCESS，正式 exact-head merge verifier 因 Draft/stacked base 保持 Pending
 - **Stacked 基线**：[C-015 Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170)，head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968`，CI run `33713182325` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
 - **合并状态**：main head `fec5c96d368f8d4427ecca861f8ce42adad7a270`，CI run `33374088290` 11/11 SUCCESS
-- **下一候选动作**：等待 Draft PR #172 exact-head 11/11，完成 owner threat-boundary 审核并取得合并授权；代码进入 main 后再生成 main-bound immutable bundle 和执行真实主机演练
+- **下一候选动作**：完成 owner threat-boundary 审核并取得 stacked base/PR 合并授权；只有 PR 可转 Ready 且 base 到达 main 后才运行正式 exact-head merge verifier，代码进入 main 后再生成 main-bound immutable bundle 和执行真实主机演练
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-03 E-017 启动
