@@ -1,7 +1,7 @@
 # DailyEnergy 文档索引
 
 - **文档状态**：Active
-- **最后更新**：2026-08-31
+- **最后更新**：2026-09-03
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 - **当前任务**：[tasks/current.md](../tasks/current.md)
@@ -162,18 +162,18 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 ### 7.5 数据分析、隐私与运营
 
-| 文件                                                                                                | 状态        | 目的                                                                             | 主要依赖                                              |
-| --------------------------------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| [docs/analytics/event-tracking.md](./analytics/event-tracking.md)                                   | Accepted    | 事件、属性、平面、匿名聚合与质量 Gate                                            | information-architecture、state-machine、API、privacy |
-| [docs/analytics/metrics.md](./analytics/metrics.md)                                                 | Accepted    | 激活、D1/D3/D7、互动、运行、成本、小样本与研究 Gate 的唯一口径                   | event-tracking                                        |
-| [docs/analytics/experiments.md](./analytics/experiments.md)                                         | Accepted    | 实验边界、方法、主指标、样本、停止、回滚与个人 assignment Gate                   | metrics                                               |
-| [docs/analytics/channel-attribution.md](./analytics/channel-attribution.md)                         | Accepted    | 小红书/抖音承接、来源令牌、首次触达、渠道指标与隐私 Gate                         | event-tracking、metrics、experiments                  |
-| [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md)                             | Accepted    | 数据、用途、位置、访问、保存、删除和用户权利                                     | domain、database、API、ADR-0005                       |
-| [docs/operations/content-moderation.md](./operations/content-moderation.md)                         | Accepted    | 审核、抽检和申诉                                                                 | safety、evaluation、privacy                           |
-| [docs/operations/user-support.md](./operations/user-support.md)                                     | Accepted    | FAQ、支持、升级、用户权利摘要与受限访问                                          | journey、privacy、moderation                          |
-| [docs/operations/incident-response.md](./operations/incident-response.md)                           | Accepted    | 故障和安全事件流程                                                               | safety、privacy、moderation、support                  |
-| [docs/operations/development-deployment-runbook.md](./operations/development-deployment-runbook.md) | Accepted    | DEV publication、安装、发布、current reconciliation、回滚、secret 轮换与换机恢复 | deployment、testing、ADR-0007                         |
-| [docs/operations/observability-runbooks/README.md](./operations/observability-runbooks/README.md)   | Implemented | E-013 的 SLO、队列、数据库、AI/成本、telemetry 与数据生命周期 Runbook 集         | observability、incident-response、E-013               |
+| 文件                                                                                                | 状态        | 目的                                                                               | 主要依赖                                              |
+| --------------------------------------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| [docs/analytics/event-tracking.md](./analytics/event-tracking.md)                                   | Accepted    | 事件、属性、平面、匿名聚合与质量 Gate                                              | information-architecture、state-machine、API、privacy |
+| [docs/analytics/metrics.md](./analytics/metrics.md)                                                 | Accepted    | 激活、D1/D3/D7、互动、运行、成本、小样本与研究 Gate 的唯一口径                     | event-tracking                                        |
+| [docs/analytics/experiments.md](./analytics/experiments.md)                                         | Accepted    | 实验边界、方法、主指标、样本、停止、回滚与个人 assignment Gate                     | metrics                                               |
+| [docs/analytics/channel-attribution.md](./analytics/channel-attribution.md)                         | Accepted    | 小红书/抖音承接、来源令牌、首次触达、渠道指标与隐私 Gate                           | event-tracking、metrics、experiments                  |
+| [docs/operations/privacy-data-map.md](./operations/privacy-data-map.md)                             | Accepted    | 数据、用途、位置、访问、保存、删除和用户权利                                       | domain、database、API、ADR-0005                       |
+| [docs/operations/content-moderation.md](./operations/content-moderation.md)                         | Accepted    | 审核、抽检和申诉                                                                   | safety、evaluation、privacy                           |
+| [docs/operations/user-support.md](./operations/user-support.md)                                     | Accepted    | FAQ、支持、升级、用户权利摘要与受限访问                                            | journey、privacy、moderation                          |
+| [docs/operations/incident-response.md](./operations/incident-response.md)                           | Accepted    | 故障和安全事件流程                                                                 | safety、privacy、moderation、support                  |
+| [docs/operations/development-deployment-runbook.md](./operations/development-deployment-runbook.md) | Accepted    | 标准 DEV 历史流程与 DEV_LITE publication、阶段发布、reconciliation、回滚和换机恢复 | deployment、testing、ADR-0007、ADR-0009               |
+| [docs/operations/observability-runbooks/README.md](./operations/observability-runbooks/README.md)   | Implemented | E-013 的 SLO、队列、数据库、AI/成本、telemetry 与数据生命周期 Runbook 集           | observability、incident-response、E-013               |
 
 ### 7.6 工程架构与交付
 
@@ -186,7 +186,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/observability.md](./technical/observability.md)                                                                                                                                        | Accepted    | 日志、Trace、指标、SLO、告警、Runbook 与 AI/基础设施成本                                                          | metrics、Gateway、privacy、incident、architecture、deployment |
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                              | database、testing、deployment、ADR-0005、Issue #44            |
 | [docker/observability/contract.json](../docker/observability/contract.json)                                                                                                                            | Implemented | E-013 vendor-neutral 信号、字段/平面/基数、期限、成本与 Production blocked Gate                                   | observability、privacy、deployment                            |
-| [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011/E-016 CI/仓库控制、E-013 observability 与 E-014 Phase Gate 证据入口                 | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
+| [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011/E-016 CI/仓库控制、E-013/E-014 Gate 与 E-017 DEV_LITE 证据入口                      | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
 | [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 已按 15 / 22 / 17 绑定三个真实 Milestone；D-001～D-005 与 C-003 Done，后续暂停                       | Accepted Phase 0B specs、E-014 Gate、C-003 #55                |
 
 ### 7.7 Phase Gate
@@ -198,15 +198,16 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 
 ## 8. 计划 ADR
 
-| 文件                                                                                                     | 状态     | 决策主题                                                | 最晚完成点        |
-| -------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------- | ----------------- |
-| [ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md)             | Accepted | 稳定种子、产品日期、历史不变与重生成                    | 规则引擎开发前    |
-| [ADR-0003-ai-provider-abstraction.md](./decisions/ADR-0003-ai-provider-abstraction.md)                   | Accepted | AI Gateway 与供应商隔离                                 | AI Gateway 开发前 |
-| [ADR-0004-structured-memory.md](./decisions/ADR-0004-structured-memory.md)                               | Accepted | 用途受限结构化记忆与不用向量库                          | 记忆开发前        |
-| [ADR-0005-data-retention-and-deletion.md](./decisions/ADR-0005-data-retention-and-deletion.md)           | Accepted | 保存期限、删除、备份、受托方和受限证据                  | 数据库开发前      |
-| [ADR-0006-monorepo-and-stack.md](./decisions/ADR-0006-monorepo-and-stack.md)                             | Accepted | pnpm/Turbo 单仓、运行时、框架、数据与版本治理           | 工程初始化前      |
-| [ADR-0007-development-colocation-exception.md](./decisions/ADR-0007-development-colocation-exception.md) | Accepted | 临时 DEV 同机 PostgreSQL/Redis、私有 COS 与生产退出边界 | E-012 开工前      |
-| [ADR-0008-data-rights-delivery-and-status.md](./decisions/ADR-0008-data-rights-delivery-and-status.md)   | Accepted | revision discovery、短期导出与删除状态续读              | C-014 恢复前      |
+| 文件                                                                                                               | 状态       | 决策主题                                                                  | 最晚完成点         |
+| ------------------------------------------------------------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------- | ------------------ |
+| [ADR-0002-deterministic-daily-result.md](./decisions/ADR-0002-deterministic-daily-result.md)                       | Accepted   | 稳定种子、产品日期、历史不变与重生成                                      | 规则引擎开发前     |
+| [ADR-0003-ai-provider-abstraction.md](./decisions/ADR-0003-ai-provider-abstraction.md)                             | Accepted   | AI Gateway 与供应商隔离                                                   | AI Gateway 开发前  |
+| [ADR-0004-structured-memory.md](./decisions/ADR-0004-structured-memory.md)                                         | Accepted   | 用途受限结构化记忆与不用向量库                                            | 记忆开发前         |
+| [ADR-0005-data-retention-and-deletion.md](./decisions/ADR-0005-data-retention-and-deletion.md)                     | Accepted   | 保存期限、删除、备份、受托方和受限证据                                    | 数据库开发前       |
+| [ADR-0006-monorepo-and-stack.md](./decisions/ADR-0006-monorepo-and-stack.md)                                       | Accepted   | pnpm/Turbo 单仓、运行时、框架、数据与版本治理                             | 工程初始化前       |
+| [ADR-0007-development-colocation-exception.md](./decisions/ADR-0007-development-colocation-exception.md)           | Superseded | 腾讯云标准 DEV 历史同机 PostgreSQL/Redis、私有 COS 与退出边界             | 已由 ADR-0009 取代 |
+| [ADR-0008-data-rights-delivery-and-status.md](./decisions/ADR-0008-data-rights-delivery-and-status.md)             | Accepted   | revision discovery、短期导出与删除状态续读                                | C-014 恢复前       |
+| [ADR-0009-development-lite-colocation-exception.md](./decisions/ADR-0009-development-lite-colocation-exception.md) | Accepted   | 阿里云 2C2G DEV_LITE、阶段启停、本地 synthetic object 与 Production NO_GO | E-017 开工前       |
 
 如果实际决策发生变化，应调整 ADR 名称和顺序，不为填满编号而创建无价值文档。
 

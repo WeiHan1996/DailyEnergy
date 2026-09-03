@@ -14,3 +14,5 @@
 6. 生效日期和关联文档。
 
 已接受的 ADR 是项目最高优先级的事实来源。
+
+当前活动开发部署例外为 [ADR-0009](./ADR-0009-development-lite-colocation-exception.md)；它取代 ADR-0007 的活动主机选择，同时保留历史 ReleaseManifestV1 与腾讯云 DEV 证据。

@@ -2,9 +2,9 @@
 
 - **文档状态**：Accepted
 - **所属任务**：S-32 — 部署、配置和回滚
-- **最后更新**：2026-08-31（C-005 tzdb release 审计绑定）
+- **最后更新**：2026-09-03（E-017 DEV_LITE topology）
 - **适用范围**：Phase 1～3 的本地/CI/开发/预发布/生产环境、OCI 镜像、Docker Compose、配置与密钥、数据库迁移、发布、回滚、备份和隔离恢复
-- **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0007 临时 DEV 同机例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
+- **上游权威**：[ADR-0006 Monorepo 与技术栈](../decisions/ADR-0006-monorepo-and-stack.md)、[ADR-0009 DEV_LITE 同机例外](../decisions/ADR-0009-development-lite-colocation-exception.md)、[ADR-0007 历史标准 DEV 例外](../decisions/ADR-0007-development-colocation-exception.md)、[系统架构](./architecture.md)、[仓库结构与模块边界](./repository-structure.md)、[测试策略](./testing.md)、[数据库规格](./database.md)、[隐私数据地图](../operations/privacy-data-map.md)、[故障和安全事件响应](../operations/incident-response.md)
 - **下游任务**：S-33～S-35、E-003～E-014、C-014、A-007～A-010
 
 ## 1. 目的
@@ -122,7 +122,7 @@ RPO/RTO 是 Phase 1/Beta 的工程准备目标，不是对用户的公开承诺�
 - production secret 不下发到 CI、LOCAL、DEV、STAGING、EVALUATION 或 MINIAPP_RUNNER；
 - 环境标识必须写入 Release Manifest、runtime startup fingerprint、数据库连接期望值和 artifact evidence；错连立即 fail closed。
 
-### 5.3 E-012 临时 DEV 例外
+### 5.3 E-012 历史标准 DEV 例外
 
 [ADR-0007](../decisions/ADR-0007-development-colocation-exception.md) 仅为当前 E-012 `DEV` 接受一个有期限的数据库/队列拓扑例外：PostgreSQL 18 与 Redis 8 可在同一台临时 application host 上以独立容器、网络和 volume 运行。object endpoint 不再使用 synthetic stub，而是使用腾讯云上海 `ap-shanghai` 的独立私有 COS；application 只能通过同地域 private/internal endpoint 访问 `dev/objects/`。家庭 NAS、生产身份、真实用户对象和生产数据均不进入该环境。
 
@@ -141,6 +141,16 @@ DEV 发布控制器固定执行 preflight、digest pull、stateful readiness、�
 首次发布尚无 Accepted state 时，同一失败 manifest 可以重放。若失败发生在 migration 阶段之前、`migration_applied=false`、`migration_verified=false` 且没有 from-current/recovery catalog，显式部署一个不同且已通过 preflight/secret materialization 的新 candidate 可以替换该失败候选；控制器必须先写入绑定旧 `operation_id`、失败阶段和 replacement manifest digest 的 `SUPERSEDED_BEFORE_MIGRATION` receipt，再清除旧 pending 并开始新 operation。active phase 已进入 migration 或任一 migration checkpoint 为 true 时禁止替换，必须保持 dirty state 并人工判定数据库事实；不得删除或编辑 operation/state 绕过。
 
 此例外不改变 5.2 与第 6、18、19 节的生产合同。`STAGING`、`PRODUCTION` 和处理真实备份的 `RECOVERY` 必须使用独立受控 PostgreSQL、Redis 与对象服务，并使用不同 bucket/prefix、credential、retention 与审计边界；其 preflight 遇到 `DEV_COLOCATED_EXCEPTION` 必须 fail closed。DEV volume、dump、COS object 或 secret 不得迁入 STAGING/PRODUCTION。
+
+### 5.4 E-017 活动 DEV_LITE 例外
+
+[ADR-0009](../decisions/ADR-0009-development-lite-colocation-exception.md) 取代 ADR-0007 的活动主机选择，但不改写历史 ReleaseManifestV1、腾讯云发布回执或 rollback 语义。DEV_LITE 使用 ReleaseManifestV2 与闭合 `deployment_profile=DEV_LITE`，固定 `stateful_topology=DEV_LITE_COLOCATED_EXCEPTION`、`object_endpoint=LOCAL_SYNTHETIC_OBJECT_STUB`、`synthetic_only=true`、`production_enabled=false`。任何 STAGING/PRODUCTION/RECOVERY 或真实身份选择该 tuple 必须 fail closed。
+
+DEV_LITE 的 2 CPU、至少 1.5 GiB 实际 RAM、至少 20 GiB 可用磁盘和至少 1 GiB swap 只在阶段化资源合同成立时有效。稳态只允许 PostgreSQL、Redis、dependency stub、API 与 loopback TLS proxy，memory limit 总和最多 704 MiB；Admin、三个 Worker 与 migration/verify/smoke 属于互斥临时窗口，同一时刻最多一个非 core workload。pull/migration 前停止 API/TLS 与全部临时 workload，每阶段检查期望 service set、health、OOMKilled、restart count 和磁盘余量；swap 是否发生持续压力由真实主机 soak 单独记录。标准 DEV 的 4 CPU/7 GiB 门槛保持不变。
+
+本地对象 smoke 在无网络、无 secret、无 volume、无 host port 的 one-shot 容器内完成单个小型 synthetic object 的 PUT/GET/hash/DELETE/HEAD，并立即关闭。它不构成外部对象 endpoint、ACL、lifecycle、region、durability 或 backup 证据。ReleaseManifestV2 不创建伪 COS credential/config；V1 与 V2 不能在同一 release state 普通 deploy、rollback 或 reconcile，换机必须 fresh state、fresh seed 与新 secret version。
+
+3 Mbps 主机的 digest pull 最长 30 分钟，其它命令保持短且有界；服务器继续禁止 checkout/build。只有 main-bound 同 run 11 项 CI、source-free bundle、真实主机 fresh deploy/reconcile/N/N+1/rollback/redeploy、完整 Safety/owner/deletion 与资源证据均通过后，才可声明 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY`；C-015 Production/Privacy/Legal 状态不变。
 
 ## 6. MVP 生产拓扑
 

@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import {
+  lstat,
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -57,6 +64,10 @@ const RELEASE_SELECTION_V1 = Object.freeze({
   cos_secret_version: "dev-cos-credential-v1",
   database_secret_version: "dev-secret-v1",
   object_config_ref: "dev-cos-config-v1",
+});
+const RELEASE_SELECTION_V2 = Object.freeze({
+  database_secret_version: "dev-lite-secret-v1",
+  deployment_profile: "DEV_LITE",
 });
 
 function runtimeEvidence(releaseId) {
@@ -311,7 +322,7 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
   const built = await buildDevelopmentBundle(bundle, directory);
   assert.equal(built.image_set_id, value.image_set_id);
   assert.equal(built.release_id, null);
-  assert.equal(built.files, 16);
+  assert.equal(built.files, 18);
   assert.equal(built.materialized, false);
   assert.deepEqual(await verifyDevelopmentBundle(bundle), built);
 
@@ -338,7 +349,7 @@ test("T-E012-IMAGE-001 creates a closed five-role digest-only DEV image set", as
   assert.deepEqual(
     await verifyDevelopmentBundle(installed.path, { materialized: true }),
     {
-      files: 16,
+      files: 18,
       image_set_id: value.image_set_id,
       materialized: true,
       release_id: materialized.release_id,
@@ -862,4 +873,111 @@ test("T-E012-IMAGE-001 keeps image publication manual, main-bound and non-deploy
   );
   assert.equal(upload.with["retention-days"], 90);
   assert.equal(upload.with["if-no-files-found"], "error");
+});
+
+test("T-E017-BUNDLE-001 builds and installs V3 DEV_LITE without COS material", async (t) => {
+  const directory = await metadataDirectory(t);
+  const publicationReleaseId = `dev-${COMMIT_SHA.slice(0, 12)}-50000000011-1`;
+  const supply = supplyEvidence(publicationReleaseId);
+  const imageSet = await generateDevImageSet(directory, {
+    ciRunAttempt: "1",
+    ciRunId: "40000000001",
+    commitSha: COMMIT_SHA,
+    createdAtUtc: "2026-09-03T04:00:00.000Z",
+    publicationRunAttempt: "1",
+    publicationRunId: "50000000011",
+    supplyEvidence: supply,
+  });
+  await Promise.all([
+    writeFile(
+      path.join(directory, "dev-image-set.json"),
+      `${JSON.stringify(imageSet, null, 2)}\n`,
+    ),
+    writeFile(
+      path.join(directory, "dev-runtime-evidence.json"),
+      `${JSON.stringify(runtimeEvidence(publicationReleaseId), null, 2)}\n`,
+    ),
+    writeFile(
+      path.join(directory, "dev-supply-evidence.json"),
+      `${JSON.stringify(supply, null, 2)}\n`,
+    ),
+  ]);
+  const bundle = path.join(directory, "dev-lite-bundle");
+  const built = await buildDevelopmentBundle(bundle, directory);
+  assert.equal(built.files, 18);
+  const bundleManifest = JSON.parse(
+    await readFile(path.join(bundle, "bundle-manifest.json"), "utf8"),
+  );
+  assert.equal(bundleManifest.bundle_version, "DevDeploymentBundleV3");
+  assert.ok(
+    bundleManifest.files.some(
+      ({ path: relativePath }) =>
+        relativePath === "docker/compose.dev-lite.yaml",
+    ),
+  );
+
+  const developmentRoot = path.join(directory, "dev-lite-root");
+  const installed = await installDevelopmentBundle(bundle, {
+    developmentRoot,
+    expectedGid: process.getgid(),
+    expectedUid: process.getuid(),
+    selection: RELEASE_SELECTION_V2,
+  });
+  assert.equal(installed.installed, true);
+  const releaseManifest = JSON.parse(
+    await readFile(path.join(installed.path, "release-manifest.json"), "utf8"),
+  );
+  assert.equal(releaseManifest.manifest_version, "ReleaseManifestV2");
+  assert.equal(releaseManifest.config.deployment_profile, "DEV_LITE");
+  assert.equal(releaseManifest.topology.production_eligible, false);
+  assert.equal(JSON.stringify(releaseManifest).includes("cos_secret"), false);
+  assert.equal(
+    JSON.stringify(releaseManifest).includes("object_config_ref"),
+    false,
+  );
+  assert.equal(
+    await readFile(path.join(developmentRoot, "config"), "utf8").catch(
+      (error) => error.code,
+    ),
+    "ENOENT",
+  );
+
+  bundleManifest.bundle_version = "DevDeploymentBundleV2";
+  bundleManifest.files = bundleManifest.files.filter(
+    ({ path: relativePath }) =>
+      ![
+        "docker/compose.dev-lite.yaml",
+        "tooling/deployment/dev-lite-runtime-check.mjs",
+      ].includes(relativePath),
+  );
+  await Promise.all(
+    [
+      "docker/compose.dev-lite.yaml",
+      "tooling/deployment/dev-lite-runtime-check.mjs",
+    ].map((relativePath) => rm(path.join(bundle, relativePath))),
+  );
+  await writeFile(
+    path.join(bundle, "bundle-manifest.json"),
+    `${JSON.stringify(bundleManifest, null, 2)}\n`,
+  );
+  assert.deepEqual(await verifyDevelopmentBundle(bundle), {
+    files: 16,
+    image_set_id: imageSet.image_set_id,
+    materialized: false,
+    release_id: null,
+  });
+  const rejectedRoot = path.join(directory, "dev-lite-v2-rejected-root");
+  await assert.rejects(
+    installDevelopmentBundle(bundle, {
+      developmentRoot: rejectedRoot,
+      expectedGid: process.getgid(),
+      expectedUid: process.getuid(),
+      selection: RELEASE_SELECTION_V2,
+    }),
+    /DEV_BUNDLE_VERSION_PROFILE_MISMATCH:DevDeploymentBundleV2/u,
+  );
+  assert.equal(
+    await lstat(rejectedRoot).catch((error) => error.code),
+    "ENOENT",
+  );
 });

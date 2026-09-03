@@ -6,7 +6,10 @@ import test from "node:test";
 import { parse } from "yaml";
 
 import { cosSmokeTesting } from "../../tooling/deployment/cos-smoke.mjs";
-import { validateDevComposePolicy } from "../../tooling/deployment/dev-compose-policy.mjs";
+import {
+  validateDevComposePolicy,
+  validateDevLiteComposePolicy,
+} from "../../tooling/deployment/dev-compose-policy.mjs";
 import { developmentDeploymentCommands } from "../../tooling/deployment/deploy-dev.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "../..");
@@ -23,6 +26,7 @@ const sources = await Promise.all([
     path.join(repositoryRoot, "tooling/deployment/bootstrap-host.sh"),
     "utf8",
   ),
+  readFile(path.join(repositoryRoot, "docker/compose.dev-lite.yaml"), "utf8"),
 ]);
 
 function policyInput() {
@@ -32,6 +36,28 @@ function policyInput() {
     cosSmokeSource: sources[4],
     dockerfile: sources[2],
     overlay: parse(sources[1], { merge: true }),
+  };
+}
+
+function devLitePolicyInput() {
+  return {
+    base: parse(sources[0], { merge: true }),
+    overlay: parse(sources[6], {
+      customTags: [
+        {
+          collection: "map",
+          resolve: (value) => value,
+          tag: "!override",
+        },
+        {
+          collection: "seq",
+          resolve: (value) => value,
+          tag: "!override",
+        },
+      ],
+      merge: true,
+    }),
+    overlaySource: sources[6],
   };
 }
 
@@ -159,6 +185,158 @@ test("T-E012-COMPOSE-001 keeps COS credential and egress on one-shot smoke only"
   assert.throws(
     () => validateDevComposePolicy(broadEgress),
     /DEV_COMPOSE_OBJECT_EGRESS_SCOPE:worker-restricted/u,
+  );
+});
+
+test("T-E017-COMPOSE-001 accepts the bounded DEV_LITE core and isolated transient profiles", () => {
+  assert.deepEqual(validateDevLiteComposePolicy(devLitePolicyInput()), {
+    core_memory_mib: 704,
+    core_services: 5,
+    object_smoke: "LOCAL_ONE_SHOT",
+    public_ports: 0,
+    transient_profiles: 5,
+  });
+
+  const { overlay } = devLitePolicyInput();
+  const core = new Set([
+    "api",
+    "dependency-stub",
+    "postgres",
+    "redis",
+    "tls-proxy",
+  ]);
+  const transient = Object.entries(overlay.services).filter(
+    ([serviceName]) => !core.has(serviceName),
+  );
+  for (const [serviceName, service] of transient) {
+    assert.equal(service.profiles.length, 1, serviceName);
+    assert.ok(
+      Object.keys(service.depends_on ?? {}).every((dependency) =>
+        core.has(dependency),
+      ),
+      `${serviceName} must not start another transient workload`,
+    );
+  }
+});
+
+test("T-E017-COMPOSE-001 rejects profile overlap, inherited transient dependencies, and core budget drift", () => {
+  const profileOverlap = devLitePolicyInput();
+  profileOverlap.overlay.services["worker-interactive"].profiles = [
+    "dev-lite-core",
+  ];
+  assert.throws(
+    () => validateDevLiteComposePolicy(profileOverlap),
+    /DEV_LITE_COMPOSE_PROFILE:worker-interactive/u,
+  );
+
+  const transientDependency = devLitePolicyInput();
+  transientDependency.overlay.services["worker-background"].depends_on.admin = {
+    condition: "service_healthy",
+  };
+  assert.throws(
+    () => validateDevLiteComposePolicy(transientDependency),
+    /DEV_LITE_COMPOSE_TRANSIENT_DEPENDENCY:worker-background/u,
+  );
+
+  const inheritedDependency = devLitePolicyInput();
+  inheritedDependency.overlaySource = inheritedDependency.overlaySource.replace(
+    "depends_on: !override",
+    "depends_on:",
+  );
+  assert.throws(
+    () => validateDevLiteComposePolicy(inheritedDependency),
+    /DEV_LITE_COMPOSE_DEPENDENCY_OVERRIDE:api/u,
+  );
+
+  const inheritedProfile = devLitePolicyInput();
+  inheritedProfile.overlaySource = inheritedProfile.overlaySource.replace(
+    "profiles: !override [dev-lite-core]",
+    "profiles: [dev-lite-core]",
+  );
+  assert.throws(
+    () => validateDevLiteComposePolicy(inheritedProfile),
+    /DEV_LITE_COMPOSE_PROFILE_OVERRIDE:postgres/u,
+  );
+
+  const budgetDrift = devLitePolicyInput();
+  budgetDrift.overlay.services.api.mem_limit = "225m";
+  assert.throws(
+    () => validateDevLiteComposePolicy(budgetDrift),
+    /DEV_LITE_COMPOSE_CORE_MEMORY:api/u,
+  );
+
+  for (const [serviceName, field, value] of [
+    ["admin", "mem_limit", "257m"],
+    ["worker-interactive", "cpus", 0.5],
+    ["database-init", "pids_limit", 129],
+  ]) {
+    const resourceDrift = devLitePolicyInput();
+    resourceDrift.overlay.services[serviceName][field] = value;
+    assert.throws(
+      () => validateDevLiteComposePolicy(resourceDrift),
+      new RegExp(`DEV_LITE_COMPOSE_RESOURCE_LIMIT:${serviceName}`, "u"),
+    );
+  }
+});
+
+test("T-E017-COMPOSE-001 rejects public stateful or TLS ports and release-only semantics", () => {
+  const publicDatabase = devLitePolicyInput();
+  publicDatabase.overlay.services.postgres.ports = ["0.0.0.0:5432:5432"];
+  assert.throws(
+    () => validateDevLiteComposePolicy(publicDatabase),
+    /DEV_LITE_COMPOSE_STATEFUL_PORT:postgres/u,
+  );
+
+  const publicTls = devLitePolicyInput();
+  publicTls.overlay.services["tls-proxy"].ports[0] = "0.0.0.0:8443:8443";
+  assert.throws(
+    () => validateDevLiteComposePolicy(publicTls),
+    /DEV_LITE_COMPOSE_TLS_PROXY:runtime-boundary/u,
+  );
+
+  const productionFlag = devLitePolicyInput();
+  productionFlag.overlay.production_eligible = false;
+  assert.throws(
+    () => validateDevLiteComposePolicy(productionFlag),
+    /DEV_LITE_COMPOSE_RELEASE_SEMANTICS:manifest-only/u,
+  );
+
+  const cosConfig = devLitePolicyInput();
+  cosConfig.overlay.x_cos_config = "forbidden";
+  assert.throws(
+    () => validateDevLiteComposePolicy(cosConfig),
+    /DEV_LITE_COMPOSE_COS_FORBIDDEN:overlay/u,
+  );
+});
+
+test("T-E017-OBJECT-001 rejects network, secret, storage, port, and resource expansion", () => {
+  for (const [field, value] of [
+    ["networks", { object_external: {} }],
+    ["ports", ["127.0.0.1:18080:18080"]],
+    ["secrets", [{ source: "fault_control_token" }]],
+    ["volumes", ["object_data:/data"]],
+  ]) {
+    const expanded = devLitePolicyInput();
+    expanded.overlay.services["object-smoke"][field] = value;
+    assert.throws(
+      () => validateDevLiteComposePolicy(expanded),
+      /DEV_LITE_COMPOSE_(?:FILE_SECRET_GRANT:object-smoke|OBJECT_SMOKE:capability-boundary)/u,
+      field,
+    );
+  }
+
+  const networkMode = devLitePolicyInput();
+  networkMode.overlay.services["object-smoke"].network_mode = "bridge";
+  assert.throws(
+    () => validateDevLiteComposePolicy(networkMode),
+    /DEV_LITE_COMPOSE_OBJECT_SMOKE:capability-boundary/u,
+  );
+
+  const resourceExpansion = devLitePolicyInput();
+  resourceExpansion.overlay.services["object-smoke"].cpus = 0.11;
+  assert.throws(
+    () => validateDevLiteComposePolicy(resourceExpansion),
+    /DEV_LITE_COMPOSE_(?:RESOURCE_LIMIT:object-smoke|OBJECT_SMOKE:capability-boundary)/u,
   );
 });
 

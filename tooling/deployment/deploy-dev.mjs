@@ -18,16 +18,19 @@ import { pathToFileURL } from "node:url";
 
 import {
   createCosConfigEvidence,
+  DEV_LITE_SECRET_FILE_NAMES,
   runDevelopmentPreflight,
   SECRET_FILE_NAMES,
 } from "./preflight.mjs";
 import {
   canonicalReleaseManifest,
   deploymentPhases,
+  RELEASE_MANIFEST_VERSION_V2,
   reconciliationPhases,
   releaseManifestDigest,
   validateDeploymentReceipts,
   validateReconciliationReceipts,
+  validateReleaseClassMatch,
   validateReleaseManifest,
   validateReleaseTransition,
   validateRollbackTransition,
@@ -60,6 +63,10 @@ const COMPOSE_SECRET_FILE_NAMES = Object.freeze({
   cos_config: "cos-config.env",
   ...SECRET_FILE_NAMES,
 });
+
+function isDevelopmentLiteManifest(manifest) {
+  return manifest.manifest_version === RELEASE_MANIFEST_VERSION_V2;
+}
 
 function fail(code, detail) {
   throw new Error(`${code}:${detail}`);
@@ -169,13 +176,12 @@ async function readDevelopmentComposeSecretMaterials(
     serviceUid,
   },
 ) {
-  const configFile = path.join(
-    root,
-    "config",
-    `${manifest.topology.object_config_ref}.env`,
-  );
+  const developmentLite = isDevelopmentLiteManifest(manifest);
+  const secretFileNames = developmentLite
+    ? DEV_LITE_SECRET_FILE_NAMES
+    : SECRET_FILE_NAMES;
   const entries = await Promise.all(
-    Object.entries(SECRET_FILE_NAMES).map(async ([role, sourceFileName]) => ({
+    Object.entries(secretFileNames).map(async ([role, sourceFileName]) => ({
       ...composeSecretIdentity(role, {
         postgresGid,
         postgresUid,
@@ -199,21 +205,28 @@ async function readDevelopmentComposeSecretMaterials(
       role,
     })),
   );
-  entries.push({
-    ...composeSecretIdentity("cos_config", {
-      postgresGid,
-      postgresUid,
-      serviceGid,
-      serviceUid,
-    }),
-    contents: await readProtectedRuntimeFile(configFile, {
-      expectedGid: expectedSourceGid,
-      expectedUid: expectedSourceUid,
-      kind: "config",
-    }),
-    fileName: COMPOSE_SECRET_FILE_NAMES.cos_config,
-    role: "cos_config",
-  });
+  if (!developmentLite) {
+    const configFile = path.join(
+      root,
+      "config",
+      `${manifest.topology.object_config_ref}.env`,
+    );
+    entries.push({
+      ...composeSecretIdentity("cos_config", {
+        postgresGid,
+        postgresUid,
+        serviceGid,
+        serviceUid,
+      }),
+      contents: await readProtectedRuntimeFile(configFile, {
+        expectedGid: expectedSourceGid,
+        expectedUid: expectedSourceUid,
+        kind: "config",
+      }),
+      fileName: COMPOSE_SECRET_FILE_NAMES.cos_config,
+      role: "cos_config",
+    });
+  }
   return entries;
 }
 
@@ -339,6 +352,7 @@ export function developmentComposeEnvironment(
   manifest,
   { composeSecretDirectory = developmentComposeSecretDirectory(manifest) } = {},
 ) {
+  const developmentLite = isDevelopmentLiteManifest(manifest);
   const fingerprints = manifest.config.runtime_fingerprints;
   return Object.freeze({
     DAILYENERGY_ADMIN_IMAGE: manifest.images.admin,
@@ -346,16 +360,27 @@ export function developmentComposeEnvironment(
     DAILYENERGY_API_DEPLOY_FINGERPRINT: fingerprints.api_deploy_config,
     DAILYENERGY_API_REDIS_URL: "redis://redis:6379",
     DAILYENERGY_CONFIG_DIR: `${DEVELOPMENT_ROOT}/config`,
-    DAILYENERGY_COS_CONFIG_REF: manifest.topology.object_config_ref,
-    DAILYENERGY_COS_SECRET_DIR: `${DEVELOPMENT_ROOT}/secrets/${manifest.config.secret_ref_versions.cos_secret_id}`,
+    ...(!developmentLite
+      ? {
+          DAILYENERGY_COS_CONFIG_REF: manifest.topology.object_config_ref,
+          DAILYENERGY_COS_SECRET_DIR: `${DEVELOPMENT_ROOT}/secrets/${manifest.config.secret_ref_versions.cos_secret_id}`,
+        }
+      : {
+          DAILYENERGY_DEPLOYMENT_PROFILE: "DEV_LITE",
+          DAILYENERGY_DEV_LITE_COMPOSE_SECRET_DIR: composeSecretDirectory,
+        }),
     DAILYENERGY_DEV_COMPOSE_SECRET_DIR: composeSecretDirectory,
     DAILYENERGY_LOG_LEVEL: manifest.config.log_level,
     DAILYENERGY_MIGRATION_IMAGE: manifest.images.migration,
     DAILYENERGY_PROXY_IMAGE: manifest.images.proxy,
-    DAILYENERGY_REDIS_KEY_PREFIX: "dailyenergy-dev",
+    DAILYENERGY_REDIS_KEY_PREFIX: developmentLite
+      ? "dailyenergy-dev-lite"
+      : "dailyenergy-dev",
     DAILYENERGY_RELEASE_ID: manifest.release_id,
     DAILYENERGY_RUNTIME_ENVIRONMENT: manifest.config.environment,
-    DAILYENERGY_SECRET_DIR: `${DEVELOPMENT_ROOT}/secrets/${databaseSecretVersion(manifest)}`,
+    DAILYENERGY_SECRET_DIR: developmentLite
+      ? composeSecretDirectory
+      : `${DEVELOPMENT_ROOT}/secrets/${databaseSecretVersion(manifest)}`,
     DAILYENERGY_SERVER_IMAGE: manifest.images.server,
     DAILYENERGY_STUB_IMAGE: manifest.images.stub,
     DAILYENERGY_TELEMETRY_ENABLED: "false",
@@ -383,23 +408,227 @@ export function renderComposeEnvironment(manifest, options) {
     .join("\n")}\n`;
 }
 
-function composeArguments(bundleRoot, environmentFile) {
+function composeArguments(
+  bundleRoot,
+  environmentFile,
+  developmentLite = false,
+) {
   return [
     "compose",
     "--project-name",
-    "dailyenergy-dev",
+    developmentLite ? "dailyenergy-dev-lite" : "dailyenergy-dev",
     "--env-file",
     environmentFile,
     "--file",
     path.join(bundleRoot, "compose.yaml"),
     "--file",
-    path.join(bundleRoot, "docker/compose.dev.yaml"),
-    "--profile",
-    "dev",
+    path.join(
+      bundleRoot,
+      developmentLite
+        ? "docker/compose.dev-lite.yaml"
+        : "docker/compose.dev.yaml",
+    ),
+    ...(developmentLite ? [] : ["--profile", "dev"]),
   ];
 }
 
-export function developmentDeploymentCommands(bundleRoot, environmentFile) {
+function developmentLiteDeploymentCommands(bundleRoot, environmentFile) {
+  const compose = composeArguments(bundleRoot, environmentFile, true);
+  const profiles = Object.freeze({
+    admin: "dev-lite-admin",
+    background: "dev-lite-background",
+    core: "dev-lite-core",
+    interactive: "dev-lite-interactive",
+    oneShot: "dev-lite-one-shot",
+    restricted: "dev-lite-restricted",
+  });
+  const allProfiles = Object.values(profiles);
+  const command = (selectedProfiles, ...arguments_) => ({
+    arguments: [
+      ...compose,
+      ...selectedProfiles.flatMap((profile) => ["--profile", profile]),
+      ...arguments_,
+    ],
+    executable: "docker",
+  });
+  const stopTransients = () =>
+    command(
+      allProfiles,
+      "stop",
+      "--timeout",
+      "10",
+      "admin",
+      "worker-interactive",
+      "worker-background",
+      "worker-restricted",
+    );
+  const stopApplication = () =>
+    command(
+      allProfiles,
+      "stop",
+      "--timeout",
+      "10",
+      "tls-proxy",
+      "api",
+      "admin",
+      "worker-interactive",
+      "worker-background",
+      "worker-restricted",
+    );
+  const converge = (profile, service) =>
+    command(
+      [profile],
+      "up",
+      "-d",
+      "--force-recreate",
+      "--no-deps",
+      "--wait",
+      "--wait-timeout",
+      "120",
+      service,
+    );
+  const databaseCommand = (mode, operationCheckpoint) => ({
+    ...command(
+      [profiles.oneShot],
+      "run",
+      "--rm",
+      "--no-deps",
+      "--name",
+      "dailyenergy-dev-lite-database-init",
+      "database-init",
+      "node",
+      "tooling/compose/provision-database.mjs",
+      mode,
+    ),
+    ...(operationCheckpoint === undefined ? {} : { operationCheckpoint }),
+  });
+  const databaseVerifyCommand = () =>
+    command(
+      [profiles.oneShot],
+      "run",
+      "--rm",
+      "--no-deps",
+      "--name",
+      "dailyenergy-dev-lite-database-verify",
+      "database-verify",
+    );
+  const databaseSmokeCommand = (phase) =>
+    command(
+      [profiles.oneShot],
+      "run",
+      "--rm",
+      "--no-deps",
+      "--name",
+      `dailyenergy-dev-lite-database-smoke-${phase}`,
+      "database-smoke",
+      "node",
+      "tooling/deployment/database-smoke.mjs",
+      phase,
+    );
+  const apiHealth = {
+    arguments: [
+      "--fail",
+      "--silent",
+      "--show-error",
+      "--insecure",
+      "--resolve",
+      "localhost:8443:127.0.0.1",
+      "https://localhost:8443/health/ready",
+    ],
+    executable: "curl",
+  };
+  const adminHealth = {
+    arguments: [
+      "--fail",
+      "--silent",
+      "--show-error",
+      "--insecure",
+      "--resolve",
+      "localhost:8444:127.0.0.1",
+      "https://localhost:8444/login",
+    ],
+    executable: "curl",
+  };
+  const pull = command(allProfiles, "pull", "--policy", "always");
+  pull.timeoutMs = 1_800_000;
+  return Object.freeze({
+    admin: [
+      stopTransients(),
+      converge(profiles.admin, "admin"),
+      converge(profiles.core, "tls-proxy"),
+      adminHealth,
+      command(allProfiles, "stop", "--timeout", "10", "tls-proxy"),
+    ],
+    api: [stopTransients(), converge(profiles.core, "api")],
+    drift: [databaseVerifyCommand()],
+    health: [apiHealth],
+    "maintenance-off": [apiHealth],
+    "maintenance-on": [stopApplication()],
+    migration: [
+      databaseCommand("prepare"),
+      databaseCommand("migrate", "MIGRATION_APPLIED"),
+      databaseCommand("seed"),
+      databaseVerifyCommand(),
+    ],
+    preflight: [],
+    pull: [stopApplication(), pull],
+    "smoke-delete": [databaseSmokeCommand("deletion")],
+    "smoke-object": [
+      command(
+        [profiles.oneShot],
+        "run",
+        "--rm",
+        "--no-deps",
+        "--name",
+        "dailyenergy-dev-lite-object-smoke",
+        "object-smoke",
+      ),
+    ],
+    "smoke-owner": [databaseSmokeCommand("owner")],
+    "smoke-safety": [databaseSmokeCommand("safety")],
+    "stateful-ready": [
+      stopApplication(),
+      command(
+        [profiles.core],
+        "up",
+        "-d",
+        "--force-recreate",
+        "--wait",
+        "--wait-timeout",
+        "120",
+        "postgres",
+        "redis",
+        "dependency-stub",
+      ),
+    ],
+    "tls-ingress": [stopTransients(), converge(profiles.core, "tls-proxy")],
+    "worker-background": [
+      stopTransients(),
+      converge(profiles.background, "worker-background"),
+    ],
+    "worker-drain": [stopTransients()],
+    "worker-interactive": [
+      stopTransients(),
+      converge(profiles.interactive, "worker-interactive"),
+    ],
+    "worker-restricted": [
+      stopTransients(),
+      converge(profiles.restricted, "worker-restricted"),
+    ],
+  });
+}
+
+export function developmentDeploymentCommands(
+  bundleRoot,
+  environmentFile,
+  manifestOrProfile = "STANDARD",
+) {
+  const developmentLite =
+    manifestOrProfile === "DEV_LITE" ||
+    manifestOrProfile?.config?.deployment_profile === "DEV_LITE";
+  if (developmentLite) {
+    return developmentLiteDeploymentCommands(bundleRoot, environmentFile);
+  }
   const compose = composeArguments(bundleRoot, environmentFile);
   const command = (...arguments_) => ({
     arguments: [...compose, ...arguments_],
@@ -568,7 +797,7 @@ function runCommand(command, { cwd, environment = {} }) {
     encoding: "utf8",
     env: { ...process.env, ...environment },
     maxBuffer: 2 * 1024 * 1024,
-    timeout: 180_000,
+    timeout: command.timeoutMs ?? 180_000,
   });
   return { code: result.status, error: result.error };
 }
@@ -759,6 +988,7 @@ async function probeRecoveryCatalog({
   const command = developmentDeploymentCommands(
     bundleRoot,
     environmentFile,
+    manifest,
   ).migration.at(-1);
   const result = await runner(command, {
     cwd: bundleRoot,
@@ -808,6 +1038,7 @@ async function resolveRecoveryCatalogReference({
 async function runPhases({
   bundleRoot,
   environmentFile,
+  manifest,
   onCommandPass = async () => undefined,
   onPhasePass = async () => undefined,
   onPhaseStart = async () => undefined,
@@ -815,7 +1046,11 @@ async function runPhases({
   receiptValidator = validateDeploymentReceipts,
   runner,
 }) {
-  const commands = developmentDeploymentCommands(bundleRoot, environmentFile);
+  const commands = developmentDeploymentCommands(
+    bundleRoot,
+    environmentFile,
+    manifest,
+  );
   const receipts = [];
   for (const phase of phases) {
     await onPhaseStart(phase);
@@ -828,6 +1063,26 @@ async function runPhases({
         fail("E012_DEPLOY_PHASE_FAILED", phase);
       }
       await onCommandPass(phase, command);
+    }
+    if (isDevelopmentLiteManifest(manifest)) {
+      const runtimeCheck = {
+        arguments: [
+          path.join(
+            bundleRoot,
+            "tooling/deployment/dev-lite-runtime-check.mjs",
+          ),
+          phase,
+        ],
+        executable: "/usr/local/bin/dailyenergy-node",
+      };
+      const result = await runner(runtimeCheck, {
+        cwd: bundleRoot,
+        environment: {},
+      });
+      if (result.error || result.code !== 0) {
+        fail("E017_DEV_LITE_RUNTIME_CHECK_FAILED", phase);
+      }
+      await onCommandPass(phase, runtimeCheck);
     }
     receipts.push({ phase, result: "PASS" });
     await onPhasePass(phase);
@@ -905,6 +1160,11 @@ export async function executeDevelopmentDeployment({
           pending.target.release_id !== manifest.release_id &&
           replaceableFailedInitialOperation(state, pending)
         ) {
+          validateReleaseClassMatch(
+            await loadOperationManifest(stateRoot, pending.target),
+            manifest,
+            "RELEASE_INITIAL_REPLACEMENT_TOPOLOGY_REQUIRES_FRESH_STATE",
+          );
           replaceInitialRelease = true;
         } else {
           fail("RELEASE_RECOVERY_REQUIRED", pending.target.release_id);
@@ -938,6 +1198,11 @@ export async function executeDevelopmentDeployment({
           loadReleaseManifest(stateRoot, state.current),
           loadCatalogManifest(stateRoot, state.catalog),
         ]);
+        validateReleaseClassMatch(
+          currentManifest,
+          catalogManifest,
+          "RECONCILE_CURRENT_CATALOG_TOPOLOGY_REQUIRES_FRESH_STATE",
+        );
         if (
           !currentManifest.compatibility.accepted_generations.includes(
             catalogManifest.migrations.catalog_generation,
@@ -986,6 +1251,7 @@ export async function executeDevelopmentDeployment({
           receipts = await runPhases({
             bundleRoot,
             environmentFile,
+            manifest: convergenceManifest,
             onPhasePass: (phase) =>
               updateReleaseOperationPhase(stateRoot, phase, true),
             onPhaseStart: (phase) =>
@@ -1018,6 +1284,20 @@ export async function executeDevelopmentDeployment({
         ) {
           fail("RECOVER_CURRENT_MANIFEST_MISMATCH", manifest.release_id);
         }
+        const recoveryClassManifests = await Promise.all([
+          loadCatalogManifest(stateRoot, state.catalog),
+          loadOperationManifest(stateRoot, pending.target),
+          ...(pending.recovery_catalog === null
+            ? []
+            : [loadOperationManifest(stateRoot, pending.recovery_catalog)]),
+        ]);
+        for (const recoveryClassManifest of recoveryClassManifests) {
+          validateReleaseClassMatch(
+            manifest,
+            recoveryClassManifest,
+            "RECOVER_CURRENT_CATALOG_TOPOLOGY_REQUIRES_FRESH_STATE",
+          );
+        }
         await preflight(manifest, imageSet, runtimeEvidence);
         const composeSecretDirectory = await secretMaterializer(manifest);
         const recoveryCatalogReference = await resolveRecoveryCatalogReference({
@@ -1031,6 +1311,11 @@ export async function executeDevelopmentDeployment({
         const catalogManifest = await loadOperationManifest(
           stateRoot,
           recoveryCatalogReference,
+        );
+        validateReleaseClassMatch(
+          manifest,
+          catalogManifest,
+          "RECOVER_CURRENT_CATALOG_TOPOLOGY_REQUIRES_FRESH_STATE",
         );
         if (
           !manifest.compatibility.accepted_generations.includes(
@@ -1065,6 +1350,7 @@ export async function executeDevelopmentDeployment({
           const receipts = await runPhases({
             bundleRoot,
             environmentFile,
+            manifest: convergenceManifest,
             onCommandPass: (_phase, command) =>
               command.operationCheckpoint === "MIGRATION_APPLIED"
                 ? markReleaseOperationMigrationApplied(stateRoot)
@@ -1139,6 +1425,7 @@ export async function executeDevelopmentDeployment({
         const receipts = await runPhases({
           bundleRoot,
           environmentFile,
+          manifest,
           onCommandPass: (_phase, command) =>
             command.operationCheckpoint === "MIGRATION_APPLIED"
               ? markReleaseOperationMigrationApplied(stateRoot)

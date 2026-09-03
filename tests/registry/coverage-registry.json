@@ -17623,6 +17623,18 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "strict ReleaseManifestV1 positive and known-fail cases",
           "test_id": "T-E012-MANIFEST-001"
+        },
+        {
+          "assertions": [
+            "Production, STAGING, real identity and external object claims reject the local synthetic topology",
+            "ReleaseManifestV2 accepts only the closed DEV_LITE synthetic topology while historical V1 remains valid",
+            "V1 and V2 or STANDARD and DEV_LITE cannot share ordinary deploy, reconcile or rollback state"
+          ],
+          "file": "tests/deployment/release.test.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "strict ReleaseManifestV2 DEV_LITE and topology transition cases",
+          "test_id": "T-E017-MANIFEST-001"
         }
       ],
       "status": "COVERED",
@@ -17668,6 +17680,30 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "closed DEV host, COS config, secret-file and network preflight cases",
           "test_id": "T-E012-PREFLIGHT-001"
+        },
+        {
+          "assertions": [
+            "Production, STAGING, real identity and external object claims reject the local synthetic topology",
+            "ReleaseManifestV2 accepts only the closed DEV_LITE synthetic topology while historical V1 remains valid",
+            "V1 and V2 or STANDARD and DEV_LITE cannot share ordinary deploy, reconcile or rollback state"
+          ],
+          "file": "tests/deployment/release.test.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "strict ReleaseManifestV2 DEV_LITE and topology transition cases",
+          "test_id": "T-E017-MANIFEST-001"
+        },
+        {
+          "assertions": [
+            "DEV_LITE accepts only eight database and fault secrets and never creates COS config or credentials",
+            "public protected ports, wrong owner, time, runtime, swap, disk or topology fail closed",
+            "standard DEV still requires four CPU and seven GiB while DEV_LITE requires two CPU, 1.5 GiB, twenty GiB free and one GiB swap"
+          ],
+          "file": "tests/deployment/preflight.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "conditional standard DEV and DEV_LITE host and secret preflight cases",
+          "test_id": "T-E017-PREFLIGHT-001"
         }
       ],
       "status": "COVERED",
@@ -17781,6 +17817,18 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "versioned DEV database and fault-control secret creation cases",
           "test_id": "T-E012-SECRET-001"
+        },
+        {
+          "assertions": [
+            "DEV_LITE accepts only eight database and fault secrets and never creates COS config or credentials",
+            "public protected ports, wrong owner, time, runtime, swap, disk or topology fail closed",
+            "standard DEV still requires four CPU and seven GiB while DEV_LITE requires two CPU, 1.5 GiB, twenty GiB free and one GiB swap"
+          ],
+          "file": "tests/deployment/preflight.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "conditional standard DEV and DEV_LITE host and secret preflight cases",
+          "test_id": "T-E017-PREFLIGHT-001"
         }
       ],
       "status": "COVERED",
@@ -17995,6 +18043,43 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "closed deployment phase and receipt order test",
           "test_id": "T-E012-ORDER-001"
+        },
+        {
+          "assertions": [
+            "deployment profile and built-in object fingerprint are bound into the release identity",
+            "the server receives no source tree, mutable image, object credential or production secret",
+            "V3 contains the DEV_LITE overlay and immutable evidence while historical V2 remains verifiable"
+          ],
+          "file": "tests/deployment/image-publish.test.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "DEV bundle V3, profile-bound release identity and historical V2 verification cases",
+          "test_id": "T-E017-BUNDLE-001"
+        },
+        {
+          "assertions": [
+            "Admin, Interactive, Background, Restricted and one-shot profiles are mutually selected by the controller",
+            "local object smoke has network none, no secret, volume or host port and cannot enter standard or production overlays",
+            "steady core memory limits total at most 704 MiB and stateful or TLS ports remain loopback-only"
+          ],
+          "file": "tests/deployment/dev-compose.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "DEV_LITE core budget, mutually exclusive workload windows and local object isolation cases",
+          "test_id": "T-E017-COMPOSE-001"
+        },
+        {
+          "assertions": [
+            "each non-core workload starts alone with a deterministic one-shot identity, completes its proof and is stopped on success or failure",
+            "fresh deploy, reconcile, N plus one, rollback and redeploy preserve exact operation and receipt semantics",
+            "pull and migration run in maintenance with core application stopped and bounded command timeouts",
+            "the Admin window proves loopback TLS before closing while failed pull keeps stateful dependencies available for recovery"
+          ],
+          "file": "tests/deployment/release.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "staged DEV_LITE deployment, cleanup, recovery, reconcile and rollback cases",
+          "test_id": "T-E017-DEPLOY-001"
         }
       ],
       "status": "COVERED",
@@ -18042,6 +18127,30 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "strict ReleaseManifestV1 positive and known-fail cases",
           "test_id": "T-E012-MANIFEST-001"
+        },
+        {
+          "assertions": [
+            "deployment profile and built-in object fingerprint are bound into the release identity",
+            "the server receives no source tree, mutable image, object credential or production secret",
+            "V3 contains the DEV_LITE overlay and immutable evidence while historical V2 remains verifiable"
+          ],
+          "file": "tests/deployment/image-publish.test.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "DEV bundle V3, profile-bound release identity and historical V2 verification cases",
+          "test_id": "T-E017-BUNDLE-001"
+        },
+        {
+          "assertions": [
+            "Production, STAGING, real identity and external object claims reject the local synthetic topology",
+            "ReleaseManifestV2 accepts only the closed DEV_LITE synthetic topology while historical V1 remains valid",
+            "V1 and V2 or STANDARD and DEV_LITE cannot share ordinary deploy, reconcile or rollback state"
+          ],
+          "file": "tests/deployment/release.test.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "strict ReleaseManifestV2 DEV_LITE and topology transition cases",
+          "test_id": "T-E017-MANIFEST-001"
         }
       ],
       "status": "COVERED",
@@ -18200,6 +18309,31 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "atomic release state, idempotent replay and single-use rollback target test",
           "test_id": "T-E012-STATE-001"
+        },
+        {
+          "assertions": [
+            "each non-core workload starts alone with a deterministic one-shot identity, completes its proof and is stopped on success or failure",
+            "fresh deploy, reconcile, N plus one, rollback and redeploy preserve exact operation and receipt semantics",
+            "pull and migration run in maintenance with core application stopped and bounded command timeouts",
+            "the Admin window proves loopback TLS before closing while failed pull keeps stateful dependencies available for recovery"
+          ],
+          "file": "tests/deployment/release.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "staged DEV_LITE deployment, cleanup, recovery, reconcile and rollback cases",
+          "test_id": "T-E017-DEPLOY-001"
+        },
+        {
+          "assertions": [
+            "Production, STAGING, real identity and external object claims reject the local synthetic topology",
+            "ReleaseManifestV2 accepts only the closed DEV_LITE synthetic topology while historical V1 remains valid",
+            "V1 and V2 or STANDARD and DEV_LITE cannot share ordinary deploy, reconcile or rollback state"
+          ],
+          "file": "tests/deployment/release.test.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "strict ReleaseManifestV2 DEV_LITE and topology transition cases",
+          "test_id": "T-E017-MANIFEST-001"
         }
       ],
       "status": "COVERED",
@@ -18328,6 +18462,18 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "mutual N/N-1 and rollback catalog compatibility cases",
           "test_id": "T-E012-COMPAT-001"
+        },
+        {
+          "assertions": [
+            "Production, STAGING, real identity and external object claims reject the local synthetic topology",
+            "ReleaseManifestV2 accepts only the closed DEV_LITE synthetic topology while historical V1 remains valid",
+            "V1 and V2 or STANDARD and DEV_LITE cannot share ordinary deploy, reconcile or rollback state"
+          ],
+          "file": "tests/deployment/release.test.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "strict ReleaseManifestV2 DEV_LITE and topology transition cases",
+          "test_id": "T-E017-MANIFEST-001"
         }
       ],
       "status": "COVERED",
@@ -18359,6 +18505,18 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "mutual N/N-1 and rollback catalog compatibility cases",
           "test_id": "T-E012-COMPAT-001"
+        },
+        {
+          "assertions": [
+            "Production, STAGING, real identity and external object claims reject the local synthetic topology",
+            "ReleaseManifestV2 accepts only the closed DEV_LITE synthetic topology while historical V1 remains valid",
+            "V1 and V2 or STANDARD and DEV_LITE cannot share ordinary deploy, reconcile or rollback state"
+          ],
+          "file": "tests/deployment/release.test.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "strict ReleaseManifestV2 DEV_LITE and topology transition cases",
+          "test_id": "T-E017-MANIFEST-001"
         }
       ],
       "status": "COVERED",
@@ -18553,6 +18711,44 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "closed deployment phase and receipt order test",
           "test_id": "T-E012-ORDER-001"
+        },
+        {
+          "assertions": [
+            "Admin, Interactive, Background, Restricted and one-shot profiles are mutually selected by the controller",
+            "local object smoke has network none, no secret, volume or host port and cannot enter standard or production overlays",
+            "steady core memory limits total at most 704 MiB and stateful or TLS ports remain loopback-only"
+          ],
+          "file": "tests/deployment/dev-compose.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "DEV_LITE core budget, mutually exclusive workload windows and local object isolation cases",
+          "test_id": "T-E017-COMPOSE-001"
+        },
+        {
+          "assertions": [
+            "each non-core workload starts alone with a deterministic one-shot identity, completes its proof and is stopped on success or failure",
+            "fresh deploy, reconcile, N plus one, rollback and redeploy preserve exact operation and receipt semantics",
+            "pull and migration run in maintenance with core application stopped and bounded command timeouts",
+            "the Admin window proves loopback TLS before closing while failed pull keeps stateful dependencies available for recovery"
+          ],
+          "file": "tests/deployment/release.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "staged DEV_LITE deployment, cleanup, recovery, reconcile and rollback cases",
+          "test_id": "T-E017-DEPLOY-001"
+        },
+        {
+          "assertions": [
+            "every DEV_LITE phase fails before its receipt when the expected healthy service set drifts or any container is OOM-killed, paused, restarting or has restarted",
+            "every DEV_LITE phase preserves at least twenty GiB free disk and no non-loopback protected listener",
+            "phase-specific service sets enforce at most one expected transient workload and reject unknown Compose services",
+            "runtime diagnostics expose only phase and aggregate status without container IDs, paths, content or secrets"
+          ],
+          "file": "tests/deployment/dev-lite-runtime-check.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "post-phase OOM, restart, disk and protected-port evidence cases",
+          "test_id": "T-E017-RUNTIME-001"
         }
       ],
       "status": "COVERED",
@@ -18777,6 +18973,19 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "atomic release state, idempotent replay and single-use rollback target test",
           "test_id": "T-E012-STATE-001"
+        },
+        {
+          "assertions": [
+            "each non-core workload starts alone with a deterministic one-shot identity, completes its proof and is stopped on success or failure",
+            "fresh deploy, reconcile, N plus one, rollback and redeploy preserve exact operation and receipt semantics",
+            "pull and migration run in maintenance with core application stopped and bounded command timeouts",
+            "the Admin window proves loopback TLS before closing while failed pull keeps stateful dependencies available for recovery"
+          ],
+          "file": "tests/deployment/release.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "staged DEV_LITE deployment, cleanup, recovery, reconcile and rollback cases",
+          "test_id": "T-E017-DEPLOY-001"
         }
       ],
       "status": "COVERED",
@@ -19374,6 +19583,30 @@
           "origin": "tests/registry/e012-evidence-manifest.json",
           "selector": "closed DEV host, COS config, secret-file and network preflight cases",
           "test_id": "T-E012-PREFLIGHT-001"
+        },
+        {
+          "assertions": [
+            "Admin, Interactive, Background, Restricted and one-shot profiles are mutually selected by the controller",
+            "local object smoke has network none, no secret, volume or host port and cannot enter standard or production overlays",
+            "steady core memory limits total at most 704 MiB and stateful or TLS ports remain loopback-only"
+          ],
+          "file": "tests/deployment/dev-compose.test.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "DEV_LITE core budget, mutually exclusive workload windows and local object isolation cases",
+          "test_id": "T-E017-COMPOSE-001"
+        },
+        {
+          "assertions": [
+            "a bounded synthetic object completes PUT, GET, SHA-256, DELETE and HEAD 404 before the loopback server closes",
+            "output omits object body, path and UUID and never claims external provider evidence",
+            "unknown method, path, query, range, redirect, traversal and oversized body fail without retaining content"
+          ],
+          "file": "tests/deployment/local-object-smoke.test.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/e017-evidence-manifest.json",
+          "selector": "one-shot in-memory object semantics and negative boundary cases",
+          "test_id": "T-E017-LOCAL-OBJECT-001"
         }
       ],
       "status": "COVERED",

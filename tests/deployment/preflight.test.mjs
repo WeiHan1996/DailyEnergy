@@ -6,9 +6,18 @@ import {
   validateDevelopmentPreflightEvidence,
 } from "../../tooling/deployment/preflight.mjs";
 import { devImageSetDigest } from "../../tooling/deployment/image-set.mjs";
+import { materializeDevelopmentRelease } from "../../tooling/deployment/materialize-dev-release.mjs";
 import { devRuntimeEvidenceDigest } from "../../tooling/deployment/runtime-evidence.mjs";
-import { validateReleaseManifest } from "../../tooling/deployment/release-contract.mjs";
-import { releaseManifestFixture } from "./release-fixture.mjs";
+import {
+  DEVELOPMENT_LITE_OBJECT_FINGERPRINT,
+  validateReleaseManifest,
+  validateReleaseTransition,
+  validateRollbackTransition,
+} from "../../tooling/deployment/release-contract.mjs";
+import {
+  devLiteReleaseManifestFixture,
+  releaseManifestFixture,
+} from "./release-fixture.mjs";
 
 const COS_CONFIG = [
   "COS_BUCKET=dailyenergy-dev-1250000000",
@@ -19,10 +28,14 @@ const COS_CONFIG = [
 ].join("\n");
 
 function evidence(options = {}) {
-  const config = createCosConfigEvidence(COS_CONFIG);
+  const developmentLite = options.deploymentProfile === "DEV_LITE";
+  const config = developmentLite ? null : createCosConfigEvidence(COS_CONFIG);
   const releaseId = `dev-${"b".repeat(12)}-50000000001-1`;
   const manifest = releaseManifestFixture(releaseId, {
-    objectConfigFingerprint: config.config_sha256,
+    ...(developmentLite ? { deploymentProfile: "DEV_LITE" } : {}),
+    ...(config === null
+      ? {}
+      : { objectConfigFingerprint: config.config_sha256 }),
   });
   options.mutateManifest?.(manifest);
   const runtimeEvidence = {
@@ -83,15 +96,19 @@ function evidence(options = {}) {
   const secretRoles = Object.keys(manifest.config.secret_ref_versions);
   const value = {
     files: {
-      config: {
-        ...config,
-        protection: "ROOT_0600_REGULAR",
-        role: "object_config",
-      },
+      ...(config === null
+        ? {}
+        : {
+            config: {
+              ...config,
+              protection: "ROOT_0600_REGULAR",
+              role: "object_config",
+            },
+          }),
       directories: [
         "root",
-        "config",
         "secrets",
+        ...(developmentLite ? [] : ["config"]),
         ...[...new Set(Object.values(manifest.config.secret_ref_versions))].map(
           (version) => `secret-version:${version}`,
         ),
@@ -108,7 +125,7 @@ function evidence(options = {}) {
     host: {
       architecture: "x86_64",
       compose_version: "2.40.3",
-      cpu_count: 4,
+      cpu_count: developmentLite ? 2 : 4,
       deployment_node_version: "24.18.0",
       disk_free_bytes: 165 * 1024 ** 3,
       docker_version: "29.1.3",
@@ -117,8 +134,9 @@ function evidence(options = {}) {
       os_id: "ubuntu",
       os_version: "24.04",
       run_uid: 0,
+      ...(developmentLite ? { swap_total_bytes: 1024 ** 3 } : {}),
       timezone: "Asia/Shanghai",
-      total_memory_bytes: 7.5 * 1024 ** 3,
+      total_memory_bytes: developmentLite ? 1_651_684 * 1024 : 7.5 * 1024 ** 3,
     },
     imageSet,
     manifest,
@@ -127,6 +145,10 @@ function evidence(options = {}) {
   };
   options.mutateEvidence?.(value);
   return value;
+}
+
+function devLiteEvidence(options = {}) {
+  return evidence({ ...options, deploymentProfile: "DEV_LITE" });
 }
 
 test("T-E012-PREFLIGHT-001 accepts the authorized root-only DEV host evidence", () => {
@@ -239,4 +261,192 @@ test("T-E012-PREFLIGHT-001 rejects path-capable config and secret version refs",
       /RELEASE_MANIFEST_(?:OBJECT_CONFIG_REF|SECRET_REF_VERSION)/u,
     );
   }
+});
+
+test("T-E017-PREFLIGHT-001 accepts the closed 2C2G DEV_LITE tuple without COS evidence", () => {
+  const value = devLiteEvidence();
+  assert.equal(validateReleaseManifest(value.manifest), value.manifest);
+  assert.deepEqual(Object.keys(value.manifest.config.secret_ref_versions), [
+    "database_admin_url",
+    "database_api_url",
+    "database_background_url",
+    "database_interactive_url",
+    "database_migration_url",
+    "database_restricted_url",
+    "fault_control_token",
+    "postgres_password",
+  ]);
+  assert.equal(
+    value.manifest.config.runtime_fingerprints.object_config,
+    DEVELOPMENT_LITE_OBJECT_FINGERPRINT,
+  );
+  assert.equal(Object.hasOwn(value.files, "config"), false);
+  assert.equal(
+    Object.hasOwn(value.manifest.topology, "object_config_ref"),
+    false,
+  );
+  assert.deepEqual(validateDevelopmentPreflightEvidence(value), {
+    checks: {
+      capacity: "PASS",
+      host_baseline: "PASS",
+      local_object_contract: "PASS",
+      network_exposure: "PASS",
+      secret_files: "PASS",
+      swap: "PASS",
+    },
+    deployment_profile: "DEV_LITE",
+    gate: "E017_DEV_LITE_PREFLIGHT",
+    release_id: `dev-${"b".repeat(12)}-50000000001-1`,
+    status: "PASS",
+  });
+});
+
+test("T-E017-PREFLIGHT-001 preserves the V1 capacity floor and closes the V2 floor", () => {
+  assert.throws(
+    () =>
+      validateDevelopmentPreflightEvidence(
+        evidence({
+          mutateEvidence: (value) => {
+            value.host.cpu_count = 2;
+            value.host.total_memory_bytes = 2 * 1024 ** 3;
+          },
+        }),
+      ),
+    /PREFLIGHT_HOST_CAPACITY/u,
+  );
+  for (const mutateEvidence of [
+    (value) => {
+      value.host.cpu_count = 1;
+    },
+    (value) => {
+      value.host.total_memory_bytes = 1.5 * 1024 ** 3 - 1;
+    },
+    (value) => {
+      value.host.disk_free_bytes = 20 * 1024 ** 3 - 1;
+    },
+    (value) => {
+      value.host.swap_total_bytes = 1024 ** 3 - 1;
+    },
+  ]) {
+    assert.throws(
+      () =>
+        validateDevelopmentPreflightEvidence(
+          devLiteEvidence({ mutateEvidence }),
+        ),
+      /PREFLIGHT_HOST_CAPACITY/u,
+    );
+  }
+});
+
+test("T-E017-PREFLIGHT-001 rejects COS fields, production claims, and local object drift", () => {
+  for (const mutateManifest of [
+    (manifest) => {
+      manifest.config.secret_ref_versions.cos_secret_id = "cos-secret-v1";
+    },
+    (manifest) => {
+      manifest.topology.object_config_ref = "cos-config-v1";
+    },
+    (manifest) => {
+      manifest.topology.production_eligible = true;
+    },
+    (manifest) => {
+      manifest.config.runtime_fingerprints.object_config = "0".repeat(64);
+    },
+  ]) {
+    assert.throws(
+      () =>
+        validateReleaseManifest(
+          devLiteReleaseManifestFixture("e017-invalid", {
+            mutate: mutateManifest,
+          }),
+        ),
+      /RELEASE_MANIFEST_/u,
+    );
+  }
+  for (const environment of ["STAGING", "PRODUCTION"]) {
+    assert.throws(
+      () =>
+        validateReleaseManifest(
+          devLiteReleaseManifestFixture("e017-environment", {
+            mutate: (manifest) => {
+              manifest.config.environment = environment;
+            },
+          }),
+        ),
+      /RELEASE_MANIFEST_PRODUCTION_GATE:dev-lite-environment/u,
+    );
+  }
+  assert.throws(
+    () =>
+      validateDevelopmentPreflightEvidence(
+        devLiteEvidence({
+          mutateEvidence: (value) => {
+            value.files.config = {
+              protection: "ROOT_0600_REGULAR",
+              role: "object_config",
+            };
+          },
+        }),
+      ),
+    /PREFLIGHT_FILE_EVIDENCE_KEYS/u,
+  );
+});
+
+test("T-E017-PREFLIGHT-001 materializes V2 without COS input and forbids cross-topology transitions", () => {
+  const value = devLiteEvidence();
+  const supplyEvidence = {
+    catalog_fingerprint: value.imageSet.evidence.catalog_fingerprint,
+    ci_provenance_sha256: value.imageSet.evidence.ci_provenance_sha256,
+    ci_sbom_sha256: value.imageSet.evidence.ci_sbom_sha256,
+    evidence_version: "DevSupplyEvidenceV1",
+    lockfile_sha256: value.imageSet.evidence.lockfile_sha256,
+    migration_head: value.imageSet.evidence.migration_head,
+    runtime_evidence_sha256: devRuntimeEvidenceDigest(value.runtimeEvidence),
+  };
+  const materialized = materializeDevelopmentRelease({
+    imageSet: value.imageSet,
+    runtimeEvidence: value.runtimeEvidence,
+    selection: {
+      database_secret_version: "dev-lite-secret-v1",
+      deployment_profile: "DEV_LITE",
+    },
+    supplyEvidence,
+  });
+  assert.equal(materialized.manifest_version, "ReleaseManifestV2");
+  assert.equal(materialized.config.deployment_profile, "DEV_LITE");
+  assert.equal(materialized.topology.production_eligible, false);
+  assert.equal(JSON.stringify(materialized).includes("cos_secret"), false);
+  assert.equal(
+    JSON.stringify(materialized).includes("object_config_ref"),
+    false,
+  );
+  assert.throws(
+    () =>
+      materializeDevelopmentRelease({
+        imageSet: value.imageSet,
+        objectConfigSource: COS_CONFIG,
+        runtimeEvidence: value.runtimeEvidence,
+        selection: {
+          database_secret_version: "dev-lite-secret-v1",
+          deployment_profile: "DEV_LITE",
+        },
+        supplyEvidence,
+      }),
+    /DEV_LITE_RELEASE_OBJECT_CONFIG_FORBIDDEN/u,
+  );
+
+  const standard = releaseManifestFixture("e012-standard", {
+    acceptedGenerations: [1],
+  });
+  const lite = devLiteReleaseManifestFixture("e017-lite", {
+    acceptedGenerations: [1],
+  });
+  assert.throws(
+    () => validateReleaseTransition(standard, lite),
+    /RELEASE_TOPOLOGY_TRANSITION_REQUIRES_FRESH_STATE/u,
+  );
+  assert.throws(
+    () => validateRollbackTransition(lite, standard),
+    /ROLLBACK_TOPOLOGY_TRANSITION_REQUIRES_FRESH_STATE/u,
+  );
 });

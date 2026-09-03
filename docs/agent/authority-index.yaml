@@ -2,6 +2,34 @@ version: 1
 projectContext: docs/agent/PROJECT_CONTEXT.md
 
 taskRules:
+  - match: E-017
+    profile: security
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Repository, secret, production, and destructive-operation rules
+      - path: tasks/current.md
+        required: true
+        reason: Current DEV_LITE scope, authorization, stacked branch, and C-015 interruption
+      - path: docs/decisions/ADR-0009-development-lite-colocation-exception.md
+        required: true
+        reason: Accepted 2C2G topology, staged runtime, local object, and production prohibition
+      - path: docs/decisions/ADR-0007-development-colocation-exception.md
+        required: true
+        reason: Superseded standard DEV history and migration boundary
+      - path: docs/technical/deployment.md
+        required: true
+        reason: Release manifest, artifact, secret, rollback, and production contracts
+      - path: docs/operations/development-deployment-runbook.md
+        required: true
+        reason: Executable publication, host, rollout, rollback, and evidence procedure
+      - path: docs/technical/testing.md
+        required: true
+        reason: Security-negative, failure, recovery, and real-host evidence rules
+      - path: docs/operations/privacy-data-map.md
+        required: true
+        reason: Synthetic-only, processor, location, log, and production privacy boundaries
+
   - match: E-016
     profile: security
     sources:

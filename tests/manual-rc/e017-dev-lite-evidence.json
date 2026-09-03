@@ -1,0 +1,60 @@
+{
+  "evidence_version": "e-017-dev-lite-manual-evidence-v1",
+  "task_id": "E-017",
+  "issue": "https://github.com/WeiHan1996/DailyEnergy/issues/171",
+  "branch": "agent/e017-dev-lite",
+  "stacked_base_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/170",
+  "owner_decision": "ACCEPTED_2026-09-03 / DEV_LITE / SYNTHETIC_ONLY / PRODUCTION_AND_RC_NO_GO",
+  "pass_claim": "PROHIBITED_UNTIL_REAL_HOST_EXERCISE_COMPLETES",
+  "host_admission": {
+    "status": "PARTIAL_READ_ONLY_PASS / BOOTSTRAP_PENDING",
+    "provider_region": "ALIBABA_CLOUD / CHINA_EAST_2_SHANGHAI",
+    "console_security_verification": "COMPLETED_2026-09-03",
+    "host_identity": "LOCAL_ONLY / PUBLIC_IP_INSTANCE_ID_AND_HOST_KEY_NOT_TRACKED",
+    "ssh_key_pair": "IMPORTED_BOUND_AND_NORMAL_RESTARTED / ROOT_BATCHMODE_PASS",
+    "os_arch": "UBUNTU_24_04_4 / X86_64 / PASS",
+    "capacity": "2_CPU / MEMTOTAL_1651684_KB / ROOT_40_GIB / FREE_APPROX_35_GIB",
+    "time": "ASIA_SHANGHAI / NTP_SYNCHRONIZED / PASS",
+    "swap": "PENDING / OBSERVED_ZERO",
+    "docker": "PENDING / NOT_INSTALLED",
+    "compose": "PENDING / NOT_INSTALLED",
+    "firewall": "PENDING_HARDENING / UFW_INACTIVE / ONLY_SSH_OBSERVED_LISTENING"
+  },
+  "automated_evidence": {
+    "release_manifest_v2": "PASS / T-E017-MANIFEST-001",
+    "historical_v1_compatibility": "PASS / T-E012-MANIFEST-001 / T-E012-COMPAT-001",
+    "dev_lite_compose": "PASS / T-E017-COMPOSE-001",
+    "resource_budget": "PASS / T-E017-COMPOSE-001 / T-E017-PREFLIGHT-001",
+    "staged_workload_exclusion": "PASS / T-E017-DEPLOY-001",
+    "local_synthetic_object": "PASS / T-E017-LOCAL-OBJECT-001 / LOCAL_ONLY",
+    "preflight": "PASS / T-E017-PREFLIGHT-001",
+    "bundle_v3": "PASS / T-E017-BUNDLE-001",
+    "transition_and_rollback": "PASS / T-E017-MANIFEST-001 / T-E017-DEPLOY-001",
+    "task_gate": "AUTOMATED_PASS / FULL_SECURITY_GATE / MANUAL_EVIDENCE_REQUIRED"
+  },
+  "real_host_exercise": {
+    "immutable_bundle": "PENDING_MAIN_BOUND_PUBLICATION",
+    "fresh_state_and_seed": "PENDING",
+    "deploy_phases": "PENDING",
+    "reconcile_phases": "PENDING",
+    "n_to_n_plus_1": "PENDING",
+    "rollback_to_n": "PENDING",
+    "redeploy_n_plus_1": "PENDING",
+    "oom_killed": "PENDING",
+    "restart_loop": "PENDING",
+    "swap_pressure": "PENDING",
+    "free_disk": "PENDING",
+    "non_loopback_protected_ports": "PENDING",
+    "local_object_scope": "PENDING / NEVER_EXTERNAL_OBJECT_EVIDENCE"
+  },
+  "production_boundary": {
+    "production_eligible": false,
+    "real_user_data": "PROHIBITED",
+    "external_object": "UNAVAILABLE",
+    "backup_pitr_ha": "UNAVAILABLE",
+    "c015_production_bundle": "STILL_PENDING",
+    "privacy_legal": "STILL_PENDING",
+    "production_rc": "NO_GO"
+  },
+  "review_status": "IN_PROGRESS"
+}

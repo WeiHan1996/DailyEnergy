@@ -32,6 +32,7 @@ import {
   commitSuccessfulDeployment,
   commitSuccessfulRollback,
   markReleaseOperationRecovering,
+  persistReleaseManifest,
   readReleaseOperation,
   readReleaseState,
   updateReleaseOperationPhase,
@@ -43,7 +44,10 @@ import {
   materializeDevelopmentComposeSecrets,
   renderComposeEnvironment,
 } from "../../tooling/deployment/deploy-dev.mjs";
-import { releaseManifestFixture as manifest } from "./release-fixture.mjs";
+import {
+  devLiteReleaseManifestFixture,
+  releaseManifestFixture as manifest,
+} from "./release-fixture.mjs";
 
 async function temporaryRoot(t) {
   const root = await mkdtemp(path.join(tmpdir(), "dailyenergy-e012-"));
@@ -406,6 +410,58 @@ test("T-E012-DEPLOY-001 materializes root-only values as release-scoped file sec
   );
 });
 
+test("T-E017-PREFLIGHT-001 materializes eight DEV_LITE secrets without COS files", async (t) => {
+  const root = await temporaryRoot(t);
+  const value = devLiteReleaseManifestFixture("e017-compose-secrets", {
+    mutate: (manifestValue) => {
+      for (const role of Object.keys(
+        manifestValue.config.secret_ref_versions,
+      )) {
+        manifestValue.config.secret_ref_versions[role] = "dev-lite-secret-v1";
+      }
+    },
+  });
+  const sourceDirectory = path.join(root, "secrets", "dev-lite-secret-v1");
+  await mkdir(sourceDirectory, { mode: 0o700, recursive: true });
+  const expectedFiles = [
+    "database-admin-url",
+    "database-api-url",
+    "database-background-url",
+    "database-interactive-url",
+    "database-migration-url",
+    "database-restricted-url",
+    "fault-control-token",
+    "postgres-password",
+  ];
+  await Promise.all(
+    expectedFiles.map((file) =>
+      writeFile(path.join(sourceDirectory, file), `synthetic-${file}\n`, {
+        mode: 0o600,
+      }),
+    ),
+  );
+  const options = {
+    expectedSourceGid: process.getgid(),
+    expectedSourceUid: process.getuid(),
+    postgresGid: process.getgid(),
+    postgresUid: process.getuid(),
+    root: await resolveRealpath(root),
+    serviceGid: process.getgid(),
+    serviceUid: process.getuid(),
+  };
+  const directory = await materializeDevelopmentComposeSecrets(value, options);
+  assert.deepEqual(await readdir(directory), expectedFiles);
+  assert.equal(
+    (await readdir(directory)).some((file) => file.includes("cos")),
+    false,
+  );
+  const environment = renderComposeEnvironment(value, {
+    composeSecretDirectory: directory,
+  });
+  assert.equal(environment.includes("COS_"), false);
+  assert.ok(environment.includes(`DAILYENERGY_SECRET_DIR=${directory}\n`));
+});
+
 test("T-E012-DEPLOY-001 executes the closed phase plan and makes exact replay idempotent", async (t) => {
   const root = await temporaryRoot(t);
   const bundleRoot = path.join(root, "bundle");
@@ -583,6 +639,128 @@ test("T-E012-DEPLOY-001 replaces only a failed pre-migration initial candidate",
     phase: "stateful-ready",
     result: "FAIL",
   });
+});
+
+test("T-E017-DEPLOY-001 refuses cross-topology initial candidate replacement", async (t) => {
+  for (const [label, first, replacement] of [
+    [
+      "standard-to-lite",
+      manifest("e017-failed-standard"),
+      devLiteReleaseManifestFixture("e017-replacement-lite"),
+    ],
+    [
+      "lite-to-standard",
+      devLiteReleaseManifestFixture("e017-failed-lite"),
+      manifest("e017-replacement-standard"),
+    ],
+  ]) {
+    const root = await temporaryRoot(t);
+    const firstBundle = path.join(root, `${label}-first`);
+    const replacementBundle = path.join(root, `${label}-replacement`);
+    const stateRoot = path.join(root, `${label}-state`);
+    await Promise.all([mkdir(firstBundle), mkdir(replacementBundle)]);
+    await assert.rejects(
+      executeDevelopmentDeployment({
+        bundleRoot: firstBundle,
+        imageSet: {},
+        manifest: first,
+        preflight: async () => undefined,
+        runner: async (command) => ({
+          code:
+            command.executable === "docker" &&
+            command.arguments.includes("postgres")
+              ? 1
+              : 0,
+        }),
+        runtimeEvidence: {},
+        secretMaterializer: noSecretMaterializer,
+        stateRoot,
+      }),
+      /E012_DEPLOY_PHASE_FAILED:stateful-ready/u,
+    );
+    const operationFile = path.join(stateRoot, "release-operation.json");
+    const operationBefore = await readFile(operationFile, "utf8");
+    const calls = { preflight: 0, runner: 0, secrets: 0 };
+    await assert.rejects(
+      executeDevelopmentDeployment({
+        bundleRoot: replacementBundle,
+        imageSet: {},
+        manifest: replacement,
+        preflight: async () => {
+          calls.preflight += 1;
+        },
+        runner: async () => {
+          calls.runner += 1;
+          return { code: 0 };
+        },
+        runtimeEvidence: {},
+        secretMaterializer: async () => {
+          calls.secrets += 1;
+          return "/synthetic/runtime-secrets";
+        },
+        stateRoot,
+      }),
+      /RELEASE_INITIAL_REPLACEMENT_TOPOLOGY_REQUIRES_FRESH_STATE/u,
+    );
+    assert.deepEqual(calls, { preflight: 0, runner: 0, secrets: 0 });
+    assert.equal(await readFile(operationFile, "utf8"), operationBefore);
+    assert.equal(await readReleaseState(stateRoot), null);
+  }
+});
+
+test("T-E017-MANIFEST-001 rejects mixed topology in operation and catalog state writes", async (t) => {
+  for (const [label, current, other] of [
+    [
+      "standard-to-lite",
+      manifest("e017-state-standard"),
+      devLiteReleaseManifestFixture("e017-state-lite"),
+    ],
+    [
+      "lite-to-standard",
+      devLiteReleaseManifestFixture("e017-state-lite-current"),
+      manifest("e017-state-standard-other"),
+    ],
+  ]) {
+    const root = await temporaryRoot(t);
+    const stateRoot = path.join(root, label);
+    await commitSuccessfulDeployment(stateRoot, current);
+    const state = await readReleaseState(stateRoot);
+    const stateFile = path.join(stateRoot, "release-state.json");
+    const stateBefore = await readFile(stateFile, "utf8");
+
+    await assert.rejects(
+      beginReleaseOperation(stateRoot, "DEPLOY", other, state.current),
+      /RELEASE_OPERATION_TOPOLOGY_REQUIRES_FRESH_STATE/u,
+    );
+    assert.equal(await readReleaseOperation(stateRoot), null);
+    assert.equal(await readFile(stateFile, "utf8"), stateBefore);
+
+    await assert.rejects(
+      commitRecoveredCurrent(stateRoot, other),
+      /RECOVER_CURRENT_CATALOG_TOPOLOGY_REQUIRES_FRESH_STATE/u,
+    );
+    assert.equal(await readFile(stateFile, "utf8"), stateBefore);
+
+    await persistReleaseManifest(stateRoot, other);
+    const otherCatalog = {
+      catalog_fingerprint: other.migrations.catalog_fingerprint,
+      catalog_generation: other.migrations.catalog_generation,
+      manifest_sha256: releaseManifestDigest(other),
+      migration_head: other.migrations.migration_head,
+      release_id: other.release_id,
+    };
+    await assert.rejects(
+      beginReconciliationOperation(
+        stateRoot,
+        current,
+        state.current,
+        otherCatalog,
+      ),
+      /RECONCILE_CURRENT_CATALOG_TOPOLOGY_REQUIRES_FRESH_STATE/u,
+    );
+    assert.equal(await readReleaseOperation(stateRoot), null);
+    assert.equal(await readFile(stateFile, "utf8"), stateBefore);
+  }
 });
 
 test("T-E012-DEPLOY-001 refuses to replace an initial candidate that reached migration", async (t) => {
@@ -1460,4 +1638,157 @@ test("T-E012-DEPLOY-001 force-recreates every service convergence phase", () => 
       `Compose up must replace stale release-scoped secret mounts: ${command.arguments.at(-1)}`,
     );
   }
+});
+
+test("T-E017-MANIFEST-001 rejects standard and DEV_LITE state transitions", () => {
+  const standard = manifest("e017-standard");
+  const developmentLite = devLiteReleaseManifestFixture("e017-lite");
+  assert.throws(
+    () => validateReleaseTransition(standard, developmentLite),
+    /RELEASE_TOPOLOGY_TRANSITION_REQUIRES_FRESH_STATE/u,
+  );
+  assert.throws(
+    () => validateRollbackTransition(developmentLite, standard),
+    /ROLLBACK_TOPOLOGY_TRANSITION_REQUIRES_FRESH_STATE/u,
+  );
+});
+
+test("T-E017-DEPLOY-001 builds a staged DEV_LITE plan without COS or concurrent transient workloads", () => {
+  const value = devLiteReleaseManifestFixture("e017-deploy-plan");
+  const secretDirectory = "/srv/dailyenergy/runtime-secrets/e017-deploy-plan";
+  const environment = renderComposeEnvironment(value, {
+    composeSecretDirectory: secretDirectory,
+  });
+  const commands = developmentDeploymentCommands(
+    "/srv/dailyenergy/bundles/e017-deploy-plan",
+    "/srv/dailyenergy/bundles/e017-deploy-plan/release.env",
+    value,
+  );
+  const serialized = JSON.stringify(commands);
+  assert.match(serialized, /docker\/compose\.dev-lite\.yaml/u);
+  assert.equal(serialized.includes("docker/compose.dev.yaml"), false);
+  assert.equal(environment.includes("COS_"), false);
+  assert.equal(environment.includes("cos-credential"), false);
+  assert.match(environment, /DAILYENERGY_DEPLOYMENT_PROFILE=DEV_LITE\n/u);
+  assert.match(
+    environment,
+    /DAILYENERGY_REDIS_KEY_PREFIX=dailyenergy-dev-lite\n/u,
+  );
+  assert.match(
+    environment,
+    new RegExp(
+      `DAILYENERGY_DEV_LITE_COMPOSE_SECRET_DIR=${secretDirectory}\\n`,
+      "u",
+    ),
+  );
+  assert.equal(commands.pull.at(-1).timeoutMs, 1_800_000);
+  assert.ok(commands.pull[0].arguments.includes("stop"));
+  for (const stateful of ["postgres", "redis", "dependency-stub"]) {
+    assert.equal(
+      commands.pull[0].arguments.includes(stateful),
+      false,
+      `pull maintenance must preserve ${stateful} for recovery probes`,
+    );
+  }
+  assert.equal(commands.health.length, 1);
+  assert.ok(commands.health[0].arguments.includes("localhost:8443:127.0.0.1"));
+  assert.ok(
+    commands.admin.some(
+      (command) =>
+        command.executable === "curl" &&
+        command.arguments.includes("localhost:8444:127.0.0.1") &&
+        command.arguments.includes("https://localhost:8444/login"),
+    ),
+  );
+  assert.ok(
+    commands.admin.some(
+      (command) =>
+        command.executable === "docker" &&
+        command.arguments.includes("tls-proxy") &&
+        command.arguments.includes("up"),
+    ),
+  );
+
+  const profiles = {
+    admin: "dev-lite-admin",
+    "worker-background": "dev-lite-background",
+    "worker-interactive": "dev-lite-interactive",
+    "worker-restricted": "dev-lite-restricted",
+  };
+  for (const [phase, profile] of Object.entries(profiles)) {
+    assert.ok(commands[phase][0].arguments.includes("stop"), phase);
+    const start = commands[phase].find((command) =>
+      command.arguments.includes("up"),
+    );
+    assert.ok(start, phase);
+    assert.ok(start.arguments.includes(profile), phase);
+    assert.ok(start.arguments.includes("--no-deps"), phase);
+  }
+  assert.ok(commands["tls-ingress"][0].arguments.includes("stop"));
+  assert.ok(
+    commands["smoke-object"][0].arguments.includes("dev-lite-one-shot"),
+  );
+  for (const phase of [
+    "migration",
+    "drift",
+    "smoke-object",
+    "smoke-safety",
+    "smoke-owner",
+    "smoke-delete",
+  ]) {
+    for (const command of commands[phase]) {
+      if (command.arguments.includes("run")) {
+        assert.ok(command.arguments.includes("--name"), phase);
+        assert.match(
+          command.arguments[command.arguments.indexOf("--name") + 1],
+          /^dailyenergy-dev-lite-/u,
+          phase,
+        );
+      }
+    }
+  }
+  assert.equal(serialized.includes(" build"), false);
+  assert.equal(serialized.includes("0.0.0.0:443"), false);
+});
+
+test("T-E017-DEPLOY-001 executes the complete DEV_LITE phase graph from fresh state", async (t) => {
+  const root = await temporaryRoot(t);
+  const bundleRoot = path.join(root, "bundle");
+  const stateRoot = path.join(root, "state");
+  await mkdir(bundleRoot);
+  const value = devLiteReleaseManifestFixture("e017-fresh-deploy");
+  const seen = [];
+  const result = await executeDevelopmentDeployment({
+    bundleRoot,
+    imageSet: {},
+    manifest: value,
+    preflight: async () => undefined,
+    runner: async (command) => {
+      seen.push(command);
+      return { code: 0 };
+    },
+    runtimeEvidence: {},
+    secretMaterializer: noSecretMaterializer,
+    stateRoot,
+  });
+  assert.equal(result.receipts.length, deploymentPhases.length);
+  assert.equal(
+    (await readReleaseState(stateRoot)).current.release_id,
+    value.release_id,
+  );
+  assert.ok(
+    seen.every(
+      (command) =>
+        command.executable !== "docker" ||
+        command.arguments.some((argument) =>
+          argument.endsWith("docker/compose.dev-lite.yaml"),
+        ),
+    ),
+  );
+  assert.ok(
+    seen.some(
+      (command) =>
+        command.executable === "docker" && command.timeoutMs === 1_800_000,
+    ),
+  );
 });

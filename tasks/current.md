@@ -3,16 +3,28 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-03
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：C-015 — C-004～C-015 统一审核修复
-- **任务状态**：Blocked（实现与统一修复已 merge；DevTools/iOS/Android no-replay 已执行，等待生产 bundle 与 Privacy/Legal 证据）
-- **任务 Profile**：`security`（幂等、Safety、删除不复活、隐私、确定性与 analytics 可信性）
-- **工作分支**：`agent/c015-post-merge-handoff`
-- **修复基线**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)，remote head `fd04b787926127bda64fc6cb07cfcf356d85ed8b`，CI run `33323476723` 11/11 SUCCESS
-- **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
-- **当前 PR**：[C-015 外部证据准备 Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170)；base=`main`，verified implementation head `9022e5b713d838196c14e6280d481f444e65cb15`，CI run `33579547592` 11/11 SUCCESS；latest evidence/security head `d1997f2e2e84feec91d7c4f07821f421c9f69da4`，CI run `33698970649` 11/11 SUCCESS
+- **当前任务**：E-017 — 2C2G DEV_LITE 可回滚部署
+- **任务状态**：In Progress（安全审查修复后的 full Gate 自动 PASS；stacked PR、exact-head CI 与真实部署 Pending）
+- **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
+- **工作分支**：`agent/e017-dev-lite`
+- **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
+- **当前 PR**：Pending；将 stacked 在 C-015 Draft PR #170 之上
+- **Stacked 基线**：[C-015 Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170)，head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968`，CI run `33713182325` 11/11 SUCCESS
+- **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
 - **合并状态**：main head `fec5c96d368f8d4427ecca861f8ce42adad7a270`，CI run `33374088290` 11/11 SUCCESS
-- **下一候选动作**：修复并绑定实际生产 origin/image/manifest；完成处理主体、位置/受托方/跨境与最终用户说明审核；不启动 C-016
+- **下一候选动作**：建立 E-017 stacked Draft PR 并取得 exact-head 11/11；代码进入 main 后再生成 main-bound immutable bundle 和执行真实主机演练
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
+
+## 2026-09-03 E-017 启动
+
+- owner 明确接受阿里云 ECS 只作为 `DEV_LITE`，仅处理 synthetic 可重建数据，`production_eligible=false`，Production/RC 保持 `NO_GO`；该决定记录于 Accepted ADR-0009；
+- 新 ECS 位于上海地域，Ubuntu 24.04.4 x86_64、2 CPU、实际 `MemTotal=1651684kB`、40 GiB 系统盘且约 35 GiB 可用、3 Mbps；时区/NTP 合格，Docker 未安装、swap=0、UFW 未启用，当前只监听 SSH；
+- owner 授权后，阿里云控制台已完成安全验证，导入现有公钥为 `dailyenergy-dev-lite-2026`、绑定唯一空实例并普通重启；固定 ED25519 主机指纹下 `root` BatchMode 登录通过；公钥、IP、实例 ID 与账号信息不进入仓库；
+- DEV_LITE 不购买外部对象存储；使用 `network_mode:none`、无 secret/volume/host port 的 one-shot 内存对象 smoke。该证据只证明本地 synthetic PUT/GET/hash/DELETE 合同，不替代旧 E-012 COS 或未来生产 OSS/CDN；
+- 约 1.6 GiB 实际 RAM 禁止九服务常驻：只保留 PostgreSQL、Redis、dependency stub、API、TLS core；Admin、Interactive、Background、Restricted 与一次性 job 按锁保护的窗口逐个启动并立即停止；swap 仅作突发缓冲，不替代资源预算；
+- 不复制腾讯云 DEV volume、dump、release state、object、secret 或 credential；服务器不 checkout、不现场 build，只接受 main-bound、同 run CI 通过且 digest 固定的 bundle；
+- 只读安全审查发现并修复旧 bundle 安装、跨 topology dirty state、阶段 service set/one-shot、pull recovery 与 Admin TLS 边界；Node 24.18.0 与官方 npm registry 下，最终 `pnpm agent:validate --mode=full --task=E-017` 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`，部署测试 `74/74`，Source registry 为 `1004 total / 538 COVERED / 466 PLANNED`；Gate 生成的 15 个 Prisma 非语义格式副作用已按 owner 授权恢复；
+- 在 E-017 完成和返回 C-015 前，不启动 C-016；C-015 的生产 bundle、主体/位置/受托方/跨境和 Legal review 继续阻塞 Production/RC。
 
 ## 2026-09-02～09-03 外部证据补齐进度
 
@@ -26,9 +38,9 @@
 - 首次修复 head `284f707` 的 CI 暴露 C-014 固定 2026-08-25 业务时钟与 queue `now()` 混用，导致 2026-09-02 后 status retention 抢先；`9022e5b` 为 due query 增加默认服务端当前时间、测试可注入的 `asOf`，真实 PostgreSQL 18 回归和 CI db-integration 均通过；
 - `9022e5b` 的 CI run `33579547592` 为 11/11 SUCCESS，覆盖 docs/static/unit-contract/db/queue/API/Admin/resilience/AI/supply-chain/full Gate；这些自动证据仍不替代 DevTools/真机和 Privacy/Legal 人工证据；
 - GitHub 当前只有 `development` environment，仓库和该环境均无 Actions variable/secret；没有可绑定的 STAGING/PRODUCTION API origin、生产 image set 或 Release Manifest；
-- `api.weihan.ltd` 已通过两台阿里云权威 DNS 和系统 resolver 验证 A 记录发布，未发布 AAAA/CNAME；公网 HTTPS/HTTP 端口均超时而 SSH 可达，因此 TLS handshake、API 健康检查和生产 origin 绑定仍未通过；owner 已将旧腾讯云主机定为 `DEV_ONLY_EXPIRING`，阿里云主机仅为 `PRODUCTION_CANDIDATE / ADMISSION_PENDING`；
+- `api.weihan.ltd` 已通过两台阿里云权威 DNS 和系统 resolver 验证 A 记录发布，未发布 AAAA/CNAME；公网 HTTPS/HTTP 端口均超时而 SSH 可达，因此 TLS handshake、API 健康检查和生产 origin 绑定仍未通过；owner 已将旧腾讯云主机定为 `DEV_ONLY_EXPIRING`，新阿里云主机严格为 `DEV_LITE / PRODUCTION_INELIGIBLE`，不承接该生产 origin；
 - 腾讯云 `DEV_ONLY_EXPIRING` 主机已通过已加载的专用密钥完成严格只读盘点：Ubuntu 24.04 x86_64、4 CPU/约 8 GiB/178 GiB、时钟同步、Docker/Compose 可用，9 个 synthetic DEV 容器健康；PostgreSQL/Redis 为本机 DEV 容器，TLS proxy 只绑定 loopback 8443/8444，主机未监听 80/443、UFW 只允许 SSH，且正式 `api.weihan.ltd` SNI 在 DEV proxy 上握手失败，因此该主机和 bundle 不具备生产资格；未读取 secret、env、日志、dump、volume 或用户内容；
-- owner 已购买上海地域 Ubuntu 24.04 的阿里云 ECS（2 vCPU / 2 GiB / 40 GiB / 3 Mbps）；公网 SSH 端口与首次观察的 ED25519 主机指纹可用，但现有专用公钥尚未绑定，`root` BatchMode 认证被拒绝且主机未被修改。该配置只能成为 `DEV_LITE_CANDIDATE / ADR_PENDING / PRODUCTION_INELIGIBLE`；不能替代 C-015 的生产 origin/image/manifest 证据；
+- owner 已购买上海地域 Ubuntu 24.04 的阿里云 ECS（2 vCPU / 2 GiB / 40 GiB / 3 Mbps）；首次盘点时专用公钥尚未绑定，随后已按明确授权完成安全验证、key pair 绑定、普通重启和固定 host key 下的 `root` BatchMode 登录。该主机只获 `DEV_LITE / SYNTHETIC_ONLY / PRODUCTION_INELIGIBLE` 决策，不能替代 C-015 的生产 origin/image/manifest 证据；
 - 本地脱敏 receipt 为 `.artifacts/c015/evidence-receipt.json`，SHA-256=`b1ea6a47128af3bdb7353ff10fdac26df49bd15c22ee91df7b6e1c28efc5a582`；该 ignored artifact 不替代 tracked 摘要、owner 接受或 CI；
 - 实际处理主体、安徽合肥登记属地、隐私联系、Android 版本和“不向不满十四周岁用户提供服务”的 owner 输入仅保存于 ignored 本地表；未成年人决定仍需 Accepted 规范与最小拒绝路径，Privacy 工程自审仍 Pending，Legal reviewer 保持 `PENDING_QUALIFIED_PRC_LEGAL_REVIEWER`；
 - 仍需完成：生产 origin/image/manifest、生产组件/受托方/region/跨境矩阵、最终用户说明和合格 Legal review。

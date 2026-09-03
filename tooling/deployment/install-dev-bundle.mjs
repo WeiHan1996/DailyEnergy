@@ -15,7 +15,10 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { pathToFileURL } from "node:url";
 
-import { verifyDevelopmentBundle } from "./deployment-bundle.mjs";
+import {
+  DEVELOPMENT_BUNDLE_VERSION,
+  verifyDevelopmentBundle,
+} from "./deployment-bundle.mjs";
 import {
   validateManifestImageSet,
   validateManifestRuntimeEvidence,
@@ -28,6 +31,8 @@ import {
 import { createCosConfigEvidence } from "./preflight.mjs";
 import {
   canonicalReleaseManifest,
+  DEVELOPMENT_LITE_OBJECT_FINGERPRINT,
+  RELEASE_MANIFEST_VERSION_V2,
   releaseManifestDigest,
   validateReleaseManifest,
 } from "./release-contract.mjs";
@@ -169,24 +174,37 @@ function validateInstalledManifest(
   validateReleaseManifest(manifest);
   validateManifestImageSet(manifest, imageSet);
   validateManifestRuntimeEvidence(manifest, imageSet, runtimeEvidence);
+  const developmentLite =
+    manifest.manifest_version === RELEASE_MANIFEST_VERSION_V2;
+  const objectConfigFingerprint = developmentLite
+    ? DEVELOPMENT_LITE_OBJECT_FINGERPRINT
+    : createCosConfigEvidence(objectConfigSource).config_sha256;
   if (
     manifest.config.runtime_fingerprints.object_config !==
-    createCosConfigEvidence(objectConfigSource).config_sha256
+    objectConfigFingerprint
   ) {
     fail("DEV_BUNDLE_INSTALL_OBJECT_CONFIG_DRIFT", manifest.release_id);
   }
-  if (
-    manifest.topology.object_config_ref !== selection.object_config_ref ||
-    manifest.config.secret_ref_versions.cos_secret_id !==
-      selection.cos_secret_version ||
-    manifest.config.secret_ref_versions.cos_secret_key !==
-      selection.cos_secret_version ||
-    Object.entries(manifest.config.secret_ref_versions).some(
-      ([name, version]) =>
-        !["cos_secret_id", "cos_secret_key"].includes(name) &&
-        version !== selection.database_secret_version,
-    )
-  ) {
+  const selectionDrift = developmentLite
+    ? selection.deployment_profile !== "DEV_LITE" ||
+      objectConfigSource !== undefined ||
+      Object.hasOwn(manifest.topology, "object_config_ref") ||
+      Object.hasOwn(manifest.config.secret_ref_versions, "cos_secret_id") ||
+      Object.hasOwn(manifest.config.secret_ref_versions, "cos_secret_key") ||
+      Object.values(manifest.config.secret_ref_versions).some(
+        (version) => version !== selection.database_secret_version,
+      )
+    : manifest.topology.object_config_ref !== selection.object_config_ref ||
+      manifest.config.secret_ref_versions.cos_secret_id !==
+        selection.cos_secret_version ||
+      manifest.config.secret_ref_versions.cos_secret_key !==
+        selection.cos_secret_version ||
+      Object.entries(manifest.config.secret_ref_versions).some(
+        ([name, version]) =>
+          !["cos_secret_id", "cos_secret_key"].includes(name) &&
+          version !== selection.database_secret_version,
+      );
+  if (selectionDrift) {
     fail("DEV_BUNDLE_INSTALL_SELECTION_DRIFT", manifest.release_id);
   }
   return manifest;
@@ -198,6 +216,10 @@ async function validateInstalledBundle(
 ) {
   const verified = await verifyDevelopmentBundle(directory, {
     materialized: true,
+    requiredBundleVersion:
+      selection.deployment_profile === "DEV_LITE"
+        ? DEVELOPMENT_BUNDLE_VERSION
+        : null,
   });
   const files = [...(await bundleFileList(directory)), "release-manifest.json"];
   await assertInstalledTree(directory, files, { expectedGid, expectedUid });
@@ -226,12 +248,15 @@ export async function installDevelopmentBundle(
   } = {},
 ) {
   const selected = validateDevelopmentReleaseSelection(selection);
+  const developmentLite = selected.deployment_profile === "DEV_LITE";
   const source = path.resolve(sourceDirectory);
   const root = path.resolve(developmentRoot);
   if (root === path.parse(root).root) {
     fail("DEV_BUNDLE_INSTALL_ROOT_INVALID", "filesystem-root");
   }
-  await verifyDevelopmentBundle(source);
+  await verifyDevelopmentBundle(source, {
+    requiredBundleVersion: developmentLite ? DEVELOPMENT_BUNDLE_VERSION : null,
+  });
   const bundlesRoot = path.join(root, "bundles");
   if (source === root || source.startsWith(`${bundlesRoot}${path.sep}`)) {
     fail("DEV_BUNDLE_INSTALL_SOURCE_INVALID", "managed-root");
@@ -251,19 +276,26 @@ export async function installDevelopmentBundle(
     expectedUid,
   });
 
-  const objectConfigFile = path.join(
-    root,
-    "config",
-    `${selected.object_config_ref}.env`,
-  );
-  await assertProtectedFile(objectConfigFile, { expectedGid, expectedUid });
-  const objectConfigSource = await readFile(objectConfigFile, "utf8");
+  let objectConfigSource;
+  if (!developmentLite) {
+    const objectConfigFile = path.join(
+      root,
+      "config",
+      `${selected.object_config_ref}.env`,
+    );
+    await assertProtectedFile(objectConfigFile, { expectedGid, expectedUid });
+    objectConfigSource = await readFile(objectConfigFile, "utf8");
+  }
   const [imageSet, runtimeEvidence, supplyEvidence] =
     await publicationEvidence(source);
   const releaseId = developmentReleaseId({
     imageSet,
-    objectConfigSha256:
-      createCosConfigEvidence(objectConfigSource).config_sha256,
+    ...(developmentLite
+      ? {}
+      : {
+          objectConfigSha256:
+            createCosConfigEvidence(objectConfigSource).config_sha256,
+        }),
     selection: selected,
   });
   const destination = path.join(bundlesRoot, releaseId);
@@ -323,7 +355,7 @@ export async function installDevelopmentBundle(
         catalogManifest,
         currentManifest,
         imageSet,
-        objectConfigSource,
+        ...(developmentLite ? {} : { objectConfigSource }),
         runtimeEvidence,
         selection: selected,
         supplyEvidence,
@@ -384,6 +416,32 @@ export async function installDevelopmentBundle(
 }
 
 async function main() {
+  if (process.argv[2] === "--dev-lite") {
+    const [sourceDirectory, databaseSecretVersion] = process.argv.slice(3);
+    if (
+      !sourceDirectory ||
+      !databaseSecretVersion ||
+      process.argv.length !== 5
+    ) {
+      fail(
+        "DEV_LITE_BUNDLE_INSTALL_USAGE",
+        "--dev-lite source-bundle-directory database-secret-version",
+      );
+    }
+    if (typeof process.getuid !== "function" || process.getuid() !== 0) {
+      fail("DEV_BUNDLE_INSTALL_OWNER", "root-required");
+    }
+    const result = await installDevelopmentBundle(sourceDirectory, {
+      selection: {
+        database_secret_version: databaseSecretVersion,
+        deployment_profile: "DEV_LITE",
+      },
+    });
+    process.stdout.write(
+      `DEV_BUNDLE_INSTALL_OK:id=${result.release_id}:generation=${result.generation}:deployment_profile=DEV_LITE:installed=${result.installed}\n`,
+    );
+    return;
+  }
   const [
     sourceDirectory,
     databaseSecretVersion,
