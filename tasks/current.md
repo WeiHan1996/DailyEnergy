@@ -19,7 +19,7 @@
 - 项目所有者已授权 Agent 准备 C-015 剩余证据，并在微信开发者工具中提供“见见今天”的既有 AppID；AppID 只用于本机忽略配置和 IDE 项目，不写入仓库或证据正文；
 - 微信开发者工具 `Stable v2.01.2510290` / 基础库 `3.7.12` 已通过 11 路由 smoke；owner 明确允许后仅开启本地服务端口，登录票据、默认信任和多端插件端口保持关闭；增强 no-replay runner 证明 `dimensions_expanded` 的 restart replay=`0`、fresh signal=`1`、storage keyword/digest change=`0`，完成后服务端口已恢复关闭；
 - iPhone 17 / iOS 26.5 / 微信 `8.0.76` 使用 ENT-001 真机调试和只接收合成 `landing_viewed` 的临时 HTTPS recorder：正向通路先验证，正式清零后离线重启=`0`、恢复网络缓存恢复=`0`、显式新调试刷新产生正向事件；AppID 未持久化，私有 `urlCheck` 已恢复 `true`，Quick Tunnel 与 recorder 已终止；iOS no-replay 证据完成；
-- Android 设备已确认为 Xiaomi MIX 2S / Android 10 / MIUI 12.5.1 / 微信 `8.0.76`；2026-09-03 已构建 STAGING 合成包并生成 Android 真机调试二维码，但 DevTools session 持续报告微信 websocket 域名解析失败且未建立真机会话；模拟器产生的两条正向事件已排除，no-replay 仍为 `INFRA_BLOCKED / PENDING_EXECUTION`，Quick Tunnel 与 recorder 已终止并恢复 LOCAL 配置；
+- Android 设备已确认为 Xiaomi MIX 2S / Android 10 / MIUI 12.5.1 / 微信 `8.0.76`；首次 STAGING 尝试遇到 DevTools websocket DNS 故障，重启后第二次已正常生成 Android 真机调试二维码且无 session error，但测试窗口内未观察到手机扫码或真机会话；模拟器正向事件已排除，no-replay 仍为 `PENDING_EXECUTION / DEVICE_SCAN_REQUIRED`，Quick Tunnel 与 recorder 已终止并恢复 LOCAL 配置；
 - 当前 head 的 LOCAL 候选 bundle build、Mini Program bundle Gate、C-015 analytics static test、已构建产物与 lockfile 禁止 SDK 名称扫描均通过；使用 Node `24.18.0` 生成的 supply-chain evidence 为 `5406` 个 build files、`750` 个 SBOM packages，artifact scanner PASS；这些结果未绑定实际 PRODUCTION API origin 或生产 OCI image，不能升级为生产 bundle PASS；
 - 2026-09-02 npm 官方 audit 新报告 transitive optional `mysql2@3.15.3` 的 high advisory `GHSA-3f6p-5ww8-9rcr`；当前分支用最小 override `mysql2@3.22.0` 修复，复核为 `critical=0/high=0`，完整自动 Gate 已在 `9022e5b` 通过；
 - 2026-09-03 npm 官方 audit 新报告 transitive optional `fast-uri@3.1.5` 的四个 high advisory（`GHSA-5jgf-p345-68v8`、`GHSA-f65p-4m7j-42xc`、`GHSA-fph4-wmhf-6fwf`、`GHSA-jqff-g426-hqxp`）；当前分支将既有最小 override 提升到 `fast-uri@3.1.6`，唯一生产解析版本与 frozen lockfile 策略通过，官方 audit 复核为 `critical=0/high=0`；Node `24.18.0` 下 `changed→full` Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`，exact-head CI run `33698970649` 为 11/11 SUCCESS；
@@ -27,8 +27,8 @@
 - `9022e5b` 的 CI run `33579547592` 为 11/11 SUCCESS，覆盖 docs/static/unit-contract/db/queue/API/Admin/resilience/AI/supply-chain/full Gate；这些自动证据仍不替代 DevTools/真机和 Privacy/Legal 人工证据；
 - GitHub 当前只有 `development` environment，仓库和该环境均无 Actions variable/secret；没有可绑定的 STAGING/PRODUCTION API origin、生产 image set 或 Release Manifest；
 - `api.weihan.ltd` 已通过两台阿里云权威 DNS 和系统 resolver 验证 A 记录发布，未发布 AAAA/CNAME；公网 HTTPS/HTTP 端口均超时而 SSH 可达，因此 TLS handshake、API 健康检查和生产 origin 绑定仍未通过；owner 已将旧腾讯云主机定为 `DEV_ONLY_EXPIRING`，阿里云主机仅为 `PRODUCTION_CANDIDATE / ADMISSION_PENDING`；
-- 腾讯云 SSH 用户名由 owner 确认为 `ubuntu`，但专用密钥的严格公钥认证于 2026-09-03 被主机拒绝；未读取服务器内容，也未尝试其它账户。解锁条件是确认该公钥已安装到 `ubuntu` 或更正实际用户名；
-- 本地脱敏 receipt 为 `.artifacts/c015/evidence-receipt.json`，SHA-256=`88038807f15fdfa3ccf67e4441018f789eb591d989f9d78103353019ec6a74f5`；该 ignored artifact 不替代 tracked 摘要、owner 接受或 CI；
+- 腾讯云 SSH 用户名由 owner 确认为 `ubuntu`；此前 `BatchMode` 失败的原因已澄清为专用私钥受口令保护，交互式 SSH 已正确到达私钥口令提示但测试窗口内未完成输入；未读取服务器内容，也未尝试其它账户。解锁条件是在用户终端运行 `ssh-add --apple-use-keychain` 或直接完成 SSH 口令提示；
+- 本地脱敏 receipt 为 `.artifacts/c015/evidence-receipt.json`，SHA-256=`4e5997e85652ee76e7be5e5d9f8483505753a658082d2a578d316f4830a990e5`；该 ignored artifact 不替代 tracked 摘要、owner 接受或 CI；
 - 实际处理主体、安徽合肥登记属地、隐私联系、Android 版本和“不向不满十四周岁用户提供服务”的 owner 输入仅保存于 ignored 本地表；未成年人决定仍需 Accepted 规范与最小拒绝路径，Privacy 工程自审仍 Pending，Legal reviewer 保持 `PENDING_QUALIFIED_PRC_LEGAL_REVIEWER`；
 - 仍需完成：Android no-replay、生产组件/受托方/region/跨境矩阵、最终用户说明和合格 Legal review。
 

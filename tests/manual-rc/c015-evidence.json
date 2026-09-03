@@ -154,18 +154,18 @@
       "fresh_debug_reload": "POSITIVE_CONTROL_REACHED_RECORDER",
       "temporary_domain_check": "GIT_IGNORED_ONLY / RESTORED_TRUE",
       "temporary_tunnel": "TERMINATED / NOT_PRODUCTION_EVIDENCE",
-      "receipt_sha256": "88038807f15fdfa3ccf67e4441018f789eb591d989f9d78103353019ec6a74f5"
+      "receipt_sha256": "4e5997e85652ee76e7be5e5d9f8483505753a658082d2a578d316f4830a990e5"
     },
     "android_no_replay": {
-      "status": "INFRA_BLOCKED / PENDING_EXECUTION",
+      "status": "PENDING_EXECUTION / DEVICE_SCAN_NOT_OBSERVED",
       "device": "Xiaomi MIX 2S",
       "os_version": "Android 10 / MIUI 12.5.1",
       "wechat_version": "8.0.76",
-      "last_attempted_at_utc": "2026-09-03T00:02:51Z",
+      "last_attempted_at_utc": "2026-09-03T01:46:33Z",
       "bundle_environment": "STAGING / SYNTHETIC_ONLY",
-      "debug_qr": "GENERATED / DEVICE_SESSION_NOT_ESTABLISHED",
-      "devtools_session": "INFRA_BLOCKED / WECHAT_WEBSOCKET_DNS_FAILURE",
-      "simulator_positive_events": "2 / EXCLUDED_FROM_DEVICE_EVIDENCE",
+      "debug_qr": "GENERATED_AFTER_DEVTOOLS_RESTART / DEVICE_SCAN_NOT_OBSERVED",
+      "devtools_session": "READY / PRIOR_WEBSOCKET_DNS_FAILURE_CLEARED_AFTER_RESTART",
+      "simulator_positive_events": "1 / EXCLUDED_FROM_DEVICE_EVIDENCE",
       "temporary_tunnel": "TERMINATED / NOT_PRODUCTION_EVIDENCE",
       "local_configuration_after_attempt": "URL_CHECK_TRUE / LOCAL_BUILD_RESTORED"
     },
@@ -175,7 +175,7 @@
       "public_https": "FAIL / TCP_443_TIMEOUT / TLS_HANDSHAKE_NOT_OBSERVED",
       "public_http": "FAIL / TCP_80_TIMEOUT",
       "legacy_tencent_host": "DEV_ONLY_EXPIRING",
-      "legacy_tencent_ssh": "PUBLICKEY_AUTHENTICATION_REJECTED_FOR_OWNER_CONFIRMED_UBUNTU_USER",
+      "legacy_tencent_ssh": "ENCRYPTED_PRIVATE_KEY / INTERACTIVE_PASSPHRASE_REQUIRED / AUDIT_PENDING",
       "alibaba_host": "PRODUCTION_CANDIDATE / ADMISSION_PENDING",
       "production_bundle_binding": "PENDING"
     },
@@ -212,7 +212,7 @@
     "external_inputs": {
       "synthetic_https_backend": "EXECUTED_AND_TERMINATED / SYNTHETIC_ONLY",
       "ios_device": "EXECUTION_PASS",
-      "android_device": "IDENTIFIED / INFRA_BLOCKED / NO_REPLAY_PENDING_EXECUTION",
+      "android_device": "IDENTIFIED / DEVICE_SCAN_REQUIRED / NO_REPLAY_PENDING_EXECUTION",
       "processing_entity": "OWNER_INPUT_AND_JURISDICTION_CAPTURED_LOCALLY / PRIVACY_AND_LEGAL_REVIEW_PENDING",
       "production_location_and_processors": "PENDING_PRIVACY_LEGAL_OWNER",
       "final_user_notice": "PENDING_PRIVACY_LEGAL_OWNER"
@@ -245,7 +245,7 @@
   },
   "real_device": {
     "ios_network_no_replay": "EXECUTION_PASS",
-    "android_network_no_replay": "INFRA_BLOCKED / MANUAL_EVIDENCE_PENDING"
+    "android_network_no_replay": "MANUAL_EVIDENCE_PENDING / DEVICE_SCAN_REQUIRED"
   },
   "reviewer": "project-owner",
   "reviewed_at_utc": "2026-08-31T06:30:54Z"
