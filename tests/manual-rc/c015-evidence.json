@@ -188,7 +188,9 @@
       "legacy_tencent_runtime": "UBUNTU_24_04_X86_64 / 4_CPU / APPROX_8_GIB / 178_GIB / NTP_SYNC / DOCKER_AND_COMPOSE_PASS / 9_HEALTHY_SYNTHETIC_DEV_CONTAINERS",
       "legacy_tencent_stateful_services": "LOCAL_DEV_POSTGRESQL_18_AND_REDIS_8 / NOT_PRODUCTION_ELIGIBLE",
       "legacy_tencent_ingress": "HOST_80_443_NOT_LISTENING / UFW_OPENSSH_ONLY / TLS_PROXY_LOOPBACK_ONLY / PRODUCTION_SNI_FAIL",
-      "alibaba_host": "PRODUCTION_CANDIDATE / ADMISSION_PENDING",
+      "alibaba_host": "PURCHASED / DEV_LITE_CANDIDATE / ADR_PENDING / PRODUCTION_INELIGIBLE",
+      "alibaba_host_capacity": "UBUNTU_24_04 / 2_VCPU / 2_GIB / 40_GIB / 3_MBPS / SHANGHAI",
+      "alibaba_ssh": "PORT_22_AND_HOST_KEY_OBSERVED / EXISTING_PUBLIC_KEY_NOT_BOUND / ROOT_BATCHMODE_AUTH_REJECTED / HOST_UNMODIFIED",
       "production_bundle_binding": "PENDING"
     },
     "dependency_audit_remediation": {

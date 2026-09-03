@@ -28,6 +28,7 @@
 - GitHub 当前只有 `development` environment，仓库和该环境均无 Actions variable/secret；没有可绑定的 STAGING/PRODUCTION API origin、生产 image set 或 Release Manifest；
 - `api.weihan.ltd` 已通过两台阿里云权威 DNS 和系统 resolver 验证 A 记录发布，未发布 AAAA/CNAME；公网 HTTPS/HTTP 端口均超时而 SSH 可达，因此 TLS handshake、API 健康检查和生产 origin 绑定仍未通过；owner 已将旧腾讯云主机定为 `DEV_ONLY_EXPIRING`，阿里云主机仅为 `PRODUCTION_CANDIDATE / ADMISSION_PENDING`；
 - 腾讯云 `DEV_ONLY_EXPIRING` 主机已通过已加载的专用密钥完成严格只读盘点：Ubuntu 24.04 x86_64、4 CPU/约 8 GiB/178 GiB、时钟同步、Docker/Compose 可用，9 个 synthetic DEV 容器健康；PostgreSQL/Redis 为本机 DEV 容器，TLS proxy 只绑定 loopback 8443/8444，主机未监听 80/443、UFW 只允许 SSH，且正式 `api.weihan.ltd` SNI 在 DEV proxy 上握手失败，因此该主机和 bundle 不具备生产资格；未读取 secret、env、日志、dump、volume 或用户内容；
+- owner 已购买上海地域 Ubuntu 24.04 的阿里云 ECS（2 vCPU / 2 GiB / 40 GiB / 3 Mbps）；公网 SSH 端口与首次观察的 ED25519 主机指纹可用，但现有专用公钥尚未绑定，`root` BatchMode 认证被拒绝且主机未被修改。该配置只能成为 `DEV_LITE_CANDIDATE / ADR_PENDING / PRODUCTION_INELIGIBLE`；不能替代 C-015 的生产 origin/image/manifest 证据；
 - 本地脱敏 receipt 为 `.artifacts/c015/evidence-receipt.json`，SHA-256=`b1ea6a47128af3bdb7353ff10fdac26df49bd15c22ee91df7b6e1c28efc5a582`；该 ignored artifact 不替代 tracked 摘要、owner 接受或 CI；
 - 实际处理主体、安徽合肥登记属地、隐私联系、Android 版本和“不向不满十四周岁用户提供服务”的 owner 输入仅保存于 ignored 本地表；未成年人决定仍需 Accepted 规范与最小拒绝路径，Privacy 工程自审仍 Pending，Legal reviewer 保持 `PENDING_QUALIFIED_PRC_LEGAL_REVIEWER`；
 - 仍需完成：生产 origin/image/manifest、生产组件/受托方/region/跨境矩阵、最终用户说明和合格 Legal review。
