@@ -11,7 +11,9 @@ import {
 import { createCosConfigEvidence } from "./preflight.mjs";
 import {
   canonicalReleaseManifest,
+  DEVELOPMENT_LITE_OBJECT_FINGERPRINT,
   RELEASE_MANIFEST_VERSION,
+  RELEASE_MANIFEST_VERSION_V2,
   validateReleaseManifest,
   validateReleaseTransition,
 } from "./release-contract.mjs";
@@ -26,6 +28,17 @@ function fail(code, detail) {
 
 export function validateDevelopmentReleaseSelection(value) {
   const keys = Object.keys(value ?? {}).sort();
+  if (
+    JSON.stringify(keys) ===
+      JSON.stringify(["database_secret_version", "deployment_profile"]) &&
+    value.deployment_profile === "DEV_LITE" &&
+    VERSION_REF.test(value.database_secret_version)
+  ) {
+    return Object.freeze({
+      database_secret_version: value.database_secret_version,
+      deployment_profile: "DEV_LITE",
+    });
+  }
   if (
     JSON.stringify(keys) !==
       JSON.stringify([
@@ -50,14 +63,25 @@ export function developmentReleaseId({
   selection,
 }) {
   const selected = validateDevelopmentReleaseSelection(selection);
-  if (!/^[a-f0-9]{64}$/u.test(objectConfigSha256)) {
+  const developmentLite = selected.deployment_profile === "DEV_LITE";
+  if (!developmentLite && !/^[a-f0-9]{64}$/u.test(objectConfigSha256)) {
     fail("DEV_RELEASE_OBJECT_CONFIG_FINGERPRINT_INVALID", "sha256");
   }
-  const binding = JSON.stringify({
-    image_set_id: imageSet.image_set_id,
-    object_config_sha256: objectConfigSha256,
-    ...selected,
-  });
+  if (developmentLite && objectConfigSha256 !== undefined) {
+    fail("DEV_LITE_RELEASE_OBJECT_CONFIG_FORBIDDEN", "sha256");
+  }
+  const binding = developmentLite
+    ? JSON.stringify({
+        deployment_profile: "DEV_LITE",
+        image_set_id: imageSet.image_set_id,
+        object_config_sha256: DEVELOPMENT_LITE_OBJECT_FINGERPRINT,
+        database_secret_version: selected.database_secret_version,
+      })
+    : JSON.stringify({
+        image_set_id: imageSet.image_set_id,
+        object_config_sha256: objectConfigSha256,
+        ...selected,
+      });
   const digest = createHash("sha256").update(binding).digest("hex");
   return `devr-${imageSet.source.commit_sha.slice(0, 12)}-${digest.slice(0, 24)}`;
 }
@@ -76,16 +100,39 @@ export function materializeDevelopmentRelease({
   }
   validateDevPublicationEvidence(imageSet, supplyEvidence, runtimeEvidence);
   const selected = validateDevelopmentReleaseSelection(selection);
+  const developmentLite = selected.deployment_profile === "DEV_LITE";
+  const expectedManifestVersion = developmentLite
+    ? RELEASE_MANIFEST_VERSION_V2
+    : RELEASE_MANIFEST_VERSION;
   if (currentManifest !== null) {
     validateReleaseManifest(currentManifest);
+    if (currentManifest.manifest_version !== expectedManifestVersion) {
+      fail(
+        "DEV_RELEASE_TOPOLOGY_REQUIRES_FRESH_STATE",
+        currentManifest.manifest_version,
+      );
+    }
   }
   if (catalogManifest !== null) {
     validateReleaseManifest(catalogManifest);
+    if (catalogManifest.manifest_version !== expectedManifestVersion) {
+      fail(
+        "DEV_RELEASE_CATALOG_TOPOLOGY_REQUIRES_FRESH_STATE",
+        catalogManifest.manifest_version,
+      );
+    }
   }
-  const objectConfig = createCosConfigEvidence(objectConfigSource);
+  if (developmentLite && objectConfigSource !== undefined) {
+    fail("DEV_LITE_RELEASE_OBJECT_CONFIG_FORBIDDEN", "source");
+  }
+  const objectConfig = developmentLite
+    ? { config_sha256: DEVELOPMENT_LITE_OBJECT_FINGERPRINT }
+    : createCosConfigEvidence(objectConfigSource);
   const materializedReleaseId = developmentReleaseId({
     imageSet,
-    objectConfigSha256: objectConfig.config_sha256,
+    ...(developmentLite
+      ? {}
+      : { objectConfigSha256: objectConfig.config_sha256 }),
     selection: selected,
   });
   const catalogChanged =
@@ -112,11 +159,12 @@ export function materializeDevelopmentRelease({
     compatibility: {
       accepted_generations: acceptedGenerations,
       generation: catalogGeneration,
-      manifest_versions: [RELEASE_MANIFEST_VERSION],
+      manifest_versions: [expectedManifestVersion],
     },
     config: {
       config_schema_version: "api-runtime-config-v1",
       contract_bundle_version: "api-contract-v1",
+      ...(developmentLite ? { deployment_profile: "DEV_LITE" } : {}),
       environment: "DEV",
       log_level: "INFO",
       product_date_policy_version: "product-date-v1",
@@ -126,8 +174,12 @@ export function materializeDevelopmentRelease({
         object_config: objectConfig.config_sha256,
       },
       secret_ref_versions: {
-        cos_secret_id: selected.cos_secret_version,
-        cos_secret_key: selected.cos_secret_version,
+        ...(!developmentLite
+          ? {
+              cos_secret_id: selected.cos_secret_version,
+              cos_secret_key: selected.cos_secret_version,
+            }
+          : {}),
         database_admin_url: selected.database_secret_version,
         database_api_url: selected.database_secret_version,
         database_background_url: selected.database_secret_version,
@@ -156,7 +208,7 @@ export function materializeDevelopmentRelease({
         image.reference,
       ]),
     ),
-    manifest_version: RELEASE_MANIFEST_VERSION,
+    manifest_version: expectedManifestVersion,
     migrations: {
       catalog_fingerprint: supplyEvidence.catalog_fingerprint,
       catalog_generation: catalogGeneration,
@@ -179,15 +231,25 @@ export function materializeDevelopmentRelease({
       provenance_sha256: supplyEvidence.ci_provenance_sha256,
       sbom_sha256: supplyEvidence.ci_sbom_sha256,
     },
-    topology: {
-      object_config_ref: selected.object_config_ref,
-      object_endpoint: "TENCENT_COS_PRIVATE_INTERNAL",
-      object_prefix: "dev/objects/",
-      object_region: "ap-shanghai",
-      production_enabled: false,
-      public_ingress: "LOOPBACK_TLS_UNTIL_ICP",
-      stateful_topology: "DEV_COLOCATED_EXCEPTION",
-    },
+    topology: developmentLite
+      ? {
+          object_endpoint: "LOCAL_SYNTHETIC_OBJECT_STUB",
+          object_prefix: "dev-lite/objects/",
+          object_region: "HOST_LOCAL_EPHEMERAL",
+          production_enabled: false,
+          production_eligible: false,
+          public_ingress: "LOOPBACK_TLS_ONLY",
+          stateful_topology: "DEV_LITE_COLOCATED_EXCEPTION",
+        }
+      : {
+          object_config_ref: selected.object_config_ref,
+          object_endpoint: "TENCENT_COS_PRIVATE_INTERNAL",
+          object_prefix: "dev/objects/",
+          object_region: "ap-shanghai",
+          production_enabled: false,
+          public_ingress: "LOOPBACK_TLS_UNTIL_ICP",
+          stateful_topology: "DEV_COLOCATED_EXCEPTION",
+        },
   };
   validateReleaseManifest(manifest);
   if (currentManifest !== null) {
@@ -197,6 +259,66 @@ export function materializeDevelopmentRelease({
 }
 
 async function main() {
+  if (process.argv[2] === "--dev-lite") {
+    const [
+      imageSetFile,
+      supplyFile,
+      runtimeFile,
+      outputFile,
+      currentFile,
+      catalogFile,
+      databaseSecretVersion,
+    ] = process.argv.slice(3);
+    if (
+      !imageSetFile ||
+      !supplyFile ||
+      !runtimeFile ||
+      !outputFile ||
+      !databaseSecretVersion
+    ) {
+      fail(
+        "DEV_LITE_RELEASE_MATERIALIZE_USAGE",
+        "--dev-lite image-set supply runtime output [current-manifest|-] [catalog-manifest|-] database-secret-version",
+      );
+    }
+    const [
+      imageSet,
+      supplyEvidence,
+      runtimeEvidence,
+      currentManifest,
+      catalogManifest,
+    ] = await Promise.all([
+      readFile(path.resolve(imageSetFile), "utf8").then(JSON.parse),
+      readFile(path.resolve(supplyFile), "utf8").then(JSON.parse),
+      readFile(path.resolve(runtimeFile), "utf8").then(JSON.parse),
+      currentFile && currentFile !== "-"
+        ? readFile(path.resolve(currentFile), "utf8").then(JSON.parse)
+        : null,
+      catalogFile && catalogFile !== "-"
+        ? readFile(path.resolve(catalogFile), "utf8").then(JSON.parse)
+        : null,
+    ]);
+    const manifest = materializeDevelopmentRelease({
+      catalogManifest,
+      currentManifest,
+      imageSet,
+      runtimeEvidence,
+      selection: {
+        database_secret_version: databaseSecretVersion,
+        deployment_profile: "DEV_LITE",
+      },
+      supplyEvidence,
+    });
+    await writeFile(
+      path.resolve(outputFile),
+      canonicalReleaseManifest(manifest),
+      { flag: "wx", mode: 0o600 },
+    );
+    process.stdout.write(
+      `DEV_RELEASE_MANIFEST_OK:id=${manifest.release_id}:generation=${manifest.compatibility.generation}:deployment_profile=DEV_LITE:production_enabled=false\n`,
+    );
+    return;
+  }
   const [
     imageSetFile,
     supplyFile,

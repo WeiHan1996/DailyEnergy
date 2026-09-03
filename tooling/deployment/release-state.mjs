@@ -15,6 +15,7 @@ import {
   deploymentPhases,
   reconciliationPhases,
   releaseManifestDigest,
+  validateReleaseClassMatch,
   validateReleaseManifest,
   validateReleaseTransition,
   validateRollbackTransition,
@@ -447,6 +448,13 @@ export async function beginReleaseOperation(
   if (existing !== null) {
     fail("RELEASE_RECOVERY_REQUIRED", existing.target.release_id);
   }
+  if (fromCurrent !== null) {
+    validateReleaseClassMatch(
+      await loadReleaseManifest(root, fromCurrent),
+      manifest,
+      "RELEASE_OPERATION_TOPOLOGY_REQUIRES_FRESH_STATE",
+    );
+  }
   await persistReleaseManifest(root, manifest);
   const operation = {
     active_phase: null,
@@ -497,6 +505,11 @@ export async function beginReconciliationOperation(
   ) {
     fail("RECONCILE_CURRENT_MANIFEST_MISMATCH", manifest.release_id);
   }
+  validateReleaseClassMatch(
+    manifest,
+    await loadCatalogManifest(root, catalogReference),
+    "RECONCILE_CURRENT_CATALOG_TOPOLOGY_REQUIRES_FRESH_STATE",
+  );
   await persistReleaseManifest(root, manifest);
   const operation = {
     active_phase: null,
@@ -708,6 +721,11 @@ export async function commitRecoveredCurrent(
   }
   validateReleaseManifest(catalogManifest);
   const current = await loadReleaseManifest(root, state.current);
+  validateReleaseClassMatch(
+    current,
+    catalogManifest,
+    "RECOVER_CURRENT_CATALOG_TOPOLOGY_REQUIRES_FRESH_STATE",
+  );
   if (
     !current.compatibility.accepted_generations.includes(
       catalogManifest.migrations.catalog_generation,

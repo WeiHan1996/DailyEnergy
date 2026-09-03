@@ -21,12 +21,18 @@ import {
 import { validateReleaseManifest } from "./release-contract.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "../..");
-const BUNDLE_VERSION = "DevDeploymentBundleV2";
+export const DEVELOPMENT_BUNDLE_VERSION = "DevDeploymentBundleV3";
+const SUPPORTED_BUNDLE_VERSIONS = new Set([
+  "DevDeploymentBundleV2",
+  DEVELOPMENT_BUNDLE_VERSION,
+]);
 const staticFiles = Object.freeze([
   "compose.yaml",
+  "docker/compose.dev-lite.yaml",
   "docker/compose.dev.yaml",
   "tooling/deployment/deployment-bundle.mjs",
   "tooling/deployment/deploy-dev.mjs",
+  "tooling/deployment/dev-lite-runtime-check.mjs",
   "tooling/deployment/image-set.mjs",
   "tooling/deployment/install-dev-bundle.mjs",
   "tooling/deployment/materialize-dev-release.mjs",
@@ -91,7 +97,7 @@ async function walkFiles(directory, prefix = "") {
 
 export async function verifyDevelopmentBundle(
   directory,
-  { materialized = false } = {},
+  { materialized = false, requiredBundleVersion = null } = {},
 ) {
   const manifestFile = path.join(directory, "bundle-manifest.json");
   await regularFile(manifestFile, "DEV_BUNDLE_MANIFEST_INVALID");
@@ -102,12 +108,31 @@ export async function verifyDevelopmentBundle(
     fail("DEV_BUNDLE_MANIFEST_INVALID", "json");
   }
   if (
-    manifest.bundle_version !== BUNDLE_VERSION ||
+    !SUPPORTED_BUNDLE_VERSIONS.has(manifest.bundle_version) ||
     manifest.production_eligible !== false ||
     !/^dev-[a-f0-9]{12}-\d{1,20}-\d{1,6}$/u.test(manifest.image_set_id) ||
     !Array.isArray(manifest.files)
   ) {
     fail("DEV_BUNDLE_MANIFEST_INVALID", "document");
+  }
+  if (
+    requiredBundleVersion !== null &&
+    manifest.bundle_version !== requiredBundleVersion
+  ) {
+    fail("DEV_BUNDLE_VERSION_PROFILE_MISMATCH", manifest.bundle_version);
+  }
+  if (
+    manifest.bundle_version === DEVELOPMENT_BUNDLE_VERSION &&
+    ![
+      "docker/compose.dev-lite.yaml",
+      "tooling/deployment/dev-lite-runtime-check.mjs",
+    ].every((requiredPath) =>
+      manifest.files.some(
+        ({ path: relativePath }) => relativePath === requiredPath,
+      ),
+    )
+  ) {
+    fail("DEV_BUNDLE_MANIFEST_INVALID", "dev-lite-overlay");
   }
   const actualFiles = await walkFiles(directory);
   const expectedFiles = [
@@ -215,7 +240,7 @@ export async function buildDevelopmentBundle(destination, evidenceDirectory) {
     path.join(destination, "bundle-manifest.json"),
     `${JSON.stringify(
       {
-        bundle_version: BUNDLE_VERSION,
+        bundle_version: DEVELOPMENT_BUNDLE_VERSION,
         files: entries,
         production_eligible: false,
         image_set_id: imageSet.image_set_id,

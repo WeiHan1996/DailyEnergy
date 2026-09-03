@@ -1,14 +1,18 @@
 # ADR-0007：临时开发环境有状态服务同机例外
 
-- **状态**：Accepted
+- **状态**：Superseded
 - **日期**：2026-08-05
 - **接受日期**：2026-08-05
+- **取代日期**：2026-09-03
+- **取代文档**：[ADR-0009：低配置 DEV_LITE 同机例外](./ADR-0009-development-lite-colocation-exception.md)
 - **所属任务**：E-012 — 部署固定开发环境与可回滚发布流程
 - **决策范围**：DEV 主机、PostgreSQL/Redis/object endpoint、数据耐久性、公网入口与迁移退出边界
 - **决策所有者**：DailyEnergy 项目
 - **相关文档**：[部署规范](../technical/deployment.md)、[数据库实现](../technical/database-implementation.md)、[ADR-0006](./ADR-0006-monorepo-and-stack.md)、[当前任务](../../tasks/current.md)
 
 ## 1. 背景
+
+> 本 ADR 只保留腾讯云标准 DEV 的历史发布、回滚与证据语义。当前活动开发主机和新发布由 ADR-0009 管理；历史 ReleaseManifestV1 validator 不得删除或放宽。
 
 E-012 原计划让单 host Compose application 连接独立受控 PostgreSQL、Redis 和对象端点。项目当前已有一台临时腾讯云轻量应用服务器，可用于开发，但正式上线会迁移到其它服务器或独立数据服务。域名已实名但尚未完成 ICP 备案。项目所有者最初选择不使用家庭 NAS 或腾讯云 COS，随后于 2026-08-05 明确改为使用同地域私有 COS 作为 DEV application object endpoint；家庭 NAS 仍不进入方案。
 

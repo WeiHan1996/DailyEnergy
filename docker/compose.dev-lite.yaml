@@ -1,0 +1,296 @@
+name: dailyenergy-dev-lite
+
+x-runtime-security: &runtime-security
+  cap_drop:
+    - ALL
+  init: true
+  pids_limit: 128
+  read_only: true
+  restart: "on-failure:3"
+  security_opt:
+    - no-new-privileges:true
+
+services:
+  postgres:
+    profiles: !override [dev-lite-core]
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 128
+    secrets:
+      - source: postgres_password
+        target: /run/secrets/postgres_password
+        uid: "999"
+        gid: "999"
+        mode: 0400
+
+  redis:
+    profiles: !override [dev-lite-core]
+    mem_limit: 96m
+    cpus: 0.15
+    pids_limit: 128
+
+  dependency-stub:
+    profiles: !override [dev-lite-core]
+    mem_limit: 64m
+    cpus: 0.1
+    pids_limit: 128
+    secrets:
+      - source: fault_control_token
+        target: /run/secrets/fault_control_token
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  api:
+    image: ${DAILYENERGY_SERVER_IMAGE:?ReleaseManifestV2 server digest required}
+    profiles: !override [dev-lite-core]
+    mem_limit: 224m
+    cpus: 0.5
+    pids_limit: 128
+    depends_on: !override
+      dependency-stub:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    secrets:
+      - source: database_api_url
+        target: /run/secrets/database_api_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  tls-proxy:
+    <<: *runtime-security
+    image: ${DAILYENERGY_PROXY_IMAGE:?ReleaseManifestV2 proxy digest required}
+    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
+    user: "1000:1000"
+    profiles: !override [dev-lite-core]
+    mem_limit: 64m
+    cpus: 0.1
+    depends_on: !override
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-check-certificate",
+          "--spider",
+          "https://localhost:8443/health/ready",
+        ]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+      start_period: 5s
+    ports:
+      - 127.0.0.1:${DAILYENERGY_DEV_API_TLS_PORT:-8443}:8443
+      - 127.0.0.1:${DAILYENERGY_DEV_ADMIN_TLS_PORT:-8444}:8444
+    tmpfs:
+      - /config:uid=1000,gid=1000,mode=0700
+      - /data:uid=1000,gid=1000,mode=0700
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      admin_api:
+      dev_lite_ingress:
+
+  admin:
+    image: ${DAILYENERGY_ADMIN_IMAGE:?ReleaseManifestV2 admin digest required}
+    profiles: !override [dev-lite-admin]
+    mem_limit: 256m
+    cpus: 0.4
+    pids_limit: 128
+    depends_on: !override
+      api:
+        condition: service_healthy
+
+  worker-interactive:
+    image: ${DAILYENERGY_SERVER_IMAGE:?ReleaseManifestV2 server digest required}
+    profiles: !override [dev-lite-interactive]
+    mem_limit: 256m
+    cpus: 0.4
+    pids_limit: 128
+    depends_on: !override
+      dependency-stub:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    secrets:
+      - source: database_interactive_url
+        target: /run/secrets/database_interactive_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  worker-background:
+    image: ${DAILYENERGY_SERVER_IMAGE:?ReleaseManifestV2 server digest required}
+    profiles: !override [dev-lite-background]
+    mem_limit: 256m
+    cpus: 0.4
+    pids_limit: 128
+    depends_on: !override
+      dependency-stub:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    secrets:
+      - source: database_background_url
+        target: /run/secrets/database_background_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  worker-restricted:
+    image: ${DAILYENERGY_SERVER_IMAGE:?ReleaseManifestV2 server digest required}
+    profiles: !override [dev-lite-restricted]
+    mem_limit: 256m
+    cpus: 0.4
+    pids_limit: 128
+    depends_on: !override
+      dependency-stub:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    secrets:
+      - source: database_restricted_url
+        target: /run/secrets/database_restricted_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  database-init:
+    image: ${DAILYENERGY_MIGRATION_IMAGE:?ReleaseManifestV2 migration digest required}
+    restart: "no"
+    profiles: !override [dev-lite-one-shot]
+    mem_limit: 512m
+    cpus: 0.6
+    pids_limit: 128
+    depends_on: !override
+      postgres:
+        condition: service_healthy
+    secrets:
+      - source: database_admin_url
+        target: /run/secrets/database_admin_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: database_api_url
+        target: /run/secrets/database_api_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: database_background_url
+        target: /run/secrets/database_background_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: database_interactive_url
+        target: /run/secrets/database_interactive_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: database_migration_url
+        target: /run/secrets/database_migration_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+      - source: database_restricted_url
+        target: /run/secrets/database_restricted_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+
+  database-verify:
+    <<: *runtime-security
+    image: ${DAILYENERGY_MIGRATION_IMAGE:?ReleaseManifestV2 migration digest required}
+    command: ["node", "tooling/database/check-drift.mjs"]
+    user: "1000:1000"
+    restart: "no"
+    profiles: !override [dev-lite-one-shot]
+    mem_limit: 384m
+    cpus: 0.5
+    pids_limit: 128
+    depends_on: !override
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_admin_url
+    secrets:
+      - source: database_admin_url
+        target: /run/secrets/database_admin_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      migration_data:
+
+  database-smoke:
+    <<: *runtime-security
+    image: ${DAILYENERGY_MIGRATION_IMAGE:?ReleaseManifestV2 migration digest required}
+    command: ["node", "tooling/deployment/database-smoke.mjs"]
+    user: "1000:1000"
+    restart: "no"
+    profiles: !override [dev-lite-one-shot]
+    mem_limit: 256m
+    cpus: 0.4
+    pids_limit: 128
+    depends_on: !override
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_admin_url
+    secrets:
+      - source: database_admin_url
+        target: /run/secrets/database_admin_url
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,mode=0700
+    networks:
+      migration_data:
+
+  object-smoke:
+    <<: *runtime-security
+    image: ${DAILYENERGY_STUB_IMAGE:?ReleaseManifestV2 stub digest required}
+    command: ["node", "/app/local-object-smoke.mjs"]
+    user: "1000:1000"
+    restart: "no"
+    profiles: !override [dev-lite-one-shot]
+    network_mode: none
+    mem_limit: 64m
+    cpus: 0.1
+
+secrets:
+  postgres_password:
+    file: ${DAILYENERGY_DEV_LITE_COMPOSE_SECRET_DIR:?run the E-017 deploy controller}/postgres-password
+  database_admin_url:
+    file: ${DAILYENERGY_DEV_LITE_COMPOSE_SECRET_DIR:?run the E-017 deploy controller}/database-admin-url
+  database_api_url:
+    file: ${DAILYENERGY_DEV_LITE_COMPOSE_SECRET_DIR:?run the E-017 deploy controller}/database-api-url
+  database_background_url:
+    file: ${DAILYENERGY_DEV_LITE_COMPOSE_SECRET_DIR:?run the E-017 deploy controller}/database-background-url
+  database_interactive_url:
+    file: ${DAILYENERGY_DEV_LITE_COMPOSE_SECRET_DIR:?run the E-017 deploy controller}/database-interactive-url
+  database_migration_url:
+    file: ${DAILYENERGY_DEV_LITE_COMPOSE_SECRET_DIR:?run the E-017 deploy controller}/database-migration-url
+  database_restricted_url:
+    file: ${DAILYENERGY_DEV_LITE_COMPOSE_SECRET_DIR:?run the E-017 deploy controller}/database-restricted-url
+  fault_control_token:
+    file: ${DAILYENERGY_DEV_LITE_COMPOSE_SECRET_DIR:?run the E-017 deploy controller}/fault-control-token
+
+networks:
+  dev_lite_ingress:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"

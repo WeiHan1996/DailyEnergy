@@ -7,7 +7,7 @@
 
 | 命令                                                 | 证据                                                                             |
 | ---------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `pnpm registry:check`                                | 736 个 Accepted/Schema Source ID 的唯一状态、强制层级和生成漂移                  |
+| `pnpm registry:check`                                | 1004 个 Accepted/Schema Source ID 的唯一状态、强制层级和生成漂移                 |
 | `pnpm registry:test`                                 | missing、duplicate、unknown status、missing assertion 与 insufficient layer 负例 |
 | `pnpm testing:policy`                                | runner、fixture、corpus、artifact、skip、quarantine 与 testing import 边界       |
 | `pnpm testing:playwright-policy`                     | Playwright 首次失败后 retry 通过仍以 `FLAKY_FAIL` 退出                           |
@@ -66,7 +66,7 @@ delivery、真实 TTL 删除、Production backend outage 或 RC 演练已经完�
 
 | 命令                       | 证据                                                                                     |
 | -------------------------- | ---------------------------------------------------------------------------------------- |
-| `pnpm phase-gate:check`    | 分层 Gate、E-012/E-013 receipt、736 个 Source ID owner 盘点和 Production 延后条件        |
+| `pnpm phase-gate:check`    | 分层 Gate、E-012/E-013 receipt、1004 个 Source ID owner 盘点和 Production 延后条件       |
 | `pnpm phase-gate:test`     | 拒绝 unconditional GO、Production PASS、silent PLANNED、RC 合并控制和人工证据 false-PASS |
 | `pnpm phase-gate:validate` | 上述 checker 与负向 suite 的聚合 Gate                                                    |
 
@@ -74,13 +74,26 @@ E-014 只建议 Phase 2 development 条件放行；final PR 仍须 11/11 和 own
 真实投递/TTL、微信 DevTools/真机与完整 incident/manual RC 保持 `BLOCKED/PENDING`，不得因此开启
 Production 或把 C/D 任务提前标记 Ready。
 
+## E-017 DEV_LITE 部署入口
+
+| 命令                       | 证据                                                                                |
+| -------------------------- | ----------------------------------------------------------------------------------- |
+| `pnpm run deployment:test` | ReleaseManifestV2、2C2G preflight、704 MiB core、互斥阶段、bundle V3 与回滚负向合同 |
+| `pnpm registry:check`      | `tests/registry/e017-evidence-manifest.json` 对 11 个 S-32 Source ID 的逐项证据映射 |
+
+`tests/manual-rc/e017-dev-lite-evidence.json` 区分已通过的自动证据与待执行的真实主机
+fresh deploy、reconcile、N→N+1、rollback、redeploy 和 soak。local object 只证明
+`network_mode:none` 容器内的 synthetic loopback-memory 合同；不能把它升级为外部对象、
+Production/RC 或 C-015 privacy/legal 证据。
+
 ## Registry 与证据
 
 - `registry/source-sets.json` 从 Accepted 原文和 executable Schema 提取 ID；
 - `registry/coverage-registry.json` 是确定性生成物，只允许 `COVERED`、`PLANNED`、
   `NA_WITH_REASON`；
 - `registry/e010-evidence-manifest.json`、`registry/e011-evidence-manifest.json`、
-  `registry/e013-evidence-manifest.json`、`registry/e014-evidence-manifest.json` 与已有
+  `registry/e013-evidence-manifest.json`、`registry/e014-evidence-manifest.json`、
+  `registry/e017-evidence-manifest.json` 与已有
   database/queue/Compose manifest 提供逐项
   assertion，不把低层证据升级为高层 conformance；
 - 尚未实现的业务、恢复、模型、真机或人工场景保持 `PLANNED` 或明确 pending，不能因

@@ -1,8 +1,16 @@
 import { createHash } from "node:crypto";
 
 export const RELEASE_MANIFEST_VERSION = "ReleaseManifestV1";
+export const RELEASE_MANIFEST_VERSION_V2 = "ReleaseManifestV2";
 export const DEVELOPMENT_TOPOLOGY = "DEV_COLOCATED_EXCEPTION";
 export const DEVELOPMENT_OBJECT_ENDPOINT = "TENCENT_COS_PRIVATE_INTERNAL";
+export const DEVELOPMENT_LITE_TOPOLOGY = "DEV_LITE_COLOCATED_EXCEPTION";
+export const DEVELOPMENT_LITE_OBJECT_ENDPOINT = "LOCAL_SYNTHETIC_OBJECT_STUB";
+export const DEVELOPMENT_LITE_OBJECT_FINGERPRINT = createHash("sha256")
+  .update(
+    "local-synthetic-object-v1:loopback-memory:HOST_LOCAL_EPHEMERAL:dev-lite/objects/",
+  )
+  .digest("hex");
 
 export const deploymentPhases = Object.freeze([
   "preflight",
@@ -52,9 +60,19 @@ const IMAGE_NAMES = Object.freeze([
   "server",
   "stub",
 ]);
-const SECRET_NAMES = Object.freeze([
+const V1_SECRET_NAMES = Object.freeze([
   "cos_secret_id",
   "cos_secret_key",
+  "database_admin_url",
+  "database_api_url",
+  "database_background_url",
+  "database_interactive_url",
+  "database_migration_url",
+  "database_restricted_url",
+  "fault_control_token",
+  "postgres_password",
+]);
+const V2_SECRET_NAMES = Object.freeze([
   "database_admin_url",
   "database_api_url",
   "database_background_url",
@@ -251,12 +269,14 @@ function validateMigrations(migrations, releaseId) {
   }
 }
 
-function validateConfig(config) {
+function validateConfig(config, manifestVersion) {
+  const developmentLite = manifestVersion === RELEASE_MANIFEST_VERSION_V2;
   exactKeys(
     config,
     [
       "config_schema_version",
       "contract_bundle_version",
+      ...(developmentLite ? ["deployment_profile"] : []),
       "environment",
       "log_level",
       "product_date_policy_version",
@@ -265,8 +285,14 @@ function validateConfig(config) {
     ],
     "RELEASE_MANIFEST_CONFIG_KEYS",
   );
+  if (developmentLite && config.deployment_profile !== "DEV_LITE") {
+    fail("RELEASE_MANIFEST_DEV_LITE_PROFILE", "deployment_profile");
+  }
+  if (developmentLite && config.environment !== "DEV") {
+    fail("RELEASE_MANIFEST_PRODUCTION_GATE", "dev-lite-environment");
+  }
   if (
-    config.environment !== "DEV" ||
+    (!developmentLite && config.environment !== "DEV") ||
     config.config_schema_version !== "api-runtime-config-v1" ||
     config.contract_bundle_version !== "api-contract-v1" ||
     config.product_date_policy_version !== "product-date-v1" ||
@@ -289,10 +315,10 @@ function validateConfig(config) {
   }
   exactKeys(
     config.secret_ref_versions,
-    SECRET_NAMES,
+    developmentLite ? V2_SECRET_NAMES : V1_SECRET_NAMES,
     "RELEASE_MANIFEST_SECRET_REF_KEYS",
   );
-  for (const name of SECRET_NAMES) {
+  for (const name of developmentLite ? V2_SECRET_NAMES : V1_SECRET_NAMES) {
     stringMatching(
       config.secret_ref_versions[name],
       VERSION_REF,
@@ -302,7 +328,35 @@ function validateConfig(config) {
   }
 }
 
-function validateTopology(topology) {
+function validateTopology(topology, manifestVersion, environment) {
+  if (manifestVersion === RELEASE_MANIFEST_VERSION_V2) {
+    exactKeys(
+      topology,
+      [
+        "object_endpoint",
+        "object_prefix",
+        "object_region",
+        "production_enabled",
+        "production_eligible",
+        "public_ingress",
+        "stateful_topology",
+      ],
+      "RELEASE_MANIFEST_TOPOLOGY_KEYS",
+    );
+    if (
+      environment !== "DEV" ||
+      topology.stateful_topology !== DEVELOPMENT_LITE_TOPOLOGY ||
+      topology.object_endpoint !== DEVELOPMENT_LITE_OBJECT_ENDPOINT ||
+      topology.object_region !== "HOST_LOCAL_EPHEMERAL" ||
+      topology.object_prefix !== "dev-lite/objects/" ||
+      topology.production_enabled !== false ||
+      topology.production_eligible !== false ||
+      topology.public_ingress !== "LOOPBACK_TLS_ONLY"
+    ) {
+      fail("RELEASE_MANIFEST_PRODUCTION_GATE", "dev-lite-topology");
+    }
+    return;
+  }
   exactKeys(
     topology,
     [
@@ -334,7 +388,7 @@ function validateTopology(topology) {
   );
 }
 
-function validateCompatibility(compatibility) {
+function validateCompatibility(compatibility, manifestVersion) {
   exactKeys(
     compatibility,
     ["accepted_generations", "generation", "manifest_versions"],
@@ -361,7 +415,7 @@ function validateCompatibility(compatibility) {
   }
   if (
     JSON.stringify(compatibility.manifest_versions) !==
-    JSON.stringify([RELEASE_MANIFEST_VERSION])
+    JSON.stringify([manifestVersion])
   ) {
     fail("RELEASE_MANIFEST_VERSION_WINDOW", "manifest_versions");
   }
@@ -414,7 +468,10 @@ export function validateReleaseManifest(value) {
     ],
     "RELEASE_MANIFEST_KEYS",
   );
-  if (value.manifest_version !== RELEASE_MANIFEST_VERSION) {
+  if (
+    value.manifest_version !== RELEASE_MANIFEST_VERSION &&
+    value.manifest_version !== RELEASE_MANIFEST_VERSION_V2
+  ) {
     fail("RELEASE_MANIFEST_VERSION", value.manifest_version ?? "missing");
   }
   stringMatching(
@@ -427,9 +484,20 @@ export function validateReleaseManifest(value) {
   validateImages(value.images);
   validateSupplyChain(value.supply_chain);
   validateMigrations(value.migrations, value.release_id);
-  validateConfig(value.config);
-  validateTopology(value.topology);
-  validateCompatibility(value.compatibility);
+  validateConfig(value.config, value.manifest_version);
+  validateTopology(
+    value.topology,
+    value.manifest_version,
+    value.config.environment,
+  );
+  if (
+    value.manifest_version === RELEASE_MANIFEST_VERSION_V2 &&
+    value.config.runtime_fingerprints.object_config !==
+      DEVELOPMENT_LITE_OBJECT_FINGERPRINT
+  ) {
+    fail("RELEASE_MANIFEST_LOCAL_OBJECT_FINGERPRINT", "object_config");
+  }
+  validateCompatibility(value.compatibility, value.manifest_version);
   validateEvidence(value.evidence);
   return value;
 }
@@ -472,9 +540,27 @@ function assertMutualGenerationSupport(left, right, ruleId) {
   }
 }
 
+export function validateReleaseClassMatch(left, right, ruleId) {
+  validateReleaseManifest(left);
+  validateReleaseManifest(right);
+  if (
+    left.manifest_version !== right.manifest_version ||
+    left.topology.stateful_topology !== right.topology.stateful_topology ||
+    left.config.deployment_profile !== right.config.deployment_profile
+  ) {
+    fail(ruleId, `${left.release_id}->${right.release_id}`);
+  }
+  return { compatible: true };
+}
+
 export function validateReleaseTransition(current, candidate) {
   validateReleaseManifest(current);
   validateReleaseManifest(candidate);
+  validateReleaseClassMatch(
+    current,
+    candidate,
+    "RELEASE_TOPOLOGY_TRANSITION_REQUIRES_FRESH_STATE",
+  );
   if (current.release_id === candidate.release_id) {
     if (releaseManifestDigest(current) !== releaseManifestDigest(candidate)) {
       fail("RELEASE_ID_CONTENT_DRIFT", current.release_id);
@@ -518,6 +604,11 @@ export function validateReleaseTransition(current, candidate) {
 export function validateRollbackTransition(current, target) {
   validateReleaseManifest(current);
   validateReleaseManifest(target);
+  validateReleaseClassMatch(
+    current,
+    target,
+    "ROLLBACK_TOPOLOGY_TRANSITION_REQUIRES_FRESH_STATE",
+  );
   assertMutualGenerationSupport(
     current,
     target,

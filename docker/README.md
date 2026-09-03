@@ -13,6 +13,13 @@ E-009 提供一套 common Compose 拓扑和三个显式环境 overlay：
 18、Redis 8、one-shot Migration、合成依赖 stub 和受限 host ingress。PostgreSQL、
 Redis 与 Worker 不发布宿主端口；应用端口只经无 secret ingress 绑定 loopback。
 
+E-017 另提供 `docker/compose.dev-lite.yaml` 作为发布控制器专用的第四个 overlay。它只
+用于 2C2G、synthetic-only、`production_eligible=false` 的 DEV_LITE 主机，不由
+`compose:up` 本地入口直接选择。稳态 core 为 PostgreSQL、Redis、dependency stub、API
+和 loopback TLS proxy，总 memory limit 为 704 MiB；Admin、三个 Worker 与 one-shot job
+由发布控制器按互斥 profile 分阶段启动。local object smoke 使用 `network_mode:none`，
+没有 secret、volume 或 host port，不能作为 OSS/COS 或 Production object 证据。
+
 ## 前置条件
 
 - Node.js 24 与 pnpm 11.17.0；
@@ -65,10 +72,12 @@ pnpm run compose:fault -- --mode=test --fault provider pass
 ```bash
 pnpm run compose:evidence
 pnpm run compose:validate
+pnpm run deployment:test
 ```
 
 `compose:validate` 会从空 test/test-fault 项目执行真实冷启动、health、egress、fault、
-shutdown 和清理。测试与 fault 数据均为合成数据。
+shutdown 和清理。`deployment:test` 静态验证 DEV_LITE 的资源预算、profile 互斥、受保护
+端口与 local object 隔离。测试与 fault 数据均为合成数据。
 
 ## 安全边界
 

@@ -187,6 +187,7 @@ fallback:
   impactProfile: security
 
 dependencies:
+  E-017: [E-012]
   D-002: [D-001]
   D-003: [D-002]
   D-004: [D-003]

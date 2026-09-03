@@ -4,7 +4,7 @@
 
 已实现的工程运行手册：
 
-- [开发环境部署 Runbook](./development-deployment-runbook.md)：DEV publication、安装、发布、reconciliation、回滚、secret 轮换和恢复；
+- [开发环境部署 Runbook](./development-deployment-runbook.md)：标准 DEV 历史流程与 DEV_LITE publication、安装、阶段发布、reconciliation、回滚、secret 轮换和恢复；
 - [可观测性 Runbook 集](./observability-runbooks/README.md)：E-013 的 SLO burn、异步队列、数据库、AI/成本、telemetry health 和数据生命周期处置入口。
 
 可观测性 Runbook 当前只适用于 LOCAL、CI、DEV 和 STAGING-like 参考环境。Production

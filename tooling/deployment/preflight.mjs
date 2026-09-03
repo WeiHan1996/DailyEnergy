@@ -8,6 +8,7 @@ import { promisify } from "node:util";
 
 import {
   assertSecretVersionsActive,
+  RELEASE_MANIFEST_VERSION_V2,
   validateReleaseManifest,
 } from "./release-contract.mjs";
 import { validateManifestRuntimeEvidence } from "./image-set.mjs";
@@ -23,6 +24,17 @@ const PROTECTED_PORTS = new Set([80, 443, 5432, 6379, 8443, 8444]);
 export const SECRET_FILE_NAMES = Object.freeze({
   cos_secret_id: "cos-secret-id",
   cos_secret_key: "cos-secret-key",
+  database_admin_url: "database-admin-url",
+  database_api_url: "database-api-url",
+  database_background_url: "database-background-url",
+  database_interactive_url: "database-interactive-url",
+  database_migration_url: "database-migration-url",
+  database_restricted_url: "database-restricted-url",
+  fault_control_token: "fault-control-token",
+  postgres_password: "postgres-password",
+});
+
+export const DEV_LITE_SECRET_FILE_NAMES = Object.freeze({
   database_admin_url: "database-admin-url",
   database_api_url: "database-api-url",
   database_background_url: "database-background-url",
@@ -54,6 +66,10 @@ function exactKeys(value, expected, ruleId) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function isDevelopmentLiteManifest(manifest) {
+  return manifest.manifest_version === RELEASE_MANIFEST_VERSION_V2;
 }
 
 function decodeConfigValue(raw, key) {
@@ -144,13 +160,17 @@ function versionAtLeast(value, minimum, ruleId) {
 }
 
 function validateSecretVersions(manifest) {
+  if (isDevelopmentLiteManifest(manifest)) {
+    return;
+  }
   const versions = manifest.config.secret_ref_versions;
   if (versions.cos_secret_id !== versions.cos_secret_key) {
     fail("PREFLIGHT_COS_SECRET_VERSION_SPLIT", "cos-credential");
   }
 }
 
-function validateHostEvidence(host) {
+function validateHostEvidence(host, manifest) {
+  const developmentLite = isDevelopmentLiteManifest(manifest);
   exactKeys(
     host,
     [
@@ -165,6 +185,7 @@ function validateHostEvidence(host) {
       "os_id",
       "os_version",
       "run_uid",
+      ...(developmentLite ? ["swap_total_bytes"] : []),
       "timezone",
       "total_memory_bytes",
     ],
@@ -187,15 +208,26 @@ function validateHostEvidence(host) {
   if (host.deployment_node_version !== "24.18.0") {
     fail("PREFLIGHT_DEPLOYMENT_NODE_VERSION", "node");
   }
-  if (
-    !Number.isSafeInteger(host.cpu_count) ||
-    host.cpu_count < 4 ||
-    !Number.isSafeInteger(host.total_memory_bytes) ||
-    host.total_memory_bytes < 7 * GIBIBYTE ||
-    !Number.isSafeInteger(host.disk_free_bytes) ||
-    host.disk_free_bytes < 20 * GIBIBYTE
-  ) {
-    fail("PREFLIGHT_HOST_CAPACITY", "cpu-memory-or-disk");
+  const capacityInvalid = developmentLite
+    ? !Number.isSafeInteger(host.cpu_count) ||
+      host.cpu_count < 2 ||
+      !Number.isSafeInteger(host.total_memory_bytes) ||
+      host.total_memory_bytes < 1.5 * GIBIBYTE ||
+      !Number.isSafeInteger(host.disk_free_bytes) ||
+      host.disk_free_bytes < 20 * GIBIBYTE ||
+      !Number.isSafeInteger(host.swap_total_bytes) ||
+      host.swap_total_bytes < GIBIBYTE
+    : !Number.isSafeInteger(host.cpu_count) ||
+      host.cpu_count < 4 ||
+      !Number.isSafeInteger(host.total_memory_bytes) ||
+      host.total_memory_bytes < 7 * GIBIBYTE ||
+      !Number.isSafeInteger(host.disk_free_bytes) ||
+      host.disk_free_bytes < 20 * GIBIBYTE;
+  if (capacityInvalid) {
+    fail(
+      "PREFLIGHT_HOST_CAPACITY",
+      developmentLite ? "cpu-memory-disk-or-swap" : "cpu-memory-or-disk",
+    );
   }
   if (
     !versionAtLeast(
@@ -220,36 +252,44 @@ function validateHostEvidence(host) {
 }
 
 function validateFileEvidence(files, manifest) {
+  const developmentLite = isDevelopmentLiteManifest(manifest);
   exactKeys(
     files,
-    ["config", "directories", "secrets"],
+    developmentLite
+      ? ["directories", "secrets"]
+      : ["config", "directories", "secrets"],
     "PREFLIGHT_FILE_EVIDENCE_KEYS",
   );
-  exactKeys(
-    files.config,
-    [
-      "config_sha256",
-      "endpoint_class",
-      "keys",
-      "prefix",
-      "protection",
-      "region",
-      "role",
-    ],
-    "PREFLIGHT_COS_CONFIG_EVIDENCE_KEYS",
-  );
-  if (
-    files.config.protection !== "ROOT_0600_REGULAR" ||
-    files.config.config_sha256 !==
-      manifest.config.runtime_fingerprints.object_config ||
-    files.config.endpoint_class !== manifest.topology.object_endpoint ||
-    files.config.region !== manifest.topology.object_region ||
-    files.config.prefix !== manifest.topology.object_prefix ||
-    JSON.stringify(files.config.keys) !== JSON.stringify(COS_CONFIG_KEYS)
-  ) {
-    fail("PREFLIGHT_COS_CONFIG_DRIFT", "object-config");
+  if (!developmentLite) {
+    exactKeys(
+      files.config,
+      [
+        "config_sha256",
+        "endpoint_class",
+        "keys",
+        "prefix",
+        "protection",
+        "region",
+        "role",
+      ],
+      "PREFLIGHT_COS_CONFIG_EVIDENCE_KEYS",
+    );
+    if (
+      files.config.protection !== "ROOT_0600_REGULAR" ||
+      files.config.config_sha256 !==
+        manifest.config.runtime_fingerprints.object_config ||
+      files.config.endpoint_class !== manifest.topology.object_endpoint ||
+      files.config.region !== manifest.topology.object_region ||
+      files.config.prefix !== manifest.topology.object_prefix ||
+      JSON.stringify(files.config.keys) !== JSON.stringify(COS_CONFIG_KEYS)
+    ) {
+      fail("PREFLIGHT_COS_CONFIG_DRIFT", "object-config");
+    }
   }
-  const expectedRoles = Object.keys(SECRET_FILE_NAMES).sort();
+  const secretFileNames = developmentLite
+    ? DEV_LITE_SECRET_FILE_NAMES
+    : SECRET_FILE_NAMES;
+  const expectedRoles = Object.keys(secretFileNames).sort();
   const actualRoles = files.secrets.map(({ role }) => role).sort();
   if (JSON.stringify(actualRoles) !== JSON.stringify(expectedRoles)) {
     fail("PREFLIGHT_SECRET_FILE_SET", "roles");
@@ -270,9 +310,9 @@ function validateFileEvidence(files, manifest) {
     fail("PREFLIGHT_SECRET_FILE_INVALID", "metadata-or-content");
   }
   const expectedDirectories = [
-    "config",
     "root",
     "secrets",
+    ...(!developmentLite ? ["config"] : []),
     ...[...new Set(Object.values(manifest.config.secret_ref_versions))].map(
       (version) => `secret-version:${version}`,
     ),
@@ -309,7 +349,23 @@ export function validateDevelopmentPreflightEvidence({
   validateSecretVersions(manifest);
   assertSecretVersionsActive(manifest, revokedSecretVersions);
   validateFileEvidence(files, manifest);
-  validateHostEvidence(host);
+  validateHostEvidence(host, manifest);
+  if (isDevelopmentLiteManifest(manifest)) {
+    return Object.freeze({
+      checks: {
+        capacity: "PASS",
+        host_baseline: "PASS",
+        local_object_contract: "PASS",
+        network_exposure: "PASS",
+        secret_files: "PASS",
+        swap: "PASS",
+      },
+      deployment_profile: "DEV_LITE",
+      gate: "E017_DEV_LITE_PREFLIGHT",
+      release_id: manifest.release_id,
+      status: "PASS",
+    });
+  }
   return Object.freeze({
     checks: {
       capacity: "PASS",
@@ -447,7 +503,16 @@ function nonLoopbackProtectedPorts(source) {
   return [...ports].sort((left, right) => left - right);
 }
 
-async function collectHostEvidence(root) {
+function swapTotalBytes(source) {
+  const match = /^SwapTotal:\s+(\d+)\s+kB$/mu.exec(source);
+  if (match === null) {
+    fail("PREFLIGHT_HOST_PROBE_FAILED", "swap");
+  }
+  return Number(match[1]) * 1024;
+}
+
+async function collectHostEvidence(root, manifest) {
+  const developmentLite = isDevelopmentLiteManifest(manifest);
   const [
     osReleaseSource,
     dockerVersion,
@@ -457,6 +522,7 @@ async function collectHostEvidence(root) {
     timezone,
     sockets,
     filesystem,
+    memoryInfo,
   ] = await Promise.all([
     readFile("/etc/os-release", "utf8"),
     commandOutput(
@@ -482,6 +548,7 @@ async function collectHostEvidence(root) {
     ),
     commandOutput("ss", ["-H", "-ltn"], "network"),
     statfs(root, { bigint: true }),
+    developmentLite ? readFile("/proc/meminfo", "utf8") : null,
   ]);
   const osRelease = parseOsRelease(osReleaseSource);
   const freeBytes = filesystem.bavail * filesystem.bsize;
@@ -498,12 +565,16 @@ async function collectHostEvidence(root) {
     os_id: osRelease.ID,
     os_version: osRelease.VERSION_ID,
     run_uid: runUid,
+    ...(developmentLite
+      ? { swap_total_bytes: swapTotalBytes(memoryInfo) }
+      : {}),
     timezone,
     total_memory_bytes: os.totalmem(),
   };
 }
 
 async function collectFileEvidence(root, manifest) {
+  const developmentLite = isDevelopmentLiteManifest(manifest);
   const configDirectory = path.join(root, "config");
   const secretsDirectory = path.join(root, "secrets");
   const versions = [
@@ -511,7 +582,9 @@ async function collectFileEvidence(root, manifest) {
   ].sort();
   const directories = await Promise.all([
     protectedDirectoryEvidence(root, "root"),
-    protectedDirectoryEvidence(configDirectory, "config"),
+    ...(!developmentLite
+      ? [protectedDirectoryEvidence(configDirectory, "config")]
+      : []),
     protectedDirectoryEvidence(secretsDirectory, "secrets"),
     ...versions.map((version) =>
       protectedDirectoryEvidence(
@@ -520,14 +593,11 @@ async function collectFileEvidence(root, manifest) {
       ),
     ),
   ]);
-  const config = await protectedFile(
-    configDirectory,
-    `${manifest.topology.object_config_ref}.env`,
-    "object_config",
-    "config",
-  );
+  const secretFileNames = developmentLite
+    ? DEV_LITE_SECRET_FILE_NAMES
+    : SECRET_FILE_NAMES;
   const secrets = await Promise.all(
-    Object.entries(SECRET_FILE_NAMES).map(([role, fileName]) =>
+    Object.entries(secretFileNames).map(([role, fileName]) =>
       protectedFile(
         path.join(secretsDirectory, manifest.config.secret_ref_versions[role]),
         fileName,
@@ -535,6 +605,15 @@ async function collectFileEvidence(root, manifest) {
         "secret",
       ),
     ),
+  );
+  if (developmentLite) {
+    return { directories, secrets };
+  }
+  const config = await protectedFile(
+    configDirectory,
+    `${manifest.topology.object_config_ref}.env`,
+    "object_config",
+    "config",
   );
   return { config, directories, secrets };
 }
@@ -553,7 +632,7 @@ export async function runDevelopmentPreflight(
   validateSecretVersions(manifest);
   const [files, host] = await Promise.all([
     collectFileEvidence(root, manifest),
-    collectHostEvidence(root),
+    collectHostEvidence(root, manifest),
   ]);
   return validateDevelopmentPreflightEvidence({
     files,

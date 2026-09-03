@@ -1,0 +1,143 @@
+{
+  "manifest_version": "e-017-evidence-v1",
+  "scope": "E-017 ReleaseManifestV2, DEV_LITE staged resources, local synthetic object, preflight, immutable bundle and rollback evidence",
+  "proofs": {
+    "T-E017-MANIFEST-001": {
+      "file": "tests/deployment/release.test.mjs",
+      "selector": "strict ReleaseManifestV2 DEV_LITE and topology transition cases",
+      "level": "CONTRACT",
+      "assertions": [
+        "ReleaseManifestV2 accepts only the closed DEV_LITE synthetic topology while historical V1 remains valid",
+        "V1 and V2 or STANDARD and DEV_LITE cannot share ordinary deploy, reconcile or rollback state",
+        "Production, STAGING, real identity and external object claims reject the local synthetic topology"
+      ]
+    },
+    "T-E017-PREFLIGHT-001": {
+      "file": "tests/deployment/preflight.test.mjs",
+      "selector": "conditional standard DEV and DEV_LITE host and secret preflight cases",
+      "level": "INTEGRATION",
+      "assertions": [
+        "standard DEV still requires four CPU and seven GiB while DEV_LITE requires two CPU, 1.5 GiB, twenty GiB free and one GiB swap",
+        "DEV_LITE accepts only eight database and fault secrets and never creates COS config or credentials",
+        "public protected ports, wrong owner, time, runtime, swap, disk or topology fail closed"
+      ]
+    },
+    "T-E017-COMPOSE-001": {
+      "file": "tests/deployment/dev-compose.test.mjs",
+      "selector": "DEV_LITE core budget, mutually exclusive workload windows and local object isolation cases",
+      "level": "STATIC",
+      "assertions": [
+        "steady core memory limits total at most 704 MiB and stateful or TLS ports remain loopback-only",
+        "Admin, Interactive, Background, Restricted and one-shot profiles are mutually selected by the controller",
+        "local object smoke has network none, no secret, volume or host port and cannot enter standard or production overlays"
+      ]
+    },
+    "T-E017-LOCAL-OBJECT-001": {
+      "file": "tests/deployment/local-object-smoke.test.mjs",
+      "selector": "one-shot in-memory object semantics and negative boundary cases",
+      "level": "CONTRACT",
+      "assertions": [
+        "a bounded synthetic object completes PUT, GET, SHA-256, DELETE and HEAD 404 before the loopback server closes",
+        "unknown method, path, query, range, redirect, traversal and oversized body fail without retaining content",
+        "output omits object body, path and UUID and never claims external provider evidence"
+      ]
+    },
+    "T-E017-BUNDLE-001": {
+      "file": "tests/deployment/image-publish.test.mjs",
+      "selector": "DEV bundle V3, profile-bound release identity and historical V2 verification cases",
+      "level": "CONTRACT",
+      "assertions": [
+        "V3 contains the DEV_LITE overlay and immutable evidence while historical V2 remains verifiable",
+        "deployment profile and built-in object fingerprint are bound into the release identity",
+        "the server receives no source tree, mutable image, object credential or production secret"
+      ]
+    },
+    "T-E017-DEPLOY-001": {
+      "file": "tests/deployment/release.test.mjs",
+      "selector": "staged DEV_LITE deployment, cleanup, recovery, reconcile and rollback cases",
+      "level": "RESILIENCE",
+      "assertions": [
+        "pull and migration run in maintenance with core application stopped and bounded command timeouts",
+        "each non-core workload starts alone with a deterministic one-shot identity, completes its proof and is stopped on success or failure",
+        "the Admin window proves loopback TLS before closing while failed pull keeps stateful dependencies available for recovery",
+        "fresh deploy, reconcile, N plus one, rollback and redeploy preserve exact operation and receipt semantics"
+      ]
+    },
+    "T-E017-RUNTIME-001": {
+      "file": "tests/deployment/dev-lite-runtime-check.test.mjs",
+      "selector": "post-phase OOM, restart, disk and protected-port evidence cases",
+      "level": "RESILIENCE",
+      "assertions": [
+        "every DEV_LITE phase fails before its receipt when the expected healthy service set drifts or any container is OOM-killed, paused, restarting or has restarted",
+        "phase-specific service sets enforce at most one expected transient workload and reject unknown Compose services",
+        "every DEV_LITE phase preserves at least twenty GiB free disk and no non-loopback protected listener",
+        "runtime diagnostics expose only phase and aggregate status without container IDs, paths, content or secrets"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "S32-DEPLOY-001",
+      "status": "COVERED",
+      "proof_ids": ["T-E017-MANIFEST-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-002",
+      "status": "COVERED",
+      "proof_ids": ["T-E017-MANIFEST-001", "T-E017-PREFLIGHT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-005",
+      "status": "COVERED",
+      "proof_ids": ["T-E017-PREFLIGHT-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-009",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-E017-BUNDLE-001",
+        "T-E017-COMPOSE-001",
+        "T-E017-DEPLOY-001"
+      ]
+    },
+    {
+      "source_id": "S32-DEPLOY-010",
+      "status": "COVERED",
+      "proof_ids": ["T-E017-BUNDLE-001", "T-E017-MANIFEST-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-014",
+      "status": "COVERED",
+      "proof_ids": ["T-E017-DEPLOY-001", "T-E017-MANIFEST-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-018",
+      "status": "COVERED",
+      "proof_ids": ["T-E017-MANIFEST-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-019",
+      "status": "COVERED",
+      "proof_ids": ["T-E017-MANIFEST-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-025",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-E017-COMPOSE-001",
+        "T-E017-DEPLOY-001",
+        "T-E017-RUNTIME-001"
+      ]
+    },
+    {
+      "source_id": "S32-DEPLOY-030",
+      "status": "COVERED",
+      "proof_ids": ["T-E017-DEPLOY-001"]
+    },
+    {
+      "source_id": "S32-DEPLOY-047",
+      "status": "COVERED",
+      "proof_ids": ["T-E017-COMPOSE-001", "T-E017-LOCAL-OBJECT-001"]
+    }
+  ]
+}

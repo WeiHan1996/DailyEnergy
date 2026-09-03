@@ -1,24 +1,35 @@
-# DailyEnergy DEV 发布、回滚与换机 Runbook
+# DailyEnergy DEV / DEV_LITE 发布、回滚与换机 Runbook
 
 - **文档状态**：Accepted
-- **所属任务**：E-012 — 部署固定开发环境与可回滚发布流程
-- **最后更新**：2026-08-12
+- **所属任务**：E-012 — 标准 DEV；E-017 — DEV_LITE 可回滚部署
+- **最后更新**：2026-09-03
 - **接受日期**：2026-08-12
-- **适用范围**：腾讯云上海临时 DEV 主机；loopback TLS；PostgreSQL 18、Redis 8 与应用同机；私有 COS application object
-- **上游权威**：[ADR-0007](../decisions/ADR-0007-development-colocation-exception.md)、[部署、配置与回滚规范](../technical/deployment.md)、[测试策略](../technical/testing.md)、[故障和安全事件响应](./incident-response.md)
+- **适用范围**：阿里云上海 DEV_LITE 活动主机与腾讯云标准 DEV 历史证据；loopback TLS；PostgreSQL 18、Redis 8 同机
+- **上游权威**：[ADR-0009](../decisions/ADR-0009-development-lite-colocation-exception.md)、[ADR-0007 历史标准 DEV](../decisions/ADR-0007-development-colocation-exception.md)、[部署、配置与回滚规范](../technical/deployment.md)、[测试策略](../technical/testing.md)、[故障和安全事件响应](./incident-response.md)
 - **生产资格**：无；本流程和产物都固定为 `production_eligible=false`
 
 ## 1. 当前边界
 
 - 域名完成 ICP 备案并取得 DNS/TLS 变更授权前，不开放公网 80/443，只通过 SSH tunnel 访问主机的 `127.0.0.1:8443` 与 `127.0.0.1:8444`；
-- DEV 只使用 synthetic seed 和专用测试身份，不接收真实用户数据；PostgreSQL/Redis volume 与 COS `dev/objects/` 都是可丢弃状态；
-- COS 只存 application object，不存 PostgreSQL backup；bucket 名、APPID、endpoint 和 credential value 不写入仓库、artifact、manifest、命令输出或聊天；
+- 活动 DEV_LITE 只使用 synthetic seed 和专用测试身份，不接收真实用户数据；PostgreSQL/Redis volume 是可丢弃状态，不复制腾讯云状态；
+- DEV_LITE 不使用外部对象服务；one-shot local object smoke 只证明本地 synthetic HTTP 语义，不证明 COS/OSS；历史标准 DEV 的私有 COS 证据不适用于新主机；
 - STAGING/PRODUCTION 必须迁移到独立 PostgreSQL、Redis 和对象服务，不能晋级本 Runbook 的同机 Compose、secret、volume、dump 或 COS object；
 - 服务器只拉取 CI 已发布的 immutable image digest，不 checkout、不现场 build、不使用 mutable tag。
 
 ## 2. 一次性主机前置
 
 以下前置只能由获授权的主机管理员执行：
+
+### 2.1 DEV_LITE 活动主机
+
+1. Ubuntu 24.04 LTS、x86_64、2 vCPU、至少 1.5 GiB 实际 RAM、至少 20 GiB 可用磁盘；时区 `Asia/Shanghai` 且 NTP 已同步；
+2. 至少 1 GiB swap，只作突发缓冲；真实验收不得出现 OOMKilled、restart loop 或持续 swap thrash；
+3. Docker `>=29.0.0`、Compose `>=2.40.0` 与 util-linux `flock`；防火墙只允许 SSH，80/443/5432/6379/8443/8444 不得在非 loopback 地址监听；
+4. 稳态 core memory limit 总和最多 704 MiB；Admin、Interactive、Background、Restricted 与 one-shot job 使用互斥窗口；
+5. 运行 `tooling/deployment/bootstrap-host.sh` 安装 checksum 固定的 Node 24.18.0；新主机使用 fresh database/fault secret version，不创建或迁移 COS credential；
+6. 主机首次拉取允许最长 30 分钟；磁盘只保留 current 与唯一 N-1 必需镜像，清理不得触达有效回滚证据。
+
+### 2.2 E-012 历史标准 DEV 主机
 
 1. Ubuntu 24.04 LTS、x86_64、4 vCPU、至少 7 GiB RAM、至少 20 GiB 可用磁盘；时区 `Asia/Shanghai` 且 NTP 已同步；
 2. Docker `>=29.0.0`、Compose `>=2.40.0`，且系统提供 util-linux `flock`；防火墙只允许 SSH，80/443/5432/6379 不得在非 loopback 地址监听；
@@ -74,7 +85,20 @@ scp -i <SSH_IDENTITY_FILE> -r \
 
 ### 4.1 安装部署包
 
-登录服务器后执行：
+DEV_LITE 登录服务器后执行；version ref 只标识新主机上单独创建的 8 项数据库与
+fault-control secret，不包含路径或值：
+
+```bash
+sudo /usr/local/bin/dailyenergy-node \
+  /tmp/dailyenergy-dev-bundle/tooling/deployment/install-dev-bundle.mjs \
+  --dev-lite \
+  /tmp/dailyenergy-dev-bundle \
+  dev-lite-secret-v1
+```
+
+安装器必须生成 `ReleaseManifestV2`，且不得读取、创建或要求 COS config/credential。
+
+历史标准 DEV 登录服务器后执行：
 
 ```bash
 sudo /usr/local/bin/dailyenergy-node \
@@ -89,9 +113,9 @@ sudo /usr/local/bin/dailyenergy-node \
 
 - 通过 Linux 内核 advisory `flock` 获取互斥所有权；`release.lock` 只保存无 secret 的当前 owner 元数据，不是文件存在即占用的哨兵，持锁进程异常退出或主机重启后内核会释放实际锁；
 - 校验 source bundle；
-- 严格校验命令中的 database secret version、COS secret version 与 object config ref；这些参数不得包含路径或 secret value；
-- 读取所选 COS 无值配置计算 fingerprint，但不读取 COS credential；
-- 结合当前 Accepted release 生成 N/N-1 兼容的 `ReleaseManifestV1`；
+- 严格校验命令中的 profile 与 version refs；标准 DEV 还校验 COS secret version 与 object config ref，任何参数都不得包含路径或 secret value；
+- DEV_LITE 使用内建 local synthetic object fingerprint；标准 DEV 读取所选 COS 无值配置计算 fingerprint，但不读取 COS credential；
+- 结合当前 Accepted release 生成 profile 内 N/N-1 兼容的 `ReleaseManifestV1` 或 `ReleaseManifestV2`，跨 profile/state 转换直接拒绝；
 - 以 `root:root`、目录 `0700`、文件 `0600` 原子安装到 `/srv/dailyenergy/bundles/<release_id>`；
 - 对同一 bundle 重放时验证已安装内容并返回 `installed=false`。
 
@@ -125,7 +149,7 @@ cd "/srv/dailyenergy/bundles/${RELEASE_ID}"
 exit
 ```
 
-控制器固定执行 18 个阶段：preflight、digest pull、stateful readiness、关闭 loopback TLS 进入 DEV 维护、drain workers、migration 与 drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、COS object smoke、Safety smoke、owner smoke、deletion smoke、退出维护。任一阶段失败都不写 Accepted release state。
+控制器固定执行 18 个阶段：preflight、digest pull、stateful readiness、关闭 loopback TLS 进入 DEV 维护、drain workers、migration 与 drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、object smoke、Safety smoke、owner smoke、deletion smoke、退出维护。DEV_LITE 在 pull/migration 前停止 application/transient workload但保留 PostgreSQL、Redis 与 dependency stub 供失败恢复 probe 使用；每个临时 profile 启动前先停止其它临时 profile，所有 one-shot 使用确定性容器名防止中断重试并发，并在每阶段 receipt 前检查期望 service set、health、OOM、restart、20 GiB 磁盘余量和受保护端口。Admin 窗口会临时启动 TLS、验证 `8444/login` 后关闭 TLS；object smoke 是本地 one-shot，标准 DEV 才使用 COS。任一阶段失败都不写 Accepted release state。
 
 首次全通过后才会更新 `/srv/dailyenergy/deployment/release-state.json`，分别保存当前 Accepted application、实际 effective catalog 和唯一
 N-1 rollback target，并写无用户内容的 PASS receipt。同一 release 在没有 dirty operation 时重放只重新核验 manifest/preflight，
@@ -150,10 +174,9 @@ ssh -i <SSH_IDENTITY_FILE> \
 
 ```bash
 curl --fail --insecure https://localhost:8443/health/ready
-curl --fail --insecure https://localhost:8444/login
 ```
 
-DEV 使用 Caddy internal certificate，因此浏览器会显示本地不受信任证书；这不是公网证书验收。不要为了消除警告而开放 80/443、修改 DNS 或导入未授权证书。
+DEV 使用 Caddy internal certificate，因此浏览器会显示本地不受信任证书；这不是公网证书验收。DEV_LITE 的 Admin 不是稳态服务，`8444/login` 已在 18 阶段发布内的 Admin 窗口验证，窗口结束后按资源合同关闭，不能用部署后的 `8444` 结果替代阶段 receipt。不要为了消除警告而开放 80/443、修改 DNS 或导入未授权证书。
 
 ## 6. Clean restart 后收敛当前 Accepted release
 
@@ -186,7 +209,7 @@ cd "/srv/dailyenergy/bundles/${CURRENT_RELEASE_ID}"
 exit
 ```
 
-控制器要求调用 manifest 与 state `current` 的 release ID/digest 完全一致，并组合当前 Accepted application/config/secret 与 state `catalog` 指向的 immutable migration image/metadata。它不 pull image，不执行 role/credential prepare、Prisma migrate 或 synthetic seed，也不改写 Accepted state、effective catalog 或 rollback target。固定 17 阶段为：preflight、stateful readiness、关闭 loopback TLS、worker drain、只读 drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、COS object smoke、Safety smoke、owner smoke、deletion smoke、退出维护；所有 Compose `up` 都使用 `--force-recreate`。
+控制器要求调用 manifest 与 state `current` 的 release ID/digest 完全一致，并组合当前 Accepted application/config/secret 与 state `catalog` 指向的 immutable migration image/metadata。它不 pull image，不执行 role/credential prepare、Prisma migrate 或 synthetic seed，也不改写 Accepted state、effective catalog 或 rollback target。固定 17 阶段为：preflight、stateful readiness、关闭 loopback TLS、worker drain、只读 drift verify、Interactive、Background、API、Admin、Restricted、恢复 TLS、health、object smoke、Safety smoke、owner smoke、deletion smoke、退出维护；所有 Compose `up` 都使用 `--force-recreate`。DEV_LITE 的 object smoke 与逐阶段 runtime guard 仍按第 4.3 节执行。
 
 成功后写一份同时绑定 current、effective catalog 与唯一 `operation_id` 的 PASS receipt，再清除 reconciliation operation；`release-state.json` 必须逐字节不变。任一阶段失败时保留 `RECONCILE_CURRENT/FAILED` operation 与原 Accepted state，修复外部原因后只能从同一 current bundle 重跑同一 `reconcile-current`，并沿用原 operation ID。无关 deploy/rollback/recover dirty operation、不同 manifest 或缺失 Accepted state 一律 fail closed。17 阶段已经全部通过而进程在 receipt/cleanup 前退出时，相同入口只确定性补建 receipt 并清理 operation，不重跑运行态命令。
 
@@ -259,6 +282,7 @@ exit
 
 ## 9. Secret/配置轮换
 
+- DEV_LITE 只轮换数据库与 fault-control 的 8 项闭合 secret version；不得为它创建 COS config/credential，使用新 version ref 重新执行 `--dev-lite` 安装入口；
 - secret value 变化必须创建新 version directory，并以新 release manifest 引用；不得覆盖 `dev-secret-v1` 或 `dev-cos-credential-v1` 的现有文件；
 - COS bucket、region、prefix 或 endpoint 变化属于 deploy config 变化，必须生成新 fingerprint 和 release；
 - CAM/API key 泄露时先吊销、记录为凭据事件，再创建新 credential/version；不要在排障输出中读取旧值；
@@ -295,16 +319,16 @@ sudo /usr/local/bin/dailyenergy-node \
 
 ## 10. 临时主机迁移或丢失
 
-DEV 的恢复单位是“同一 GitHub artifact + immutable image digest + migration catalog + 外部无值配置 + 重新创建的版本化 secret”，不是容器文件系统或旧 volume：
+DEV 的恢复单位是“同一 GitHub artifact + immutable image digest + migration catalog + profile 所需配置 + 重新创建的版本化 secret”，不是容器文件系统或旧 volume：
 
 1. 新建符合第 2 节基线的 Ubuntu 主机，保持公网业务端口关闭；
 2. 安装 Docker/Compose 和 checksum 固定的隔离 Node；
-3. 重新创建/轮换 DEV 数据库、fault、COS 和 GHCR credential，不复制到 STAGING/PRODUCTION；
+3. 重新创建/轮换 DEV 数据库、fault 和 GHCR credential；只有历史标准 DEV 才创建 COS config/credential，任何 DEV 凭据都不复制到 STAGING/PRODUCTION；
 4. 从 GitHub 下载同一 deployment artifact，安装并执行 deploy；
 5. 运行 synthetic seed 和完整 18 阶段 smoke；
 6. 通过 SSH tunnel 验收后，再退役旧主机凭据和资源。
 
-PostgreSQL/Redis DEV volume 不承诺备份、PITR、RPO、RTO 或 HA；COS application objects 会按 7 天生命周期删除。需要保留的测试事实必须来自可重复 seed/fixture，而不是迁移可变 DEV 数据。
+PostgreSQL/Redis DEV volume 不承诺备份、PITR、RPO、RTO 或 HA；历史标准 DEV 的 COS application objects 会按 7 天生命周期删除，DEV_LITE local object 在 one-shot 进程结束前已删除且不持久化。需要保留的测试事实必须来自可重复 seed/fixture，而不是迁移可变 DEV 数据。
 
 ## 11. 必须停止的情况
 
@@ -313,10 +337,11 @@ PostgreSQL/Redis DEV volume 不承诺备份、PITR、RPO、RTO 或 HA；COS appl
 - bundle 文件集、SHA-256、release/image/runtime/supply binding 或权限不一致；
 - CI 11 checks 不来自同一成功的 `main` run；
 - image 不是 digest reference，或服务器试图 build；
-- COS 配置 fingerprint、secret version、host baseline 或非 loopback 端口漂移；
-- migration/drift、health、COS、Safety、owner 或 deletion 任一 smoke 失败；
+- profile 对应的 object fingerprint、secret version、host baseline、资源 runtime guard 或非 loopback 端口漂移；
+- migration/drift、health、object、Safety、owner 或 deletion 任一 smoke 失败；
 - rollback target 不存在、不兼容或与 state digest 不一致；
 - 存在 dirty operation 却尝试普通 deploy/rollback，或恢复目标不是 state 中的 current Accepted release；
+- DEV_LITE 发现遗留的确定命名 one-shot 容器时，不得启动第二个副本；先保留 operation/state，核验该容器与失败阶段后按明确恢复步骤处理；
 - 发现真实用户数据、生产身份、生产 secret 或 DEV 状态正在向生产迁移。
 
 凭据暴露、越权、真实数据进入 DEV 或 Safety/删除控制失效时，按[故障和安全事件响应](./incident-response.md)处理。

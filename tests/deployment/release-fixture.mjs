@@ -1,12 +1,22 @@
 import { apiDeployConfigFingerprint } from "../../tooling/deployment/runtime-evidence.mjs";
+import {
+  DEVELOPMENT_LITE_OBJECT_FINGERPRINT,
+  RELEASE_MANIFEST_VERSION,
+  RELEASE_MANIFEST_VERSION_V2,
+} from "../../tooling/deployment/release-contract.mjs";
 
 const SHA = "a".repeat(64);
 
 export function releaseManifestFixture(releaseId, options = {}) {
+  const developmentLite =
+    options.deploymentProfile === "DEV_LITE" ||
+    options.manifestVersion === RELEASE_MANIFEST_VERSION_V2;
   const generation = options.generation ?? 1;
   const acceptedGenerations = options.acceptedGenerations ?? [generation];
   const value = {
-    manifest_version: "ReleaseManifestV1",
+    manifest_version: developmentLite
+      ? RELEASE_MANIFEST_VERSION_V2
+      : RELEASE_MANIFEST_VERSION,
     release_id: releaseId,
     source: {
       repository: "WeiHan1996/DailyEnergy",
@@ -39,20 +49,27 @@ export function releaseManifestFixture(releaseId, options = {}) {
     config: {
       config_schema_version: "api-runtime-config-v1",
       contract_bundle_version: "api-contract-v1",
+      ...(developmentLite ? { deployment_profile: "DEV_LITE" } : {}),
       environment: "DEV",
       log_level: "INFO",
       product_date_policy_version: "product-date-v1",
       runtime_fingerprints: {
         api_capability: SHA,
         api_deploy_config: apiDeployConfigFingerprint(releaseId),
-        object_config: options.objectConfigFingerprint ?? "f".repeat(64),
+        object_config: developmentLite
+          ? DEVELOPMENT_LITE_OBJECT_FINGERPRINT
+          : (options.objectConfigFingerprint ?? "f".repeat(64)),
         worker_background: "c".repeat(64),
         worker_interactive: "d".repeat(64),
         worker_restricted: "e".repeat(64),
       },
       secret_ref_versions: {
-        cos_secret_id: "dev-cos-credential-v1",
-        cos_secret_key: "dev-cos-credential-v1",
+        ...(!developmentLite
+          ? {
+              cos_secret_id: "dev-cos-credential-v1",
+              cos_secret_key: "dev-cos-credential-v1",
+            }
+          : {}),
         database_admin_url: "dev-secret-v1",
         database_api_url: "dev-secret-v1",
         database_background_url: "dev-secret-v1",
@@ -63,19 +80,33 @@ export function releaseManifestFixture(releaseId, options = {}) {
         postgres_password: "dev-secret-v1",
       },
     },
-    topology: {
-      object_config_ref: "dev-cos-config-v1",
-      object_endpoint: "TENCENT_COS_PRIVATE_INTERNAL",
-      object_prefix: "dev/objects/",
-      object_region: "ap-shanghai",
-      production_enabled: false,
-      public_ingress: "LOOPBACK_TLS_UNTIL_ICP",
-      stateful_topology: "DEV_COLOCATED_EXCEPTION",
-    },
+    topology: developmentLite
+      ? {
+          object_endpoint: "LOCAL_SYNTHETIC_OBJECT_STUB",
+          object_prefix: "dev-lite/objects/",
+          object_region: "HOST_LOCAL_EPHEMERAL",
+          production_enabled: false,
+          production_eligible: false,
+          public_ingress: "LOOPBACK_TLS_ONLY",
+          stateful_topology: "DEV_LITE_COLOCATED_EXCEPTION",
+        }
+      : {
+          object_config_ref: "dev-cos-config-v1",
+          object_endpoint: "TENCENT_COS_PRIVATE_INTERNAL",
+          object_prefix: "dev/objects/",
+          object_region: "ap-shanghai",
+          production_enabled: false,
+          public_ingress: "LOOPBACK_TLS_UNTIL_ICP",
+          stateful_topology: "DEV_COLOCATED_EXCEPTION",
+        },
     compatibility: {
       accepted_generations: acceptedGenerations,
       generation,
-      manifest_versions: ["ReleaseManifestV1"],
+      manifest_versions: [
+        developmentLite
+          ? RELEASE_MANIFEST_VERSION_V2
+          : RELEASE_MANIFEST_VERSION,
+      ],
     },
     evidence: {
       required_gates: [
@@ -92,4 +123,11 @@ export function releaseManifestFixture(releaseId, options = {}) {
   };
   options.mutate?.(value);
   return value;
+}
+
+export function devLiteReleaseManifestFixture(releaseId, options = {}) {
+  return releaseManifestFixture(releaseId, {
+    ...options,
+    deploymentProfile: "DEV_LITE",
+  });
 }
