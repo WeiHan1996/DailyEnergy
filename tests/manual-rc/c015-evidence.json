@@ -113,7 +113,7 @@
     "review_remediation": "C-004_THROUGH_C-015_REGRESSIONS_PASS"
   },
   "evidence_preparation": {
-    "status": "IN_PROGRESS_ANDROID_PRODUCTION_LEGAL_PENDING",
+    "status": "IN_PROGRESS_PRODUCTION_LEGAL_PENDING",
     "authorized_on": "2026-09-02",
     "devtools": {
       "version": "Stable v2.01.2510290",
@@ -154,18 +154,27 @@
       "fresh_debug_reload": "POSITIVE_CONTROL_REACHED_RECORDER",
       "temporary_domain_check": "GIT_IGNORED_ONLY / RESTORED_TRUE",
       "temporary_tunnel": "TERMINATED / NOT_PRODUCTION_EVIDENCE",
-      "receipt_sha256": "4e5997e85652ee76e7be5e5d9f8483505753a658082d2a578d316f4830a990e5"
+      "receipt_sha256": "b1ea6a47128af3bdb7353ff10fdac26df49bd15c22ee91df7b6e1c28efc5a582"
     },
     "android_no_replay": {
-      "status": "PENDING_EXECUTION / DEVICE_SCAN_NOT_OBSERVED",
+      "status": "EXECUTION_PASS",
       "device": "Xiaomi MIX 2S",
       "os_version": "Android 10 / MIUI 12.5.1",
       "wechat_version": "8.0.76",
-      "last_attempted_at_utc": "2026-09-03T01:46:33Z",
+      "completed_at_utc": "2026-09-03T02:21:27Z",
       "bundle_environment": "STAGING / SYNTHETIC_ONLY",
-      "debug_qr": "GENERATED_AFTER_DEVTOOLS_RESTART / DEVICE_SCAN_NOT_OBSERVED",
+      "bundle_source_fingerprint": "0e07142cd495e5d8ab7c3e4650e192a8c9649f85a89f3a0300863fa00188267a",
+      "debug_qr": "TRUE_DEVICE_DEBUG / ENT-001",
       "devtools_session": "READY / PRIOR_WEBSOCKET_DNS_FAILURE_CLEARED_AFTER_RESTART",
-      "simulator_positive_events": "1 / EXCLUDED_FROM_DEVICE_EVIDENCE",
+      "pre_reset_simulator_baseline": 1,
+      "positive_control_after_device_connect": 2,
+      "device_positive_delta": 1,
+      "formal_reset_count": 0,
+      "offline_restart_count": 0,
+      "network_resume_without_new_load_count": 0,
+      "explicit_reload_without_new_process_count": 0,
+      "cold_process_explicit_qr_count": 1,
+      "conclusion": "NO OFFLINE EVENT REPLAYED; EXPLICIT COLD-PROCESS QR LOAD REACHED RECORDER",
       "temporary_tunnel": "TERMINATED / NOT_PRODUCTION_EVIDENCE",
       "local_configuration_after_attempt": "URL_CHECK_TRUE / LOCAL_BUILD_RESTORED"
     },
@@ -175,7 +184,10 @@
       "public_https": "FAIL / TCP_443_TIMEOUT / TLS_HANDSHAKE_NOT_OBSERVED",
       "public_http": "FAIL / TCP_80_TIMEOUT",
       "legacy_tencent_host": "DEV_ONLY_EXPIRING",
-      "legacy_tencent_ssh": "ENCRYPTED_PRIVATE_KEY / INTERACTIVE_PASSPHRASE_REQUIRED / AUDIT_PENDING",
+      "legacy_tencent_ssh": "READ_ONLY_AUDIT_PASS / DEV_ONLY_EXPIRING",
+      "legacy_tencent_runtime": "UBUNTU_24_04_X86_64 / 4_CPU / APPROX_8_GIB / 178_GIB / NTP_SYNC / DOCKER_AND_COMPOSE_PASS / 9_HEALTHY_SYNTHETIC_DEV_CONTAINERS",
+      "legacy_tencent_stateful_services": "LOCAL_DEV_POSTGRESQL_18_AND_REDIS_8 / NOT_PRODUCTION_ELIGIBLE",
+      "legacy_tencent_ingress": "HOST_80_443_NOT_LISTENING / UFW_OPENSSH_ONLY / TLS_PROXY_LOOPBACK_ONLY / PRODUCTION_SNI_FAIL",
       "alibaba_host": "PRODUCTION_CANDIDATE / ADMISSION_PENDING",
       "production_bundle_binding": "PENDING"
     },
@@ -212,7 +224,7 @@
     "external_inputs": {
       "synthetic_https_backend": "EXECUTED_AND_TERMINATED / SYNTHETIC_ONLY",
       "ios_device": "EXECUTION_PASS",
-      "android_device": "IDENTIFIED / DEVICE_SCAN_REQUIRED / NO_REPLAY_PENDING_EXECUTION",
+      "android_device": "EXECUTION_PASS",
       "processing_entity": "OWNER_INPUT_AND_JURISDICTION_CAPTURED_LOCALLY / PRIVACY_AND_LEGAL_REVIEW_PENDING",
       "production_location_and_processors": "PENDING_PRIVACY_LEGAL_OWNER",
       "final_user_notice": "PENDING_PRIVACY_LEGAL_OWNER"
@@ -236,7 +248,6 @@
       "client analytics identity cells, metrics M05/M19/M22 and count-free G01-G04 evidence use their accepted closed contracts"
     ],
     "residual_evidence": [
-      "Android network no-replay evidence",
       "production deployment inspection confirming no third-party analytics, BI, ad, replay or attribution SDK is bundled",
       "privacy/legal confirmation of the actual processing entity, production location and user notice",
       "production scheduler authorization and incident thresholds remain outside automated C-015 evidence"
@@ -245,7 +256,7 @@
   },
   "real_device": {
     "ios_network_no_replay": "EXECUTION_PASS",
-    "android_network_no_replay": "MANUAL_EVIDENCE_PENDING / DEVICE_SCAN_REQUIRED"
+    "android_network_no_replay": "EXECUTION_PASS"
   },
   "reviewer": "project-owner",
   "reviewed_at_utc": "2026-08-31T06:30:54Z"

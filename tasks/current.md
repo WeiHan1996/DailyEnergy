@@ -4,14 +4,14 @@
 - **最后更新**：2026-09-03
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-015 — C-004～C-015 统一审核修复
-- **任务状态**：Blocked（实现与统一修复已 merge；DevTools/iOS no-replay 已执行，等待 Android、生产 bundle 与 Privacy/Legal 证据）
+- **任务状态**：Blocked（实现与统一修复已 merge；DevTools/iOS/Android no-replay 已执行，等待生产 bundle 与 Privacy/Legal 证据）
 - **任务 Profile**：`security`（幂等、Safety、删除不复活、隐私、确定性与 analytics 可信性）
 - **工作分支**：`agent/c015-post-merge-handoff`
 - **修复基线**：[C-015 Draft PR #168](https://github.com/WeiHan1996/DailyEnergy/pull/168)，remote head `fd04b787926127bda64fc6cb07cfcf356d85ed8b`，CI run `33323476723` 11/11 SUCCESS
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)；保持 Open
 - **当前 PR**：[C-015 外部证据准备 Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170)；base=`main`，verified implementation head `9022e5b713d838196c14e6280d481f444e65cb15`，CI run `33579547592` 11/11 SUCCESS；latest evidence/security head `d1997f2e2e84feec91d7c4f07821f421c9f69da4`，CI run `33698970649` 11/11 SUCCESS
 - **合并状态**：main head `fec5c96d368f8d4427ecca861f8ce42adad7a270`，CI run `33374088290` 11/11 SUCCESS
-- **下一候选动作**：执行 Android no-replay；修复并绑定实际生产 origin/image/manifest；完成处理主体、位置/受托方/跨境与最终用户说明审核；不启动 C-016
+- **下一候选动作**：修复并绑定实际生产 origin/image/manifest；完成处理主体、位置/受托方/跨境与最终用户说明审核；不启动 C-016
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-02～09-03 外部证据补齐进度
@@ -19,7 +19,7 @@
 - 项目所有者已授权 Agent 准备 C-015 剩余证据，并在微信开发者工具中提供“见见今天”的既有 AppID；AppID 只用于本机忽略配置和 IDE 项目，不写入仓库或证据正文；
 - 微信开发者工具 `Stable v2.01.2510290` / 基础库 `3.7.12` 已通过 11 路由 smoke；owner 明确允许后仅开启本地服务端口，登录票据、默认信任和多端插件端口保持关闭；增强 no-replay runner 证明 `dimensions_expanded` 的 restart replay=`0`、fresh signal=`1`、storage keyword/digest change=`0`，完成后服务端口已恢复关闭；
 - iPhone 17 / iOS 26.5 / 微信 `8.0.76` 使用 ENT-001 真机调试和只接收合成 `landing_viewed` 的临时 HTTPS recorder：正向通路先验证，正式清零后离线重启=`0`、恢复网络缓存恢复=`0`、显式新调试刷新产生正向事件；AppID 未持久化，私有 `urlCheck` 已恢复 `true`，Quick Tunnel 与 recorder 已终止；iOS no-replay 证据完成；
-- Android 设备已确认为 Xiaomi MIX 2S / Android 10 / MIUI 12.5.1 / 微信 `8.0.76`；首次 STAGING 尝试遇到 DevTools websocket DNS 故障，重启后第二次已正常生成 Android 真机调试二维码且无 session error，但测试窗口内未观察到手机扫码或真机会话；模拟器正向事件已排除，no-replay 仍为 `PENDING_EXECUTION / DEVICE_SCAN_REQUIRED`，Quick Tunnel 与 recorder 已终止并恢复 LOCAL 配置；
+- Xiaomi MIX 2S / Android 10 / MIUI 12.5.1 / 微信 `8.0.76` 使用 ENT-001 真机调试和合成 recorder：模拟器基线 `1` 被排除，真机连接新增正向 delta=`1`；正式清零后离线重启=`0`、原页恢复网络 replay=`0`、显式刷新未产生新进程=`0`、联网冷进程重新扫码正向事件=`1`；Android no-replay 证据完成，Quick Tunnel 与 recorder 已终止，私有 `urlCheck` 和 LOCAL build 已恢复；
 - 当前 head 的 LOCAL 候选 bundle build、Mini Program bundle Gate、C-015 analytics static test、已构建产物与 lockfile 禁止 SDK 名称扫描均通过；使用 Node `24.18.0` 生成的 supply-chain evidence 为 `5406` 个 build files、`750` 个 SBOM packages，artifact scanner PASS；这些结果未绑定实际 PRODUCTION API origin 或生产 OCI image，不能升级为生产 bundle PASS；
 - 2026-09-02 npm 官方 audit 新报告 transitive optional `mysql2@3.15.3` 的 high advisory `GHSA-3f6p-5ww8-9rcr`；当前分支用最小 override `mysql2@3.22.0` 修复，复核为 `critical=0/high=0`，完整自动 Gate 已在 `9022e5b` 通过；
 - 2026-09-03 npm 官方 audit 新报告 transitive optional `fast-uri@3.1.5` 的四个 high advisory（`GHSA-5jgf-p345-68v8`、`GHSA-f65p-4m7j-42xc`、`GHSA-fph4-wmhf-6fwf`、`GHSA-jqff-g426-hqxp`）；当前分支将既有最小 override 提升到 `fast-uri@3.1.6`，唯一生产解析版本与 frozen lockfile 策略通过，官方 audit 复核为 `critical=0/high=0`；Node `24.18.0` 下 `changed→full` Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`，exact-head CI run `33698970649` 为 11/11 SUCCESS；
@@ -27,10 +27,10 @@
 - `9022e5b` 的 CI run `33579547592` 为 11/11 SUCCESS，覆盖 docs/static/unit-contract/db/queue/API/Admin/resilience/AI/supply-chain/full Gate；这些自动证据仍不替代 DevTools/真机和 Privacy/Legal 人工证据；
 - GitHub 当前只有 `development` environment，仓库和该环境均无 Actions variable/secret；没有可绑定的 STAGING/PRODUCTION API origin、生产 image set 或 Release Manifest；
 - `api.weihan.ltd` 已通过两台阿里云权威 DNS 和系统 resolver 验证 A 记录发布，未发布 AAAA/CNAME；公网 HTTPS/HTTP 端口均超时而 SSH 可达，因此 TLS handshake、API 健康检查和生产 origin 绑定仍未通过；owner 已将旧腾讯云主机定为 `DEV_ONLY_EXPIRING`，阿里云主机仅为 `PRODUCTION_CANDIDATE / ADMISSION_PENDING`；
-- 腾讯云 SSH 用户名由 owner 确认为 `ubuntu`；此前 `BatchMode` 失败的原因已澄清为专用私钥受口令保护，交互式 SSH 已正确到达私钥口令提示但测试窗口内未完成输入；未读取服务器内容，也未尝试其它账户。解锁条件是在用户终端运行 `ssh-add --apple-use-keychain` 或直接完成 SSH 口令提示；
-- 本地脱敏 receipt 为 `.artifacts/c015/evidence-receipt.json`，SHA-256=`4e5997e85652ee76e7be5e5d9f8483505753a658082d2a578d316f4830a990e5`；该 ignored artifact 不替代 tracked 摘要、owner 接受或 CI；
+- 腾讯云 `DEV_ONLY_EXPIRING` 主机已通过已加载的专用密钥完成严格只读盘点：Ubuntu 24.04 x86_64、4 CPU/约 8 GiB/178 GiB、时钟同步、Docker/Compose 可用，9 个 synthetic DEV 容器健康；PostgreSQL/Redis 为本机 DEV 容器，TLS proxy 只绑定 loopback 8443/8444，主机未监听 80/443、UFW 只允许 SSH，且正式 `api.weihan.ltd` SNI 在 DEV proxy 上握手失败，因此该主机和 bundle 不具备生产资格；未读取 secret、env、日志、dump、volume 或用户内容；
+- 本地脱敏 receipt 为 `.artifacts/c015/evidence-receipt.json`，SHA-256=`b1ea6a47128af3bdb7353ff10fdac26df49bd15c22ee91df7b6e1c28efc5a582`；该 ignored artifact 不替代 tracked 摘要、owner 接受或 CI；
 - 实际处理主体、安徽合肥登记属地、隐私联系、Android 版本和“不向不满十四周岁用户提供服务”的 owner 输入仅保存于 ignored 本地表；未成年人决定仍需 Accepted 规范与最小拒绝路径，Privacy 工程自审仍 Pending，Legal reviewer 保持 `PENDING_QUALIFIED_PRC_LEGAL_REVIEWER`；
-- 仍需完成：Android no-replay、生产组件/受托方/region/跨境矩阵、最终用户说明和合格 Legal review。
+- 仍需完成：生产 origin/image/manifest、生产组件/受托方/region/跨境矩阵、最终用户说明和合格 Legal review。
 
 ## Post-merge receipt
 
@@ -134,10 +134,9 @@
 
 ## 8. 精确下一动作
 
-1. **解锁条件**：完成 Android 真机网络证据，证明 offline signal 不持久化、不跨重启 replay；
-2. 提供生产 bundle 检查，证明不含第三方 analytics/BI/ad/replay/attribution SDK；
-3. 提供实际处理主体、生产位置与用户说明的 privacy/legal 确认；生产 scheduler 与 incident threshold 继续留在 Production Gate；
-4. 证据齐备并获 owner 接受前，C-015 保持 Blocked、Issue #68 保持 Open、C-016 不启动、Production/RC 保持 `NO_GO`。
+1. **解锁条件**：提供生产 bundle 检查，证明实际 origin/image/manifest 不含第三方 analytics/BI/ad/replay/attribution SDK；
+2. 提供实际处理主体、生产位置与用户说明的 privacy/legal 确认；生产 scheduler 与 incident threshold 继续留在 Production Gate；
+3. 证据齐备并获 owner 接受前，C-015 保持 Blocked、Issue #68 保持 Open、C-016 不启动、Production/RC 保持 `NO_GO`。
 
 ## 9. C-015 后统一审核
 
