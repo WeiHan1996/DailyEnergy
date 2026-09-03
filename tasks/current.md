@@ -4,15 +4,15 @@
 - **最后更新**：2026-09-03
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：E-017 — 2C2G DEV_LITE 可回滚部署
-- **任务状态**：In Review（Draft PR #172；本地 full Gate 与 exact-head CI 11/11，owner 审核、正式 merge verifier 与真实部署 Pending）
+- **任务状态**：In Review（owner threat-boundary 审核通过；PR #170 已合并，#172 正在更新 main 基线，final CI/verifier/merge 与真实部署 Pending）
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
 - **工作分支**：`agent/e017-dev-lite`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：[E-017 Draft PR #172](https://github.com/WeiHan1996/DailyEnergy/pull/172)；base=`agent/c015-post-merge-handoff`，implementation commit `ea5d479a2285afeed33bcabd867e7ed61da6e49`；head `7923c84520608dfd8a81e4b20d6a3fad1cf59c16` 的 CI run `33720679810` 为 11/11 SUCCESS，正式 exact-head merge verifier 因 Draft/stacked base 保持 Pending
-- **Stacked 基线**：[C-015 Draft PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170)，head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968`，CI run `33713182325` 11/11 SUCCESS
+- **当前 PR**：[E-017 PR #172](https://github.com/WeiHan1996/DailyEnergy/pull/172)；base 已改为 `main`，implementation commit `ea5d479a2285afeed33bcabd867e7ed61da6e49`；stacked head `3efb67f8e2a616022933e26ac4dfe75b686870f1` 的 CI run `33721033780` 为 11/11 SUCCESS，合并 main 后的新 head/CI/verifier Pending
+- **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
-- **合并状态**：main head `fec5c96d368f8d4427ecca861f8ce42adad7a270`，CI run `33374088290` 11/11 SUCCESS
-- **下一候选动作**：完成 owner threat-boundary 审核并取得 stacked base/PR 合并授权；只有 PR 可转 Ready 且 base 到达 main 后才运行正式 exact-head merge verifier，代码进入 main 后再生成 main-bound immutable bundle 和执行真实主机演练
+- **合并状态**：main head `0de26bf56f226246825a9a34fdd2a8967574dcda`，CI run `33736831445` 11/11 SUCCESS；E-017 尚未进入 main
+- **下一候选动作**：完成 #172 的 main merge commit、final 11/11 与 exact-head verifier 后 squash 合并；merged-main CI 通过后生成 main-bound immutable bundle 并执行真实主机演练
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-03 E-017 启动
@@ -52,6 +52,7 @@
 - 最终 PR #169 exact head `453eb55504dab35209c0886eefede51342547199`，CI run `33373613585` 11/11 SUCCESS；merged-main CI run `33374088290` 11/11 SUCCESS；
 - 一次性 merge window 完成后，repository `allow_merge_commit=false` 已恢复；main ruleset `21080906` 已恢复 deletion、non-fast-forward、required-linear-history、squash-only、11 strict checks、空 bypass；
 - post-merge 状态最初通过 docs-only Draft PR #170 提交；owner 后续授权在同一 C-015 PR 完成证据准备、供应链 high 修复和固定时钟回归，PR 继续保持 Draft 且不解除剩余人工/生产 blocker；
+- PR #170 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` 的 CI run `33713182325` 为 11/11 SUCCESS，正式 merge verifier 通过后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS；C-015 仍因生产 bundle 与 Privacy/Legal 证据保持 Blocked；
 - C-004～C-014 Issues #56/#57/#58/#59/#62/#60/#61/#63/#64/#70/#65 均已 CLOSED 并附 merge receipt；C-015 Issue #68 因外部证据 Pending 保持 OPEN；
 - owner 代码与 differential-query/four-plane threat-boundary 审核已通过；外部/真机证据仍 Pending，因此当前任务不标记 Done，Production/RC 保持 `NO_GO`。
 
