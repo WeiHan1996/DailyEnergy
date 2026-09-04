@@ -6,13 +6,13 @@
 - **当前任务**：E-017 — 2C2G DEV_LITE 可回滚部署
 - **任务状态**：In Progress（PR #170/#172 已验证并合并；main-bound publication、阿里云 bootstrap 与真实部署证据进行中）
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
-- **工作分支**：`agent/e017-dev-lite-host-evidence`
+- **工作分支**：`agent/e017-dev-lite-offline-pull`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：Pending（真实主机 evidence 分支尚未推送）
+- **当前 PR**：Pending（DEV_LITE offline exact-digest pull 修复尚未推送）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
-- **合并状态**：main head `9db168528ffc9e25e476f6390be85c9403dc7252`，CI run `33737657223` 11/11 SUCCESS；E-017 实现已进入 main，任务仍等待真实主机证据
-- **下一候选动作**：触发 main-bound `Publish DEV images`，完成阿里云 DEV_LITE bootstrap、fresh deploy/reconcile/N→N+1/rollback/redeploy/soak，并提交脱敏 host evidence
+- **合并状态**：main head `8640a12bb1457f13b90c39d499a8cb36a0e06a72`，CI run `33741540390` 11/11 SUCCESS；fingerprint 修复已合并，E-017 仍等待 pull 修复与真实主机证据
+- **下一候选动作**：完成 DEV_LITE `pull --policy missing` 修复 Gate/PR/merge，使用已导入且完整 tag@digest 可解析的基础镜像恢复同一 pre-migration operation，再执行 deploy/reconcile/N→N+1/rollback/redeploy/soak
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-03 E-017 启动
@@ -29,6 +29,10 @@
 - main-bound publication run `33738800444` 已通过 source/CI gate 并推送五个 role image，但真实 image probe 以 `DEV_RUNTIME_IMAGE_PROBE_INVALID:api-deploy-config` 拒绝，未生成或上传 bundle；根因是 E-013 后 Redis/telemetry fingerprint 字段未同步，且 DEV_LITE prefix 需要 profile 绑定。该 run 的 tag 禁止安装/部署，修复必须重新走完整 PR/main Gate 后产生新 run；
 - 阿里云 bootstrap 已完成：2 GiB persistent swap、Docker `29.7.2`、Compose `5.5.0`、固定 Node `24.18.0`；UFW active 且仅允许 SSH，Docker active/enabled、零容器/零镜像，`/srv/dailyenergy` 仍不存在，受保护端口无非 loopback 监听；Docker 官方 CDN 在上海 reset 后改用 Docker 官方签名 key 验证的阿里云 Docker CE 镜像完成安装；
 - runtime fingerprint 修复已将 Redis/telemetry 字段与 STANDARD/DEV_LITE prefix 绑定到 deployment helper、image probe、materializer 与 manifest validator；编译后 API parity 为 2/2，部署测试 `74/74`，Node 24.18.0 + 官方 npm registry 下 full security Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；本次 15 个 Prisma 非语义生成副作用已按 owner 授权恢复；
+- runtime fingerprint 修复 PR #173 已在 exact head `a9b60ca43816bb9154df15a52e80880dfb283bbb` / CI run `33740464810` / 11 checks 验证后 squash 合并为 `8640a12bb1457f13b90c39d499a8cb36a0e06a72`；merged-main CI run `33741540390` 11/11 SUCCESS；replacement publication run `33741778621` 的真实 image probe、proxy、supply、V3 bundle 18-file 校验与 artifact 上传全部 PASS；
+- 阿里云已创建 fresh 8-file secret version 并安装 generation 1 bundle；首次 deploy 在 pull 阶段因 Docker Hub 国内直连 DNS/网络超时而按合同失败，migration 未进入、Accepted state 未写、dirty operation 保留。五个 GHCR digest 已串行缓存；PostgreSQL/Redis exact-digest 镜像由本机同一 main Compose 的已验证缓存传输，archive SHA-256 校验与 `tag@digest` 解析通过。第三方 registry mirror 未获授权且未配置；真实诊断证明 `pull --policy missing` 对全部 Compose exact digest 本地命中，STANDARD `always` 语义保持不变；
+- offline pull 修复的部署测试 `74/74` 通过；完整 Gate 连续两次只在 audit metadata 阶段失败，根因是本机全局 npmmirror 与 corepack 子进程覆盖不稳定，而显式 npm 官方 registry audit 为 `critical=0/high=0`。修复将官方 `registry.npmjs.org` 固定进生产 audit 命令并以 CI policy test 防止回退；阈值仍为 high/critical=0；
+- DEV_LITE `pull --policy missing`、STANDARD `pull --policy always` 与官方 audit registry pin 的最终 full security Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；部署测试 `74/74`、CI policy `29/29`、audit `critical=0/high=0`，本次 Prisma 非语义生成副作用已按 owner 授权恢复；
 - 在 E-017 完成和返回 C-015 前，不启动 C-016；C-015 的生产 bundle、主体/位置/受托方/跨境和 Legal review 继续阻塞 Production/RC。
 
 ## 2026-09-02～09-03 外部证据补齐进度
