@@ -2,7 +2,7 @@
   "evidence_version": "e-017-dev-lite-manual-evidence-v1",
   "task_id": "E-017",
   "issue": "https://github.com/WeiHan1996/DailyEnergy/issues/171",
-  "pull_request": "PENDING_DEV_LITE_REBUILD_EVIDENCE_PR",
+  "pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/177",
   "implementation_pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/172",
   "branch": "agent/e017-dev-lite-rebuild-evidence",
   "stacked_base_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/170",

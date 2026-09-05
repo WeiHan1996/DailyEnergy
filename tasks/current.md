@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
 - **工作分支**：`agent/e017-dev-lite-rebuild-evidence`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：Pending（记录完整 synthetic DEV 重建审批点与后续真实主机证据）
+- **当前 PR**：[PR #177](https://github.com/WeiHan1996/DailyEnergy/pull/177)（Draft；记录完整 synthetic DEV 重建审批点与后续真实主机证据）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
 - **合并状态**：main head `98b7c33e12b1c95be5e1b0ed482c46759045f506`，merged-main CI run `33955032026` 11/11 SUCCESS；one-shot profile 修复 PR #176 已合并并发布，E-017 等待显式重建授权
