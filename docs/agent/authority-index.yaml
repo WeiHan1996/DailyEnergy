@@ -259,6 +259,68 @@ taskRules:
         required: true
         reason: Contract, DB, security-negative, and failure evidence
 
+  - match: C-016
+    profile: code
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Product, safety, privacy, repository, and implementation guardrails
+      - path: tasks/current.md
+        required: true
+        reason: Development-only dependency exception, DEV_LITE boundary, and current C-016 handoff
+      - path: docs/technical/testing.md
+        required: true
+        reason: Black-box E2E, resilience, real dependency, deterministic fixture, and evidence rules
+      - path: docs/product/journey.md
+        required: true
+        reason: First-use, daily, seven-day, failure, recovery, and deletion journeys
+      - path: docs/product/state-machine.md
+        required: true
+        reason: Authoritative cross-flow state, guard, event, and recovery behavior
+      - path: docs/technical/api.md
+        required: true
+        reason: Strict HTTP contracts, identity, idempotency, error, and maintenance behavior
+      - path: docs/operations/privacy-data-map.md
+        required: true
+        reason: Synthetic-only fixtures, data rights, deletion propagation, and forbidden evidence content
+      - path: docs/design/screen-inventory.md
+        required: true
+        reason: Accepted user-visible screen and state inventory
+      - path: docs/design/interaction-states.md
+        required: true
+        reason: Accepted loading, failure, retry, offline, maintenance, and deletion interaction states
+      - path: tests/manual-rc/e017-dev-lite-evidence.json
+        required: true
+        reason: Accepted synthetic DEV_LITE host boundary and real-host runtime evidence
+
+  - match: C-017
+    profile: security
+    sources:
+      - path: AGENTS.md
+        required: true
+        reason: Product, privacy, safety, evidence, and Production authorization guardrails
+      - path: tasks/current.md
+        required: true
+        reason: Development-only Gate boundary and current C-017 handoff
+      - path: ROADMAP.md
+        required: true
+        reason: Phase 2 exit criteria and Phase 3 entry boundary
+      - path: docs/product/mvp.md
+        required: true
+        reason: Deterministic core acceptance and product completion criteria
+      - path: docs/technical/testing.md
+        required: true
+        reason: Full E2E, resilience, coverage, performance, and manual evidence rules
+      - path: docs/analytics/metrics.md
+        required: true
+        reason: D1, D3, D7, data-quality, and Gate calculation contract
+      - path: docs/operations/privacy-data-map.md
+        required: true
+        reason: Privacy, deletion, processor, and Production blocker boundary
+      - path: tests/manual-rc/e017-dev-lite-evidence.json
+        required: true
+        reason: Development host qualification and explicit Production ineligibility
+
   - match: C-*
     profile: code
     sources:
