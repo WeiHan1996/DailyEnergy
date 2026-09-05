@@ -3,16 +3,16 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-05
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：E-017 — 2C2G DEV_LITE 可回滚部署
-- **任务状态**：In Review（fresh N、reconcile、N→N+1、rollback、redeploy、clean-restart transient 边界、31-sample soak 与 full automated Gate 已通过；等待 final evidence 接受）
-- **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
-- **工作分支**：`agent/e017-real-host-evidence`
-- **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：[PR #179](https://github.com/WeiHan1996/DailyEnergy/pull/179)（Draft；完整真实主机 lifecycle、soak、边界与历史失败证据）
+- **当前任务**：C-015 — 统一审核修复
+- **任务状态**：Blocked（offline no-replay 与 DEV_LITE 已完成；production bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 仍缺失）
+- **任务 Profile**：`security`（生产 bundle、隐私/法律证据、数据位置与 Production authorization）
+- **工作分支**：`agent/e017-complete-handoff`
+- **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)
+- **当前 PR**：Pending（E-017 post-merge 项目控制收尾）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
-- **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
-- **合并状态**：PR #177 合并为 `adb8a7a5ac0f8e3936be80a51794bb587dbf7fe4`，merged-main CI run `33964293962` 11/11 SUCCESS，publication run `33964437990` PASS；clean-restart transient 修复 PR #178 合并为 main head `921f2eb1bec4d3e21d54fdbbc702120ea5025783`，merged-main CI run `33965927848` 11/11 SUCCESS，publication run `33966042523` PASS
-- **下一候选动作**：完成 PR #179 final head 的 changed Gate 与 11/11 CI；证据无漂移后按 owner 持续授权转 Ready 并 squash 合并，随后将 E-017 设为 Done 并恢复 C-015 Blocked，C-016 继续 Planned，Production/RC 继续 `NO_GO`
+- **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
+- **合并状态**：C-015 implementation/统一审核 PR #168/#169/#170 已合并；iOS/Android offline no-replay 已完成；E-017 支撑环境已完成，不能替代 C-015 production bundle 或 Privacy/Legal evidence
+- **下一候选动作**：提供并验证 production origin/image/Release Manifest bundle；补齐实际处理主体、生产位置、受托方/跨境矩阵、最终用户说明与合格 Legal review。上述证据齐备前 C-015 保持 Blocked、C-016/C-017 保持 Planned、Production/RC 保持 `NO_GO`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-03 E-017 启动
