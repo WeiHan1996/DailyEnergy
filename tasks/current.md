@@ -8,7 +8,7 @@
 - **任务 Profile**：`code`（HTTP/Admin/Mini Program/真实 PostgreSQL、Redis、BullMQ 的合成黑盒与故障恢复）
 - **工作分支**：`agent/c016-development-handoff`（开工控制包；实现分支在本 PR 接受后创建）
 - **任务 Issue**：[C-016 Issue #66](https://github.com/WeiHan1996/DailyEnergy/issues/66)
-- **当前 PR**：Pending（开工控制、精确路由与隐私政策草案）
+- **当前 PR**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182)（Draft；开工控制、精确路由与隐私政策草案）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
