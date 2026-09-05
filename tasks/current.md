@@ -3,17 +3,28 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-05
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：C-015 — 统一审核修复
-- **任务状态**：Blocked（offline no-replay 与 DEV_LITE 已完成；production bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 仍缺失）
-- **任务 Profile**：`security`（生产 bundle、隐私/法律证据、数据位置与 Production authorization）
-- **工作分支**：None（C-015 外部证据齐备后再创建）
-- **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)
-- **当前 PR**：None（C-015 外部证据齐备后再创建）
+- **当前任务**：C-016 — 建立确定性核心全路径端到端测试
+- **任务状态**：Ready
+- **任务 Profile**：`code`（HTTP/Admin/Mini Program/真实 PostgreSQL、Redis、BullMQ 的合成黑盒与故障恢复）
+- **工作分支**：`agent/c016-development-handoff`（开工控制包；实现分支在本 PR 接受后创建）
+- **任务 Issue**：[C-016 Issue #66](https://github.com/WeiHan1996/DailyEnergy/issues/66)
+- **当前 PR**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182)（Draft；开工控制、精确路由与隐私政策草案）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
-- **合并状态**：C-015 implementation/统一审核 PR #168/#169/#170 已合并；iOS/Android offline no-replay 已完成；E-017 支撑环境已完成，不能替代 C-015 production bundle 或 Privacy/Legal evidence
-- **下一候选动作**：提供并验证 production origin/image/Release Manifest bundle；补齐实际处理主体、生产位置、受托方/跨境矩阵、最终用户说明与合格 Legal review。上述证据齐备前 C-015 保持 Blocked、C-016/C-017 保持 Planned、Production/RC 保持 `NO_GO`
-- **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
+- **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
+- **依赖例外**：owner 于 2026-09-05 明确允许 C-016 在现有 DEV_LITE 上仅使用 synthetic 数据继续；C-015 已合并实现与威胁审核仍是代码前置，其延期的 Production/Privacy/Legal 证据不阻塞 development-only C-016，也不能由 C-016 反向关闭
+- **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
+- **下一候选动作**：接受并合并本开工控制包后运行 `pnpm agent:prepare C-016 --remote --deep`，创建 `agent/c016-core-e2e` 并把 C-016 改为 In Progress；C-017 只有在 C-016 Done 后才可提升为 Ready
+- **Phase Gate 结论**：`DEVELOPMENT_ONLY_GO_FOR_C-016 / PRODUCTION_AND_RC_NO_GO`
+
+## 2026-09-05 C-016 development-only 开工授权
+
+- owner 明确确认“按 DEV_LITE 继续完成开发、生产证据延期”；该决定只调整任务顺序，不降低 C-015 原验收条件，也不改变 ADR-0009 的 synthetic-only 与 production-ineligible 边界；
+- C-015 保持 Blocked 和 Issue #68 Open；现有 2C2G 阿里云上海 ECS 继续只作为 DEV_LITE，不登记为 production application host，不处理真实用户、生产身份或 production secret；
+- C-016 只运行合成 HTTP/Admin/Mini Program/真实 PostgreSQL、Redis、BullMQ 组合 E2E、故障与恢复证据；不验证生产域名、外部对象、HA、备份恢复、真实微信用户或 Production authorization；
+- C-017 继续依赖 C-016 Done，结论只决定能否进入 Phase 3 development；即使 Development GO，也不授予 Production/RC GO；
+- owner 提供小程序名称“见见今天”、ICP 备案主体“陈斌”、服务地区中国大陆、现有 2C2G 阿里云上海主机、网页 URL 偏好和 `Legal reviewer=PENDING`。处理主体暂按“个人 / 陈斌”记录，小程序名称不作为法定主体；正式生效前仍须微信后台主体原始证据与合格法律审核；
+- `docs/operations/privacy-notice.html` 为候选 `necessary-consent-v2` 网页草案，目标地址 `https://api.weihan.ltd/privacy` 尚未发布；草案不更新当前 runtime `necessary-consent-v1`，不解除 C-015，也不替代生产受托方/位置/跨境和 Legal evidence。
 
 ## 2026-09-03 E-017 启动
 
@@ -176,9 +187,9 @@
 
 ## 8. 精确下一动作
 
-1. **解锁条件**：提供生产 bundle 检查，证明实际 origin/image/manifest 不含第三方 analytics/BI/ad/replay/attribution SDK；
-2. 提供实际处理主体、生产位置与用户说明的 privacy/legal 确认；生产 scheduler 与 incident threshold 继续留在 Production Gate；
-3. 证据齐备并获 owner 接受前，C-015 保持 Blocked、Issue #68 保持 Open、C-016 不启动、Production/RC 保持 `NO_GO`。
+1. C-016 只使用 synthetic DEV_LITE 完成首次进入到七天、删除、并发、离线、Redis loss、Worker crash、维护和 Safety 的黑盒回归；
+2. C-015 生产 bundle、主体/位置/受托方/跨境、最终用户说明与 Legal review 继续独立补齐；这些延期项不阻塞 C-016 development，但持续阻塞 Production/RC；
+3. C-016 Done 后才能把 C-017 提升为 Ready；C-017 只形成 Phase 3 development 的 go/fix/no-go，不自动部署生产、招募用户或开始 Alpha。
 
 ## 9. C-015 后统一审核
 

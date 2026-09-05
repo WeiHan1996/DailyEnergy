@@ -61,6 +61,18 @@
       "taskId": "D-005",
       "states": { "D-004": "Accepted" },
       "expectedRuleIds": []
+    },
+    {
+      "id": "known-fail-c017-before-c016",
+      "taskId": "C-017",
+      "states": { "C-016": "In Review" },
+      "expectedRuleIds": ["DEPENDENCY_BLOCKED"]
+    },
+    {
+      "id": "known-pass-c017-after-c016",
+      "taskId": "C-017",
+      "states": { "C-016": "Done" },
+      "expectedRuleIds": []
     }
   ],
   "routeCases": [
@@ -68,6 +80,8 @@
     { "id": "hybrid-d002", "taskId": "D-002", "expectedProfile": "hybrid" },
     { "id": "design-d004", "taskId": "D-004", "expectedProfile": "design" },
     { "id": "research-r001", "taskId": "R-001", "expectedProfile": "research" },
+    { "id": "exact-c016", "taskId": "C-016", "expectedProfile": "code" },
+    { "id": "exact-c017", "taskId": "C-017", "expectedProfile": "security" },
     {
       "id": "known-fail-unknown-task",
       "taskId": "S-999",

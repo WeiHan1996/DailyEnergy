@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="document-status" content="Draft" />
+    <meta name="notice-version" content="necessary-consent-v2" />
+    <title>见见今天隐私政策（草案）</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        font-synthesis: none;
+        --background: #f7f8f6;
+        --surface: #ffffff;
+        --text: #202522;
+        --muted: #5c655f;
+        --line: #d9dedb;
+        --accent: #167052;
+        --accent-soft: #e7f2ed;
+        --warning: #8a4b1f;
+        --warning-soft: #fff1e6;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--background);
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        background: var(--background);
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 1.75;
+      }
+
+      a {
+        color: var(--accent);
+        text-underline-offset: 3px;
+      }
+
+      .page {
+        width: min(100% - 32px, 820px);
+        margin: 0 auto;
+        padding: 40px 0 72px;
+      }
+
+      .draft-banner {
+        padding: 12px 16px;
+        border: 1px solid #e7c3a8;
+        border-radius: 6px;
+        color: var(--warning);
+        background: var(--warning-soft);
+        font-size: 14px;
+        font-weight: 650;
+      }
+
+      header {
+        padding: 40px 0 32px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .product-name {
+        margin: 0 0 8px;
+        color: var(--accent);
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 34px;
+        letter-spacing: 0;
+        line-height: 1.25;
+      }
+
+      .meta,
+      .lead {
+        color: var(--muted);
+      }
+
+      .meta {
+        margin: 14px 0 0;
+        font-size: 14px;
+      }
+
+      .lead {
+        margin: 22px 0 0;
+      }
+
+      nav {
+        padding: 24px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      nav ol {
+        display: grid;
+        margin: 0;
+        padding-left: 24px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px 28px;
+      }
+
+      section {
+        padding: 30px 0;
+        border-bottom: 1px solid var(--line);
+        scroll-margin-top: 16px;
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: 22px;
+        letter-spacing: 0;
+        line-height: 1.4;
+      }
+
+      h3 {
+        margin: 22px 0 8px;
+        font-size: 17px;
+        letter-spacing: 0;
+        line-height: 1.5;
+      }
+
+      p,
+      ul {
+        margin: 10px 0;
+      }
+
+      ul {
+        padding-left: 24px;
+      }
+
+      li + li {
+        margin-top: 6px;
+      }
+
+      .summary {
+        padding: 16px;
+        border-left: 4px solid var(--accent);
+        background: var(--accent-soft);
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        margin: 16px 0;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      th,
+      td {
+        min-width: 130px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #eef1ef;
+      }
+
+      .pending {
+        color: var(--warning);
+        font-weight: 650;
+      }
+
+      footer {
+        padding-top: 30px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      @media (max-width: 620px) {
+        .page {
+          width: min(100% - 24px, 820px);
+          padding-top: 20px;
+        }
+
+        header {
+          padding-top: 28px;
+        }
+
+        h1 {
+          font-size: 29px;
+        }
+
+        nav ol {
+          grid-template-columns: 1fr;
+        }
+
+        table,
+        tbody,
+        tr,
+        td {
+          display: block;
+          width: 100%;
+        }
+
+        table {
+          font-size: 15px;
+        }
+
+        thead {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+
+        tr {
+          margin-bottom: 12px;
+          border: 1px solid var(--line);
+          border-radius: 6px;
+          background: var(--surface);
+        }
+
+        td {
+          display: grid;
+          min-width: 0;
+          padding: 10px 12px;
+          border: 0;
+          border-bottom: 1px solid var(--line);
+          grid-template-columns: 88px minmax(0, 1fr);
+          gap: 12px;
+        }
+
+        td:last-child {
+          border-bottom: 0;
+        }
+
+        td::before {
+          color: var(--muted);
+          font-size: 13px;
+          font-weight: 700;
+        }
+
+        .data-table td:nth-child(1)::before,
+        .processor-table td:nth-child(1)::before {
+          content: "类别";
+        }
+
+        .data-table td:nth-child(2)::before {
+          content: "示例";
+        }
+
+        .data-table td:nth-child(3)::before {
+          content: "必要性与用途";
+        }
+
+        .processor-table td:nth-child(2)::before {
+          content: "当前状态";
+        }
+
+        .processor-table td:nth-child(3)::before {
+          content: "处理范围";
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="draft-banner" role="status">
+        草案，尚未生效。生产处理位置、受托方、跨境安排和法律审核仍待完成，本页不能替代已生效的隐私政策。
+      </div>
+
+      <header>
+        <p class="product-name">见见今天</p>
+        <h1>隐私政策</h1>
+        <p class="meta">
+          候选告知版本：necessary-consent-v2<br />
+          草案更新日期：2026 年 9 月 5 日<br />
+          生效日期：待定
+        </p>
+        <p class="lead">
+          “见见今天”是一款每天约一分钟的轻量陪伴小程序。我们重视你的个人信息和选择权，并按照最少、必要、可解释、可删除的原则处理数据。
+        </p>
+      </header>
+
+      <nav aria-label="目录">
+        <ol>
+          <li><a href="#scope">适用范围与处理者</a></li>
+          <li><a href="#product">产品边界</a></li>
+          <li><a href="#collection">收集与使用</a></li>
+          <li><a href="#permissions">设备权限与本地数据</a></li>
+          <li><a href="#ai-analytics">AI 与数据分析</a></li>
+          <li><a href="#processors">受托方与跨境</a></li>
+          <li><a href="#retention">保存与删除</a></li>
+          <li><a href="#rights">你的权利</a></li>
+          <li><a href="#minors">未成年人</a></li>
+          <li><a href="#security">安全保护</a></li>
+          <li><a href="#changes">政策变更</a></li>
+          <li><a href="#contact">联系我们</a></li>
+        </ol>
+      </nav>
+
+      <main>
+        <section id="scope">
+          <h2>1. 适用范围与个人信息处理者</h2>
+          <p>本政策适用于微信小程序“见见今天”提供的服务。</p>
+          <ul>
+            <li>个人信息处理者：陈斌（个人）。</li>
+            <li>登记地区：中国大陆，安徽省合肥市。</li>
+            <li>服务地区：中国大陆。</li>
+            <li>
+              隐私联系邮箱：<a href="mailto:jccily@qq.com">jccily@qq.com</a>。
+            </li>
+          </ul>
+          <p>
+            微信平台为你提供账号、网络和小程序运行环境。微信自身的数据处理适用其另行提供的规则；本政策只说明“见见今天”控制或委托处理的活动。
+          </p>
+        </section>
+
+        <section id="product">
+          <h2>2. 产品边界</h2>
+          <div class="summary">
+            “今日能量”等内容用于娱乐和自我反思，不预测未来，也不构成医疗、心理、法律、投资或其他专业意见。
+          </div>
+          <p>
+            当输入触发高风险安全边界时，普通内容流程会停止，并展示固定的安全响应与可用资源。产品不会以恐惧、羞耻或确定性承诺推动使用或付费。
+          </p>
+        </section>
+
+        <section id="collection">
+          <h2>3. 我们收集和使用的信息</h2>
+          <p>
+            我们只按实际启用的功能处理以下信息。可选信息可以不提供；拒绝可选功能不会影响已经满足必要条件的基础体验。
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>类别</th>
+                  <th>示例</th>
+                  <th>必要性与用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>账号与会话</td>
+                  <td>微信平台提供的账号标识映射、登录和会话状态</td>
+                  <td>用于登录、识别你自己的数据和保护账号安全</td>
+                </tr>
+                <tr>
+                  <td>同意记录</td>
+                  <td>告知版本、同意或撤回状态及时间</td>
+                  <td>用于证明当前必要告知状态；撤回后普通使用会被阻断</td>
+                </tr>
+                <tr>
+                  <td>个人偏好</td>
+                  <td>可选称呼、表达方式</td>
+                  <td>称呼可留空；用于调整展示方式，不建立人物画像</td>
+                </tr>
+                <tr>
+                  <td>每日与晚间记录</td>
+                  <td>心情、精力、睡眠感受、晚间感受和可选一句话</td>
+                  <td>用于生成、展示和回顾当天内容；不同类别保持分开</td>
+                </tr>
+                <tr>
+                  <td>互动与连续记录</td>
+                  <td>任务状态、点亮、帮助度反馈、七天趋势所需事实</td>
+                  <td>用于展示实际完成状态和基于真实记录的趋势</td>
+                </tr>
+                <tr>
+                  <td>可选事项与记忆授权</td>
+                  <td>事项标题、目标日期、记忆用途开关</td>
+                  <td>仅在你主动创建或授权后使用，可查看、撤回和删除</td>
+                </tr>
+                <tr>
+                  <td>通知设置</td>
+                  <td>提醒偏好和微信平台返回的权限状态</td>
+                  <td>默认关闭；仅用于你主动开启的提醒</td>
+                </tr>
+                <tr>
+                  <td>安全与运行信息</td>
+                  <td>最小安全状态、稳定错误码、服务健康和受限审计记录</td>
+                  <td>用于退出高风险流程、保障可靠运行和处理安全事件</td>
+                </tr>
+                <tr>
+                  <td>数据权利任务</td>
+                  <td>导出、删除、注销的任务状态和最小回执</td>
+                  <td>用于执行你的数据权利并防止已删除数据恢复</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            当前支持入口提交的说明只做当次处理并丢弃，不建立外部客服工单。我们不会为了补齐年龄或身份判断而收集生日、身份证、人脸或监护人联系方式。
+          </p>
+        </section>
+
+        <section id="permissions">
+          <h2>4. 设备权限与本地数据</h2>
+          <p>
+            小程序使用网络访问完成登录、读取和保存。订阅消息等平台权限只在你主动操作时申请，拒绝后不会反复强迫授权。
+          </p>
+          <p>
+            设备侧只保存完成当前流程所需的短期草稿和白名单状态，不建立长期自由文本、Safety
+            原文、普通会话或离线事件队列。离线时，导出、删除、注销和数据分析信号不会排队后重放。
+          </p>
+        </section>
+
+        <section id="ai-analytics">
+          <h2>5. AI 与数据分析</h2>
+          <h3>5.1 当前不向外部生成式 AI 发送个人信息</h3>
+          <p>
+            当前版本的每日和七天表达使用本地、确定性的受控模板。外部生成式 AI
+            provider
+            尚未启用，因此不会把你的个人信息发送给外部模型服务。未来如启用，将先更新本政策并完成必要的评估、告知和授权。
+          </p>
+          <h3>5.2 第一方最小聚合，不使用第三方追踪 SDK</h3>
+          <p>
+            我们不集成第三方数据分析、广告、用户回放或跨产品归因
+            SDK。产品会处理少量第一方、低基数的使用信号，用于判断功能是否正常和改进整体体验；不保存用户、设备、会话、IP
+            或原始事件明细，不记录页面正文或自由文本。
+          </p>
+          <p>
+            只有达到至少 10
+            个不同主体的聚合单元才会形成统计结果，每个结果最多两个维度。聚合分析数据最长保存
+            13 个自然月，不用于个体画像或广告投放。
+          </p>
+        </section>
+
+        <section id="processors">
+          <h2>6. 委托处理、共享与跨境</h2>
+          <div class="table-wrap">
+            <table class="processor-table">
+              <thead>
+                <tr>
+                  <th>类别</th>
+                  <th>当前状态</th>
+                  <th>处理范围</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>微信小程序平台</td>
+                  <td>使用中，正式协议引用待法律审核</td>
+                  <td>提供账号登录、小程序运行和你主动选择的平台能力</td>
+                </tr>
+                <tr>
+                  <td>云与数据库服务</td>
+                  <td class="pending">生产厂商、地域和合同待确定</td>
+                  <td>应用运行、数据库、缓存、对象和备份所需的最小处理</td>
+                </tr>
+                <tr>
+                  <td>外部生成式 AI</td>
+                  <td>未启用</td>
+                  <td>无</td>
+                </tr>
+                <tr>
+                  <td>第三方分析与广告</td>
+                  <td>未启用</td>
+                  <td>无</td>
+                </tr>
+                <tr>
+                  <td>外部客服或工单</td>
+                  <td>未启用</td>
+                  <td>无</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            我们不出售个人信息，也不为广告目的共享个人信息。依法必须提供、取得你的单独同意或委托服务商按指令处理的情形，将遵循最少必要原则。
+          </p>
+          <p class="pending">
+            当前跨境状态为未核验。本草案不作“全部境内存储”或“绝无境外访问”的结论；正式生效前必须依据实际生产厂商、子处理者、远程访问和合同完成核验与必要措施。
+          </p>
+        </section>
+
+        <section id="retention">
+          <h2>7. 保存期限与删除</h2>
+          <p>
+            我们按目的所需的最短期限保存，并在目的结束、你撤回或删除时提前处理：
+          </p>
+          <ul>
+            <li>会话最长 30 天，可随时撤销。</li>
+            <li>连续 24 个月未主动登录的账户会进入自动删除流程。</li>
+            <li>
+              被替代的同意记录最长 6 个月；旧称呼最长 72
+              小时，其他旧偏好版本最长 30 天。
+            </li>
+            <li>完成或过期的事项最长 90 天；通知运行记录最长 35 天。</li>
+            <li>
+              分享草稿最长 24 小时，分享对象最长 7 天；导出下载入口最长 24
+              小时。
+            </li>
+            <li>普通运行记录最长 30 天，安全日志和必要删除回执最长 6 个月。</li>
+            <li>
+              防止已删除日期恢复的最小 guard 最长 45 天；隔离备份最长 35 天。
+            </li>
+            <li>满足匿名聚合门槛的第一方统计最长 13 个自然月。</li>
+          </ul>
+          <p>
+            删除请求会先阻断旧数据继续用于普通体验。在线数据和普通受托副本目标在
+            72 小时内清理；用户可见最终状态最迟 7 天完成；隔离备份在最长 35
+            天内自然到期。依法需要限期保留的最小证据会被隔离，不能继续用于生成、营销或普通产品体验。
+          </p>
+        </section>
+
+        <section id="rights">
+          <h2>8. 你的权利</h2>
+          <p>你可以通过小程序“隐私与数据”入口或隐私联系邮箱提出请求，包括：</p>
+          <ul>
+            <li>查看和更正自己的资料及记录；</li>
+            <li>导出自己的数据；</li>
+            <li>撤回必要同意或关闭记忆、通知等可选授权；</li>
+            <li>删除单日、事项、关系数据，或者注销账户；</li>
+            <li>查询导出或删除任务状态，并对误判或处理结果提出申诉。</li>
+          </ul>
+          <p>
+            为保护账号和他人信息，我们可能在必要范围内核验请求是否来自本人。我们会在适用法律要求的期限内处理，不会要求提供与核验无关的证件或信息。
+          </p>
+        </section>
+
+        <section id="minors">
+          <h2>9. 未成年人</h2>
+          <p>
+            “见见今天”不向不满 14
+            周岁的用户提供服务。进入服务前需要完成最小年龄适用确认；选择或被合理识别为不满
+            14 周岁时，普通旅程会停止，不会继续收集产品资料。
+          </p>
+          <p>
+            我们不会为年龄确认收集生日、身份证、人脸或监护人联系方式。如你认为被误判，可通过隐私联系邮箱申诉。关于
+            14 至 17
+            周岁用户的最终适用安排仍待法律审核，本草案不构成该安排已经完成。
+          </p>
+        </section>
+
+        <section id="security">
+          <h2>10. 安全保护</h2>
+          <p>
+            我们采用传输保护、加密或不可逆标识、最小权限、服务能力隔离、日志脱敏、版本追踪和删除防恢复等措施。管理入口不提供任意用户正文浏览；高风险、安全和删除数据使用受限访问与审计。
+          </p>
+          <p>
+            如发生可能影响你权益的安全事件，我们会进行隔离、调查和修复，并按适用法律要求告知或报告。互联网服务无法保证绝对安全，但我们不会以此免除应承担的保护责任。
+          </p>
+        </section>
+
+        <section id="changes">
+          <h2>11. 政策变更</h2>
+          <p>
+            本政策以告知版本管理。处理主体、目的、敏感信息、受托方、跨境、保存期限或用户权利发生重大变化时，我们会更新政策，并在必要时重新取得明确同意。继续使用不能代替依法需要的单独同意。
+          </p>
+        </section>
+
+        <section id="contact">
+          <h2>12. 联系我们</h2>
+          <p>
+            对本政策、个人信息处理或你的数据权利有疑问，可发送邮件至
+            <a href="mailto:jccily@qq.com">jccily@qq.com</a
+            >。请不要在普通邮件中发送身份证、密码、验证码或其他不必要的敏感信息。
+          </p>
+        </section>
+
+        <section aria-labelledby="pending-title">
+          <h2 id="pending-title">草案转为正式版本前的待办</h2>
+          <ul>
+            <li>核验微信小程序登记主体及平台协议引用；</li>
+            <li>
+              确定生产应用、数据库、缓存、对象、备份和日志的实际厂商、地域、子处理者与删除能力；
+            </li>
+            <li>完成跨境、敏感个人信息、单独同意和未成年人路径的法律评估；</li>
+            <li>
+              实现完整政策链接、撤回必要同意入口和不满 14 周岁最小拒绝路径；
+            </li>
+            <li>
+              由合格的中国大陆法律审核人确认文本，并记录审核人、机构、日期和结论；
+            </li>
+            <li>
+              发布正式 URL，记录页面 SHA-256 与生效日期，再启用
+              necessary-consent-v2。
+            </li>
+          </ul>
+        </section>
+      </main>
+
+      <footer>
+        文档状态：Draft · Legal review pending · Production/RC no-go<br />
+        目标正式地址：https://api.weihan.ltd/privacy（当前未发布）
+      </footer>
+    </div>
+  </body>
+</html>
