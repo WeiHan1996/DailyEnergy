@@ -2,7 +2,7 @@
   "evidence_version": "e-017-dev-lite-manual-evidence-v1",
   "task_id": "E-017",
   "issue": "https://github.com/WeiHan1996/DailyEnergy/issues/171",
-  "pull_request": "PENDING_DEV_LITE_ONE_SHOT_PROFILE_FIX_PR",
+  "pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/176",
   "implementation_pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/172",
   "branch": "agent/e017-dev-lite-one-shot-profiles",
   "stacked_base_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/170",

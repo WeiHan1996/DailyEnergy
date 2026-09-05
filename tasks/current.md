@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
 - **工作分支**：`agent/e017-dev-lite-one-shot-profiles`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：Pending（DEV_LITE one-shot profile closure 修复尚未推送）
+- **当前 PR**：[PR #176](https://github.com/WeiHan1996/DailyEnergy/pull/176)（Draft；DEV_LITE one-shot profile closure 修复等待 CI 与 owner review）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
 - **合并状态**：main head `4b12d08c220cdf519d8b8d3d92d5995783e7c346`，merged-main CI run `33950575390` 11/11 SUCCESS；healthcheck 修复 PR #175 已合并，E-017 仍等待 one-shot profile 修复与真实主机证据
