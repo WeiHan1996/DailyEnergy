@@ -217,6 +217,19 @@ test("T-E017-COMPOSE-001 accepts the bounded DEV_LITE core and isolated transien
       `${serviceName} must not start another transient workload`,
     );
   }
+
+  assert.deepEqual(overlay.services["dependency-stub"].healthcheck, {
+    interval: "5s",
+    retries: 20,
+    start_period: "2s",
+    test: [
+      "CMD",
+      "/bin/bash",
+      "-c",
+      "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /health HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && head -n 1 <&3 | grep -Eq '^HTTP/1\\.[01] 200 '",
+    ],
+    timeout: "2s",
+  });
 });
 
 test("T-E017-COMPOSE-001 rejects profile overlap, inherited transient dependencies, and core budget drift", () => {
@@ -277,6 +290,27 @@ test("T-E017-COMPOSE-001 rejects profile overlap, inherited transient dependenci
       new RegExp(`DEV_LITE_COMPOSE_RESOURCE_LIMIT:${serviceName}`, "u"),
     );
   }
+});
+
+test("T-E017-COMPOSE-001 rejects a heavyweight or relaxed DEV_LITE stub healthcheck", () => {
+  const heavyweight = devLitePolicyInput();
+  heavyweight.overlay.services["dependency-stub"].healthcheck.test = [
+    "CMD",
+    "node",
+    "-e",
+    "fetch('http://127.0.0.1:8080/health')",
+  ];
+  assert.throws(
+    () => validateDevLiteComposePolicy(heavyweight),
+    /DEV_LITE_COMPOSE_HEALTHCHECK:dependency-stub/u,
+  );
+
+  const relaxed = devLitePolicyInput();
+  relaxed.overlay.services["dependency-stub"].healthcheck.timeout = "10s";
+  assert.throws(
+    () => validateDevLiteComposePolicy(relaxed),
+    /DEV_LITE_COMPOSE_HEALTHCHECK:dependency-stub/u,
+  );
 });
 
 test("T-E017-COMPOSE-001 rejects public stateful or TLS ports and release-only semantics", () => {

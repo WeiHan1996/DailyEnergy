@@ -25,7 +25,7 @@
 1. Ubuntu 24.04 LTS、x86_64、2 vCPU、至少 1.5 GiB 实际 RAM、至少 20 GiB 可用磁盘；时区 `Asia/Shanghai` 且 NTP 已同步；
 2. 至少 1 GiB swap，只作突发缓冲；真实验收不得出现 OOMKilled、restart loop 或持续 swap thrash；
 3. Docker `>=29.0.0`、Compose `>=2.40.0` 与 util-linux `flock`；防火墙只允许 SSH，80/443/5432/6379/8443/8444 不得在非 loopback 地址监听；
-4. 稳态 core memory limit 总和最多 704 MiB；Admin、Interactive、Background、Restricted 与 one-shot job 使用互斥窗口；
+4. 稳态 core memory limit 总和最多 704 MiB；Admin、Interactive、Background、Restricted 与 one-shot job 使用互斥窗口；`dependency-stub` 在 0.1 CPU 配额下必须使用固定的轻量 loopback HTTP healthcheck，禁止为每次探针启动 Node 子进程造成资源饥饿和健康假阴性；
 5. 运行 `tooling/deployment/bootstrap-host.sh` 安装 checksum 固定的 Node 24.18.0；新主机使用 fresh database/fault secret version，不创建或迁移 COS credential；
 6. 主机首次拉取允许最长 30 分钟；磁盘只保留 current 与唯一 N-1 必需镜像，清理不得触达有效回滚证据。
 
