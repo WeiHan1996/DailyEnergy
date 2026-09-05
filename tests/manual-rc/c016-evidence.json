@@ -1,0 +1,36 @@
+{
+  "evidence_version": "c-016-evidence-v1",
+  "task_id": "C-016",
+  "issue": "https://github.com/WeiHan1996/DailyEnergy/issues/66",
+  "branch": "agent/c016-core-e2e",
+  "environment_boundary": "DEV_LITE_ACCEPTED / SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE",
+  "automated_core": {
+    "status": "PASS",
+    "runner": "pnpm test:core:e2e",
+    "clean_runs": 3,
+    "required_clean_runs": 3,
+    "dependencies": "POSTGRESQL_18 / REDIS_8 / BULLMQ_5 / REAL_NEST_HTTP / THREE_WORKER_PROFILES",
+    "provider_calls": 0,
+    "scope": "FIRST_ENTRY / SEVEN_PRODUCT_DAYS / SAME_DAY_RETURN / TWO_DEVICE_CONCURRENCY / UNKNOWN_OUTCOME / WORKER_RESTART / REDIS_LOSS / WEEKLY / DAY_DELETE / SAFETY / MAINTENANCE / ADMIN_AUDIENCE"
+  },
+  "miniapp_devtools": {
+    "status": "INFRA_BLOCKED",
+    "attempted_on": "2026-09-06",
+    "stable_reason": "MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT",
+    "cli": "/Applications/wechatwebdevtools.app/Contents/MacOS/cli",
+    "base_library": "3.7.12",
+    "pass_claim": "PROHIBITED",
+    "unlock": "Close or safely preserve the currently open IDE project, restart DevTools with its local HTTP/automation endpoint, then rerun pnpm test:miniapp:devtools."
+  },
+  "excluded": [
+    "PRODUCTION_ORIGIN_OR_IMAGE",
+    "REAL_WECHAT_USER",
+    "EXTERNAL_OBJECT",
+    "PITR_OR_BACKUP_RESTORE",
+    "HA_OR_PRODUCTION_CAPACITY",
+    "QUALIFIED_LEGAL_REVIEW",
+    "PRODUCTION_AUTHORIZATION"
+  ],
+  "production_rc": "NO_GO",
+  "review_status": "AUTOMATED_CORE_AND_THREE_CLEAN_RUNS_PASS / MINIAPP_DEVTOOLS_INFRA_BLOCKED"
+}

@@ -377,8 +377,7 @@ export function createClientWeeklySummaryView(
             ...(published.expression.helpful_pattern === undefined
               ? []
               : [published.expression.helpful_pattern.text]),
-            published.expression.next_week.text,
-            published.expression.closing.text,
+            `${published.expression.next_week.text}${published.expression.closing.text}`,
           ],
           revision: published.summary_revision,
           summary_id: published.summary_id,

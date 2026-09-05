@@ -87,7 +87,15 @@ describe("T-E010-POLICY-001 runner evidence policy", () => {
   });
 
   it("pins every required runner to its real evidence boundary", () => {
-    expect(validateRunnerRegistry(runnerRegistry)).toEqual({ runners: 6 });
+    expect(validateRunnerRegistry(runnerRegistry)).toEqual({ runners: 7 });
+
+    const fakeCore = structuredClone(runnerRegistry);
+    fakeCore.runners.find(
+      ({ runner_id: runnerId }) => runnerId === "core-e2e",
+    ).retry = 1;
+    expect(() => validateRunnerRegistry(fakeCore)).toThrow(
+      "TEST_RUNNER_CORE_E2E_REALITY",
+    );
 
     const browserSubstitute = structuredClone(runnerRegistry);
     browserSubstitute.runners.find(

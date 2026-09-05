@@ -51,6 +51,8 @@
     "test:projects": "node tooling/testing/run-vitest-projects.mjs",
     "test:coverage": "node tooling/testing/run-vitest-projects.mjs --coverage",
     "test:api:e2e": "node tooling/testing/run-api-playwright.mjs",
+    "test:core:e2e": "node tooling/testing/run-core-e2e.mjs",
+    "test:core:e2e:stability": "CORE_E2E_REPEAT=3 node tooling/testing/run-core-e2e.mjs",
     "test:miniapp:devtools": "pnpm --filter @daily-energy/app-miniapp run build && pnpm --filter @daily-energy/app-miniapp run test:devtools",
     "database:generate": "prisma generate",
     "database:bootstrap": "node tooling/database/bootstrap.mjs",
@@ -95,7 +97,7 @@
     "test": "pnpm run config:fixtures && pnpm run typecheck:fixtures && pnpm run lint:fixtures && pnpm run architecture:fixtures && pnpm run contract:fixtures && pnpm run design-tokens:test && pnpm run admin:bundle:fixtures && pnpm run agent:fixtures && pnpm run registry:check && pnpm run registry:test && pnpm run analytics:test && pnpm run testing:policy && pnpm run testing:playwright-policy && pnpm run ci:test && pnpm run deployment:test && pnpm run phase-gate:validate && pnpm run test:harness && pnpm run database:test && pnpm run queue:evidence && turbo run test",
     "build": "turbo run build",
     "clean": "node tooling/clean.mjs",
-    "validate": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run ci:audit && pnpm run ci:supply-chain:evidence && pnpm run database:validate && pnpm run queue:test"
+    "validate": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run ci:audit && pnpm run ci:supply-chain:evidence && pnpm run database:validate && pnpm run queue:test && pnpm run test:core:e2e"
   },
   "devDependencies": {
     "@babel/core": "catalog:",

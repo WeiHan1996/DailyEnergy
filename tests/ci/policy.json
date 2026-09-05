@@ -242,8 +242,33 @@
     {
       "id": "api-e2e",
       "execution": "AUTOMATED_REQUIRED",
-      "commands": [["pnpm", "run", "test:api:e2e"]],
-      "source_ids": ["S20-C02", "S31-TEST-035"]
+      "commands": [
+        ["pnpm", "run", "test:api:e2e"],
+        ["pnpm", "run", "test:core:e2e"]
+      ],
+      "source_ids": [
+        "PDM-C04",
+        "PDM-U04",
+        "S20-A08",
+        "S20-C02",
+        "S20-C05",
+        "S20-C07",
+        "S20-D07",
+        "S20-E10",
+        "S20-S01",
+        "S20-S10",
+        "S29-ARCH-009",
+        "S29-ARCH-011",
+        "S29-ARCH-017",
+        "S29-ARCH-033",
+        "S29-ARCH-037",
+        "S29-ARCH-041",
+        "S29-ARCH-042",
+        "S31-TEST-033",
+        "S31-TEST-034",
+        "S31-TEST-035",
+        "S31-TEST-039"
+      ]
     },
     {
       "id": "admin-e2e",

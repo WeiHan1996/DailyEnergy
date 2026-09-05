@@ -218,7 +218,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势           | Done    | PR #166 merge commit `6ee5e9fd`；统一审核通过                                             |
 | [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | Done    | PR #167 merge commit `2fa0df61`；统一审核通过                                             |
 | [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 统一审核修复       | Blocked | 生产/Privacy/Legal 证据延期；不阻塞获批的 synthetic DEV_LITE C-016；Production/RC `NO_GO` |
-| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Ready   | DEV_LITE synthetic-only 核心 E2E；不验证生产、真实用户或外部对象能力                      |
+| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Blocked | 自动核心与三次 clean stability PASS；等待动作时确认临时开启 DevTools Service Port         |
 | [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | Planned | 依赖 C-016 Done；只形成 Development Gate，Production/RC `NO_GO`                           |
 
 ## 6. Phase 3：AI 陪伴层

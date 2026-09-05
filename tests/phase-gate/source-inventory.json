@@ -4,8 +4,8 @@
   "snapshot_base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
   "counts": {
     "total": 1004,
-    "COVERED": 538,
-    "PLANNED": 466,
+    "COVERED": 561,
+    "PLANNED": 443,
     "NA_WITH_REASON": 0
   },
   "planned_policy": {
@@ -25,7 +25,7 @@
       "set_id": "s29-architecture",
       "authority_path": "docs/technical/architecture.md",
       "owner": "Owning Phase 1-3 architecture implementation issue",
-      "counts": { "COVERED": 12, "PLANNED": 36, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 19, "PLANNED": 29, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s30-repository",
@@ -37,7 +37,7 @@
       "set_id": "s31-testing",
       "authority_path": "docs/technical/testing.md",
       "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-      "counts": { "COVERED": 31, "PLANNED": 17, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 34, "PLANNED": 14, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s32-deployment",
@@ -55,7 +55,7 @@
       "set_id": "s17-domain-model",
       "authority_path": "docs/data/domain-model.md",
       "owner": "Owning Phase 2-3 domain implementation issue",
-      "counts": { "COVERED": 21, "PLANNED": 27, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 25, "PLANNED": 23, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s19-database",
@@ -67,7 +67,7 @@
       "set_id": "s20-api",
       "authority_path": "docs/technical/api.md",
       "owner": "Owning API or business implementation issue",
-      "counts": { "COVERED": 28, "PLANNED": 20, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 35, "PLANNED": 13, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s12-gateway",
@@ -85,7 +85,7 @@
       "set_id": "s21-privacy",
       "authority_path": "docs/operations/privacy-data-map.md",
       "owner": "Owning privacy, data-rights, or business implementation issue",
-      "counts": { "COVERED": 12, "PLANNED": 22, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 14, "PLANNED": 20, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s24-event-tracking",

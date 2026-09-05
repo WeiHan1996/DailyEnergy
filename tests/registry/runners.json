@@ -53,6 +53,23 @@
       "unavailable_status": "INFRA_BLOCKED"
     },
     {
+      "runner_id": "core-e2e",
+      "command": "pnpm test:core:e2e",
+      "levels": ["E2E", "RESILIENCE"],
+      "implementation": "NODE_HTTP_AND_TESTCONTAINERS",
+      "application": "REAL_NEST_AND_WORKER_PROFILES",
+      "real_dependencies": {
+        "postgresql": "postgres:18.0-bookworm@sha256:3f55f8895c4ed50603e2fbdfc72fffeeaba3173321fee5cb825bbbeb30d9d854",
+        "redis": "redis:8.2.1-bookworm@sha256:5fa2edb1e408fa8235e6db8fab01d1afaaae96c9403ba67b70feceb8661e8621",
+        "bullmq": "5.81.3"
+      },
+      "fake_substitution": "PROHIBITED",
+      "isolation": "EPHEMERAL_CONTAINERS_PORT_QUEUE_NAMESPACE_AND_SYNTHETIC_IDENTITIES",
+      "retry": 0,
+      "synthetic_only": true,
+      "unavailable_status": "INFRA_BLOCKED"
+    },
+    {
       "runner_id": "admin-e2e",
       "command": "pnpm --filter @daily-energy/app-admin run test:e2e",
       "levels": ["E2E"],
