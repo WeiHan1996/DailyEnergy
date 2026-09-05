@@ -8,7 +8,7 @@
 - **任务 Profile**：`code`（HTTP/Admin/Mini Program/真实 PostgreSQL、Redis、BullMQ 的合成黑盒与故障恢复）
 - **工作分支**：`agent/c016-core-e2e`
 - **任务 Issue**：[C-016 Issue #66](https://github.com/WeiHan1996/DailyEnergy/issues/66)
-- **当前 PR**：None（实现与完整 Gate 完成后创建聚焦 Draft PR）
+- **当前 PR**：[PR #183](https://github.com/WeiHan1996/DailyEnergy/pull/183)（Draft；自动核心实现与证据已完成，DevTools Service Port 动作时确认 Pending）
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
@@ -30,6 +30,7 @@
 ## 2026-09-06 C-016 实施进度
 
 - PR #182 经 exact-head verifier 后已合并，merged-main CI 11/11 SUCCESS；实现分支 `agent/c016-core-e2e` 已从该 main 创建；
+- C-016 实现 Draft PR #183 已创建；实现基线 commit `9cc3498`，保持 Draft/Blocked，不得在 DevTools evidence 前标记 Ready 或合并；
 - 新增真实 Nest HTTP + PostgreSQL 18 + Redis 8 + BullMQ 5 + Interactive/Background/Restricted 三 profile 的 synthetic-only 组合 E2E，覆盖首次进入、同日返回、双设备并发、unknown outcome、七个产品日、任务/点亮/晚间/weekly、Worker 重启、Redis loss、DAY 删除、Safety、维护和 Admin audience；
 - `pnpm test:core:e2e:stability` 使用三套全新容器连续 `3/3` PASS、retry=`0`；provider calls=`0`，queue/log/HTTP 敏感字段扫描通过；
 - 组合测试发现完整七天 + helpful pattern + 两个 observation 会把客户端 summary 投影成 6 段并违反最多 5 段 Schema；现已把 next-week 与 closing 按原顺序合并为一段，聚焦单元 `6/6` 与三次组合回归通过；
