@@ -478,7 +478,7 @@ function developmentLiteDeploymentCommands(bundleRoot, environmentFile) {
     );
   const converge = (profile, service) =>
     command(
-      [profile],
+      profile === profiles.core ? [profiles.core] : [profiles.core, profile],
       "up",
       "-d",
       "--force-recreate",

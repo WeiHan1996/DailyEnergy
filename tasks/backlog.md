@@ -130,7 +130,7 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 | [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Done    | Phase 2 development 条件放行；Production/RC NO-GO       |
 | [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done    | P0/P1 上下文路由、任务 Profile 与安静验证               |
 | [E-016](https://github.com/WeiHan1996/DailyEnergy/issues/148) | 公开仓库与平台强制 CI Gate                 | Done    | PUBLIC、main ruleset、11 required checks 与安全公开审计 |
-| [E-017](https://github.com/WeiHan1996/DailyEnergy/issues/171) | 2C2G DEV_LITE 可回滚部署                   | Blocked | 重建清理已完成；等待删除 15 个旧 image refs 的明确授权  |
+| [E-017](https://github.com/WeiHan1996/DailyEnergy/issues/171) | 2C2G DEV_LITE 可回滚部署                   | Blocked | PR #177 待审核；第二次 synthetic DEV 重建需明确授权     |
 
 E-004 已随 PR #96 合并，E-008 已随 PR #97 squash 合并，E-005 已随 PR #98
 合并，E-015 已随 PR #106 squash 合并。E-006 已随 PR #110/#111 完成，E-007 已随
