@@ -4,15 +4,15 @@
 - **最后更新**：2026-09-05
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：E-017 — 2C2G DEV_LITE 可回滚部署
-- **任务状态**：In Progress（PR #174 已验证并合并；阿里云真实部署暴露 DEV_LITE healthcheck 资源假阴性，聚焦修复进行中）
+- **任务状态**：In Progress（PR #175 已验证并合并；阿里云真实部署暴露 DEV_LITE one-shot profile closure 缺陷，聚焦修复进行中）
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
-- **工作分支**：`agent/e017-dev-lite-healthcheck`
+- **工作分支**：`agent/e017-dev-lite-one-shot-profiles`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：[PR #175](https://github.com/WeiHan1996/DailyEnergy/pull/175)（Draft；DEV_LITE dependency-stub 轻量 healthcheck 修复等待 CI 与 owner review）
+- **当前 PR**：Pending（DEV_LITE one-shot profile closure 修复尚未推送）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
-- **合并状态**：main head `b4dba9f26d0318080e0bde36f9d6d3238f16912d`，merged-main CI run `33939690862` 11/11 SUCCESS；offline pull 修复 PR #174 已合并，E-017 仍等待 healthcheck 修复与真实主机证据
-- **下一候选动作**：完成 DEV_LITE 轻量 healthcheck 修复 Gate/Draft PR/owner review/merge，重新发布 bundle 并恢复同一 pre-migration operation，再执行 deploy/reconcile/N→N+1/rollback/redeploy/soak
+- **合并状态**：main head `4b12d08c220cdf519d8b8d3d92d5995783e7c346`，merged-main CI run `33950575390` 11/11 SUCCESS；healthcheck 修复 PR #175 已合并，E-017 仍等待 one-shot profile 修复与真实主机证据
+- **下一候选动作**：完成 DEV_LITE one-shot profile closure 修复 Gate/Draft PR/owner review/merge，重新发布 bundle 并恢复同一 migration-before-apply operation，再执行 deploy/reconcile/N→N+1/rollback/redeploy/soak
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-03 E-017 启动
@@ -36,6 +36,8 @@
 - owner 于 2026-09-05 审核并授权合并 offline pull 修复；PR #174 在 exact head `137c88d34e3183ad7d14c808df67302ca6f01e55` / CI run `33845762969` / 11 checks 验证后 squash 合并为 `b4dba9f26d0318080e0bde36f9d6d3238f16912d`，merged-main CI run `33939690862` 11/11 SUCCESS；publication run `33939833910` 的五 role image、runtime/proxy/supply、V3 bundle 18-file 校验与 artifact 上传全部 PASS；
 - 新 bundle `devr-b4dba9f26d03-88fa366d62c70ea4b9ba236b` 安装通过并按合同以 `SUPERSEDED_BEFORE_MIGRATION` 取代旧 pull failure；五个新 GHCR digest 最终全部拉取。旧腾讯云 x86_64 主机只导出同一官方 PostgreSQL/Redis exact digest 的公开 immutable image layers，不读取或迁移 volume、dump、secret、release state、object、credential 或日志；amd64 archive SHA-256=`72ef84f3317c316404a591816a8c7a04b1392a91dfd1b8f653711c0ff55617c3`，远端 gzip/SHA、image metadata 与 network-none `uname -m=x86_64` 均通过；
 - amd64 修复后 PostgreSQL 18 与 Redis 8 均 healthy，dependency stub 本身通过 bash loopback HTTP 返回 200，但继承的每 2 秒 Node `fetch` healthcheck 在 0.1 CPU / 64 MiB 限额下持续超过 2 秒、占满 CPU 并积累 health PID，导致 `stateful-ready` 假阴性；deployment 仍在 migration 前失败、Accepted state 不存在、原 operation 与 volumes 保留。聚焦修复只为 DEV_LITE 固定轻量 bash loopback HTTP 探针并增加 policy negative test，不提高资源限额或放宽 healthy 要求；
+- owner 于 2026-09-05 审核并授权合并 healthcheck 修复；PR #175 在 exact head `a835b8c43efede246b6fa7a70ec49f46f5623363` / CI run `33944596672` / 11 checks 验证后 squash 合并为 `4b12d08c220cdf519d8b8d3d92d5995783e7c346`，merged-main CI run `33950575390` 11/11 SUCCESS；publication run `33950701210` 的五 role image、runtime/proxy/supply、V3 bundle 18-file 校验与 artifact 上传全部 PASS；
+- 新 bundle `devr-4b12d08c220c-586c629cb1a811d78a81b17e` 安装并按合同取代旧 pre-migration failure；分段缓存五个新 GHCR digest 后，轻量 dependency-stub healthcheck 与 PostgreSQL/Redis stateful readiness 均在真实 2C2G 主机通过。migration 第一条 `database-init prepare` 在启动容器前被 Compose v5 以 `service database-smoke depends on undefined service postgres` 拒绝；根因是 one-shot 命令只激活 `dev-lite-one-shot` 而未激活依赖模型所需的 `dev-lite-core`。`migration_applied=false`、`migration_verified=false`、Accepted state 不存在、operation 与 volumes 保留；修复只让所有 one-shot 命令同时激活 core/one-shot profiles，仍固定 `run --no-deps`，不增加实际并发服务；
 - 在 E-017 完成和返回 C-015 前，不启动 C-016；C-015 的生产 bundle、主体/位置/受托方/跨境和 Legal review 继续阻塞 Production/RC。
 
 ## 2026-09-02～09-03 外部证据补齐进度
