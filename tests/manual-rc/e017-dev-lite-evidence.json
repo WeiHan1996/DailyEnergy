@@ -2,7 +2,7 @@
   "evidence_version": "e-017-dev-lite-manual-evidence-v1",
   "task_id": "E-017",
   "issue": "https://github.com/WeiHan1996/DailyEnergy/issues/171",
-  "pull_request": "PENDING_FINAL_EVIDENCE_PULL_REQUEST",
+  "pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/179",
   "implementation_pull_request": "https://github.com/WeiHan1996/DailyEnergy/pull/172",
   "branch": "agent/e017-real-host-evidence",
   "stacked_base_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/170",
