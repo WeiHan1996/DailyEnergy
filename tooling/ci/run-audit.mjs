@@ -4,6 +4,8 @@ import path from "node:path";
 
 import { repositoryRoot, runBounded } from "./runtime.mjs";
 
+const AUDIT_REGISTRY = "https://registry.npmjs.org";
+
 const policy = JSON.parse(
   await readFile(
     path.resolve(repositoryRoot, "tests/ci/security-policy.json"),
@@ -28,7 +30,14 @@ const outputDirectory = path.resolve(
 await mkdir(outputDirectory, { recursive: true, mode: 0o700 });
 const execution = await runBounded(
   "pnpm",
-  ["audit", "--prod", "--audit-level", "high", "--json"],
+  [
+    "audit",
+    "--prod",
+    "--audit-level",
+    "high",
+    "--json",
+    `--registry=${AUDIT_REGISTRY}`,
+  ],
   { maximumBytes: 16 * 1024 * 1024 },
 );
 

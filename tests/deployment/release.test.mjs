@@ -1564,6 +1564,12 @@ test("T-E012-DEPLOY-001 keeps Docker builds, public bindings and raw secrets out
     "/srv/dailyenergy/bundles/e012-deploy-plan/release.env",
   );
   const serialized = JSON.stringify(commands);
+  assert.equal(
+    commands.pull[0].arguments[
+      commands.pull[0].arguments.indexOf("--policy") + 1
+    ],
+    "always",
+  );
   assert.equal(serialized.includes(" build"), false);
   assert.equal(serialized.includes("docker.sock"), false);
   assert.equal(serialized.includes("0.0.0.0:443"), false);
@@ -1682,6 +1688,12 @@ test("T-E017-DEPLOY-001 builds a staged DEV_LITE plan without COS or concurrent 
     ),
   );
   assert.equal(commands.pull.at(-1).timeoutMs, 1_800_000);
+  assert.equal(
+    commands.pull.at(-1).arguments[
+      commands.pull.at(-1).arguments.indexOf("--policy") + 1
+    ],
+    "missing",
+  );
   assert.ok(commands.pull[0].arguments.includes("stop"));
   for (const stateful of ["postgres", "redis", "dependency-stub"]) {
     assert.equal(

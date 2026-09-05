@@ -549,7 +549,7 @@ function developmentLiteDeploymentCommands(bundleRoot, environmentFile) {
     ],
     executable: "curl",
   };
-  const pull = command(allProfiles, "pull", "--policy", "always");
+  const pull = command(allProfiles, "pull", "--policy", "missing");
   pull.timeoutMs = 1_800_000;
   return Object.freeze({
     admin: [

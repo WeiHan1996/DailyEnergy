@@ -366,6 +366,19 @@ test("T-E011-CI-POLICY-001 keeps external lanes pending", () => {
   );
 });
 
+test("T-E011-CI-POLICY-001 pins production audit to the official registry", async () => {
+  const source = await readFile(
+    path.resolve(repositoryRoot, "tooling/ci/run-audit.mjs"),
+    "utf8",
+  );
+  assert.match(
+    source,
+    /const AUDIT_REGISTRY = "https:\/\/registry\.npmjs\.org";/u,
+  );
+  assert.match(source, /`--registry=\$\{AUDIT_REGISTRY\}`/u);
+  assert.equal(source.includes("registry.npmmirror.com"), false);
+});
+
 test("T-E016-CI-POLICY-001 keeps Production and RC admission separate", () => {
   const productionControl = structuredClone(ciPolicy);
   productionControl.merge_gate.production_or_rc_admission =
