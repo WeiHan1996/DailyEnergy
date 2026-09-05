@@ -2,7 +2,7 @@
 
 - **文档状态**：Accepted
 - **所属任务**：E-012 — 标准 DEV；E-017 — DEV_LITE 可回滚部署
-- **最后更新**：2026-09-03
+- **最后更新**：2026-09-05
 - **接受日期**：2026-08-12
 - **适用范围**：阿里云上海 DEV_LITE 活动主机与腾讯云标准 DEV 历史证据；loopback TLS；PostgreSQL 18、Redis 8 同机
 - **上游权威**：[ADR-0009](../decisions/ADR-0009-development-lite-colocation-exception.md)、[ADR-0007 历史标准 DEV](../decisions/ADR-0007-development-colocation-exception.md)、[部署、配置与回滚规范](../technical/deployment.md)、[测试策略](../technical/testing.md)、[故障和安全事件响应](./incident-response.md)
@@ -25,7 +25,7 @@
 1. Ubuntu 24.04 LTS、x86_64、2 vCPU、至少 1.5 GiB 实际 RAM、至少 20 GiB 可用磁盘；时区 `Asia/Shanghai` 且 NTP 已同步；
 2. 至少 1 GiB swap，只作突发缓冲；真实验收不得出现 OOMKilled、restart loop 或持续 swap thrash；
 3. Docker `>=29.0.0`、Compose `>=2.40.0` 与 util-linux `flock`；防火墙只允许 SSH，80/443/5432/6379/8443/8444 不得在非 loopback 地址监听；
-4. 稳态 core memory limit 总和最多 704 MiB；Admin、Interactive、Background、Restricted 与 one-shot job 使用互斥窗口；`dependency-stub` 在 0.1 CPU 配额下必须使用固定的轻量 loopback HTTP healthcheck，禁止为每次探针启动 Node 子进程造成资源饥饿和健康假阴性；
+4. 稳态 core memory limit 总和最多 704 MiB；Admin、Interactive、Background、Restricted 与 one-shot job 使用互斥窗口并固定 `restart: "no"`，Docker daemon 或主机重启不得使 transient workload 自行复活；`dependency-stub` 在 0.1 CPU 配额下必须使用固定的轻量 loopback HTTP healthcheck，禁止为每次探针启动 Node 子进程造成资源饥饿和健康假阴性；
 5. 运行 `tooling/deployment/bootstrap-host.sh` 安装 checksum 固定的 Node 24.18.0；新主机使用 fresh database/fault secret version，不创建或迁移 COS credential；
 6. 主机首次拉取允许最长 30 分钟；磁盘只保留 current 与唯一 N-1 必需镜像，清理不得触达有效回滚证据。
 
@@ -250,8 +250,8 @@ deploy/rollback 绕过。
 首次发布尚无 Accepted state 时不能执行 `recover-current`。修复外部原因后可对同一 manifest 重试 `deploy`。如果根因必须通过新 artifact 修复，只有旧 operation 为 `FAILED`、没有 from-current/recovery catalog、active/completed phase 都在 migration 之前且 `migration_applied=false`、`migration_verified=false` 时，才可从新 candidate bundle 执行普通 `deploy`。控制器会在新 candidate 的 preflight 和 file secret materialization 通过后，先写绑定旧 `operation_id`、失败阶段及 replacement digest 的 `SUPERSEDED_BEFORE_MIGRATION` receipt，再清理旧 pending 并开始新 operation。已进入 migration 或 checkpoint 不明确时，新候选仍被拒绝；不得人工删除 operation/state。
 
 若首次发布已经进入 migration，且根因只能由新 artifact 修复，保持任务为 `Blocked` 并保留完整 dirty operation、已安装 bundle、不可变镜像和
-有状态 volume。不得单独删除或移动 `release-operation.json` 来伪造空环境。当前 DEV 仅含 synthetic、可重建数据时，项目所有者可以依据
-ADR-0007 另行明确批准“完整 DEV 环境重建”：执行前必须再次证明没有 Accepted release、记录 operation ID/失败阶段/migration checkpoints
+有状态 volume。不得单独删除或移动 `release-operation.json` 来伪造空环境。当前 DEV 或 DEV_LITE 仅含 synthetic、可重建数据时，项目所有者可以依据
+对应的 ADR-0007 历史边界或 ADR-0009 另行明确批准“完整 DEV 环境重建”：执行前必须再次证明没有 Accepted release、记录 operation ID/失败阶段/migration checkpoints
 与 artifact identity，预览将停止的容器和将永久删除的 PostgreSQL/Redis volume；批准后归档无 secret 的失败证据，删除整个 DEV Compose
 环境及其有状态 volume，并从空 deployment state 用新 artifact 重建。该授权不适用于 STAGING/PRODUCTION，也不能由一般发布批准或自动化 Gate
 推定获得。

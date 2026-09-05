@@ -4,15 +4,15 @@
 - **最后更新**：2026-09-05
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：E-017 — 2C2G DEV_LITE 可回滚部署
-- **任务状态**：Blocked（PR #177 transient profile closure 自动与真实主机证据已通过；等待 owner 审核合并并明确批准第二次完整 synthetic DEV 重建）
+- **任务状态**：In Review（fresh N、reconcile、N→N+1、rollback、redeploy、clean-restart transient 边界、31-sample soak 与 full automated Gate 已通过；等待 final evidence 接受）
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
-- **工作分支**：`agent/e017-dev-lite-rebuild-evidence`
+- **工作分支**：`agent/e017-real-host-evidence`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：[PR #177](https://github.com/WeiHan1996/DailyEnergy/pull/177)（Draft；记录完整 synthetic DEV 重建审批点与后续真实主机证据）
+- **当前 PR**：[PR #179](https://github.com/WeiHan1996/DailyEnergy/pull/179)（Draft；完整真实主机 lifecycle、soak、边界与历史失败证据）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
-- **合并状态**：main head `98b7c33e12b1c95be5e1b0ed482c46759045f506`，merged-main CI run `33955032026` 11/11 SUCCESS；one-shot profile 修复 PR #176 已合并并发布；重建归档/删除/fresh v2 已完成，fresh deploy 在写 operation 前被容量 Gate 拒绝
-- **下一候选动作**：owner 审核并授权合并 PR #177；merged-main 11/11 后发布新 bundle，再归档当前无 secret operation，按单独授权删除 4 个 stopped containers、PostgreSQL 71.4 MB/Redis 0 B synthetic volumes、10 networks、dirty deployment state 与一个 v2 runtime-secret 目录，保留 7 images/全部 bundles/GHCR/v1/v2，创建 fresh v3 并空状态部署；未经授权不执行
+- **合并状态**：PR #177 合并为 `adb8a7a5ac0f8e3936be80a51794bb587dbf7fe4`，merged-main CI run `33964293962` 11/11 SUCCESS，publication run `33964437990` PASS；clean-restart transient 修复 PR #178 合并为 main head `921f2eb1bec4d3e21d54fdbbc702120ea5025783`，merged-main CI run `33965927848` 11/11 SUCCESS，publication run `33966042523` PASS
+- **下一候选动作**：完成 PR #179 final head 的 changed Gate 与 11/11 CI；证据无漂移后按 owner 持续授权转 Ready 并 squash 合并，随后将 E-017 设为 Done 并恢复 C-015 Blocked，C-016 继续 Planned，Production/RC 继续 `NO_GO`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-03 E-017 启动
@@ -48,6 +48,10 @@
 - v2-bound release fresh deploy 已通过 preflight、pull、stateful-ready、maintenance、worker-drain 与完整 migration，operation `38877a0e-97c1-4c8d-9baf-a3152b06be1c` 记录 `migration_applied=true`、`migration_verified=true`；随后 `worker-interactive` 在创建容器前因只激活 `dev-lite-interactive`、未激活其 Compose dependency model 所需的 `dev-lite-core` 而失败。修复将 Admin/Interactive/Background/Restricted convergence 同时激活 core+目标 profile，仍固定 `up --no-deps`；当前 migrated volumes/operation 保留，core 已停止，Accepted state 仍不存在；
 - transient profile closure 的 deployment suite `75/75` 通过；真实阿里云以 core+interactive profiles、`up --no-deps` 启动 worker-interactive 并通过 phase runtime guard：4 running、1 transient、OOM/restart/public ports 均为 0、disk floor 20 GiB，trap 随后停止全部服务。固定 Node 24.18.0 full security Gate 首次仅因本机 Testcontainers PostgreSQL host port 10 秒绑定超时失败，聚焦 queue integration `8/8` 复核后完整 Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；
 - 因当前 operation 已完成 migration，新 artifact 仍不能替换；第二次重建预览为 4 个 stopped containers、`dailyenergy-dev-lite_postgres_data` 71.4 MB、`dailyenergy-dev-lite_redis_data` 0 B、10 networks、dirty operation/state 与 `devr-98b7c33e12b1-1fa3c9a0f22237f60b66f104` runtime-secret 目录。Accepted state 不存在；删除前仍需 owner 在审核 PR #177 后单独明确授权，计划保留 latest 7 images、所有 bundles、GHCR、v1/v2 并创建 fresh v3；
+- owner 审核通过并授权合并 PR #177、发布新 bundle 与第二次完整 synthetic DEV_LITE 重建；PR #177 exact head CI run `33961266770` 11/11 PASS，squash 合并后 merged-main run `33964293962` 11/11 PASS，publication run `33964437990` 的 V3 bundle 与五 role image PASS；第二次重建归档 SHA-256=`55fd3d9284f226fda697abe23d9733679bd224f4f18817d68d1a5daa5c16ecb2`，闭合成员、gzip、operation 与敏感值扫描通过，随后仅删除授权的 4 containers、2 synthetic volumes、10 networks、dirty state 与一个 v2 runtime-secret，保留 images/bundles/GHCR/v1/v2 并创建不继承旧 credential 的 fresh v3；
+- v3-bound fresh N `devr-adb8a7a5ac0f-29ca176313a877805c7428f9` 从空状态完成 18/18 deploy，Accepted current/catalog 与 PASS receipt 写入，operation 清除。首次 Docker clean restart 暴露 Admin 因继承 `on-failure:3` 在 daemon restart 后复活，reconcile preflight 正确 fail closed；显式 containment 后同一 operation 完成 17/17 且 state SHA-256 不变；
+- 修复将 Admin 与三个 Worker 及所有 one-shot 的 transient restart policy 闭合为 `no`，并同时验证 source 与 canonical merged Compose；PR #178 exact head `064306653d37183c7e27688afbabf57ed0f365ae` / CI run `33965800866` 11/11 PASS，squash 合并为 `921f2eb1bec4d3e21d54fdbbc702120ea5025783`，merged-main run `33965927848` 11/11 PASS，publication run `33966042523` PASS；
+- v4 只继承 v3 PostgreSQL admin/container credential 并轮换其余 6 个 application/fault 值；N+1 `devr-921f2eb1bec4-1723de8b593718c7dab57816` 已完成 N→N+1 18/18、无人工 stop 的 Docker clean restart + reconcile 17/17、唯一 target rollback N 18/18 和 redeploy N+1 18/18，共 6 份独立 PASS receipt；最终 current/catalog=N+1、rollback target=N、operation 不存在、5 core healthy、OOM/restart/public protected ports=0。31 个一分钟 soak 样本全部通过，持续约 30 分钟，最小可用内存 `797798400` bytes、最大 swap 使用 `0`、`pswpin/pswpout` 增量 `0/0`、最小磁盘 `24158523392` bytes；无值原始 JSONL 已按远/本相同 SHA-256 `fd0022ef4944fe8f748e4209c6efb7953aa1aa7e7e68c5e1d5b89ca113a4801e` 保存在 ignored 本地 artifact；
 - 在 E-017 完成和返回 C-015 前，不启动 C-016；C-015 的生产 bundle、主体/位置/受托方/跨境和 Legal review 继续阻塞 Production/RC。
 
 ## 2026-09-02～09-03 外部证据补齐进度
