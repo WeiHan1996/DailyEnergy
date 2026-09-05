@@ -4,15 +4,15 @@
 - **最后更新**：2026-09-05
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：E-017 — 2C2G DEV_LITE 可回滚部署
-- **任务状态**：In Progress（PR #175 已验证并合并；阿里云真实部署暴露 DEV_LITE one-shot profile closure 缺陷，聚焦修复进行中）
+- **任务状态**：Blocked（PR #177 transient profile closure 自动与真实主机证据已通过；等待 owner 审核合并并明确批准第二次完整 synthetic DEV 重建）
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
-- **工作分支**：`agent/e017-dev-lite-one-shot-profiles`
+- **工作分支**：`agent/e017-dev-lite-rebuild-evidence`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：[PR #176](https://github.com/WeiHan1996/DailyEnergy/pull/176)（Draft；DEV_LITE one-shot profile closure 修复等待 CI 与 owner review）
+- **当前 PR**：[PR #177](https://github.com/WeiHan1996/DailyEnergy/pull/177)（Draft；记录完整 synthetic DEV 重建审批点与后续真实主机证据）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
-- **合并状态**：main head `4b12d08c220cdf519d8b8d3d92d5995783e7c346`，merged-main CI run `33950575390` 11/11 SUCCESS；healthcheck 修复 PR #175 已合并，E-017 仍等待 one-shot profile 修复与真实主机证据
-- **下一候选动作**：完成 DEV_LITE one-shot profile closure 修复 Gate/Draft PR/owner review/merge，重新发布 bundle 并恢复同一 migration-before-apply operation，再执行 deploy/reconcile/N→N+1/rollback/redeploy/soak
+- **合并状态**：main head `98b7c33e12b1c95be5e1b0ed482c46759045f506`，merged-main CI run `33955032026` 11/11 SUCCESS；one-shot profile 修复 PR #176 已合并并发布；重建归档/删除/fresh v2 已完成，fresh deploy 在写 operation 前被容量 Gate 拒绝
+- **下一候选动作**：owner 审核并授权合并 PR #177；merged-main 11/11 后发布新 bundle，再归档当前无 secret operation，按单独授权删除 4 个 stopped containers、PostgreSQL 71.4 MB/Redis 0 B synthetic volumes、10 networks、dirty deployment state 与一个 v2 runtime-secret 目录，保留 7 images/全部 bundles/GHCR/v1/v2，创建 fresh v3 并空状态部署；未经授权不执行
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-03 E-017 启动
@@ -38,6 +38,16 @@
 - amd64 修复后 PostgreSQL 18 与 Redis 8 均 healthy，dependency stub 本身通过 bash loopback HTTP 返回 200，但继承的每 2 秒 Node `fetch` healthcheck 在 0.1 CPU / 64 MiB 限额下持续超过 2 秒、占满 CPU 并积累 health PID，导致 `stateful-ready` 假阴性；deployment 仍在 migration 前失败、Accepted state 不存在、原 operation 与 volumes 保留。聚焦修复只为 DEV_LITE 固定轻量 bash loopback HTTP 探针并增加 policy negative test，不提高资源限额或放宽 healthy 要求；
 - owner 于 2026-09-05 审核并授权合并 healthcheck 修复；PR #175 在 exact head `a835b8c43efede246b6fa7a70ec49f46f5623363` / CI run `33944596672` / 11 checks 验证后 squash 合并为 `4b12d08c220cdf519d8b8d3d92d5995783e7c346`，merged-main CI run `33950575390` 11/11 SUCCESS；publication run `33950701210` 的五 role image、runtime/proxy/supply、V3 bundle 18-file 校验与 artifact 上传全部 PASS；
 - 新 bundle `devr-4b12d08c220c-586c629cb1a811d78a81b17e` 安装并按合同取代旧 pre-migration failure；分段缓存五个新 GHCR digest 后，轻量 dependency-stub healthcheck 与 PostgreSQL/Redis stateful readiness 均在真实 2C2G 主机通过。migration 第一条 `database-init prepare` 在启动容器前被 Compose v5 以 `service database-smoke depends on undefined service postgres` 拒绝；根因是 one-shot 命令只激活 `dev-lite-one-shot` 而未激活依赖模型所需的 `dev-lite-core`。`migration_applied=false`、`migration_verified=false`、Accepted state 不存在、operation 与 volumes 保留；修复只让所有 one-shot 命令同时激活 core/one-shot profiles，仍固定 `run --no-deps`，不增加实际并发服务；
+- owner 于 2026-09-05 审核并授权合并 one-shot profile 修复；PR #176 在 exact head `c63e8de93e79cbaaeb49e097c00a9307e9948d79` / CI run `33953077320` / 11 checks 验证后 squash 合并为 `98b7c33e12b1c95be5e1b0ed482c46759045f506`，merged-main CI run `33955032026` 11/11 SUCCESS；publication run `33955155237` 的五 role image、runtime/proxy/supply、V3 bundle 18-file 校验与 artifact 上传全部 PASS；新 bundle `devr-98b7c33e12b1-84a47aea55262c8708b1e7d7` 已服务器端二次验证并安装；
+- 现有失败 operation `b170b082-692c-47ad-a46e-5192515a7827` 的 `active_phase=migration`，即使 `migration_applied=false`、`migration_verified=false`，Accepted Runbook 与 `replaceableFailedInitialOperation` 仍禁止新 artifact replacement；不得手工改 operation 或跨 bundle 执行控制器。重建预览固定为 project `dailyenergy-dev-lite` 的 3 个 stopped containers、`dailyenergy-dev-lite_postgres_data` 48.54 MB、`dailyenergy-dev-lite_redis_data` 0 B、dirty deployment state；Accepted state 不存在、受保护端口无监听。执行前必须取得 owner 对永久删除上述 synthetic volumes/state 的单独明确授权并先归档无 secret failure receipts；
+- owner 于 2026-09-05 明确审核通过重建预览并授权：先归档无 secret operation/receipts，再删除上述 3 个 stopped containers、2 个 synthetic volumes、Compose networks、dirty deployment state 与 3 个失败 release runtime-secret 目录；保留 immutable bundles、镜像、GHCR 登录和 `dev-lite-secret-v1`，创建 fresh `dev-lite-secret-v2`，使用 publication run `33955155237` 的同一已验证 source bundle 从空状态部署；Production/RC 继续 `NO_GO`；
+- 重建前 `/srv/dailyenergy/deployment` 已归档到 ignored 本地 artifact，远端/本地 SHA-256 均为 `d1313f9254f9bf18164358ebd45eb1c4b54c7b2c46c26df03b576578eb64a7cb`；gzip、闭合文件清单和 6 个 JSON 敏感值扫描通过，只含 operation、两份 supersede receipt、三个无值 ReleaseManifest 与 lock 元数据。随后已按授权删除 3 个 containers、2 个 volumes、10 个 networks、dirty deployment state 与 3 个 runtime-secret 目录；复核全部为 0，5 个 bundles、GHCR、v1 和 images 保留；
+- fresh `dev-lite-secret-v2` 已在主机生成完整 8-file `0600` 集，未继承 v1 admin credential；同一 run `33955155237` source bundle 安装得到 v2-bound `devr-98b7c33e12b1-1fa3c9a0f22237f60b66f104`。五个新 application digests 已逐个缓存，七个 Compose images 均验证 `linux/amd64`；fresh deploy 在创建 operation 前以 `PREFLIGHT_HOST_CAPACITY` 拒绝。清理两份已有本地校验副本的远端 base-image transfer archives 与可重建 apt cache/lists 后，可用空间为 `21631524864` bytes，仅高于 20 GiB 门槛 `156688384` bytes（约 149 MiB），不足以承担 PostgreSQL 初始化和逐阶段 20 GiB guard；
+- 当前 22 个 image refs 包含 PostgreSQL/Redis、latest `main@98b7c33e` 五 role set 与三个从未成为 Accepted/N-1 的旧五 role sets；Docker 报告 images `12.91 GB`、reclaimable `12.49 GB`。删除旧 15 refs 可由保留 bundles/GitHub artifacts/GHCR exact digest 重建，但 owner 此前明确要求保留 images，因此在取得新的精确 image-removal 授权前 E-017 保持 Blocked；
+- owner 于 2026-09-05 明确批准删除三个从未成为 Accepted/N-1 的旧五 role image sets 共 15 个精确 digest refs；删除未使用 `--force` 或 prune，复核镜像闭集只剩 latest `main@98b7c33e` 五 role 与 PostgreSQL/Redis 共 7 refs，bundles/GHCR/v1/v2 保留。可用磁盘从 `21631524864` 提升到 `29649711104` bytes，增加约 7.6 GiB 运行余量；
+- v2-bound release fresh deploy 已通过 preflight、pull、stateful-ready、maintenance、worker-drain 与完整 migration，operation `38877a0e-97c1-4c8d-9baf-a3152b06be1c` 记录 `migration_applied=true`、`migration_verified=true`；随后 `worker-interactive` 在创建容器前因只激活 `dev-lite-interactive`、未激活其 Compose dependency model 所需的 `dev-lite-core` 而失败。修复将 Admin/Interactive/Background/Restricted convergence 同时激活 core+目标 profile，仍固定 `up --no-deps`；当前 migrated volumes/operation 保留，core 已停止，Accepted state 仍不存在；
+- transient profile closure 的 deployment suite `75/75` 通过；真实阿里云以 core+interactive profiles、`up --no-deps` 启动 worker-interactive 并通过 phase runtime guard：4 running、1 transient、OOM/restart/public ports 均为 0、disk floor 20 GiB，trap 随后停止全部服务。固定 Node 24.18.0 full security Gate 首次仅因本机 Testcontainers PostgreSQL host port 10 秒绑定超时失败，聚焦 queue integration `8/8` 复核后完整 Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；
+- 因当前 operation 已完成 migration，新 artifact 仍不能替换；第二次重建预览为 4 个 stopped containers、`dailyenergy-dev-lite_postgres_data` 71.4 MB、`dailyenergy-dev-lite_redis_data` 0 B、10 networks、dirty operation/state 与 `devr-98b7c33e12b1-1fa3c9a0f22237f60b66f104` runtime-secret 目录。Accepted state 不存在；删除前仍需 owner 在审核 PR #177 后单独明确授权，计划保留 latest 7 images、所有 bundles、GHCR、v1/v2 并创建 fresh v3；
 - 在 E-017 完成和返回 C-015 前，不启动 C-016；C-015 的生产 bundle、主体/位置/受托方/跨境和 Legal review 继续阻塞 Production/RC。
 
 ## 2026-09-02～09-03 外部证据补齐进度

@@ -112,25 +112,25 @@ S-35 已获用户确认，[Phase 0B Gate](../docs/reports/phase-0b-gate.md) 结�
 
 ## 4. Phase 1：工程基础
 
-| ID                                                            | 任务                                       | 状态        | 主要结果                                                 |
-| ------------------------------------------------------------- | ------------------------------------------ | ----------- | -------------------------------------------------------- |
-| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)  | 初始化 TypeScript Monorepo                 | Done        | Workspace、包管理和统一脚本                              |
-| [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)  | 代码质量基线                               | Done        | TypeScript、ESLint、Prettier、提交规范                   |
-| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)  | NestJS API 骨架                            | Done        | 配置、错误、健康检查和日志                               |
-| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)  | 微信小程序骨架                             | Done        | 原生小程序、TypeScript、路由和环境                       |
-| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)  | Next.js 管理后台骨架                       | Done        | 登录外壳和基础布局                                       |
-| [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)  | PostgreSQL 与 Prisma                       | Done        | 初始 Schema、迁移和测试数据；PR #108 安全返工            |
-| [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45)  | Redis 与 BullMQ                            | Done        | 缓存、队列和连接管理                                     |
-| [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)  | 统一 Zod Schema、OpenAPI 与生成 API Client | Done        | client-safe Schema、OpenAPI、生成客户端与 drift Gate     |
-| [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done        | 可重复本地环境                                           |
-| [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done        | 单元、集成、契约和端到端                                 |
-| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done        | 11/11 Gate、365 天 retention 与临时合并控制              |
-| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | Done        | 固定 DEV、不可变发布、回滚、reconciliation 与真实演练    |
-| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Done        | OTel、SLO、告警、Dashboard、Runbook 与成本预算           |
-| [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Done        | Phase 2 development 条件放行；Production/RC NO-GO        |
-| [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done        | P0/P1 上下文路由、任务 Profile 与安静验证                |
-| [E-016](https://github.com/WeiHan1996/DailyEnergy/issues/148) | 公开仓库与平台强制 CI Gate                 | Done        | PUBLIC、main ruleset、11 required checks 与安全公开审计  |
-| [E-017](https://github.com/WeiHan1996/DailyEnergy/issues/171) | 2C2G DEV_LITE 可回滚部署                   | In Progress | PR #172 已合并；publication/bootstrap/真实主机演练进行中 |
+| ID                                                            | 任务                                       | 状态    | 主要结果                                                |
+| ------------------------------------------------------------- | ------------------------------------------ | ------- | ------------------------------------------------------- |
+| [E-001](https://github.com/WeiHan1996/DailyEnergy/issues/39)  | 初始化 TypeScript Monorepo                 | Done    | Workspace、包管理和统一脚本                             |
+| [E-002](https://github.com/WeiHan1996/DailyEnergy/issues/41)  | 代码质量基线                               | Done    | TypeScript、ESLint、Prettier、提交规范                  |
+| [E-003](https://github.com/WeiHan1996/DailyEnergy/issues/40)  | NestJS API 骨架                            | Done    | 配置、错误、健康检查和日志                              |
+| [E-004](https://github.com/WeiHan1996/DailyEnergy/issues/42)  | 微信小程序骨架                             | Done    | 原生小程序、TypeScript、路由和环境                      |
+| [E-005](https://github.com/WeiHan1996/DailyEnergy/issues/43)  | Next.js 管理后台骨架                       | Done    | 登录外壳和基础布局                                      |
+| [E-006](https://github.com/WeiHan1996/DailyEnergy/issues/44)  | PostgreSQL 与 Prisma                       | Done    | 初始 Schema、迁移和测试数据；PR #108 安全返工           |
+| [E-007](https://github.com/WeiHan1996/DailyEnergy/issues/45)  | Redis 与 BullMQ                            | Done    | 缓存、队列和连接管理                                    |
+| [E-008](https://github.com/WeiHan1996/DailyEnergy/issues/46)  | 统一 Zod Schema、OpenAPI 与生成 API Client | Done    | client-safe Schema、OpenAPI、生成客户端与 drift Gate    |
+| [E-009](https://github.com/WeiHan1996/DailyEnergy/issues/47)  | 本地 Docker Compose                        | Done    | 可重复本地环境                                          |
+| [E-010](https://github.com/WeiHan1996/DailyEnergy/issues/49)  | 测试骨架                                   | Done    | 单元、集成、契约和端到端                                |
+| [E-011](https://github.com/WeiHan1996/DailyEnergy/issues/48)  | CI                                         | Done    | 11/11 Gate、365 天 retention 与临时合并控制             |
+| [E-012](https://github.com/WeiHan1996/DailyEnergy/issues/50)  | 开发环境部署                               | Done    | 固定 DEV、不可变发布、回滚、reconciliation 与真实演练   |
+| [E-013](https://github.com/WeiHan1996/DailyEnergy/issues/51)  | 日志与监控基线                             | Done    | OTel、SLO、告警、Dashboard、Runbook 与成本预算          |
+| [E-014](https://github.com/WeiHan1996/DailyEnergy/issues/52)  | Phase 1 Gate                               | Done    | Phase 2 development 条件放行；Production/RC NO-GO       |
+| [E-015](https://github.com/WeiHan1996/DailyEnergy/issues/105) | Agent 上下文路由与分级验证入口             | Done    | P0/P1 上下文路由、任务 Profile 与安静验证               |
+| [E-016](https://github.com/WeiHan1996/DailyEnergy/issues/148) | 公开仓库与平台强制 CI Gate                 | Done    | PUBLIC、main ruleset、11 required checks 与安全公开审计 |
+| [E-017](https://github.com/WeiHan1996/DailyEnergy/issues/171) | 2C2G DEV_LITE 可回滚部署                   | Blocked | PR #177 待审核；第二次 synthetic DEV 重建需明确授权     |
 
 E-004 已随 PR #96 合并，E-008 已随 PR #97 squash 合并，E-005 已随 PR #98
 合并，E-015 已随 PR #106 squash 合并。E-006 已随 PR #110/#111 完成，E-007 已随

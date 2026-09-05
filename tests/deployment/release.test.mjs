@@ -1733,6 +1733,7 @@ test("T-E017-DEPLOY-001 builds a staged DEV_LITE plan without COS or concurrent 
       command.arguments.includes("up"),
     );
     assert.ok(start, phase);
+    assert.ok(start.arguments.includes("dev-lite-core"), phase);
     assert.ok(start.arguments.includes(profile), phase);
     assert.ok(start.arguments.includes("--no-deps"), phase);
   }
