@@ -6,9 +6,9 @@
 - **当前任务**：C-015 — 统一审核修复
 - **任务状态**：Blocked（offline no-replay 与 DEV_LITE 已完成；production bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 仍缺失）
 - **任务 Profile**：`security`（生产 bundle、隐私/法律证据、数据位置与 Production authorization）
-- **工作分支**：`agent/e017-complete-handoff`
+- **工作分支**：None（C-015 外部证据齐备后再创建）
 - **任务 Issue**：[C-015 Issue #68](https://github.com/WeiHan1996/DailyEnergy/issues/68)
-- **当前 PR**：[PR #180](https://github.com/WeiHan1996/DailyEnergy/pull/180)（E-017 post-merge 项目控制收尾）
+- **当前 PR**：None（C-015 外部证据齐备后再创建）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **合并状态**：C-015 implementation/统一审核 PR #168/#169/#170 已合并；iOS/Android offline no-replay 已完成；E-017 支撑环境已完成，不能替代 C-015 production bundle 或 Privacy/Legal evidence
