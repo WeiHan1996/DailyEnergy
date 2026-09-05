@@ -8,11 +8,11 @@
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
 - **工作分支**：`agent/e017-real-host-evidence`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：Pending（soak 完成和证据定稿后创建）
+- **当前 PR**：[PR #179](https://github.com/WeiHan1996/DailyEnergy/pull/179)（Draft；完整真实主机 lifecycle、soak、边界与历史失败证据）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
 - **合并状态**：PR #177 合并为 `adb8a7a5ac0f8e3936be80a51794bb587dbf7fe4`，merged-main CI run `33964293962` 11/11 SUCCESS，publication run `33964437990` PASS；clean-restart transient 修复 PR #178 合并为 main head `921f2eb1bec4d3e21d54fdbbc702120ea5025783`，merged-main CI run `33965927848` 11/11 SUCCESS，publication run `33966042523` PASS
-- **下一候选动作**：创建 final evidence PR，完成 exact-head 11/11 与 evidence 接受后 squash 合并；随后将 E-017 设为 Done 并恢复 C-015 Blocked，C-016 继续 Planned，Production/RC 继续 `NO_GO`
+- **下一候选动作**：完成 PR #179 final head 的 changed Gate 与 11/11 CI；证据无漂移后按 owner 持续授权转 Ready 并 squash 合并，随后将 E-017 设为 Done 并恢复 C-015 Blocked，C-016 继续 Planned，Production/RC 继续 `NO_GO`
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-03 E-017 启动
