@@ -557,6 +557,9 @@ export function validateMergedDevLiteCompose(value) {
     if (JSON.stringify(service?.profiles) !== JSON.stringify([profile])) {
       fail("DEV_LITE_COMPOSE_MERGED_TRANSIENT_PROFILE", serviceName);
     }
+    if (service.restart !== "no") {
+      fail("DEV_LITE_COMPOSE_MERGED_TRANSIENT_RESTART", serviceName);
+    }
     if (
       Object.keys(service.depends_on ?? {}).some(
         (dependency) => !DEV_LITE_CORE_SERVICES.includes(dependency),
@@ -606,7 +609,7 @@ export function validateMergedDevLiteCompose(value) {
   });
 }
 
-function mergedDevLiteComposeModel() {
+export function mergedDevLiteComposeModel() {
   const canary = "e017-synthetic-secret-canary";
   const secretDirectory = mkdtempSync(
     path.join(tmpdir(), "dailyenergy-e017-compose-secrets-"),
@@ -909,6 +912,9 @@ export function validateDevLiteComposePolicy({ base, overlay, overlaySource }) {
     const service = overlay.services[serviceName];
     if (JSON.stringify(service?.profiles) !== JSON.stringify([profile])) {
       fail("DEV_LITE_COMPOSE_PROFILE", serviceName);
+    }
+    if (service.restart !== "no") {
+      fail("DEV_LITE_COMPOSE_TRANSIENT_RESTART", serviceName);
     }
     const dependencies = Object.keys(service.depends_on ?? {});
     if (

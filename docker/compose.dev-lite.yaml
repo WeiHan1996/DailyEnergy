@@ -110,6 +110,7 @@ services:
 
   admin:
     image: ${DAILYENERGY_ADMIN_IMAGE:?ReleaseManifestV2 admin digest required}
+    restart: "no"
     profiles: !override [dev-lite-admin]
     mem_limit: 256m
     cpus: 0.4
@@ -120,6 +121,7 @@ services:
 
   worker-interactive:
     image: ${DAILYENERGY_SERVER_IMAGE:?ReleaseManifestV2 server digest required}
+    restart: "no"
     profiles: !override [dev-lite-interactive]
     mem_limit: 256m
     cpus: 0.4
@@ -140,6 +142,7 @@ services:
 
   worker-background:
     image: ${DAILYENERGY_SERVER_IMAGE:?ReleaseManifestV2 server digest required}
+    restart: "no"
     profiles: !override [dev-lite-background]
     mem_limit: 256m
     cpus: 0.4
@@ -160,6 +163,7 @@ services:
 
   worker-restricted:
     image: ${DAILYENERGY_SERVER_IMAGE:?ReleaseManifestV2 server digest required}
+    restart: "no"
     profiles: !override [dev-lite-restricted]
     mem_limit: 256m
     cpus: 0.4
