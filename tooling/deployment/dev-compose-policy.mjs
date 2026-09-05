@@ -168,6 +168,20 @@ const DEV_LITE_RESOURCE_LIMITS = Object.freeze({
   "worker-interactive": { cpus: 0.4, memory_mib: 256 },
   "worker-restricted": { cpus: 0.4, memory_mib: 256 },
 });
+const DEV_LITE_DEPENDENCY_STUB_HEALTH_COMMAND =
+  "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /health HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && head -n 1 <&3 | grep -Eq '^HTTP/1\\.[01] 200 '";
+const DEV_LITE_DEPENDENCY_STUB_HEALTHCHECK = Object.freeze({
+  interval: "5s",
+  retries: 20,
+  start_period: "2s",
+  test: Object.freeze([
+    "CMD",
+    "/bin/bash",
+    "-c",
+    DEV_LITE_DEPENDENCY_STUB_HEALTH_COMMAND,
+  ]),
+  timeout: "2s",
+});
 const DEV_LITE_SECRET_FILES = Object.freeze({
   database_admin_url: "database-admin-url",
   database_api_url: "database-api-url",
@@ -234,6 +248,23 @@ function sorted(values) {
 
 function sameSet(left, right) {
   return JSON.stringify(sorted(left)) === JSON.stringify(sorted(right));
+}
+
+function validateDevLiteDependencyStubHealthcheck(service, ruleId) {
+  const healthcheck = service?.healthcheck;
+  if (
+    JSON.stringify(healthcheck?.test) !==
+      JSON.stringify(DEV_LITE_DEPENDENCY_STUB_HEALTHCHECK.test) ||
+    String(healthcheck?.interval) !==
+      DEV_LITE_DEPENDENCY_STUB_HEALTHCHECK.interval ||
+    String(healthcheck?.timeout) !==
+      DEV_LITE_DEPENDENCY_STUB_HEALTHCHECK.timeout ||
+    String(healthcheck?.start_period) !==
+      DEV_LITE_DEPENDENCY_STUB_HEALTHCHECK.start_period ||
+    healthcheck?.retries !== DEV_LITE_DEPENDENCY_STUB_HEALTHCHECK.retries
+  ) {
+    fail(ruleId, "dependency-stub");
+  }
 }
 
 function parseComposeSource(source) {
@@ -515,6 +546,10 @@ export function validateMergedDevLiteCompose(value) {
       fail("DEV_LITE_COMPOSE_MERGED_RESOURCE_LIMIT", serviceName);
     }
   }
+  validateDevLiteDependencyStubHealthcheck(
+    value.services["dependency-stub"],
+    "DEV_LITE_COMPOSE_MERGED_HEALTHCHECK",
+  );
   for (const [serviceName, profile] of Object.entries(
     DEV_LITE_TRANSIENT_PROFILES,
   )) {
@@ -937,6 +972,10 @@ export function validateDevLiteComposePolicy({ base, overlay, overlaySource }) {
       fail("DEV_LITE_COMPOSE_RESOURCE_LIMIT", serviceName);
     }
   }
+  validateDevLiteDependencyStubHealthcheck(
+    overlay.services["dependency-stub"],
+    "DEV_LITE_COMPOSE_HEALTHCHECK",
+  );
 
   for (const [serviceName, service] of Object.entries({
     ...base.services,

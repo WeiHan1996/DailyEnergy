@@ -1,18 +1,18 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-09-03
+- **最后更新**：2026-09-05
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：E-017 — 2C2G DEV_LITE 可回滚部署
-- **任务状态**：In Progress（PR #170/#172 已验证并合并；main-bound publication、阿里云 bootstrap 与真实部署证据进行中）
+- **任务状态**：In Progress（PR #174 已验证并合并；阿里云真实部署暴露 DEV_LITE healthcheck 资源假阴性，聚焦修复进行中）
 - **任务 Profile**：`security`（部署身份、secret、资源隔离、可回滚与生产禁用边界）
-- **工作分支**：`agent/e017-dev-lite-offline-pull`
+- **工作分支**：`agent/e017-dev-lite-healthcheck`
 - **任务 Issue**：[E-017 Issue #171](https://github.com/WeiHan1996/DailyEnergy/issues/171)
-- **当前 PR**：Pending（DEV_LITE offline exact-digest pull 修复尚未推送）
+- **当前 PR**：Pending（DEV_LITE dependency-stub 轻量 healthcheck 修复尚未推送）
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **被中断任务**：C-015 保持 Blocked；生产 bundle 与 Privacy/Legal 证据不因 DEV_LITE 降级
-- **合并状态**：main head `8640a12bb1457f13b90c39d499a8cb36a0e06a72`，CI run `33741540390` 11/11 SUCCESS；fingerprint 修复已合并，E-017 仍等待 pull 修复与真实主机证据
-- **下一候选动作**：完成 DEV_LITE `pull --policy missing` 修复 Gate/PR/merge，使用已导入且完整 tag@digest 可解析的基础镜像恢复同一 pre-migration operation，再执行 deploy/reconcile/N→N+1/rollback/redeploy/soak
+- **合并状态**：main head `b4dba9f26d0318080e0bde36f9d6d3238f16912d`，merged-main CI run `33939690862` 11/11 SUCCESS；offline pull 修复 PR #174 已合并，E-017 仍等待 healthcheck 修复与真实主机证据
+- **下一候选动作**：完成 DEV_LITE 轻量 healthcheck 修复 Gate/Draft PR/owner review/merge，重新发布 bundle 并恢复同一 pre-migration operation，再执行 deploy/reconcile/N→N+1/rollback/redeploy/soak
 - **Phase Gate 结论**：`CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`
 
 ## 2026-09-03 E-017 启动
@@ -30,9 +30,12 @@
 - 阿里云 bootstrap 已完成：2 GiB persistent swap、Docker `29.7.2`、Compose `5.5.0`、固定 Node `24.18.0`；UFW active 且仅允许 SSH，Docker active/enabled、零容器/零镜像，`/srv/dailyenergy` 仍不存在，受保护端口无非 loopback 监听；Docker 官方 CDN 在上海 reset 后改用 Docker 官方签名 key 验证的阿里云 Docker CE 镜像完成安装；
 - runtime fingerprint 修复已将 Redis/telemetry 字段与 STANDARD/DEV_LITE prefix 绑定到 deployment helper、image probe、materializer 与 manifest validator；编译后 API parity 为 2/2，部署测试 `74/74`，Node 24.18.0 + 官方 npm registry 下 full security Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；本次 15 个 Prisma 非语义生成副作用已按 owner 授权恢复；
 - runtime fingerprint 修复 PR #173 已在 exact head `a9b60ca43816bb9154df15a52e80880dfb283bbb` / CI run `33740464810` / 11 checks 验证后 squash 合并为 `8640a12bb1457f13b90c39d499a8cb36a0e06a72`；merged-main CI run `33741540390` 11/11 SUCCESS；replacement publication run `33741778621` 的真实 image probe、proxy、supply、V3 bundle 18-file 校验与 artifact 上传全部 PASS；
-- 阿里云已创建 fresh 8-file secret version 并安装 generation 1 bundle；首次 deploy 在 pull 阶段因 Docker Hub 国内直连 DNS/网络超时而按合同失败，migration 未进入、Accepted state 未写、dirty operation 保留。五个 GHCR digest 已串行缓存；PostgreSQL/Redis exact-digest 镜像由本机同一 main Compose 的已验证缓存传输，archive SHA-256 校验与 `tag@digest` 解析通过。第三方 registry mirror 未获授权且未配置；真实诊断证明 `pull --policy missing` 对全部 Compose exact digest 本地命中，STANDARD `always` 语义保持不变；
+- 阿里云已创建 fresh 8-file secret version 并安装 generation 1 bundle；首次 deploy 在 pull 阶段因 Docker Hub 国内直连 DNS/网络超时而按合同失败，migration 未进入、Accepted state 未写、dirty operation 保留。五个 GHCR digest 已串行缓存；最初从 Apple Silicon 本机传输的 PostgreSQL/Redis archive 虽通过 SHA-256 与 `tag@digest` 解析，但实际只含 `linux/arm64` platform content，证明 tag/index 可解析不能替代容器内架构执行证据；第三方 registry mirror 未获授权且未配置；
 - offline pull 修复的部署测试 `74/74` 通过；完整 Gate 连续两次只在 audit metadata 阶段失败，根因是本机全局 npmmirror 与 corepack 子进程覆盖不稳定，而显式 npm 官方 registry audit 为 `critical=0/high=0`。修复将官方 `registry.npmjs.org` 固定进生产 audit 命令并以 CI policy test 防止回退；阈值仍为 high/critical=0；
 - DEV_LITE `pull --policy missing`、STANDARD `pull --policy always` 与官方 audit registry pin 的最终 full security Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`；部署测试 `74/74`、CI policy `29/29`、audit `critical=0/high=0`，本次 Prisma 非语义生成副作用已按 owner 授权恢复；
+- owner 于 2026-09-05 审核并授权合并 offline pull 修复；PR #174 在 exact head `137c88d34e3183ad7d14c808df67302ca6f01e55` / CI run `33845762969` / 11 checks 验证后 squash 合并为 `b4dba9f26d0318080e0bde36f9d6d3238f16912d`，merged-main CI run `33939690862` 11/11 SUCCESS；publication run `33939833910` 的五 role image、runtime/proxy/supply、V3 bundle 18-file 校验与 artifact 上传全部 PASS；
+- 新 bundle `devr-b4dba9f26d03-88fa366d62c70ea4b9ba236b` 安装通过并按合同以 `SUPERSEDED_BEFORE_MIGRATION` 取代旧 pull failure；五个新 GHCR digest 最终全部拉取。旧腾讯云 x86_64 主机只导出同一官方 PostgreSQL/Redis exact digest 的公开 immutable image layers，不读取或迁移 volume、dump、secret、release state、object、credential 或日志；amd64 archive SHA-256=`72ef84f3317c316404a591816a8c7a04b1392a91dfd1b8f653711c0ff55617c3`，远端 gzip/SHA、image metadata 与 network-none `uname -m=x86_64` 均通过；
+- amd64 修复后 PostgreSQL 18 与 Redis 8 均 healthy，dependency stub 本身通过 bash loopback HTTP 返回 200，但继承的每 2 秒 Node `fetch` healthcheck 在 0.1 CPU / 64 MiB 限额下持续超过 2 秒、占满 CPU 并积累 health PID，导致 `stateful-ready` 假阴性；deployment 仍在 migration 前失败、Accepted state 不存在、原 operation 与 volumes 保留。聚焦修复只为 DEV_LITE 固定轻量 bash loopback HTTP 探针并增加 policy negative test，不提高资源限额或放宽 healthy 要求；
 - 在 E-017 完成和返回 C-015 前，不启动 C-016；C-015 的生产 bundle、主体/位置/受托方/跨境和 Legal review 继续阻塞 Production/RC。
 
 ## 2026-09-02～09-03 外部证据补齐进度
