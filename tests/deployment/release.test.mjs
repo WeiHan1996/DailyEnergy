@@ -1750,6 +1750,9 @@ test("T-E017-DEPLOY-001 builds a staged DEV_LITE plan without COS or concurrent 
   ]) {
     for (const command of commands[phase]) {
       if (command.arguments.includes("run")) {
+        assert.ok(command.arguments.includes("dev-lite-core"), phase);
+        assert.ok(command.arguments.includes("dev-lite-one-shot"), phase);
+        assert.ok(command.arguments.includes("--no-deps"), phase);
         assert.ok(command.arguments.includes("--name"), phase);
         assert.match(
           command.arguments[command.arguments.indexOf("--name") + 1],

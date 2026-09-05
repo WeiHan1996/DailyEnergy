@@ -443,6 +443,7 @@ function developmentLiteDeploymentCommands(bundleRoot, environmentFile) {
     restricted: "dev-lite-restricted",
   });
   const allProfiles = Object.values(profiles);
+  const oneShotProfiles = [profiles.core, profiles.oneShot];
   const command = (selectedProfiles, ...arguments_) => ({
     arguments: [
       ...compose,
@@ -489,7 +490,7 @@ function developmentLiteDeploymentCommands(bundleRoot, environmentFile) {
     );
   const databaseCommand = (mode, operationCheckpoint) => ({
     ...command(
-      [profiles.oneShot],
+      oneShotProfiles,
       "run",
       "--rm",
       "--no-deps",
@@ -504,7 +505,7 @@ function developmentLiteDeploymentCommands(bundleRoot, environmentFile) {
   });
   const databaseVerifyCommand = () =>
     command(
-      [profiles.oneShot],
+      oneShotProfiles,
       "run",
       "--rm",
       "--no-deps",
@@ -514,7 +515,7 @@ function developmentLiteDeploymentCommands(bundleRoot, environmentFile) {
     );
   const databaseSmokeCommand = (phase) =>
     command(
-      [profiles.oneShot],
+      oneShotProfiles,
       "run",
       "--rm",
       "--no-deps",
@@ -575,7 +576,7 @@ function developmentLiteDeploymentCommands(bundleRoot, environmentFile) {
     "smoke-delete": [databaseSmokeCommand("deletion")],
     "smoke-object": [
       command(
-        [profiles.oneShot],
+        oneShotProfiles,
         "run",
         "--rm",
         "--no-deps",
