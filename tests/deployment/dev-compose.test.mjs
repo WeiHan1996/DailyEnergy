@@ -7,8 +7,10 @@ import { parse } from "yaml";
 
 import { cosSmokeTesting } from "../../tooling/deployment/cos-smoke.mjs";
 import {
+  mergedDevLiteComposeModel,
   validateDevComposePolicy,
   validateDevLiteComposePolicy,
+  validateMergedDevLiteCompose,
 } from "../../tooling/deployment/dev-compose-policy.mjs";
 import { developmentDeploymentCommands } from "../../tooling/deployment/deploy-dev.mjs";
 
@@ -210,6 +212,7 @@ test("T-E017-COMPOSE-001 accepts the bounded DEV_LITE core and isolated transien
   );
   for (const [serviceName, service] of transient) {
     assert.equal(service.profiles.length, 1, serviceName);
+    assert.equal(service.restart, "no", serviceName);
     assert.ok(
       Object.keys(service.depends_on ?? {}).every((dependency) =>
         core.has(dependency),
@@ -217,6 +220,13 @@ test("T-E017-COMPOSE-001 accepts the bounded DEV_LITE core and isolated transien
       `${serviceName} must not start another transient workload`,
     );
   }
+
+  const merged = mergedDevLiteComposeModel();
+  delete merged.services.admin.restart;
+  assert.throws(
+    () => validateMergedDevLiteCompose(merged),
+    /DEV_LITE_COMPOSE_MERGED_TRANSIENT_RESTART:admin/u,
+  );
 
   assert.deepEqual(overlay.services["dependency-stub"].healthcheck, {
     interval: "5s",
@@ -249,6 +259,13 @@ test("T-E017-COMPOSE-001 rejects profile overlap, inherited transient dependenci
   assert.throws(
     () => validateDevLiteComposePolicy(transientDependency),
     /DEV_LITE_COMPOSE_TRANSIENT_DEPENDENCY:worker-background/u,
+  );
+
+  const transientRestart = devLitePolicyInput();
+  delete transientRestart.overlay.services.admin.restart;
+  assert.throws(
+    () => validateDevLiteComposePolicy(transientRestart),
+    /DEV_LITE_COMPOSE_TRANSIENT_RESTART:admin/u,
   );
 
   const inheritedDependency = devLitePolicyInput();
