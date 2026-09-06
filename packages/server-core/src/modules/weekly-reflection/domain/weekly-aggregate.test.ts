@@ -169,7 +169,15 @@ describe("weekly-aggregate-v1", () => {
 
   it("projects INVALIDATED facts without a ghost summary and AVAILABLE with one", () => {
     const derivation = deriveWeeklyAggregate(
-      source(DATES.map((date, index) => recordedDay(date, index))),
+      source(
+        DATES.map((date, index) =>
+          recordedDay(date, index, { helpful: index < 2 }),
+        ),
+      ),
+    );
+    expect(derivation.expressionPlan?.observation_fact_ids).toHaveLength(2);
+    expect(derivation.expressionPlan?.helpful_pattern_fact_id).toBe(
+      "fact.helpfulness.top_action_kind",
     );
     const invalidated = createClientWeeklySummaryView({
       aggregate: derivation.aggregate,
@@ -217,6 +225,7 @@ describe("weekly-aggregate-v1", () => {
       summaryStatus: "AVAILABLE",
     });
     expect(available.summary?.revision).toBe(1);
+    expect(available.summary?.paragraphs).toHaveLength(5);
     expect(JSON.stringify(available)).not.toMatch(
       /source_fingerprint|source_ref|daily_score|raw_notes|model/u,
     );

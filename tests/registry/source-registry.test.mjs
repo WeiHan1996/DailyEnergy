@@ -20,9 +20,9 @@ function cloneRegistry() {
 test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () => {
   assert.deepEqual(await loadAndValidateCoverageRegistry(), {
     counts: {
-      COVERED: 538,
+      COVERED: 562,
       NA_WITH_REASON: 0,
-      PLANNED: 466,
+      PLANNED: 442,
     },
     total: 1004,
   });
@@ -54,6 +54,8 @@ test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () =>
       "D17-D04",
       "D17-D05",
       "D17-D06",
+      "D17-G03",
+      "D17-I01",
       "D17-I03",
       "D17-I04",
       "D17-I05",
@@ -64,9 +66,11 @@ test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () =>
       "D17-R02",
       "D17-R03",
       "D17-R04",
+      "D17-R05",
       "D17-R06",
       "D17-V01",
       "D17-V02",
+      "D17-V03",
       "D17-V06",
       "D17-X05",
     ],
@@ -129,6 +133,41 @@ test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () =>
       "S20-D09",
       "S20-D10",
       "S31-TEST-022",
+    ],
+  );
+
+  const c016Entries = registry.entries.filter(({ evidence }) =>
+    evidence?.some(
+      ({ origin }) => origin === "tests/registry/c016-evidence-manifest.json",
+    ),
+  );
+  assert.deepEqual(
+    c016Entries.map(({ source_id: sourceId }) => sourceId),
+    [
+      "D17-G03",
+      "D17-I01",
+      "D17-R05",
+      "D17-V03",
+      "PDM-C04",
+      "PDM-U04",
+      "S20-A08",
+      "S20-C05",
+      "S20-C07",
+      "S20-D07",
+      "S20-E10",
+      "S20-S01",
+      "S20-S10",
+      "S29-ARCH-009",
+      "S29-ARCH-011",
+      "S29-ARCH-017",
+      "S29-ARCH-033",
+      "S29-ARCH-037",
+      "S29-ARCH-041",
+      "S29-ARCH-042",
+      "S31-TEST-016",
+      "S31-TEST-033",
+      "S31-TEST-034",
+      "S31-TEST-039",
     ],
   );
 

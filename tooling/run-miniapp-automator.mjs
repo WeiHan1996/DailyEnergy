@@ -100,7 +100,10 @@ async function withTimeout(promise, reasonCode) {
 function report(error, phase) {
   const result = classifyMiniappDevtoolsError(error, phase);
   console.error(formatMiniappDevtoolsResult(result));
-  process.exitCode = result.exitCode;
+  // automator.launch can leave its CLI child pending after our bounded timeout.
+  // This command owns that child, so a classified terminal result must end the
+  // runner instead of hanging until an external SIGINT.
+  process.exit(result.exitCode);
 }
 
 async function main() {

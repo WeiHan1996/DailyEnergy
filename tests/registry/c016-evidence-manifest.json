@@ -1,0 +1,185 @@
+{
+  "manifest_version": "c-016-evidence-v1",
+  "scope": "C-016 synthetic-only first entry through seven product days, same-day return, two-device concurrency, unknown outcome, real PostgreSQL 18/Redis 8/BullMQ 5 worker recovery, weekly projection, stale-cache DAY deletion, Safety override, maintenance and Admin audience closure",
+  "authority": [
+    "docs/ai/safety.md",
+    "docs/data/domain-model.md",
+    "docs/decisions/ADR-0002-deterministic-daily-result.md",
+    "docs/decisions/ADR-0005-data-retention-and-deletion.md",
+    "docs/design/interaction-states.md",
+    "docs/operations/privacy-data-map.md",
+    "docs/product/journey.md",
+    "docs/product/state-machine.md",
+    "docs/technical/api.md",
+    "docs/technical/architecture.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-C016-CORE-CONTRACT-001": {
+      "file": "tooling/check-contracts.mjs",
+      "selector": "shared Schema, OpenAPI, generated client and error catalog drift Gate",
+      "level": "CONTRACT",
+      "assertions": [
+        "generation without a check-in, maintenance, Safety-first writes, strict validation details and disabled Admin mutation use registered closed error contracts",
+        "Today is a closed client projection and cannot expose memory dependencies, provider metadata, seed, guard epoch or internal result fields",
+        "the public and Admin path catalogs contain no endpoint that edits a published result or directly clears Safety"
+      ]
+    },
+    "T-C016-CORE-E2E-001": {
+      "file": "tests/e2e/core/core-journey.test.mjs",
+      "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+      "level": "E2E",
+      "assertions": [
+        "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+        "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+        "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists",
+        "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+        "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail"
+      ]
+    },
+    "T-C016-CORE-RESILIENCE-001": {
+      "file": "tests/e2e/core/core-journey.test.mjs",
+      "selector": "T-C016-CORE-E2E-001 worker, Redis and deletion recovery",
+      "level": "RESILIENCE",
+      "assertions": [
+        "an interactive Worker is drained after enqueue; PostgreSQL reports GENERATION_PENDING until the restarted Worker rebuilds the published outbox and publishes one result",
+        "Redis FLUSHALL followed by all three profile rebuilds preserves the same seven PostgreSQL results and skips already consumed outbox facts instead of duplicating them",
+        "a historical result is cached before DAY confirmation, the synchronous guard blocks it before the Restricted Worker runs, and task completion removes the day, light, relationship and weekly source",
+        "post-deletion outbox rebuild and relay do not resurrect the deleted check-in or cached result; weekly truth falls from seven to six real/lit days with one explicit missing date"
+      ]
+    },
+    "T-C016-MINIAPP-DEVTOOLS-001": {
+      "file": "tests/manual-rc/c016-evidence.json",
+      "selector": "C-016 WeChat DevTools registered page and route conformance",
+      "level": "MANUAL_RC",
+      "assertions": [
+        "WeChat DevTools Stable v2.01.2510290 with base library 3.7.12 loads and verifies all 11 registered Mini Program page and route cases",
+        "the run uses the real WeChat DevTools automator rather than a browser or jsdom substitute",
+        "the local Service Port is enabled only for the authorized run and restored off afterward while login-ticket access, default automation trust and the multi-end plugin port remain off",
+        "the evidence is limited to DevTools conformance and does not claim real-device, RC or Production completion"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "D17-I01",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "D17-G03",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "D17-R05",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001", "T-C016-CORE-RESILIENCE-001"]
+    },
+    {
+      "source_id": "D17-V03",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "PDM-C04",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "PDM-U04",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S20-A08",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-CONTRACT-001", "T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S20-C05",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-CONTRACT-001", "T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S20-C07",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-CONTRACT-001", "T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S20-D07",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-CONTRACT-001", "T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S20-E10",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-CONTRACT-001", "T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S20-S01",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-CONTRACT-001", "T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S20-S10",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-CONTRACT-001", "T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S29-ARCH-009",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S29-ARCH-011",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S29-ARCH-017",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S29-ARCH-033",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S29-ARCH-037",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-RESILIENCE-001"]
+    },
+    {
+      "source_id": "S29-ARCH-041",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S29-ARCH-042",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-CONTRACT-001", "T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S31-TEST-016",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-MINIAPP-DEVTOOLS-001"]
+    },
+    {
+      "source_id": "S31-TEST-033",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001", "T-C016-CORE-RESILIENCE-001"]
+    },
+    {
+      "source_id": "S31-TEST-034",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S31-TEST-039",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-CORE-RESILIENCE-001"]
+    }
+  ]
+}

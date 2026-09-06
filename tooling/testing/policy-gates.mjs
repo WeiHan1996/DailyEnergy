@@ -136,6 +136,7 @@ export function validateRunnerRegistry(registry) {
     "postgresql-18",
     "queue-integration",
     "api-http",
+    "core-e2e",
     "admin-e2e",
     "miniapp-devtools",
   ];
@@ -181,6 +182,26 @@ export function validateRunnerRegistry(registry) {
     api.retry?.sticky_first_failure !== true
   ) {
     fail("TEST_RUNNER_API_HTTP_INVALID", "api-http");
+  }
+
+  const core = runners.get("core-e2e");
+  if (
+    core.implementation !== "NODE_HTTP_AND_TESTCONTAINERS" ||
+    core.application !== "REAL_NEST_AND_WORKER_PROFILES" ||
+    !core.levels.includes("E2E") ||
+    !core.levels.includes("RESILIENCE") ||
+    !core.real_dependencies?.postgresql?.startsWith(
+      "postgres:18.0-bookworm@sha256:",
+    ) ||
+    !core.real_dependencies?.redis?.startsWith(
+      "redis:8.2.1-bookworm@sha256:",
+    ) ||
+    core.real_dependencies?.bullmq !== "5.81.3" ||
+    core.fake_substitution !== "PROHIBITED" ||
+    core.retry !== 0 ||
+    core.unavailable_status !== "INFRA_BLOCKED"
+  ) {
+    fail("TEST_RUNNER_CORE_E2E_REALITY", "core-e2e");
   }
 
   const admin = runners.get("admin-e2e");

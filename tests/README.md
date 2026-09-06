@@ -14,6 +14,8 @@
 | `pnpm test:harness`                                  | 固定时间/随机源、合成身份、封闭网络/provider、fault 与 evidence policy           |
 | `pnpm test:projects`                                 | root Vitest projects 编排                                                        |
 | `pnpm test:api:e2e`                                  | Playwright `APIRequestContext` + 真实 Nest 测试应用 HTTP                         |
+| `pnpm test:core:e2e`                                 | C-016 真实 Nest + PG18/Redis8/BullMQ5 七日组合 E2E/恢复                          |
+| `pnpm test:core:e2e:stability`                       | C-016 从 clean containers 连续三次重跑，任一首错即失败                           |
 | `pnpm database:test:integration`                     | 固定 digest 的真实 PostgreSQL 18                                                 |
 | `pnpm queue:test`                                    | 固定 digest 的真实 PostgreSQL 18 / Redis 8 + BullMQ 5                            |
 | `pnpm --filter @daily-energy/app-admin run test:e2e` | Playwright Chromium Admin E2E                                                    |

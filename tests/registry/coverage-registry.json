@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 538, "NA_WITH_REASON": 0, "PLANNED": 466 },
+  "counts": { "COVERED": 562, "NA_WITH_REASON": 0, "PLANNED": 442 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -241,11 +241,23 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -293,11 +305,23 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -720,11 +744,36 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        },
+        {
+          "assertions": [
+            "a historical result is cached before DAY confirmation, the synchronous guard blocks it before the Restricted Worker runs, and task completion removes the day, light, relationship and weekly source",
+            "an interactive Worker is drained after enqueue; PostgreSQL reports GENERATION_PENDING until the restarted Worker rebuilds the published outbox and publishes one result",
+            "post-deletion outbox rebuild and relay do not resurrect the deleted check-in or cached result; weekly truth falls from seven to six real/lit days with one explicit missing date",
+            "Redis FLUSHALL followed by all three profile rebuilds preserves the same seven PostgreSQL results and skips already consumed outbox facts instead of duplicating them"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 worker, Redis and deletion recovery",
+          "test_id": "T-C016-CORE-RESILIENCE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -919,11 +968,23 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -4122,11 +4183,23 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -4707,11 +4780,23 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -6899,11 +6984,35 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "generation without a check-in, maintenance, Safety-first writes, strict validation details and disabled Admin mutation use registered closed error contracts",
+            "the public and Admin path catalogs contain no endpoint that edits a published result or directly clears Safety",
+            "Today is a closed client projection and cannot expose memory dependencies, provider metadata, seed, guard epoch or internal result fields"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "shared Schema, OpenAPI, generated client and error catalog drift Gate",
+          "test_id": "T-C016-CORE-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-A08",
       "source_sets": ["s20-api"]
@@ -7077,11 +7186,35 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "generation without a check-in, maintenance, Safety-first writes, strict validation details and disabled Admin mutation use registered closed error contracts",
+            "the public and Admin path catalogs contain no endpoint that edits a published result or directly clears Safety",
+            "Today is a closed client projection and cannot expose memory dependencies, provider metadata, seed, guard epoch or internal result fields"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "shared Schema, OpenAPI, generated client and error catalog drift Gate",
+          "test_id": "T-C016-CORE-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-C05",
       "source_sets": ["s20-api"]
@@ -7099,11 +7232,35 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "generation without a check-in, maintenance, Safety-first writes, strict validation details and disabled Admin mutation use registered closed error contracts",
+            "the public and Admin path catalogs contain no endpoint that edits a published result or directly clears Safety",
+            "Today is a closed client projection and cannot expose memory dependencies, provider metadata, seed, guard epoch or internal result fields"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "shared Schema, OpenAPI, generated client and error catalog drift Gate",
+          "test_id": "T-C016-CORE-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-C07",
       "source_sets": ["s20-api"]
@@ -7485,11 +7642,35 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "generation without a check-in, maintenance, Safety-first writes, strict validation details and disabled Admin mutation use registered closed error contracts",
+            "the public and Admin path catalogs contain no endpoint that edits a published result or directly clears Safety",
+            "Today is a closed client projection and cannot expose memory dependencies, provider metadata, seed, guard epoch or internal result fields"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "shared Schema, OpenAPI, generated client and error catalog drift Gate",
+          "test_id": "T-C016-CORE-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-D07",
       "source_sets": ["s20-api"]
@@ -7851,22 +8032,70 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "generation without a check-in, maintenance, Safety-first writes, strict validation details and disabled Admin mutation use registered closed error contracts",
+            "the public and Admin path catalogs contain no endpoint that edits a published result or directly clears Safety",
+            "Today is a closed client projection and cannot expose memory dependencies, provider metadata, seed, guard epoch or internal result fields"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "shared Schema, OpenAPI, generated client and error catalog drift Gate",
+          "test_id": "T-C016-CORE-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-E10",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "generation without a check-in, maintenance, Safety-first writes, strict validation details and disabled Admin mutation use registered closed error contracts",
+            "the public and Admin path catalogs contain no endpoint that edits a published result or directly clears Safety",
+            "Today is a closed client projection and cannot expose memory dependencies, provider metadata, seed, guard epoch or internal result fields"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "shared Schema, OpenAPI, generated client and error catalog drift Gate",
+          "test_id": "T-C016-CORE-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-S01",
       "source_sets": ["s20-api"]
@@ -8105,11 +8334,35 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "generation without a check-in, maintenance, Safety-first writes, strict validation details and disabled Admin mutation use registered closed error contracts",
+            "the public and Admin path catalogs contain no endpoint that edits a published result or directly clears Safety",
+            "Today is a closed client projection and cannot expose memory dependencies, provider metadata, seed, guard epoch or internal result fields"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "shared Schema, OpenAPI, generated client and error catalog drift Gate",
+          "test_id": "T-C016-CORE-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-S10",
       "source_sets": ["s20-api"]
@@ -14751,11 +15004,23 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -14797,11 +15062,23 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -14935,11 +15212,23 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -15383,11 +15672,23 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -15493,11 +15794,22 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a historical result is cached before DAY confirmation, the synchronous guard blocks it before the Restricted Worker runs, and task completion removes the day, light, relationship and weekly source",
+            "an interactive Worker is drained after enqueue; PostgreSQL reports GENERATION_PENDING until the restarted Worker rebuilds the published outbox and publishes one result",
+            "post-deletion outbox rebuild and relay do not resurrect the deleted check-in or cached result; weekly truth falls from seven to six real/lit days with one explicit missing date",
+            "Redis FLUSHALL followed by all three profile rebuilds preserves the same seven PostgreSQL results and skips already consumed outbox facts instead of duplicating them"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 worker, Redis and deletion recovery",
+          "test_id": "T-C016-CORE-RESILIENCE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -15585,11 +15897,23 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -15608,11 +15932,35 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "generation without a check-in, maintenance, Safety-first writes, strict validation details and disabled Admin mutation use registered closed error contracts",
+            "the public and Admin path catalogs contain no endpoint that edits a published result or directly clears Safety",
+            "Today is a closed client projection and cannot expose memory dependencies, provider metadata, seed, guard epoch or internal result fields"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "shared Schema, OpenAPI, generated client and error catalog drift Gate",
+          "test_id": "T-C016-CORE-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -16903,11 +17251,22 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "the evidence is limited to DevTools conformance and does not claim real-device, RC or Production completion",
+            "the local Service Port is enabled only for the authorized run and restored off afterward while login-ticket access, default automation trust and the multi-end plugin port remain off",
+            "the run uses the real WeChat DevTools automator rather than a browser or jsdom substitute",
+            "WeChat DevTools Stable v2.01.2510290 with base library 3.7.12 loads and verifies all 11 registered Mini Program page and route cases"
+          ],
+          "file": "tests/manual-rc/c016-evidence.json",
+          "level": "MANUAL_RC",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "C-016 WeChat DevTools registered page and route conformance",
+          "test_id": "T-C016-MINIAPP-DEVTOOLS-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["MANUAL_RC"] }],
       "source_id": "S31-TEST-016",
       "source_sets": ["s31-testing"]
@@ -17321,22 +17680,59 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        },
+        {
+          "assertions": [
+            "a historical result is cached before DAY confirmation, the synchronous guard blocks it before the Restricted Worker runs, and task completion removes the day, light, relationship and weekly source",
+            "an interactive Worker is drained after enqueue; PostgreSQL reports GENERATION_PENDING until the restarted Worker rebuilds the published outbox and publishes one result",
+            "post-deletion outbox rebuild and relay do not resurrect the deleted check-in or cached result; weekly truth falls from seven to six real/lit days with one explicit missing date",
+            "Redis FLUSHALL followed by all three profile rebuilds preserves the same seven PostgreSQL results and skips already consumed outbox facts instead of duplicating them"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 worker, Redis and deletion recovery",
+          "test_id": "T-C016-CORE-RESILIENCE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["E2E", "RESILIENCE"] }],
       "source_id": "S31-TEST-033",
       "source_sets": ["s31-testing"]
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a high-risk evening note atomically activates the real restricted Safety state, exposes only SafetyView, leaves all seven ordinary feedback rows unchanged and blocks Today, check-in and light across a product-day boundary",
+            "blocking maintenance returns the stable recoverable contract and HTTP, queue and ordinary-log scans expose no internal field, credential, user text, Safety category or provider detail",
+            "seven fixed ProductDates publish exactly seven controlled-template results with zero provider attempts, preserve same-day identity and complete task, light, evening and weekly views",
+            "two real HTTP sessions for one synthetic WeChat identity converge on one PostgreSQL account, one same-command check-in and one same-command generation intent",
+            "unknown fields return allowlisted validation details, generation without a check-in fails closed, a Mini Program bearer cannot enter Admin, and no Admin Safety-clear route exists"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "E2E",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 deterministic core journey",
+          "test_id": "T-C016-CORE-E2E-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["E2E", "RESILIENCE"] }],
       "source_id": "S31-TEST-034",
       "source_sets": ["s31-testing"]
@@ -17428,11 +17824,22 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a historical result is cached before DAY confirmation, the synchronous guard blocks it before the Restricted Worker runs, and task completion removes the day, light, relationship and weekly source",
+            "an interactive Worker is drained after enqueue; PostgreSQL reports GENERATION_PENDING until the restarted Worker rebuilds the published outbox and publishes one result",
+            "post-deletion outbox rebuild and relay do not resurrect the deleted check-in or cached result; weekly truth falls from seven to six real/lit days with one explicit missing date",
+            "Redis FLUSHALL followed by all three profile rebuilds preserves the same seven PostgreSQL results and skips already consumed outbox facts instead of duplicating them"
+          ],
+          "file": "tests/e2e/core/core-journey.test.mjs",
+          "level": "RESILIENCE",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "T-C016-CORE-E2E-001 worker, Redis and deletion recovery",
+          "test_id": "T-C016-CORE-RESILIENCE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["E2E", "RESILIENCE"] }],
       "source_id": "S31-TEST-039",
       "source_sets": ["s31-testing"]

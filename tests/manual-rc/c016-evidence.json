@@ -1,0 +1,51 @@
+{
+  "evidence_version": "c-016-evidence-v1",
+  "task_id": "C-016",
+  "issue": "https://github.com/WeiHan1996/DailyEnergy/issues/66",
+  "branch": "agent/c016-core-e2e",
+  "environment_boundary": "DEV_LITE_ACCEPTED / SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE",
+  "automated_core": {
+    "status": "PASS / VERIFIED_IMPLEMENTATION_HEAD",
+    "runner": "pnpm test:core:e2e",
+    "clean_runs": 3,
+    "required_clean_runs": 3,
+    "dependencies": "POSTGRESQL_18 / REDIS_8 / BULLMQ_5 / REAL_NEST_HTTP / THREE_WORKER_PROFILES",
+    "provider_calls": 0,
+    "scope": "FIRST_ENTRY / SEVEN_PRODUCT_DAYS / SAME_DAY_RETURN / TWO_DEVICE_CONCURRENCY / UNKNOWN_OUTCOME / WORKER_RESTART / REDIS_LOSS / WEEKLY / DAY_DELETE / SAFETY / MAINTENANCE / ADMIN_AUDIENCE",
+    "first_exact_head_failure": "RECORDED / HEAD_4FFCD37BFC152AC88498715778F02BDB4EEB909C / RUN_34001276671 / API_E2E_FAILED / AGGREGATE_FAILED / OTHER_NINE_CHECKS_SUCCESS",
+    "failure_class": "TEST_ORCHESTRATION_ADVANCED_PRODUCT_DATE_AFTER_RELAY_PUBLISHED_WITHOUT_WAITING_FOR_CONSUMER_INBOX_SETTLEMENT",
+    "deterministic_fix": "POSTGRES_OUTBOX_INBOX_BARRIER / FAILED_PENDING_TERMINAL_ZERO / EVERY_PUBLISHED_EVENT_CONSUMED / NO_FIXED_SLEEP / RETRY_ZERO",
+    "post_fix_stability": "PASS / THREE_FRESH_POSTGRESQL_18_AND_REDIS_8_RUNS / RETRY_ZERO",
+    "post_fix_targeted": "PASS / TERMINAL_INBOX_FAIL_CLOSED_QUERY / ONE_FRESH_DEPENDENCY_RUN",
+    "post_fix_infrastructure_retry": "FIRST_CHANGED_GATE_INFRA_BLOCKED_BY_LOCAL_TESTCONTAINERS_REDIS_HOST_PORT_BIND_TIMEOUT / QUEUE_INTEGRATION_FOCUSED_8_OF_8_PASS / FAILURE_NOT_COUNTED_AS_PASS",
+    "post_fix_validation": "CHANGED_TO_FULL_AUTOMATED_PASS_166758MS / TASK_AUTOMATED_PASS_83010MS",
+    "post_fix_exact_head_ci": "PASS / HEAD_1BA7AC6ACAC12A706872820AC2E9556138051C56 / RUN_34002593800 / ELEVEN_OF_ELEVEN_SUCCESS / API_E2E_52_SECONDS"
+  },
+  "miniapp_devtools": {
+    "status": "PASS",
+    "executed_on": "2026-09-06",
+    "cli": "/Applications/wechatwebdevtools.app/Contents/MacOS/cli",
+    "devtools_version": "Stable v2.01.2510290",
+    "base_library": "3.7.12",
+    "command": "pnpm test:miniapp:devtools",
+    "registered_page_and_route_cases": 11,
+    "build_source_fingerprint": "f73bc61f8498cfdc16a02591bee4edf0bd8a1b9fa94db7aa1c9ced609baa2eb4",
+    "prior_infrastructure_result": "MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT",
+    "service_port": "TEMPORARILY_ENABLED_LOCAL_ONLY_THEN_RESTORED_OFF",
+    "login_ticket_access": "OFF",
+    "default_automation_trust": "OFF",
+    "multi_end_plugin_port": "OFF",
+    "pass_claim": "MINIAPP_DEVTOOLS_CONFORMANCE_PASS / REAL_DEVICE_NOT_INCLUDED"
+  },
+  "excluded": [
+    "PRODUCTION_ORIGIN_OR_IMAGE",
+    "REAL_WECHAT_USER",
+    "EXTERNAL_OBJECT",
+    "PITR_OR_BACKUP_RESTORE",
+    "HA_OR_PRODUCTION_CAPACITY",
+    "QUALIFIED_LEGAL_REVIEW",
+    "PRODUCTION_AUTHORIZATION"
+  ],
+  "production_rc": "NO_GO",
+  "review_status": "POST_FIX_AUTOMATED_CORE_EXACT_HEAD_AND_MINIAPP_DEVTOOLS_PASS / OWNER_REVIEW_PENDING"
+}
