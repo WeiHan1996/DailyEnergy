@@ -3,20 +3,31 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-06
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：C-016 — 建立确定性核心全路径端到端测试
-- **任务状态**：In Review
-- **任务 Profile**：`code`（HTTP/Admin/Mini Program/真实 PostgreSQL、Redis、BullMQ 的合成黑盒与故障恢复）
-- **工作分支**：`agent/c016-core-e2e`
-- **任务 Issue**：[C-016 Issue #66](https://github.com/WeiHan1996/DailyEnergy/issues/66)
-- **当前 PR**：[PR #183](https://github.com/WeiHan1996/DailyEnergy/pull/183)（Draft；后台竞态修复实现 head `1ba7ac6acac12a706872820ac2e9556138051c56` / CI run `34002593800` 已 11/11 SUCCESS，等待 owner 审核）
+- **当前任务**：C-017 — 执行 Phase 2 确定性核心 Gate
+- **任务状态**：Ready（尚未开工）
+- **任务 Profile**：`security`（Phase 2 全量证据、隐私/Safety/删除/owner/幂等与 Development/Production 判定边界）
+- **工作分支**：尚未创建；建议 `agent/c017-phase-2-gate`
+- **任务 Issue**：[C-017 Issue #69](https://github.com/WeiHan1996/DailyEnergy/issues/69)
+- **当前 PR**：无；C-017 尚未开始
+- **上一完成任务**：C-016 Done；[PR #183](https://github.com/WeiHan1996/DailyEnergy/pull/183) final head `6636360a94b90c06072c073b9e030113da82e027` / CI run `34002759447` / 11 checks 通过后 squash 合并为 `299e3e8082aae38063aaec7332749a407b7c4f54`；merged-main CI run `34007506687` 11/11 SUCCESS；Issue #66 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖例外**：owner 于 2026-09-05 明确允许 C-016 在现有 DEV_LITE 上仅使用 synthetic 数据继续；C-015 已合并实现与威胁审核仍是代码前置，其延期的 Production/Privacy/Legal 证据不阻塞 development-only C-016，也不能由 C-016 反向关闭
+- **依赖边界**：C-016 已 Done，C-017 前置满足；C-015 已合并实现与威胁审核仍是代码前置，其延期的 Production/Privacy/Legal 证据不阻塞 development-only C-017 Gate，但持续阻塞 Production/RC，也不能由 C-017 自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：请求 owner 审核 PR #183；任何后续 head 都必须先保持同一 run 11/11 SUCCESS，未经明确批准不标记 Ready、不运行 merge verifier、不合并，C-017 继续 Planned
-- **Phase Gate 结论**：`DEVELOPMENT_ONLY_GO_FOR_C-016 / PRODUCTION_AND_RC_NO_GO`
+- **下一候选动作**：执行 `pnpm agent:prepare C-017 --remote --deep`，读取全部 required sources，复核 Gate 范围后才创建任务分支；本次收尾不启动 C-017
+- **Phase Gate 结论**：`C-016_DONE / C-017_READY / PRODUCTION_AND_RC_NO_GO`
+
+## 2026-09-06 C-016 post-merge 收尾
+
+- owner 明确要求“合并 PR #183 并收尾”；PR 先从 Draft 标记 Ready，再由固定 Node `24.18.0` 运行 exact-head verifier，结果为 `CI_PR_MERGE_GATE_OK:pr=183:head=6636360a94b90c06072c073b9e030113da82e027:run=34002759447:checks=11`；首次错误的额外 `--` 参数只触发本地 `CI_PR_MERGE_GATE_PR_INVALID:argument`，未执行远端验证或改变合并状态，随后已按脚本真实参数格式成功复核；
+- PR #183 以 `--squash --match-head-commit 6636360a94b90c06072c073b9e030113da82e027` 合并为 `299e3e8082aae38063aaec7332749a407b7c4f54`，未删除分支；merged-main CI run `34007506687` 同一提交 11/11 SUCCESS；本地与远端 main 已精确对齐；
+- C-016 最终交付包括真实 Nest HTTP + PostgreSQL 18 + Redis 8 + BullMQ 5 三 Worker profile 的七日合成核心旅程、并发/unknown/重启/Redis loss/删除/Safety/维护/Admin 隔离、weekly 五段 Schema 修复、DevTools 11/11 conformance、24 个 Source ID 覆盖和 outbox/inbox 确定性收敛；registry 为 `562/1004 COVERED`、`442 PLANNED`；
+- 首次 exact-head CI run `34001276671` 的 api-e2e 竞态失败保留；修复后本地三次 clean stability、完整 changed→full/task Gate、实现 head CI、final receipt head CI 与 merged-main CI 均通过，retry 保持 0；
+- Issue #66 已附 PR/CI/merge 与 Production 边界收据后关闭；C-016 状态为 Done；C-017 是唯一 Ready，但尚未创建分支或开始执行；
+- post-merge 状态变更的 `pnpm agent:validate --mode=changed` 自动部分 PASS（2 个命令），因当前任务已切到 C-017 `security` Profile 而如实返回 `MANUAL_EVIDENCE_REQUIRED`；owner 本轮已明确授权“合并 PR #183 并收尾”，本次不改变既有 threat boundary，Production authorization 不适用且继续 `NO_GO`，不将该结果冒充 Production 或 C-017 Gate PASS；
+- C-015 继续 Blocked，DEV_LITE 继续 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`，Production/RC 保持 `NO_GO`；C-017 只能形成 Phase 3 development 的 go/fix/no-go，不能自动部署生产、招募用户、开始 Alpha 或把 AI-001 提升为 Ready。
 
 ## 2026-09-05 C-016 development-only 开工授权
 
