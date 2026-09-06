@@ -14,13 +14,20 @@
     "scope": "FIRST_ENTRY / SEVEN_PRODUCT_DAYS / SAME_DAY_RETURN / TWO_DEVICE_CONCURRENCY / UNKNOWN_OUTCOME / WORKER_RESTART / REDIS_LOSS / WEEKLY / DAY_DELETE / SAFETY / MAINTENANCE / ADMIN_AUDIENCE"
   },
   "miniapp_devtools": {
-    "status": "INFRA_BLOCKED",
-    "attempted_on": "2026-09-06",
-    "stable_reason": "MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT",
+    "status": "PASS",
+    "executed_on": "2026-09-06",
     "cli": "/Applications/wechatwebdevtools.app/Contents/MacOS/cli",
+    "devtools_version": "Stable v2.01.2510290",
     "base_library": "3.7.12",
-    "pass_claim": "PROHIBITED",
-    "unlock": "Close or safely preserve the currently open IDE project, restart DevTools with its local HTTP/automation endpoint, then rerun pnpm test:miniapp:devtools."
+    "command": "pnpm test:miniapp:devtools",
+    "registered_page_and_route_cases": 11,
+    "build_source_fingerprint": "f73bc61f8498cfdc16a02591bee4edf0bd8a1b9fa94db7aa1c9ced609baa2eb4",
+    "prior_infrastructure_result": "MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT",
+    "service_port": "TEMPORARILY_ENABLED_LOCAL_ONLY_THEN_RESTORED_OFF",
+    "login_ticket_access": "OFF",
+    "default_automation_trust": "OFF",
+    "multi_end_plugin_port": "OFF",
+    "pass_claim": "MINIAPP_DEVTOOLS_CONFORMANCE_PASS / REAL_DEVICE_NOT_INCLUDED"
   },
   "excluded": [
     "PRODUCTION_ORIGIN_OR_IMAGE",
@@ -32,5 +39,5 @@
     "PRODUCTION_AUTHORIZATION"
   ],
   "production_rc": "NO_GO",
-  "review_status": "AUTOMATED_CORE_AND_THREE_CLEAN_RUNS_PASS / MINIAPP_DEVTOOLS_INFRA_BLOCKED"
+  "review_status": "AUTOMATED_CORE_THREE_CLEAN_RUNS_AND_MINIAPP_DEVTOOLS_PASS / OWNER_REVIEW_PENDING"
 }

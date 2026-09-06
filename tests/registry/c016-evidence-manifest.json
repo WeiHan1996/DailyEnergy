@@ -47,6 +47,17 @@
         "a historical result is cached before DAY confirmation, the synchronous guard blocks it before the Restricted Worker runs, and task completion removes the day, light, relationship and weekly source",
         "post-deletion outbox rebuild and relay do not resurrect the deleted check-in or cached result; weekly truth falls from seven to six real/lit days with one explicit missing date"
       ]
+    },
+    "T-C016-MINIAPP-DEVTOOLS-001": {
+      "file": "tests/manual-rc/c016-evidence.json",
+      "selector": "C-016 WeChat DevTools registered page and route conformance",
+      "level": "MANUAL_RC",
+      "assertions": [
+        "WeChat DevTools Stable v2.01.2510290 with base library 3.7.12 loads and verifies all 11 registered Mini Program page and route cases",
+        "the run uses the real WeChat DevTools automator rather than a browser or jsdom substitute",
+        "the local Service Port is enabled only for the authorized run and restored off afterward while login-ticket access, default automation trust and the multi-end plugin port remain off",
+        "the evidence is limited to DevTools conformance and does not claim real-device, RC or Production completion"
+      ]
     }
   },
   "entries": [
@@ -149,6 +160,11 @@
       "source_id": "S29-ARCH-042",
       "status": "COVERED",
       "proof_ids": ["T-C016-CORE-CONTRACT-001", "T-C016-CORE-E2E-001"]
+    },
+    {
+      "source_id": "S31-TEST-016",
+      "status": "COVERED",
+      "proof_ids": ["T-C016-MINIAPP-DEVTOOLS-001"]
     },
     {
       "source_id": "S31-TEST-033",

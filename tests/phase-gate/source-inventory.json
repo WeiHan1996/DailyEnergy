@@ -4,8 +4,8 @@
   "snapshot_base_commit": "a5d83d5a4fe48988c6618fe53fbc0ab0e8039eae",
   "counts": {
     "total": 1004,
-    "COVERED": 561,
-    "PLANNED": 443,
+    "COVERED": 562,
+    "PLANNED": 442,
     "NA_WITH_REASON": 0
   },
   "planned_policy": {
@@ -37,7 +37,7 @@
       "set_id": "s31-testing",
       "authority_path": "docs/technical/testing.md",
       "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-      "counts": { "COVERED": 34, "PLANNED": 14, "NA_WITH_REASON": 0 }
+      "counts": { "COVERED": 35, "PLANNED": 13, "NA_WITH_REASON": 0 }
     },
     {
       "set_id": "s32-deployment",

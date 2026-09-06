@@ -4,18 +4,18 @@
 - **最后更新**：2026-09-06
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-016 — 建立确定性核心全路径端到端测试
-- **任务状态**：Blocked（自动核心与三次 clean stability 已通过；Mini Program DevTools Service Port 动作时确认 Pending）
+- **任务状态**：In Review
 - **任务 Profile**：`code`（HTTP/Admin/Mini Program/真实 PostgreSQL、Redis、BullMQ 的合成黑盒与故障恢复）
 - **工作分支**：`agent/c016-core-e2e`
 - **任务 Issue**：[C-016 Issue #66](https://github.com/WeiHan1996/DailyEnergy/issues/66)
-- **当前 PR**：[PR #183](https://github.com/WeiHan1996/DailyEnergy/pull/183)（Draft；自动核心实现与证据已完成，DevTools Service Port 动作时确认 Pending）
+- **当前 PR**：[PR #183](https://github.com/WeiHan1996/DailyEnergy/pull/183)（Draft；实现、自动核心、三次 stability 与 Mini Program DevTools evidence 已完成，等待 owner 审核）
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖例外**：owner 于 2026-09-05 明确允许 C-016 在现有 DEV_LITE 上仅使用 synthetic 数据继续；C-015 已合并实现与威胁审核仍是代码前置，其延期的 Production/Privacy/Legal 证据不阻塞 development-only C-016，也不能由 C-016 反向关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：经 owner 动作时确认临时开启 DevTools 本地 Service Port，运行 `WECHAT_DEVTOOLS_CLI_PATH=/Applications/wechatwebdevtools.app/Contents/MacOS/cli pnpm test:miniapp:devtools`，完成后立即恢复 Service Port 关闭并复核另外三项安全设置仍关闭；该证据前 C-016 不得 Done，C-017 不得提升为 Ready
+- **下一候选动作**：提交 DevTools evidence 与最终 Gate receipt，等待 PR #183 exact-head CI 后请求 owner 审核；未经明确批准不标记 Ready、不运行 merge verifier、不合并，C-017 继续 Planned
 - **Phase Gate 结论**：`DEVELOPMENT_ONLY_GO_FOR_C-016 / PRODUCTION_AND_RC_NO_GO`
 
 ## 2026-09-05 C-016 development-only 开工授权
@@ -34,10 +34,10 @@
 - 新增真实 Nest HTTP + PostgreSQL 18 + Redis 8 + BullMQ 5 + Interactive/Background/Restricted 三 profile 的 synthetic-only 组合 E2E，覆盖首次进入、同日返回、双设备并发、unknown outcome、七个产品日、任务/点亮/晚间/weekly、Worker 重启、Redis loss、DAY 删除、Safety、维护和 Admin audience；
 - `pnpm test:core:e2e:stability` 使用三套全新容器连续 `3/3` PASS、retry=`0`；provider calls=`0`，queue/log/HTTP 敏感字段扫描通过；
 - 组合测试发现完整七天 + helpful pattern + 两个 observation 会把客户端 summary 投影成 6 段并违反最多 5 段 Schema；现已把 next-week 与 closing 按原顺序合并为一段，聚焦单元 `6/6` 与三次组合回归通过；
-- C-016 evidence manifest 将 23 个实际证明的 Source ID 从 PLANNED 提升为 COVERED，registry 当前 `561/1004 COVERED`、`443 PLANNED`、`0 NA_WITH_REASON`；未实现/未执行的 backup restore、Safety 两步恢复、Admin 受限列表和 DevTools conformance 未被冒充覆盖；
-- DevTools `Stable v2.01.2510290` / 基础库 `3.7.12` 构建通过，但 automator 因本地 Service Port 关闭返回 `MINIAPP_DEVTOOLS_LAUNCH_TIMEOUT`；runner 已修复为稳定 exit 2，不再遗留挂起 child。Service Port 属动作时安全设置确认，仍需 owner 确认后临时开启；登录票据、默认信任和多端插件端口必须继续关闭，完成后 Service Port 也恢复关闭。
-- 固定 Node `24.18.0` 下 `pnpm agent:validate --mode=changed --task=C-016` 已保守升级为 full 并返回 `automated=PASS`（167352ms）；此前本机 Node 24.6.0 生成的 supply-chain provenance 被 exact-version scanner 正确拒绝，未被当作 PASS。
-- 固定 Node `24.18.0` 下 `pnpm agent:validate --mode=task --task=C-016` 返回 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（85288ms），路径提升 Profile=`security`，required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；PR #182/ADR-0009 的 development-only threat boundary 已获 owner 接受，Production authorization 不适用于本任务且保持 `NO_GO`，DevTools conformance 仍 Pending。
+- C-016 evidence manifest 将 24 个实际证明的 Source ID 从 PLANNED 提升为 COVERED，registry 当前 `562/1004 COVERED`、`442 PLANNED`、`0 NA_WITH_REASON`；未实现/未执行的 backup restore、Safety 两步恢复和 Admin 受限列表未被冒充覆盖；
+- owner 于 2026-09-06 完成动作时确认后，临时开启本地 Service Port；DevTools `Stable v2.01.2510290` / 基础库 `3.7.12` 对 11 个注册页面与路由全部 PASS，build source fingerprint=`f73bc61f8498cfdc16a02591bee4edf0bd8a1b9fa94db7aa1c9ced609baa2eb4`。完成后 Service Port 已恢复关闭，并复核登录票据、默认信任和多端插件端口均关闭；该证据不包含真机、RC 或 Production；
+- 固定 Node `24.18.0` 下 evidence 更新后的 `pnpm agent:validate --mode=changed --task=C-016` 已保守升级为 full 并返回 `automated=PASS`（174248ms）；此前本机 Node 24.6.0 生成的 supply-chain provenance 被 exact-version scanner 正确拒绝，未被当作 PASS。
+- 固定 Node `24.18.0` 下 evidence 更新后的 `pnpm agent:validate --mode=task --task=C-016` 返回 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（87524ms），路径提升 Profile=`security`，required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；PR #182/ADR-0009 的 development-only threat boundary 已获 owner 接受，Production authorization 不适用于本任务且保持 `NO_GO`，Mini Program DevTools conformance 已完成。
 
 ## 2026-09-03 E-017 启动
 

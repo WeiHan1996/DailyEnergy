@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 561, "NA_WITH_REASON": 0, "PLANNED": 443 },
+  "counts": { "COVERED": 562, "NA_WITH_REASON": 0, "PLANNED": 442 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -17251,11 +17251,22 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "the evidence is limited to DevTools conformance and does not claim real-device, RC or Production completion",
+            "the local Service Port is enabled only for the authorized run and restored off afterward while login-ticket access, default automation trust and the multi-end plugin port remain off",
+            "the run uses the real WeChat DevTools automator rather than a browser or jsdom substitute",
+            "WeChat DevTools Stable v2.01.2510290 with base library 3.7.12 loads and verifies all 11 registered Mini Program page and route cases"
+          ],
+          "file": "tests/manual-rc/c016-evidence.json",
+          "level": "MANUAL_RC",
+          "origin": "tests/registry/c016-evidence-manifest.json",
+          "selector": "C-016 WeChat DevTools registered page and route conformance",
+          "test_id": "T-C016-MINIAPP-DEVTOOLS-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["MANUAL_RC"] }],
       "source_id": "S31-TEST-016",
       "source_sets": ["s31-testing"]
