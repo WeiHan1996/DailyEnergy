@@ -142,6 +142,61 @@ async function scalar(admin, statement, values = []) {
   return (await admin.query(statement, values)).rows[0]?.value;
 }
 
+async function readQueueSettlement(admin) {
+  return (
+    await admin.query(
+      `SELECT
+         count(*) FILTER (WHERE outbox.state='FAILED')::int AS failed,
+         count(*) FILTER (WHERE outbox.state='PENDING')::int AS pending,
+         count(*) FILTER (
+           WHERE outbox.state='PUBLISHED'
+             AND NOT EXISTS (
+               SELECT 1
+                 FROM runtime_inbox_receipt inbox
+                WHERE inbox."eventId"=outbox.id
+                  AND inbox."outcomeCode"<>'PROCESSING'
+             )
+         )::int AS unconsumed,
+         count(*) FILTER (
+           WHERE EXISTS (
+             SELECT 1
+              FROM runtime_inbox_receipt inbox
+              WHERE inbox."eventId"=outbox.id
+                AND left(inbox."outcomeCode",9)='TERMINAL_'
+           )
+         )::int AS terminal
+       FROM runtime_outbox_event outbox`,
+    )
+  ).rows[0];
+}
+
+function settleQueue(admin, backgroundWorker, label) {
+  return pollUntil(
+    label,
+    () => readQueueSettlement(admin),
+    ({ failed, pending, terminal, unconsumed }) =>
+      failed === 0 && pending === 0 && terminal === 0 && unconsumed === 0,
+    () => backgroundWorker.relayOnce(),
+  );
+}
+
+function safeFailureDiagnostic(operation, error) {
+  const name =
+    error instanceof Error && /^[A-Za-z][A-Za-z0-9]{0,31}$/u.test(error.name)
+      ? error.name
+      : "UnknownError";
+  const candidateCode =
+    error !== null && typeof error === "object" && "code" in error
+      ? error.code
+      : undefined;
+  const code =
+    typeof candidateCode === "string" &&
+    /^[A-Z0-9_]{1,64}$/u.test(candidateCode)
+      ? candidateCode
+      : "UNKNOWN";
+  return Object.freeze({ code, name, operation });
+}
+
 test(
   "T-C016-CORE-E2E-001 runs the deterministic seven-day, recovery, Safety and deletion journey",
   {
@@ -251,6 +306,26 @@ test(
         eveningSafetyStore,
       );
 
+      let lastCheckinFailure;
+      const diagnosticCheckinStore = Object.freeze({
+        close: () => checkinStore.close(),
+        correct: (input) =>
+          checkinStore.correct(input).catch((error) => {
+            lastCheckinFailure = safeFailureDiagnostic("correct", error);
+            throw error;
+          }),
+        getToday: (input) =>
+          checkinStore.getToday(input).catch((error) => {
+            lastCheckinFailure = safeFailureDiagnostic("getToday", error);
+            throw error;
+          }),
+        submit: (input) =>
+          checkinStore.submit(input).catch((error) => {
+            lastCheckinFailure = safeFailureDiagnostic("submit", error);
+            throw error;
+          }),
+      });
+
       const keyPrefix = `c016-core-${runOrdinal}`;
       generationRuntime =
         await testingAdapters.PostgresDailyGenerationRuntime.connect({
@@ -319,7 +394,7 @@ test(
           verify: (value) => value === "Bearer synthetic-admin-c016",
         },
         authStore,
-        checkinStore,
+        checkinStore: diagnosticCheckinStore,
         consentProfileStore,
         dailyGenerationStore,
         dailyInteractionStore,
@@ -474,27 +549,30 @@ test(
           mood: index % 2 === 0 ? "GOOD" : "STEADY",
           sleep: "OKAY",
         };
+        lastCheckinFailure = undefined;
         const checkins =
           index === 0
             ? await Promise.all([
                 requestJson(baseUrl, "/v1/daily/checkin/submit", {
                   authorization: authA,
                   body: checkinBody,
-                  expectedStatus: 200,
                 }),
                 requestJson(baseUrl, "/v1/daily/checkin/submit", {
                   authorization: authB,
                   body: checkinBody,
-                  expectedStatus: 200,
                 }),
               ])
             : [
                 await requestJson(baseUrl, "/v1/daily/checkin/submit", {
                   authorization: activeAuth,
                   body: checkinBody,
-                  expectedStatus: 200,
                 }),
               ];
+        assert.equal(
+          checkins.every(({ response }) => response.status === 200),
+          true,
+          `CORE_E2E_CHECKIN_FAILED:${JSON.stringify(lastCheckinFailure ?? {})}`,
+        );
         assert.equal(
           new Set(checkins.map(({ body }) => body.data.checkin_ref)).size,
           1,
@@ -668,7 +746,11 @@ test(
           },
           expectedStatus: 200,
         });
-        await backgroundWorker.relayOnce();
+        await settleQueue(
+          admin,
+          backgroundWorker,
+          `daily-background-${productDate}`,
+        );
       }
 
       clock.setProductDate(dates.at(-1));
@@ -746,6 +828,7 @@ test(
         restrictedWorker.rebuild(),
       ]);
       assert.ok(rebuilds.some((result) => result.skippedReceipts > 0));
+      await settleQueue(admin, backgroundWorker, "redis-loss-background");
       const afterRedisLoss = await requestJson(baseUrl, "/v1/daily/today", {
         authorization: authB,
         expectedStatus: 200,
@@ -864,7 +947,7 @@ test(
         1,
       );
       await backgroundWorker.rebuild();
-      await backgroundWorker.relayOnce();
+      await settleQueue(admin, backgroundWorker, "post-deletion-background");
       assert.equal(
         await scalar(
           admin,
