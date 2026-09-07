@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-07
 - **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：[C-017 Phase 2 Gate](./current.md)：In Review；Draft PR #185 等待 exact-head CI 与 owner review，C-015 外部证据继续独立 Blocked
+- **当前任务**：[C-017 Phase 2 Gate](./current.md)：In Review；owner 已接受 development Gate/threat boundary，Draft PR #185 等待新 head CI 与 merge approval
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -219,7 +219,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | Done      | PR #167 merge commit `2fa0df61`；统一审核通过                                          |
 | [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 统一审核修复       | Blocked   | 生产/Privacy/Legal 证据延期；不阻塞 development-only C-017 Gate；Production/RC `NO_GO` |
 | [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Done      | PR #183 squash 合并为 `299e3e80`；merged-main CI 11/11；Issue #66 Closed               |
-| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | In Review | Draft PR #185；建议 Phase 3 development GO；等待 owner review；Production/RC `NO_GO`   |
+| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | In Review | PR #185；owner 已接受 Phase 3 development GO；等待 CI/merge；Production/RC `NO_GO`     |
 
 ## 6. Phase 3：AI 陪伴层
 

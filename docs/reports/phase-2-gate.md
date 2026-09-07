@@ -1,30 +1,30 @@
 # DailyEnergy Phase 2 确定性核心 Gate
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
 - **所属任务**：C-017 — 执行 Phase 2 确定性核心 Gate
 - **评审日期**：2026-09-07
-- **接受日期**：待项目所有者确认
+- **接受日期**：2026-09-07
 - **评审基线**：`main@57529035071348e322d77c0e9b99237973da45a7`
 - **机器合同**：[C-017 Phase Gate contract](../../tests/phase-gate/c017-contract.json)
 - **人工证据**：[C-017 manual evidence](../../tests/manual-rc/c017-evidence.json)
 - **当前 PR**：[Draft PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185)
-- **最终建议**：`RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW`
+- **最终结论**：`GO_FOR_PHASE_3_DEVELOPMENT`
 - **Production / Release Candidate**：`NO_GO`
 
 ## 1. 结论
 
 ```text
-Phase 3 development: RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW
+Phase 3 development: GO_FOR_PHASE_3_DEVELOPMENT
 Production / Release Candidate: NO_GO
 Alpha / real-user admission: NO_GO
-Owner decision: PENDING_REVIEW
-Threat boundary review: AGENT_PREPARED_OWNER_PENDING
+Owner decision: ACCEPTED
+Threat boundary review: COMPLETED
 Production authorization: NOT_GRANTED
 ```
 
 当前证据支持进入 Phase 3 **开发**，因为 ROADMAP 的九项 Phase 2 退出门槛均有 Accepted
-设计证据或可重复自动证明，确定性核心不依赖真实 AI provider 即可完成。该结论在项目所有者
-审核前只是建议，不是 Accepted `GO`；C-017 合并前 AI-001 继续 Planned。
+设计证据或可重复自动证明，确定性核心不依赖真实 AI provider 即可完成。项目所有者已于
+2026-09-07 接受该分层结论和第 11 节 threat boundary；C-017 合并前 AI-001 继续 Planned。
 
 本 Gate 不批准 Production、RC、Alpha、真实用户、真实 provider、真实对象存储、公开服务或
 招募。C-015 的 Production bundle、处理主体/位置/受托方/跨境、最终用户说明与合格法律审核
@@ -167,16 +167,19 @@ production secret 或成为 Production application host。
 - `pnpm agent:validate --mode=task --task=C-017`：自动部分 PASS，最终状态
   `MANUAL_EVIDENCE_REQUIRED`，83508ms；
 - required manual evidence：`threatBoundaryReview`、`productionAuthorizationWhenApplicable`；
-  前者等待 owner，后者不适用于本 development Gate且固定 `NOT_GRANTED / NO_GO`；
+  前者已由 owner 完成，后者不适用于本 development Gate 且固定 `NOT_GRANTED / NO_GO`；
 - PR #185 review head `209a7b1d54e55edced26a04d6d3ec069421a3dfa` / CI run
   `34075171162`：11/11 SUCCESS；owner 接受状态将产生新 head，必须重新获得 exact-head 11/11；
+- owner acceptance 写入后，固定 Node `24.18.0` 的 changed→full 与 task Gate 自动部分再次 PASS，
+  分别为 171945ms / 90211ms；threat review 已记录，Production authorization 仍为 `NOT_GRANTED`；
 - full Gate 产生的 Prisma 非语义生成副作用已恢复，不进入变更。
 
-自动部分 PASS 不能改变本报告 Draft 状态；final PR head 仍须在固定 Ubuntu CI 同一 run 11/11。
+owner acceptance 已将报告转为 Accepted；final PR head 仍须在固定 Ubuntu CI 同一 run 11/11，
+且 merge 仍需单独明确授权。
 
 ## 11. Threat Boundary Review
 
-待项目所有者复核以下结论：
+项目所有者已接受以下结论：
 
 1. 本 Gate 只允许 Phase 3 development，不授予 Alpha/真实用户/RC/Production；
 2. C-015 blockers、S25 G01～G04 和 DEV_LITE production-ineligible 边界均未降低；
@@ -185,23 +188,23 @@ production secret 或成为 Production application host。
 5. AI-001～AI-016 必须逐项遵守 Gateway、事实绑定、Safety、记忆、成本与真实 provider 授权；
 6. final PR head 仍须同一 CI run 11/11、exact-head verifier 和 owner merge approval。
 
-项目所有者明确接受前，`owner_decision=PENDING_REVIEW`、
-`threat_boundary_review=AGENT_PREPARED_OWNER_PENDING`，本报告保持 Draft。
+接受记录：`owner_decision=ACCEPTED`、`threat_boundary_review=COMPLETED`、
+`production_authorization=NOT_GRANTED`。该记录不授权 PR merge 或任何 Production/RC 操作。
 
 ## 12. 接受后的状态迁移
 
-只有项目所有者接受建议且 final PR head 通过完整 Gate 后：
+项目所有者已接受建议；在 final PR head 通过完整 Gate 并取得单独 merge approval 后：
 
-1. 本报告转为 Accepted，记录接受日期；
-2. C-017 可标 Done，并经 exact-head verifier 合并；
-3. ROADMAP 当前阶段才可改为 Phase 3；
-4. AI-001 才可成为唯一 Ready，但不得在 C-017 收尾中启动；
-5. C-015 保持 Blocked，Production/RC 保持 `NO_GO`。
+1. C-017 可标 Done，并经 exact-head verifier 合并；
+2. ROADMAP 当前阶段才可改为 Phase 3；
+3. AI-001 才可成为唯一 Ready，但不得在 C-017 收尾中启动；
+4. C-015 保持 Blocked，Production/RC 保持 `NO_GO`。
 
 若 owner 拒绝、任一退出门槛/硬 Gate 失败、性能预算超限、registry 出现 UNMAPPED/silent PLANNED，
 结论必须改为 `FIX_REQUIRED` 或 `NO_GO`，明确 owner 和解锁条件，不得靠聊天承诺绕过。
 
-## 13. 当前需要的决定
+## 13. 接受记录
 
-项目所有者需要确认一件事：是否接受
+项目所有者于 2026-09-07 明确接受
 `GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO` 的分层结论及第 11 节 threat boundary。
+接受不包含 Production authorization 或 PR merge；下一步是验证接受状态新 head 并请求单独合并授权。

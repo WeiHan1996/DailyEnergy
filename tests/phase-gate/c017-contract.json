@@ -4,14 +4,14 @@
   "profile": "security",
   "report_path": "docs/reports/phase-2-gate.md",
   "decision": {
-    "phase_3_development": "RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW",
+    "phase_3_development": "GO_FOR_PHASE_3_DEVELOPMENT",
     "production_release_candidate": "NO_GO",
     "alpha_or_real_user_admission": "NO_GO",
-    "owner_decision": "PENDING_REVIEW",
-    "threat_boundary_review": "AGENT_PREPARED_OWNER_PENDING",
+    "owner_decision": "ACCEPTED",
+    "threat_boundary_review": "COMPLETED",
     "production_authorization": "NOT_GRANTED",
     "production_readiness_claim": "PROHIBITED",
-    "accepted_on": null
+    "accepted_on": "2026-09-07"
   },
   "baseline": {
     "main_commit": "57529035071348e322d77c0e9b99237973da45a7",

@@ -196,7 +196,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | ----------------------------------------------------------- | -------- | ------------------------------------------------------------------------- | --------------------- |
 | [docs/reports/phase-0b-gate.md](./reports/phase-0b-gate.md) | Accepted | 复核 Phase 0B 总退出门槛、端到端追踪、延后项、外部 Gate 与 E-001 开工合同 | S-01～S-34、ROADMAP   |
 | [docs/reports/phase-1-gate.md](./reports/phase-1-gate.md)   | Accepted | E-014 Phase 2 development 条件放行、Production/RC NO-GO 与最终合并证据    | E-001～E-014、ROADMAP |
-| [docs/reports/phase-2-gate.md](./reports/phase-2-gate.md)   | Draft    | C-017 Phase 3 development 建议、确定性核心证据与 Production/RC NO-GO      | C-001～C-016、ROADMAP |
+| [docs/reports/phase-2-gate.md](./reports/phase-2-gate.md)   | Accepted | C-017 Phase 3 development 放行、确定性核心证据与 Production/RC NO-GO      | C-001～C-016、ROADMAP |
 
 ## 8. 计划 ADR
 

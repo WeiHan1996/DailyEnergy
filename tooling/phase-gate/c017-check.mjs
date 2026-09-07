@@ -91,6 +91,7 @@ function validateDecision(decision, manualEvidence, report, index) {
     manualEvidence.decision.owner_decision !== decision.owner_decision ||
     manualEvidence.decision.threat_boundary_review !==
       decision.threat_boundary_review ||
+    manualEvidence.decision.accepted_on !== decision.accepted_on ||
     manualEvidence.decision.production_authorization !== "NOT_GRANTED" ||
     manualEvidence.decision.production_release_candidate !== "NO_GO"
   ) {
@@ -99,13 +100,15 @@ function validateDecision(decision, manualEvidence, report, index) {
   if (
     pending &&
     (manualEvidence.reviewer !== null ||
-      manualEvidence.reviewed_at_utc !== null)
+      manualEvidence.reviewed_at_utc !== null ||
+      manualEvidence.owner_statement !== undefined)
   ) {
     fail("C017_GATE_MANUAL_EVIDENCE", "premature-reviewer");
   }
   if (
     accepted &&
     (!isNonEmpty(manualEvidence.reviewer) ||
+      !isNonEmpty(manualEvidence.owner_statement) ||
       !/^\d{4}-\d{2}-\d{2}T/u.test(manualEvidence.reviewed_at_utc ?? ""))
   ) {
     fail("C017_GATE_MANUAL_EVIDENCE", "accepted-reviewer-missing");
@@ -344,6 +347,21 @@ export function validateC017PhaseGateContract(
       "PENDING_AFTER_OWNER_DECISION"
   ) {
     fail("C017_GATE_AUTOMATED_RECEIPT", "manual-evidence");
+  }
+  const acceptedChanged =
+    manualEvidence.automated_evidence.accepted_changed_full_security_gate;
+  const acceptedTask =
+    manualEvidence.automated_evidence.accepted_task_security_gate;
+  if (
+    (review === "OWNER_ACCEPTED" &&
+      (acceptedChanged !==
+        "AUTOMATED_PASS / OWNER_THREAT_REVIEW_RECORDED / PRODUCTION_NOT_GRANTED / 171945MS" ||
+        acceptedTask !==
+          "AUTOMATED_PASS / OWNER_THREAT_REVIEW_RECORDED / PRODUCTION_NOT_GRANTED / 90211MS")) ||
+    (review === "PENDING_OWNER_REVIEW" &&
+      (acceptedChanged !== undefined || acceptedTask !== undefined))
+  ) {
+    fail("C017_GATE_ACCEPTANCE_RECEIPT", review);
   }
   validateConditions(contract.development_conditions);
   validateProductionRequirements(contract.deferred_production_requirements);

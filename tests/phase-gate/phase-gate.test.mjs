@@ -170,11 +170,11 @@ test("T-E014-GATE-005 keeps platform merge control insufficient for Production o
   );
 });
 
-test("T-C017-GATE-001 accepts the Phase 3 development recommendation while owner review is pending", async () => {
+test("T-C017-GATE-001 accepts the owner-approved Phase 3 development decision", async () => {
   assert.deepEqual(await validateC017PhaseGateRepository(), {
-    development: "RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW",
+    development: "GO_FOR_PHASE_3_DEVELOPMENT",
     production: "NO_GO",
-    review: "PENDING_OWNER_REVIEW",
+    review: "OWNER_ACCEPTED",
     exits: 9,
     conditions: 2,
     deferred: 5,
@@ -189,7 +189,9 @@ test("T-C017-GATE-001 accepts the Phase 3 development recommendation while owner
 
 test("T-C017-GATE-002 rejects development GO without owner acceptance and threat review", () => {
   const falseGo = structuredClone(c017Contract);
-  falseGo.decision.phase_3_development = "GO_FOR_PHASE_3_DEVELOPMENT";
+  falseGo.decision.owner_decision = "PENDING_REVIEW";
+  falseGo.decision.threat_boundary_review = "AGENT_PREPARED_OWNER_PENDING";
+  falseGo.decision.accepted_on = null;
   assert.throws(
     () => validateC017PhaseGateContract(falseGo, c017Dependencies),
     /C017_GATE_DECISION/u,
@@ -237,7 +239,8 @@ test("T-C017-GATE-005 rejects registry false-PASS and manual-evidence drift", ()
   );
 
   const falseManual = structuredClone(c017ManualEvidence);
-  falseManual.execution_status = "OWNER_ACCEPTED_FOR_PHASE_3_DEVELOPMENT";
+  falseManual.execution_status =
+    "AUTOMATED_EVIDENCE_COMPLETE_OWNER_REVIEW_PENDING";
   assert.throws(
     () =>
       validateC017PhaseGateContract(c017Contract, {
@@ -261,38 +264,47 @@ test("T-C017-GATE-006 rejects a stale C-016 review or merge receipt", () => {
   );
 });
 
-test("T-C017-GATE-007 accepts only a correlated owner decision and threat review", () => {
-  const acceptedContract = structuredClone(c017Contract);
-  acceptedContract.decision.phase_3_development = "GO_FOR_PHASE_3_DEVELOPMENT";
-  acceptedContract.decision.owner_decision = "ACCEPTED";
-  acceptedContract.decision.threat_boundary_review = "COMPLETED";
-  acceptedContract.decision.accepted_on = "2026-09-07";
+test("T-C017-GATE-007 accepts only a correlated pre-review Draft state", () => {
+  const pendingContract = structuredClone(c017Contract);
+  pendingContract.decision.phase_3_development =
+    "RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW";
+  pendingContract.decision.owner_decision = "PENDING_REVIEW";
+  pendingContract.decision.threat_boundary_review =
+    "AGENT_PREPARED_OWNER_PENDING";
+  pendingContract.decision.accepted_on = null;
 
-  const acceptedManual = structuredClone(c017ManualEvidence);
-  acceptedManual.execution_status = "OWNER_ACCEPTED_FOR_PHASE_3_DEVELOPMENT";
-  acceptedManual.decision.phase_3_development = "GO_FOR_PHASE_3_DEVELOPMENT";
-  acceptedManual.decision.owner_decision = "ACCEPTED";
-  acceptedManual.decision.threat_boundary_review = "COMPLETED";
-  acceptedManual.reviewer = "PROJECT_OWNER";
-  acceptedManual.reviewed_at_utc = "2026-09-07T00:00:00.000Z";
+  const pendingManual = structuredClone(c017ManualEvidence);
+  pendingManual.execution_status =
+    "AUTOMATED_EVIDENCE_COMPLETE_OWNER_REVIEW_PENDING";
+  pendingManual.decision.phase_3_development =
+    "RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW";
+  pendingManual.decision.owner_decision = "PENDING_REVIEW";
+  pendingManual.decision.threat_boundary_review =
+    "AGENT_PREPARED_OWNER_PENDING";
+  pendingManual.decision.accepted_on = null;
+  delete pendingManual.owner_statement;
+  delete pendingManual.automated_evidence.accepted_changed_full_security_gate;
+  delete pendingManual.automated_evidence.accepted_task_security_gate;
+  pendingManual.reviewer = null;
+  pendingManual.reviewed_at_utc = null;
 
-  const acceptedReport = c017Report
-    .replace("- **文档状态**：Draft", "- **文档状态**：Accepted")
+  const pendingReport = c017Report
+    .replace("- **文档状态**：Accepted", "- **文档状态**：Draft")
     .replaceAll(
-      "RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW",
       "GO_FOR_PHASE_3_DEVELOPMENT",
+      "RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW",
     );
-  const acceptedIndex = docsIndex.replace(
-    /(phase-2-gate\.md\)\s+\|) Draft(\s+\|)/u,
-    "$1 Accepted$2",
+  const pendingIndex = docsIndex.replace(
+    /(phase-2-gate\.md\)\s+\|) Accepted(\s+\|)/u,
+    "$1 Draft$2",
   );
   assert.equal(
-    validateC017PhaseGateContract(acceptedContract, {
+    validateC017PhaseGateContract(pendingContract, {
       ...c017Dependencies,
-      index: acceptedIndex,
-      manualEvidence: acceptedManual,
-      report: acceptedReport,
+      index: pendingIndex,
+      manualEvidence: pendingManual,
+      report: pendingReport,
     }).review,
-    "OWNER_ACCEPTED",
+    "PENDING_OWNER_REVIEW",
   );
 });
