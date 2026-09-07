@@ -338,7 +338,10 @@ export function validateC017PhaseGateContract(
       "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED / 171650MS" ||
     manualEvidence.automated_evidence.task_security_gate !==
       "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED / 83508MS" ||
-    manualEvidence.automated_evidence.final_pr_head_ci !== "PENDING"
+    manualEvidence.automated_evidence.verified_review_head_ci !==
+      "PASS / HEAD_209A7B1D54E55EDCED26A04D6D3EC069421A3DFA / RUN_34075171162 / ELEVEN_OF_ELEVEN_SUCCESS" ||
+    manualEvidence.automated_evidence.final_pr_head_ci !==
+      "PENDING_AFTER_OWNER_DECISION"
   ) {
     fail("C017_GATE_AUTOMATED_RECEIPT", "manual-evidence");
   }

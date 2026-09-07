@@ -168,6 +168,8 @@ production secret 或成为 Production application host。
   `MANUAL_EVIDENCE_REQUIRED`，83508ms；
 - required manual evidence：`threatBoundaryReview`、`productionAuthorizationWhenApplicable`；
   前者等待 owner，后者不适用于本 development Gate且固定 `NOT_GRANTED / NO_GO`；
+- PR #185 review head `209a7b1d54e55edced26a04d6d3ec069421a3dfa` / CI run
+  `34075171162`：11/11 SUCCESS；owner 接受状态将产生新 head，必须重新获得 exact-head 11/11；
 - full Gate 产生的 Prisma 非语义生成副作用已恢复，不进入变更。
 
 自动部分 PASS 不能改变本报告 Draft 状态；final PR head 仍须在固定 Ubuntu CI 同一 run 11/11。

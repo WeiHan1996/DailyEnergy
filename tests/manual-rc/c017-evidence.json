@@ -44,7 +44,8 @@
     "s25_hard_gates": "G01_G02_G03_G04_PASS",
     "changed_full_security_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED / 171650MS",
     "task_security_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED / 83508MS",
-    "final_pr_head_ci": "PENDING"
+    "verified_review_head_ci": "PASS / HEAD_209A7B1D54E55EDCED26A04D6D3EC069421A3DFA / RUN_34075171162 / ELEVEN_OF_ELEVEN_SUCCESS",
+    "final_pr_head_ci": "PENDING_AFTER_OWNER_DECISION"
   },
   "review_scope": [
     "Phase 2 exit evidence is sufficient only for Phase 3 development",
