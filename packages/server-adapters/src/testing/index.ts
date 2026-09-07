@@ -105,6 +105,7 @@ export {
   SyntheticGatewayAttemptStoreV1,
 } from "./synthetic-ai-provider.js";
 export type { SyntheticProviderTransportV1 } from "./synthetic-ai-provider.js";
+export { RedisGatewayBreakerStoreV1 } from "../ai/redis-gateway-breaker-store.js";
 export {
   PostgresAnalyticsStore,
   UNAVAILABLE_ANALYTICS_AGGREGATE_STORE,

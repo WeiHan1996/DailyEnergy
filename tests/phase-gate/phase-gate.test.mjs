@@ -67,8 +67,8 @@ test("T-E014-GATE-001 accepts conditional development admission and Production N
     conditions: 1,
     deferred: 7,
     total: 1004,
-    COVERED: 578,
-    PLANNED: 426,
+    COVERED: 587,
+    PLANNED: 417,
     NA_WITH_REASON: 0,
   });
 });
@@ -181,8 +181,8 @@ test("T-C017-GATE-001 accepts the owner-approved Phase 3 development decision", 
     cachedP95Ms: 42,
     generationP95Ms: 119,
     total: 1004,
-    COVERED: 578,
-    PLANNED: 426,
+    COVERED: 587,
+    PLANNED: 417,
     NA_WITH_REASON: 0,
   });
 });
@@ -239,9 +239,11 @@ test("T-C017-GATE-005 rejects registry false-PASS and manual-evidence drift", ()
   );
 
   const registryRegression = structuredClone(registry);
+  const regressionCount =
+    registry.counts.COVERED - c017Contract.source_registry.counts.COVERED + 1;
   for (const entry of registryRegression.entries
     .filter(({ status }) => status === "COVERED")
-    .slice(0, 17)) {
+    .slice(0, regressionCount)) {
     delete entry.evidence;
     entry.status = "PLANNED";
     entry.planned = {

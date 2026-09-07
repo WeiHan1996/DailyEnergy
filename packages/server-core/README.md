@@ -42,6 +42,17 @@ AI-001 新增 `@daily-energy/server-core/ai-gateway` 与 `/spi`：
 - attempt store、provider registry/adapter、candidate validator 与 template renderer SPI，
   attempt 只接收脱敏元数据，不接收 Prompt、正文或 provider raw response。
 
+AI-002 在同一边界内新增有限路由与熔断策略：
+
+- 严格按 `PRIMARY_AI` → `BACKUP_AI` 顺序，每个 role 最多一次；主备均失败时只返回
+  `CONTROLLED_TEMPLATE_REQUIRED`，不提前执行 AI-006 renderer；
+- total deadline 保留本地 template/validation 预算，Safety、删除、取消、已有结果和预算
+  hard stop 均优先于 provider；candidate 返回后再次读取 live PublishGuard；
+- infrastructure、quality、auth/config 使用隔离的纯 breaker 状态机，支持 20 样本窗口、
+  HALF_OPEN 两探测、递增 cooldown 与 route fingerprint reset；
+- breaker store、live guard 或 Gateway 执行不可读时 fail closed，attempt telemetry 只携带
+  封闭 role/model bucket、归一化 usage/cost 与完整性，不携带正文或用户引用。
+
 本包不得导入 Nest、Prisma、Redis、BullMQ、provider SDK、环境变量或客户端代码。
 PostgreSQL 和运行 profile 实现位于 `@daily-energy/server-adapters` 的显式 capability
 subpath。Weekly 持久化、TX-07 与 HTTP 适配仍位于 adapters/API，不进入本包。

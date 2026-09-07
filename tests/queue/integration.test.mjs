@@ -22,7 +22,12 @@ import {
   QueueTerminalError,
   RESTRICTED_WORKER_MANIFEST,
   RedisLossRebuilder,
+  RedisGatewayBreakerStoreV1,
 } from "../../packages/server-adapters/dist/testing/index.js";
+import {
+  initialGatewayBreakerSnapshotV1,
+  recordGatewayBreakerOutcomeV1,
+} from "../../packages/server-core/dist/modules/ai-gateway/public/index.js";
 import {
   bootstrapTestDatabase,
   loadPg,
@@ -1403,6 +1408,78 @@ test(
         postgresContainer.stop(),
         redisContainer.stop(),
       ]);
+    }
+  },
+);
+
+test(
+  "AI-002 real Redis breaker CAS and loss fail closed",
+  {
+    skip: integrationEnabled
+      ? false
+      : "set QUEUE_INTEGRATION=1 to run the real Redis 8 harness",
+  },
+  async () => {
+    const { container, url } = await startRedis();
+    const store = await RedisGatewayBreakerStoreV1.connect({
+      keyPrefix: "ai002-breaker",
+      redisUrl: url,
+    });
+    const key = "a".repeat(64);
+    try {
+      const initial = initialGatewayBreakerSnapshotV1("b".repeat(64));
+      const claims = await Promise.all([
+        store.compareAndSet({
+          expectedRevision: null,
+          expectedRouteFingerprint: null,
+          key,
+          next: initial,
+          ttlMs: 60_000,
+        }),
+        store.compareAndSet({
+          expectedRevision: null,
+          expectedRouteFingerprint: null,
+          key,
+          next: initial,
+          ttlMs: 60_000,
+        }),
+      ]);
+      assert.deepEqual(claims.sort(), [false, true]);
+      assert.deepEqual(await store.load(key), initial);
+      const nextRoute = initialGatewayBreakerSnapshotV1("c".repeat(64));
+      assert.equal(
+        await store.compareAndSet({
+          expectedRevision: initial.revision,
+          expectedRouteFingerprint: initial.routeFingerprint,
+          key,
+          next: nextRoute,
+          ttlMs: 60_000,
+        }),
+        true,
+      );
+      assert.equal(
+        await store.compareAndSet({
+          expectedRevision: initial.revision,
+          expectedRouteFingerprint: initial.routeFingerprint,
+          key,
+          next: recordGatewayBreakerOutcomeV1({
+            nowMs: 1,
+            outcome: "SUCCESS",
+            snapshot: initial,
+          }),
+          ttlMs: 60_000,
+        }),
+        false,
+      );
+      assert.deepEqual(await store.load(key), nextRoute);
+      await container.stop();
+      await assert.rejects(
+        () => store.load(key),
+        /GATEWAY_BREAKER_STORE_UNAVAILABLE/u,
+      );
+    } finally {
+      await store.close();
+      await container.stop().catch(() => undefined);
     }
   },
 );

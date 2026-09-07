@@ -5,21 +5,21 @@
 
 ## E-010 正式测试入口
 
-| 命令                                                 | 证据                                                                               |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `pnpm registry:check`                                | 1004 个 Accepted/Schema Source ID 的唯一状态、强制层级和生成漂移                   |
-| `pnpm registry:test`                                 | missing、duplicate、unknown status、missing assertion 与 insufficient layer 负例   |
-| `pnpm testing:policy`                                | runner、fixture、corpus、artifact、skip、quarantine 与 testing import 边界         |
-| `pnpm testing:playwright-policy`                     | Playwright 首次失败后 retry 通过仍以 `FLAKY_FAIL` 退出                             |
-| `pnpm test:harness`                                  | 固定时间/随机源、合成身份、封闭网络/provider、fault 与 evidence policy             |
-| `pnpm test:projects`                                 | root Vitest projects 编排                                                          |
-| `pnpm test:api:e2e`                                  | Playwright `APIRequestContext` + 真实 Nest 测试应用 HTTP                           |
-| `pnpm test:core:e2e`                                 | C-016/C-017 真实 Nest + PG18/Redis8/BullMQ5 七日组合 E2E、恢复与 P95 基线          |
-| `pnpm test:core:e2e:stability`                       | clean containers 连续三次，retry=0；缓存 Today/模板生成按 Accepted P95 fail closed |
-| `pnpm database:test:integration`                     | 固定 digest 的真实 PostgreSQL 18                                                   |
-| `pnpm queue:test`                                    | 固定 digest 的真实 PostgreSQL 18 / Redis 8 + BullMQ 5                              |
-| `pnpm --filter @daily-energy/app-admin run test:e2e` | Playwright Chromium Admin E2E                                                      |
-| `pnpm test:miniapp:devtools`                         | 微信开发者工具 + automator；不可用时为 `INFRA_BLOCKED`                             |
+| 命令                                                 | 证据                                                                                |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `pnpm registry:check`                                | 1004 个 Accepted/Schema Source ID 的唯一状态、强制层级和生成漂移                    |
+| `pnpm registry:test`                                 | missing、duplicate、unknown status、missing assertion 与 insufficient layer 负例    |
+| `pnpm testing:policy`                                | runner、fixture、corpus、artifact、skip、quarantine 与 testing import 边界          |
+| `pnpm testing:playwright-policy`                     | Playwright 首次失败后 retry 通过仍以 `FLAKY_FAIL` 退出                              |
+| `pnpm test:harness`                                  | 固定时间/随机源、合成身份、封闭网络/provider、fault 与 evidence policy              |
+| `pnpm test:projects`                                 | root Vitest projects 编排                                                           |
+| `pnpm test:api:e2e`                                  | Playwright `APIRequestContext` + 真实 Nest 测试应用 HTTP                            |
+| `pnpm test:core:e2e`                                 | C-016/C-017 真实 Nest + PG18/Redis8/BullMQ5 七日组合 E2E、恢复与 P95 基线           |
+| `pnpm test:core:e2e:stability`                       | clean containers 连续三次，retry=0；缓存 Today/模板生成按 Accepted P95 fail closed  |
+| `pnpm database:test:integration`                     | 固定 digest 的真实 PostgreSQL 18                                                    |
+| `pnpm queue:test`                                    | 固定 digest 的真实 PostgreSQL 18 / Redis 8 + BullMQ 5，以及 AI-002 breaker CAS/loss |
+| `pnpm --filter @daily-energy/app-admin run test:e2e` | Playwright Chromium Admin E2E                                                       |
+| `pnpm test:miniapp:devtools`                         | 微信开发者工具 + automator；不可用时为 `INFRA_BLOCKED`                              |
 
 机器可读 runner 及其真实依赖、隔离、retry 和 unavailable 状态见
 `registry/runners.json`。浏览器/jsdom 不能代替微信运行时，内存替身不能代替
@@ -100,14 +100,17 @@ Production/RC 或 C-015 privacy/legal 证据。
   `NA_WITH_REASON`；
 - `registry/e010-evidence-manifest.json`、`registry/e011-evidence-manifest.json`、
   `registry/e013-evidence-manifest.json`、`registry/e014-evidence-manifest.json`、
-  `registry/e017-evidence-manifest.json`、`registry/ai001-evidence-manifest.json` 与已有
+  `registry/e017-evidence-manifest.json`、`registry/ai001-evidence-manifest.json`、
+  `registry/ai002-evidence-manifest.json` 与已有
   database/queue/Compose manifest 提供逐项
   assertion，不把低层证据升级为高层 conformance；
 - 尚未实现的业务、恢复、模型、真机或人工场景保持 `PLANNED` 或明确 pending，不能因
   runner/模板存在而变为 PASS；
 - AI-001 只把 Gateway foundation 实际证明的 16 个 S-12/架构/仓库/隐私 Source ID
-  映射为 `COVERED`；真实 provider、late success、熔断阈值和后续 Prompt/validator 场景继续
-  保持 `PLANNED`；
+  映射为 `COVERED`；
+- AI-002 只登记有限主备路由、late deadline、breaker 阈值/隔离、template reserve 与
+  usage/cost unknown 语义确实证明的 Source ID；真实 provider、AI-006 template renderer、
+  weekly 容量池和后续 Prompt/validator 场景继续保持 `PLANNED`；
 - `manual-rc/evidence-template.json` 与 `ai-evaluation/evidence-template.json` 默认禁止
   PASS，且不调用 provider。
 
@@ -148,5 +151,5 @@ E-007 增加独立的 queue lane：
 - `queue/evidence.test.mjs`：拒绝缺失 Source ID、未知 proof 和虚假 coverage 状态；
 - `queue/integration.test.mjs`：使用固定 digest 的真实 Redis 8.2.1、BullMQ 5.81.3 与
   PostgreSQL 18，验证 relay/ACK crash、Inbox duplicate、profile/guard/retry、空 Redis
-  重建与 graceful drain；
+  重建、graceful drain，以及 breaker revision + route fingerprint CAS 与 Redis loss；
 - `pnpm queue:validate`：运行 scoped evidence Gate 和真实容器集成套件。

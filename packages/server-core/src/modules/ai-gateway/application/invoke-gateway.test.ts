@@ -17,6 +17,7 @@ import type {
   GatewayAttemptReservationResultV1,
   GatewayAttemptReservationV1,
   GatewayAttemptStoreV1,
+  GatewayAttemptTelemetrySinkV1,
   GatewayCandidateValidatorV1,
   GatewayProviderAdapterV1,
   GatewayProviderRegistryV1,
@@ -269,12 +270,17 @@ function success(route: GatewayProviderRouteV1, message: string) {
 
 function gateway(input: {
   readonly adapters?: readonly GatewayProviderAdapterV1[];
+  readonly attemptTelemetry?: GatewayAttemptTelemetrySinkV1;
   readonly attempts?: MemoryAttemptStore;
+  readonly now?: () => Date;
 }) {
   return new AiGatewayV1({
     attempts: input.attempts ?? new MemoryAttemptStore(),
+    ...(input.attemptTelemetry
+      ? { attemptTelemetry: input.attemptTelemetry }
+      : {}),
     candidateValidator: validator(),
-    clock: { now: () => new Date(ACCEPTED_AT) },
+    clock: { now: input.now ?? (() => new Date(ACCEPTED_AT)) },
     ids: ids(),
     providers: registry(input.adapters ?? []),
   });
@@ -406,9 +412,108 @@ describe("AI-001 Gateway MODULE and deterministic AI_EVAL", () => {
     await expect(service.invoke(input)).resolves.toEqual({
       failedRole: "PRIMARY_AI",
       reasonCode: "OUTCOME_UNKNOWN",
+      replayedAttempt: true,
       status: "FALLBACK_REQUIRED",
     });
     expect(primary.invoke).toHaveBeenCalledTimes(1);
+  });
+
+  it("records truthful normalized usage and cost completeness after attempt persistence", async () => {
+    const route = manifest();
+    const events: Parameters<GatewayAttemptTelemetrySinkV1["record"]>[0][] = [];
+    const primary = adapter(route.primary, success(route.primary, "完整候选"));
+    await gateway({
+      adapters: [primary],
+      attemptTelemetry: { record: (event) => events.push(event) },
+    }).invoke({
+      admission: { status: "ALLOWED" },
+      invocation: invocation(route),
+      manifest: route,
+      role: "PRIMARY_AI",
+      runtimeProfile: "INTERACTIVE",
+    });
+
+    expect(events).toEqual([
+      {
+        costCompleteness: "KNOWN",
+        modelRevisionBucket: "CURRENT",
+        outcomeCode: "SUCCEEDED",
+        reasonCode: "NONE",
+        role: "PRIMARY_AI",
+        routeManifestVersion: route.manifestVersion,
+        usage: {
+          billedCostMicrounits: 120,
+          inputUnits: 20,
+          outputUnits: 10,
+        },
+        usageCompleteness: "KNOWN",
+        workload: "DAILY_EXPRESSION_V1",
+      },
+    ]);
+  });
+
+  it("G12-B07 preserves the template reserve without reserving or calling a provider", async () => {
+    const route = manifest();
+    const attempts = new MemoryAttemptStore();
+    const primary = adapter(
+      route.primary,
+      success(route.primary, "不应被调用"),
+    );
+    await expect(
+      gateway({
+        adapters: [primary],
+        attempts,
+        now: () => new Date("2026-09-07T02:00:03.001Z"),
+      }).invoke({
+        admission: { status: "ALLOWED" },
+        invocation: invocation(route),
+        manifest: route,
+        role: "PRIMARY_AI",
+        runtimeProfile: "INTERACTIVE",
+      }),
+    ).resolves.toEqual({
+      failedRole: "PRIMARY_AI",
+      reasonCode: "DEADLINE_RESERVE_REQUIRED",
+      status: "FALLBACK_REQUIRED",
+    });
+    expect(attempts.reservations).toHaveLength(0);
+    expect(primary.invoke).not.toHaveBeenCalled();
+  });
+
+  it("G12-L05 discards a provider response when the hard generation window closes", async () => {
+    const route = manifest();
+    const attempts = new MemoryAttemptStore();
+    const primary = adapter(
+      route.primary,
+      success(route.primary, "迟到候选不得发布"),
+    );
+    let clockRead = 0;
+    await expect(
+      gateway({
+        adapters: [primary],
+        attempts,
+        now: () => {
+          clockRead += 1;
+          return new Date(clockRead >= 3 ? DEADLINE_AT : ACCEPTED_AT);
+        },
+      }).invoke({
+        admission: { status: "ALLOWED" },
+        invocation: invocation(route),
+        manifest: route,
+        role: "PRIMARY_AI",
+        runtimeProfile: "INTERACTIVE",
+      }),
+    ).resolves.toEqual({
+      failedRole: "PRIMARY_AI",
+      reasonCode: "OUTCOME_UNKNOWN",
+      status: "FALLBACK_REQUIRED",
+    });
+    expect(attempts.completions).toMatchObject([
+      {
+        failureCode: "LATE_RESPONSE_DISCARDED",
+        outcome: "OUTCOME_UNKNOWN",
+      },
+    ]);
   });
 
   it("S29-ARCH-031 lets one concurrent claim dispatch while the loser recovers", async () => {
