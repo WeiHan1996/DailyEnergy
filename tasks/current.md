@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-003 — 实现 Prompt 与模板版本管理
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **任务 Profile**：`security`（server-only Prompt 资产、输入最小化、版本/指纹、bundle/secret/content 边界）
-- **工作分支**：无；待从 verified `main@849ab17d2e8c36663cb5c4d9a4364cb4d68d7c5a` 创建
+- **工作分支**：`agent/ai003-prompt-versioning`
 - **任务 Issue**：[AI-003 Issue #72](https://github.com/WeiHan1996/DailyEnergy/issues/72)
-- **当前 PR**：无；尚未开始 AI-003 实现
+- **当前 PR**：无；实现与本地验证进行中
 - **上一完成任务**：AI-002 Done；[PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189) final head `d809892f1de7b4e828058c660f53b128bb662ec4` / CI run `34143534031` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `849ab17d2e8c36663cb5c4d9a4364cb4d68d7c5a`；merged-main CI run `34167933143` 11/11 SUCCESS；Issue #71 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,8 +16,16 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-001、AI-002 与 E-008 已 Done，AI-003 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-003 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：合并本状态收尾后运行 `pnpm agent:prepare AI-003 --remote --deep`，读取 Prompt/personality/repository authority 与现有 `packages/prompt-library`，再创建 AI-003 分支实施
+- **下一候选动作**：实现 immutable Daily/Weekly/Evaluation Prompt registry、strict prepared-input builder、compile/fingerprint/release catalog 与 Prompt bundle/content 边界；随后运行 full/task security Gate 并创建 Draft PR
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-08 AI-003 启动
+
+- AI-002 状态收尾 PR #190 final head `a3fa9b02c1ec746e12a43a599d324bc867572105` / CI run `34169107241` 11/11 SUCCESS，经 exact-head verifier 后 squash 合并为 `81fae24e0e0a5445af5d50e8972451b7a5c4a65e`；merged-main CI run `34169295665` 11/11 SUCCESS；
+- `pnpm agent:prepare AI-003 --remote --deep` 在固定 Node `24.18.0` 下返回 `READY`，Profile=`security`，Node/pnpm/dependencies/GitHub 全部 PASS；required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；
+- 分支 `agent/ai003-prompt-versioning` 从本地、origin/main 与远端一致的 verified `main@81fae24e0e0a5445af5d50e8972451b7a5c4a65e` 创建；开工前工作树无变更；
+- 本任务只在既有 `packages/prompt-library` server-asset 边界实现 Daily/Weekly Prompt package、Evaluation registry、strict prepared input、canonical compile/fingerprint 与 release catalog，并补 bundle/secret/content 和 Source-ID 证据；
+- 不直接调用模型，不接真实 provider/key，不允许运行时任意编辑 Prompt，不实现 AI-004 candidate semantic validator 或 AI-006 template renderer；Production/RC、Alpha、真实用户与真实 provider 保持 `NO_GO`。
 
 ## 2026-09-08 AI-002 post-merge 收尾
 
