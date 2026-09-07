@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-07
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-001 — 实现服务端 AI Gateway 基础
-- **任务状态**：In Review（自动 Gate 通过；owner threat-boundary review 待完成）
+- **任务状态**：In Review（owner threat-boundary review 完成；merge 已授权）
 - **任务 Profile**：`security`（AI 调用边界、最小输入、运行 profile、attempt/unknown、隐私与 Safety）
 - **工作分支**：`agent/ai001-gateway-foundation`
 - **任务 Issue**：[AI-001 Issue #67](https://github.com/WeiHan1996/DailyEnergy/issues/67)
-- **当前 PR**：[Draft PR #187](https://github.com/WeiHan1996/DailyEnergy/pull/187)；review baseline head `d2b9a052c259e5933b89d516e48a796afd2995c5` / CI run `34087155613` 11/11 SUCCESS；owner threat-boundary review 待完成
+- **当前 PR**：[Draft PR #187](https://github.com/WeiHan1996/DailyEnergy/pull/187)；final pre-acceptance head `d7b989dd5439e7ac6ba4ac4de594327f5d91c7c6` / CI run `34087396900` 11/11 SUCCESS；owner threat-boundary review 完成并授权合并，接受状态新 head 待 CI
 - **上一完成任务**：C-017 Done；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185) final head `642e69fcfdf3fb66e2f99ca206dcecbeb0cf323f` / CI run `34077907327` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`；merged-main CI run `34078365765` 11/11 SUCCESS；Issue #69 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,7 +16,7 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：C-017 已 Done，AI-001 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-001 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：创建 AI-001 Draft PR，等待 11 项 exact-head CI 与 owner threat-boundary review；未经明确批准不标记 Ready、不运行 merge verifier、不合并
+- **下一候选动作**：推送 owner 接受状态，等待新 head 的 11 项同 run CI；随后把 PR #187 标记 Ready、运行 exact-head verifier 并 squash merge，不删除分支
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-07 AI-001 启动
@@ -29,6 +29,7 @@
 
 ### AI-001 实施与本地验证
 
+- owner 于 2026-09-07 明确“审核完成，合并后进行下一步”，接受 PR #187 的 AI-001 threat boundary 并授权合并与进入下一任务；该决定不授予 Production、RC、Alpha、真实用户或真实 provider，不降低 C-015 blocker；
 - 实现提交 `5c76105256f9a1b06f994dd7e03372df12479472` 已推送并创建 Draft PR #187；PR 保持 Draft，当前不授权 exact-head merge verifier、Ready 或 merge；
 - PR #187 review baseline head `d2b9a052c259e5933b89d516e48a796afd2995c5` 的 CI run `34087155613` 为 11/11 SUCCESS，包含 docs/static/unit-contract/db/queue/API/Admin/resilience/AI/supply-chain 与聚合 full Gate；本收据提交后的新 final head 仍须使用自己的同 run CI，不能复用该 baseline；
 - `@daily-energy/server-core/ai-gateway` 与 `/spi` 已建立 `expression-gateway-v1`：不可变 route manifest、Daily/Weekly workload、8/20 秒硬 deadline、template reserve、最小 prepared input、request fingerprint、usage/cost、attempt/candidate 分离和稳定 outcome；
