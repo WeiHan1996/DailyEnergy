@@ -1,0 +1,159 @@
+{
+  "manifest_version": "ai-001-evidence-v1",
+  "scope": "AI-001 server-core Gateway foundation, immutable route and invocation contracts, caller-selected single provider role, attempt UNKNOWN recovery, minimal input and server-adapters profile/egress/outside-transaction boundary",
+  "authority": [
+    "docs/decisions/ADR-0003-ai-provider-abstraction.md",
+    "docs/ai/gateway.md",
+    "docs/ai/safety.md",
+    "docs/operations/privacy-data-map.md",
+    "docs/technical/architecture.md",
+    "docs/technical/repository-structure.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-AI001-GATEWAY-MODULE-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+      "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL",
+      "level": "MODULE",
+      "assertions": [
+        "an immutable fingerprinted manifest binds exact workload, route, adapter, model, deadlines, compatibility, input/output limits, cost ceiling and controlled-template reserve without latest or implicit defaults",
+        "a caller-selected primary or backup role can hand one response to the injected complete-candidate validator without letting the Gateway choose a downstream fallback policy",
+        "UNKNOWN is recorded once and replay of the same invocation/role/ordinal never dispatches that role again",
+        "two concurrent claims of the same invocation/role/ordinal dispatch one provider call while the loser returns RECOVER_EXISTING",
+        "provider unavailability and unreadable breaker admission return FALLBACK_REQUIRED so the caller can choose a later reviewed route or controlled template",
+        "high-risk admission invokes no ordinary provider",
+        "prepared input rejects account/user identity, root seed, raw score, source refs, raw note and Safety category keys before any adapter call",
+        "invalid provider raw output is rejected whole and never enters attempt reservation or completion metadata"
+      ]
+    },
+    "T-AI001-GATEWAY-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+      "selector": "G12-L01/G12-L02 and G12-P01/P03/P04/P06 deterministic cases",
+      "level": "AI_EVAL",
+      "assertions": [
+        "every deterministic S-12 case uses synthetic prepared input and provider results with zero external network or real user data",
+        "UNKNOWN duplicate recovery, unavailable fallback, minimal-input rejection and high-risk zero-call paths assert each sample rather than selecting a best result",
+        "provider candidates pass the complete-candidate validator port and no candidate is repaired, spliced or partially retained",
+        "attempt evidence contains only opaque refs, route metadata, fingerprints, normalized outcome, usage and cost"
+      ]
+    },
+    "T-AI001-GATEWAY-CONTRACT-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+      "selector": "G12-P03 provider raw response and attempt metadata separation",
+      "level": "CONTRACT",
+      "assertions": [
+        "a provider response with an otherwise usable field plus an unknown private source field is rejected whole",
+        "attempt reservation and completion retain only stable route metadata, fingerprints, outcome, usage and cost",
+        "the invalid raw provider body and source value do not enter attempt persistence inputs"
+      ]
+    },
+    "T-AI001-ADAPTER-CONTRACT-001": {
+      "file": "packages/server-adapters/src/ai/gateway-provider-adapter.test.ts",
+      "selector": "AI-001 provider adapter profile, egress and transaction contract",
+      "level": "CONTRACT",
+      "assertions": [
+        "only the manifest-bound adapter/version, allowed Interactive or Background workload profile and exact egress target can reach the provider transport",
+        "an active database transaction, wrong runtime profile, expired deadline, cancellation or unlisted egress fails before transport",
+        "each adapter invocation calls transport at most once and preserves OUTCOME_UNKNOWN without same-role retry",
+        "usage and cost are non-negative normalized metadata and malformed provider results fail closed",
+        "arbitrary transport exceptions become a stable PROVIDER_NETWORK_ERROR without provider body, secret or error text"
+      ]
+    },
+    "T-AI001-ARCH-STATIC-001": {
+      "file": "tooling/test-boundaries.mjs",
+      "selector": "AI-001 API/Gateway/provider known-fail boundary fixtures",
+      "level": "STATIC",
+      "assertions": [
+        "API imports of either server-core/ai-gateway or server-adapters/ai fail with BOUNDARY_CAPABILITY_API",
+        "server-core imports of provider SDK or concrete adapter runtime fail with BOUNDARY_CAPABILITY_SERVER_CORE",
+        "provider SDK imports outside packages/server-adapters/src/ai fail with BOUNDARY_PROVIDER_LOCATION",
+        "Interactive and Background may import the AI adapter while Restricted, Migration, API and client profiles cannot"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "G12-L01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-GATEWAY-MODULE-001", "T-AI001-GATEWAY-AI-EVAL-001"]
+    },
+    {
+      "source_id": "G12-L02",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-GATEWAY-MODULE-001", "T-AI001-GATEWAY-AI-EVAL-001"]
+    },
+    {
+      "source_id": "G12-P01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-GATEWAY-MODULE-001", "T-AI001-GATEWAY-AI-EVAL-001"]
+    },
+    {
+      "source_id": "G12-P03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-GATEWAY-MODULE-001", "T-AI001-GATEWAY-AI-EVAL-001"]
+    },
+    {
+      "source_id": "G12-P04",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI001-ADAPTER-CONTRACT-001",
+        "T-AI001-GATEWAY-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "G12-P06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-GATEWAY-MODULE-001", "T-AI001-GATEWAY-AI-EVAL-001"]
+    },
+    {
+      "source_id": "PDM-U05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-GATEWAY-CONTRACT-001"]
+    },
+    {
+      "source_id": "S29-ARCH-008",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-ADAPTER-CONTRACT-001"]
+    },
+    {
+      "source_id": "S29-ARCH-026",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-ARCH-STATIC-001"]
+    },
+    {
+      "source_id": "S29-ARCH-031",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-GATEWAY-MODULE-001"]
+    },
+    {
+      "source_id": "S29-ARCH-044",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-ADAPTER-CONTRACT-001"]
+    },
+    {
+      "source_id": "S30-REPO-025",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-ARCH-STATIC-001"]
+    },
+    {
+      "source_id": "S30-REPO-033",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-ARCH-STATIC-001"]
+    },
+    {
+      "source_id": "S30-REPO-034",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-ARCH-STATIC-001"]
+    },
+    {
+      "source_id": "S30-REPO-035",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-ADAPTER-CONTRACT-001"]
+    },
+    {
+      "source_id": "S30-REPO-044",
+      "status": "COVERED",
+      "proof_ids": ["T-AI001-ARCH-STATIC-001"]
+    }
+  ]
+}

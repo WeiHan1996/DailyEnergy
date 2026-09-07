@@ -6,11 +6,14 @@ import path from "node:path";
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const requiredOutputs = [
   "packages/shared-schemas/dist/index.d.ts",
+  "packages/server-core/dist/modules/ai-gateway/public/index.d.ts",
+  "packages/server-core/dist/modules/ai-gateway/spi/index.d.ts",
   "packages/server-core/dist/modules/generation/public/index.d.ts",
   "packages/server-core/dist/modules/generation/spi/index.d.ts",
   "packages/server-core/dist/modules/product-time/public/index.d.ts",
   "packages/server-core/dist/modules/product-time/spi/index.d.ts",
   "packages/server-adapters/dist/api/index.d.ts",
+  "packages/server-adapters/dist/ai/index.d.ts",
   "packages/server-adapters/dist/testing/index.d.ts",
   "packages/server-adapters/dist/worker-background/index.d.ts",
   "packages/server-adapters/dist/worker-interactive/index.d.ts",

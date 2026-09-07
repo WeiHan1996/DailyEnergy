@@ -37,3 +37,8 @@ C-015 的 `PostgresAnalyticsStore` 只调用封闭 SQL：API 只能递交达到 
 计数 delta，Background 只能重建某个已成熟产品日和执行 TTL。四个 T4 平面表不向这两个
 profile 开放直接读取；Background 的 aggregation/retention handler payload 也不含
 owner、cycle、device、session、正文或 Prompt。
+
+AI-001 新增 `./ai` provider adapter 边界：每次调用都核对 manifest 绑定的 adapter、
+Interactive/Background/Evaluation profile、egress allowlist、硬 deadline 与事务外状态；
+transport 每 role 最多调用一次，异常只归一化为稳定 metadata。合成 provider 与内存
+attempt store 只从 `./testing` 导出，不接真实 provider、key 或网络。

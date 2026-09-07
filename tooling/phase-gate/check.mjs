@@ -95,7 +95,16 @@ export function validateSourceInventory(inventory, configuration, registry) {
       ({ status }) => status === "NA_WITH_REASON",
     ).length,
   };
-  if (!sameJson(inventory.counts, registryCounts)) {
+  if (
+    inventory.counts?.total !== registryCounts.total ||
+    inventory.counts.NA_WITH_REASON !== registryCounts.NA_WITH_REASON ||
+    registryCounts.COVERED < inventory.counts.COVERED ||
+    registryCounts.PLANNED > inventory.counts.PLANNED ||
+    registryCounts.COVERED +
+      registryCounts.PLANNED +
+      registryCounts.NA_WITH_REASON !==
+      registryCounts.total
+  ) {
     fail("E014_SOURCE_INVENTORY_COUNT", JSON.stringify(registryCounts));
   }
 
@@ -129,7 +138,10 @@ export function validateSourceInventory(inventory, configuration, registry) {
     if (
       actual?.authority_path !== sourceSet.authority_path ||
       actual.owner !== sourceSet.planned_owner ||
-      !sameJson(actual.counts, counts)
+      actual.counts?.NA_WITH_REASON !== counts.NA_WITH_REASON ||
+      counts.COVERED < actual.counts.COVERED ||
+      counts.PLANNED > actual.counts.PLANNED ||
+      counts.COVERED + counts.PLANNED + counts.NA_WITH_REASON !== entries.length
     ) {
       fail("E014_SOURCE_INVENTORY_SET_DRIFT", sourceSet.set_id);
     }

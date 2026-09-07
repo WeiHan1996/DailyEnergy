@@ -67,8 +67,8 @@ test("T-E014-GATE-001 accepts conditional development admission and Production N
     conditions: 1,
     deferred: 7,
     total: 1004,
-    COVERED: 562,
-    PLANNED: 442,
+    COVERED: 578,
+    PLANNED: 426,
     NA_WITH_REASON: 0,
   });
 });
@@ -181,8 +181,8 @@ test("T-C017-GATE-001 accepts the owner-approved Phase 3 development decision", 
     cachedP95Ms: 42,
     generationP95Ms: 119,
     total: 1004,
-    COVERED: 562,
-    PLANNED: 442,
+    COVERED: 578,
+    PLANNED: 426,
     NA_WITH_REASON: 0,
   });
 });
@@ -235,6 +235,26 @@ test("T-C017-GATE-005 rejects registry false-PASS and manual-evidence drift", ()
   registryPass.source_registry.counts.COVERED = 1004;
   assert.throws(
     () => validateC017PhaseGateContract(registryPass, c017Dependencies),
+    /C017_GATE_REGISTRY/u,
+  );
+
+  const registryRegression = structuredClone(registry);
+  for (const entry of registryRegression.entries
+    .filter(({ status }) => status === "COVERED")
+    .slice(0, 17)) {
+    delete entry.evidence;
+    entry.status = "PLANNED";
+    entry.planned = {
+      owner: "Synthetic regression fixture",
+      reason: "Coverage was removed below the accepted C-017 baseline.",
+    };
+  }
+  assert.throws(
+    () =>
+      validateC017PhaseGateContract(c017Contract, {
+        ...c017Dependencies,
+        registry: registryRegression,
+      }),
     /C017_GATE_REGISTRY/u,
   );
 

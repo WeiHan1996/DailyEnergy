@@ -204,8 +204,13 @@ function validateRegistry(snapshot, registry) {
       ({ status }) => status === "NA_WITH_REASON",
     ).length,
   };
+  const baseline = snapshot?.counts;
   if (
-    !sameJson(snapshot?.counts, counts) ||
+    baseline?.total !== counts.total ||
+    baseline.NA_WITH_REASON !== counts.NA_WITH_REASON ||
+    counts.COVERED < baseline.COVERED ||
+    counts.PLANNED > baseline.PLANNED ||
+    counts.COVERED + counts.PLANNED + counts.NA_WITH_REASON !== counts.total ||
     snapshot.unmapped !== 0 ||
     snapshot.silent_planned !== 0 ||
     snapshot.planned_admission !== "EXPLICITLY_TRACKED_NOT_PASS" ||

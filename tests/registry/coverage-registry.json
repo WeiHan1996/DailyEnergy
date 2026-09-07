@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 562, "NA_WITH_REASON": 0, "PLANNED": 442 },
+  "counts": { "COVERED": 578, "NA_WITH_REASON": 0, "PLANNED": 426 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -2278,11 +2278,39 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "attempt evidence contains only opaque refs, route metadata, fingerprints, normalized outcome, usage and cost",
+            "every deterministic S-12 case uses synthetic prepared input and provider results with zero external network or real user data",
+            "provider candidates pass the complete-candidate validator port and no candidate is repaired, spliced or partially retained",
+            "UNKNOWN duplicate recovery, unavailable fallback, minimal-input rejection and high-risk zero-call paths assert each sample rather than selecting a best result"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "G12-L01/G12-L02 and G12-P01/P03/P04/P06 deterministic cases",
+          "test_id": "T-AI001-GATEWAY-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a caller-selected primary or backup role can hand one response to the injected complete-candidate validator without letting the Gateway choose a downstream fallback policy",
+            "an immutable fingerprinted manifest binds exact workload, route, adapter, model, deadlines, compatibility, input/output limits, cost ceiling and controlled-template reserve without latest or implicit defaults",
+            "high-risk admission invokes no ordinary provider",
+            "invalid provider raw output is rejected whole and never enters attempt reservation or completion metadata",
+            "prepared input rejects account/user identity, root seed, raw score, source refs, raw note and Safety category keys before any adapter call",
+            "provider unavailability and unreadable breaker admission return FALLBACK_REQUIRED so the caller can choose a later reviewed route or controlled template",
+            "two concurrent claims of the same invocation/role/ordinal dispatch one provider call while the loser returns RECOVER_EXISTING",
+            "UNKNOWN is recorded once and replay of the same invocation/role/ordinal never dispatches that role again"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL",
+          "test_id": "T-AI001-GATEWAY-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2295,11 +2323,39 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "attempt evidence contains only opaque refs, route metadata, fingerprints, normalized outcome, usage and cost",
+            "every deterministic S-12 case uses synthetic prepared input and provider results with zero external network or real user data",
+            "provider candidates pass the complete-candidate validator port and no candidate is repaired, spliced or partially retained",
+            "UNKNOWN duplicate recovery, unavailable fallback, minimal-input rejection and high-risk zero-call paths assert each sample rather than selecting a best result"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "G12-L01/G12-L02 and G12-P01/P03/P04/P06 deterministic cases",
+          "test_id": "T-AI001-GATEWAY-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a caller-selected primary or backup role can hand one response to the injected complete-candidate validator without letting the Gateway choose a downstream fallback policy",
+            "an immutable fingerprinted manifest binds exact workload, route, adapter, model, deadlines, compatibility, input/output limits, cost ceiling and controlled-template reserve without latest or implicit defaults",
+            "high-risk admission invokes no ordinary provider",
+            "invalid provider raw output is rejected whole and never enters attempt reservation or completion metadata",
+            "prepared input rejects account/user identity, root seed, raw score, source refs, raw note and Safety category keys before any adapter call",
+            "provider unavailability and unreadable breaker admission return FALLBACK_REQUIRED so the caller can choose a later reviewed route or controlled template",
+            "two concurrent claims of the same invocation/role/ordinal dispatch one provider call while the loser returns RECOVER_EXISTING",
+            "UNKNOWN is recorded once and replay of the same invocation/role/ordinal never dispatches that role again"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL",
+          "test_id": "T-AI001-GATEWAY-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2465,11 +2521,39 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "attempt evidence contains only opaque refs, route metadata, fingerprints, normalized outcome, usage and cost",
+            "every deterministic S-12 case uses synthetic prepared input and provider results with zero external network or real user data",
+            "provider candidates pass the complete-candidate validator port and no candidate is repaired, spliced or partially retained",
+            "UNKNOWN duplicate recovery, unavailable fallback, minimal-input rejection and high-risk zero-call paths assert each sample rather than selecting a best result"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "G12-L01/G12-L02 and G12-P01/P03/P04/P06 deterministic cases",
+          "test_id": "T-AI001-GATEWAY-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a caller-selected primary or backup role can hand one response to the injected complete-candidate validator without letting the Gateway choose a downstream fallback policy",
+            "an immutable fingerprinted manifest binds exact workload, route, adapter, model, deadlines, compatibility, input/output limits, cost ceiling and controlled-template reserve without latest or implicit defaults",
+            "high-risk admission invokes no ordinary provider",
+            "invalid provider raw output is rejected whole and never enters attempt reservation or completion metadata",
+            "prepared input rejects account/user identity, root seed, raw score, source refs, raw note and Safety category keys before any adapter call",
+            "provider unavailability and unreadable breaker admission return FALLBACK_REQUIRED so the caller can choose a later reviewed route or controlled template",
+            "two concurrent claims of the same invocation/role/ordinal dispatch one provider call while the loser returns RECOVER_EXISTING",
+            "UNKNOWN is recorded once and replay of the same invocation/role/ordinal never dispatches that role again"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL",
+          "test_id": "T-AI001-GATEWAY-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2499,11 +2583,39 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "attempt evidence contains only opaque refs, route metadata, fingerprints, normalized outcome, usage and cost",
+            "every deterministic S-12 case uses synthetic prepared input and provider results with zero external network or real user data",
+            "provider candidates pass the complete-candidate validator port and no candidate is repaired, spliced or partially retained",
+            "UNKNOWN duplicate recovery, unavailable fallback, minimal-input rejection and high-risk zero-call paths assert each sample rather than selecting a best result"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "G12-L01/G12-L02 and G12-P01/P03/P04/P06 deterministic cases",
+          "test_id": "T-AI001-GATEWAY-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a caller-selected primary or backup role can hand one response to the injected complete-candidate validator without letting the Gateway choose a downstream fallback policy",
+            "an immutable fingerprinted manifest binds exact workload, route, adapter, model, deadlines, compatibility, input/output limits, cost ceiling and controlled-template reserve without latest or implicit defaults",
+            "high-risk admission invokes no ordinary provider",
+            "invalid provider raw output is rejected whole and never enters attempt reservation or completion metadata",
+            "prepared input rejects account/user identity, root seed, raw score, source refs, raw note and Safety category keys before any adapter call",
+            "provider unavailability and unreadable breaker admission return FALLBACK_REQUIRED so the caller can choose a later reviewed route or controlled template",
+            "two concurrent claims of the same invocation/role/ordinal dispatch one provider call while the loser returns RECOVER_EXISTING",
+            "UNKNOWN is recorded once and replay of the same invocation/role/ordinal never dispatches that role again"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL",
+          "test_id": "T-AI001-GATEWAY-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2516,11 +2628,36 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "an active database transaction, wrong runtime profile, expired deadline, cancellation or unlisted egress fails before transport",
+            "arbitrary transport exceptions become a stable PROVIDER_NETWORK_ERROR without provider body, secret or error text",
+            "each adapter invocation calls transport at most once and preserves OUTCOME_UNKNOWN without same-role retry",
+            "only the manifest-bound adapter/version, allowed Interactive or Background workload profile and exact egress target can reach the provider transport",
+            "usage and cost are non-negative normalized metadata and malformed provider results fail closed"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-provider-adapter.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 provider adapter profile, egress and transaction contract",
+          "test_id": "T-AI001-ADAPTER-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "attempt evidence contains only opaque refs, route metadata, fingerprints, normalized outcome, usage and cost",
+            "every deterministic S-12 case uses synthetic prepared input and provider results with zero external network or real user data",
+            "provider candidates pass the complete-candidate validator port and no candidate is repaired, spliced or partially retained",
+            "UNKNOWN duplicate recovery, unavailable fallback, minimal-input rejection and high-risk zero-call paths assert each sample rather than selecting a best result"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "G12-L01/G12-L02 and G12-P01/P03/P04/P06 deterministic cases",
+          "test_id": "T-AI001-GATEWAY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2550,11 +2687,39 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "attempt evidence contains only opaque refs, route metadata, fingerprints, normalized outcome, usage and cost",
+            "every deterministic S-12 case uses synthetic prepared input and provider results with zero external network or real user data",
+            "provider candidates pass the complete-candidate validator port and no candidate is repaired, spliced or partially retained",
+            "UNKNOWN duplicate recovery, unavailable fallback, minimal-input rejection and high-risk zero-call paths assert each sample rather than selecting a best result"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "G12-L01/G12-L02 and G12-P01/P03/P04/P06 deterministic cases",
+          "test_id": "T-AI001-GATEWAY-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a caller-selected primary or backup role can hand one response to the injected complete-candidate validator without letting the Gateway choose a downstream fallback policy",
+            "an immutable fingerprinted manifest binds exact workload, route, adapter, model, deadlines, compatibility, input/output limits, cost ceiling and controlled-template reserve without latest or implicit defaults",
+            "high-risk admission invokes no ordinary provider",
+            "invalid provider raw output is rejected whole and never enters attempt reservation or completion metadata",
+            "prepared input rejects account/user identity, root seed, raw score, source refs, raw note and Safety category keys before any adapter call",
+            "provider unavailability and unreadable breaker admission return FALLBACK_REQUIRED so the caller can choose a later reviewed route or controlled template",
+            "two concurrent claims of the same invocation/role/ordinal dispatch one provider call while the loser returns RECOVER_EXISTING",
+            "UNKNOWN is recorded once and replay of the same invocation/role/ordinal never dispatches that role again"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL",
+          "test_id": "T-AI001-GATEWAY-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -4805,11 +4970,21 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a provider response with an otherwise usable field plus an unknown private source field is rejected whole",
+            "attempt reservation and completion retain only stable route metadata, fingerprints, outcome, usage and cost",
+            "the invalid raw provider body and source value do not enter attempt persistence inputs"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "G12-P03 provider raw response and attempt metadata separation",
+          "test_id": "T-AI001-GATEWAY-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -14981,11 +15156,23 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "an active database transaction, wrong runtime profile, expired deadline, cancellation or unlisted egress fails before transport",
+            "arbitrary transport exceptions become a stable PROVIDER_NETWORK_ERROR without provider body, secret or error text",
+            "each adapter invocation calls transport at most once and preserves OUTCOME_UNKNOWN without same-role retry",
+            "only the manifest-bound adapter/version, allowed Interactive or Background workload profile and exact egress target can reach the provider transport",
+            "usage and cost are non-negative normalized metadata and malformed provider results fail closed"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-provider-adapter.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 provider adapter profile, egress and transaction contract",
+          "test_id": "T-AI001-ADAPTER-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -15502,11 +15689,22 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "API imports of either server-core/ai-gateway or server-adapters/ai fail with BOUNDARY_CAPABILITY_API",
+            "Interactive and Background may import the AI adapter while Restricted, Migration, API and client profiles cannot",
+            "provider SDK imports outside packages/server-adapters/src/ai fail with BOUNDARY_PROVIDER_LOCATION",
+            "server-core imports of provider SDK or concrete adapter runtime fail with BOUNDARY_CAPABILITY_SERVER_CORE"
+          ],
+          "file": "tooling/test-boundaries.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 API/Gateway/provider known-fail boundary fixtures",
+          "test_id": "T-AI001-ARCH-STATIC-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -15617,11 +15815,26 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a caller-selected primary or backup role can hand one response to the injected complete-candidate validator without letting the Gateway choose a downstream fallback policy",
+            "an immutable fingerprinted manifest binds exact workload, route, adapter, model, deadlines, compatibility, input/output limits, cost ceiling and controlled-template reserve without latest or implicit defaults",
+            "high-risk admission invokes no ordinary provider",
+            "invalid provider raw output is rejected whole and never enters attempt reservation or completion metadata",
+            "prepared input rejects account/user identity, root seed, raw score, source refs, raw note and Safety category keys before any adapter call",
+            "provider unavailability and unreadable breaker admission return FALLBACK_REQUIRED so the caller can choose a later reviewed route or controlled template",
+            "two concurrent claims of the same invocation/role/ordinal dispatch one provider call while the loser returns RECOVER_EXISTING",
+            "UNKNOWN is recorded once and replay of the same invocation/role/ordinal never dispatches that role again"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL",
+          "test_id": "T-AI001-GATEWAY-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -16002,11 +16215,23 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "an active database transaction, wrong runtime profile, expired deadline, cancellation or unlisted egress fails before transport",
+            "arbitrary transport exceptions become a stable PROVIDER_NETWORK_ERROR without provider body, secret or error text",
+            "each adapter invocation calls transport at most once and preserves OUTCOME_UNKNOWN without same-role retry",
+            "only the manifest-bound adapter/version, allowed Interactive or Background workload profile and exact egress target can reach the provider transport",
+            "usage and cost are non-negative normalized metadata and malformed provider results fail closed"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-provider-adapter.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 provider adapter profile, egress and transaction contract",
+          "test_id": "T-AI001-ADAPTER-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -16495,11 +16720,22 @@
     },
     {
       "authority_paths": ["docs/technical/repository-structure.md"],
-      "planned": {
-        "owner": "E-010 or E-011 according to the missing runner or Gate",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "API imports of either server-core/ai-gateway or server-adapters/ai fail with BOUNDARY_CAPABILITY_API",
+            "Interactive and Background may import the AI adapter while Restricted, Migration, API and client profiles cannot",
+            "provider SDK imports outside packages/server-adapters/src/ai fail with BOUNDARY_PROVIDER_LOCATION",
+            "server-core imports of provider SDK or concrete adapter runtime fail with BOUNDARY_CAPABILITY_SERVER_CORE"
+          ],
+          "file": "tooling/test-boundaries.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 API/Gateway/provider known-fail boundary fixtures",
+          "test_id": "T-AI001-ARCH-STATIC-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "STATIC"] }
       ],
@@ -16706,11 +16942,22 @@
     },
     {
       "authority_paths": ["docs/technical/repository-structure.md"],
-      "planned": {
-        "owner": "E-010 or E-011 according to the missing runner or Gate",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "API imports of either server-core/ai-gateway or server-adapters/ai fail with BOUNDARY_CAPABILITY_API",
+            "Interactive and Background may import the AI adapter while Restricted, Migration, API and client profiles cannot",
+            "provider SDK imports outside packages/server-adapters/src/ai fail with BOUNDARY_PROVIDER_LOCATION",
+            "server-core imports of provider SDK or concrete adapter runtime fail with BOUNDARY_CAPABILITY_SERVER_CORE"
+          ],
+          "file": "tooling/test-boundaries.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 API/Gateway/provider known-fail boundary fixtures",
+          "test_id": "T-AI001-ARCH-STATIC-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "STATIC"] }
       ],
@@ -16719,11 +16966,22 @@
     },
     {
       "authority_paths": ["docs/technical/repository-structure.md"],
-      "planned": {
-        "owner": "E-010 or E-011 according to the missing runner or Gate",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "API imports of either server-core/ai-gateway or server-adapters/ai fail with BOUNDARY_CAPABILITY_API",
+            "Interactive and Background may import the AI adapter while Restricted, Migration, API and client profiles cannot",
+            "provider SDK imports outside packages/server-adapters/src/ai fail with BOUNDARY_PROVIDER_LOCATION",
+            "server-core imports of provider SDK or concrete adapter runtime fail with BOUNDARY_CAPABILITY_SERVER_CORE"
+          ],
+          "file": "tooling/test-boundaries.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 API/Gateway/provider known-fail boundary fixtures",
+          "test_id": "T-AI001-ARCH-STATIC-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "STATIC"] }
       ],
@@ -16732,11 +16990,23 @@
     },
     {
       "authority_paths": ["docs/technical/repository-structure.md"],
-      "planned": {
-        "owner": "E-010 or E-011 according to the missing runner or Gate",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "an active database transaction, wrong runtime profile, expired deadline, cancellation or unlisted egress fails before transport",
+            "arbitrary transport exceptions become a stable PROVIDER_NETWORK_ERROR without provider body, secret or error text",
+            "each adapter invocation calls transport at most once and preserves OUTCOME_UNKNOWN without same-role retry",
+            "only the manifest-bound adapter/version, allowed Interactive or Background workload profile and exact egress target can reach the provider transport",
+            "usage and cost are non-negative normalized metadata and malformed provider results fail closed"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-provider-adapter.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 provider adapter profile, egress and transaction contract",
+          "test_id": "T-AI001-ADAPTER-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "STATIC"] }
       ],
@@ -16858,11 +17128,22 @@
     },
     {
       "authority_paths": ["docs/technical/repository-structure.md"],
-      "planned": {
-        "owner": "E-010 or E-011 according to the missing runner or Gate",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "API imports of either server-core/ai-gateway or server-adapters/ai fail with BOUNDARY_CAPABILITY_API",
+            "Interactive and Background may import the AI adapter while Restricted, Migration, API and client profiles cannot",
+            "provider SDK imports outside packages/server-adapters/src/ai fail with BOUNDARY_PROVIDER_LOCATION",
+            "server-core imports of provider SDK or concrete adapter runtime fail with BOUNDARY_CAPABILITY_SERVER_CORE"
+          ],
+          "file": "tooling/test-boundaries.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai001-evidence-manifest.json",
+          "selector": "AI-001 API/Gateway/provider known-fail boundary fixtures",
+          "test_id": "T-AI001-ARCH-STATIC-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "INTEGRATION", "STATIC"] }
       ],

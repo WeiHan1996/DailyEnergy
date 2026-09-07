@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-07
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-001 — 实现服务端 AI Gateway 基础
-- **任务状态**：Ready（尚未开工）
+- **任务状态**：In Review（自动 Gate 通过；owner threat-boundary review 待完成）
 - **任务 Profile**：`security`（AI 调用边界、最小输入、运行 profile、attempt/unknown、隐私与 Safety）
-- **工作分支**：尚未创建；建议 `agent/ai001-gateway-foundation`
+- **工作分支**：`agent/ai001-gateway-foundation`
 - **任务 Issue**：[AI-001 Issue #67](https://github.com/WeiHan1996/DailyEnergy/issues/67)
-- **当前 PR**：无；AI-001 尚未开始
+- **当前 PR**：待创建 Draft PR
 - **上一完成任务**：C-017 Done；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185) final head `642e69fcfdf3fb66e2f99ca206dcecbeb0cf323f` / CI run `34077907327` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`；merged-main CI run `34078365765` 11/11 SUCCESS；Issue #69 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,8 +16,29 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：C-017 已 Done，AI-001 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-001 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：在收到继续开工指令后，运行 `pnpm agent:prepare AI-001 --remote --deep`，读取全部 required sources，再从当前 `main` 创建聚焦分支；本次收尾不启动 AI-001 实现
+- **下一候选动作**：创建 AI-001 Draft PR，等待 11 项 exact-head CI 与 owner threat-boundary review；未经明确批准不标记 Ready、不运行 merge verifier、不合并
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-07 AI-001 启动
+
+- owner 明确要求“开始 AI-001”；本任务是当前唯一 In Progress，不改变 Accepted 产品方向、框架、数据库或服务边界；
+- `pnpm agent:prepare AI-001 --remote --deep` 返回 `READY`，Profile=`security`，Node/pnpm/dependencies/GitHub 全部 PASS；required manual evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；
+- 分支 `agent/ai001-gateway-foundation` 从本地与远端一致的 `main@890cbb7e64773f020f0ccc2cb14b49c4e41ee671` 创建；开工前工作树无变更；
+- 范围只覆盖 server-core Gateway port/use case、不可变 route manifest、workload/deadline/request fingerprint/usage-cost outcome、server-adapters provider SPI、合成 fake、attempt/unknown、profile/import/egress 与事务外调用；不接真实 provider/key，不实现 Prompt 资产或 AI-002 路由上线；
+- 开发继续受 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE` 约束，Production/RC、真实用户和真实 provider 保持 `NO_GO`。
+
+### AI-001 实施与本地验证
+
+- `@daily-energy/server-core/ai-gateway` 与 `/spi` 已建立 `expression-gateway-v1`：不可变 route manifest、Daily/Weekly workload、8/20 秒硬 deadline、template reserve、最小 prepared input、request fingerprint、usage/cost、attempt/candidate 分离和稳定 outcome；
+- Gateway 每次只执行调用方明确选择的一个 `PRIMARY_AI` 或 `BACKUP_AI` role；UNKNOWN 和并发相同 `(invocation, role, ordinal)` 不重复 dispatch，provider/admission 不可用时返回 `FALLBACK_REQUIRED`，不提前实现 AI-002 的自动主备策略或 AI-006 的模板执行；
+- `@daily-energy/server-adapters/ai` 已实现 immutable capability、health、Interactive/Background/Evaluation profile、egress allowlist、事务外调用、硬 deadline/AbortSignal、单次 transport、usage/error 脱敏归一化；合成 provider 与 attempt store 只从 `/testing` 导出；
+- API 对 `server-core/ai-gateway` 和 `server-adapters/ai` 的导入均由 `BOUNDARY_CAPABILITY_API` 拒绝；provider SDK 仍只允许位于 AI adapter，Restricted/Migration/client 无 AI capability；
+- Source Registry 新增 `tests/registry/ai001-evidence-manifest.json`，仅将 16 个实际证明的 S-12/架构/仓库/隐私 Source ID 提升为 COVERED；当前 `578/1004 COVERED`、`426 PLANNED`、`0 NA_WITH_REASON`、`0 UNMAPPED`；完整候选事实/人格/Safety、自动主备、熔断状态机、模板执行、late-success publish 等下游场景保持 PLANNED；
+- C-017/E-014 历史 registry 快照 Gate 改为单调策略：保留原 `562/442` 接受收据，只允许后续 COVERED 增加/PLANNED 减少，并以负向 fixture 拒绝低于历史基线、silent PLANNED、总数或 NA 漂移；Development GO 与 Production/RC NO_GO 未改变；
+- 固定 Node `24.18.0`、pnpm `11.17.0`、官方 npm registry：final `pnpm agent:validate --mode=full --task=AI-001` 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（181007ms）；final task Gate 同终态（88458ms）；此前 changed 模式已按策略升级 full 并自动通过；required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；
+- 聚焦证据：server-core `76/76`、server-adapters `64/64`、registry `5/5`、Phase Gate `12/12`、28 个 architecture known-fail 与 12 类实际边界检查通过；`git diff --check` 通过；full Gate 的 15 个 Prisma 空白生成副作用已确认无语义差异并恢复，未进入任务 diff；
+- 待 owner 审核 threat boundary：最小输入 key deny、attempt store 不接收正文、invalid/late body 不持久、外部调用在 reservation 完成且事务外、profile/egress/API import 双层限制、UNKNOWN 不盲重试。Production authorization 对本 development PR 不适用且保持 `NOT_GRANTED / NO_GO`；
+- AI-001 接受后的下一任务为 AI-002（主备模型、超时、重试与熔断），本次不启动。
 
 ## 2026-09-07 C-017 post-merge 收尾
 

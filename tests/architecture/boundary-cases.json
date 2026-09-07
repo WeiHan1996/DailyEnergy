@@ -1,5 +1,5 @@
 {
-  "fixture_version": "e-002-boundary-v4",
+  "fixture_version": "ai-001-boundary-v5",
   "cases": [
     {
       "case_id": "workspace-root-runtime-export",
@@ -419,6 +419,19 @@
           {
             "path": "apps/api/src/composition/unsafe.ts",
             "content": "import \"@daily-energy/server-adapters/ai\";\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "api-core-gateway-capability",
+      "gate": "capability",
+      "expected_rule_id": "BOUNDARY_CAPABILITY_API",
+      "project": {
+        "files": [
+          {
+            "path": "apps/api/src/composition/unsafe-core-gateway.ts",
+            "content": "import { AiGatewayV1 } from \"@daily-energy/server-core/ai-gateway\";\nvoid AiGatewayV1;\n"
           }
         ]
       }
