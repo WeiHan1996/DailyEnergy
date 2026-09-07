@@ -3,21 +3,31 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-07
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：AI-001 — 实现服务端 AI Gateway 基础
-- **任务状态**：In Review（owner threat-boundary review 完成；merge 已授权）
-- **任务 Profile**：`security`（AI 调用边界、最小输入、运行 profile、attempt/unknown、隐私与 Safety）
-- **工作分支**：`agent/ai001-gateway-foundation`
-- **任务 Issue**：[AI-001 Issue #67](https://github.com/WeiHan1996/DailyEnergy/issues/67)
-- **当前 PR**：[Draft PR #187](https://github.com/WeiHan1996/DailyEnergy/pull/187)；final pre-acceptance head `d7b989dd5439e7ac6ba4ac4de594327f5d91c7c6` / CI run `34087396900` 11/11 SUCCESS；owner threat-boundary review 完成并授权合并，接受状态新 head 待 CI
-- **上一完成任务**：C-017 Done；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185) final head `642e69fcfdf3fb66e2f99ca206dcecbeb0cf323f` / CI run `34077907327` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`；merged-main CI run `34078365765` 11/11 SUCCESS；Issue #69 Closed
+- **当前任务**：AI-002 — 实现主备模型、超时、重试与熔断
+- **任务状态**：Ready（尚未开工）
+- **任务 Profile**：`security`（provider 路由、deadline、bounded retry、breaker/Redis loss、usage/cost telemetry 与 Safety 优先级）
+- **工作分支**：尚未创建；建议 `agent/ai002-provider-routing`
+- **任务 Issue**：[AI-002 Issue #71](https://github.com/WeiHan1996/DailyEnergy/issues/71)
+- **当前 PR**：无；AI-002 尚未开始
+- **上一完成任务**：AI-001 Done；[PR #187](https://github.com/WeiHan1996/DailyEnergy/pull/187) final head `700e8e6c60f9fae4b65488463a5131ae4f5d78c3` / CI run `34123266299` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `02e0120bdad29f7d116cadce1cc021fa866146d6`；merged-main CI run `34123602647` 11/11 SUCCESS；Issue #67 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：C-017 已 Done，AI-001 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-001 或后续开发任务自动关闭
+- **依赖边界**：AI-001 已 Done，AI-002 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-002 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：推送 owner 接受状态，等待新 head 的 11 项同 run CI；随后把 PR #187 标记 Ready、运行 exact-head verifier 并 squash merge，不删除分支
+- **下一候选动作**：运行 `pnpm agent:prepare AI-002 --remote --deep`，读取全部 required sources，再从收尾后的当前 `main` 创建聚焦实现分支；不接生产 provider 凭据
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-07 AI-001 post-merge 收尾
+
+- owner 明确“审核完成，合并后进行下一步”，接受 AI-001 threat boundary 并授权将 PR #187 标记 Ready、运行 exact-head verifier、squash merge 和推进 AI-002；该决定不授予 Production、RC、Alpha、真实用户或真实 provider；
+- HTTPS Git transport 在 owner 接受状态 push 时持续 TLS/HTTP2 失败；GitHub API 仍正常。接受状态通过 Git Data API 以 `force=false` 从已验证 parent `d7b989dd5439e7ac6ba4ac4de594327f5d91c7c6` fast-forward 到等价 tree `850e19052a0431c3e78268fb7749aec6cb59b6d1` 的 commit `700e8e6c60f9fae4b65488463a5131ae4f5d78c3`，没有改写 main 或 force-update；
+- PR #187 final head `700e8e6c60f9fae4b65488463a5131ae4f5d78c3` 的 CI run `34123266299` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=187:head=700e8e6c60f9fae4b65488463a5131ae4f5d78c3:run=34123266299:checks=11`；
+- PR #187 以 `--squash --match-head-commit 700e8e6c60f9fae4b65488463a5131ae4f5d78c3` 合并为 `02e0120bdad29f7d116cadce1cc021fa866146d6`，未删除分支；merged-main CI run `34123602647` 同一提交 11/11 SUCCESS；
+- GitHub API 返回 merge commit `verified=true / reason=valid`；本地在 `github.com` fetch 故障期间使用该 verified payload/signature 重建出同一 commit SHA，并将本地与远端 main 精确对齐，工作树干净；
+- Issue #67 已自动关闭，AI-001 进入 Done；AI-002 是唯一 Ready，但收尾分支不提前实现 AI-002；
+- C-015 继续 Blocked，DEV_LITE 继续 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`，Production/RC、Alpha、真实用户、真实 provider 和公网服务操作继续 `NO_GO`。
 
 ## 2026-09-07 AI-001 启动
 
