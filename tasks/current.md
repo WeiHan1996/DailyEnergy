@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-07
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-002 — 实现主备模型、超时、重试与熔断
-- **任务状态**：Ready（尚未开工）
+- **任务状态**：In Progress
 - **任务 Profile**：`security`（provider 路由、deadline、bounded retry、breaker/Redis loss、usage/cost telemetry 与 Safety 优先级）
-- **工作分支**：尚未创建；建议 `agent/ai002-provider-routing`
+- **工作分支**：`agent/ai002-provider-routing`
 - **任务 Issue**：[AI-002 Issue #71](https://github.com/WeiHan1996/DailyEnergy/issues/71)
-- **当前 PR**：无；AI-002 尚未开始
+- **当前 PR**：无；实现与本地验证进行中
 - **上一完成任务**：AI-001 Done；[PR #187](https://github.com/WeiHan1996/DailyEnergy/pull/187) final head `700e8e6c60f9fae4b65488463a5131ae4f5d78c3` / CI run `34123266299` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `02e0120bdad29f7d116cadce1cc021fa866146d6`；merged-main CI run `34123602647` 11/11 SUCCESS；Issue #67 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,8 +16,16 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-001 已 Done，AI-002 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-002 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：运行 `pnpm agent:prepare AI-002 --remote --deep`，读取全部 required sources，再从收尾后的当前 `main` 创建聚焦实现分支；不接生产 provider 凭据
+- **下一候选动作**：实现主备有限编排、breaker/half-open、Redis-loss fail closed、deadline/late/unknown 与低基数 usage/cost telemetry；随后运行 full/task security Gate 并创建 Draft PR
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-07 AI-002 启动
+
+- AI-001 状态收尾 PR #188 final head `8b9a8611d61f807b0a3e914eb558ac21c4f68963` / CI run `34124597876` 11/11 SUCCESS，经 exact-head verifier 后 squash 合并为 `23e1e2ca3aafd1dccdb6b76e4cfea042070e92a0`；merged-main CI run `34124875164` 11/11 SUCCESS；
+- `pnpm agent:prepare AI-002 --remote --deep` 在固定 Node `24.18.0` 下返回 `READY`，Profile=`security`，Node/pnpm/dependencies/GitHub 全部 PASS；
+- 分支 `agent/ai002-provider-routing` 从本地、origin/main 与远端一致的 `main@23e1e2ca3aafd1dccdb6b76e4cfea042070e92a0` 创建；开工前工作树无变更；
+- 本任务实现 primary→backup 的最多两次 provider 调用、每角色一次、总 deadline/template reserve、infrastructure/quality breaker 与 HALF_OPEN、Redis loss fail closed、late/unknown 隔离和 usage/cost completeness；
+- 不接生产 provider/key，不实现 Prompt/人格评价，不执行 AI-006 的模板 renderer，不改变 Published result 或 Safety/删除优先级；Production/RC、Alpha、真实用户与真实 provider 保持 `NO_GO`。
 
 ## 2026-09-07 AI-001 post-merge 收尾
 
