@@ -1,0 +1,217 @@
+{
+  "contract_version": "c-017-phase-gate-v1",
+  "task_id": "C-017",
+  "profile": "security",
+  "report_path": "docs/reports/phase-2-gate.md",
+  "decision": {
+    "phase_3_development": "GO_FOR_PHASE_3_DEVELOPMENT",
+    "production_release_candidate": "NO_GO",
+    "alpha_or_real_user_admission": "NO_GO",
+    "owner_decision": "ACCEPTED",
+    "threat_boundary_review": "COMPLETED",
+    "production_authorization": "NOT_GRANTED",
+    "production_readiness_claim": "PROHIBITED",
+    "accepted_on": "2026-09-07"
+  },
+  "baseline": {
+    "main_commit": "57529035071348e322d77c0e9b99237973da45a7",
+    "main_ci_run": 34008347462,
+    "main_ci_checks": 11,
+    "c016": {
+      "pull_request": 183,
+      "final_head": "6636360a94b90c06072c073b9e030113da82e027",
+      "ci_run": 34002759447,
+      "merge_commit": "299e3e8082aae38063aaec7332749a407b7c4f54",
+      "merged_main_ci_run": 34007506687
+    }
+  },
+  "phase_2_exit_requirements": [
+    {
+      "id": "C017-EXIT-001",
+      "status": "MANUAL_EVIDENCE_REUSED",
+      "claim": "The accepted visual direction, design system, core flow and remaining Phase 2 handoffs are complete; this Gate does not re-accept design evidence.",
+      "evidence": [
+        "docs/design/design-system.md",
+        "docs/design/core-flow-high-fidelity.md",
+        "docs/design/phase2-remaining-handoff.md"
+      ]
+    },
+    {
+      "id": "C017-EXIT-002",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "A synthetic new user independently completes consent, onboarding, check-in, one deterministic result and first light through real Nest HTTP and PostgreSQL.",
+      "evidence": [
+        "tests/e2e/core/core-journey.test.mjs",
+        "tests/manual-rc/c016-evidence.json",
+        "apps/miniapp/src/features/onboarding/onboarding-flow.test.ts",
+        "apps/miniapp/src/features/checkin/checkin-flow.test.ts",
+        "apps/miniapp/src/features/daily/daily-flow.test.ts"
+      ]
+    },
+    {
+      "id": "C017-EXIT-003",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "Same-day return through a second session reads the identical immutable result and interaction state.",
+      "evidence": ["tests/e2e/core/core-journey.test.mjs"]
+    },
+    {
+      "id": "C017-EXIT-004",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "Concurrent check-in, generation, task and light commands preserve one authoritative fact and stable conflict semantics.",
+      "evidence": [
+        "tests/e2e/core/core-journey.test.mjs",
+        "tests/database/transactions.test.mjs"
+      ]
+    },
+    {
+      "id": "C017-EXIT-005",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "Morning state, deterministic daily content, evening feedback and behavior remain separate authoritative records and projections.",
+      "evidence": [
+        "tests/e2e/core/core-journey.test.mjs",
+        "tests/database/c013-weekly-reflection.test.mjs"
+      ]
+    },
+    {
+      "id": "C017-EXIT-006",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "Product-date boundaries, unknown outcomes and worker interruption recover the original intent without moving or duplicating facts.",
+      "evidence": [
+        "tests/e2e/core/core-journey.test.mjs",
+        "tests/database/c005-product-time-seed.test.mjs"
+      ]
+    },
+    {
+      "id": "C017-EXIT-007",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "Seven consecutive ProductDates produce seven real state slots, seven unique results and the accepted weekly projection without fabricated missing data.",
+      "evidence": ["tests/e2e/core/core-journey.test.mjs"]
+    },
+    {
+      "id": "C017-EXIT-008",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "DAY deletion blocks stale reads synchronously, removes authoritative and derived facts, survives Redis rebuild and leaves one explicit missing date.",
+      "evidence": [
+        "tests/e2e/core/core-journey.test.mjs",
+        "tests/database/c014-data-rights.test.mjs"
+      ]
+    },
+    {
+      "id": "C017-EXIT-009",
+      "status": "AUTOMATED_PROOF_AVAILABLE",
+      "claim": "The complete deterministic core E2E passes with real PostgreSQL 18, Redis 8, BullMQ 5, three Worker profiles, zero provider calls and retry zero.",
+      "evidence": [
+        "tests/e2e/core/core-journey.test.mjs",
+        "tests/registry/c016-evidence-manifest.json"
+      ]
+    }
+  ],
+  "performance_baseline": {
+    "environment": "LOCAL_SYNTHETIC_POSTGRESQL_18_REDIS_8_BULLMQ_5_NEST_HTTP",
+    "clean_runs": 3,
+    "retry_count": 0,
+    "cached_today": {
+      "target_p95_ms": 1000,
+      "samples_per_run": 7,
+      "observed_run_p95_ms": [31, 19, 42],
+      "observed_worst_run_p95_ms": 42
+    },
+    "controlled_template_generation": {
+      "target_p95_ms": 8000,
+      "samples_per_run": 6,
+      "excluded_fault_recovery_days_per_run": 1,
+      "observed_run_p95_ms": [114, 118, 119],
+      "observed_worst_run_p95_ms": 119
+    },
+    "limitations": [
+      "LOCAL_SYNTHETIC_BASELINE_NOT_PRODUCTION_SLO_PROOF",
+      "NO_REAL_PROVIDER_OR_EXTERNAL_NETWORK",
+      "FAULT_RECOVERY_DAY_EXCLUDED_FROM_NORMAL_GENERATION_P95"
+    ]
+  },
+  "reliability": {
+    "core_e2e_clean_runs": 3,
+    "retry_count": 0,
+    "first_flaky_failure_preserved": true,
+    "first_failure_run": 34001276671,
+    "fixed_final_head_run": 34002759447,
+    "merged_main_run": 34007506687,
+    "outbox_inbox_settlement": "FAILED_PENDING_TERMINAL_ZERO_AND_EVERY_PUBLISHED_EVENT_CONSUMED"
+  },
+  "data_quality": {
+    "s25_hard_gates": "G01_G02_G03_G04_PASS",
+    "metric_fixtures": "10_OF_10_PASS",
+    "phase_gate_tests": "12_OF_12_PASS",
+    "research_metrics": "Q01_Q02_UNAVAILABLE",
+    "client_signals": "BEST_EFFORT_NO_OFFLINE_REPLAY",
+    "persistent_user_level_analytics": "PROHIBITED"
+  },
+  "source_registry": {
+    "counts": {
+      "total": 1004,
+      "COVERED": 562,
+      "PLANNED": 442,
+      "NA_WITH_REASON": 0
+    },
+    "unmapped": 0,
+    "silent_planned": 0,
+    "planned_admission": "EXPLICITLY_TRACKED_NOT_PASS",
+    "production_admission": "INSUFFICIENT"
+  },
+  "development_conditions": [
+    {
+      "id": "C017-COND-001",
+      "status": "REQUIRED_BEFORE_ACCEPTANCE_OR_MERGE",
+      "owner": "Project owner",
+      "unlock": "Explicitly accept or reject the Phase 3 development recommendation and complete the threat-boundary review; this does not grant Production authorization."
+    },
+    {
+      "id": "C017-COND-002",
+      "status": "REQUIRED_BEFORE_ACCEPTANCE_OR_MERGE",
+      "owner": "C-017 merge gate",
+      "unlock": "Bind the final PR head to all 11 required checks from one successful CI run, then use the exact-head verifier and match-head merge control."
+    }
+  ],
+  "deferred_production_requirements": [
+    {
+      "id": "C017-PROD-001",
+      "status": "EXTERNAL_EVIDENCE_PENDING",
+      "pass_claim": "PROHIBITED",
+      "owner": "Privacy owner and qualified PRC legal reviewer",
+      "reason": "The final processing entity, user notice, processors, locations, cross-border state and qualified legal review remain incomplete under C-015.",
+      "unlock": "Complete and accept the final privacy/legal evidence against the actual Production data flow."
+    },
+    {
+      "id": "C017-PROD-002",
+      "status": "BLOCKED",
+      "pass_claim": "PROHIBITED",
+      "owner": "Infrastructure and Privacy/Security owners",
+      "reason": "DEV_LITE is synthetic-only and has no approved Production origin/image manifest, independent stateful services, HA or PITR restore proof.",
+      "unlock": "Approve a Production topology and execute immutable publication, isolated PITR restore, deletion-ledger replay and recovery-copy destruction evidence."
+    },
+    {
+      "id": "C017-PROD-003",
+      "status": "EXTERNAL_EVIDENCE_PENDING",
+      "pass_claim": "PROHIBITED",
+      "owner": "AI, cloud and processor owners",
+      "reason": "No Production AI provider, object store, monitoring backend, region, training/retention profile or processor contract is approved.",
+      "unlock": "Approve every actual provider profile, region, contract, retention, deletion and egress control before activating Production routes."
+    },
+    {
+      "id": "C017-PROD-004",
+      "status": "MANUAL_EVIDENCE_PENDING",
+      "pass_claim": "PROHIBITED",
+      "owner": "Incident Commander and Safety/Privacy/Security reviewers",
+      "reason": "Real alert delivery, on-call acknowledgement, incident, deletion, restore and observation-window exercises are not complete for a named RC.",
+      "unlock": "Run and accept the named RC incident/manual exercise with real approved recipients and no user content."
+    },
+    {
+      "id": "C017-PROD-005",
+      "status": "MANUAL_EVIDENCE_PENDING",
+      "pass_claim": "PROHIBITED",
+      "owner": "Release reviewers",
+      "reason": "DevTools and prior synthetic no-replay evidence do not constitute the complete named RC iOS/Android, accessibility, weak-network and release matrix.",
+      "unlock": "Complete the approved named RC real-device and release matrix, then obtain explicit Production authorization."
+    }
+  ]
+}

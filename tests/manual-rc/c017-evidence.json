@@ -1,0 +1,64 @@
+{
+  "evidence_version": "c-017-manual-evidence-v1",
+  "task_id": "C-017",
+  "issue": "https://github.com/WeiHan1996/DailyEnergy/issues/69",
+  "draft_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/185",
+  "branch": "agent/c017-phase-2-gate",
+  "execution_status": "OWNER_ACCEPTED_FOR_PHASE_3_DEVELOPMENT",
+  "pass_claim": "PROHIBITED",
+  "decision": {
+    "phase_3_development": "GO_FOR_PHASE_3_DEVELOPMENT",
+    "owner_decision": "ACCEPTED",
+    "threat_boundary_review": "COMPLETED",
+    "production_authorization": "NOT_GRANTED",
+    "production_release_candidate": "NO_GO",
+    "accepted_on": "2026-09-07"
+  },
+  "performance_baseline": {
+    "environment": "LOCAL_SYNTHETIC_POSTGRESQL_18_REDIS_8_BULLMQ_5_NEST_HTTP",
+    "clean_runs": 3,
+    "retry_count": 0,
+    "cached_today": {
+      "target_p95_ms": 1000,
+      "samples_per_run": 7,
+      "observed_run_p95_ms": [31, 19, 42],
+      "observed_worst_run_p95_ms": 42
+    },
+    "controlled_template_generation": {
+      "target_p95_ms": 8000,
+      "samples_per_run": 6,
+      "excluded_fault_recovery_days_per_run": 1,
+      "observed_run_p95_ms": [114, 118, 119],
+      "observed_worst_run_p95_ms": 119
+    },
+    "limitations": [
+      "LOCAL_SYNTHETIC_BASELINE_NOT_PRODUCTION_SLO_PROOF",
+      "NO_REAL_PROVIDER_OR_EXTERNAL_NETWORK",
+      "FAULT_RECOVERY_DAY_EXCLUDED_FROM_NORMAL_GENERATION_P95"
+    ]
+  },
+  "automated_evidence": {
+    "phase_gate": "12_OF_12_PASS / C017_7_OF_7_PASS",
+    "phase_2_exit_requirements": "9_OF_9_AUTOMATED_OR_ACCEPTED_EVIDENCE_AVAILABLE",
+    "core_e2e_stability": "3_OF_3_PASS / RETRY_ZERO / PROVIDER_CALLS_ZERO",
+    "source_registry": "562_OF_1004_COVERED / 442_PLANNED / ZERO_NA / ZERO_UNMAPPED",
+    "s25_hard_gates": "G01_G02_G03_G04_PASS",
+    "changed_full_security_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED / 171650MS",
+    "task_security_gate": "AUTOMATED_PASS / MANUAL_EVIDENCE_REQUIRED / 83508MS",
+    "verified_review_head_ci": "PASS / HEAD_209A7B1D54E55EDCED26A04D6D3EC069421A3DFA / RUN_34075171162 / ELEVEN_OF_ELEVEN_SUCCESS",
+    "accepted_changed_full_security_gate": "AUTOMATED_PASS / OWNER_THREAT_REVIEW_RECORDED / PRODUCTION_NOT_GRANTED / 171945MS",
+    "accepted_task_security_gate": "AUTOMATED_PASS / OWNER_THREAT_REVIEW_RECORDED / PRODUCTION_NOT_GRANTED / 90211MS",
+    "final_pr_head_ci": "PENDING_AFTER_OWNER_DECISION"
+  },
+  "review_scope": [
+    "Phase 2 exit evidence is sufficient only for Phase 3 development",
+    "442 PLANNED Source IDs remain explicit non-PASS work for Phase 3 or later mandatory evidence",
+    "S25 G01 through G04 cannot be offset by product or performance metrics",
+    "C-015 external privacy, legal and Production bundle blockers remain active",
+    "DEV_LITE remains synthetic-only and Production-ineligible",
+    "No AI provider, real user, Alpha, RC or Production operation is authorized"
+  ],
+  "owner_statement": "接受 GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO 的分层结论，以及报告第 11 节的 threat boundary",
+  "reviewer": "PROJECT_OWNER",
+  "reviewed_at_utc": "2026-09-07T02:36:49Z"
+}
