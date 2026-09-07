@@ -347,7 +347,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 3 — AI 陪伴层
-状态：AI-002 In Review（自动 Gate 通过，Draft PR 待创建）
+状态：AI-002 In Review（自动 Gate 通过，Draft PR #189 待审核）
 当前目标：实现有限主备路由、deadline/template reserve、breaker/Redis fail-closed 与受限 telemetry
 当前任务：AI-002 实现主备模型、超时、重试与熔断
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/71

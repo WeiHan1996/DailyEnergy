@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：[AI-002 主备模型、超时、重试与熔断](./current.md)：In Review，Draft PR 待创建；AI-001 已合并并关闭，AI-003 仍为 Planned，C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
+- **当前任务**：[AI-002 主备模型、超时、重试与熔断](./current.md)：In Review，[Draft PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189) 等待 threat review；AI-001 已合并并关闭，AI-003 仍为 Planned，C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -226,7 +226,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | ID                                                            | 任务               | 状态      | 主要结果                                                                 |
 | ------------------------------------------------------------- | ------------------ | --------- | ------------------------------------------------------------------------ |
 | [AI-001](https://github.com/WeiHan1996/DailyEnergy/issues/67) | AI Gateway 基础    | Done      | PR #187 squash 合并为 `02e0120b`；merged-main CI 11/11；Issue #67 Closed |
-| [AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71) | 主模型与备用模型   | In Review | 分支 `agent/ai002-provider-routing`；自动 Gate PASS，待 threat review    |
+| [AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71) | 主模型与备用模型   | In Review | Draft PR #189；自动 Gate PASS，待 threat review                          |
 | [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理    | Planned   | 可追踪输入和输出                                                         |
 | [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验     | Planned   | Schema 失败不可展示                                                      |
 | [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | Planned   | 同一人格不同语气                                                         |
