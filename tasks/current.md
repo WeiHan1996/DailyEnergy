@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（provider 路由、deadline、bounded retry、breaker/Redis loss、usage/cost telemetry 与 Safety 优先级）
 - **工作分支**：`agent/ai002-provider-routing`
 - **任务 Issue**：[AI-002 Issue #71](https://github.com/WeiHan1996/DailyEnergy/issues/71)
-- **当前 PR**：[Draft PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189)；等待 owner threat-boundary review 与 exact-head CI
+- **当前 PR**：[Draft PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189)；review baseline CI 11/11，通过后等待 owner threat-boundary review；合并前仍须 exact-head verifier
 - **上一完成任务**：AI-001 Done；[PR #187](https://github.com/WeiHan1996/DailyEnergy/pull/187) final head `700e8e6c60f9fae4b65488463a5131ae4f5d78c3` / CI run `34123266299` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `02e0120bdad29f7d116cadce1cc021fa866146d6`；merged-main CI run `34123602647` 11/11 SUCCESS；Issue #67 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -30,6 +30,7 @@
 ### 2026-09-08 AI-002 实施与本地验证
 
 - 实现提交 `30c619981ce9250e41e7ad98d5a2ff54de5a23d8` 已推送并创建 [Draft PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189)；本次状态回写产生的新 head 必须使用自己的同 run CI，不能复用实现提交或本地 Gate 作为合并证据；
+- PR #189 review baseline head `2ea00ecbd7b2f559851efc0f394171beddcff126` 的 CI run `34142896498` 为 11/11 SUCCESS；本收据提交后的新 final head 仍须使用自己的同 run CI，不能复用该 baseline；
 - `GatewayRouteOrchestratorV1` 已实现固定 `PRIMARY_AI` → `BACKUP_AI` 顺序、每 role 最多一次、无竞速/拼接；两个 provider 路径均不可用时只返回 `CONTROLLED_TEMPLATE_REQUIRED`，AI-006 renderer 不在本任务执行；
 - Safety/删除 admission 与 budget hard stop 在 route/breaker/provider 之前生效；provider candidate 返回后重新读取 live PublishGuard，guard 不可读时阻断普通发布，late deadline 返回 `OUTCOME_UNKNOWN` 且候选不发布；
 - `gateway-policy-v1` breaker 分离 infrastructure 与 quality denominator：5 次连续失败或 10～20 样本中至少 50% infrastructure failure 进入 OPEN，cooldown 为 60/120/240/480/900 秒，HALF_OPEN 最多两个探测并需两个成功关闭；auth/quality 只随精确 route fingerprint 变化重置；
