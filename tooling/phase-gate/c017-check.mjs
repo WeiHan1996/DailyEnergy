@@ -82,6 +82,8 @@ function validateDecision(decision, manualEvidence, report, index) {
     : "OWNER_ACCEPTED_FOR_PHASE_3_DEVELOPMENT";
   if (
     manualEvidence?.task_id !== "C-017" ||
+    manualEvidence.draft_pr !==
+      "https://github.com/WeiHan1996/DailyEnergy/pull/185" ||
     manualEvidence.execution_status !== expectedExecution ||
     manualEvidence.pass_claim !== "PROHIBITED" ||
     manualEvidence.decision?.phase_3_development !==

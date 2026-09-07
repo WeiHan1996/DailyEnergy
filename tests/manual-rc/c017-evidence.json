@@ -2,6 +2,7 @@
   "evidence_version": "c-017-manual-evidence-v1",
   "task_id": "C-017",
   "issue": "https://github.com/WeiHan1996/DailyEnergy/issues/69",
+  "draft_pr": "https://github.com/WeiHan1996/DailyEnergy/pull/185",
   "branch": "agent/c017-phase-2-gate",
   "execution_status": "AUTOMATED_EVIDENCE_COMPLETE_OWNER_REVIEW_PENDING",
   "pass_claim": "PROHIBITED",

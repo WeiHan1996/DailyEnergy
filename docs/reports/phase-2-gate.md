@@ -7,6 +7,7 @@
 - **评审基线**：`main@57529035071348e322d77c0e9b99237973da45a7`
 - **机器合同**：[C-017 Phase Gate contract](../../tests/phase-gate/c017-contract.json)
 - **人工证据**：[C-017 manual evidence](../../tests/manual-rc/c017-evidence.json)
+- **当前 PR**：[Draft PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185)
 - **最终建议**：`RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW`
 - **Production / Release Candidate**：`NO_GO`
 

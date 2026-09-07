@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-07
 - **当前阶段**：Phase 2 — 确定性核心闭环
 - **当前任务**：C-017 — 执行 Phase 2 确定性核心 Gate
-- **任务状态**：In Progress
+- **任务状态**：In Review
 - **任务 Profile**：`security`（Phase 2 全量证据、隐私/Safety/删除/owner/幂等与 Development/Production 判定边界）
 - **工作分支**：`agent/c017-phase-2-gate`
 - **任务 Issue**：[C-017 Issue #69](https://github.com/WeiHan1996/DailyEnergy/issues/69)
-- **当前 PR**：无；实现与 Gate 证据准备中
+- **当前 PR**：[Draft PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185)；自动证据完成，等待 exact-head CI 与 owner decision/threat review
 - **上一完成任务**：C-016 Done；[PR #183](https://github.com/WeiHan1996/DailyEnergy/pull/183) final head `6636360a94b90c06072c073b9e030113da82e027` / CI run `34002759447` / 11 checks 通过后 squash 合并为 `299e3e8082aae38063aaec7332749a407b7c4f54`；merged-main CI run `34007506687` 11/11 SUCCESS；Issue #66 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,8 +16,8 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：C-016 已 Done，C-017 前置满足；C-015 已合并实现与威胁审核仍是代码前置，其延期的 Production/Privacy/Legal 证据不阻塞 development-only C-017 Gate，但持续阻塞 Production/RC，也不能由 C-017 自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：完成性能基线、C-017 机器合同/负向 Gate、Draft Phase 2 报告与人工证据边界，运行完整 security Gate 后创建 Draft PR 请求 owner 审核
-- **Phase Gate 结论**：`C-017_IN_PROGRESS / PHASE_3_DEVELOPMENT_DECISION_PENDING / PRODUCTION_AND_RC_NO_GO`
+- **下一候选动作**：等待 PR #185 final head 同一 CI run 11/11；通过后请求 owner 审核 `GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO` 与 threat boundary，未经确认不标记 Ready、不运行 merge verifier、不合并或启动 AI-001
+- **Phase Gate 结论**：`RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW / PRODUCTION_AND_RC_NO_GO`
 
 ## 2026-09-07 C-017 启动
 
@@ -29,7 +29,7 @@
 - C-017 machine Gate 当前证明九项 Phase 2 退出门槛、C-016 final/merge 收据、S25 G01～G04、`562/1004 COVERED` / `442 PLANNED` / `0 UNMAPPED` 和五类 Production blocker；负向测试拒绝无 owner GO、Production/real-user false-PASS、性能超限、registry/manual/C-016 receipt 漂移；
 - 固定 Node `24.18.0` 的 changed→full Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（171650ms），task Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（83508ms）；required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`，Production authorization 对本 development Gate 不适用并保持 `NOT_GRANTED / NO_GO`；
 - 审计发现并修正 `tests/manual-rc/c016-evidence.json` 的旧 `OWNER_REVIEW_PENDING`，现精确绑定 final head `6636360a`、PR/merged-main CI、merge `299e3e80`、status closeout `57529035` 与 Issue #66 Closed；
-- Draft 报告为 `docs/reports/phase-2-gate.md`，当前建议 `RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW`；下一动作是完成最终聚焦复核、提交并创建 Draft PR，不提前启动 AI-001。
+- Draft 报告为 `docs/reports/phase-2-gate.md`，当前建议 `RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW`；Draft PR #185 已创建，下一动作是等待 exact-head CI 后请求 owner decision/threat review，不提前启动 AI-001。
 
 ## 2026-09-06 C-016 post-merge 收尾
 
