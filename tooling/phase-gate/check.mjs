@@ -9,6 +9,7 @@ import {
   loadCoverageRegistryDocument,
   loadRegistryConfiguration,
 } from "../testing/source-registry.mjs";
+import { validateC017PhaseGateRepository } from "./c017-check.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "../..");
 
@@ -312,9 +313,15 @@ export async function validatePhaseGateRepository() {
 }
 
 async function main() {
-  const result = await validatePhaseGateRepository();
+  const [result, c017] = await Promise.all([
+    validatePhaseGateRepository(),
+    validateC017PhaseGateRepository(),
+  ]);
   console.log(
     `E014_PHASE_GATE_OK:development=${result.development}:production=${result.production}:conditions=${result.conditions}:deferred=${result.deferred}:registry=${result.COVERED}/${result.total}:planned=${result.PLANNED}`,
+  );
+  console.log(
+    `C017_PHASE_GATE_OK:development=${c017.development}:production=${c017.production}:review=${c017.review}:exits=${c017.exits}:conditions=${c017.conditions}:deferred=${c017.deferred}:registry=${c017.COVERED}/${c017.total}:planned=${c017.PLANNED}:cached_p95_ms=${c017.cachedP95Ms}:generation_p95_ms=${c017.generationP95Ms}`,
   );
 }
 

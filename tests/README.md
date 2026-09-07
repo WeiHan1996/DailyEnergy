@@ -5,21 +5,21 @@
 
 ## E-010 正式测试入口
 
-| 命令                                                 | 证据                                                                             |
-| ---------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `pnpm registry:check`                                | 1004 个 Accepted/Schema Source ID 的唯一状态、强制层级和生成漂移                 |
-| `pnpm registry:test`                                 | missing、duplicate、unknown status、missing assertion 与 insufficient layer 负例 |
-| `pnpm testing:policy`                                | runner、fixture、corpus、artifact、skip、quarantine 与 testing import 边界       |
-| `pnpm testing:playwright-policy`                     | Playwright 首次失败后 retry 通过仍以 `FLAKY_FAIL` 退出                           |
-| `pnpm test:harness`                                  | 固定时间/随机源、合成身份、封闭网络/provider、fault 与 evidence policy           |
-| `pnpm test:projects`                                 | root Vitest projects 编排                                                        |
-| `pnpm test:api:e2e`                                  | Playwright `APIRequestContext` + 真实 Nest 测试应用 HTTP                         |
-| `pnpm test:core:e2e`                                 | C-016 真实 Nest + PG18/Redis8/BullMQ5 七日组合 E2E/恢复                          |
-| `pnpm test:core:e2e:stability`                       | C-016 从 clean containers 连续三次重跑，任一首错即失败                           |
-| `pnpm database:test:integration`                     | 固定 digest 的真实 PostgreSQL 18                                                 |
-| `pnpm queue:test`                                    | 固定 digest 的真实 PostgreSQL 18 / Redis 8 + BullMQ 5                            |
-| `pnpm --filter @daily-energy/app-admin run test:e2e` | Playwright Chromium Admin E2E                                                    |
-| `pnpm test:miniapp:devtools`                         | 微信开发者工具 + automator；不可用时为 `INFRA_BLOCKED`                           |
+| 命令                                                 | 证据                                                                               |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `pnpm registry:check`                                | 1004 个 Accepted/Schema Source ID 的唯一状态、强制层级和生成漂移                   |
+| `pnpm registry:test`                                 | missing、duplicate、unknown status、missing assertion 与 insufficient layer 负例   |
+| `pnpm testing:policy`                                | runner、fixture、corpus、artifact、skip、quarantine 与 testing import 边界         |
+| `pnpm testing:playwright-policy`                     | Playwright 首次失败后 retry 通过仍以 `FLAKY_FAIL` 退出                             |
+| `pnpm test:harness`                                  | 固定时间/随机源、合成身份、封闭网络/provider、fault 与 evidence policy             |
+| `pnpm test:projects`                                 | root Vitest projects 编排                                                          |
+| `pnpm test:api:e2e`                                  | Playwright `APIRequestContext` + 真实 Nest 测试应用 HTTP                           |
+| `pnpm test:core:e2e`                                 | C-016/C-017 真实 Nest + PG18/Redis8/BullMQ5 七日组合 E2E、恢复与 P95 基线          |
+| `pnpm test:core:e2e:stability`                       | clean containers 连续三次，retry=0；缓存 Today/模板生成按 Accepted P95 fail closed |
+| `pnpm database:test:integration`                     | 固定 digest 的真实 PostgreSQL 18                                                   |
+| `pnpm queue:test`                                    | 固定 digest 的真实 PostgreSQL 18 / Redis 8 + BullMQ 5                              |
+| `pnpm --filter @daily-energy/app-admin run test:e2e` | Playwright Chromium Admin E2E                                                      |
+| `pnpm test:miniapp:devtools`                         | 微信开发者工具 + automator；不可用时为 `INFRA_BLOCKED`                             |
 
 机器可读 runner 及其真实依赖、隔离、retry 和 unavailable 状态见
 `registry/runners.json`。浏览器/jsdom 不能代替微信运行时，内存替身不能代替
@@ -64,17 +64,22 @@ development `CONDITIONAL_GO_FOR_PHASE_2` 与 Production/RC
 `NO_GO / completed=false / pass_claim=PROHIBITED`。不能由 E-013/E-014 静态证据冒充真实 alert
 delivery、真实 TTL 删除、Production backend outage 或 RC 演练已经完成。
 
-## E-014 Phase Gate 入口
+## E-014 / C-017 Phase Gate 入口
 
-| 命令                       | 证据                                                                                     |
-| -------------------------- | ---------------------------------------------------------------------------------------- |
-| `pnpm phase-gate:check`    | 分层 Gate、E-012/E-013 receipt、1004 个 Source ID owner 盘点和 Production 延后条件       |
-| `pnpm phase-gate:test`     | 拒绝 unconditional GO、Production PASS、silent PLANNED、RC 合并控制和人工证据 false-PASS |
-| `pnpm phase-gate:validate` | 上述 checker 与负向 suite 的聚合 Gate                                                    |
+| 命令                       | 证据                                                                                   |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| `pnpm phase-gate:check`    | E-014/C-017 分层 Gate、C-016 receipt、P95、1004 个 Source ID 与 Production 延后条件    |
+| `pnpm phase-gate:test`     | 拒绝无 owner GO、Production PASS、性能超限、registry/receipt 漂移和人工证据 false-PASS |
+| `pnpm phase-gate:validate` | 上述 checker 与负向 suite 的聚合 Gate                                                  |
 
 E-014 只建议 Phase 2 development 条件放行；final PR 仍须 11/11 和 owner 审核。PITR/restore、
 真实投递/TTL、微信 DevTools/真机与完整 incident/manual RC 保持 `BLOCKED/PENDING`，不得因此开启
 Production 或把 C/D 任务提前标记 Ready。
+
+C-017 只建议 Phase 3 development 放行，并在 owner 审核前保持
+`RECOMMEND_GO_FOR_PHASE_3_DEVELOPMENT_PENDING_OWNER_REVIEW`。机器合同同时绑定 Phase 2 九项
+退出门槛、C-016 final/merge 收据、三次 synthetic P95、S25 G01～G04、442 个显式 PLANNED 和
+五类 Production/RC blocker；不得由自动 Gate 代签 threat review 或启动 AI-001。
 
 ## E-017 DEV_LITE 部署入口
 

@@ -2,6 +2,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import path from "node:path";
+import { performance } from "node:perf_hooks";
 import test from "node:test";
 
 import { GenericContainer, Wait } from "testcontainers";
@@ -24,6 +25,8 @@ const REDIS_IMAGE =
   "redis:8.2.1-bookworm@sha256:5fa2edb1e408fa8235e6db8fab01d1afaaae96c9403ba67b70feceb8661e8621";
 const FORBIDDEN_OUTPUT =
   /stack|prisma|sql|provider|model|prompt|openid|ciphertext|deletion_epoch|guard_epoch/iu;
+const CACHED_TODAY_P95_BUDGET_MS = 1_000;
+const TEMPLATE_GENERATION_P95_BUDGET_MS = 8_000;
 
 class MutableClock {
   #value = new Date("2026-08-30T12:00:00.000Z");
@@ -89,6 +92,7 @@ async function requestJson(baseUrl, route, options = {}) {
       : { "Idempotency-Key": options.body.command_ref }),
     ...(options.headers ?? {}),
   };
+  const startedAt = performance.now();
   const response = await fetch(new URL(route, baseUrl), {
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
     headers,
@@ -105,11 +109,17 @@ async function requestJson(baseUrl, route, options = {}) {
   if (!response.ok) {
     assert.doesNotMatch(JSON.stringify(body), FORBIDDEN_OUTPUT);
   }
-  return { body, response };
+  return { body, durationMs: performance.now() - startedAt, response };
 }
 
 function authenticated(sessionToken) {
   return `Bearer ${sessionToken}`;
+}
+
+function percentile95(samples) {
+  assert.ok(samples.length > 0);
+  const sorted = [...samples].sort((left, right) => left - right);
+  return sorted[Math.ceil(sorted.length * 0.95) - 1];
 }
 
 async function pollUntil(label, read, accept, drive = async () => undefined) {
@@ -502,6 +512,8 @@ test(
         "2026-09-05",
       ];
       const resultRefs = [];
+      const cachedTodaySamples = [];
+      const templateGenerationSamples = [];
       for (const [index, productDate] of dates.entries()) {
         clock.setProductDate(productDate);
         const activeAuth = index % 2 === 0 ? authA : authB;
@@ -582,6 +594,7 @@ test(
           command_ref: `c016-generation-${index}`,
           expected_checkin_revision: 1,
         };
+        const generationStartedAt = performance.now();
         const firstGeneration = await requestJson(
           baseUrl,
           "/v1/daily/generation/start",
@@ -628,6 +641,11 @@ test(
           ({ response }) => response.status === 200,
           () => backgroundWorker.relayOnce(),
         );
+        if (index !== 3) {
+          templateGenerationSamples.push(
+            performance.now() - generationStartedAt,
+          );
+        }
         const resultRef = today.body.data.content.result_id;
         resultRefs.push(resultRef);
         assert.equal(today.body.data.content.product_date, productDate);
@@ -641,6 +659,7 @@ test(
           authorization: index % 2 === 0 ? authB : authA,
           expectedStatus: 200,
         });
+        cachedTodaySamples.push(sameDayReturn.durationMs);
         assert.equal(sameDayReturn.body.data.content.result_id, resultRef);
 
         if (index === 0) {
@@ -1036,6 +1055,22 @@ test(
           "SELECT count(*)::int AS value FROM runtime_gateway_attempt",
         ),
         0,
+      );
+
+      const cachedTodayP95Ms = percentile95(cachedTodaySamples);
+      const templateGenerationP95Ms = percentile95(templateGenerationSamples);
+      assert.equal(cachedTodaySamples.length, 7);
+      assert.equal(templateGenerationSamples.length, 6);
+      assert.ok(
+        cachedTodayP95Ms <= CACHED_TODAY_P95_BUDGET_MS,
+        `CORE_E2E_CACHED_TODAY_P95_EXCEEDED:${Math.ceil(cachedTodayP95Ms)}`,
+      );
+      assert.ok(
+        templateGenerationP95Ms <= TEMPLATE_GENERATION_P95_BUDGET_MS,
+        `CORE_E2E_TEMPLATE_GENERATION_P95_EXCEEDED:${Math.ceil(templateGenerationP95Ms)}`,
+      );
+      console.log(
+        `CORE_E2E_PERFORMANCE_OK:cached_today_p95_ms=${Math.ceil(cachedTodayP95Ms)}:cached_samples=7:template_generation_p95_ms=${Math.ceil(templateGenerationP95Ms)}:generation_samples=6`,
       );
       clock.setProductDate("2026-09-06");
       const crossDaySafety = await requestJson(baseUrl, "/v1/daily/today", {
