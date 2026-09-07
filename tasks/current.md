@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（AI 调用边界、最小输入、运行 profile、attempt/unknown、隐私与 Safety）
 - **工作分支**：`agent/ai001-gateway-foundation`
 - **任务 Issue**：[AI-001 Issue #67](https://github.com/WeiHan1996/DailyEnergy/issues/67)
-- **当前 PR**：待创建 Draft PR
+- **当前 PR**：[Draft PR #187](https://github.com/WeiHan1996/DailyEnergy/pull/187)；owner threat-boundary review 与 exact-head CI 待完成
 - **上一完成任务**：C-017 Done；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185) final head `642e69fcfdf3fb66e2f99ca206dcecbeb0cf323f` / CI run `34077907327` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`；merged-main CI run `34078365765` 11/11 SUCCESS；Issue #69 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -29,6 +29,7 @@
 
 ### AI-001 实施与本地验证
 
+- 实现提交 `5c76105256f9a1b06f994dd7e03372df12479472` 已推送并创建 Draft PR #187；PR 保持 Draft，当前不授权 exact-head merge verifier、Ready 或 merge；
 - `@daily-energy/server-core/ai-gateway` 与 `/spi` 已建立 `expression-gateway-v1`：不可变 route manifest、Daily/Weekly workload、8/20 秒硬 deadline、template reserve、最小 prepared input、request fingerprint、usage/cost、attempt/candidate 分离和稳定 outcome；
 - Gateway 每次只执行调用方明确选择的一个 `PRIMARY_AI` 或 `BACKUP_AI` role；UNKNOWN 和并发相同 `(invocation, role, ordinal)` 不重复 dispatch，provider/admission 不可用时返回 `FALLBACK_REQUIRED`，不提前实现 AI-002 的自动主备策略或 AI-006 的模板执行；
 - `@daily-energy/server-adapters/ai` 已实现 immutable capability、health、Interactive/Background/Evaluation profile、egress allowlist、事务外调用、硬 deadline/AbortSignal、单次 transport、usage/error 脱敏归一化；合成 provider 与 attempt store 只从 `/testing` 导出；
