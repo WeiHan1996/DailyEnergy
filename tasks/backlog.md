@@ -2,8 +2,8 @@
 
 - **文档状态**：Active
 - **最后更新**：2026-09-07
-- **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：[C-017 Phase 2 Gate](./current.md)：In Review；owner 已接受 development Gate/threat boundary，Draft PR #185 等待新 head CI 与 merge approval
+- **当前阶段**：Phase 3 — AI 陪伴层
+- **当前任务**：[AI-001 AI Gateway 基础](./current.md)：唯一 Ready，尚未开工；C-017 已合并并关闭，C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -201,47 +201,47 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 ### 5.2 确定性核心实现
 
-| ID                                                           | 任务               | 状态      | 主要结果                                                                               |
-| ------------------------------------------------------------ | ------------------ | --------- | -------------------------------------------------------------------------------------- |
-| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Done      | 安全会话与身份边界；PR #147 合并为 `505a926`                                           |
-| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Done      | 最小授权和可修改资料；PR #152 合并为 `56695b5`                                         |
-| [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | Done      | 称呼和表达偏好；PR #154 合并为 `bd00fbe`                                               |
-| [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | Done      | PR #157 merge commit `4ac2009b`；统一审核通过                                          |
-| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | Done      | PR #158 merge commit `38138a78`；统一审核通过                                          |
-| [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎           | Done      | PR #159 merge commit `aad63032`；统一审核通过                                          |
-| [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容       | Done      | PR #160 merge commit `873bcc24`；统一审核通过                                          |
-| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | Done      | PR #161 merge commit `7d6d5cb9`；统一审核通过                                          |
-| [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面       | Done      | PR #162 merge commit `2e8935ed`；统一审核通过                                          |
-| [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务           | Done      | PR #163 merge commit `812595cf`；统一审核通过                                          |
-| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | Done      | PR #164 merge commit `0ee0e66c`；统一审核通过                                          |
-| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈           | Done      | PR #165 merge commit `90e8e23c`；统一审核通过                                          |
-| [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势           | Done      | PR #166 merge commit `6ee5e9fd`；统一审核通过                                          |
-| [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | Done      | PR #167 merge commit `2fa0df61`；统一审核通过                                          |
-| [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 统一审核修复       | Blocked   | 生产/Privacy/Legal 证据延期；不阻塞 development-only C-017 Gate；Production/RC `NO_GO` |
-| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Done      | PR #183 squash 合并为 `299e3e80`；merged-main CI 11/11；Issue #66 Closed               |
-| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | In Review | PR #185；owner 已接受 Phase 3 development GO；等待 CI/merge；Production/RC `NO_GO`     |
+| ID                                                           | 任务               | 状态    | 主要结果                                                                             |
+| ------------------------------------------------------------ | ------------------ | ------- | ------------------------------------------------------------------------------------ |
+| [C-001](https://github.com/WeiHan1996/DailyEnergy/issues/53) | 微信身份与会话     | Done    | 安全会话与身份边界；PR #147 合并为 `505a926`                                         |
+| [C-002](https://github.com/WeiHan1996/DailyEnergy/issues/54) | 隐私同意与用户资料 | Done    | 最小授权和可修改资料；PR #152 合并为 `56695b5`                                       |
+| [C-003](https://github.com/WeiHan1996/DailyEnergy/issues/55) | 首次认识           | Done    | 称呼和表达偏好；PR #154 合并为 `bd00fbe`                                             |
+| [C-004](https://github.com/WeiHan1996/DailyEnergy/issues/56) | 每日签到           | Done    | PR #157 merge commit `4ac2009b`；统一审核通过                                        |
+| [C-005](https://github.com/WeiHan1996/DailyEnergy/issues/57) | 稳定种子           | Done    | PR #158 merge commit `38138a78`；统一审核通过                                        |
+| [C-006](https://github.com/WeiHan1996/DailyEnergy/issues/58) | 规则引擎           | Done    | PR #159 merge commit `aad63032`；统一审核通过                                        |
+| [C-007](https://github.com/WeiHan1996/DailyEnergy/issues/59) | 本地模板内容       | Done    | PR #160 merge commit `873bcc24`；统一审核通过                                        |
+| [C-008](https://github.com/WeiHan1996/DailyEnergy/issues/62) | 今日结果幂等与缓存 | Done    | PR #161 merge commit `7d6d5cb9`；统一审核通过                                        |
+| [C-009](https://github.com/WeiHan1996/DailyEnergy/issues/60) | 今日内容页面       | Done    | PR #162 merge commit `2e8935ed`；统一审核通过                                        |
+| [C-010](https://github.com/WeiHan1996/DailyEnergy/issues/61) | 行动任务           | Done    | PR #163 merge commit `812595cf`；统一审核通过                                        |
+| [C-011](https://github.com/WeiHan1996/DailyEnergy/issues/63) | 点亮与连续记录     | Done    | PR #164 merge commit `0ee0e66c`；统一审核通过                                        |
+| [C-012](https://github.com/WeiHan1996/DailyEnergy/issues/64) | 晚间反馈           | Done    | PR #165 merge commit `90e8e23c`；统一审核通过                                        |
+| [C-013](https://github.com/WeiHan1996/DailyEnergy/issues/70) | 七天趋势           | Done    | PR #166 merge commit `6ee5e9fd`；统一审核通过                                        |
+| [C-014](https://github.com/WeiHan1996/DailyEnergy/issues/65) | 数据查看与删除     | Done    | PR #167 merge commit `2fa0df61`；统一审核通过                                        |
+| [C-015](https://github.com/WeiHan1996/DailyEnergy/issues/68) | 统一审核修复       | Blocked | 生产/Privacy/Legal 证据延期；不阻塞获批的 Phase 3 development；Production/RC `NO_GO` |
+| [C-016](https://github.com/WeiHan1996/DailyEnergy/issues/66) | 核心端到端测试     | Done    | PR #183 squash 合并为 `299e3e80`；merged-main CI 11/11；Issue #66 Closed             |
+| [C-017](https://github.com/WeiHan1996/DailyEnergy/issues/69) | Phase 2 Gate       | Done    | PR #185 squash 合并为 `15e0e673`；merged-main CI 11/11；Issue #69 Closed             |
 
 ## 6. Phase 3：AI 陪伴层
 
-| ID                                                            | 任务               | 状态    | 主要结果              |
-| ------------------------------------------------------------- | ------------------ | ------- | --------------------- |
-| [AI-001](https://github.com/WeiHan1996/DailyEnergy/issues/67) | AI Gateway 基础    | Planned | 统一供应商调用        |
-| [AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71) | 主模型与备用模型   | Planned | 超时、重试和熔断      |
-| [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理    | Planned | 可追踪输入和输出      |
-| [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验     | Planned | Schema 失败不可展示   |
-| [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | Planned | 同一人格不同语气      |
-| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | Planned | 模型故障仍可完成      |
-| [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Planned | 第 1、3、7 天连续性   |
-| [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | Planned | 用户主动添加和删除    |
-| [AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78) | 结构化记忆         | Planned | 来源、用途和有效期    |
-| [AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79) | 第 3 天风格校准    | Planned | 反馈影响后续表达      |
-| [AI-011](https://github.com/WeiHan1996/DailyEnergy/issues/84) | 七天 AI 总结       | Planned | 只引用真实数据        |
-| [AI-012](https://github.com/WeiHan1996/DailyEnergy/issues/82) | 内容安全分类       | Planned | 专业边界与敏感内容    |
-| [AI-013](https://github.com/WeiHan1996/DailyEnergy/issues/86) | 高风险固定响应     | Planned | 退出普通运势流程      |
-| [AI-014](https://github.com/WeiHan1996/DailyEnergy/issues/81) | 自动人格评价       | Planned | 质量评分和回归        |
-| [AI-015](https://github.com/WeiHan1996/DailyEnergy/issues/85) | 人工内容抽检       | Planned | 样本和问题分类        |
-| [AI-016](https://github.com/WeiHan1996/DailyEnergy/issues/80) | 延迟、Token 和成本 | Planned | 达到 MVP 工程目标     |
-| [AI-017](https://github.com/WeiHan1996/DailyEnergy/issues/83) | Phase 3 Gate       | Planned | AI 稳定、安全、可降级 |
+| ID                                                            | 任务               | 状态    | 主要结果                         |
+| ------------------------------------------------------------- | ------------------ | ------- | -------------------------------- |
+| [AI-001](https://github.com/WeiHan1996/DailyEnergy/issues/67) | AI Gateway 基础    | Ready   | 唯一 Ready；C-017 Done；尚未开工 |
+| [AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71) | 主模型与备用模型   | Planned | 超时、重试和熔断                 |
+| [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理    | Planned | 可追踪输入和输出                 |
+| [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验     | Planned | Schema 失败不可展示              |
+| [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | Planned | 同一人格不同语气                 |
+| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | Planned | 模型故障仍可完成                 |
+| [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Planned | 第 1、3、7 天连续性              |
+| [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | Planned | 用户主动添加和删除               |
+| [AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78) | 结构化记忆         | Planned | 来源、用途和有效期               |
+| [AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79) | 第 3 天风格校准    | Planned | 反馈影响后续表达                 |
+| [AI-011](https://github.com/WeiHan1996/DailyEnergy/issues/84) | 七天 AI 总结       | Planned | 只引用真实数据                   |
+| [AI-012](https://github.com/WeiHan1996/DailyEnergy/issues/82) | 内容安全分类       | Planned | 专业边界与敏感内容               |
+| [AI-013](https://github.com/WeiHan1996/DailyEnergy/issues/86) | 高风险固定响应     | Planned | 退出普通运势流程                 |
+| [AI-014](https://github.com/WeiHan1996/DailyEnergy/issues/81) | 自动人格评价       | Planned | 质量评分和回归                   |
+| [AI-015](https://github.com/WeiHan1996/DailyEnergy/issues/85) | 人工内容抽检       | Planned | 样本和问题分类                   |
+| [AI-016](https://github.com/WeiHan1996/DailyEnergy/issues/80) | 延迟、Token 和成本 | Planned | 达到 MVP 工程目标                |
+| [AI-017](https://github.com/WeiHan1996/DailyEnergy/issues/83) | Phase 3 Gate       | Planned | AI 稳定、安全、可降级            |
 
 ## 7. Phase 4：内部 Alpha
 

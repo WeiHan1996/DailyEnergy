@@ -346,11 +346,11 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 ## 当前状态
 
 ```text
-阶段：Phase 2 — 确定性核心闭环
-状态：D-004 In Review（D-003 已接受并随 PR #144 合并）
-当前目标：审核核心流程可点击原型、异常恢复、Visual QA baseline 与开发交付合同
-当前任务：D-004 完成高保真原型、验证与开发交付
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/102
+阶段：Phase 3 — AI 陪伴层
+状态：AI-001 Ready（尚未开工）
+当前目标：建立服务端唯一 AI Gateway 边界、route manifest、attempt 与 provider adapter SPI
+当前任务：AI-001 实现服务端 AI Gateway 基础
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/67
 ```
 
 长期工作入口：
@@ -363,35 +363,17 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 当前任务范围：
 
-- E-014 已随 [PR #138](https://github.com/WeiHan1996/DailyEnergy/pull/138) squash 合并为
-  `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`，Phase 1 已结束；
-- [D-001 Issue #99](https://github.com/WeiHan1996/DailyEnergy/issues/99) 已随
-  [PR #140](https://github.com/WeiHan1996/DailyEnergy/pull/140) squash 合并为
-  `e37009439bce545dd1f19d19f589b209ec178b9e` 并进入 Done；
-- [D-002 Issue #100](https://github.com/WeiHan1996/DailyEnergy/issues/100) 已获项目所有者接受，并随
-  [PR #142](https://github.com/WeiHan1996/DailyEnergy/pull/142) squash 合并为 `1fa5922`；220 个
-  canonical Token、17 个逻辑组件与 Figma source 已成为 Accepted D-003/D-004 设计基础；
-- [D-003 Issue #101](https://github.com/WeiHan1996/DailyEnergy/issues/101) 已获项目所有者接受，并随
-  [PR #144](https://github.com/WeiHan1996/DailyEnergy/pull/144) 合并为
-  `db57fbc7aeb7b9ebceddcc69c6d2d90e41722f7f`；Issue #101 已关闭；
-- [D-004 Issue #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 是唯一 In Review 任务：核心 Prototype、20 项内部 scripted walkthrough、15 个 Figma Visual QA raster baseline 与 `docs/design/developer-handoff.md` Draft 已完成；
-- D-004 仍需唯一一次 Draft PR CI 和项目负责人明确接受；接受前 C-003、C-004、C-009 继续受 D-004 前置阻断；
-- 用户要求减少 Actions 消耗：所有设计/文档先在无 PR 分支收口，仅在准备评审后创建 Draft PR 触发一次必要 CI，不主动 rerun；
-- D-005 与 C-001～C-017 不随 D-004 In Review 自动启动；
-- 已接受结论继续为 `CONDITIONAL_GO_FOR_PHASE_2 / PRODUCTION_NO_GO`；
-- Production PITR、真实告警投递/TTL、微信 DevTools/真机和完整 incident/manual RC 保持
-  `BLOCKED/PENDING`，不因 Phase 2 development admission 自动解除；
-- 私有 GitHub Free 临时合并控制只允许逐次获 owner 风险接受的 development branch merge，进入任一 RC 前停止；PR #138 的接受不自动适用于后续 PR。
-
-[Phase 0B Gate](./docs/reports/phase-0b-gate.md) 已获用户确认并进入 Accepted。
-E-001～E-015 已完成，Phase 1 已结束；E-012 的真实 DEV deploy/rollback/reconciliation、E-013 的 reference observability baseline 和 E-014 的分层 Phase Gate 已获接受。
-[D-001 #99](https://github.com/WeiHan1996/DailyEnergy/issues/99)、
-[D-002 #100](https://github.com/WeiHan1996/DailyEnergy/issues/100)、
-[D-003 #101](https://github.com/WeiHan1996/DailyEnergy/issues/101)、
-[D-004 #102](https://github.com/WeiHan1996/DailyEnergy/issues/102) 与
-[D-005 #104](https://github.com/WeiHan1996/DailyEnergy/issues/104) 已登记；D-001～D-003 为 Done，
-D-004 为唯一 In Review，D-005 为 Planned。D-004 是 C-003、C-004、C-009 的正式设计交付前置；D-005 是
-C-012、C-013、C-014 的正式设计交付前置。云厂商、域名、主体、跨境、真实账号/密钥、热线和值班等外部 Gate 仍未解除。
+- C-017 的 `GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO` 及 threat boundary
+  已获 owner 接受；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185)
+  经 exact-head verifier 后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`，
+  merged-main CI run `34078365765` 为 11/11 SUCCESS；
+- Phase 2 已结束，Phase 3 development 开始；AI-001 是唯一 Ready 任务，尚未开工；
+- AI-001 只实现服务端 Gateway 基础、不可变 route manifest、attempt 和合成 fake provider；
+  不接入真实主备模型，不授权 provider 成本调用或生产出网；
+- C-015 的 Production bundle、处理主体/位置/受托方/跨境、最终用户说明和合格 Legal review
+  继续 Blocked；
+- DEV_LITE 继续 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`；
+  Production、RC、Alpha、真实用户、真实 provider 和公网服务操作均未获授权。
 
 ---
 

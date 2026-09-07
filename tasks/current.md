@@ -2,22 +2,31 @@
 
 - **文档状态**：Active
 - **最后更新**：2026-09-07
-- **当前阶段**：Phase 2 — 确定性核心闭环
-- **当前任务**：C-017 — 执行 Phase 2 确定性核心 Gate
-- **任务状态**：In Review
-- **任务 Profile**：`security`（Phase 2 全量证据、隐私/Safety/删除/owner/幂等与 Development/Production 判定边界）
-- **工作分支**：`agent/c017-phase-2-gate`
-- **任务 Issue**：[C-017 Issue #69](https://github.com/WeiHan1996/DailyEnergy/issues/69)
-- **当前 PR**：[Draft PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185)；owner 已接受 development Gate/threat boundary，等待接受状态新 head 的 11/11 与单独 merge approval
-- **上一完成任务**：C-016 Done；[PR #183](https://github.com/WeiHan1996/DailyEnergy/pull/183) final head `6636360a94b90c06072c073b9e030113da82e027` / CI run `34002759447` / 11 checks 通过后 squash 合并为 `299e3e8082aae38063aaec7332749a407b7c4f54`；merged-main CI run `34007506687` 11/11 SUCCESS；Issue #66 Closed
+- **当前阶段**：Phase 3 — AI 陪伴层
+- **当前任务**：AI-001 — 实现服务端 AI Gateway 基础
+- **任务状态**：Ready（尚未开工）
+- **任务 Profile**：`security`（AI 调用边界、最小输入、运行 profile、attempt/unknown、隐私与 Safety）
+- **工作分支**：尚未创建；建议 `agent/ai001-gateway-foundation`
+- **任务 Issue**：[AI-001 Issue #67](https://github.com/WeiHan1996/DailyEnergy/issues/67)
+- **当前 PR**：无；AI-001 尚未开始
+- **上一完成任务**：C-017 Done；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185) final head `642e69fcfdf3fb66e2f99ca206dcecbeb0cf323f` / CI run `34077907327` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`；merged-main CI run `34078365765` 11/11 SUCCESS；Issue #69 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：C-016 已 Done，C-017 前置满足；C-015 已合并实现与威胁审核仍是代码前置，其延期的 Production/Privacy/Legal 证据不阻塞 development-only C-017 Gate，但持续阻塞 Production/RC，也不能由 C-017 自动关闭
+- **依赖边界**：C-017 已 Done，AI-001 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-001 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：提交 owner acceptance，等待 PR #185 新 head 同一 CI run 11/11；通过后请求单独 merge approval，未经合并授权不标记 Ready、不运行 merge verifier、不合并或启动 AI-001
-- **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；merge pending）
+- **下一候选动作**：在收到继续开工指令后，运行 `pnpm agent:prepare AI-001 --remote --deep`，读取全部 required sources，再从当前 `main` 创建聚焦分支；本次收尾不启动 AI-001 实现
+- **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-07 C-017 post-merge 收尾
+
+- owner 明确批准将 PR #185 标记 Ready、运行 exact-head verifier 并 squash 合并收尾；
+- PR #185 final head `642e69fcfdf3fb66e2f99ca206dcecbeb0cf323f` 的 CI run `34077907327` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=185:head=642e69fcfdf3fb66e2f99ca206dcecbeb0cf323f:run=34077907327:checks=11`；
+- PR #185 以 `--squash --match-head-commit 642e69fcfdf3fb66e2f99ca206dcecbeb0cf323f` 合并为 `15e0e673a09b3d993637c284da3e299898595306`，未删除分支；merged-main CI run `34078365765` 同一提交 11/11 SUCCESS；
+- Issue #69 已附 owner 决定、PR/CI/merge 和 Production 边界收据后关闭；C-017 进入 Done；
+- Phase 2 已结束，Phase 3 development 开始；AI-001 被提升为唯一 Ready，但本次收尾没有创建 AI-001 分支、PR 或代码；
+- C-015 继续 Blocked，DEV_LITE 继续 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`，Production/RC、Alpha、真实用户、真实 provider 和公网服务操作继续 `NO_GO`。
 
 ## 2026-09-07 C-017 启动
 

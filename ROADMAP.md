@@ -1,8 +1,8 @@
 # DailyEnergy 项目路线图
 
 - **文档状态**：Accepted
-- **最后更新**：2026-08-21
-- **当前阶段**：Phase 2 — 确定性核心闭环
+- **最后更新**：2026-09-07
+- **当前阶段**：Phase 3 — AI 陪伴层
 - **维护方式**：每个里程碑结束或重大决策变更时更新
 - **当前任务入口**：[tasks/current.md](./tasks/current.md)
 - **文档索引**：[docs/INDEX.md](./docs/INDEX.md)
@@ -42,8 +42,8 @@ DailyEnergy 希望成为一位每天陪伴用户一分钟的数字朋友。
 | Phase 0A | 产品基线       | 愿景、画像、旅程、MVP、人格、定位决策统一       | 已完成   |
 | Phase 0B | 开发前详细规格 | 页面、状态、数据、AI、API、指标和工程规范可实施 | 已完成   |
 | Phase 1  | 工程基础       | 单仓、环境、数据库、缓存、CI 与可部署骨架       | 已完成   |
-| Phase 2  | 确定性核心闭环 | 不依赖大模型也能完成每日核心体验                | 当前阶段 |
-| Phase 3  | AI 陪伴层      | AI 表达、记忆、安全、降级和成本控制可用         | 未开始   |
+| Phase 2  | 确定性核心闭环 | 不依赖大模型也能完成每日核心体验                | 已完成   |
+| Phase 3  | AI 陪伴层      | AI 表达、记忆、安全、降级和成本控制可用         | 当前阶段 |
 | Phase 4  | 内部 Alpha     | 10～20 人可连续使用，核心缺陷被发现并修复       | 未开始   |
 | Phase 5  | 种子 Beta      | 50～100 名目标用户完成 14 天验证                | 未开始   |
 | Phase 6  | 留存迭代       | 根据数据解决次日、一周留存和内容疲劳            | 未开始   |
@@ -788,19 +788,16 @@ S-12 完成后，再依据实际 Issue 数量制定：
 
 ## 17. 当前结论
 
-- Phase 0A 已完成；
-- Phase 0B 已通过 Accepted Gate；
-- E-005 已随 PR #98 合并；
-- E-015 已随 PR #106 squash 合并并进入 Done；
-- E-006 已随 PR #110/#111 完成，最终 full Gate 与真实 PostgreSQL 18 `82/82` 通过；
-- E-007 已随 PR #113 squash 合并并进入 Done，merged `main` 的完整验证通过；
-- E-009 已随 PR #115 squash 合并并进入 Done，merged `main` 的完整验证通过；
-- E-010 已随 PR #117 squash 合并并进入 Done；
-- E-011 已随 PR #119 squash 合并并进入 Done，11/11 CI Gate 与 365 天供应链证据通过；
-- E-012/E-013 已完成；E-014 已随 PR #138 squash 合并为 `c1ad026cd1ac1be131b56b8f5c82bf76e407b503`，Phase 1 已结束；
-- Phase 2 development 已按 `CONDITIONAL_GO_FOR_PHASE_2` 开始，Production/RC 保持 `NO_GO`；
-- D-001～D-005 已分别完成并获接受；C-003 已随 PR #154 合并并进入 Done；
-- 项目所有者于 2026-08-21 授权恢复开发；C-004 Draft PR #157、C-005 stacked Draft PR #158、C-006 stacked Draft PR #159 与 C-007 stacked Draft PR #160 已完成自动 Gate 和 final-head 11/11 CI 并进入统一审核批次；C-008 [stacked Draft PR #161](https://github.com/WeiHan1996/DailyEnergy/pull/161) final head `7e4a6e1` 的 CI run `32688523258`、C-009 [stacked Draft PR #162](https://github.com/WeiHan1996/DailyEnergy/pull/162) final head `941c302` 的 CI run `32692776724`、C-010 [stacked Draft PR #163](https://github.com/WeiHan1996/DailyEnergy/pull/163) final head `e6dc371` 的 CI run `32697952655`、C-011 [stacked Draft PR #164](https://github.com/WeiHan1996/DailyEnergy/pull/164) final head `3ca1105` 的 CI run `32705520165`、C-012 [stacked Draft PR #165](https://github.com/WeiHan1996/DailyEnergy/pull/165) final head `b70b9e3` 的 CI run `32728000420`、C-013 [stacked Draft PR #166](https://github.com/WeiHan1996/DailyEnergy/pull/166) final head `e43e75b` 的 CI run `32742512307` 均已取得 11/11 SUCCESS；C-014 已从 C-013 verified head 启动，C-015 后续继续推进；
-- C-003、C-004、C-009 的 D-004 设计前置已满足；
-- C-012、C-013、C-014 的 D-005 设计前置已满足；
+- Phase 0A、Phase 0B 和 Phase 1 已完成；Phase 1 的 development admission 未授权 Production/RC；
+- D-001～D-005、C-001～C-014、C-016 与 C-017 已完成；C-015 仅因延期的
+  Production/Privacy/Legal 外部证据保持 Blocked；
+- 项目所有者于 2026-09-07 接受
+  `GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO` 及 Phase 2 Gate 报告第 11 节 threat boundary；
+- C-017 [PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185) final head
+  `642e69fcfdf3fb66e2f99ca206dcecbeb0cf323f` 经 run `34077907327` 11/11 和 exact-head verifier 后
+  squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`，merged-main run `34078365765`
+  为 11/11 SUCCESS，Issue #69 已关闭；
+- Phase 2 已结束，Phase 3 development 开始；AI-001 是唯一 Ready 任务且尚未开工；
+- C-015、DEV_LITE synthetic-only 和 Production-ineligible 边界保持不变；Production、RC、Alpha、
+  真实用户、真实 provider 与公网服务操作继续 `NO_GO`；
 - 所有新会话通过仓库恢复上下文，不依赖聊天记忆。
