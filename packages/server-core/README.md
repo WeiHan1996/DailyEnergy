@@ -31,6 +31,17 @@ C-015 新增 `@daily-energy/server-core/analytics`：
 - ActivationCycle/EncounterLink 的精确 D1/D3/D7 只在函数调用内使用 owner/cycle key，
   返回值不含持久 subject。
 
+AI-001 新增 `@daily-energy/server-core/ai-gateway` 与 `/spi`：
+
+- `expression-gateway-v1` 的 Daily/Weekly workload、不可变 route manifest、兼容性、
+  deadline、input/response limit、cost ceiling 与 request fingerprint；
+- 调用方显式选择单个 primary 或 backup role；provider UNKNOWN 不重复同一
+  invocation/role/ordinal，不可用或 admission 关闭时返回 `FALLBACK_REQUIRED`，不提前实现
+  AI-002/AI-006 的路由与模板策略；
+- prepared input 拒绝身份、seed、raw score、source ref、raw note 和 Safety 类别键；
+- attempt store、provider registry/adapter、candidate validator 与 template renderer SPI，
+  attempt 只接收脱敏元数据，不接收 Prompt、正文或 provider raw response。
+
 本包不得导入 Nest、Prisma、Redis、BullMQ、provider SDK、环境变量或客户端代码。
 PostgreSQL 和运行 profile 实现位于 `@daily-energy/server-adapters` 的显式 capability
 subpath。Weekly 持久化、TX-07 与 HTTP 适配仍位于 adapters/API，不进入本包。

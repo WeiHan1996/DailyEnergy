@@ -646,6 +646,7 @@ function checkCapability(input) {
         file.path.startsWith("apps/api/") &&
         (specifier === "@daily-energy/prompt-library" ||
           packageNameFromSpecifier(specifier) === "bullmq" ||
+          specifier.startsWith("@daily-energy/server-core/ai-gateway") ||
           specifier.startsWith("@daily-energy/server-adapters/ai") ||
           specifier.includes("worker-") ||
           specifier.includes("/migration"))

@@ -4,6 +4,14 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./ai-gateway": {
+      "types": "./dist/modules/ai-gateway/public/index.d.ts",
+      "import": "./dist/modules/ai-gateway/public/index.js"
+    },
+    "./ai-gateway/spi": {
+      "types": "./dist/modules/ai-gateway/spi/index.d.ts",
+      "import": "./dist/modules/ai-gateway/spi/index.js"
+    },
     "./content-publication": {
       "types": "./dist/modules/content-publication/public/index.d.ts",
       "import": "./dist/modules/content-publication/public/index.js"

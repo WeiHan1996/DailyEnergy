@@ -223,25 +223,25 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 ## 6. Phase 3：AI 陪伴层
 
-| ID                                                            | 任务               | 状态    | 主要结果                         |
-| ------------------------------------------------------------- | ------------------ | ------- | -------------------------------- |
-| [AI-001](https://github.com/WeiHan1996/DailyEnergy/issues/67) | AI Gateway 基础    | Ready   | 唯一 Ready；C-017 Done；尚未开工 |
-| [AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71) | 主模型与备用模型   | Planned | 超时、重试和熔断                 |
-| [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理    | Planned | 可追踪输入和输出                 |
-| [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验     | Planned | Schema 失败不可展示              |
-| [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | Planned | 同一人格不同语气                 |
-| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | Planned | 模型故障仍可完成                 |
-| [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Planned | 第 1、3、7 天连续性              |
-| [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | Planned | 用户主动添加和删除               |
-| [AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78) | 结构化记忆         | Planned | 来源、用途和有效期               |
-| [AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79) | 第 3 天风格校准    | Planned | 反馈影响后续表达                 |
-| [AI-011](https://github.com/WeiHan1996/DailyEnergy/issues/84) | 七天 AI 总结       | Planned | 只引用真实数据                   |
-| [AI-012](https://github.com/WeiHan1996/DailyEnergy/issues/82) | 内容安全分类       | Planned | 专业边界与敏感内容               |
-| [AI-013](https://github.com/WeiHan1996/DailyEnergy/issues/86) | 高风险固定响应     | Planned | 退出普通运势流程                 |
-| [AI-014](https://github.com/WeiHan1996/DailyEnergy/issues/81) | 自动人格评价       | Planned | 质量评分和回归                   |
-| [AI-015](https://github.com/WeiHan1996/DailyEnergy/issues/85) | 人工内容抽检       | Planned | 样本和问题分类                   |
-| [AI-016](https://github.com/WeiHan1996/DailyEnergy/issues/80) | 延迟、Token 和成本 | Planned | 达到 MVP 工程目标                |
-| [AI-017](https://github.com/WeiHan1996/DailyEnergy/issues/83) | Phase 3 Gate       | Planned | AI 稳定、安全、可降级            |
+| ID                                                            | 任务               | 状态      | 主要结果                                                  |
+| ------------------------------------------------------------- | ------------------ | --------- | --------------------------------------------------------- |
+| [AI-001](https://github.com/WeiHan1996/DailyEnergy/issues/67) | AI Gateway 基础    | In Review | Draft PR #187；自动 Gate 通过，owner threat review 待完成 |
+| [AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71) | 主模型与备用模型   | Planned   | 超时、重试和熔断                                          |
+| [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理    | Planned   | 可追踪输入和输出                                          |
+| [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验     | Planned   | Schema 失败不可展示                                       |
+| [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | Planned   | 同一人格不同语气                                          |
+| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | Planned   | 模型故障仍可完成                                          |
+| [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Planned   | 第 1、3、7 天连续性                                       |
+| [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | Planned   | 用户主动添加和删除                                        |
+| [AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78) | 结构化记忆         | Planned   | 来源、用途和有效期                                        |
+| [AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79) | 第 3 天风格校准    | Planned   | 反馈影响后续表达                                          |
+| [AI-011](https://github.com/WeiHan1996/DailyEnergy/issues/84) | 七天 AI 总结       | Planned   | 只引用真实数据                                            |
+| [AI-012](https://github.com/WeiHan1996/DailyEnergy/issues/82) | 内容安全分类       | Planned   | 专业边界与敏感内容                                        |
+| [AI-013](https://github.com/WeiHan1996/DailyEnergy/issues/86) | 高风险固定响应     | Planned   | 退出普通运势流程                                          |
+| [AI-014](https://github.com/WeiHan1996/DailyEnergy/issues/81) | 自动人格评价       | Planned   | 质量评分和回归                                            |
+| [AI-015](https://github.com/WeiHan1996/DailyEnergy/issues/85) | 人工内容抽检       | Planned   | 样本和问题分类                                            |
+| [AI-016](https://github.com/WeiHan1996/DailyEnergy/issues/80) | 延迟、Token 和成本 | Planned   | 达到 MVP 工程目标                                         |
+| [AI-017](https://github.com/WeiHan1996/DailyEnergy/issues/83) | Phase 3 Gate       | Planned   | AI 稳定、安全、可降级                                     |
 
 ## 7. Phase 4：内部 Alpha
 

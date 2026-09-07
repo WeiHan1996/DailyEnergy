@@ -100,11 +100,14 @@ Production/RC 或 C-015 privacy/legal 证据。
   `NA_WITH_REASON`；
 - `registry/e010-evidence-manifest.json`、`registry/e011-evidence-manifest.json`、
   `registry/e013-evidence-manifest.json`、`registry/e014-evidence-manifest.json`、
-  `registry/e017-evidence-manifest.json` 与已有
+  `registry/e017-evidence-manifest.json`、`registry/ai001-evidence-manifest.json` 与已有
   database/queue/Compose manifest 提供逐项
   assertion，不把低层证据升级为高层 conformance；
 - 尚未实现的业务、恢复、模型、真机或人工场景保持 `PLANNED` 或明确 pending，不能因
   runner/模板存在而变为 PASS；
+- AI-001 只把 Gateway foundation 实际证明的 16 个 S-12/架构/仓库/隐私 Source ID
+  映射为 `COVERED`；真实 provider、late success、熔断阈值和后续 Prompt/validator 场景继续
+  保持 `PLANNED`；
 - `manual-rc/evidence-template.json` 与 `ai-evaluation/evidence-template.json` 默认禁止
   PASS，且不调用 provider。
 
