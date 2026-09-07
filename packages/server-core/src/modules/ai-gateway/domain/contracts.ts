@@ -156,6 +156,7 @@ export type GatewayOutcomeV1 =
   | {
       readonly failedRole: GatewayProviderRole;
       readonly reasonCode: string;
+      readonly replayedAttempt?: true;
       readonly status: "FALLBACK_REQUIRED";
     }
   | {
@@ -390,6 +391,46 @@ export function allowedGatewayProfile(
     (workload === "DAILY_EXPRESSION_V1" && profile === "INTERACTIVE") ||
     (workload === "WEEKLY_EXPRESSION_V1" && profile === "BACKGROUND")
   );
+}
+
+export function assertGatewayRouteCompatibilityV1(input: {
+  readonly invocation: GatewayInvocationV1;
+  readonly manifest: GatewayRouteManifestV1;
+  readonly runtimeProfile: GatewayRuntimeProfile;
+}): void {
+  const { invocation, manifest, runtimeProfile } = input;
+  if (
+    invocation.gatewayContractVersion !== GATEWAY_CONTRACT_VERSION ||
+    invocation.gatewayPolicyVersion !== GATEWAY_POLICY_VERSION ||
+    invocation.routeManifestVersion !== manifest.manifestVersion ||
+    invocation.routeManifestFingerprint !== manifest.fingerprint
+  ) {
+    throw new GatewayContractError("ROUTE_FINGERPRINT_MISMATCH");
+  }
+  if (
+    manifest.status !== "ACTIVE" ||
+    manifest.workload !== invocation.workload ||
+    !manifest.compatiblePromptVersions.includes(invocation.promptVersion) ||
+    !manifest.compatibleOutputSchemaVersions.includes(
+      invocation.outputSchemaVersion,
+    ) ||
+    !manifest.compatibleSafetyPolicyVersions.includes(
+      invocation.safetyPolicyVersion,
+    ) ||
+    invocation.templateVersion !==
+      manifest.template.templateCompatibilityVersion ||
+    !allowedGatewayProfile(invocation.workload, runtimeProfile)
+  ) {
+    throw new GatewayContractError("ROUTE_COMPATIBILITY_INVALID");
+  }
+  if (
+    Buffer.byteLength(
+      canonicalGatewayJson(invocation.preparedModelInput),
+      "utf8",
+    ) > manifest.inputLimits.preparedModelInputBytes
+  ) {
+    throw new GatewayContractError("INPUT_LIMIT_EXCEEDED");
+  }
 }
 
 function parseManifestInput(

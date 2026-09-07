@@ -1,10 +1,8 @@
 import { randomUUID } from "node:crypto";
 
 import {
-  GATEWAY_CONTRACT_VERSION,
-  GATEWAY_POLICY_VERSION,
   GatewayContractError,
-  allowedGatewayProfile,
+  assertGatewayRouteCompatibilityV1,
   canonicalGatewayJson,
   fingerprintGatewayJson,
   fingerprintGatewayRequestV1,
@@ -26,6 +24,7 @@ import type {
   ExpressionGatewayV1,
   GatewayAttemptCompletionV1,
   GatewayAttemptStoreV1,
+  GatewayAttemptTelemetrySinkV1,
   GatewayCandidateValidationResultV1,
   GatewayCandidateValidatorV1,
   GatewayClockV1,
@@ -44,6 +43,7 @@ const ZERO_USAGE: GatewayNormalizedUsageV1 = Object.freeze({
 
 export interface AiGatewayV1Dependencies {
   readonly attempts: GatewayAttemptStoreV1;
+  readonly attemptTelemetry?: GatewayAttemptTelemetrySinkV1;
   readonly candidateValidator: GatewayCandidateValidatorV1;
   readonly clock?: GatewayClockV1;
   readonly ids?: GatewayIdFactoryV1;
@@ -52,6 +52,7 @@ export interface AiGatewayV1Dependencies {
 
 export class AiGatewayV1 implements ExpressionGatewayV1 {
   readonly #attempts: GatewayAttemptStoreV1;
+  readonly #attemptTelemetry: GatewayAttemptTelemetrySinkV1;
   readonly #candidateValidator: GatewayCandidateValidatorV1;
   readonly #clock: GatewayClockV1;
   readonly #ids: GatewayIdFactoryV1;
@@ -59,6 +60,7 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
 
   public constructor(dependencies: AiGatewayV1Dependencies) {
     this.#attempts = dependencies.attempts;
+    this.#attemptTelemetry = dependencies.attemptTelemetry ?? { record() {} };
     this.#candidateValidator = dependencies.candidateValidator;
     this.#clock = dependencies.clock ?? { now: () => new Date() };
     this.#ids = dependencies.ids ?? { nextAttemptId: () => randomUUID() };
@@ -90,7 +92,11 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
     try {
       const invocation = validateGatewayInvocationV1(input.invocation);
       const manifest = verifyGatewayRouteManifestV1(input.manifest);
-      this.#assertCompatibility(invocation, manifest, input.runtimeProfile);
+      assertGatewayRouteCompatibilityV1({
+        invocation,
+        manifest,
+        runtimeProfile: input.runtimeProfile,
+      });
 
       if (input.admission.status === "ORDINARY_GATEWAY_BLOCKED") {
         return Object.freeze({
@@ -142,6 +148,16 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
     readonly signal?: AbortSignal;
   }): Promise<GatewayOutcomeV1> {
     const attemptId = this.#ids.nextAttemptId();
+    const complete = (
+      completion: Omit<GatewayAttemptCompletionV1, "finishedAt">,
+      modelRevisionBucket: "CURRENT" | "OTHER" | "UNKNOWN" = "UNKNOWN",
+    ) =>
+      this.#complete(completion, {
+        modelRevisionBucket,
+        role: input.role,
+        routeManifestVersion: input.manifest.manifestVersion,
+        workload: input.invocation.workload,
+      });
     const requestFingerprint = fingerprintGatewayRequestV1({
       invocation: input.invocation,
       role: input.role,
@@ -172,19 +188,22 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
           status: "RECOVER_EXISTING",
         });
       }
-      return fallback(
-        input.role,
-        reservation.existingOutcome === "OUTCOME_UNKNOWN"
-          ? "OUTCOME_UNKNOWN"
-          : "ATTEMPT_ALREADY_COMPLETED_WITHOUT_CANDIDATE",
-      );
+      return Object.freeze({
+        ...fallback(
+          input.role,
+          reservation.existingOutcome === "OUTCOME_UNKNOWN"
+            ? "OUTCOME_UNKNOWN"
+            : "ATTEMPT_ALREADY_COMPLETED_WITHOUT_CANDIDATE",
+        ),
+        replayedAttempt: true as const,
+      });
     }
 
     let adapter: GatewayProviderAdapterV1 | undefined;
     try {
       adapter = this.#providers.resolve(input.route);
     } catch {
-      await this.#complete({
+      await complete({
         attemptId,
         failureCode: "PROVIDER_REGISTRY_UNAVAILABLE",
         outcome: "PROVIDER_ERROR",
@@ -193,7 +212,7 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
       return fallback(input.role, "PROVIDER_REGISTRY_UNAVAILABLE");
     }
     if (!adapter) {
-      await this.#complete({
+      await complete({
         attemptId,
         failureCode: "PROVIDER_UNAVAILABLE",
         outcome: "PROVIDER_ERROR",
@@ -205,7 +224,7 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
       adapter.adapterId !== input.route.adapterId ||
       adapter.adapterVersion !== input.route.adapterVersion
     ) {
-      await this.#complete({
+      await complete({
         attemptId,
         failureCode: "ADAPTER_CONTRACT_INVALID",
         outcome: "PROVIDER_ERROR",
@@ -221,7 +240,7 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
         input.invocation.workload,
       );
     } catch {
-      await this.#complete({
+      await complete({
         attemptId,
         failureCode: "ADAPTER_CAPABILITY_INVALID",
         outcome: "PROVIDER_ERROR",
@@ -230,7 +249,7 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
       return fallback(input.role, "ADAPTER_CAPABILITY_INVALID");
     }
     if (!capabilitiesValid) {
-      await this.#complete({
+      await complete({
         attemptId,
         failureCode: "ADAPTER_CAPABILITY_MISMATCH",
         outcome: "PROVIDER_ERROR",
@@ -270,7 +289,7 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
     try {
       usage = validateGatewayNormalizedUsageV1(providerResult.usage);
     } catch {
-      await this.#complete({
+      await complete({
         attemptId,
         failureCode: "ADAPTER_USAGE_INVALID",
         outcome: "PROVIDER_ERROR",
@@ -278,16 +297,23 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
       });
       return fallback(input.role, "ADAPTER_USAGE_INVALID");
     }
+    const modelRevisionBucket = observedModelBucket(
+      providerResult,
+      input.route,
+    );
     const providerRequestRef = safeProviderRequestRef(
       providerResult.providerRequestRef,
     );
     if (input.signal?.aborted) {
-      await this.#complete({
-        attemptId,
-        failureCode: "OWNER_CANCELLED_OR_DELETED",
-        outcome: "CANCELLED",
-        usage,
-      });
+      await complete(
+        {
+          attemptId,
+          failureCode: "OWNER_CANCELLED_OR_DELETED",
+          outcome: "CANCELLED",
+          usage,
+        },
+        modelRevisionBucket,
+      );
       return Object.freeze({
         reasonCode: "OWNER_CANCELLED_OR_DELETED",
         status: "BLOCKED",
@@ -296,36 +322,45 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
     if (
       this.#clock.now().getTime() >= Date.parse(input.invocation.hardDeadlineAt)
     ) {
-      await this.#complete({
-        attemptId,
-        failureCode: "LATE_RESPONSE_DISCARDED",
-        outcome: "OUTCOME_UNKNOWN",
-        usage,
-      });
+      await complete(
+        {
+          attemptId,
+          failureCode: "LATE_RESPONSE_DISCARDED",
+          outcome: "OUTCOME_UNKNOWN",
+          usage,
+        },
+        modelRevisionBucket,
+      );
       return fallback(input.role, "OUTCOME_UNKNOWN");
     }
     if (
       (usage.billedCostMicrounits ?? 0) >
       input.manifest.invocationCostLimitMicrounits
     ) {
-      await this.#complete({
-        attemptId,
-        failureCode: "INVOCATION_COST_LIMIT_EXCEEDED",
-        outcome: "BUDGET_EXHAUSTED",
-        usage,
-      });
+      await complete(
+        {
+          attemptId,
+          failureCode: "INVOCATION_COST_LIMIT_EXCEEDED",
+          outcome: "BUDGET_EXHAUSTED",
+          usage,
+        },
+        modelRevisionBucket,
+      );
       return fallback(input.role, "INVOCATION_COST_LIMIT_EXCEEDED");
     }
 
     if (
       !["FAILURE", "OUTCOME_UNKNOWN", "SUCCESS"].includes(providerResult.status)
     ) {
-      await this.#complete({
-        attemptId,
-        failureCode: "ADAPTER_RESULT_INVALID",
-        outcome: "PROVIDER_ERROR",
-        usage,
-      });
+      await complete(
+        {
+          attemptId,
+          failureCode: "ADAPTER_RESULT_INVALID",
+          outcome: "PROVIDER_ERROR",
+          usage,
+        },
+        modelRevisionBucket,
+      );
       return fallback(input.role, "ADAPTER_RESULT_INVALID");
     }
     if (providerResult.status === "OUTCOME_UNKNOWN") {
@@ -333,13 +368,16 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
         providerResult.reasonCode,
         "PROVIDER_PROTOCOL_INVALID",
       );
-      await this.#complete({
-        attemptId,
-        failureCode,
-        outcome: "OUTCOME_UNKNOWN",
-        ...(providerRequestRef ? { providerRequestRef } : {}),
-        usage,
-      });
+      await complete(
+        {
+          attemptId,
+          failureCode,
+          outcome: "OUTCOME_UNKNOWN",
+          ...(providerRequestRef ? { providerRequestRef } : {}),
+          usage,
+        },
+        modelRevisionBucket,
+      );
       return fallback(input.role, "OUTCOME_UNKNOWN");
     }
     if (providerResult.status === "FAILURE") {
@@ -347,20 +385,23 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
         providerResult.reasonCode,
         "PROVIDER_PROTOCOL_INVALID",
       );
-      await this.#complete({
-        attemptId,
-        failureCode,
-        outcome:
-          providerResult.reasonCode === "PROVIDER_CANCELLED"
-            ? "CANCELLED"
-            : "PROVIDER_ERROR",
-        ...(providerRequestRef ? { providerRequestRef } : {}),
-        ...(Number.isSafeInteger(providerResult.retryAfterMs) &&
-        Number(providerResult.retryAfterMs) >= 0
-          ? { retryAfterMs: providerResult.retryAfterMs }
-          : {}),
-        usage,
-      });
+      await complete(
+        {
+          attemptId,
+          failureCode,
+          outcome:
+            providerResult.reasonCode === "PROVIDER_CANCELLED"
+              ? "CANCELLED"
+              : "PROVIDER_ERROR",
+          ...(providerRequestRef ? { providerRequestRef } : {}),
+          ...(Number.isSafeInteger(providerResult.retryAfterMs) &&
+          Number(providerResult.retryAfterMs) >= 0
+            ? { retryAfterMs: providerResult.retryAfterMs }
+            : {}),
+          usage,
+        },
+        modelRevisionBucket,
+      );
       return fallback(input.role, failureCode);
     }
 
@@ -372,13 +413,16 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
       providerResult.observedModelId !==
         (input.route.immutableModelRevision ?? input.route.modelId)
     ) {
-      await this.#complete({
-        attemptId,
-        failureCode: "PROVIDER_PROTOCOL_INVALID",
-        outcome: "INVALID_SCHEMA",
-        ...(providerRequestRef ? { providerRequestRef } : {}),
-        usage,
-      });
+      await complete(
+        {
+          attemptId,
+          failureCode: "PROVIDER_PROTOCOL_INVALID",
+          outcome: "INVALID_SCHEMA",
+          ...(providerRequestRef ? { providerRequestRef } : {}),
+          usage,
+        },
+        modelRevisionBucket,
+      );
       return fallback(input.role, "PROVIDER_PROTOCOL_INVALID");
     }
 
@@ -390,12 +434,15 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
         source: input.role,
       });
     } catch {
-      await this.#complete({
-        attemptId,
-        failureCode: "OUTPUT_VALIDATOR_UNAVAILABLE",
-        outcome: "INVALID_SCHEMA",
-        usage,
-      });
+      await complete(
+        {
+          attemptId,
+          failureCode: "OUTPUT_VALIDATOR_UNAVAILABLE",
+          outcome: "INVALID_SCHEMA",
+          usage,
+        },
+        modelRevisionBucket,
+      );
       return fallback(input.role, "OUTPUT_VALIDATOR_UNAVAILABLE");
     }
     if (validation.status === "REJECT") {
@@ -403,13 +450,16 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
         validation.reasonCode,
         "OUTPUT_VALIDATOR_INVALID_REASON",
       );
-      await this.#complete({
-        attemptId,
-        failureCode,
-        outcome: validation.outcome,
-        ...(providerRequestRef ? { providerRequestRef } : {}),
-        usage,
-      });
+      await complete(
+        {
+          attemptId,
+          failureCode,
+          outcome: validation.outcome,
+          ...(providerRequestRef ? { providerRequestRef } : {}),
+          usage,
+        },
+        modelRevisionBucket,
+      );
       return fallback(input.role, failureCode);
     }
     let validCandidate: Extract<
@@ -419,22 +469,28 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
     try {
       validCandidate = validatePassedCandidate(validation);
     } catch {
-      await this.#complete({
-        attemptId,
-        failureCode: "OUTPUT_VALIDATOR_CONTRACT_INVALID",
-        outcome: "INVALID_SCHEMA",
-        usage,
-      });
+      await complete(
+        {
+          attemptId,
+          failureCode: "OUTPUT_VALIDATOR_CONTRACT_INVALID",
+          outcome: "INVALID_SCHEMA",
+          usage,
+        },
+        modelRevisionBucket,
+      );
       return fallback(input.role, "OUTPUT_VALIDATOR_CONTRACT_INVALID");
     }
 
-    await this.#complete({
-      attemptId,
-      candidateFingerprint: validCandidate.payloadFingerprint,
-      outcome: "SUCCEEDED",
-      ...(providerRequestRef ? { providerRequestRef } : {}),
-      usage,
-    });
+    await complete(
+      {
+        attemptId,
+        candidateFingerprint: validCandidate.payloadFingerprint,
+        outcome: "SUCCEEDED",
+        ...(providerRequestRef ? { providerRequestRef } : {}),
+        usage,
+      },
+      modelRevisionBucket,
+    );
     return candidateOutcome(
       attemptId,
       input.role,
@@ -445,49 +501,35 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
 
   async #complete(
     input: Omit<GatewayAttemptCompletionV1, "finishedAt">,
+    context: {
+      readonly modelRevisionBucket: "CURRENT" | "OTHER" | "UNKNOWN";
+      readonly role: GatewayProviderRole;
+      readonly routeManifestVersion: string;
+      readonly workload: GatewayInvocationV1["workload"];
+    },
   ): Promise<void> {
     await this.#attempts.completeAttempt({
       ...input,
       finishedAt: this.#clock.now().toISOString(),
     });
-  }
-
-  #assertCompatibility(
-    invocation: GatewayInvocationV1,
-    manifest: GatewayRouteManifestV1,
-    runtimeProfile: GatewayRuntimeProfile,
-  ): void {
-    if (
-      invocation.gatewayContractVersion !== GATEWAY_CONTRACT_VERSION ||
-      invocation.gatewayPolicyVersion !== GATEWAY_POLICY_VERSION ||
-      invocation.routeManifestVersion !== manifest.manifestVersion ||
-      invocation.routeManifestFingerprint !== manifest.fingerprint
-    ) {
-      throw new GatewayContractError("ROUTE_FINGERPRINT_MISMATCH");
-    }
-    if (
-      manifest.status !== "ACTIVE" ||
-      manifest.workload !== invocation.workload ||
-      !manifest.compatiblePromptVersions.includes(invocation.promptVersion) ||
-      !manifest.compatibleOutputSchemaVersions.includes(
-        invocation.outputSchemaVersion,
-      ) ||
-      !manifest.compatibleSafetyPolicyVersions.includes(
-        invocation.safetyPolicyVersion,
-      ) ||
-      invocation.templateVersion !==
-        manifest.template.templateCompatibilityVersion ||
-      !allowedGatewayProfile(invocation.workload, runtimeProfile)
-    ) {
-      throw new GatewayContractError("ROUTE_COMPATIBILITY_INVALID");
-    }
-    if (
-      Buffer.byteLength(
-        canonicalGatewayJson(invocation.preparedModelInput),
-        "utf8",
-      ) > manifest.inputLimits.preparedModelInputBytes
-    ) {
-      throw new GatewayContractError("INPUT_LIMIT_EXCEEDED");
+    try {
+      this.#attemptTelemetry.record({
+        costCompleteness:
+          input.usage.billedCostMicrounits === null ? "UNKNOWN" : "KNOWN",
+        modelRevisionBucket: context.modelRevisionBucket,
+        outcomeCode: input.outcome,
+        reasonCode: input.failureCode ?? "NONE",
+        role: context.role,
+        routeManifestVersion: context.routeManifestVersion,
+        usage: input.usage,
+        usageCompleteness:
+          input.usage.inputUnits === null || input.usage.outputUnits === null
+            ? "UNKNOWN"
+            : "KNOWN",
+        workload: context.workload,
+      });
+    } catch {
+      // Telemetry must not alter the provider outcome.
     }
   }
 }
@@ -555,6 +597,22 @@ function safeProviderRequestRef(value: string | undefined): string | undefined {
     /^[A-Za-z0-9][A-Za-z0-9._:-]*$/u.test(value)
     ? value
     : undefined;
+}
+
+function observedModelBucket(
+  result: GatewayProviderResultV1,
+  route: GatewayProviderRouteV1,
+): "CURRENT" | "OTHER" | "UNKNOWN" {
+  if (result.status !== "SUCCESS") {
+    return "UNKNOWN";
+  }
+  if (typeof result.observedModelId !== "string") {
+    return "UNKNOWN";
+  }
+  return result.observedModelId ===
+    (route.immutableModelRevision ?? route.modelId)
+    ? "CURRENT"
+    : "OTHER";
 }
 
 function validCapabilities(

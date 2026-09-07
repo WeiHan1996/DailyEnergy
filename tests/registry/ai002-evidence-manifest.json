@@ -1,0 +1,182 @@
+{
+  "manifest_version": "ai-002-evidence-v1",
+  "scope": "AI-002 sequential primary-to-backup routing, total deadline and template reserve, infrastructure and quality breakers with Redis CAS/loss behavior, live PublishGuard recheck, and low-cardinality normalized usage/cost telemetry",
+  "authority": [
+    "docs/decisions/ADR-0003-ai-provider-abstraction.md",
+    "docs/ai/gateway.md",
+    "docs/ai/safety.md",
+    "docs/technical/observability.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-AI002-ROUTING-MODULE-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+      "selector": "AI-002 sequential Gateway routing",
+      "level": "MODULE",
+      "assertions": [
+        "primary timeout advances once to backup with the same frozen plan, prepared input and route fingerprint, without racing or joining candidate fields",
+        "an OPEN primary route is skipped immediately and the independent backup route remains eligible",
+        "Safety and budget admission stop before breaker or provider access, and unreadable breaker state returns only CONTROLLED_TEMPLATE_REQUIRED",
+        "a fresh live guard after provider completion rejects stale, Safety, deletion or existing-result publication",
+        "replayed UNKNOWN attempt state advances to backup without adding a second infrastructure breaker sample"
+      ]
+    },
+    "T-AI002-ROUTING-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+      "selector": "G12-F01/G12-F03 deterministic route cases",
+      "level": "AI_EVAL",
+      "assertions": [
+        "all route cases use synthetic immutable inputs and provider outcomes with no external provider, credential, user identity or real content",
+        "primary timeout produces exactly one backup candidate using the unchanged plan and prepared input",
+        "OPEN primary breaker state causes no primary dispatch and does not wait for cooldown before backup"
+      ]
+    },
+    "T-AI002-BREAKER-MODULE-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/domain/breaker.test.ts",
+      "selector": "AI-002 gateway breaker policy",
+      "level": "MODULE",
+      "assertions": [
+        "five consecutive infrastructure failures OPEN the route with bounded 60/120/240/480/900 second cooldown policy",
+        "the bounded twenty-sample infrastructure window enforces the ten-sample minimum and fifty-percent threshold after either a failure or success",
+        "HALF_OPEN permits at most two claims and needs two successes to close while a probe failure reopens",
+        "auth and quality blocks remain until the exact route fingerprint changes",
+        "quality and neutral outcomes do not enter or reset the infrastructure denominator, and malformed persisted snapshots fail closed"
+      ]
+    },
+    "T-AI002-BREAKER-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/domain/breaker.test.ts",
+      "selector": "G12-B01 through G12-B05 deterministic breaker cases",
+      "level": "AI_EVAL",
+      "assertions": [
+        "each accepted S-12 breaker threshold is asserted against a deterministic synthetic outcome timeline",
+        "quality failures are counted only in the quality response window and never dilute the infrastructure denominator",
+        "auth and quality recovery requires a new immutable route fingerprint rather than elapsed time"
+      ]
+    },
+    "T-AI002-BREAKER-REDIS-001": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "AI-002 real Redis breaker CAS and loss fail closed",
+      "level": "INTEGRATION",
+      "assertions": [
+        "the Redis 8 adapter accepts exactly one of two concurrent missing-revision compare-and-set writes",
+        "a stale in-flight outcome with the same numeric revision but an old route fingerprint cannot overwrite a new route revision",
+        "the stored immutable breaker snapshot reads back exactly through the strict parser",
+        "stopping Redis makes breaker load return only the stable GATEWAY_BREAKER_STORE_UNAVAILABLE error"
+      ]
+    },
+    "T-AI002-DEADLINE-MODULE-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+      "selector": "G12-B07 preserves the template reserve",
+      "level": "MODULE",
+      "assertions": [
+        "when remaining total time is below route deadline plus template reserve, no attempt is reserved and no provider is called",
+        "the caller receives the stable DEADLINE_RESERVE_REQUIRED fallback reason without extending the hard deadline"
+      ]
+    },
+    "T-AI002-DEADLINE-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+      "selector": "G12-B07 deterministic deadline reserve case",
+      "level": "AI_EVAL",
+      "assertions": [
+        "the fixed Daily eight-second timeline preserves at least one second for local validation and template work",
+        "the deterministic case uses only a synthetic clock and provider adapter and does not call a real provider"
+      ]
+    },
+    "T-AI002-LATE-MODULE-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+      "selector": "G12-L05 discards a provider response when the hard generation window closes",
+      "level": "MODULE",
+      "assertions": [
+        "a complete provider response arriving at the hard deadline is not returned as a candidate",
+        "the attempt records LATE_RESPONSE_DISCARDED with OUTCOME_UNKNOWN and the caller can only enter a later bounded path"
+      ]
+    },
+    "T-AI002-LATE-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+      "selector": "G12-L05 deterministic late response case",
+      "level": "AI_EVAL",
+      "assertions": [
+        "the fixed synthetic clock crosses the exact Daily generation deadline after the provider response",
+        "the late candidate body never enters the returned Gateway outcome or attempt metadata"
+      ]
+    },
+    "T-AI002-TELEMETRY-CONTRACT-001": {
+      "file": "packages/server-adapters/src/ai/gateway-telemetry.test.ts",
+      "selector": "AI-002 low-cardinality Gateway telemetry",
+      "level": "CONTRACT",
+      "assertions": [
+        "known normalized input/output units and billed cost record their actual non-negative values",
+        "unknown usage and cost increment explicit unknown counters and are never coerced to zero",
+        "provider and model use closed role/revision buckets while route version, attempt identifiers, Prompt and content never become metric labels",
+        "breaker skips and final no-result routing decisions are separate low-cardinality signals"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "G12-F01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI002-ROUTING-MODULE-001", "T-AI002-ROUTING-AI-EVAL-001"]
+    },
+    {
+      "source_id": "G12-F03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI002-ROUTING-MODULE-001", "T-AI002-ROUTING-AI-EVAL-001"]
+    },
+    {
+      "source_id": "G12-B01",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI002-BREAKER-MODULE-001",
+        "T-AI002-BREAKER-AI-EVAL-001",
+        "T-AI002-BREAKER-REDIS-001"
+      ]
+    },
+    {
+      "source_id": "G12-L05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI002-LATE-MODULE-001", "T-AI002-LATE-AI-EVAL-001"]
+    },
+    {
+      "source_id": "G12-B02",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI002-BREAKER-MODULE-001",
+        "T-AI002-BREAKER-AI-EVAL-001",
+        "T-AI002-BREAKER-REDIS-001"
+      ]
+    },
+    {
+      "source_id": "G12-B03",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI002-BREAKER-MODULE-001",
+        "T-AI002-BREAKER-AI-EVAL-001",
+        "T-AI002-BREAKER-REDIS-001"
+      ]
+    },
+    {
+      "source_id": "G12-B04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI002-BREAKER-MODULE-001", "T-AI002-BREAKER-AI-EVAL-001"]
+    },
+    {
+      "source_id": "G12-B05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI002-BREAKER-MODULE-001", "T-AI002-BREAKER-AI-EVAL-001"]
+    },
+    {
+      "source_id": "G12-B07",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI002-DEADLINE-MODULE-001",
+        "T-AI002-DEADLINE-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "S33-OBS-033",
+      "status": "COVERED",
+      "proof_ids": ["T-AI002-TELEMETRY-CONTRACT-001"]
+    }
+  ]
+}

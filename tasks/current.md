@@ -1,14 +1,14 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-09-07
+- **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-002 — 实现主备模型、超时、重试与熔断
-- **任务状态**：Ready（尚未开工）
+- **任务状态**：In Review
 - **任务 Profile**：`security`（provider 路由、deadline、bounded retry、breaker/Redis loss、usage/cost telemetry 与 Safety 优先级）
-- **工作分支**：尚未创建；建议 `agent/ai002-provider-routing`
+- **工作分支**：`agent/ai002-provider-routing`
 - **任务 Issue**：[AI-002 Issue #71](https://github.com/WeiHan1996/DailyEnergy/issues/71)
-- **当前 PR**：无；AI-002 尚未开始
+- **当前 PR**：[Draft PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189)；review baseline CI 11/11，通过后等待 owner threat-boundary review；合并前仍须 exact-head verifier
 - **上一完成任务**：AI-001 Done；[PR #187](https://github.com/WeiHan1996/DailyEnergy/pull/187) final head `700e8e6c60f9fae4b65488463a5131ae4f5d78c3` / CI run `34123266299` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `02e0120bdad29f7d116cadce1cc021fa866146d6`；merged-main CI run `34123602647` 11/11 SUCCESS；Issue #67 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,8 +16,31 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-001 已 Done，AI-002 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-002 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：运行 `pnpm agent:prepare AI-002 --remote --deep`，读取全部 required sources，再从收尾后的当前 `main` 创建聚焦实现分支；不接生产 provider 凭据
+- **下一候选动作**：等待 owner 审核 [PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189) 的 threat boundary；获明确批准后才可标记 Ready、执行 exact-head verifier 与 squash merge
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-07 AI-002 启动
+
+- AI-001 状态收尾 PR #188 final head `8b9a8611d61f807b0a3e914eb558ac21c4f68963` / CI run `34124597876` 11/11 SUCCESS，经 exact-head verifier 后 squash 合并为 `23e1e2ca3aafd1dccdb6b76e4cfea042070e92a0`；merged-main CI run `34124875164` 11/11 SUCCESS；
+- `pnpm agent:prepare AI-002 --remote --deep` 在固定 Node `24.18.0` 下返回 `READY`，Profile=`security`，Node/pnpm/dependencies/GitHub 全部 PASS；
+- 分支 `agent/ai002-provider-routing` 从本地、origin/main 与远端一致的 `main@23e1e2ca3aafd1dccdb6b76e4cfea042070e92a0` 创建；开工前工作树无变更；
+- 本任务实现 primary→backup 的最多两次 provider 调用、每角色一次、总 deadline/template reserve、infrastructure/quality breaker 与 HALF_OPEN、Redis loss fail closed、late/unknown 隔离和 usage/cost completeness；
+- 不接生产 provider/key，不实现 Prompt/人格评价，不执行 AI-006 的模板 renderer，不改变 Published result 或 Safety/删除优先级；Production/RC、Alpha、真实用户与真实 provider 保持 `NO_GO`。
+
+### 2026-09-08 AI-002 实施与本地验证
+
+- 实现提交 `30c619981ce9250e41e7ad98d5a2ff54de5a23d8` 已推送并创建 [Draft PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189)；本次状态回写产生的新 head 必须使用自己的同 run CI，不能复用实现提交或本地 Gate 作为合并证据；
+- PR #189 review baseline head `2ea00ecbd7b2f559851efc0f394171beddcff126` 的 CI run `34142896498` 为 11/11 SUCCESS；本收据提交后的新 final head 仍须使用自己的同 run CI，不能复用该 baseline；
+- `GatewayRouteOrchestratorV1` 已实现固定 `PRIMARY_AI` → `BACKUP_AI` 顺序、每 role 最多一次、无竞速/拼接；两个 provider 路径均不可用时只返回 `CONTROLLED_TEMPLATE_REQUIRED`，AI-006 renderer 不在本任务执行；
+- Safety/删除 admission 与 budget hard stop 在 route/breaker/provider 之前生效；provider candidate 返回后重新读取 live PublishGuard，guard 不可读时阻断普通发布，late deadline 返回 `OUTCOME_UNKNOWN` 且候选不发布；
+- `gateway-policy-v1` breaker 分离 infrastructure 与 quality denominator：5 次连续失败或 10～20 样本中至少 50% infrastructure failure 进入 OPEN，cooldown 为 60/120/240/480/900 秒，HALF_OPEN 最多两个探测并需两个成功关闭；auth/quality 只随精确 route fingerprint 变化重置；
+- Redis 8 adapter 使用不可逆 key、严格 snapshot parser、有界 TTL 和 Lua CAS；CAS 同时核对 revision 与 route fingerprint，旧在途结果不能通过 revision ABA 覆盖新 route，Redis 丢失/损坏/unreadable 只返回稳定不可用并使 provider calls 为 0；
+- provider attempt 完成后才产生 usage/cost telemetry：已知值记录真实非负 units/microunits，未知值进入显式 unknown counter，不按 0；metric labels 只使用 PRIMARY/BACKUP、CURRENT/OTHER/UNKNOWN、workload 与封闭 outcome/reason，不含 route version、attempt/user ref、Prompt 或正文；telemetry 故障不改变 Safety、路由或 provider outcome；
+- `tests/registry/ai002-evidence-manifest.json` 仅把确实证明的 `G12-B01/B02/B03/B04/B05/B07`、`G12-F01/F03`、`G12-L05` 提升为 COVERED，并为既有 `S33-OBS-033` 增加 AI-002 证据；当前 registry=`587/1004 COVERED`、`417 PLANNED`、`0 NA_WITH_REASON`；需要 AI-006 实际模板、weekly 容量池、真实 provider 或后续 Prompt/validator 的场景继续 PLANNED；
+- 固定 Node `24.18.0` / pnpm `11.17.0`：server-core `104/104`、server-adapters 与 registry/Phase Gate 通过；真实 PostgreSQL 18 + Redis 8 + BullMQ 5 queue integration `9/9`，其中 AI-002 验证并发 missing-CAS、route-fingerprint ABA 拒绝、精确回读与 Redis loss；
+- 最终 `pnpm agent:validate --mode=changed --task=AI-002` 按策略升级 full 后为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（174131ms）；显式 full 同终态（178104ms）；task Gate 同终态（85590ms）。required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；
+- full Gate 产生的 Prisma generated 空白差异已确认无语义变化并恢复，未进入任务 diff；当前只等待 owner 审核以下 threat boundary：无真实 provider/key/出网，template 只返回调用方决策，breaker/guard unreadable fail closed，Safety/删除/预算优先，UNKNOWN 不重放同 role，旧 route 不能污染新 breaker，telemetry 不含正文或用户标识；Production authorization 对本 development PR 不适用并保持 `NOT_GRANTED / NO_GO`；
+- AI-002 接受并合并后的下一任务为 AI-003（Prompt 版本管理）；本次不启动 AI-003。
 
 ## 2026-09-07 AI-001 post-merge 收尾
 

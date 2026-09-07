@@ -42,3 +42,9 @@ AI-001 新增 `./ai` provider adapter 边界：每次调用都核对 manifest �
 Interactive/Background/Evaluation profile、egress allowlist、硬 deadline 与事务外状态；
 transport 每 role 最多调用一次，异常只归一化为稳定 metadata。合成 provider 与内存
 attempt store 只从 `./testing` 导出，不接真实 provider、key 或网络。
+
+AI-002 新增 Redis 8 breaker store 与 Gateway telemetry sink：breaker key 只使用不可逆
+fingerprint，Lua CAS 同时核对 revision 与 route fingerprint 并设置有界 TTL；Redis 丢失、
+损坏 snapshot 或 CAS 状态不可读均返回稳定不可用错误。telemetry 只投影 PRIMARY/BACKUP、
+CURRENT/OTHER/UNKNOWN、workload、封闭 outcome/reason，以及真实归一化 usage/cost 或显式
+UNKNOWN；route version、attempt ref、Prompt、provider body 和用户内容不进入 metric label。

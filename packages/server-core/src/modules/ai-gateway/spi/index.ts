@@ -12,6 +12,61 @@ import type {
   GatewayValidationReceiptV1,
   GatewayWorkload,
 } from "../domain/contracts.js";
+import type {
+  GatewayBreakerOutcomeClass,
+  GatewayBreakerSnapshotV1,
+} from "../domain/breaker.js";
+
+export interface GatewayBreakerStateStoreV1 {
+  compareAndSet(input: {
+    readonly expectedRevision: number | null;
+    readonly expectedRouteFingerprint: string | null;
+    readonly key: string;
+    readonly next: GatewayBreakerSnapshotV1;
+    readonly ttlMs: number;
+  }): Promise<boolean>;
+  load(key: string): Promise<GatewayBreakerSnapshotV1 | null>;
+}
+
+export interface GatewayLiveGuardV1 {
+  read(): Promise<
+    | { readonly status: "ALLOWED" }
+    | {
+        readonly reasonCode:
+          | "OWNER_CANCELLED_OR_DELETED"
+          | "RESULT_ALREADY_AVAILABLE"
+          | "SAFETY_OVERLAY_ACTIVE"
+          | "STALE_PUBLISH_GUARD";
+        readonly status: "BLOCKED";
+      }
+  >;
+}
+
+export interface GatewayRoutingTelemetrySinkV1 {
+  record(event: {
+    readonly outcomeCode: "BLOCKED" | "CANDIDATE" | "FALLBACK";
+    readonly reasonCode: string;
+    readonly role?: GatewayProviderRole;
+    readonly routeManifestVersion: string;
+    readonly workload: GatewayWorkload;
+  }): void;
+}
+
+export interface GatewayAttemptTelemetrySinkV1 {
+  record(event: {
+    readonly costCompleteness: "KNOWN" | "UNKNOWN";
+    readonly modelRevisionBucket: "CURRENT" | "OTHER" | "UNKNOWN";
+    readonly outcomeCode: GatewayAttemptOutcome;
+    readonly reasonCode: string;
+    readonly role: GatewayProviderRole;
+    readonly routeManifestVersion: string;
+    readonly usage: GatewayNormalizedUsageV1;
+    readonly usageCompleteness: "KNOWN" | "UNKNOWN";
+    readonly workload: GatewayWorkload;
+  }): void;
+}
+
+export type { GatewayBreakerOutcomeClass, GatewayBreakerSnapshotV1 };
 
 export interface GatewayAttemptReservationV1 {
   readonly adapterVersion: string;

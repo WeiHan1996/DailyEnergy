@@ -14,3 +14,8 @@ export {
   renderControlledDailyTemplate,
 } from "./controlled-daily-template.js";
 export type { RenderedControlledDailyTemplate } from "./controlled-daily-template.js";
+export {
+  createGatewayAttemptTelemetrySinkV1,
+  createGatewayRoutingTelemetrySinkV1,
+} from "./gateway-telemetry.js";
+export { RedisGatewayBreakerStoreV1 } from "./redis-gateway-breaker-store.js";
