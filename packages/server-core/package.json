@@ -32,6 +32,10 @@
       "types": "./dist/modules/product-time/spi/index.d.ts",
       "import": "./dist/modules/product-time/spi/index.js"
     },
+    "./relationship": {
+      "types": "./dist/modules/relationship/public/index.d.ts",
+      "import": "./dist/modules/relationship/public/index.js"
+    },
     "./weekly-reflection": {
       "types": "./dist/modules/weekly-reflection/public/index.d.ts",
       "import": "./dist/modules/weekly-reflection/public/index.js"

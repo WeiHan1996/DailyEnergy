@@ -286,6 +286,15 @@ export const RelationshipStageValues = [
 export const RelationshipStageSchema = z.enum(RelationshipStageValues);
 export type RelationshipStage = z.infer<typeof RelationshipStageSchema>;
 
+export const RelationshipNodeCodeValues = [
+  "FIRST_MEETING",
+  "STYLE_CALIBRATION_AVAILABLE",
+  "IMPORTANT_MATTER_INVITE_AVAILABLE",
+  "FIRST_SEVEN_DAY_REVIEW_AVAILABLE",
+] as const;
+export const RelationshipNodeCodeSchema = z.enum(RelationshipNodeCodeValues);
+export type RelationshipNodeCode = z.infer<typeof RelationshipNodeCodeSchema>;
+
 export const ExpressionStyleValues = [
   "BALANCED",
   "GENTLE",

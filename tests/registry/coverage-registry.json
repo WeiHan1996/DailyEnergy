@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 664, "NA_WITH_REASON": 0, "PLANNED": 340 },
+  "counts": { "COVERED": 672, "NA_WITH_REASON": 0, "PLANNED": 332 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -1862,11 +1862,44 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "controlled copy avoids internal source, count, Prompt, Safety and fingerprint details",
+            "exclusivity, forever promises, fabricated waiting, interruption blame, make-up pressure, relationship injury and vulnerability language are rejected",
+            "the controlled registry renders only the reviewed first, third and seventh encounter-day copy and keeps the fourth-day matter invitation outside AI-007"
+          ],
+          "file": "packages/server-core/src/modules/relationship/domain/continuity-copy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 controlled relationship continuity copy",
+          "test_id": "T-AI007-COPY-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "the first, third and seventh encounter-day directives limit claims to real relationship facts and require explicit prohibited-inference language",
+            "the fourth-day matter directive remains outside AI-007 and unbounded directives are rejected"
+          ],
+          "file": "packages/prompt-library/src/relationship-continuity.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 relationship continuity Prompt policy",
+          "test_id": "T-AI007-PROMPT-DIRECTIVE-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "an exact replay is deduplicated, calendar gaps do not reset the relationship, and removing a source changes the fingerprint and deterministically lowers the projection",
+            "opened, check-in, notification, Safety and vulnerability fields are rejected rather than becoming relationship evidence",
+            "zero, first, third and seventh encounter-day vectors derive the exact count, stage, canonical eligibility and publishable node without using natural-day continuity"
+          ],
+          "file": "packages/server-core/src/modules/relationship/domain/relationship.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 relationship projection policy",
+          "test_id": "T-AI007-RELATIONSHIP-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-R08",
       "source_sets": ["s16-ai-corpus"]
@@ -1884,11 +1917,44 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "controlled copy avoids internal source, count, Prompt, Safety and fingerprint details",
+            "exclusivity, forever promises, fabricated waiting, interruption blame, make-up pressure, relationship injury and vulnerability language are rejected",
+            "the controlled registry renders only the reviewed first, third and seventh encounter-day copy and keeps the fourth-day matter invitation outside AI-007"
+          ],
+          "file": "packages/server-core/src/modules/relationship/domain/continuity-copy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 controlled relationship continuity copy",
+          "test_id": "T-AI007-COPY-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "the first, third and seventh encounter-day directives limit claims to real relationship facts and require explicit prohibited-inference language",
+            "the fourth-day matter directive remains outside AI-007 and unbounded directives are rejected"
+          ],
+          "file": "packages/prompt-library/src/relationship-continuity.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 relationship continuity Prompt policy",
+          "test_id": "T-AI007-PROMPT-DIRECTIVE-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "an exact replay is deduplicated, calendar gaps do not reset the relationship, and removing a source changes the fingerprint and deterministically lowers the projection",
+            "opened, check-in, notification, Safety and vulnerability fields are rejected rather than becoming relationship evidence",
+            "zero, first, third and seventh encounter-day vectors derive the exact count, stage, canonical eligibility and publishable node without using natural-day continuity"
+          ],
+          "file": "packages/server-core/src/modules/relationship/domain/relationship.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 relationship projection policy",
+          "test_id": "T-AI007-RELATIONSHIP-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-R10",
       "source_sets": ["s16-ai-corpus"]
@@ -4095,22 +4161,68 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "gapped first, third and seventh encounter days publish exactly one reviewed node receipt each; repeat Today reads and late or duplicate DayLit events do not publish another node",
+            "real PostgreSQL 18 freezes the prior LightFact-derived relationship stage and count into each new generation snapshot while an existing Published result and fingerprint remain byte-stable",
+            "relationship-data deletion rejects old DayLit replay and a fresh post-cutoff cycle can publish its own first-meeting node without restoring old sources",
+            "source removal advances the cycle revision and fingerprint, lowers the public stage, and a later threshold recross does not replay a node already published in that cycle"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-AI007-DB-001"
+        },
+        {
+          "assertions": [
+            "an exact replay is deduplicated, calendar gaps do not reset the relationship, and removing a source changes the fingerprint and deterministically lowers the projection",
+            "opened, check-in, notification, Safety and vulnerability fields are rejected rather than becoming relationship evidence",
+            "zero, first, third and seventh encounter-day vectors derive the exact count, stage, canonical eligibility and publishable node without using natural-day continuity"
+          ],
+          "file": "packages/server-core/src/modules/relationship/domain/relationship.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 relationship projection policy",
+          "test_id": "T-AI007-RELATIONSHIP-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-D05",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "gapped first, third and seventh encounter days publish exactly one reviewed node receipt each; repeat Today reads and late or duplicate DayLit events do not publish another node",
+            "real PostgreSQL 18 freezes the prior LightFact-derived relationship stage and count into each new generation snapshot while an existing Published result and fingerprint remain byte-stable",
+            "relationship-data deletion rejects old DayLit replay and a fresh post-cutoff cycle can publish its own first-meeting node without restoring old sources",
+            "source removal advances the cycle revision and fingerprint, lowers the public stage, and a later threshold recross does not replay a node already published in that cycle"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-AI007-DB-001"
+        },
+        {
+          "assertions": [
+            "an exact replay is deduplicated, calendar gaps do not reset the relationship, and removing a source changes the fingerprint and deterministically lowers the projection",
+            "opened, check-in, notification, Safety and vulnerability fields are rejected rather than becoming relationship evidence",
+            "zero, first, third and seventh encounter-day vectors derive the exact count, stage, canonical eligibility and publishable node without using natural-day continuity"
+          ],
+          "file": "packages/server-core/src/modules/relationship/domain/relationship.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 relationship projection policy",
+          "test_id": "T-AI007-RELATIONSHIP-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-D06",
       "source_sets": ["s16-ai-corpus"]
@@ -4150,11 +4262,55 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "gapped first, third and seventh encounter days publish exactly one reviewed node receipt each; repeat Today reads and late or duplicate DayLit events do not publish another node",
+            "real PostgreSQL 18 freezes the prior LightFact-derived relationship stage and count into each new generation snapshot while an existing Published result and fingerprint remain byte-stable",
+            "relationship-data deletion rejects old DayLit replay and a fresh post-cutoff cycle can publish its own first-meeting node without restoring old sources",
+            "source removal advances the cycle revision and fingerprint, lowers the public stage, and a later threshold recross does not replay a node already published in that cycle"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-AI007-DB-001"
+        },
+        {
+          "assertions": [
+            "the online authoritative Today response may carry one relationship node, but the local Today cache removes node_display so offline and subsequent cached reads cannot replay it"
+          ],
+          "file": "apps/miniapp/src/features/daily/daily-cache.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "C-009 daily view cache",
+          "test_id": "T-AI007-MINIAPP-001"
+        },
+        {
+          "assertions": [
+            "real Redis 8 loss rebuilds the same authoritative content, interaction and relationship projection from PostgreSQL without replaying the already published first-meeting node",
+            "the PostgreSQL node receipt remains unique while cache keys are rebuilt"
+          ],
+          "file": "tests/queue/integration.test.mjs",
+          "level": "INTEGRATION",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "C-008 outbox/inbox publishes once and Redis cache loss rebuilds from PostgreSQL",
+          "test_id": "T-AI007-QUEUE-001"
+        },
+        {
+          "assertions": [
+            "an exact replay is deduplicated, calendar gaps do not reset the relationship, and removing a source changes the fingerprint and deterministically lowers the projection",
+            "opened, check-in, notification, Safety and vulnerability fields are rejected rather than becoming relationship evidence",
+            "zero, first, third and seventh encounter-day vectors derive the exact count, stage, canonical eligibility and publishable node without using natural-day continuity"
+          ],
+          "file": "packages/server-core/src/modules/relationship/domain/relationship.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 relationship projection policy",
+          "test_id": "T-AI007-RELATIONSHIP-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-D10",
       "source_sets": ["s16-ai-corpus"]
@@ -4183,11 +4339,20 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "changing relationship stage and count does not change RuleFacts and the current Daily v1 expression plan remains relationship_mode GENERIC with empty resolved context slots",
+            "relationship continuity is delivered as a separate deterministic DLY-003 module rather than silently widening the accepted Daily Prompt v1 memory contract"
+          ],
+          "file": "packages/server-core/src/modules/generation/application/derive-daily-rules.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "C-006 daily derivation bindings",
+          "test_id": "T-AI007-PROMPT-V1-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-R01",
       "source_sets": ["s16-ai-corpus"]
@@ -4436,11 +4601,34 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "gapped first, third and seventh encounter days publish exactly one reviewed node receipt each; repeat Today reads and late or duplicate DayLit events do not publish another node",
+            "real PostgreSQL 18 freezes the prior LightFact-derived relationship stage and count into each new generation snapshot while an existing Published result and fingerprint remain byte-stable",
+            "relationship-data deletion rejects old DayLit replay and a fresh post-cutoff cycle can publish its own first-meeting node without restoring old sources",
+            "source removal advances the cycle revision and fingerprint, lowers the public stage, and a later threshold recross does not replay a node already published in that cycle"
+          ],
+          "file": "tests/database/c008-daily-generation.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+          "test_id": "T-AI007-DB-001"
+        },
+        {
+          "assertions": [
+            "an exact replay is deduplicated, calendar gaps do not reset the relationship, and removing a source changes the fingerprint and deterministically lowers the projection",
+            "opened, check-in, notification, Safety and vulnerability fields are rejected rather than becoming relationship evidence",
+            "zero, first, third and seventh encounter-day vectors derive the exact count, stage, canonical eligibility and publishable node without using natural-day continuity"
+          ],
+          "file": "packages/server-core/src/modules/relationship/domain/relationship.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 relationship projection policy",
+          "test_id": "T-AI007-RELATIONSHIP-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-S12",
       "source_sets": ["s16-ai-corpus"]
@@ -6886,11 +7074,33 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "controlled copy avoids internal source, count, Prompt, Safety and fingerprint details",
+            "exclusivity, forever promises, fabricated waiting, interruption blame, make-up pressure, relationship injury and vulnerability language are rejected",
+            "the controlled registry renders only the reviewed first, third and seventh encounter-day copy and keeps the fourth-day matter invitation outside AI-007"
+          ],
+          "file": "packages/server-core/src/modules/relationship/domain/continuity-copy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 controlled relationship continuity copy",
+          "test_id": "T-AI007-COPY-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "an exact replay is deduplicated, calendar gaps do not reset the relationship, and removing a source changes the fingerprint and deterministically lowers the projection",
+            "opened, check-in, notification, Safety and vulnerability fields are rejected rather than becoming relationship evidence",
+            "zero, first, third and seventh encounter-day vectors derive the exact count, stage, canonical eligibility and publishable node without using natural-day continuity"
+          ],
+          "file": "packages/server-core/src/modules/relationship/domain/relationship.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai007-evidence-manifest.json",
+          "selector": "AI-007 relationship projection policy",
+          "test_id": "T-AI007-RELATIONSHIP-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-D08",
       "source_sets": ["s16-ai-corpus"]

@@ -1,0 +1,147 @@
+{
+  "manifest_version": "ai-007-evidence-v1",
+  "scope": "AI-007 LightFact-only relationship projection, immutable relationship snapshots, one-time node receipts, deletion/replay behavior, and reviewed day 1/3/7 continuity copy",
+  "authority": [
+    "docs/product/state-machine.md",
+    "docs/product/business-rules.md",
+    "docs/ai/personality.md",
+    "docs/ai/prompt-spec.md",
+    "docs/ai/memory.md",
+    "docs/ai/safety.md",
+    "docs/data/domain-model.md",
+    "docs/technical/database.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-AI007-RELATIONSHIP-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/relationship/domain/relationship.test.ts",
+      "selector": "AI-007 relationship projection policy",
+      "level": "AI_EVAL",
+      "assertions": [
+        "zero, first, third and seventh encounter-day vectors derive the exact count, stage, canonical eligibility and publishable node without using natural-day continuity",
+        "an exact replay is deduplicated, calendar gaps do not reset the relationship, and removing a source changes the fingerprint and deterministically lowers the projection",
+        "opened, check-in, notification, Safety and vulnerability fields are rejected rather than becoming relationship evidence"
+      ]
+    },
+    "T-AI007-COPY-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/relationship/domain/continuity-copy.test.ts",
+      "selector": "AI-007 controlled relationship continuity copy",
+      "level": "AI_EVAL",
+      "assertions": [
+        "the controlled registry renders only the reviewed first, third and seventh encounter-day copy and keeps the fourth-day matter invitation outside AI-007",
+        "controlled copy avoids internal source, count, Prompt, Safety and fingerprint details",
+        "exclusivity, forever promises, fabricated waiting, interruption blame, make-up pressure, relationship injury and vulnerability language are rejected"
+      ]
+    },
+    "T-AI007-PROMPT-DIRECTIVE-AI-EVAL-001": {
+      "file": "packages/prompt-library/src/relationship-continuity.test.ts",
+      "selector": "AI-007 relationship continuity Prompt policy",
+      "level": "AI_EVAL",
+      "assertions": [
+        "the first, third and seventh encounter-day directives limit claims to real relationship facts and require explicit prohibited-inference language",
+        "the fourth-day matter directive remains outside AI-007 and unbounded directives are rejected"
+      ]
+    },
+    "T-AI007-PROMPT-V1-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/generation/application/derive-daily-rules.test.ts",
+      "selector": "C-006 daily derivation bindings",
+      "level": "AI_EVAL",
+      "assertions": [
+        "changing relationship stage and count does not change RuleFacts and the current Daily v1 expression plan remains relationship_mode GENERIC with empty resolved context slots",
+        "relationship continuity is delivered as a separate deterministic DLY-003 module rather than silently widening the accepted Daily Prompt v1 memory contract"
+      ]
+    },
+    "T-AI007-DB-001": {
+      "file": "tests/database/c008-daily-generation.test.mjs",
+      "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+      "level": "DB",
+      "assertions": [
+        "real PostgreSQL 18 freezes the prior LightFact-derived relationship stage and count into each new generation snapshot while an existing Published result and fingerprint remain byte-stable",
+        "gapped first, third and seventh encounter days publish exactly one reviewed node receipt each; repeat Today reads and late or duplicate DayLit events do not publish another node",
+        "source removal advances the cycle revision and fingerprint, lowers the public stage, and a later threshold recross does not replay a node already published in that cycle",
+        "relationship-data deletion rejects old DayLit replay and a fresh post-cutoff cycle can publish its own first-meeting node without restoring old sources"
+      ]
+    },
+    "T-AI007-MINIAPP-001": {
+      "file": "apps/miniapp/src/features/daily/daily-cache.test.ts",
+      "selector": "C-009 daily view cache",
+      "level": "UNIT",
+      "assertions": [
+        "the online authoritative Today response may carry one relationship node, but the local Today cache removes node_display so offline and subsequent cached reads cannot replay it"
+      ]
+    },
+    "T-AI007-QUEUE-001": {
+      "file": "tests/queue/integration.test.mjs",
+      "selector": "C-008 outbox/inbox publishes once and Redis cache loss rebuilds from PostgreSQL",
+      "level": "INTEGRATION",
+      "assertions": [
+        "real Redis 8 loss rebuilds the same authoritative content, interaction and relationship projection from PostgreSQL without replaying the already published first-meeting node",
+        "the PostgreSQL node receipt remains unique while cache keys are rebuilt"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "E16-R08",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI007-RELATIONSHIP-AI-EVAL-001",
+        "T-AI007-COPY-AI-EVAL-001",
+        "T-AI007-PROMPT-DIRECTIVE-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "E16-R10",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI007-RELATIONSHIP-AI-EVAL-001",
+        "T-AI007-COPY-AI-EVAL-001",
+        "T-AI007-PROMPT-DIRECTIVE-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "M14-D05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI007-RELATIONSHIP-AI-EVAL-001", "T-AI007-DB-001"]
+    },
+    {
+      "source_id": "M14-D06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI007-RELATIONSHIP-AI-EVAL-001", "T-AI007-DB-001"]
+    },
+    {
+      "source_id": "M14-D10",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI007-RELATIONSHIP-AI-EVAL-001",
+        "T-AI007-DB-001",
+        "T-AI007-MINIAPP-001",
+        "T-AI007-QUEUE-001"
+      ]
+    },
+    {
+      "source_id": "M14-R01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI007-PROMPT-V1-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-S12",
+      "status": "COVERED",
+      "proof_ids": ["T-AI007-RELATIONSHIP-AI-EVAL-001", "T-AI007-DB-001"]
+    },
+    {
+      "source_id": "S15-D08",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI007-RELATIONSHIP-AI-EVAL-001",
+        "T-AI007-COPY-AI-EVAL-001"
+      ]
+    }
+  ],
+  "pending_evidence": {
+    "E16-R09": "AI-011 must implement and validate the first seven-day Weekly summary from exact approved aggregate refs.",
+    "E16-R11": "AI-009 must implement future permissioned memory expiry, revocation and deletion propagation.",
+    "model_and_human_quality": "AI-014 and AI-015 must run authorized MODEL/HUMAN evaluation; deterministic copy is not provider or human evidence.",
+    "production_authorization": "NOT_GRANTED"
+  }
+}

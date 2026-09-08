@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:4f25a52e42831a6ecaee032c92a92244e262169e452cf8a25389c0ba450a89a5
+// source-fingerprint: sha256:00a1a9cf76a6e9f1e0141332084859a6cd8c4ccc6cf4fdf25771f72b43e5da17
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:4f25a52e42831a6ecaee032c92a92244e262169e452cf8a25389c0ba450a89a5";
+  "sha256:00a1a9cf76a6e9f1e0141332084859a6cd8c4ccc6cf4fdf25771f72b43e5da17";
 
 export interface paths {
   "/analytics/signals": {
@@ -1710,8 +1710,24 @@ export interface components {
         updated_at: string;
       };
       relationship: {
-        display_token?: string;
+        eligible_nodes: Array<
+          | "FIRST_MEETING"
+          | "STYLE_CALIBRATION_AVAILABLE"
+          | "IMPORTANT_MATTER_INVITE_AVAILABLE"
+          | "FIRST_SEVEN_DAY_REVIEW_AVAILABLE"
+        >;
         encounter_day_count: number;
+        node_display?: {
+          body: string;
+          copy_version: "relationship-continuity-copy-v1";
+          title: string;
+          token:
+            | "FIRST_MEETING"
+            | "STYLE_CALIBRATION_AVAILABLE"
+            | "IMPORTANT_MATTER_INVITE_AVAILABLE"
+            | "FIRST_SEVEN_DAY_REVIEW_AVAILABLE";
+        };
+        projection_version: "relationship-projection-v1";
         stage:
           | "BEFORE_FIRST_MEETING"
           | "NEWLY_MET"

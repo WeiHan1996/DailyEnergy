@@ -112,7 +112,7 @@ export class DailyViewCache {
       ...(current?.historyList === undefined
         ? {}
         : { historyList: current.historyList }),
-      today: view,
+      today: todayCacheProjection(view),
     });
   }
 
@@ -265,6 +265,15 @@ function historyCacheProjection(view: HistoryDayView): HistoryDayView {
     delete evening.feedback.note;
   }
   return projectHistoryDayView(candidate);
+}
+
+function todayCacheProjection(view: TodayView): TodayView {
+  const candidate = JSON.parse(JSON.stringify(view)) as Record<string, unknown>;
+  const relationship = candidate.relationship;
+  if (isRecord(relationship)) {
+    delete relationship.node_display;
+  }
+  return projectTodayView(candidate);
 }
 
 function historyContainsNote(value: Record<string, unknown>): boolean {

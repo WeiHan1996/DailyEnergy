@@ -39,6 +39,38 @@ describe("C-009 daily view cache", () => {
     ).resolves.toBeUndefined();
   });
 
+  it("does not replay a one-time relationship node from the offline cache", async () => {
+    const state = storage();
+    const cache = new DailyViewCache(state.port, "scope", () => 1_000);
+    await cache.saveToday({
+      ...todayFixture,
+      relationship: {
+        eligible_nodes: ["FIRST_MEETING"],
+        encounter_day_count: 1,
+        node_display: {
+          body: "先从今天这一小步开始，不急着把彼此说得很熟。",
+          copy_version: "relationship-continuity-copy-v1",
+          title: "今天是第一次相遇",
+          token: "FIRST_MEETING",
+        },
+        projection_version: "relationship-projection-v1",
+        stage: "NEWLY_MET",
+      },
+    });
+
+    await expect(cache.loadToday()).resolves.toMatchObject({
+      relationship: {
+        eligible_nodes: ["FIRST_MEETING"],
+        encounter_day_count: 1,
+        projection_version: "relationship-projection-v1",
+        stage: "NEWLY_MET",
+      },
+    });
+    expect(await cache.loadToday()).not.toHaveProperty(
+      "relationship.node_display",
+    );
+  });
+
   it("does not retain notes and evicts details for authoritative missing days", async () => {
     const state = storage();
     const cache = new DailyViewCache(state.port, "scope", () => 1_000);

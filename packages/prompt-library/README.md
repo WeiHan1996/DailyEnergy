@@ -37,6 +37,10 @@
   `CONTROLLED_TEMPLATE` candidate；
 - `validateControlledDailyTemplateCandidateV1`，复查 Schema、事实 ID、字符预算、
   人格、低压力、仪式与 Safety 禁止项。
+- AI-007 的 `relationship-continuity-directive-v1` 与
+  `relationship-continuity-copy-v1`：只为有效 LightFact 派生的第 1/3/7 日节点提供封闭
+  Prompt 指令和受控文案；第 4 日事项邀请保留给 AI-008，当前 Daily Prompt v1 仍为
+  `relationship_mode=GENERIC`。
 
 模板候选保留四份 Accepted 规范的 source attribution；Daily v1 不解析记忆或事项，
 因此 `source_dependencies=[]`、`privacy_fallbacks={}`。发布、唯一性、live guard、

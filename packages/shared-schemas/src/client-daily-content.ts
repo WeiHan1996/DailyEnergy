@@ -6,6 +6,8 @@ import {
   OpaqueIdSchema,
   PositiveRevisionSchema,
   ProductDateSchema,
+  RelationshipNodeCodeSchema,
+  type RelationshipNodeCode,
   RelationshipStageSchema,
   Rfc3339TimestampSchema,
   RitualKindSchema,
@@ -239,13 +241,61 @@ export const GenerationIntentViewSchema = z
   });
 export type GenerationIntentView = z.infer<typeof GenerationIntentViewSchema>;
 
-export const RelationshipViewSchema = z
+export const RELATIONSHIP_PROJECTION_VERSION = "relationship-projection-v1";
+export const RELATIONSHIP_CONTINUITY_COPY_VERSION =
+  "relationship-continuity-copy-v1";
+
+export const RelationshipNodeDisplaySchema = z
   .object({
-    stage: RelationshipStageSchema,
-    encounter_day_count: z.number().int().nonnegative(),
-    display_token: VersionTokenSchema.optional(),
+    token: RelationshipNodeCodeSchema,
+    copy_version: z.literal(RELATIONSHIP_CONTINUITY_COPY_VERSION),
+    title: generatedTextSchema(4, 24),
+    body: generatedTextSchema(12, 80),
   })
   .strict();
+export type RelationshipNodeDisplay = z.infer<
+  typeof RelationshipNodeDisplaySchema
+>;
+
+export const RelationshipViewSchema = z
+  .object({
+    projection_version: z.literal(RELATIONSHIP_PROJECTION_VERSION),
+    stage: RelationshipStageSchema,
+    encounter_day_count: z.number().int().nonnegative(),
+    eligible_nodes: z.array(RelationshipNodeCodeSchema).max(4),
+    node_display: RelationshipNodeDisplaySchema.optional(),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const expectedStage = relationshipStage(value.encounter_day_count);
+    if (value.stage !== expectedStage) {
+      addCustomIssue(
+        context,
+        ["stage"],
+        `must be ${expectedStage} for encounter_day_count`,
+      );
+    }
+    const expectedNodes = eligibleRelationshipNodes(value.encounter_day_count);
+    if (
+      JSON.stringify(value.eligible_nodes) !== JSON.stringify(expectedNodes)
+    ) {
+      addCustomIssue(
+        context,
+        ["eligible_nodes"],
+        "must contain the canonical nodes qualified by encounter_day_count",
+      );
+    }
+    if (
+      value.node_display !== undefined &&
+      !expectedNodes.includes(value.node_display.token)
+    ) {
+      addCustomIssue(
+        context,
+        ["node_display", "token"],
+        "must reference an eligible relationship node",
+      );
+    }
+  });
 export type RelationshipView = z.infer<typeof RelationshipViewSchema>;
 
 export const TodayViewSchema = z
@@ -256,3 +306,30 @@ export const TodayViewSchema = z
   })
   .strict();
 export type TodayView = z.infer<typeof TodayViewSchema>;
+
+function relationshipStage(encounterDayCount: number) {
+  return encounterDayCount === 0
+    ? ("BEFORE_FIRST_MEETING" as const)
+    : encounterDayCount < 3
+      ? ("NEWLY_MET" as const)
+      : encounterDayCount < 7
+        ? ("BECOMING_FAMILIAR" as const)
+        : ("FIRST_WEEK_RECORDED" as const);
+}
+
+function eligibleRelationshipNodes(
+  encounterDayCount: number,
+): RelationshipNodeCode[] {
+  return [
+    ...(encounterDayCount >= 1 ? (["FIRST_MEETING"] as const) : []),
+    ...(encounterDayCount >= 3
+      ? (["STYLE_CALIBRATION_AVAILABLE"] as const)
+      : []),
+    ...(encounterDayCount >= 4
+      ? (["IMPORTANT_MATTER_INVITE_AVAILABLE"] as const)
+      : []),
+    ...(encounterDayCount >= 7
+      ? (["FIRST_SEVEN_DAY_REVIEW_AVAILABLE"] as const)
+      : []),
+  ];
+}

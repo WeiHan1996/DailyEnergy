@@ -60,6 +60,10 @@
     {
       "name": "20260830000000_c015_core_analytics",
       "sha256": "2e6a80aae8cfa73b4a79925fe33e695f6a83eefb25cb2d4a9114bc18d51f1ff3"
+    },
+    {
+      "name": "20260908000000_ai007_relationship_continuity",
+      "sha256": "9488fef69d7d106b649749f873e174891c92eb515c0291b08858211d674c772e"
     }
   ]
 }

@@ -1,6 +1,5 @@
-import { createHash } from "node:crypto";
-
 import type { GenerationGuardSnapshotV1 } from "@daily-energy/server-core/generation";
+import { relationshipSourceFingerprintV1 } from "@daily-energy/server-core/relationship";
 
 import { parseGenerationGuardSnapshot } from "../generation/guard-snapshot.js";
 import {
@@ -300,13 +299,14 @@ function deletionEpochMatches(
 }
 
 function relationshipFingerprint(rows: readonly LinkFingerprintRow[]): Buffer {
-  const source = rows
-    .map(
-      (row) =>
-        `${row.productDate}:${row.sourceLightId}:${row.sourceValidityRevision}`,
-    )
-    .join("|");
-  return createHash("sha256")
-    .update(`relationship-projection-v1|${source}`, "utf8")
-    .digest();
+  return Buffer.from(
+    relationshipSourceFingerprintV1(
+      rows.map((row) => ({
+        productDate: row.productDate,
+        sourceLightRef: row.sourceLightId,
+        sourceValidityRevision: row.sourceValidityRevision,
+      })),
+    ),
+    "hex",
+  );
 }

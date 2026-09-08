@@ -140,7 +140,9 @@ function todayView(): TodayView {
       updated_at: fixedNow.toISOString(),
     },
     relationship: {
+      eligible_nodes: [],
       encounter_day_count: 0,
+      projection_version: "relationship-projection-v1",
       stage: "BEFORE_FIRST_MEETING",
     },
   };

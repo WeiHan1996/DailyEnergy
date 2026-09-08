@@ -7935,14 +7935,62 @@
       "RelationshipView": {
         "additionalProperties": false,
         "properties": {
-          "display_token": {
-            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
-            "type": "string"
+          "eligible_nodes": {
+            "items": {
+              "enum": [
+                "FIRST_MEETING",
+                "STYLE_CALIBRATION_AVAILABLE",
+                "IMPORTANT_MATTER_INVITE_AVAILABLE",
+                "FIRST_SEVEN_DAY_REVIEW_AVAILABLE"
+              ],
+              "type": "string"
+            },
+            "maxItems": 4,
+            "type": "array"
           },
           "encounter_day_count": {
             "maximum": 9007199254740991,
             "minimum": 0,
             "type": "integer"
+          },
+          "node_display": {
+            "additionalProperties": false,
+            "properties": {
+              "body": {
+                "type": "string"
+              },
+              "copy_version": {
+                "enum": [
+                  "relationship-continuity-copy-v1"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "token": {
+                "enum": [
+                  "FIRST_MEETING",
+                  "STYLE_CALIBRATION_AVAILABLE",
+                  "IMPORTANT_MATTER_INVITE_AVAILABLE",
+                  "FIRST_SEVEN_DAY_REVIEW_AVAILABLE"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "token",
+              "copy_version",
+              "title",
+              "body"
+            ],
+            "type": "object"
+          },
+          "projection_version": {
+            "enum": [
+              "relationship-projection-v1"
+            ],
+            "type": "string"
           },
           "stage": {
             "enum": [
@@ -7955,8 +8003,10 @@
           }
         },
         "required": [
+          "projection_version",
           "stage",
-          "encounter_day_count"
+          "encounter_day_count",
+          "eligible_nodes"
         ],
         "type": "object",
         "x-source-contract": "RelationshipViewSchema",
@@ -8791,14 +8841,62 @@
           "relationship": {
             "additionalProperties": false,
             "properties": {
-              "display_token": {
-                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
-                "type": "string"
+              "eligible_nodes": {
+                "items": {
+                  "enum": [
+                    "FIRST_MEETING",
+                    "STYLE_CALIBRATION_AVAILABLE",
+                    "IMPORTANT_MATTER_INVITE_AVAILABLE",
+                    "FIRST_SEVEN_DAY_REVIEW_AVAILABLE"
+                  ],
+                  "type": "string"
+                },
+                "maxItems": 4,
+                "type": "array"
               },
               "encounter_day_count": {
                 "maximum": 9007199254740991,
                 "minimum": 0,
                 "type": "integer"
+              },
+              "node_display": {
+                "additionalProperties": false,
+                "properties": {
+                  "body": {
+                    "type": "string"
+                  },
+                  "copy_version": {
+                    "enum": [
+                      "relationship-continuity-copy-v1"
+                    ],
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "enum": [
+                      "FIRST_MEETING",
+                      "STYLE_CALIBRATION_AVAILABLE",
+                      "IMPORTANT_MATTER_INVITE_AVAILABLE",
+                      "FIRST_SEVEN_DAY_REVIEW_AVAILABLE"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token",
+                  "copy_version",
+                  "title",
+                  "body"
+                ],
+                "type": "object"
+              },
+              "projection_version": {
+                "enum": [
+                  "relationship-projection-v1"
+                ],
+                "type": "string"
               },
               "stage": {
                 "enum": [
@@ -8811,8 +8909,10 @@
               }
             },
             "required": [
+              "projection_version",
               "stage",
-              "encounter_day_count"
+              "encounter_day_count",
+              "eligible_nodes"
             ],
             "type": "object"
           }
@@ -13161,6 +13261,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:4f25a52e42831a6ecaee032c92a92244e262169e452cf8a25389c0ba450a89a5"
+    "source-fingerprint": "sha256:00a1a9cf76a6e9f1e0141332084859a6cd8c4ccc6cf4fdf25771f72b43e5da17"
   }
 }

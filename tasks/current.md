@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-007 — 实现关系阶段与第 1/3/7 天连续性
-- **任务状态**：Ready
+- **任务状态**：In Review
 - **任务 Profile**：`security`（LightFact 派生关系、节点资格与回执、删除/重放/历史冻结、Prompt/模板关系语言 Safety）
-- **工作分支**：`agent/ai006-completion-status`（仅状态收尾）；收到新的明确启动指令并合并本状态 PR 后，才从 verified `main` 创建 AI-007 实现分支
+- **工作分支**：`agent/ai007-relationship-continuity`（基于 verified `main@766c3c68b1054729cc83f59642483f786957945f`）
 - **任务 Issue**：[AI-007 Issue #76](https://github.com/WeiHan1996/DailyEnergy/issues/76)
-- **当前 PR**：[Draft PR #199](https://github.com/WeiHan1996/DailyEnergy/pull/199)（仅 AI-006 状态收尾）；AI-007 实现尚未开始
+- **当前 PR**：Draft PR 待创建；首次实现提交推送后回填准确编号
 - **上一完成任务**：AI-006 Done；[PR #198](https://github.com/WeiHan1996/DailyEnergy/pull/198) final head `4cf7d4874fa1668a529c49f0e458fc25bc9f1ec1` / CI run `34205576509` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `aa7e6a28f074a1fc7d2b30a5d84848c7bed79967`；merged-main CI run `34206603459` 11/11 SUCCESS；Issue #75 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,7 +16,7 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：C-011、C-013、AI-005 与 AI-006 已 Done，AI-007 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-007 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：提交并验证 AI-006 状态收尾 Draft PR；owner 明确批准合并后，AI-007 保持唯一 Ready，收到新的明确启动指令前不运行 AI-007 prepare、不创建实现分支或编码
+- **下一候选动作**：创建聚焦 Draft PR；等待 owner 审核 LightFact/回执/删除/Prompt/缓存 threat boundary，随后只对 PR final head 使用同 run 11-check CI 和 exact-head verifier
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-08 AI-006 post-merge 收尾
@@ -28,6 +28,32 @@
 - AI-006 已闭合 bounded controlled-template preflight、主备失败后的完整严格校验模板候选、三种 route 的统一发布、server-only provenance/低基数 telemetry 与客户端克制降级呈现；
 - Weekly template/capacity `G12-F05/G12-B08`、真实 provider、MODEL/LOAD/HUMAN 与 Production authorization 继续 Planned/Pending，不由本合并冒充完成；C-015 继续 Blocked，DEV_LITE 保持 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`，Production/RC 继续 `NO_GO`。
 - 状态提交 `8edb99d21fe1b3028ba2bd1b5909df2b62612fa8` 已推送并创建 [Draft PR #199](https://github.com/WeiHan1996/DailyEnergy/pull/199)；本次 PR 引用回写产生的新 final head 必须使用自己的同 run CI，不能复用本地 Gate、PR #198 或 merged-main CI。
+
+## 2026-09-08 AI-007 启动
+
+- owner 明确“开始 AI-007”，按项目既有开工流程授权先完成 AI-006 纯状态收尾 PR #199，再从 verified `main` 建立 AI-007 实现分支；该指令不授予 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；
+- PR #199 final head `a0c1a3c6bdb2fac63180e97c27ad2cb1deaba126` 的 CI run `34207975320` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=199:head=a0c1a3c6bdb2fac63180e97c27ad2cb1deaba126:run=34207975320:checks=11`；
+- PR #199 已用 exact-head squash 合并为 `766c3c68b1054729cc83f59642483f786957945f`，final head 与 merge commit tree 均为 `d5458439bf1313cafd38463c68399910bde91f7a`；merged-main CI run `34215755088` 为 11/11 SUCCESS；
+- 分支 `agent/ai007-relationship-continuity` 从本地、`origin/main` 与远端一致的 verified `main@766c3c68b1054729cc83f59642483f786957945f` 创建，开工前工作树无变更；
+- 本任务只让 Accepted 的有效 LightFact/相遇日决定关系计数、阶段和第 1/3/7 天节点；打开、签到、生成、任务、通知、想象聊天、用户脆弱度与 Safety 事件均不成为关系证据；
+- 删除必须让关系源、资格和相关回执准确失效；重复、并发、迟到和重放必须收敛；历史 Published result 保持生成时版本，不因当前关系变化改写；
+- AI-008 重要事项实现、AI-010 风格反馈生效、AI-011 七天 AI 总结、第 21/30 天、恋爱等级、付费关系权益、主动聊天、真实 provider 和 Production/RC 均不在本任务范围。
+
+### AI-007 实施与本地验证
+
+- 新增 `relationship-policy-v1`：输入严格限定为 product date、LightFact ref 与 source validity revision；同日精确重放去重，冲突源 fail closed，日历中断不清零，输出 count、四阶段、第 1/3/4/7 日资格和稳定 SHA-256 source fingerprint；
+- GenerationInputSnapshot 不再硬编码零关系，而是在账户 guard 下读取当前有效 encounter links 并冻结真实 count/stage；现有 `daily-expression-zh-cn-v1` 仍保持 `relationship_mode=GENERIC` 和空 relationship memory slot，关系节点作为独立 DLY-003 模块，不改写 RuleFacts 或历史 Published result；
+- Today 公开投影新增 `relationship-projection-v1`、封闭 eligible nodes 和可选 `relationship-continuity-copy-v1` node display；第 1/3/7 日经受控模板发布，第 4 日只保留资格给 AI-008，不提前实现事项；客户端展示节点但不写入离线 Today cache；
+- 节点发布在同一 PostgreSQL 事务中写最小 receipt；应用 account advisory lock 与新增 `(cycleId,nodeCode)` 唯一索引共同保证同周期同节点最多一次，不同 source fingerprint 也不能绕过；历史读取不领取节点；
+- 新 migration 增加 DAY link 删除后的 SECURITY DEFINER projection refresh trigger，并 backfill 旧 active cycle；普通 DAY 删除保留防重回执、count/stage/fingerprint 准确下降，再次跨阈值不重放；关系数据整体删除清除旧 cycle/link/receipt 后，post-cutoff 新 LightFact 可建立全新 cycle；
+- `relationship-continuity-directive-v1` 与 copy registry 均有固定 fingerprint；关系文案拒绝排他依赖、永远承诺、虚假等待、中断责备、补签压力、关系受伤和脆弱度推断，不使用 Safety event 促进关系成长；
+- Source registry 将 `E16-R08/R10`、`M14-S12/R01/D05/D06/D10`、`S15-D08` 共 8 项从 PLANNED 提升为 COVERED，当前为 `672/1004 COVERED`、`332 PLANNED`、`0 NA_WITH_REASON`；E16-R09/R11、MODEL/HUMAN 与 Production authorization 继续 Planned/Pending；
+- 聚焦验证：server-core `141/141`、prompt-library `74/74`、server-adapters `75/75`、Mini Program `92/92`、API `158/158`、registry `5/5`、Phase Gate `12/12`、真实 PostgreSQL C-008 `1/1`、数据库 catalog/lifecycle `72/72`、真实 Redis 8/BullMQ 5 queue integration `9/9`，contract/codegen/architecture/lint/typecheck 均通过；
+- 固定 Node `24.18.0` 的最终 implementation-state `pnpm agent:validate --mode=changed` 按路径升级 full，并返回 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（182181ms）；此前参数、架构、registry count、catalog drift、queue fixture 与 lint 的失败均保留为失败且逐项根因修复，不被最终 PASS 改写；Gate 产生的 15 个 Prisma 纯格式副作用已确认并恢复，未进入任务 diff；
+- In Review 与最终唯一索引状态下，固定 Node `24.18.0` 的 `pnpm agent:validate --mode=full --task=AI-007` 再次返回 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（180828ms），终态 `pnpm agent:validate --mode=task --task=AI-007` 同样为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（90440ms，executed=5）；最终 full Gate 的 15 个 Prisma 纯格式副作用再次恢复，未进入 diff；
+- 微信构建与设计系统 Gate 通过，但 DevTools CLI 未配置，`pnpm test:miniapp:devtools` 返回 `MINIAPP_DEVTOOLS_INFRA_BLOCKED`，不能冒充平台 conformance PASS；
+- 待 owner 审核的 threat boundary：只有有效 LightFact 能增长关系；公开 stage/count/资格不等于亲密度；一次性 GET 节点在响应未知时选择 at-most-once 而不重复制造压力；DAY 删除不重放旧节点，RELATIONSHIP_DATA 删除后新 cycle 才可重建；Prompt v1 不扩权，关系 copy 独立确定性；节点不进离线 cache，Safety/删除 guard 在节点 claim 前生效；Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`；
+- AI-007 接受并合并后的下一任务为 AI-008（用户主动添加和删除重要事项）；本次不启动 AI-008。
 
 ## 2026-09-08 AI-006 启动
 
