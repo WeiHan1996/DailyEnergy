@@ -347,10 +347,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 3 — AI 陪伴层
-状态：AI-007 In Review
-当前目标：基于真实 LightFact 派生关系阶段与第 1/3/7 天节点资格
-当前任务：AI-007 实现关系阶段与第 1/3/7 天连续性
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/76
+状态：AI-008 Ready（等待新的明确启动指令）
+当前目标：实现用户主动添加、编辑与删除的重要事项
+当前任务：AI-008 实现重要事项的添加、编辑与删除
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/77
 ```
 
 长期工作入口：
@@ -367,9 +367,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
   已获 owner 接受；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185)
   经 exact-head verifier 后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`，
   merged-main CI run `34078365765` 为 11/11 SUCCESS；
-- Phase 2 已结束，Phase 3 development 开始；AI-001～AI-006 已合并并关闭，AI-007 已进入 In Review；
-- AI-006 已闭合受控模板 preflight、完整候选、统一发布、客户端克制状态与确定性故障矩阵；
-  Weekly capacity、真实 provider、MODEL/LOAD/HUMAN 与 Production 证据仍保持 Planned/Pending；
+- Phase 2 已结束，Phase 3 development 开始；AI-001～AI-007 已合并并关闭，AI-008 是唯一 Ready，本次不启动；
+- AI-007 已闭合 LightFact-only 关系派生、第 1/3/7 天一次性节点、删除/重放、历史冻结与受控关系文案；
+  微信 DevTools、真实 provider、MODEL/LOAD/HUMAN 与 Production 证据仍保持 Blocked/Planned/Pending；
 - C-015 的 Production bundle、处理主体/位置/受托方/跨境、最终用户说明和合格 Legal review
   继续 Blocked；
 - DEV_LITE 继续 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`；
