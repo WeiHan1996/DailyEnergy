@@ -347,7 +347,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 3 — AI 陪伴层
-状态：AI-004 In Progress
+状态：AI-004 In Review（自动 Gate 通过，Draft PR #193 待审核）
 当前目标：把不可信 Daily/Weekly candidate 收敛为完整 PASS 或无正文的稳定失败
 当前任务：AI-004 实现 AI 结构化输出完整校验
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/73
@@ -367,7 +367,8 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
   已获 owner 接受；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185)
   经 exact-head verifier 后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`，
   merged-main CI run `34078365765` 为 11/11 SUCCESS；
-- Phase 2 已结束，Phase 3 development 开始；AI-001～AI-003 已合并并关闭，AI-004 正在实现；
+- Phase 2 已结束，Phase 3 development 开始；AI-001～AI-003 已合并并关闭，AI-004 已完成
+  实现与自动 Gate，等待 threat-boundary review；
 - AI-004 只实现 server-side candidate 的单 JSON、strict Schema、事实/ref、字符、人格、隐私、
   Safety 与 receipt 校验，以及既有 Gateway 的完整 fallback/live guard 协作；不接真实 provider，
   不提前执行 AI-006 template renderer；
