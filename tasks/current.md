@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-005 post-merge — 修复 merged-main 供应链扫描误报
-- **任务状态**：In Progress（紧急 CI Gate 缺陷中断 AI-006 启动）
+- **任务状态**：In Review（紧急 CI Gate 缺陷中断 AI-006 启动）
 - **任务 Profile**：`security`（供应链 artifact 敏感值扫描与 fail-closed 边界）
 - **工作分支**：`agent/ai005-postmerge-artifact-scan`（从 merged `main@2617dac3163721f958c16219964702b36a69492a` 创建）
 - **任务 Issue**：[AI-005 Issue #74](https://github.com/WeiHan1996/DailyEnergy/issues/74) 已随 PR #195 关闭；本 post-merge 修复不重开产品范围
-- **当前 PR**：无；完成聚焦回归和 full Gate 后创建独立 Draft PR，未经 owner 明确批准不合并
+- **当前 PR**：[Draft PR #196](https://github.com/WeiHan1996/DailyEnergy/pull/196)；实现基线 `dc7ac78ce0c29234143378809bcdf5813594d083` 已推送，本状态收据提交后必须使用新 head 的独立 CI
 - **上一完成任务**：AI-004 Done；[PR #193](https://github.com/WeiHan1996/DailyEnergy/pull/193) final head `d9ec7b086b4af07e3b97171b19ad6ea822c89eb4` / CI run `34186587481` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `52876a9a2f1784ecbdb5bc6e3678d7c89db0c0f8`；merged-main CI run `34186841083` 11/11 SUCCESS；Issue #73 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,7 +16,7 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-003、AI-004、C-002 与 C-003 已 Done，AI-005 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-005 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：修复 SPDX `documentNamespace` 中 opaque digest 的手机号误报，同时证明真实手机号/credential 仍 fail closed；完成 full Gate 后创建 Draft PR 请求 owner 审核，修复合并且 merged-main CI 通过后才启动 AI-006
+- **下一候选动作**：等待 PR #196 final head 的 11/11 CI 与 owner threat-boundary review；未经明确批准不标记 Ready、不运行 exact-head merge verifier、不合并，也不启动 AI-006
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-08 AI-005 post-merge CI Gate 中断
@@ -29,6 +29,7 @@
 - 聚焦修复只让手机号正则在检查前遮蔽边界完整的 40/64 位十六进制 digest；私钥、数据库/Redis URL、Bearer 等其它敏感模式仍检查原始值，artifact Schema 和 supply-chain source/lockfile 精确绑定不变；回归使用真实 merge SHA，并证明真实手机号及 `Bearer <40-hex>` 仍被拒绝；
 - CI policy `29/29`、policy/agent fixtures 与 `git diff --check` 通过；固定 Node `24.18.0` 的 `pnpm agent:validate --mode=full --task=AI-005` 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（177490ms）。Gate 产生的 15 个 Prisma 纯空白副作用经忽略空白 diff 证明无语义变化后已恢复，未进入任务 diff；
 - 待 owner 审核的修复 threat boundary：仅手机号模式忽略 opaque digest token，不放宽其它 credential/raw-content 检测；digest 以外的手机号仍拒绝；供应链文档仍由严格 Schema 与 SHA/lockfile binding fail closed。Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`。
+- 实现提交 `dc7ac78ce0c29234143378809bcdf5813594d083` 已推送并创建 [Draft PR #196](https://github.com/WeiHan1996/DailyEnergy/pull/196)；本次状态回写产生的新 final head 必须使用自己的同 run CI，不能复用实现提交、本地 Gate 或失败的 merged-main run 作为合并证据。
 
 ## 2026-09-08 AI-005 启动
 
