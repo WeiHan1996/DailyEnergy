@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（server-only Prompt 资产、输入最小化、版本/指纹、bundle/secret/content 边界）
 - **工作分支**：`agent/ai003-prompt-versioning`
 - **任务 Issue**：[AI-003 Issue #72](https://github.com/WeiHan1996/DailyEnergy/issues/72)
-- **当前 PR**：[Draft PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191)；等待 owner Prompt/输入/bundle threat-boundary review 与 exact-head CI
+- **当前 PR**：[Draft PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191)；review baseline CI 11/11，通过后等待 owner Prompt/输入/bundle threat-boundary review；合并前仍须 exact-head verifier
 - **上一完成任务**：AI-002 Done；[PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189) final head `d809892f1de7b4e828058c660f53b128bb662ec4` / CI run `34143534031` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `849ab17d2e8c36663cb5c4d9a4364cb4d68d7c5a`；merged-main CI run `34167933143` 11/11 SUCCESS；Issue #71 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -30,6 +30,7 @@
 ### AI-003 实施与本地验证
 
 - 实现提交 `543908682d1acf1e8d11961361c96cd751b3b5be` 已推送并创建 [Draft PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191)；本次状态回写产生的新 head 必须使用自己的同 run CI，不能复用实现提交或本地 Gate 作为合并证据；
+- PR #191 review baseline head `356ce33428f9bd79df92ef9e0a90b6ea1c0bf612` 的 CI run `34173745512` 为 11/11 SUCCESS；本收据提交后的新 final head 仍须使用自己的同 run CI，不能复用该 baseline；
 - `packages/prompt-library` 新增 `daily-expression-zh-cn-v1` / `weekly-expression-zh-cn-v1` immutable Prompt packages：common、Daily、Weekly 三段 canonical instruction 与 Accepted `docs/ai/prompt-spec.md` 逐字一致，output Schema fingerprint 来自 `shared-schemas/json-schema`；两 package 保持 `STAGED`；
 - package fingerprint 分别为 Daily=`ae1f1fb708ed8d42c0f32e21fbfb343a9ae2e51db6411a790562fa92e73d1209`、Weekly=`09ba0195d8a56516cfbe9ea455206e2a3ac975e9d9561b3f6f38b361dbf2dc4c`；registry/release/evaluation fingerprint 均固定，evaluation 只允许 `DETERMINISTIC` 且 `externalProviderCallsAllowed=false`；
 - `buildPreparedDailyPromptInputV1` 只接收严格 `ControlledExpressionPlanV1`，复用已验证 action/task/ritual catalog binding，注入式称呼直接省略，v1 context/memory 仍为空；`buildPreparedWeeklyPromptInputV1` 只接收严格 aggregate+plan，预分配 exact segment refs，不发送 day slots、缺失日期、window/source ref、note、历史 AI 文本或娱乐分数；
