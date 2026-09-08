@@ -8,6 +8,7 @@ import {
   fingerprintGatewayRequestV1,
   validateGatewayInvocationV1,
   validateGatewayNormalizedUsageV1,
+  verifyGatewayValidationReceiptV1,
   verifyGatewayRouteManifestV1,
   type GatewayCandidateV1,
   type GatewayGatewayFailureCode,
@@ -445,7 +446,7 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
       );
       return fallback(input.role, "OUTPUT_VALIDATOR_UNAVAILABLE");
     }
-    if (validation.status === "REJECT") {
+    if (validation.status !== "PASS") {
       const failureCode = stableFailureCode(
         validation.reasonCode,
         "OUTPUT_VALIDATOR_INVALID_REASON",
@@ -454,7 +455,8 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
         {
           attemptId,
           failureCode,
-          outcome: validation.outcome,
+          outcome:
+            validation.status === "REJECTED" ? "UNSAFE" : "INVALID_SCHEMA",
           ...(providerRequestRef ? { providerRequestRef } : {}),
           usage,
         },
@@ -467,7 +469,11 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
       { readonly status: "PASS" }
     >;
     try {
-      validCandidate = validatePassedCandidate(validation);
+      validCandidate = validatePassedCandidate(
+        validation,
+        input.invocation,
+        input.role,
+      );
     } catch {
       await complete(
         {
@@ -569,19 +575,25 @@ function validatePassedCandidate(
     GatewayCandidateValidationResultV1,
     { readonly status: "PASS" }
   >,
+  invocation: GatewayInvocationV1,
+  routeRole: GatewayProviderRole,
 ): Extract<GatewayCandidateValidationResultV1, { readonly status: "PASS" }> {
   if (
     !/^[a-f0-9]{64}$/u.test(validation.payloadFingerprint) ||
-    fingerprintGatewayJson(validation.payload) !==
-      validation.payloadFingerprint ||
-    validation.receipt.verdict !== "PASS" ||
-    !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(
-      validation.receipt.validatorVersion,
-    ) ||
-    validation.receipt.validatorVersion.toLowerCase() === "latest"
+    fingerprintGatewayJson(validation.payload) !== validation.payloadFingerprint
   ) {
     throw new GatewayContractError("ADAPTER_CONTRACT_INVALID");
   }
+  verifyGatewayValidationReceiptV1(validation.receipt, {
+    outputSchemaVersion: invocation.outputSchemaVersion,
+    payloadFingerprint: validation.payloadFingerprint,
+    planFingerprint: invocation.planFingerprint,
+    promptVersion: invocation.promptVersion,
+    routeRole,
+    safetyPolicyVersion: invocation.safetyPolicyVersion,
+    validatorVersion: validation.receipt.validatorVersion,
+    workload: invocation.workload,
+  });
   return validation;
 }
 

@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 590, "NA_WITH_REASON": 0, "PLANNED": 414 },
+  "counts": { "COVERED": 644, "NA_WITH_REASON": 0, "PLANNED": 360 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -1165,22 +1165,46 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-F03",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-F04",
       "source_sets": ["s16-ai-corpus"]
@@ -1253,11 +1277,23 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-F11",
       "source_sets": ["s16-ai-corpus"]
@@ -1330,11 +1366,35 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "result-existing, owner/deletion, Safety and stale PublishGuard changes after candidate return discard the whole candidate",
+            "schema, Safety and validator-unavailable outcomes move to one backup using the original frozen invocation without candidate fragments",
+            "two failed provider roles produce only CONTROLLED_TEMPLATE_REQUIRED and do not execute AI-006 rendering"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+          "test_id": "T-AI004-ROUTING-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-O06",
       "source_sets": ["s16-ai-corpus"]
@@ -1440,11 +1500,23 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-P04",
       "source_sets": ["s16-ai-corpus"]
@@ -1506,11 +1578,23 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-P10",
       "source_sets": ["s16-ai-corpus"]
@@ -1594,11 +1678,23 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-R06",
       "source_sets": ["s16-ai-corpus"]
@@ -1660,11 +1756,23 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-R12",
       "source_sets": ["s16-ai-corpus"]
@@ -1737,11 +1845,23 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-T07",
       "source_sets": ["s16-ai-corpus"]
@@ -1770,22 +1890,46 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-T10",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-T11",
       "source_sets": ["s16-ai-corpus"]
@@ -1880,22 +2024,46 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-X08",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-X09",
       "source_sets": ["s16-ai-corpus"]
@@ -1913,11 +2081,35 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a PASS receipt is content-free and fingerprint-bound to workload, role, plan, Prompt, output Schema, Safety policy and payload",
+            "every semantic receipt mutation is rejected and unsafe or indeterminate results expose only stable metadata",
+            "the AI adapter maps the prompt-library validator to the Gateway SPI without copying validation policy"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-structured-output-validator.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 Gateway structured-output validator adapter",
+          "test_id": "T-AI004-ADAPTER-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-X11",
       "source_sets": ["s16-ai-corpus"]
@@ -2253,11 +2445,35 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "Daily and Weekly positive/negative fixtures exercise the same strict shared schemas used by publication contracts",
+            "PASS returns one frozen strict payload and fingerprint while every failure returns one stable reason without raw text or partial fields",
+            "the public validator consumes only the candidate plus the closed invocation projection and returns PASS, INVALID, REJECTED or INDETERMINATE"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2270,11 +2486,35 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "Daily and Weekly positive/negative fixtures exercise the same strict shared schemas used by publication contracts",
+            "PASS returns one frozen strict payload and fingerprint while every failure returns one stable reason without raw text or partial fields",
+            "the public validator consumes only the candidate plus the closed invocation projection and returns PASS, INVALID, REJECTED or INDETERMINATE"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2287,11 +2527,35 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "Daily and Weekly positive/negative fixtures exercise the same strict shared schemas used by publication contracts",
+            "PASS returns one frozen strict payload and fingerprint while every failure returns one stable reason without raw text or partial fields",
+            "the public validator consumes only the candidate plus the closed invocation projection and returns PASS, INVALID, REJECTED or INDETERMINATE"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2304,11 +2568,35 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "Daily and Weekly positive/negative fixtures exercise the same strict shared schemas used by publication contracts",
+            "PASS returns one frozen strict payload and fingerprint while every failure returns one stable reason without raw text or partial fields",
+            "the public validator consumes only the candidate plus the closed invocation projection and returns PASS, INVALID, REJECTED or INDETERMINATE"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2321,11 +2609,35 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "Daily and Weekly positive/negative fixtures exercise the same strict shared schemas used by publication contracts",
+            "PASS returns one frozen strict payload and fingerprint while every failure returns one stable reason without raw text or partial fields",
+            "the public validator consumes only the candidate plus the closed invocation projection and returns PASS, INVALID, REJECTED or INDETERMINATE"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2338,11 +2650,33 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "result-existing, owner/deletion, Safety and stale PublishGuard changes after candidate return discard the whole candidate",
+            "schema, Safety and validator-unavailable outcomes move to one backup using the original frozen invocation without candidate fragments",
+            "two failed provider roles produce only CONTROLLED_TEMPLATE_REQUIRED and do not execute AI-006 rendering"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+          "test_id": "T-AI004-ROUTING-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "primary and backup remain sequential and receive byte-identical prepared input and plan/route fingerprints",
+            "quality and indeterminate outcomes never race, retry one role or produce a partial candidate",
+            "the live guard is read before dispatch and again before returning a candidate"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+          "test_id": "T-AI004-ROUTING-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2612,11 +2946,33 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "result-existing, owner/deletion, Safety and stale PublishGuard changes after candidate return discard the whole candidate",
+            "schema, Safety and validator-unavailable outcomes move to one backup using the original frozen invocation without candidate fragments",
+            "two failed provider roles produce only CONTROLLED_TEMPLATE_REQUIRED and do not execute AI-006 rendering"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+          "test_id": "T-AI004-ROUTING-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "primary and backup remain sequential and receive byte-identical prepared input and plan/route fingerprints",
+            "quality and indeterminate outcomes never race, retry one role or produce a partial candidate",
+            "the live guard is read before dispatch and again before returning a candidate"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+          "test_id": "T-AI004-ROUTING-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2666,11 +3022,33 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "result-existing, owner/deletion, Safety and stale PublishGuard changes after candidate return discard the whole candidate",
+            "schema, Safety and validator-unavailable outcomes move to one backup using the original frozen invocation without candidate fragments",
+            "two failed provider roles produce only CONTROLLED_TEMPLATE_REQUIRED and do not execute AI-006 rendering"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+          "test_id": "T-AI004-ROUTING-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "primary and backup remain sequential and receive byte-identical prepared input and plan/route fingerprints",
+            "quality and indeterminate outcomes never race, retry one role or produce a partial candidate",
+            "the live guard is read before dispatch and again before returning a candidate"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+          "test_id": "T-AI004-ROUTING-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2700,11 +3078,35 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "Daily and Weekly positive/negative fixtures exercise the same strict shared schemas used by publication contracts",
+            "PASS returns one frozen strict payload and fingerprint while every failure returns one stable reason without raw text or partial fields",
+            "the public validator consumes only the candidate plus the closed invocation projection and returns PASS, INVALID, REJECTED or INDETERMINATE"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2717,11 +3119,35 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "Daily and Weekly positive/negative fixtures exercise the same strict shared schemas used by publication contracts",
+            "PASS returns one frozen strict payload and fingerprint while every failure returns one stable reason without raw text or partial fields",
+            "the public validator consumes only the candidate plus the closed invocation projection and returns PASS, INVALID, REJECTED or INDETERMINATE"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2860,6 +3286,32 @@
           "origin": "tests/registry/ai001-evidence-manifest.json",
           "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL",
           "test_id": "T-AI001-GATEWAY-MODULE-001"
+        },
+        {
+          "assertions": [
+            "a malformed PASS receipt or payload fingerprint is rejected before CANDIDATE_READY",
+            "invalid and indeterminate raw bodies never enter attempt reservation or completion storage",
+            "INVALID, REJECTED and INDETERMINATE validation outcomes complete the attempt with bounded metadata and return FALLBACK_REQUIRED"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL / AI-004 indeterminate candidate",
+          "test_id": "T-AI004-GATEWAY-MODULE-001"
+        },
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
         }
       ],
       "status": "COVERED",
@@ -2902,6 +3354,32 @@
           "origin": "tests/registry/ai001-evidence-manifest.json",
           "selector": "G12-L01/G12-L02 and G12-P01/P03/P04/P06 deterministic cases",
           "test_id": "T-AI001-GATEWAY-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a malformed PASS receipt or payload fingerprint is rejected before CANDIDATE_READY",
+            "invalid and indeterminate raw bodies never enter attempt reservation or completion storage",
+            "INVALID, REJECTED and INDETERMINATE validation outcomes complete the attempt with bounded metadata and return FALLBACK_REQUIRED"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL / AI-004 indeterminate candidate",
+          "test_id": "T-AI004-GATEWAY-MODULE-001"
+        },
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
         }
       ],
       "status": "COVERED",
@@ -3504,22 +3982,46 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-C01",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-C02",
       "source_sets": ["s16-ai-corpus"]
@@ -3527,6 +4029,20 @@
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
       "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
         {
           "assertions": [
             "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
@@ -3585,11 +4101,21 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "result-existing, owner/deletion, Safety and stale PublishGuard changes after candidate return discard the whole candidate",
+            "schema, Safety and validator-unavailable outcomes move to one backup using the original frozen invocation without candidate fragments",
+            "two failed provider roles produce only CONTROLLED_TEMPLATE_REQUIRED and do not execute AI-006 rendering"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+          "test_id": "T-AI004-ROUTING-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-C05",
       "source_sets": ["s16-ai-corpus"]
@@ -3647,6 +4173,32 @@
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
       "evidence": [
+        {
+          "assertions": [
+            "a malformed PASS receipt or payload fingerprint is rejected before CANDIDATE_READY",
+            "invalid and indeterminate raw bodies never enter attempt reservation or completion storage",
+            "INVALID, REJECTED and INDETERMINATE validation outcomes complete the attempt with bounded metadata and return FALLBACK_REQUIRED"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL / AI-004 indeterminate candidate",
+          "test_id": "T-AI004-GATEWAY-MODULE-001"
+        },
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
         {
           "assertions": [
             "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
@@ -3802,6 +4354,20 @@
       "evidence": [
         {
           "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
             "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
             "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
             "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
@@ -3850,6 +4416,20 @@
       "evidence": [
         {
           "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
             "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
             "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
             "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
@@ -3872,6 +4452,20 @@
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
       "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
         {
           "assertions": [
             "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
@@ -4018,6 +4612,20 @@
       "evidence": [
         {
           "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
             "all resulting candidates pass the strict candidate and ExpressionPayload Schemas",
             "five representative real C-006 derived plans render directly without a mapper, provider or second fact source",
             "rendered primary action, optional task and ritual keys remain exactly bound to C-006 RuleFacts"
@@ -4090,6 +4698,20 @@
       "evidence": [
         {
           "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
             "all eight actions and one-to-one tasks, four ritual sets, fifteen dimension-band phrases and three eligible semantic variants render complete strict candidates",
             "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT remain one personality while producing bounded copy differences",
             "daily-template-v1 has one immutable registry, renderer version, four-source attribution list and pinned SHA-256 fingerprint",
@@ -4112,6 +4734,20 @@
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
       "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
         {
           "assertions": [
             "all resulting candidates pass the strict candidate and ExpressionPayload Schemas",
@@ -4174,6 +4810,20 @@
       "evidence": [
         {
           "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
             "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
             "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
             "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
@@ -4196,6 +4846,20 @@
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
       "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
         {
           "assertions": [
             "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
@@ -4246,6 +4910,20 @@
       "evidence": [
         {
           "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
             "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
             "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
             "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
@@ -4294,6 +4972,20 @@
       "evidence": [
         {
           "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
             "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
             "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
             "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
@@ -4318,6 +5010,20 @@
       "evidence": [
         {
           "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
             "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
             "generic Daily v1 output contains no fabricated memory, relationship history, provider or internal fact tokens",
             "unknown, missing, incompatible and catalog-corrupted plans fail with stable template errors",
@@ -4339,176 +5045,368 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W01",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W02",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W03",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W04",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W05",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W06",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W07",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W08",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W09",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W10",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W11",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W12",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W13",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W14",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W15",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W16",
       "source_sets": ["s16-ai-corpus"]
@@ -4526,11 +5424,23 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-W18",
       "source_sets": ["s16-ai-corpus"]
@@ -5874,99 +6784,219 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-O01",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-O02",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-O03",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-O04",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-O05",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-O06",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-O07",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-O08",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "result-existing, owner/deletion, Safety and stale PublishGuard changes after candidate return discard the whole candidate",
+            "schema, Safety and validator-unavailable outcomes move to one backup using the original frozen invocation without candidate fragments",
+            "two failed provider roles produce only CONTROLLED_TEMPLATE_REQUIRED and do not execute AI-006 rendering"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+          "test_id": "T-AI004-ROUTING-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-O09",
       "source_sets": ["s16-ai-corpus"]
@@ -18561,11 +19591,35 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+            "no validation path calls a provider, repairs JSON, stores raw output or splices fields",
+            "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+            "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+            "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "Daily and Weekly positive/negative fixtures exercise the same strict shared schemas used by publication contracts",
+            "PASS returns one frozen strict payload and fingerprint while every failure returns one stable reason without raw text or partial fields",
+            "the public validator consumes only the candidate plus the closed invocation projection and returns PASS, INVALID, REJECTED or INDETERMINATE"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai004-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI004-VALIDATOR-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL", "MODULE"] }],
       "source_id": "S31-TEST-044",
       "source_sets": ["s31-testing"]

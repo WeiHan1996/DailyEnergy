@@ -202,9 +202,16 @@ export type GatewayCandidateValidationResultV1 =
       readonly status: "PASS";
     }
   | {
-      readonly outcome: "INVALID_SCHEMA" | "UNSAFE";
       readonly reasonCode: string;
-      readonly status: "REJECT";
+      readonly status: "INVALID";
+    }
+  | {
+      readonly reasonCode: string;
+      readonly status: "REJECTED";
+    }
+  | {
+      readonly reasonCode: "OUTPUT_VALIDATOR_UNAVAILABLE";
+      readonly status: "INDETERMINATE";
     };
 
 export interface GatewayCandidateValidatorV1 {

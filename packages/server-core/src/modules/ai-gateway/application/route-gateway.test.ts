@@ -4,6 +4,7 @@ import {
   GATEWAY_CONTRACT_VERSION,
   GATEWAY_POLICY_VERSION,
   createGatewayRouteManifestV1,
+  createGatewayValidationReceiptV1,
   fingerprintGatewayJson,
   type GatewayAdmissionV1,
   type GatewayCandidateV1,
@@ -28,7 +29,16 @@ const candidate = {
   generationMode: "BACKUP_AI",
   payload: { message: "synthetic" },
   payloadFingerprint: "a".repeat(64),
-  validationReceipt: { validatorVersion: "validator-v1", verdict: "PASS" },
+  validationReceipt: createGatewayValidationReceiptV1({
+    outputSchemaVersion: "1.0.0",
+    payloadFingerprint: "a".repeat(64),
+    planFingerprint: "1".repeat(64),
+    promptVersion: "daily-expression-zh-cn-v1",
+    routeRole: "BACKUP_AI",
+    safetyPolicyVersion: "safety-policy-v1",
+    validatorVersion: "validator-v1",
+    workload: "DAILY_EXPRESSION_V1",
+  }),
   workload: "DAILY_EXPRESSION_V1",
 } as const satisfies GatewayCandidateV1;
 
@@ -209,6 +219,8 @@ describe("AI-002 sequential Gateway routing", () => {
     "PROVIDER_PROTOCOL_INVALID",
     "PROVIDER_UNAVAILABLE",
     "OUTPUT_SCHEMA_INVALID",
+    "OUTPUT_SAFETY_REJECTED",
+    "OUTPUT_VALIDATOR_UNAVAILABLE",
     "OUTCOME_UNKNOWN",
   ])("routes stable failure %s to one backup attempt", async (reasonCode) => {
     const context = setup({
@@ -305,26 +317,28 @@ describe("AI-002 sequential Gateway routing", () => {
     }
   });
 
-  it("discards a candidate when the live PublishGuard changes after return", async () => {
-    const context = setup({
-      guards: [
-        { status: "ALLOWED" },
-        { reasonCode: "STALE_PUBLISH_GUARD", status: "BLOCKED" },
-      ],
-      outcomes: [{ candidate, status: "CANDIDATE_READY" }],
-    });
-    await expect(
-      context.value.invoke({
-        admission: allowed,
-        invocation,
-        manifest,
-        runtimeProfile: "INTERACTIVE",
-      }),
-    ).resolves.toEqual({
-      reasonCode: "STALE_PUBLISH_GUARD",
-      status: "BLOCKED",
-    });
-  });
+  it.each([
+    "RESULT_ALREADY_AVAILABLE",
+    "OWNER_CANCELLED_OR_DELETED",
+    "SAFETY_OVERLAY_ACTIVE",
+    "STALE_PUBLISH_GUARD",
+  ] as const)(
+    "G12-L04/G12-L06 discards a complete candidate when the live guard changes to %s",
+    async (reasonCode) => {
+      const context = setup({
+        guards: [{ status: "ALLOWED" }, { reasonCode, status: "BLOCKED" }],
+        outcomes: [{ candidate, status: "CANDIDATE_READY" }],
+      });
+      await expect(
+        context.value.invoke({
+          admission: allowed,
+          invocation,
+          manifest,
+          runtimeProfile: "INTERACTIVE",
+        }),
+      ).resolves.toEqual({ reasonCode, status: "BLOCKED" });
+    },
+  );
 
   it("G12-F03 skips an open primary breaker and continues directly to backup", async () => {
     const breaker = new MemoryBreaker();

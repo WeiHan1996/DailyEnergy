@@ -1,5 +1,3 @@
-import { createHash } from "node:crypto";
-
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -7,6 +5,8 @@ import {
   GATEWAY_POLICY_VERSION,
   GatewayContractError,
   createGatewayRouteManifestV1,
+  createGatewayValidationReceiptV1,
+  fingerprintGatewayJson,
   type GatewayInvocationV1,
   type GatewayJsonObject,
   type GatewayProviderRouteV1,
@@ -164,9 +164,7 @@ function invocation(route: GatewayRouteManifestV1): GatewayInvocationV1 {
 }
 
 function fingerprint(value: GatewayJsonObject): string {
-  return createHash("sha256")
-    .update(JSON.stringify(value), "utf8")
-    .digest("hex");
+  return fingerprintGatewayJson(value);
 }
 
 function validator(): GatewayCandidateValidatorV1 {
@@ -178,9 +176,8 @@ function validator(): GatewayCandidateValidatorV1 {
           payload = JSON.parse(payload);
         } catch {
           return {
-            outcome: "INVALID_SCHEMA",
             reasonCode: "OUTPUT_NOT_SINGLE_JSON_OBJECT",
-            status: "REJECT",
+            status: "INVALID",
           };
         }
       }
@@ -192,21 +189,27 @@ function validator(): GatewayCandidateValidatorV1 {
         typeof (payload as { message?: unknown }).message !== "string"
       ) {
         return {
-          outcome: "INVALID_SCHEMA",
           reasonCode: "OUTPUT_SCHEMA_INVALID",
-          status: "REJECT",
+          status: "INVALID",
         };
       }
       const parsed = Object.freeze({
         message: (payload as { message: string }).message,
       });
+      const payloadFingerprint = fingerprint(parsed);
       return {
         payload: parsed,
-        payloadFingerprint: fingerprint(parsed),
-        receipt: {
+        payloadFingerprint,
+        receipt: createGatewayValidationReceiptV1({
+          outputSchemaVersion: input.invocation.outputSchemaVersion,
+          payloadFingerprint,
+          planFingerprint: input.invocation.planFingerprint,
+          promptVersion: input.invocation.promptVersion,
+          routeRole: input.source,
+          safetyPolicyVersion: input.invocation.safetyPolicyVersion,
           validatorVersion: "synthetic-validator-v1",
-          verdict: "PASS",
-        },
+          workload: input.invocation.workload,
+        }),
         status: "PASS",
       };
     },
@@ -638,6 +641,53 @@ describe("AI-001 Gateway MODULE and deterministic AI_EVAL", () => {
     expect(JSON.stringify(attempts)).not.toContain("SYNTHETIC_PRIVATE_SOURCE");
   });
 
+  it("classifies validator unavailability as indeterminate without retaining the candidate body", async () => {
+    const route = manifest();
+    const attempts = new MemoryAttemptStore();
+    const privateRawBody = JSON.stringify({
+      message: "synthetic private body",
+    });
+    const primary = adapter(route.primary, {
+      ...success(route.primary, "unused"),
+      bodyUtf8: privateRawBody,
+    });
+    const service = new AiGatewayV1({
+      attempts,
+      candidateValidator: {
+        async validate() {
+          return {
+            reasonCode: "OUTPUT_VALIDATOR_UNAVAILABLE",
+            status: "INDETERMINATE",
+          };
+        },
+      },
+      clock: { now: () => new Date(ACCEPTED_AT) },
+      ids: ids(),
+      providers: registry([primary]),
+    });
+
+    await expect(
+      service.invoke({
+        admission: { status: "ALLOWED" },
+        invocation: invocation(route),
+        manifest: route,
+        role: "PRIMARY_AI",
+        runtimeProfile: "INTERACTIVE",
+      }),
+    ).resolves.toEqual({
+      failedRole: "PRIMARY_AI",
+      reasonCode: "OUTPUT_VALIDATOR_UNAVAILABLE",
+      status: "FALLBACK_REQUIRED",
+    });
+    expect(attempts.completions).toMatchObject([
+      {
+        failureCode: "OUTPUT_VALIDATOR_UNAVAILABLE",
+        outcome: "INVALID_SCHEMA",
+      },
+    ]);
+    expect(JSON.stringify(attempts)).not.toContain("synthetic private body");
+  });
+
   it("finishes the attempt when a validator returns an invalid PASS receipt", async () => {
     const route = manifest();
     const attempts = new MemoryAttemptStore();
@@ -645,13 +695,24 @@ describe("AI-001 Gateway MODULE and deterministic AI_EVAL", () => {
     const service = new AiGatewayV1({
       attempts,
       candidateValidator: {
-        async validate() {
+        async validate(input) {
+          const payload = { message: "synthetic" };
+          const payloadFingerprint = fingerprintGatewayJson(payload);
           return {
-            payload: { message: "synthetic" },
-            payloadFingerprint: "0".repeat(64),
+            payload,
+            payloadFingerprint,
             receipt: {
-              validatorVersion: "synthetic-validator-v1",
-              verdict: "PASS",
+              ...createGatewayValidationReceiptV1({
+                outputSchemaVersion: input.invocation.outputSchemaVersion,
+                payloadFingerprint,
+                planFingerprint: input.invocation.planFingerprint,
+                promptVersion: input.invocation.promptVersion,
+                routeRole: input.source,
+                safetyPolicyVersion: input.invocation.safetyPolicyVersion,
+                validatorVersion: "synthetic-validator-v1",
+                workload: input.invocation.workload,
+              }),
+              validationFingerprint: "0".repeat(64),
             },
             status: "PASS",
           };

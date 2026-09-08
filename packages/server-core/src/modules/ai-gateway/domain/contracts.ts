@@ -115,8 +115,26 @@ export interface GatewayNormalizedUsageV1 {
 }
 
 export interface GatewayValidationReceiptV1 {
+  readonly outputSchemaVersion: string;
+  readonly planFingerprint: string;
+  readonly promptVersion: string;
+  readonly routeRole: GatewayRouteRole;
+  readonly safetyPolicyVersion: string;
+  readonly validationFingerprint: string;
   readonly validatorVersion: string;
   readonly verdict: "PASS";
+  readonly workload: GatewayWorkload;
+}
+
+export interface GatewayValidationReceiptInputV1 {
+  readonly outputSchemaVersion: string;
+  readonly payloadFingerprint: string;
+  readonly planFingerprint: string;
+  readonly promptVersion: string;
+  readonly routeRole: GatewayRouteRole;
+  readonly safetyPolicyVersion: string;
+  readonly validatorVersion: string;
+  readonly workload: GatewayWorkload;
 }
 
 export interface GatewayCandidateV1 {
@@ -310,6 +328,95 @@ export function validateGatewayNormalizedUsageV1(
     }
   }
   return Object.freeze({ ...value });
+}
+
+export function createGatewayValidationReceiptV1(
+  input: GatewayValidationReceiptInputV1,
+): GatewayValidationReceiptV1 {
+  if (!isRecord(input)) {
+    throw new GatewayContractError("ADAPTER_CONTRACT_INVALID");
+  }
+  assertExactKeys(
+    input,
+    [
+      "outputSchemaVersion",
+      "payloadFingerprint",
+      "planFingerprint",
+      "promptVersion",
+      "routeRole",
+      "safetyPolicyVersion",
+      "validatorVersion",
+      "workload",
+    ],
+    "ADAPTER_CONTRACT_INVALID",
+  );
+  for (const value of [
+    input.outputSchemaVersion,
+    input.promptVersion,
+    input.safetyPolicyVersion,
+    input.validatorVersion,
+  ]) {
+    assertVersionToken(value, "ADAPTER_CONTRACT_INVALID");
+  }
+  if (
+    !SHA256_HEX.test(input.payloadFingerprint) ||
+    !SHA256_HEX.test(input.planFingerprint) ||
+    !GATEWAY_ROUTE_ROLES.includes(input.routeRole) ||
+    !GATEWAY_WORKLOADS.includes(input.workload)
+  ) {
+    throw new GatewayContractError("ADAPTER_CONTRACT_INVALID");
+  }
+  const fingerprintSource = validationReceiptFingerprintSource(input);
+  return deepFreeze({
+    outputSchemaVersion: input.outputSchemaVersion,
+    planFingerprint: input.planFingerprint,
+    promptVersion: input.promptVersion,
+    routeRole: input.routeRole,
+    safetyPolicyVersion: input.safetyPolicyVersion,
+    validationFingerprint: fingerprintGatewayJson(fingerprintSource),
+    validatorVersion: input.validatorVersion,
+    verdict: "PASS" as const,
+    workload: input.workload,
+  });
+}
+
+export function verifyGatewayValidationReceiptV1(
+  value: GatewayValidationReceiptV1,
+  expected: GatewayValidationReceiptInputV1,
+): GatewayValidationReceiptV1 {
+  if (!isRecord(value)) {
+    throw new GatewayContractError("ADAPTER_CONTRACT_INVALID");
+  }
+  assertExactKeys(
+    value,
+    [
+      "outputSchemaVersion",
+      "planFingerprint",
+      "promptVersion",
+      "routeRole",
+      "safetyPolicyVersion",
+      "validationFingerprint",
+      "validatorVersion",
+      "verdict",
+      "workload",
+    ],
+    "ADAPTER_CONTRACT_INVALID",
+  );
+  const canonical = createGatewayValidationReceiptV1(expected);
+  if (
+    value.verdict !== "PASS" ||
+    value.outputSchemaVersion !== canonical.outputSchemaVersion ||
+    value.planFingerprint !== canonical.planFingerprint ||
+    value.promptVersion !== canonical.promptVersion ||
+    value.routeRole !== canonical.routeRole ||
+    value.safetyPolicyVersion !== canonical.safetyPolicyVersion ||
+    value.validationFingerprint !== canonical.validationFingerprint ||
+    value.validatorVersion !== canonical.validatorVersion ||
+    value.workload !== canonical.workload
+  ) {
+    throw new GatewayContractError("ADAPTER_CONTRACT_INVALID");
+  }
+  return canonical;
 }
 
 export function validateGatewayInvocationV1(
@@ -730,6 +837,22 @@ function canonicalize(value: GatewayJsonValue): GatewayJsonValue {
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([key, entry]) => [key, canonicalize(entry as GatewayJsonValue)]),
   );
+}
+
+function validationReceiptFingerprintSource(
+  input: GatewayValidationReceiptInputV1,
+): GatewayJsonObject {
+  return {
+    output_schema_version: input.outputSchemaVersion,
+    payload_fingerprint: input.payloadFingerprint,
+    plan_fingerprint: input.planFingerprint,
+    prompt_version: input.promptVersion,
+    route_role: input.routeRole,
+    safety_policy_version: input.safetyPolicyVersion,
+    validator_version: input.validatorVersion,
+    verdict: "PASS",
+    workload: input.workload,
+  };
 }
 
 function cloneJson<T extends GatewayJsonValue>(value: T): T {
