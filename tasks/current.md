@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（LightFact 派生关系、节点资格与回执、删除/重放/历史冻结、Prompt/模板关系语言 Safety）
 - **工作分支**：`agent/ai006-completion-status`（仅状态收尾）；收到新的明确启动指令并合并本状态 PR 后，才从 verified `main` 创建 AI-007 实现分支
 - **任务 Issue**：[AI-007 Issue #76](https://github.com/WeiHan1996/DailyEnergy/issues/76)
-- **当前 PR**：无；本分支将创建仅含项目控制文件的 Draft PR，AI-007 实现尚未开始
+- **当前 PR**：[Draft PR #199](https://github.com/WeiHan1996/DailyEnergy/pull/199)（仅 AI-006 状态收尾）；AI-007 实现尚未开始
 - **上一完成任务**：AI-006 Done；[PR #198](https://github.com/WeiHan1996/DailyEnergy/pull/198) final head `4cf7d4874fa1668a529c49f0e458fc25bc9f1ec1` / CI run `34205576509` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `aa7e6a28f074a1fc7d2b30a5d84848c7bed79967`；merged-main CI run `34206603459` 11/11 SUCCESS；Issue #75 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -27,6 +27,7 @@
 - merged-main CI run `34206603459` 为 11/11 SUCCESS，包含 supply-chain、AI deterministic 和聚合 full Gate；AI-006 进入 Done，AI-007 是唯一 Ready，但本次不启动；
 - AI-006 已闭合 bounded controlled-template preflight、主备失败后的完整严格校验模板候选、三种 route 的统一发布、server-only provenance/低基数 telemetry 与客户端克制降级呈现；
 - Weekly template/capacity `G12-F05/G12-B08`、真实 provider、MODEL/LOAD/HUMAN 与 Production authorization 继续 Planned/Pending，不由本合并冒充完成；C-015 继续 Blocked，DEV_LITE 保持 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`，Production/RC 继续 `NO_GO`。
+- 状态提交 `8edb99d21fe1b3028ba2bd1b5909df2b62612fa8` 已推送并创建 [Draft PR #199](https://github.com/WeiHan1996/DailyEnergy/pull/199)；本次 PR 引用回写产生的新 final head 必须使用自己的同 run CI，不能复用本地 Gate、PR #198 或 merged-main CI。
 
 ## 2026-09-08 AI-006 启动
 
