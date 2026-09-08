@@ -3,21 +3,30 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：AI-006 — 实现 AI 失败时的完整模板降级
-- **任务状态**：In Review
-- **任务 Profile**：`security`（主备失败到模板、strict Schema/Safety、PublishGuard/epoch/revision、历史冻结、客户端与低基数 telemetry）
-- **工作分支**：`agent/ai006-controlled-template-fallback`（从 verified `main@4470fdf9cef9d0987d75fa353fa36e73fa9c6c27` 创建）
-- **任务 Issue**：[AI-006 Issue #75](https://github.com/WeiHan1996/DailyEnergy/issues/75)
-- **当前 PR**：[Draft PR #198](https://github.com/WeiHan1996/DailyEnergy/pull/198)；实现基线 `3d1def645412af13c73feec7bfe0f2ab3aba2091` 已推送，本状态收据提交后必须使用新 head 的独立 CI
-- **上一完成任务**：AI-005 Done；PR #195 squash 合并为 `2617dac3163721f958c16219964702b36a69492a`，其 merged-main SHA 手机号误报由 [PR #196](https://github.com/WeiHan1996/DailyEnergy/pull/196) 修复并 squash 合并为 `605ec8b61d634e82769121d4458d12297e902bf6`；merged-main CI run `34197579568` 11/11 SUCCESS；Issue #74 Closed
+- **当前任务**：AI-007 — 实现关系阶段与第 1/3/7 天连续性
+- **任务状态**：Ready
+- **任务 Profile**：`security`（LightFact 派生关系、节点资格与回执、删除/重放/历史冻结、Prompt/模板关系语言 Safety）
+- **工作分支**：`agent/ai006-completion-status`（仅状态收尾）；收到新的明确启动指令并合并本状态 PR 后，才从 verified `main` 创建 AI-007 实现分支
+- **任务 Issue**：[AI-007 Issue #76](https://github.com/WeiHan1996/DailyEnergy/issues/76)
+- **当前 PR**：无；本分支将创建仅含项目控制文件的 Draft PR，AI-007 实现尚未开始
+- **上一完成任务**：AI-006 Done；[PR #198](https://github.com/WeiHan1996/DailyEnergy/pull/198) final head `4cf7d4874fa1668a529c49f0e458fc25bc9f1ec1` / CI run `34205576509` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `aa7e6a28f074a1fc7d2b30a5d84848c7bed79967`；merged-main CI run `34206603459` 11/11 SUCCESS；Issue #75 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-002、AI-004、AI-005、C-007 与 C-008 已 Done，AI-006 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-006 或后续开发任务自动关闭
+- **依赖边界**：C-011、C-013、AI-005 与 AI-006 已 Done，AI-007 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-007 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待 PR #198 final head 的 11/11 CI 后请求 owner 审核 template/validator/publish/telemetry threat boundary；未经明确批准不标记 Ready、不运行 merge verifier、不合并
+- **下一候选动作**：提交并验证 AI-006 状态收尾 Draft PR；owner 明确批准合并后，AI-007 保持唯一 Ready，收到新的明确启动指令前不运行 AI-007 prepare、不创建实现分支或编码
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-08 AI-006 post-merge 收尾
+
+- owner 明确“批准合并”，接受 PR #198 所列 template/validator/publish/telemetry threat boundary，并授权标记 Ready、exact-head verifier 与 squash merge；该决定不授予 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；
+- PR #198 final head `4cf7d4874fa1668a529c49f0e458fc25bc9f1ec1` 的 CI run `34205576509` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=198:head=4cf7d4874fa1668a529c49f0e458fc25bc9f1ec1:run=34205576509:checks=11`；
+- PR #198 已用 `--squash --match-head-commit 4cf7d4874fa1668a529c49f0e458fc25bc9f1ec1` 合并为 `aa7e6a28f074a1fc7d2b30a5d84848c7bed79967`，GitHub verification=`valid`，final head 与 merge commit tree 均为 `029ab3c2efd965da127f5f5853311e8c14aef01d`，Issue #75 Closed；
+- merged-main CI run `34206603459` 为 11/11 SUCCESS，包含 supply-chain、AI deterministic 和聚合 full Gate；AI-006 进入 Done，AI-007 是唯一 Ready，但本次不启动；
+- AI-006 已闭合 bounded controlled-template preflight、主备失败后的完整严格校验模板候选、三种 route 的统一发布、server-only provenance/低基数 telemetry 与客户端克制降级呈现；
+- Weekly template/capacity `G12-F05/G12-B08`、真实 provider、MODEL/LOAD/HUMAN 与 Production authorization 继续 Planned/Pending，不由本合并冒充完成；C-015 继续 Blocked，DEV_LITE 保持 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`，Production/RC 继续 `NO_GO`。
 
 ## 2026-09-08 AI-006 启动
 
