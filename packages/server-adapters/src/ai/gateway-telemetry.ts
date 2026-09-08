@@ -2,6 +2,7 @@ import type {
   GatewayAttemptTelemetrySinkV1,
   GatewayRoutingTelemetrySinkV1,
 } from "@daily-energy/server-core/ai-gateway/spi";
+import type { GatewayRouteRole } from "@daily-energy/server-core/ai-gateway";
 
 import type {
   TelemetryAttributes,
@@ -88,7 +89,7 @@ export function createGatewayRoutingTelemetrySinkV1(
 ): GatewayRoutingTelemetrySinkV1 {
   return Object.freeze({
     record(event: GatewayRoutingTelemetryEventV1): void {
-      if (event.role !== undefined && event.reasonCode === "CIRCUIT_OPEN") {
+      if (isProviderRole(event.role) && event.reasonCode === "CIRCUIT_OPEN") {
         runtime.record("dailyenergy_gateway_breaker_state", 1, {
           operationCode: "GATEWAY_INVOKE",
           outcomeCode: "EXPECTED_REJECT",
@@ -96,8 +97,19 @@ export function createGatewayRoutingTelemetrySinkV1(
           reasonCode: "DEPENDENCY_UNAVAILABLE",
         });
       }
-      if (event.outcomeCode === "FALLBACK" && event.role !== undefined) {
+      if (event.outcomeCode === "FALLBACK" && isProviderRole(event.role)) {
         return;
+      }
+      if (
+        event.outcomeCode === "CANDIDATE" &&
+        event.role === "CONTROLLED_TEMPLATE"
+      ) {
+        runtime.record("dailyenergy_gateway_fallbacks_total", 1, {
+          operationCode: "GATEWAY_INVOKE",
+          outcomeCode: "SUCCESS",
+          reasonCode: reasonCode(event.reasonCode),
+          workload: workload(event.workload),
+        });
       }
       const outcomeCode: TelemetryOutcomeCode =
         event.outcomeCode === "CANDIDATE"
@@ -123,6 +135,12 @@ export function createGatewayRoutingTelemetrySinkV1(
       );
     },
   });
+}
+
+function isProviderRole(
+  role: GatewayRouteRole | undefined,
+): role is "PRIMARY_AI" | "BACKUP_AI" {
+  return role === "PRIMARY_AI" || role === "BACKUP_AI";
 }
 
 function attemptOutcome(

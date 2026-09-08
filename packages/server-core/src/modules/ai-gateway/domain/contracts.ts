@@ -137,14 +137,27 @@ export interface GatewayValidationReceiptInputV1 {
   readonly workload: GatewayWorkload;
 }
 
-export interface GatewayCandidateV1 {
+interface GatewayCandidateBaseV1 {
   readonly attemptId: string;
-  readonly generationMode: GatewayRouteRole;
   readonly payload: GatewayJsonObject;
   readonly payloadFingerprint: string;
   readonly validationReceipt: GatewayValidationReceiptV1;
   readonly workload: GatewayWorkload;
 }
+
+export type GatewayCandidateV1 =
+  | (GatewayCandidateBaseV1 & {
+      readonly generationMode: GatewayProviderRole;
+      readonly provenance: {
+        readonly model: string;
+        readonly promptVersion: string;
+        readonly provider: string;
+      };
+    })
+  | (GatewayCandidateBaseV1 & {
+      readonly generationMode: "CONTROLLED_TEMPLATE";
+      readonly provenance: { readonly templateVersion: string };
+    });
 
 export type GatewayAdmissionV1 =
   | { readonly status: "ALLOWED" }
@@ -204,6 +217,7 @@ export type GatewayGatewayFailureCode =
   | "GATEWAY_DEADLINE_EXCEEDED"
   | "INVOCATION_SCHEMA_INVALID"
   | "INPUT_LIMIT_EXCEEDED"
+  | "PLAN_BINDING_INVALID"
   | "ROUTE_COMPATIBILITY_INVALID"
   | "ROUTE_FINGERPRINT_MISMATCH"
   | "ROUTE_MANIFEST_INVALID"

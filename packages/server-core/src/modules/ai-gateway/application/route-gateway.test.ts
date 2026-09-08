@@ -19,8 +19,10 @@ import {
 import type {
   ExpressionGatewayV1,
   GatewayBreakerStateStoreV1,
+  GatewayClockV1,
   GatewayLiveGuardV1,
   GatewayRoutingTelemetrySinkV1,
+  GatewayTemplatePreflightV1,
 } from "../spi/index.js";
 import { GatewayRouteOrchestratorV1 } from "./route-gateway.js";
 
@@ -29,6 +31,11 @@ const candidate = {
   generationMode: "BACKUP_AI",
   payload: { message: "synthetic" },
   payloadFingerprint: "a".repeat(64),
+  provenance: {
+    model: "model-backup-v1",
+    promptVersion: "daily-expression-zh-cn-v1",
+    provider: "provider-backup",
+  },
   validationReceipt: createGatewayValidationReceiptV1({
     outputSchemaVersion: "1.0.0",
     payloadFingerprint: "a".repeat(64),
@@ -41,6 +48,22 @@ const candidate = {
   }),
   workload: "DAILY_EXPRESSION_V1",
 } as const satisfies GatewayCandidateV1;
+const templateCandidate = {
+  ...candidate,
+  generationMode: "CONTROLLED_TEMPLATE",
+  provenance: { templateVersion: "daily-template-v1" },
+  validationReceipt: createGatewayValidationReceiptV1({
+    outputSchemaVersion: "1.0.0",
+    payloadFingerprint: "a".repeat(64),
+    planFingerprint: "1".repeat(64),
+    promptVersion: "daily-expression-zh-cn-v1",
+    routeRole: "CONTROLLED_TEMPLATE",
+    safetyPolicyVersion: "safety-policy-v1",
+    validatorVersion: "validator-v1",
+    workload: "DAILY_EXPRESSION_V1",
+  }),
+} as const satisfies GatewayCandidateV1;
+const frozenPlan = { contract: "daily-expression-v1" } as const;
 
 const route = (role: "PRIMARY_AI" | "BACKUP_AI", suffix: string) =>
   ({
@@ -133,8 +156,10 @@ class MemoryBreaker implements GatewayBreakerStateStoreV1 {
 function setup(input: {
   readonly outcomes: readonly GatewayOutcomeV1[];
   readonly breaker?: GatewayBreakerStateStoreV1;
+  readonly clock?: GatewayClockV1;
   readonly guard?: GatewayLiveGuardV1;
   readonly guards?: readonly Awaited<ReturnType<GatewayLiveGuardV1["read"]>>[];
+  readonly templateOutcome?: GatewayOutcomeV1;
   readonly telemetry?: GatewayRoutingTelemetrySinkV1;
 }) {
   const outcomes = [...input.outcomes];
@@ -157,15 +182,31 @@ function setup(input: {
   const telemetry: GatewayRoutingTelemetrySinkV1 = input.telemetry ?? {
     record: (event) => events.push(event),
   };
+  const templateCalls: Parameters<
+    GatewayTemplatePreflightV1["preflight"]
+  >[0][] = [];
+  const template: GatewayTemplatePreflightV1 = {
+    async preflight(value) {
+      templateCalls.push(value);
+      return (
+        input.templateOutcome ?? {
+          candidate: templateCandidate,
+          status: "CANDIDATE_READY",
+        }
+      );
+    },
+  };
   return {
     calls,
     events,
     roles,
+    templateCalls,
     value: new GatewayRouteOrchestratorV1({
       breaker: input.breaker ?? new MemoryBreaker(),
-      clock: { now: () => new Date("2026-09-07T02:00:00Z") },
+      clock: input.clock ?? { now: () => new Date("2026-09-07T02:00:00Z") },
       gateway,
       guard,
+      template,
       telemetry,
     }),
   };
@@ -186,6 +227,7 @@ describe("AI-002 sequential Gateway routing", () => {
     await expect(
       context.value.invoke({
         admission: allowed,
+        frozenPlan,
         invocation,
         manifest,
         runtimeProfile: "INTERACTIVE",
@@ -236,6 +278,7 @@ describe("AI-002 sequential Gateway routing", () => {
     await expect(
       context.value.invoke({
         admission: allowed,
+        frozenPlan,
         invocation,
         manifest,
         runtimeProfile: "INTERACTIVE",
@@ -244,7 +287,7 @@ describe("AI-002 sequential Gateway routing", () => {
     expect(context.roles).toEqual(["PRIMARY_AI", "BACKUP_AI"]);
   });
 
-  it("returns a template decision after both provider roles fail", async () => {
+  it("G12-F02/E16-O07 returns one complete template candidate after both provider roles fail", async () => {
     const context = setup({
       outcomes: [
         {
@@ -254,7 +297,7 @@ describe("AI-002 sequential Gateway routing", () => {
         },
         {
           failedRole: "BACKUP_AI",
-          reasonCode: "OUTCOME_UNKNOWN",
+          reasonCode: "PROVIDER_PROTOCOL_INVALID",
           status: "FALLBACK_REQUIRED",
         },
       ],
@@ -262,15 +305,121 @@ describe("AI-002 sequential Gateway routing", () => {
     await expect(
       context.value.invoke({
         admission: allowed,
+        frozenPlan,
         invocation,
         manifest,
         runtimeProfile: "INTERACTIVE",
       }),
     ).resolves.toEqual({
-      reasonCode: "PROVIDER_PATHS_EXHAUSTED",
-      status: "CONTROLLED_TEMPLATE_REQUIRED",
+      candidate: templateCandidate,
+      status: "CANDIDATE_READY",
     });
     expect(context.roles).toEqual(["PRIMARY_AI", "BACKUP_AI"]);
+    expect(context.templateCalls).toHaveLength(1);
+    expect(context.events.at(-1)).toMatchObject({
+      outcomeCode: "CANDIDATE",
+      reasonCode: "PROVIDER_PATHS_EXHAUSTED",
+      role: "CONTROLLED_TEMPLATE",
+    });
+  });
+
+  it("G12-N04 preflights the template but never returns it when primary succeeds", async () => {
+    const primaryCandidate = {
+      ...candidate,
+      generationMode: "PRIMARY_AI",
+      provenance: {
+        model: "model-primary-v1",
+        promptVersion: "daily-expression-zh-cn-v1",
+        provider: "provider-primary",
+      },
+      validationReceipt: createGatewayValidationReceiptV1({
+        outputSchemaVersion: "1.0.0",
+        payloadFingerprint: "a".repeat(64),
+        planFingerprint: "1".repeat(64),
+        promptVersion: "daily-expression-zh-cn-v1",
+        routeRole: "PRIMARY_AI",
+        safetyPolicyVersion: "safety-policy-v1",
+        validatorVersion: "validator-v1",
+        workload: "DAILY_EXPRESSION_V1",
+      }),
+    } as const satisfies GatewayCandidateV1;
+    const context = setup({
+      outcomes: [{ candidate: primaryCandidate, status: "CANDIDATE_READY" }],
+    });
+
+    await expect(
+      context.value.invoke({
+        admission: allowed,
+        frozenPlan,
+        invocation,
+        manifest,
+        runtimeProfile: "INTERACTIVE",
+      }),
+    ).resolves.toEqual({
+      candidate: primaryCandidate,
+      status: "CANDIDATE_READY",
+    });
+    expect(context.templateCalls).toHaveLength(1);
+    expect(context.roles).toEqual(["PRIMARY_AI"]);
+  });
+
+  it("discards a preflighted template when the live guard changes before fallback", async () => {
+    const context = setup({
+      guards: [
+        { status: "ALLOWED" },
+        { status: "ALLOWED" },
+        { status: "ALLOWED" },
+        { reasonCode: "SAFETY_OVERLAY_ACTIVE", status: "BLOCKED" },
+      ],
+      outcomes: [
+        {
+          failedRole: "PRIMARY_AI",
+          reasonCode: "PROVIDER_RESPONSE_TIMEOUT",
+          status: "FALLBACK_REQUIRED",
+        },
+        {
+          failedRole: "BACKUP_AI",
+          reasonCode: "OUTPUT_SCHEMA_INVALID",
+          status: "FALLBACK_REQUIRED",
+        },
+      ],
+    });
+    await expect(
+      context.value.invoke({
+        admission: allowed,
+        frozenPlan,
+        invocation,
+        manifest,
+        runtimeProfile: "INTERACTIVE",
+      }),
+    ).resolves.toEqual({
+      reasonCode: "SAFETY_OVERLAY_ACTIVE",
+      status: "BLOCKED",
+    });
+    expect(context.roles).toEqual(["PRIMARY_AI", "BACKUP_AI"]);
+  });
+
+  it("fails before provider dispatch when template preflight is invalid", async () => {
+    const context = setup({
+      outcomes: [],
+      templateOutcome: {
+        reasonCode: "TEMPLATE_PREFLIGHT_FAILED",
+        status: "TERMINAL_GATEWAY_FAILURE",
+      },
+    });
+    await expect(
+      context.value.invoke({
+        admission: allowed,
+        frozenPlan,
+        invocation,
+        manifest,
+        runtimeProfile: "INTERACTIVE",
+      }),
+    ).resolves.toEqual({
+      reasonCode: "TEMPLATE_PREFLIGHT_FAILED",
+      status: "TERMINAL_GATEWAY_FAILURE",
+    });
+    expect(context.roles).toEqual([]);
   });
 
   it("fails closed to template when breaker state is unreadable", async () => {
@@ -286,13 +435,14 @@ describe("AI-002 sequential Gateway routing", () => {
     await expect(
       context.value.invoke({
         admission: allowed,
+        frozenPlan,
         invocation,
         manifest,
         runtimeProfile: "INTERACTIVE",
       }),
     ).resolves.toEqual({
-      reasonCode: "BREAKER_STATE_UNAVAILABLE",
-      status: "CONTROLLED_TEMPLATE_REQUIRED",
+      candidate: templateCandidate,
+      status: "CANDIDATE_READY",
     });
     expect(context.roles).toEqual([]);
   });
@@ -308,13 +458,61 @@ describe("AI-002 sequential Gateway routing", () => {
       const context = setup({ outcomes: [] });
       const result = await context.value.invoke({
         admission,
+        frozenPlan,
         invocation,
         manifest,
         runtimeProfile: "INTERACTIVE",
       });
-      expect(result.status).toMatch(/BLOCKED|CONTROLLED_TEMPLATE_REQUIRED/u);
+      expect(result.status).toMatch(/BLOCKED|CANDIDATE_READY/u);
       expect(context.roles).toEqual([]);
+      expect(context.templateCalls).toHaveLength(
+        admission.status === "ORDINARY_GATEWAY_BLOCKED" ? 0 : 1,
+      );
     }
+  });
+
+  it.each(["BUDGET_HARD_LIMIT", "COST_UNKNOWN", "ROUTE_DISABLED"] as const)(
+    "G12-B06/G12-F04 routes provider admission %s to the validated template",
+    async (reasonCode) => {
+      const context = setup({ outcomes: [] });
+      await expect(
+        context.value.invoke({
+          admission: { reasonCode, status: "PROVIDER_CALLS_DISABLED" },
+          frozenPlan,
+          invocation,
+          manifest,
+          runtimeProfile: "INTERACTIVE",
+        }),
+      ).resolves.toEqual({
+        candidate: templateCandidate,
+        status: "CANDIDATE_READY",
+      });
+      expect(context.roles).toEqual([]);
+      expect(context.templateCalls).toHaveLength(1);
+    },
+  );
+
+  it("does not return a preflighted template after the hard Gateway deadline", async () => {
+    const context = setup({
+      clock: { now: () => new Date(invocation.hardDeadlineAt) },
+      outcomes: [],
+    });
+    await expect(
+      context.value.invoke({
+        admission: {
+          reasonCode: "BUDGET_HARD_LIMIT",
+          status: "PROVIDER_CALLS_DISABLED",
+        },
+        frozenPlan,
+        invocation,
+        manifest,
+        runtimeProfile: "INTERACTIVE",
+      }),
+    ).resolves.toEqual({
+      reasonCode: "GATEWAY_DEADLINE_EXCEEDED",
+      status: "TERMINAL_GATEWAY_FAILURE",
+    });
+    expect(context.roles).toEqual([]);
   });
 
   it.each([
@@ -326,12 +524,17 @@ describe("AI-002 sequential Gateway routing", () => {
     "G12-L04/G12-L06 discards a complete candidate when the live guard changes to %s",
     async (reasonCode) => {
       const context = setup({
-        guards: [{ status: "ALLOWED" }, { reasonCode, status: "BLOCKED" }],
+        guards: [
+          { status: "ALLOWED" },
+          { status: "ALLOWED" },
+          { reasonCode, status: "BLOCKED" },
+        ],
         outcomes: [{ candidate, status: "CANDIDATE_READY" }],
       });
       await expect(
         context.value.invoke({
           admission: allowed,
+          frozenPlan,
           invocation,
           manifest,
           runtimeProfile: "INTERACTIVE",
@@ -368,6 +571,7 @@ describe("AI-002 sequential Gateway routing", () => {
     await expect(
       context.value.invoke({
         admission: allowed,
+        frozenPlan,
         invocation,
         manifest,
         runtimeProfile: "INTERACTIVE",
@@ -399,6 +603,7 @@ describe("AI-002 sequential Gateway routing", () => {
     });
     await context.value.invoke({
       admission: allowed,
+      frozenPlan,
       invocation,
       manifest,
       runtimeProfile: "INTERACTIVE",
@@ -429,6 +634,7 @@ describe("AI-002 sequential Gateway routing", () => {
     await expect(
       context.value.invoke({
         admission: allowed,
+        frozenPlan,
         invocation,
         manifest,
         runtimeProfile: "INTERACTIVE",
@@ -449,6 +655,7 @@ describe("AI-002 sequential Gateway routing", () => {
     await expect(
       context.value.invoke({
         admission: allowed,
+        frozenPlan,
         invocation,
         manifest: {
           ...manifest,
@@ -472,6 +679,7 @@ describe("AI-002 sequential Gateway routing", () => {
     await expect(
       context.value.invoke({
         admission: allowed,
+        frozenPlan,
         invocation: { ...invocation, routeManifestVersion: "route-v2" },
         manifest,
         runtimeProfile: "INTERACTIVE",
@@ -498,6 +706,7 @@ describe("AI-002 sequential Gateway routing", () => {
           reasonCode: "SAFETY_OVERLAY_ACTIVE",
           status: "ORDINARY_GATEWAY_BLOCKED",
         },
+        frozenPlan,
         invocation,
         manifest,
         runtimeProfile: "INTERACTIVE",

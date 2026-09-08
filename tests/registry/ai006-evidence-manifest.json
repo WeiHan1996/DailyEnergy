@@ -1,0 +1,163 @@
+{
+  "manifest_version": "ai-006-evidence-v1",
+  "scope": "AI-006 bounded controlled-template preflight, complete primary-to-backup-to-template routing, shared validation and publication, client-safe presentation, and low-cardinality fallback telemetry",
+  "authority": [
+    "docs/decisions/ADR-0003-ai-provider-abstraction.md",
+    "docs/ai/gateway.md",
+    "docs/ai/daily-content-schema.md",
+    "docs/ai/safety.md",
+    "docs/technical/architecture.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-AI006-ROUTING-MODULE-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+      "selector": "AI-002 sequential Gateway routing",
+      "level": "MODULE",
+      "assertions": [
+        "the template is preflighted once before provider dispatch but a successful primary candidate is returned without publishing the template",
+        "primary rate limit plus backup protocol failure returns one complete CONTROLLED_TEMPLATE candidate with no field splicing or extra provider call",
+        "budget hard limit, unknown cost, disabled route and unreadable breaker state make zero provider calls and return the already validated template",
+        "Safety admission invokes neither provider nor template, and a changed live guard discards a preflighted template before fallback publication",
+        "template preflight failure is terminal before provider dispatch and cannot expose partial content"
+      ]
+    },
+    "T-AI006-ROUTING-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+      "selector": "G12-F02/E16-O07 and controlled-template route cases",
+      "level": "AI_EVAL",
+      "assertions": [
+        "all route inputs, failures and candidates are deterministic synthetic values with no external provider or credential",
+        "the frozen invocation and one preflighted complete template survive every provider failure class without inheriting provider text",
+        "the final routing event records CONTROLLED_TEMPLATE and one bounded reason rather than a no-result success"
+      ]
+    },
+    "T-AI006-TEMPLATE-MODULE-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/controlled-template.test.ts",
+      "selector": "AI-006 controlled template preflight",
+      "level": "MODULE",
+      "assertions": [
+        "the frozen plan fingerprint is verified before rendering and drift makes renderer calls zero",
+        "the renderer output passes the common candidate validator and produces one frozen payload, fingerprint, receipt and template provenance",
+        "INVALID, REJECTED, INDETERMINATE, renderer failure and local deadline overrun produce only TEMPLATE_PREFLIGHT_FAILED without partial content"
+      ]
+    },
+    "T-AI006-TEMPLATE-AI-EVAL-001": {
+      "file": "packages/server-adapters/src/ai/gateway-controlled-template.test.ts",
+      "selector": "AI-006 real Daily controlled-template Gateway adapter",
+      "level": "AI_EVAL",
+      "assertions": [
+        "a real C-006 plan is rendered by daily-template-v1 and accepted by the AI-004 strict validator through the Gateway template SPI",
+        "the complete expression preserves selected action and optional task IDs and low-state humor ceilings",
+        "a primary rate limit and backup protocol failure use the real template preflight, return one complete candidate and enter the common immutable Daily publisher with unchanged RuleFacts",
+        "the path uses no provider, network, key, provider output or second fact source"
+      ]
+    },
+    "T-AI006-PUBLICATION-MODULE-001": {
+      "file": "packages/server-core/src/modules/content-publication/domain/daily-publication.test.ts",
+      "selector": "C-008 daily publication and client projection",
+      "level": "MODULE",
+      "assertions": [
+        "PRIMARY_AI and BACKUP_AI candidates use the same strict immutable PublishedDailyResult assembly as CONTROLLED_TEMPLATE",
+        "server-only provider, model and Prompt provenance matches the selected candidate mode",
+        "the client projection contains no provider, model, Prompt, route, token, cost or breaker detail"
+      ]
+    },
+    "T-AI006-TELEMETRY-CONTRACT-001": {
+      "file": "packages/server-adapters/src/ai/gateway-telemetry.test.ts",
+      "selector": "AI-002 low-cardinality Gateway telemetry",
+      "level": "CONTRACT",
+      "assertions": [
+        "a validated template records CONTROLLED_TEMPLATE success and one closed reason bucket",
+        "route version and candidate content never become metric labels",
+        "existing provider attempt telemetry retains explicit unknown usage and cost rather than coercing them to zero"
+      ]
+    },
+    "T-AI006-MINIAPP-UNIT-001": {
+      "file": "apps/miniapp/src/pages/generation/presentation.test.ts",
+      "selector": "AI-006 controlled template presentation",
+      "level": "UNIT",
+      "assertions": [
+        "FALLBACK_RUNNING uses one restrained completion state while other active states remain neutral",
+        "visible fallback copy contains no AI, model, provider, error, failure, retry or cost implementation detail"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "G12-N04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI006-ROUTING-MODULE-001", "T-AI006-ROUTING-AI-EVAL-001"]
+    },
+    {
+      "source_id": "G12-F02",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI006-ROUTING-MODULE-001",
+        "T-AI006-ROUTING-AI-EVAL-001",
+        "T-AI006-TEMPLATE-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "G12-F04",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI006-ROUTING-MODULE-001",
+        "T-AI006-ROUTING-AI-EVAL-001",
+        "T-AI006-TEMPLATE-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "G12-F06",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI006-TEMPLATE-AI-EVAL-001",
+        "T-AI006-PUBLICATION-MODULE-001",
+        "T-AI006-MINIAPP-UNIT-001"
+      ]
+    },
+    {
+      "source_id": "G12-B06",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI006-ROUTING-MODULE-001",
+        "T-AI006-ROUTING-AI-EVAL-001",
+        "T-AI006-TELEMETRY-CONTRACT-001"
+      ]
+    },
+    {
+      "source_id": "G12-P05",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI006-PUBLICATION-MODULE-001",
+        "T-AI006-ROUTING-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "E16-O07",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI006-ROUTING-AI-EVAL-001",
+        "T-AI006-TEMPLATE-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "S29-ARCH-028",
+      "status": "COVERED",
+      "proof_ids": ["T-AI006-ROUTING-MODULE-001"]
+    },
+    {
+      "source_id": "S31-TEST-043",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI006-ROUTING-MODULE-001",
+        "T-AI006-TEMPLATE-AI-EVAL-001"
+      ]
+    }
+  ],
+  "pending_evidence": {
+    "weekly_template_and_capacity": "G12-F05 and G12-B08 remain PLANNED for the Weekly Gateway and workload-capacity implementation.",
+    "production_provider_matrix": "MODEL and LOAD evidence remain pending AI-014/AI-016 and explicit provider authorization.",
+    "production_authorization": "NOT_GRANTED"
+  }
+}

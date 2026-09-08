@@ -20,9 +20,9 @@ function cloneRegistry() {
 test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () => {
   assert.deepEqual(await loadAndValidateCoverageRegistry(), {
     counts: {
-      COVERED: 655,
+      COVERED: 664,
       NA_WITH_REASON: 0,
-      PLANNED: 349,
+      PLANNED: 340,
     },
     total: 1004,
   });

@@ -102,7 +102,8 @@ Production/RC 或 C-015 privacy/legal 证据。
   `registry/e013-evidence-manifest.json`、`registry/e014-evidence-manifest.json`、
   `registry/e017-evidence-manifest.json`、`registry/ai001-evidence-manifest.json`、
   `registry/ai002-evidence-manifest.json`、`registry/ai003-evidence-manifest.json`、
-  `registry/ai004-evidence-manifest.json`、`registry/ai005-evidence-manifest.json` 与已有
+  `registry/ai004-evidence-manifest.json`、`registry/ai005-evidence-manifest.json`、
+  `registry/ai006-evidence-manifest.json` 与已有
   database/queue/Compose manifest 提供逐项
   assertion，不把低层证据升级为高层 conformance；
 - 尚未实现的业务、恢复、模型、真机或人工场景保持 `PLANNED` 或明确 pending，不能因
@@ -119,6 +120,9 @@ Production/RC 或 C-015 privacy/legal 证据。
 - AI-005 登记一个不可变单一人格参数策略、六份合成 Daily/Weekly 同事实样例、禁用语言、
   care/uncertainty 幽默上限和 profile 偏好未来生效/历史冻结证据；`E16-T02/T03` 的 120-output
   人工盲评、AI-014 runner、MODEL/LOAD/HUMAN 和真实 provider 继续保持 `PLANNED`；
+- AI-006 登记 template preflight、主备双失败、breaker/预算/成本不可用、统一发布、客户端
+  安全投影与低基数 fallback telemetry；Weekly template/capacity、MODEL/LOAD 与生产 provider
+  继续保持 `PLANNED` 或 pending；
 - `manual-rc/evidence-template.json` 与 `ai-evaluation/evidence-template.json` 默认禁止
   PASS，且不调用 provider。
 

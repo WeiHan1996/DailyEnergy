@@ -52,3 +52,8 @@ UNKNOWN；route version、attempt ref、Prompt、provider body 和用户内容�
 AI-004 新增 `createGatewayStructuredOutputValidatorV1`，只把 prompt-library 的纯 validator
 适配为 Gateway SPI，并用 server-core canonical fingerprint 生成内容无关的验证 receipt。
 adapter 不复制事实/Safety 规则，不记录 candidate，也不把 `INDETERMINATE` 改成 PASS。
+
+AI-006 新增 `createGatewayControlledDailyTemplateRendererV1`，只接受与 route manifest 精确绑定的
+`daily-template-v1` / renderer / locale 版本和 frozen C-006 plan。renderer 无网络、无随机、
+不读取 provider 输出；完整表达仍交给 AI-004 validator。Gateway telemetry 将成功模板记为
+`CONTROLLED_TEMPLATE` 并使用封闭 fallback reason，不记录 route ref、正文或用户内容。

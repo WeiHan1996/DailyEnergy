@@ -44,6 +44,7 @@ export type {
 
 export { AiGatewayV1 } from "../application/invoke-gateway.js";
 export type { AiGatewayV1Dependencies } from "../application/invoke-gateway.js";
+export { ControlledTemplateGatewayV1 } from "../application/controlled-template.js";
 export {
   decideGatewayBreakerClaimV1,
   initialGatewayBreakerSnapshotV1,

@@ -62,6 +62,16 @@ AI-004 收紧 candidate validator SPI 与 PASS receipt：
 - route 继续在 dispatch 前和 candidate 返回后读取 live guard，existing、Safety、删除和 stale
   revision 均阻断迟到结果；双 provider 失败只返回 AI-006 可消费的 template 决策。
 
+AI-006 将上述决策闭合为完整本地候选：
+
+- `ControlledTemplateGatewayV1` 在 provider dispatch 前校验 frozen plan fingerprint，用版本化
+  renderer 生成完整 payload，并通过与 AI 相同的 candidate validator 和 receipt；
+- route 仍严格按 `PRIMARY_AI` → `BACKUP_AI`，但主备失败、breaker/预算/成本不可用时直接
+  返回已 preflight 的 `CONTROLLED_TEMPLATE` candidate，不再返回占位决策；
+- Safety/删除、live guard 不可读、template 版本/Schema/Safety/执行预算失败继续 fail closed；
+- PRIMARY/BACKUP/TEMPLATE candidate 通过同一 Daily publish assembler，provider/model/Prompt
+  provenance 只留在内部结果，客户端投影不包含技术来源。
+
 本包不得导入 Nest、Prisma、Redis、BullMQ、provider SDK、环境变量或客户端代码。
 PostgreSQL 和运行 profile 实现位于 `@daily-energy/server-adapters` 的显式 capability
 subpath。Weekly 持久化、TX-07 与 HTTP 适配仍位于 adapters/API，不进入本包。
