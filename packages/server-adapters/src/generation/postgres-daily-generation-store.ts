@@ -14,6 +14,7 @@ import {
   type GenerationIntentStatus,
   type GenerationIntentView,
   type HistoryDayView,
+  type RelationshipNodeDisplay,
   type TodayView,
 } from "@daily-energy/shared-schemas";
 import {
@@ -26,6 +27,12 @@ import {
   type GenerationGuardSnapshotV1,
   type GenerationManifestRecord,
 } from "@daily-energy/server-core/generation";
+import {
+  deriveRelationshipProjectionV1,
+  publishableRelationshipNodeV1,
+  renderRelationshipNodeDisplayV1,
+  type RelationshipProjectionV1,
+} from "@daily-energy/server-core/relationship";
 
 import { commandRefStorageUuid } from "../commands/command-ref.js";
 import { createClosedDatabaseFactory } from "../db/internal/create-closed-database-factory.js";
@@ -168,7 +175,6 @@ interface TodayRow {
   readonly isLit: boolean;
   readonly productDate: string;
   readonly provenancePayload: unknown;
-  readonly relationshipCount: number;
   readonly resultFingerprint: Buffer;
   readonly resultId: string;
   readonly resultVersion: string;
@@ -191,8 +197,22 @@ type CommandClaim =
 interface TodaySource {
   readonly cacheIdentity: DailyContentCacheIdentity;
   readonly guard: GenerationGuardSnapshotV1;
+  readonly nodeDisplay?: RelationshipNodeDisplay;
   readonly publishedResult: ReturnType<typeof PublishedDailyResultSchema.parse>;
+  readonly relationshipProjection: RelationshipProjectionV1;
   readonly row: TodayRow;
+}
+
+interface RelationshipSourceRow {
+  readonly cycleId: string;
+  readonly productDate: string | null;
+  readonly sourceLightRef: string | null;
+  readonly sourceValidityRevision: number | null;
+}
+
+interface StoredRelationshipProjection {
+  readonly cycleId?: string;
+  readonly projection: RelationshipProjectionV1;
 }
 
 interface HistorySource extends TodaySource {
@@ -321,6 +341,10 @@ export class PostgresDailyGenerationStore implements DailyGenerationStore {
         await abandonCommandClaim(client, input);
         return { status: "ONBOARDING_REQUIRED" };
       }
+      const relationship = await readRelationshipProjection(
+        client,
+        input.accountId,
+      );
       const snapshot = GenerationInputSnapshotSchema.parse({
         snapshot_version: manifest.manifest.input_snapshot_version,
         product_date: input.productDate,
@@ -337,8 +361,8 @@ export class PostgresDailyGenerationStore implements DailyGenerationStore {
           expression_style: profileRow.expressionStyle,
         },
         relationship: {
-          stage: "BEFORE_FIRST_MEETING",
-          encounter_day_count: 0,
+          stage: relationship.projection.stage,
+          encounter_day_count: relationship.projection.encounterDayCount,
         },
         permitted_context: [],
       });
@@ -492,7 +516,7 @@ export class PostgresDailyGenerationStore implements DailyGenerationStore {
     readonly productDate: string;
   }): Promise<TodayQueryResult> {
     const source = await this.#transaction((client) =>
-      readTodaySource(client, input.accountId, input.productDate),
+      readTodaySource(client, input.accountId, input.productDate, true),
     );
     if (source.status !== "FOUND") {
       return source;
@@ -525,23 +549,18 @@ export class PostgresDailyGenerationStore implements DailyGenerationStore {
     if (row.helpfulnessRating !== null && row.helpfulnessRevision === null) {
       throw new Error("DAILY_HELPFULNESS_REVISION_MISSING");
     }
-    const relationshipCount = row.relationshipCount;
+    const relationship = source.value.relationshipProjection;
     const view = TodayViewSchema.parse({
       content,
       interaction: interactionView(row),
       relationship: {
-        stage:
-          relationshipCount === 0
-            ? "BEFORE_FIRST_MEETING"
-            : relationshipCount < 3
-              ? "NEWLY_MET"
-              : relationshipCount < 7
-                ? "BECOMING_FAMILIAR"
-                : "FIRST_WEEK_RECORDED",
-        encounter_day_count: relationshipCount,
-        ...(relationshipNodeToken(relationshipCount) === undefined
+        projection_version: "relationship-projection-v1",
+        stage: relationship.stage,
+        encounter_day_count: relationship.encounterDayCount,
+        eligible_nodes: relationship.eligibleNodeCodes,
+        ...(source.value.nodeDisplay === undefined
           ? {}
-          : { display_token: relationshipNodeToken(relationshipCount) }),
+          : { node_display: source.value.nodeDisplay }),
       },
     });
     return { status: "FOUND", value: view };
@@ -599,6 +618,7 @@ async function readTodaySource(
   client: PoolClient,
   accountId: string,
   productDate: string,
+  claimNodeDisplay = false,
 ): Promise<
   | { readonly status: "FOUND"; readonly value: TodaySource }
   | Exclude<TodayQueryResult, { readonly status: "FOUND" }>
@@ -625,8 +645,7 @@ async function readTodaySource(
             task.status::text AS "taskStatus",
             helpfulness.rating::text AS "helpfulnessRating",
             helpfulness.revision AS "helpfulnessRevision",
-            (light.id IS NOT NULL) AS "isLit",
-            COALESCE(relationship.count, 0)::int AS "relationshipCount"
+            (light.id IS NOT NULL) AS "isLit"
        FROM daily_energy.app_published_daily_result result
        JOIN daily_energy.app_published_result_visibility visibility
          ON visibility."resultId"=result.id AND visibility.state='AVAILABLE'
@@ -638,29 +657,6 @@ async function readTodaySource(
          ON helpfulness."interactionId"=interaction.id
        LEFT JOIN daily_energy.app_daily_light_fact light
          ON light."interactionId"=interaction.id
-       LEFT JOIN LATERAL (
-         SELECT count(link.id)::int AS count
-           FROM daily_energy.app_relationship_cycle cycle
-           LEFT JOIN daily_energy.app_relationship_encounter_link link
-             ON link."cycleId"=cycle.id
-           LEFT JOIN daily_energy.app_daily_light_fact relationship_light
-             ON relationship_light.id=link."sourceLightId"
-            AND relationship_light."sourceValidityRevision"=link."sourceValidityRevision"
-          WHERE cycle."accountId"=result."accountId"
-            AND cycle."activeSlot" IS TRUE
-            AND cycle.state='ACTIVE'
-            AND (
-              link.id IS NULL
-              OR (
-                relationship_light.id IS NOT NULL
-                AND daily_energy.resolve_generation_guard_snapshot(
-                  result."accountId",link."productDate",'necessary-consent-v1'
-                )->>'status'='ALLOWED'
-              )
-            )
-          GROUP BY cycle.id
-          LIMIT 1
-       ) relationship ON TRUE
       WHERE result."accountId"=$1::uuid AND result."productDate"=$2::date
       LIMIT 1`,
     [accountId, productDate],
@@ -704,6 +700,10 @@ async function readTodaySource(
   ) {
     throw new Error("DAILY_RESULT_FINGERPRINT_MISMATCH");
   }
+  const relationship = await readRelationshipProjection(client, accountId);
+  const nodeDisplay = claimNodeDisplay
+    ? await claimRelationshipNodeDisplay(client, relationship)
+    : undefined;
   return {
     status: "FOUND",
     value: {
@@ -716,25 +716,97 @@ async function readTodaySource(
         visibilityRevision: row.visibilityRevision,
       },
       guard,
+      ...(nodeDisplay === undefined ? {} : { nodeDisplay }),
       publishedResult,
+      relationshipProjection: relationship.projection,
       row,
     },
   };
 }
 
-function relationshipNodeToken(count: number): string | undefined {
-  switch (count) {
-    case 1:
-      return "FIRST_MEETING";
-    case 3:
-      return "STYLE_CALIBRATION_AVAILABLE";
-    case 4:
-      return "IMPORTANT_MATTER_INVITE_AVAILABLE";
-    case 7:
-      return "FIRST_SEVEN_DAY_REVIEW_AVAILABLE";
-    default:
-      return undefined;
+async function readRelationshipProjection(
+  client: PoolClient,
+  accountId: string,
+): Promise<StoredRelationshipProjection> {
+  const result = await client.query<RelationshipSourceRow>(
+    `SELECT cycle.id AS "cycleId",
+            source."productDate"::text AS "productDate",
+            source."sourceLightRef",source."sourceValidityRevision"
+       FROM daily_energy.app_relationship_cycle cycle
+       LEFT JOIN LATERAL (
+         SELECT link."productDate",link."sourceLightId" AS "sourceLightRef",
+                link."sourceValidityRevision"
+           FROM daily_energy.app_relationship_encounter_link link
+           JOIN daily_energy.app_daily_light_fact light
+             ON light.id=link."sourceLightId"
+            AND light."sourceValidityRevision"=link."sourceValidityRevision"
+          WHERE link."cycleId"=cycle.id
+            AND daily_energy.resolve_generation_guard_snapshot(
+              cycle."accountId",link."productDate",'necessary-consent-v1'
+            )->>'status'='ALLOWED'
+          ORDER BY link."productDate",link."sourceLightId"
+       ) source ON TRUE
+      WHERE cycle."accountId"=$1::uuid AND cycle."activeSlot" IS TRUE
+        AND cycle.state='ACTIVE'`,
+    [accountId],
+  );
+  const cycleId = result.rows[0]?.cycleId;
+  const projection = deriveRelationshipProjectionV1(
+    result.rows.flatMap((row) =>
+      row.productDate === null ||
+      row.sourceLightRef === null ||
+      row.sourceValidityRevision === null
+        ? []
+        : [
+            {
+              productDate: row.productDate,
+              sourceLightRef: row.sourceLightRef,
+              sourceValidityRevision: row.sourceValidityRevision,
+            },
+          ],
+    ),
+  );
+  return cycleId === undefined
+    ? Object.freeze({ projection })
+    : Object.freeze({ cycleId, projection });
+}
+
+async function claimRelationshipNodeDisplay(
+  client: PoolClient,
+  relationship: StoredRelationshipProjection,
+): Promise<RelationshipNodeDisplay | undefined> {
+  const nodeCode = publishableRelationshipNodeV1(
+    relationship.projection.encounterDayCount,
+  );
+  if (relationship.cycleId === undefined || nodeCode === undefined) {
+    return undefined;
   }
+  const inserted = await client.query(
+    `INSERT INTO daily_energy.app_relationship_node_receipt
+      (id,"cycleId","nodeCode","sourceFingerprint","outcomeCode",
+       "retentionPolicyVersion","retentionScope","retentionAnchorAt")
+     SELECT gen_random_uuid(),cycle.id,$2::varchar(64),$3::bytea,'PUBLISHED',
+            $4::varchar(64),
+            'RELATIONSHIP_DATA',clock_timestamp()
+       FROM daily_energy.app_relationship_cycle cycle
+      WHERE cycle.id=$1::uuid AND cycle."activeSlot" IS TRUE
+        AND cycle.state='ACTIVE'
+        AND NOT EXISTS (
+          SELECT 1 FROM daily_energy.app_relationship_node_receipt receipt
+           WHERE receipt."cycleId"=cycle.id
+             AND receipt."nodeCode"=$2::varchar(64)
+        )
+     ON CONFLICT DO NOTHING`,
+    [
+      relationship.cycleId,
+      nodeCode,
+      Buffer.from(relationship.projection.sourceFingerprintHex, "hex"),
+      RETENTION_POLICY_VERSION,
+    ],
+  );
+  return inserted.rowCount === 1
+    ? renderRelationshipNodeDisplayV1(nodeCode)
+    : undefined;
 }
 
 async function readHistorySource(
@@ -745,7 +817,7 @@ async function readHistorySource(
   | { readonly status: "FOUND"; readonly value: HistorySource }
   | Exclude<HistoryDayQueryResult, { readonly status: "FOUND" }>
 > {
-  const source = await readTodaySource(client, accountId, productDate);
+  const source = await readTodaySource(client, accountId, productDate, false);
   if (source.status !== "FOUND") {
     switch (source.status) {
       case "GENERATION_FAILED_RETRYABLE":

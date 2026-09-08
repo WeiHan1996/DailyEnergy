@@ -100,7 +100,9 @@ export const todayFixture: TodayView = {
     updated_at: "2026-08-24T02:00:00.000Z",
   },
   relationship: {
+    eligible_nodes: [],
     encounter_day_count: 0,
+    projection_version: "relationship-projection-v1",
     stage: "BEFORE_FIRST_MEETING",
   },
 };

@@ -659,7 +659,27 @@ test(
                 productDate,
               });
               assert.equal(afterLoss.status, "FOUND");
-              assert.deepEqual(afterLoss, beforeLoss);
+              assert.ok(beforeLoss.status === "FOUND");
+              assert.ok(afterLoss.status === "FOUND");
+              assert.equal(
+                beforeLoss.value.relationship.node_display?.token,
+                "FIRST_MEETING",
+              );
+              const relationship = { ...beforeLoss.value.relationship };
+              delete relationship.node_display;
+              assert.deepEqual(afterLoss, {
+                ...beforeLoss,
+                value: { ...beforeLoss.value, relationship },
+              });
+              assert.equal(
+                await count(
+                  admin,
+                  "app_relationship_node_receipt",
+                  '"nodeCode"=$1',
+                  ["FIRST_MEETING"],
+                ),
+                1,
+              );
               const cacheKeys = await redisContainer.exec([
                 "redis-cli",
                 "--scan",

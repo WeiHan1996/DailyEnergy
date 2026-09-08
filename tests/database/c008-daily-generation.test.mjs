@@ -752,10 +752,313 @@ test(
       assert.deepEqual(
         litToday.status === "FOUND" && litToday.value.relationship,
         {
-          display_token: "FIRST_MEETING",
+          eligible_nodes: ["FIRST_MEETING"],
           encounter_day_count: 1,
+          node_display: {
+            body: "先从今天这一小步开始，不急着把彼此说得很熟。",
+            copy_version: "relationship-continuity-copy-v1",
+            title: "今天是第一次相遇",
+            token: "FIRST_MEETING",
+          },
+          projection_version: "relationship-projection-v1",
           stage: "NEWLY_MET",
         },
+      );
+      const firstNodeReplay = await generation.getToday({
+        accountId,
+        productDate,
+      });
+      assert.equal(firstNodeReplay.status, "FOUND");
+      assert.equal(
+        firstNodeReplay.status === "FOUND" &&
+          firstNodeReplay.value.relationship.node_display,
+        undefined,
+      );
+
+      async function addRelationshipDay(targetProductDate, ordinal) {
+        const dayStart = new Date(`${targetProductDate}T02:00:00.000Z`);
+        assert.equal(
+          (
+            await checkin.submit({
+              accountId,
+              commandRef: `ai007-checkin-${ordinal}`,
+              energy: "STEADY",
+              mood: "GOOD",
+              normalizedPayloadFingerprint: bytes(
+                `ai007:checkin:${targetProductDate}`,
+              ),
+              now: dayStart,
+              productDate: targetProductDate,
+              productDatePolicyVersion: "product-date-v1",
+              sleep: "OKAY",
+            })
+          ).status,
+          "ACCEPTED",
+        );
+        const started = await generation.start({
+          accountId,
+          commandRef: `ai007-generation-${ordinal}`,
+          expectedCheckinRevision: 1,
+          normalizedPayloadFingerprint: bytes(
+            `ai007:generation:${targetProductDate}`,
+          ),
+          now: new Date(dayStart.getTime() + 1_000),
+          productDate: targetProductDate,
+          productDatePolicyVersion: "product-date-v1",
+        });
+        assert.equal(started.status, "ACCEPTED");
+        assert.ok("value" in started);
+        const targetIntentRef = started.value.intent_ref;
+        const acceptedEvent = await acceptedEnvelope(admin, targetIntentRef);
+        await claimIntent(queueStore, acceptedHandler, acceptedEvent);
+        assert.equal(
+          await runtime.executeIntent(targetIntentRef, {
+            now: () => new Date(dayStart.getTime() + 2_000),
+          }),
+          "PUBLISHED",
+        );
+        const beforeLight = await generation.getToday({
+          accountId,
+          productDate: targetProductDate,
+        });
+        assert.equal(beforeLight.status, "FOUND");
+        assert.ok(beforeLight.status === "FOUND");
+        assert.equal(
+          (
+            await dailyInteraction.openToday({
+              accountId,
+              openedAt: new Date(dayStart.getTime() + 3_000),
+              productDate: targetProductDate,
+              resultId: beforeLight.value.interaction.result_id,
+              sessionId,
+            })
+          ).status,
+          "RECORDED",
+        );
+        const light = await dailyInteraction.lightDay({
+          accountId,
+          commandRef: `ai007-light-${ordinal}`,
+          normalizedPayloadFingerprint: bytes(
+            `ai007:light:${targetProductDate}`,
+          ),
+          now: new Date(dayStart.getTime() + 4_000),
+          productDate: targetProductDate,
+          productDatePolicyVersion: "product-date-v1",
+          resultRef: beforeLight.value.interaction.result_id,
+          sessionId,
+        });
+        assert.equal(light.status, "ACCEPTED");
+        assert.ok("value" in light);
+        const targetLightId = (
+          await admin.query(
+            `SELECT light.id
+               FROM app_daily_light_fact light
+               JOIN app_daily_interaction interaction
+                 ON interaction.id=light."interactionId"
+              WHERE interaction."accountId"=$1
+                AND interaction."productDate"=$2::date`,
+            [accountId, targetProductDate],
+          )
+        ).rows[0]?.id;
+        assert.equal(typeof targetLightId, "string");
+        const event = await outboxEnvelope(admin, targetLightId, "DayLit");
+        const consumed = await backgroundQueueStore.consumeInbox(
+          "background-relationship",
+          event,
+          (transaction) => dayLitHandler.handle(event, transaction),
+        );
+        assert.equal(consumed.outcomeCode, "RELATIONSHIP_LINKED");
+        const snapshot = (
+          await admin.query(
+            `SELECT snapshot."snapshotPayload"->'relationship' AS relationship
+               FROM app_generation_input_snapshot snapshot
+               JOIN app_generation_intent intent
+                 ON intent.id=snapshot."generationIntentId"
+              WHERE intent."accountId"=$1
+                AND intent."targetProductDate"=$2::date`,
+            [accountId, targetProductDate],
+          )
+        ).rows[0]?.relationship;
+        return {
+          snapshot,
+          today: await generation.getToday({
+            accountId,
+            productDate: targetProductDate,
+          }),
+        };
+      }
+
+      const relationshipDates = [
+        "2026-08-27",
+        "2026-08-29",
+        "2026-09-01",
+        "2026-09-02",
+        "2026-09-04",
+        "2026-09-08",
+      ];
+      for (const [index, targetProductDate] of relationshipDates.entries()) {
+        const count = index + 2;
+        const result = await addRelationshipDay(targetProductDate, count);
+        assert.equal(result.today.status, "FOUND");
+        assert.ok(result.today.status === "FOUND");
+        assert.equal(result.snapshot.encounter_day_count, count - 1);
+        assert.equal(
+          result.snapshot.stage,
+          count - 1 < 3
+            ? "NEWLY_MET"
+            : count - 1 < 7
+              ? "BECOMING_FAMILIAR"
+              : "FIRST_WEEK_RECORDED",
+        );
+        const expectedNode =
+          count === 3
+            ? "STYLE_CALIBRATION_AVAILABLE"
+            : count === 7
+              ? "FIRST_SEVEN_DAY_REVIEW_AVAILABLE"
+              : undefined;
+        assert.equal(
+          result.today.value.relationship.node_display?.token,
+          expectedNode,
+        );
+        assert.equal(
+          result.today.value.relationship.encounter_day_count,
+          count,
+        );
+        assert.equal(
+          result.today.value.relationship.stage,
+          count < 3
+            ? "NEWLY_MET"
+            : count < 7
+              ? "BECOMING_FAMILIAR"
+              : "FIRST_WEEK_RECORDED",
+        );
+        if (expectedNode !== undefined) {
+          const replay = await generation.getToday({
+            accountId,
+            productDate: targetProductDate,
+          });
+          assert.equal(replay.status, "FOUND");
+          assert.equal(
+            replay.status === "FOUND" && replay.value.relationship.node_display,
+            undefined,
+          );
+        }
+      }
+
+      const relationshipReceipts = await admin.query(
+        `SELECT receipt."nodeCode",receipt."outcomeCode",
+                octet_length(receipt."sourceFingerprint") AS fingerprint_bytes
+           FROM app_relationship_node_receipt receipt
+           JOIN app_relationship_cycle cycle ON cycle.id=receipt."cycleId"
+          WHERE cycle."accountId"=$1
+          ORDER BY receipt."nodeCode"`,
+        [accountId],
+      );
+      assert.deepEqual(relationshipReceipts.rows, [
+        {
+          fingerprint_bytes: 32,
+          nodeCode: "FIRST_MEETING",
+          outcomeCode: "PUBLISHED",
+        },
+        {
+          fingerprint_bytes: 32,
+          nodeCode: "FIRST_SEVEN_DAY_REVIEW_AVAILABLE",
+          outcomeCode: "PUBLISHED",
+        },
+        {
+          fingerprint_bytes: 32,
+          nodeCode: "STYLE_CALIBRATION_AVAILABLE",
+          outcomeCode: "PUBLISHED",
+        },
+      ]);
+      await assert.rejects(
+        admin.query(
+          `INSERT INTO app_relationship_node_receipt
+            (id,"cycleId","nodeCode","sourceFingerprint","outcomeCode",
+             "retentionPolicyVersion","retentionScope","retentionAnchorAt")
+           SELECT gen_random_uuid(),cycle.id,'FIRST_MEETING',decode(repeat('00',32),'hex'),
+                  'PUBLISHED','retention-policy-v1','RELATIONSHIP_DATA',clock_timestamp()
+             FROM app_relationship_cycle cycle
+            WHERE cycle."accountId"=$1 AND cycle."activeSlot" IS TRUE`,
+          [accountId],
+        ),
+        /duplicate key/u,
+      );
+      const historicalAfterRelationshipGrowth = (
+        await admin.query(
+          `SELECT "expressionCorePayload","resultFingerprint"
+             FROM app_published_daily_result
+            WHERE "accountId"=$1 AND "productDate"=$2`,
+          [accountId, productDate],
+        )
+      ).rows[0];
+      assert.deepEqual(
+        historicalAfterRelationshipGrowth,
+        historicalAfterPreferenceChange,
+        "AI-007 current relationship growth must not rewrite historical output",
+      );
+
+      const cycleBeforeSourceRemoval = (
+        await admin.query(
+          `SELECT revision,"projectionFingerprint"
+             FROM app_relationship_cycle
+            WHERE "accountId"=$1 AND "activeSlot" IS TRUE`,
+          [accountId],
+        )
+      ).rows[0];
+      await admin.query(
+        `DELETE FROM app_relationship_encounter_link link
+          USING app_relationship_cycle cycle
+          WHERE link."cycleId"=cycle.id AND cycle."accountId"=$1
+            AND link."productDate"='2026-09-08'::date`,
+        [accountId],
+      );
+      const cycleAfterSourceRemoval = (
+        await admin.query(
+          `SELECT revision,"projectionFingerprint"
+             FROM app_relationship_cycle
+            WHERE "accountId"=$1 AND "activeSlot" IS TRUE`,
+          [accountId],
+        )
+      ).rows[0];
+      assert.equal(
+        cycleAfterSourceRemoval.revision,
+        cycleBeforeSourceRemoval.revision + 1,
+      );
+      assert.notDeepEqual(
+        cycleAfterSourceRemoval.projectionFingerprint,
+        cycleBeforeSourceRemoval.projectionFingerprint,
+      );
+      const afterRemoval = await generation.getToday({
+        accountId,
+        productDate: "2026-09-04",
+      });
+      assert.equal(afterRemoval.status, "FOUND");
+      assert.deepEqual(
+        afterRemoval.status === "FOUND" && afterRemoval.value.relationship,
+        {
+          eligible_nodes: [
+            "FIRST_MEETING",
+            "STYLE_CALIBRATION_AVAILABLE",
+            "IMPORTANT_MATTER_INVITE_AVAILABLE",
+          ],
+          encounter_day_count: 6,
+          projection_version: "relationship-projection-v1",
+          stage: "BECOMING_FAMILIAR",
+        },
+      );
+      const recrossed = await addRelationshipDay("2026-09-10", 8);
+      assert.equal(recrossed.today.status, "FOUND");
+      assert.equal(
+        recrossed.today.status === "FOUND" &&
+          recrossed.today.value.relationship.encounter_day_count,
+        7,
+      );
+      assert.equal(
+        recrossed.today.status === "FOUND" &&
+          recrossed.today.value.relationship.node_display,
+        undefined,
+        "ordinary source removal must not replay the seven-day node",
       );
       const recent = await dailyInteraction.listHistory({
         accountId,
@@ -826,6 +1129,41 @@ test(
           )
         ).rows[0].count,
         0,
+      );
+
+      await admin.query(
+        `DELETE FROM app_relationship_node_receipt receipt
+          USING app_relationship_cycle cycle
+          WHERE receipt."cycleId"=cycle.id AND cycle."accountId"=$1`,
+        [accountId],
+      );
+      await admin.query(
+        `DELETE FROM app_relationship_encounter_link link
+          USING app_relationship_cycle cycle
+          WHERE link."cycleId"=cycle.id AND cycle."accountId"=$1`,
+        [accountId],
+      );
+      await admin.query(
+        `DELETE FROM app_relationship_cycle WHERE "accountId"=$1`,
+        [accountId],
+      );
+      const newCycle = await addRelationshipDay("2026-09-12", 9);
+      assert.equal(newCycle.today.status, "FOUND");
+      assert.deepEqual(
+        newCycle.today.status === "FOUND" && newCycle.today.value.relationship,
+        {
+          eligible_nodes: ["FIRST_MEETING"],
+          encounter_day_count: 1,
+          node_display: {
+            body: "先从今天这一小步开始，不急着把彼此说得很熟。",
+            copy_version: "relationship-continuity-copy-v1",
+            title: "今天是第一次相遇",
+            token: "FIRST_MEETING",
+          },
+          projection_version: "relationship-projection-v1",
+          stage: "NEWLY_MET",
+        },
+        "a completed relationship deletion permits a fresh cycle without old facts",
       );
 
       const eveningRead = await evening.get({

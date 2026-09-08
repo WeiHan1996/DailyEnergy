@@ -111,3 +111,11 @@ export type {
   OptionalExpressionStyleResolutionV1,
   VisibleExpressionStyle,
 } from "./expression-style-policy.js";
+
+export {
+  RELATIONSHIP_CONTINUITY_PROMPT_DIRECTIVE_VERSION,
+  RELATIONSHIP_CONTINUITY_PROMPT_REGISTRY_FINGERPRINT,
+  RelationshipContinuityPromptError,
+  assertRelationshipPromptLanguage,
+  relationshipPromptDirectiveV1,
+} from "./relationship-continuity.js";

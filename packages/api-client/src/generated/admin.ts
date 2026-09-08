@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:4f25a52e42831a6ecaee032c92a92244e262169e452cf8a25389c0ba450a89a5
+// source-fingerprint: sha256:00a1a9cf76a6e9f1e0141332084859a6cd8c4ccc6cf4fdf25771f72b43e5da17
 // do not edit; run `pnpm codegen`.
 
 export const ADMIN_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:4f25a52e42831a6ecaee032c92a92244e262169e452cf8a25389c0ba450a89a5";
+  "sha256:00a1a9cf76a6e9f1e0141332084859a6cd8c4ccc6cf4fdf25771f72b43e5da17";
 
 export interface paths {
   "/admin/auth/login": {

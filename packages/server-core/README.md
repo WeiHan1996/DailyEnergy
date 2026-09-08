@@ -72,6 +72,13 @@ AI-006 将上述决策闭合为完整本地候选：
 - PRIMARY/BACKUP/TEMPLATE candidate 通过同一 Daily publish assembler，provider/model/Prompt
   provenance 只留在内部结果，客户端投影不包含技术来源。
 
+AI-007 新增 `@daily-energy/server-core/relationship`：
+
+- `relationship-policy-v1` 只从有效、按产品日期去重的 LightFact 源投影 count、stage、
+  第 1/3/4/7 日资格和 SHA-256 source fingerprint；
+- 日历中断不清零，同日精确重放不增加，冲突源 fail closed，删除源后可确定性降级；
+- 第 1/3/7 日是当前可发布连续性节点；第 4 日资格保留给 AI-008，不由 AI-007 提前实现事项。
+
 本包不得导入 Nest、Prisma、Redis、BullMQ、provider SDK、环境变量或客户端代码。
 PostgreSQL 和运行 profile 实现位于 `@daily-energy/server-adapters` 的显式 capability
 subpath。Weekly 持久化、TX-07 与 HTTP 适配仍位于 adapters/API，不进入本包。

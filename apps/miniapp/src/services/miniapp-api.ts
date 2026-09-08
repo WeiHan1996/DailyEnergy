@@ -907,9 +907,22 @@ function projectInteractionView(value: unknown) {
 }
 
 function projectRelationshipView(value: unknown) {
+  const nodeCodes = [
+    "FIRST_MEETING",
+    "STYLE_CALIBRATION_AVAILABLE",
+    "IMPORTANT_MATTER_INVITE_AVAILABLE",
+    "FIRST_SEVEN_DAY_REVIEW_AVAILABLE",
+  ];
   if (
     !isRecord(value) ||
-    !hasOnlyKeys(value, ["stage", "encounter_day_count", "display_token"]) ||
+    !hasOnlyKeys(value, [
+      "projection_version",
+      "stage",
+      "encounter_day_count",
+      "eligible_nodes",
+      "node_display",
+    ]) ||
+    value.projection_version !== "relationship-projection-v1" ||
     ![
       "BEFORE_FIRST_MEETING",
       "NEWLY_MET",
@@ -919,11 +932,53 @@ function projectRelationshipView(value: unknown) {
     typeof value.encounter_day_count !== "number" ||
     !Number.isInteger(value.encounter_day_count) ||
     value.encounter_day_count < 0 ||
-    (value.display_token !== undefined && !isText(value.display_token))
+    !Array.isArray(value.eligible_nodes) ||
+    value.eligible_nodes.some((node) => !nodeCodes.includes(String(node))) ||
+    new Set(value.eligible_nodes).size !== value.eligible_nodes.length ||
+    !validRelationshipStageAndNodes(value) ||
+    (value.node_display !== undefined &&
+      (!isRecord(value.node_display) ||
+        !hasOnlyKeys(value.node_display, [
+          "token",
+          "copy_version",
+          "title",
+          "body",
+        ]) ||
+        !nodeCodes.includes(String(value.node_display.token)) ||
+        !value.eligible_nodes.includes(value.node_display.token) ||
+        value.node_display.copy_version !== "relationship-continuity-copy-v1" ||
+        !isText(value.node_display.title) ||
+        value.node_display.title.length > 24 ||
+        !isText(value.node_display.body) ||
+        value.node_display.body.length > 80))
   ) {
     throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
   }
   return freezeJson(value) as TodayView["relationship"];
+}
+
+function validRelationshipStageAndNodes(
+  value: Record<string, unknown>,
+): boolean {
+  const count = Number(value.encounter_day_count);
+  const stage =
+    count === 0
+      ? "BEFORE_FIRST_MEETING"
+      : count < 3
+        ? "NEWLY_MET"
+        : count < 7
+          ? "BECOMING_FAMILIAR"
+          : "FIRST_WEEK_RECORDED";
+  const nodes = [
+    ...(count >= 1 ? ["FIRST_MEETING"] : []),
+    ...(count >= 3 ? ["STYLE_CALIBRATION_AVAILABLE"] : []),
+    ...(count >= 4 ? ["IMPORTANT_MATTER_INVITE_AVAILABLE"] : []),
+    ...(count >= 7 ? ["FIRST_SEVEN_DAY_REVIEW_AVAILABLE"] : []),
+  ];
+  return (
+    value.stage === stage &&
+    JSON.stringify(value.eligible_nodes) === JSON.stringify(nodes)
+  );
 }
 
 export function projectTodayView(data: Record<string, unknown>): TodayView {

@@ -131,6 +131,13 @@
         ></de-action-button>
       </view>
 
+      <de-friend-message
+        wx:if="{{view.relationship.node_display}}"
+        label="这段相遇"
+        title="{{view.relationship.node_display.title}}"
+        body="{{view.relationship.node_display.body}}"
+      ></de-friend-message>
+
       <de-section-card heading="再看看">
         <view class="today__dimension today__dimension--focus">
           <view class="today__dimension-heading">

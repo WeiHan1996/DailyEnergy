@@ -231,11 +231,38 @@ describe("daily content contracts", () => {
           updated_at: "2026-08-24T01:00:00Z",
         },
         relationship: {
+          eligible_nodes: [],
           stage: "BEFORE_FIRST_MEETING",
           encounter_day_count: 0,
+          projection_version: "relationship-projection-v1",
         },
       }).success,
     ).toBe(true);
+    expect(
+      TodayViewSchema.safeParse({
+        content: clientDailyContentViewFixture,
+        interaction: {
+          contract: "daily-interaction-state",
+          schema_version: "1.0.0",
+          result_id: clientDailyContentViewFixture.result_id,
+          product_date: clientDailyContentViewFixture.product_date,
+          is_lit: true,
+          task: {
+            task_id: clientDailyContentViewFixture.optional_task.task_id,
+            revision: 1,
+            status: "UNMARKED",
+          },
+          helpfulness: { revision: 0, rating: "UNRATED" },
+          updated_at: "2026-08-24T01:00:00Z",
+        },
+        relationship: {
+          eligible_nodes: [],
+          encounter_day_count: 1,
+          projection_version: "relationship-projection-v1",
+          stage: "BEFORE_FIRST_MEETING",
+        },
+      }).success,
+    ).toBe(false);
 
     const history = {
       product_date: clientDailyContentViewFixture.product_date,

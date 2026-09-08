@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:79c5124f5ad8f698e49c3ba193a1a99f32741b3ee830d6e66dd0cc0e60d730be
+// source-fingerprint: sha256:a4f7db4d9563915d934f9402825a8e1802b823e86f9a52c90e840fdcfd43fe9f
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:79c5124f5ad8f698e49c3ba193a1a99f32741b3ee830d6e66dd0cc0e60d730be";
+  "sha256:a4f7db4d9563915d934f9402825a8e1802b823e86f9a52c90e840fdcfd43fe9f";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -4273,14 +4273,53 @@ export const jsonSchemas = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
     additionalProperties: false,
     properties: {
-      display_token: {
-        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
-        type: "string",
+      eligible_nodes: {
+        items: {
+          enum: [
+            "FIRST_MEETING",
+            "STYLE_CALIBRATION_AVAILABLE",
+            "IMPORTANT_MATTER_INVITE_AVAILABLE",
+            "FIRST_SEVEN_DAY_REVIEW_AVAILABLE",
+          ],
+          type: "string",
+        },
+        maxItems: 4,
+        type: "array",
       },
       encounter_day_count: {
         maximum: 9007199254740991,
         minimum: 0,
         type: "integer",
+      },
+      node_display: {
+        additionalProperties: false,
+        properties: {
+          body: {
+            type: "string",
+          },
+          copy_version: {
+            const: "relationship-continuity-copy-v1",
+            type: "string",
+          },
+          title: {
+            type: "string",
+          },
+          token: {
+            enum: [
+              "FIRST_MEETING",
+              "STYLE_CALIBRATION_AVAILABLE",
+              "IMPORTANT_MATTER_INVITE_AVAILABLE",
+              "FIRST_SEVEN_DAY_REVIEW_AVAILABLE",
+            ],
+            type: "string",
+          },
+        },
+        required: ["token", "copy_version", "title", "body"],
+        type: "object",
+      },
+      projection_version: {
+        const: "relationship-projection-v1",
+        type: "string",
       },
       stage: {
         enum: [
@@ -4292,7 +4331,12 @@ export const jsonSchemas = {
         type: "string",
       },
     },
-    required: ["stage", "encounter_day_count"],
+    required: [
+      "projection_version",
+      "stage",
+      "encounter_day_count",
+      "eligible_nodes",
+    ],
     type: "object",
   },
   todayView: {
@@ -4588,14 +4632,53 @@ export const jsonSchemas = {
       relationship: {
         additionalProperties: false,
         properties: {
-          display_token: {
-            pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
-            type: "string",
+          eligible_nodes: {
+            items: {
+              enum: [
+                "FIRST_MEETING",
+                "STYLE_CALIBRATION_AVAILABLE",
+                "IMPORTANT_MATTER_INVITE_AVAILABLE",
+                "FIRST_SEVEN_DAY_REVIEW_AVAILABLE",
+              ],
+              type: "string",
+            },
+            maxItems: 4,
+            type: "array",
           },
           encounter_day_count: {
             maximum: 9007199254740991,
             minimum: 0,
             type: "integer",
+          },
+          node_display: {
+            additionalProperties: false,
+            properties: {
+              body: {
+                type: "string",
+              },
+              copy_version: {
+                const: "relationship-continuity-copy-v1",
+                type: "string",
+              },
+              title: {
+                type: "string",
+              },
+              token: {
+                enum: [
+                  "FIRST_MEETING",
+                  "STYLE_CALIBRATION_AVAILABLE",
+                  "IMPORTANT_MATTER_INVITE_AVAILABLE",
+                  "FIRST_SEVEN_DAY_REVIEW_AVAILABLE",
+                ],
+                type: "string",
+              },
+            },
+            required: ["token", "copy_version", "title", "body"],
+            type: "object",
+          },
+          projection_version: {
+            const: "relationship-projection-v1",
+            type: "string",
           },
           stage: {
             enum: [
@@ -4607,7 +4690,12 @@ export const jsonSchemas = {
             type: "string",
           },
         },
-        required: ["stage", "encounter_day_count"],
+        required: [
+          "projection_version",
+          "stage",
+          "encounter_day_count",
+          "eligible_nodes",
+        ],
         type: "object",
       },
     },
