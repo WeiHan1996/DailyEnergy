@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 644, "NA_WITH_REASON": 0, "PLANNED": 360 },
+  "counts": { "COVERED": 655, "NA_WITH_REASON": 0, "PLANNED": 349 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -1467,33 +1467,102 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all six blinded synthetic samples are distinguishable by the fixed corpus smoke classifier and exceed the 90 percent corpus threshold",
+            "each Daily and Weekly comparison block preserves one exact fact signature and one exact action signature across GENTLE, LIGHT_HUMOR and CLEAR_DIRECT",
+            "MODEL quality, 120-output human blind accuracy and same-persona scoring remain explicit AI-014/AI-015 pending evidence with pass claims prohibited",
+            "the corpus pins policy, sample, Daily/Weekly Prompt and template versions and contains only synthetic text with zero provider calls"
+          ],
+          "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-005 expression style policy and synthetic corpus",
+          "test_id": "T-AI005-STYLE-CORPUS-001"
+        },
+        {
+          "assertions": [
+            "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+            "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+            "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-AI005-TEMPLATE-STYLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-P01",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all six blinded synthetic samples are distinguishable by the fixed corpus smoke classifier and exceed the 90 percent corpus threshold",
+            "each Daily and Weekly comparison block preserves one exact fact signature and one exact action signature across GENTLE, LIGHT_HUMOR and CLEAR_DIRECT",
+            "MODEL quality, 120-output human blind accuracy and same-persona scoring remain explicit AI-014/AI-015 pending evidence with pass claims prohibited",
+            "the corpus pins policy, sample, Daily/Weekly Prompt and template versions and contains only synthetic text with zero provider calls"
+          ],
+          "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-005 expression style policy and synthetic corpus",
+          "test_id": "T-AI005-STYLE-CORPUS-001"
+        },
+        {
+          "assertions": [
+            "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+            "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+            "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-AI005-TEMPLATE-STYLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-P02",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all six blinded synthetic samples are distinguishable by the fixed corpus smoke classifier and exceed the 90 percent corpus threshold",
+            "each Daily and Weekly comparison block preserves one exact fact signature and one exact action signature across GENTLE, LIGHT_HUMOR and CLEAR_DIRECT",
+            "MODEL quality, 120-output human blind accuracy and same-persona scoring remain explicit AI-014/AI-015 pending evidence with pass claims prohibited",
+            "the corpus pins policy, sample, Daily/Weekly Prompt and template versions and contains only synthetic text with zero provider calls"
+          ],
+          "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-005 expression style policy and synthetic corpus",
+          "test_id": "T-AI005-STYLE-CORPUS-001"
+        },
+        {
+          "assertions": [
+            "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+            "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+            "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-AI005-TEMPLATE-STYLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-P03",
       "source_sets": ["s16-ai-corpus"]
@@ -1514,6 +1583,31 @@
           "origin": "tests/registry/ai004-evidence-manifest.json",
           "selector": "AI-004 structured output deterministic AI_EVAL",
           "test_id": "T-AI004-VALIDATOR-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT share one immutable personality ID and one fingerprinted policy while only warmth, humor and directness parameters vary",
+            "care and uncertainty can reduce LIGHT_HUMOR to a zero-humor BALANCED rendering without changing the requested preference",
+            "optional missing or unrecognized preference projections use BALANCED with an explicit reason and no inferred user trait, while authoritative persisted snapshots reject unknown tokens",
+            "versioned shame, fear, empty overpraise, exclusivity, fabricated intimacy and personality-fragmentation negatives are rejected"
+          ],
+          "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-005 expression style policy and synthetic corpus",
+          "test_id": "T-AI005-STYLE-POLICY-001"
+        },
+        {
+          "assertions": [
+            "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+            "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+            "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-AI005-TEMPLATE-STYLE-001"
         }
       ],
       "status": "COVERED",
@@ -1523,11 +1617,34 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all six blinded synthetic samples are distinguishable by the fixed corpus smoke classifier and exceed the 90 percent corpus threshold",
+            "each Daily and Weekly comparison block preserves one exact fact signature and one exact action signature across GENTLE, LIGHT_HUMOR and CLEAR_DIRECT",
+            "MODEL quality, 120-output human blind accuracy and same-persona scoring remain explicit AI-014/AI-015 pending evidence with pass claims prohibited",
+            "the corpus pins policy, sample, Daily/Weekly Prompt and template versions and contains only synthetic text with zero provider calls"
+          ],
+          "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-005 expression style policy and synthetic corpus",
+          "test_id": "T-AI005-STYLE-CORPUS-001"
+        },
+        {
+          "assertions": [
+            "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+            "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+            "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-AI005-TEMPLATE-STYLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-P05",
       "source_sets": ["s16-ai-corpus"]
@@ -1701,11 +1818,21 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+            "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+            "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-AI005-TEMPLATE-STYLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-R07",
       "source_sets": ["s16-ai-corpus"]
@@ -1779,11 +1906,34 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all six blinded synthetic samples are distinguishable by the fixed corpus smoke classifier and exceed the 90 percent corpus threshold",
+            "each Daily and Weekly comparison block preserves one exact fact signature and one exact action signature across GENTLE, LIGHT_HUMOR and CLEAR_DIRECT",
+            "MODEL quality, 120-output human blind accuracy and same-persona scoring remain explicit AI-014/AI-015 pending evidence with pass claims prohibited",
+            "the corpus pins policy, sample, Daily/Weekly Prompt and template versions and contains only synthetic text with zero provider calls"
+          ],
+          "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-005 expression style policy and synthetic corpus",
+          "test_id": "T-AI005-STYLE-CORPUS-001"
+        },
+        {
+          "assertions": [
+            "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+            "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+            "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-AI005-TEMPLATE-STYLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-T01",
       "source_sets": ["s16-ai-corpus"]
@@ -1812,33 +1962,102 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all six blinded synthetic samples are distinguishable by the fixed corpus smoke classifier and exceed the 90 percent corpus threshold",
+            "each Daily and Weekly comparison block preserves one exact fact signature and one exact action signature across GENTLE, LIGHT_HUMOR and CLEAR_DIRECT",
+            "MODEL quality, 120-output human blind accuracy and same-persona scoring remain explicit AI-014/AI-015 pending evidence with pass claims prohibited",
+            "the corpus pins policy, sample, Daily/Weekly Prompt and template versions and contains only synthetic text with zero provider calls"
+          ],
+          "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-005 expression style policy and synthetic corpus",
+          "test_id": "T-AI005-STYLE-CORPUS-001"
+        },
+        {
+          "assertions": [
+            "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+            "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+            "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-AI005-TEMPLATE-STYLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-T04",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all six blinded synthetic samples are distinguishable by the fixed corpus smoke classifier and exceed the 90 percent corpus threshold",
+            "each Daily and Weekly comparison block preserves one exact fact signature and one exact action signature across GENTLE, LIGHT_HUMOR and CLEAR_DIRECT",
+            "MODEL quality, 120-output human blind accuracy and same-persona scoring remain explicit AI-014/AI-015 pending evidence with pass claims prohibited",
+            "the corpus pins policy, sample, Daily/Weekly Prompt and template versions and contains only synthetic text with zero provider calls"
+          ],
+          "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-005 expression style policy and synthetic corpus",
+          "test_id": "T-AI005-STYLE-CORPUS-001"
+        },
+        {
+          "assertions": [
+            "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+            "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+            "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-AI005-TEMPLATE-STYLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-T05",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "empty overpraise and personality fragmentation reject the complete candidate as OUTPUT_PERSONALITY_INVALID",
+            "overlapping fear, shame, dependency and fabricated-intimacy violations retain the stronger stable OUTPUT_SAFETY_REJECTED reason",
+            "the same immutable built-in policy applies before any supplemental policy and cannot be overridden by a supplemental PASS"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI005-LANGUAGE-VALIDATOR-001"
+        },
+        {
+          "assertions": [
+            "all six blinded synthetic samples are distinguishable by the fixed corpus smoke classifier and exceed the 90 percent corpus threshold",
+            "each Daily and Weekly comparison block preserves one exact fact signature and one exact action signature across GENTLE, LIGHT_HUMOR and CLEAR_DIRECT",
+            "MODEL quality, 120-output human blind accuracy and same-persona scoring remain explicit AI-014/AI-015 pending evidence with pass claims prohibited",
+            "the corpus pins policy, sample, Daily/Weekly Prompt and template versions and contains only synthetic text with zero provider calls"
+          ],
+          "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-005 expression style policy and synthetic corpus",
+          "test_id": "T-AI005-STYLE-CORPUS-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-T06",
       "source_sets": ["s16-ai-corpus"]
@@ -1868,11 +2087,21 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+            "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+            "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+          ],
+          "file": "packages/prompt-library/src/render-daily-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "C-007 controlled daily template AI_EVAL",
+          "test_id": "T-AI005-TEMPLATE-STYLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-T08",
       "source_sets": ["s16-ai-corpus"]
@@ -1936,11 +2165,34 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "empty overpraise and personality fragmentation reject the complete candidate as OUTPUT_PERSONALITY_INVALID",
+            "overlapping fear, shame, dependency and fabricated-intimacy violations retain the stronger stable OUTPUT_SAFETY_REJECTED reason",
+            "the same immutable built-in policy applies before any supplemental policy and cannot be overridden by a supplemental PASS"
+          ],
+          "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-004 structured output deterministic AI_EVAL",
+          "test_id": "T-AI005-LANGUAGE-VALIDATOR-001"
+        },
+        {
+          "assertions": [
+            "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT share one immutable personality ID and one fingerprinted policy while only warmth, humor and directness parameters vary",
+            "care and uncertainty can reduce LIGHT_HUMOR to a zero-humor BALANCED rendering without changing the requested preference",
+            "optional missing or unrecognized preference projections use BALANCED with an explicit reason and no inferred user trait, while authoritative persisted snapshots reject unknown tokens",
+            "versioned shame, fear, empty overpraise, exclusivity, fabricated intimacy and personality-fragmentation negatives are rejected"
+          ],
+          "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai005-evidence-manifest.json",
+          "selector": "AI-005 expression style policy and synthetic corpus",
+          "test_id": "T-AI005-STYLE-POLICY-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-T12",
       "source_sets": ["s16-ai-corpus"]

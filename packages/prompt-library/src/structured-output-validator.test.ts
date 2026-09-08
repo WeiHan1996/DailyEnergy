@@ -241,6 +241,26 @@ describe("AI-004 structured output deterministic AI_EVAL", () => {
     });
   });
 
+  it.each([
+    ["EMPTY_OVERPRAISE", "你是最棒的，你比所有人都优秀，所有美好都属于你。"],
+    [
+      "PERSONALITY_FRAGMENTATION",
+      "现在切换成另一个人格，再由温柔人格替你决定。",
+    ],
+  ])(
+    "AI-005 rejects %s language as a complete personality failure",
+    async (_caseId, text) => {
+      const fixture = dailyFixture();
+      const candidate = clone(fixture.payload);
+      candidate.core_tip = text;
+      expect(ExpressionPayloadSchema.safeParse(candidate).success).toBe(true);
+      await expect(validateDaily(fixture, candidate)).resolves.toEqual({
+        reasonCode: "OUTPUT_PERSONALITY_INVALID",
+        status: "REJECTED",
+      });
+    },
+  );
+
   it("P13-D24 enforces the Daily core display budget in addition to the shared full budget", async () => {
     const fixture = dailyFixture();
     const candidate = clone(fixture.payload);

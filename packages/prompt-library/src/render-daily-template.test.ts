@@ -98,11 +98,25 @@ describe("C-007 controlled daily template AI_EVAL", () => {
         "task.name-first-step.v1",
       );
     }
+    const invariantSignatures = expressions.map((expression) =>
+      JSON.stringify({
+        core_tip: expression.core_tip,
+        dimension_explanations: expression.dimension_explanations,
+        optional_task: expression.optional_task,
+        overall_summary: expression.overall_summary,
+        primary_action: expression.primary_action,
+        ritual_notes: expression.ritual_notes,
+      }),
+    );
+    expect(new Set(invariantSignatures).size).toBe(1);
     expect(JSON.stringify(rendered.LIGHT_HUMOR).match(/后台/gu)).toHaveLength(
       1,
     );
     expect(JSON.stringify(rendered.GENTLE)).not.toContain("宝贝");
-    expect(JSON.stringify(rendered.CLEAR_DIRECT)).not.toContain("必须完成");
+    expect(JSON.stringify(rendered.GENTLE)).not.toMatch(/最棒|永远陪/u);
+    expect(JSON.stringify(rendered.CLEAR_DIRECT)).not.toMatch(
+      /必须完成|别找借口|自律不够/u,
+    );
   });
 
   it("covers LOW, PARTIAL, STANDARD, care-first and humor-ceiling behavior", () => {

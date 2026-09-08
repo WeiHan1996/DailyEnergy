@@ -1,0 +1,140 @@
+{
+  "manifest_version": "ai-005-evidence-v1",
+  "scope": "AI-005 immutable single-personality style parameters, synthetic same-fact Daily/Weekly comparison corpus, prohibited-language policy, Safety-first effective style and future-only profile preference behavior",
+  "authority": [
+    "docs/ai/personality.md",
+    "docs/ai/scoring-rules.md",
+    "docs/ai/prompt-spec.md",
+    "docs/ai/evaluation.md",
+    "docs/ai/safety.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-AI005-STYLE-POLICY-001": {
+      "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+      "selector": "AI-005 expression style policy and synthetic corpus",
+      "level": "AI_EVAL",
+      "assertions": [
+        "BALANCED, GENTLE, LIGHT_HUMOR and CLEAR_DIRECT share one immutable personality ID and one fingerprinted policy while only warmth, humor and directness parameters vary",
+        "optional missing or unrecognized preference projections use BALANCED with an explicit reason and no inferred user trait, while authoritative persisted snapshots reject unknown tokens",
+        "care and uncertainty can reduce LIGHT_HUMOR to a zero-humor BALANCED rendering without changing the requested preference",
+        "versioned shame, fear, empty overpraise, exclusivity, fabricated intimacy and personality-fragmentation negatives are rejected"
+      ]
+    },
+    "T-AI005-STYLE-CORPUS-001": {
+      "file": "packages/prompt-library/src/expression-style-policy.test.ts",
+      "selector": "AI-005 expression style policy and synthetic corpus",
+      "level": "AI_EVAL",
+      "assertions": [
+        "each Daily and Weekly comparison block preserves one exact fact signature and one exact action signature across GENTLE, LIGHT_HUMOR and CLEAR_DIRECT",
+        "all six blinded synthetic samples are distinguishable by the fixed corpus smoke classifier and exceed the 90 percent corpus threshold",
+        "the corpus pins policy, sample, Daily/Weekly Prompt and template versions and contains only synthetic text with zero provider calls",
+        "MODEL quality, 120-output human blind accuracy and same-persona scoring remain explicit AI-014/AI-015 pending evidence with pass claims prohibited"
+      ]
+    },
+    "T-AI005-TEMPLATE-STYLE-001": {
+      "file": "packages/prompt-library/src/render-daily-template.test.ts",
+      "selector": "C-007 controlled daily template AI_EVAL",
+      "level": "AI_EVAL",
+      "assertions": [
+        "all four style tokens render one complete candidate with identical overall, dimension, primary action, optional task and ritual fields",
+        "GENTLE avoids overpraise and fabricated intimacy, LIGHT_HUMOR uses at most one lightweight metaphor, and CLEAR_DIRECT avoids command, blame and shame",
+        "LOW_ASSERTION and care remove humor, while missing preferred names remain generic and contain no fabricated history"
+      ]
+    },
+    "T-AI005-LANGUAGE-VALIDATOR-001": {
+      "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+      "selector": "AI-004 structured output deterministic AI_EVAL",
+      "level": "AI_EVAL",
+      "assertions": [
+        "empty overpraise and personality fragmentation reject the complete candidate as OUTPUT_PERSONALITY_INVALID",
+        "overlapping fear, shame, dependency and fabricated-intimacy violations retain the stronger stable OUTPUT_SAFETY_REJECTED reason",
+        "the same immutable built-in policy applies before any supplemental policy and cannot be overridden by a supplemental PASS"
+      ]
+    },
+    "T-AI005-HISTORY-FREEZE-001": {
+      "file": "tests/database/c008-daily-generation.test.mjs",
+      "selector": "C-008 real PostgreSQL idempotent generation, publication and guard fences",
+      "level": "DB",
+      "assertions": [
+        "the accepted generation snapshot freezes BALANCED with profile revision 1 before a profile style update",
+        "the style update does not change the old snapshot, published expression payload or result fingerprint",
+        "a later product-date generation snapshot alone reads GENTLE with profile revision 2"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "E16-P01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI005-STYLE-CORPUS-001", "T-AI005-TEMPLATE-STYLE-001"]
+    },
+    {
+      "source_id": "E16-P02",
+      "status": "COVERED",
+      "proof_ids": ["T-AI005-STYLE-CORPUS-001", "T-AI005-TEMPLATE-STYLE-001"]
+    },
+    {
+      "source_id": "E16-P03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI005-STYLE-CORPUS-001", "T-AI005-TEMPLATE-STYLE-001"]
+    },
+    {
+      "source_id": "E16-P04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI005-STYLE-POLICY-001", "T-AI005-TEMPLATE-STYLE-001"]
+    },
+    {
+      "source_id": "E16-P05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI005-STYLE-CORPUS-001", "T-AI005-TEMPLATE-STYLE-001"]
+    },
+    {
+      "source_id": "E16-R07",
+      "status": "COVERED",
+      "proof_ids": ["T-AI005-TEMPLATE-STYLE-001"]
+    },
+    {
+      "source_id": "E16-T01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI005-STYLE-CORPUS-001", "T-AI005-TEMPLATE-STYLE-001"]
+    },
+    {
+      "source_id": "E16-T04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI005-STYLE-CORPUS-001", "T-AI005-TEMPLATE-STYLE-001"]
+    },
+    {
+      "source_id": "E16-T05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI005-STYLE-CORPUS-001", "T-AI005-TEMPLATE-STYLE-001"]
+    },
+    {
+      "source_id": "E16-T06",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI005-STYLE-CORPUS-001",
+        "T-AI005-LANGUAGE-VALIDATOR-001"
+      ]
+    },
+    {
+      "source_id": "E16-T08",
+      "status": "COVERED",
+      "proof_ids": ["T-AI005-TEMPLATE-STYLE-001"]
+    },
+    {
+      "source_id": "E16-T12",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI005-STYLE-POLICY-001",
+        "T-AI005-LANGUAGE-VALIDATOR-001"
+      ]
+    }
+  ],
+  "pending_evidence": {
+    "E16-T02": "AI-015 must run the required 120-output two-rater blind review; deterministic fixture classification is not human evidence.",
+    "E16-T03": "AI-015 must establish the required same-persona human score; a shared catalog ID is not a substitute.",
+    "model_quality": "AI-014 must run the versioned corpus against authorized candidate routes.",
+    "production_authorization": "NOT_GRANTED"
+  }
+}

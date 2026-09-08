@@ -14,6 +14,11 @@
 
 当前 public surface 导出：
 
+- AI-005 的 `expression-style-policy-v1`：以一个 `dailyenergy-digital-friend-v1`
+  人格 ID 固定 BALANCED/GENTLE/LIGHT_HUMOR/CLEAR_DIRECT 的温暖度、幽默度和直接度，
+  指纹同时覆盖禁用语言、合成盲分标记与 Daily/Weekly Prompt/template 版本绑定；
+- `resolveOptionalExpressionStylePreferenceV1` 只为可选偏好投影提供带原因的 BALANCED
+  默认；`assertAuthoritativeExpressionStyleV1` 对冻结 snapshot 的未知 token 保持 fail closed；
 - AI-003 的 `daily-expression-zh-cn-v1` 与 `weekly-expression-zh-cn-v1` immutable
   Prompt packages；common/Daily/Weekly 规范指令与 Accepted S-13 原文逐字一致，package、
   registry、release catalog 与 deterministic evaluation 均有固定 SHA-256 fingerprint；
@@ -38,6 +43,7 @@
 缓存和历史冻结由 C-008 实现，本包不把候选写成 AVAILABLE 结果。
 
 两套 AI Prompt package 当前均为 `STAGED`；evaluation registry 固定为
-`DETERMINISTIC_ONLY / externalProviderCallsAllowed=false`。S-16 provider bake-off、AI-005
-表达质量、AI-006 template 路径与后续发布 Gate 完成前，不得升级为 ACTIVE，也不得接入真实
-provider、key 或生产出网。
+`DETERMINISTIC_ONLY / externalProviderCallsAllowed=false`。AI-005 的小型合成 corpus 不替代
+AI-014 完整 Evaluation runner、AI-015 的 120-output 双人盲评或 S-16 provider bake-off；
+AI-006 template 路径与后续发布 Gate 完成前，不得升级为 ACTIVE，也不得接入真实 provider、
+key 或生产出网。
