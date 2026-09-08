@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-003 — 实现 Prompt 与模板版本管理
-- **任务状态**：Ready
+- **任务状态**：In Review
 - **任务 Profile**：`security`（server-only Prompt 资产、输入最小化、版本/指纹、bundle/secret/content 边界）
-- **工作分支**：无；待从 verified `main@849ab17d2e8c36663cb5c4d9a4364cb4d68d7c5a` 创建
+- **工作分支**：`agent/ai003-prompt-versioning`
 - **任务 Issue**：[AI-003 Issue #72](https://github.com/WeiHan1996/DailyEnergy/issues/72)
-- **当前 PR**：无；尚未开始 AI-003 实现
+- **当前 PR**：[Draft PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191)；owner 已批准 Prompt/输入/bundle threat boundary，当前等待接受状态新 head 的 11/11 CI；通过后才标记 Ready、执行 exact-head verifier 与 squash merge
 - **上一完成任务**：AI-002 Done；[PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189) final head `d809892f1de7b4e828058c660f53b128bb662ec4` / CI run `34143534031` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `849ab17d2e8c36663cb5c4d9a4364cb4d68d7c5a`；merged-main CI run `34167933143` 11/11 SUCCESS；Issue #71 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,8 +16,33 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-001、AI-002 与 E-008 已 Done，AI-003 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-003 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：合并本状态收尾后运行 `pnpm agent:prepare AI-003 --remote --deep`，读取 Prompt/personality/repository authority 与现有 `packages/prompt-library`，再创建 AI-003 分支实施
+- **下一候选动作**：提交并推送 owner 接受记录，等待该 exact head 的 11/11 CI；同 run 全绿后标记 [PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191) Ready、执行 exact-head verifier 与 squash merge，再验证 merged-main CI 并启动 AI-004
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-08 AI-003 启动
+
+- AI-002 状态收尾 PR #190 final head `a3fa9b02c1ec746e12a43a599d324bc867572105` / CI run `34169107241` 11/11 SUCCESS，经 exact-head verifier 后 squash 合并为 `81fae24e0e0a5445af5d50e8972451b7a5c4a65e`；merged-main CI run `34169295665` 11/11 SUCCESS；
+- `pnpm agent:prepare AI-003 --remote --deep` 在固定 Node `24.18.0` 下返回 `READY`，Profile=`security`，Node/pnpm/dependencies/GitHub 全部 PASS；required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；
+- 分支 `agent/ai003-prompt-versioning` 从本地、origin/main 与远端一致的 verified `main@81fae24e0e0a5445af5d50e8972451b7a5c4a65e` 创建；开工前工作树无变更；
+- 本任务只在既有 `packages/prompt-library` server-asset 边界实现 Daily/Weekly Prompt package、Evaluation registry、strict prepared input、canonical compile/fingerprint 与 release catalog，并补 bundle/secret/content 和 Source-ID 证据；
+- 不直接调用模型，不接真实 provider/key，不允许运行时任意编辑 Prompt，不实现 AI-004 candidate semantic validator 或 AI-006 template renderer；Production/RC、Alpha、真实用户与真实 provider 保持 `NO_GO`。
+
+### AI-003 实施与本地验证
+
+- owner 于 2026-09-08 明确“审核通过，合并收尾后完成 AI-004”，接受 PR #191 的 Prompt/输入/bundle threat boundary，并授权标记 Ready、执行 exact-head verifier、squash merge 和后续 AI-004；该决定不授予 Production、RC、Alpha、真实用户或真实 provider；
+- 实现提交 `543908682d1acf1e8d11961361c96cd751b3b5be` 已推送并创建 [Draft PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191)；本次状态回写产生的新 head 必须使用自己的同 run CI，不能复用实现提交或本地 Gate 作为合并证据；
+- PR #191 review baseline head `356ce33428f9bd79df92ef9e0a90b6ea1c0bf612` 的 CI run `34173745512` 为 11/11 SUCCESS；本收据提交后的新 final head 仍须使用自己的同 run CI，不能复用该 baseline；
+- `packages/prompt-library` 新增 `daily-expression-zh-cn-v1` / `weekly-expression-zh-cn-v1` immutable Prompt packages：common、Daily、Weekly 三段 canonical instruction 与 Accepted `docs/ai/prompt-spec.md` 逐字一致，output Schema fingerprint 来自 `shared-schemas/json-schema`；两 package 保持 `STAGED`；
+- package fingerprint 分别为 Daily=`ae1f1fb708ed8d42c0f32e21fbfb343a9ae2e51db6411a790562fa92e73d1209`、Weekly=`09ba0195d8a56516cfbe9ea455206e2a3ac975e9d9561b3f6f38b361dbf2dc4c`；registry/release/evaluation fingerprint 均固定，evaluation 只允许 `DETERMINISTIC` 且 `externalProviderCallsAllowed=false`；
+- `buildPreparedDailyPromptInputV1` 只接收严格 `ControlledExpressionPlanV1`，复用已验证 action/task/ritual catalog binding，注入式称呼直接省略，v1 context/memory 仍为空；`buildPreparedWeeklyPromptInputV1` 只接收严格 aggregate+plan，预分配 exact segment refs，不发送 day slots、缺失日期、window/source ref、note、历史 AI 文本或娱乐分数；
+- `compilePromptRequestV1` 将 canonical common、workload instruction 与 input JSON 分为 system/developer/user-data 三层，携带 strict output JSON Schema，执行 Daily 16 KiB / Weekly 24 KiB 及 4/6/5/1 KiB、4/5/13/2 KiB 子预算；不截断，unknown field/超限/fingerprint/latest/workload/version mismatch 均稳定 fail closed；
+- 每个 compiled request 生成不可变 request fingerprint 与 version trace，覆盖 model、route manifest、Gateway、Safety、template、Prompt package、input contract、output Schema、plan、rule 和 result version；不查询 current/latest，不把 provider key、用户 ref 或正文写入 registry/catalog；
+- 静态边界新增 `BOUNDARY_PROVIDER_PROMPT_CONTENT`，除既有 import Gate 外拒绝在 prompt-library/evaluation/tooling 之外内联复制 canonical Prompt marker；Mini Program/Admin bundle 新增 Prompt asset rule，并以 provider key/Prompt text known-fail fixture 验证；
+- `tests/registry/ai003-evidence-manifest.json` 仅将新证明的 `P13-C04`、`P13-C10` 与 `S31-TEST-014` 从 PLANNED 提升为 COVERED，并为既有 `P13-C06`、`S30-REPO-023/025/029`、`S31-TEST-013` 增加 AI-003 证据；registry=`590/1004 COVERED`、`414 PLANNED`、`0 NA_WITH_REASON`；AI-004 输出语义、AI-006 template 和真实 provider 场景继续 PLANNED；
+- 固定 Node `24.18.0` / pnpm `11.17.0`：Prompt library `22/22`、registry `5/5`、Phase Gate `12/12`、architecture known-fail `32`、Admin bundle `7`、Mini Program bundle `11` 全部通过；root lint/typecheck/build 与真实依赖/E2E 已由 full Gate 覆盖；
+- 最终 `pnpm agent:validate --mode=changed --task=AI-003` 按策略升级 full 后为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（178371ms）；task Gate 同终态（87357ms）。required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；
+- 待 owner 审核 threat boundary：Prompt 资产只在 server-asset，API/Admin/Mini/Restricted 禁止 import 或内联复制；用户来源值只进入 canonical JSON data，不进入 system/developer；Daily/Weekly v1 不发送未批准历史/记忆/自由文本；所有 package 保持 STAGED、evaluation 禁止真实 provider；Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`；
+- AI-003 接受并合并后的下一任务为 AI-004（结构化输出校验）；本次不启动 AI-004。
 
 ## 2026-09-08 AI-002 post-merge 收尾
 

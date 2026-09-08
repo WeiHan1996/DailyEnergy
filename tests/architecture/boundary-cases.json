@@ -1,5 +1,5 @@
 {
-  "fixture_version": "ai-001-boundary-v5",
+  "fixture_version": "ai-003-boundary-v6",
   "cases": [
     {
       "case_id": "workspace-root-runtime-export",
@@ -484,6 +484,58 @@
           {
             "path": "apps/miniapp/src/services/unsafe-template.ts",
             "content": "import { renderControlledDailyTemplateV1 } from \"@daily-energy/prompt-library\";\nvoid renderControlledDailyTemplateV1;\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "prompt-library-from-admin",
+      "gate": "provider",
+      "expected_rule_id": "BOUNDARY_PROVIDER_PROMPT_LOCATION",
+      "project": {
+        "files": [
+          {
+            "path": "apps/admin/src/app/page.tsx",
+            "content": "import { DAILY_PROMPT_PACKAGE_V1 } from \"@daily-energy/prompt-library\";\nvoid DAILY_PROMPT_PACKAGE_V1;\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "prompt-library-from-api",
+      "gate": "provider",
+      "expected_rule_id": "BOUNDARY_PROVIDER_PROMPT_LOCATION",
+      "project": {
+        "files": [
+          {
+            "path": "apps/api/src/prompt.ts",
+            "content": "import { compilePromptRequestV1 } from \"@daily-energy/prompt-library\";\nvoid compilePromptRequestV1;\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "prompt-library-from-restricted-worker",
+      "gate": "provider",
+      "expected_rule_id": "BOUNDARY_PROVIDER_PROMPT_LOCATION",
+      "project": {
+        "files": [
+          {
+            "path": "apps/worker/src/entrypoints/restricted.ts",
+            "content": "import { PROMPT_PACKAGE_REGISTRY_V1 } from \"@daily-energy/prompt-library\";\nvoid PROMPT_PACKAGE_REGISTRY_V1;\n"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "inline-prompt-content-from-api",
+      "gate": "provider",
+      "expected_rule_id": "BOUNDARY_PROVIDER_PROMPT_CONTENT",
+      "project": {
+        "files": [
+          {
+            "path": "apps/api/src/copied-prompt.ts",
+            "content": "export const copied = \"common-expression-system-v1\";\n"
           }
         ]
       }

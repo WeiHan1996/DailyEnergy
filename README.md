@@ -347,7 +347,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 3 — AI 陪伴层
-状态：AI-003 Ready（AI-002 已合并收尾）
+状态：AI-003 In Review（自动 Gate 通过，Draft PR #191 待审核）
 当前目标：建立 server-only Prompt registry、不可变版本、编译指纹与最小输入 builder
 当前任务：AI-003 实现 Prompt 与模板版本管理
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/72
@@ -367,8 +367,8 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
   已获 owner 接受；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185)
   经 exact-head verifier 后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`，
   merged-main CI run `34078365765` 为 11/11 SUCCESS；
-- Phase 2 已结束，Phase 3 development 开始；AI-001/AI-002 已合并并关闭，AI-003 是唯一
-  Ready 任务；
+- Phase 2 已结束，Phase 3 development 开始；AI-001/AI-002 已合并并关闭，AI-003 已完成
+  实现与自动 Gate，等待 threat-boundary review；
 - AI-003 只实现 server-only Prompt 资产、Daily/Weekly/Evaluation registry、编译指纹、最小
   输入 builder 与版本追踪；不直接调用模型，不允许运行时任意编辑生产 Prompt；
 - C-015 的 Production bundle、处理主体/位置/受托方/跨境、最终用户说明和合格 Legal review

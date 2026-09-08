@@ -1,5 +1,5 @@
 {
-  "fixture_version": "e-005-admin-bundle-v1",
+  "fixture_version": "ai-003-admin-bundle-v2",
   "source_ids": [
     "S28-STACK-009",
     "S30-REPO-020",
@@ -78,6 +78,30 @@
       ],
       "secret_values": [],
       "user_body_canaries": ["今天有点累，这是合成测试正文"]
+    },
+    {
+      "case_id": "AI003-BUNDLE-001",
+      "expected_rule_id": "ADMIN_BUNDLE_PROMPT_ASSET",
+      "files": [
+        {
+          "path": "apps/admin/.next/static/chunks/copied-prompt.js",
+          "content": "const copiedPrompt = \"common-expression-system-v1\";"
+        }
+      ],
+      "secret_values": [],
+      "user_body_canaries": []
+    },
+    {
+      "case_id": "AI003-BUNDLE-002",
+      "expected_rule_id": "ADMIN_BUNDLE_SECRET_IDENTIFIER",
+      "files": [
+        {
+          "path": "apps/admin/.next/static/chunks/provider-key.js",
+          "content": "const PROVIDER_API_KEY = \"synthetic-canary\";"
+        }
+      ],
+      "secret_values": [],
+      "user_body_canaries": []
     }
   ]
 }

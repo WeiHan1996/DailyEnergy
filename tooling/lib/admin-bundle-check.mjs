@@ -1,5 +1,6 @@
 export const ADMIN_BUNDLE_RULE_IDS = Object.freeze([
   "ADMIN_BUNDLE_RESTRICTED_FIELD",
+  "ADMIN_BUNDLE_PROMPT_ASSET",
   "ADMIN_BUNDLE_SECRET_IDENTIFIER",
   "ADMIN_BUNDLE_SECRET_VALUE",
   "ADMIN_BUNDLE_SERVER_ONLY_DEPENDENCY",
@@ -15,6 +16,8 @@ const serverConfigurationIdentifier =
   /\b(?:ADMIN_API_ORIGIN|ADMIN_IDENTITY_CLIENT_SECRET_FILE|ADMIN_SESSION_SECRET_FILE|ANTHROPIC_API_KEY|DATABASE_URL|OPENAI_API_KEY|PROVIDER_API_KEY|REDIS_URL)\b/u;
 const restrictedField =
   /\b(?:account_ref|ciphertext|deletion_evidence|evening_note|matter_title|openid|provider_payload|raw_provider_body|safety_confidence|safety_rationale|user_note)\b/u;
+const promptAsset =
+  /(?:common-expression-system-v1|daily-expression-instruction-v1|weekly-expression-instruction-v1|你是 DailyEnergy 的受控表达器)/u;
 
 function diagnostic(ruleId, path, message) {
   return {
@@ -120,6 +123,15 @@ export function scanAdminBrowserExposure({
 }) {
   const diagnostics = [];
   for (const file of files) {
+    if (promptAsset.test(file.content)) {
+      diagnostics.push(
+        diagnostic(
+          "ADMIN_BUNDLE_PROMPT_ASSET",
+          file.path,
+          "browser output contains a canonical Prompt asset marker",
+        ),
+      );
+    }
     if (serverOnlyDependency.test(file.content)) {
       diagnostics.push(
         diagnostic(

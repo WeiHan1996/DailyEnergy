@@ -1,0 +1,113 @@
+{
+  "manifest_version": "ai-003-evidence-v1",
+  "scope": "AI-003 server-only immutable Daily/Weekly Prompt packages, deterministic evaluation registry, strict prepared-input builders, canonical layered compile, complete version trace and client/API/restricted Prompt asset boundaries",
+  "authority": [
+    "docs/ai/prompt-spec.md",
+    "docs/ai/personality.md",
+    "docs/ai/safety.md",
+    "docs/technical/repository-structure.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-AI003-PROMPT-CONTRACT-001": {
+      "file": "packages/prompt-library/src/prompt-package.test.ts",
+      "selector": "AI-003 immutable Prompt package registry",
+      "level": "CONTRACT",
+      "assertions": [
+        "common, Daily and Weekly canonical instruction blocks match the Accepted S-13 source byte for byte",
+        "Daily, Weekly, package registry, release catalog and deterministic evaluation fingerprints are pinned and immutable",
+        "packages remain STAGED and evaluation remains DETERMINISTIC_ONLY with external provider calls disabled",
+        "latest, unknown and cross-workload lookups fail with one stable package-not-found code"
+      ]
+    },
+    "T-AI003-PROMPT-MODULE-001": {
+      "file": "packages/prompt-library/src/prompt-package.test.ts",
+      "selector": "AI-003 strict prepared input and golden compile",
+      "level": "MODULE",
+      "assertions": [
+        "Daily builder accepts one strict ControlledExpressionPlan, binds action/task/ritual catalogs and omits injection-like preferred names",
+        "Weekly builder accepts one strict aggregate and expression plan, emits only approved fact projections and fixes each segment ref before model execution",
+        "compiled requests separate immutable system, developer and canonical user-data JSON layers and include model/route/gateway/safety/template/prompt/schema/plan/rule/result provenance",
+        "unknown input fields, aggregate drift, stale package fingerprints, latest versions and 16/24 KiB budget violations fail closed before any provider boundary"
+      ]
+    },
+    "T-AI003-PROMPT-AI-EVAL-001": {
+      "file": "packages/prompt-library/src/prompt-package.test.ts",
+      "selector": "P13-C04/P13-C06/P13-C10 deterministic compile cases",
+      "level": "AI_EVAL",
+      "assertions": [
+        "all compile cases use synthetic plans, aggregates, model and route versions with zero external provider calls",
+        "oversized instruction/data/schema budgets are rejected without truncation",
+        "data-like injection cannot modify either canonical instruction layer and an unsafe preferred name is omitted",
+        "package, workload and version mismatches reject before a compiled request can be returned"
+      ]
+    },
+    "T-AI003-PROMPT-BOUNDARY-001": {
+      "file": "tooling/test-boundaries.mjs",
+      "selector": "AI-003 Prompt import and inline-content known-fail fixtures",
+      "level": "STATIC",
+      "assertions": [
+        "Mini Program, Admin, API and Restricted source imports of prompt-library are rejected",
+        "copying a canonical Prompt instruction marker outside prompt-library/evaluation/tooling is rejected even without an import"
+      ]
+    },
+    "T-AI003-MINIAPP-BUNDLE-001": {
+      "file": "tooling/test-miniapp-bundle.mjs",
+      "selector": "AI-003 Mini Program Prompt asset and secret bundle fixtures",
+      "level": "STATIC",
+      "assertions": [
+        "the compiled Mini Program bundle rejects server/Prompt imports, canonical Prompt text copied inline and provider secret identifiers"
+      ]
+    },
+    "T-AI003-ADMIN-BUNDLE-001": {
+      "file": "tooling/test-admin-bundle.mjs",
+      "selector": "AI-003 Admin Prompt asset and provider-key bundle fixtures",
+      "level": "STATIC",
+      "assertions": [
+        "the Admin browser bundle rejects prompt-library/server dependencies, canonical Prompt text copied inline, provider key identifiers and escaped secret values"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "P13-C04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI003-PROMPT-MODULE-001", "T-AI003-PROMPT-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-C06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI003-PROMPT-MODULE-001", "T-AI003-PROMPT-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-C10",
+      "status": "COVERED",
+      "proof_ids": ["T-AI003-PROMPT-CONTRACT-001", "T-AI003-PROMPT-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S30-REPO-023",
+      "status": "COVERED",
+      "proof_ids": ["T-AI003-MINIAPP-BUNDLE-001", "T-AI003-ADMIN-BUNDLE-001"]
+    },
+    {
+      "source_id": "S30-REPO-025",
+      "status": "COVERED",
+      "proof_ids": ["T-AI003-PROMPT-BOUNDARY-001"]
+    },
+    {
+      "source_id": "S30-REPO-029",
+      "status": "COVERED",
+      "proof_ids": ["T-AI003-PROMPT-BOUNDARY-001"]
+    },
+    {
+      "source_id": "S31-TEST-013",
+      "status": "COVERED",
+      "proof_ids": ["T-AI003-MINIAPP-BUNDLE-001"]
+    },
+    {
+      "source_id": "S31-TEST-014",
+      "status": "COVERED",
+      "proof_ids": ["T-AI003-ADMIN-BUNDLE-001"]
+    }
+  ]
+}
