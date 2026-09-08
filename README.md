@@ -347,7 +347,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 3 — AI 陪伴层
-状态：AI-006 In Review
+状态：AI-006 In Review（Draft PR #198）
 当前目标：主备失败后返回完整、稳定、可发布的本地模板候选
 当前任务：AI-006 实现 AI 失败时的完整模板降级
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/75

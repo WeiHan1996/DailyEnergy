@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（主备失败到模板、strict Schema/Safety、PublishGuard/epoch/revision、历史冻结、客户端与低基数 telemetry）
 - **工作分支**：`agent/ai006-controlled-template-fallback`（从 verified `main@4470fdf9cef9d0987d75fa353fa36e73fa9c6c27` 创建）
 - **任务 Issue**：[AI-006 Issue #75](https://github.com/WeiHan1996/DailyEnergy/issues/75)
-- **当前 PR**：无；实现与 full Gate 已完成，提交并推送后创建独立 Draft PR
+- **当前 PR**：[Draft PR #198](https://github.com/WeiHan1996/DailyEnergy/pull/198)；实现基线 `3d1def645412af13c73feec7bfe0f2ab3aba2091` 已推送，本状态收据提交后必须使用新 head 的独立 CI
 - **上一完成任务**：AI-005 Done；PR #195 squash 合并为 `2617dac3163721f958c16219964702b36a69492a`，其 merged-main SHA 手机号误报由 [PR #196](https://github.com/WeiHan1996/DailyEnergy/pull/196) 修复并 squash 合并为 `605ec8b61d634e82769121d4458d12297e902bf6`；merged-main CI run `34197579568` 11/11 SUCCESS；Issue #74 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,7 +16,7 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-002、AI-004、AI-005、C-007 与 C-008 已 Done，AI-006 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-006 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：提交并推送 AI-006 实现，创建聚焦 Draft PR；等待 final-head 11/11 CI 后请求 owner 审核 template/validator/publish/telemetry threat boundary，未经明确批准不标记 Ready、不运行 merge verifier、不合并
+- **下一候选动作**：等待 PR #198 final head 的 11/11 CI 后请求 owner 审核 template/validator/publish/telemetry threat boundary；未经明确批准不标记 Ready、不运行 merge verifier、不合并
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-08 AI-006 启动
@@ -36,6 +36,7 @@
 - 固定 Node `24.18.0` 的 `pnpm agent:validate --mode=full --task=AI-006` 在实现状态为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（177021ms），最终 In Review 状态与组合证据回写后再次同终态通过（189351ms）；两次 Gate 产生的 15 个 Prisma 纯空白副作用均经忽略空白 diff 证明无语义变化后恢复，未进入任务 diff；
 - 最终 `pnpm agent:validate --mode=task --task=AI-006` 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（92676ms，executed=5）；required evidence 保持 `threatBoundaryReview, productionAuthorizationWhenApplicable`，后者对本 development PR 不适用且仍为 `NOT_GRANTED`；
 - 待 owner 审核的 threat boundary：template preflight 在 provider 前但不会在 primary/backup 成功时发布；模板只接 frozen plan 且经过同一 strict validator/receipt；provider 与模板不拼接；Safety/删除/live guard/deadline 覆盖模板；内部 provenance 与 fallback reason 不进入客户端或高基数标签；Weekly capacity、真实 provider 和 Production authorization 不在本 PR，保持 `NOT_GRANTED / NO_GO`。
+- 实现提交 `3d1def645412af13c73feec7bfe0f2ab3aba2091` 已推送并创建 [Draft PR #198](https://github.com/WeiHan1996/DailyEnergy/pull/198)；本次状态回写产生的新 final head 必须使用自己的同 run CI，不能复用实现提交、本地 Gate 或状态 PR #197 的 CI。
 
 ## 2026-09-08 AI-005 post-merge 收尾
 

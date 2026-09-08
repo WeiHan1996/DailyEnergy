@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：[AI-006 本地模板降级](./current.md)：In Review；实现与 full security Gate 已完成，待创建 Draft PR 和 owner threat-boundary review；C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
+- **当前任务**：[AI-006 本地模板降级](./current.md)：In Review；Draft PR #198 已创建，等待 final-head CI 与 owner threat-boundary review；C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -230,7 +230,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理    | Done      | PR #191 squash 合并为 `e6202556`；merged-main CI 11/11；Issue #72 Closed |
 | [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验     | Done      | PR #193 squash 合并为 `52876a9a`；merged-main CI 11/11；Issue #73 Closed |
 | [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | Done      | PR #195/#196 已合并；merged-main CI 11/11；Issue #74 Closed              |
-| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | In Review | 实现与自动 Gate 完成；待 Draft PR/owner threat review                    |
+| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | In Review | Draft PR #198；自动 Gate 完成，待 owner threat review                    |
 | [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Planned   | 第 1、3、7 天连续性                                                      |
 | [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | Planned   | 用户主动添加和删除                                                       |
 | [AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78) | 结构化记忆         | Planned   | 来源、用途和有效期                                                       |
