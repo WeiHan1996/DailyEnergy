@@ -33,6 +33,8 @@ const forbiddenImportPattern =
   /(?:node:|@nestjs\/|@prisma\/|@daily-energy\/(?:server-|prompt-library)|\b(?:bullmq|ioredis|openai|anthropic)\b|@anthropic-ai\/sdk|@google\/generative-ai)/iu;
 const forbiddenSecretIdentifier =
   /\b(?:OPENAI|ANTHROPIC|PROVIDER|DATABASE|REDIS)_(?:API_)?(?:KEY|SECRET|TOKEN|URL)\b/u;
+const forbiddenPromptAsset =
+  /(?:common-expression-system-v1|daily-expression-instruction-v1|weekly-expression-instruction-v1|你是 DailyEnergy 的受控表达器)/u;
 const esModulePattern = /^\s*(?:export\s|import\s)/mu;
 
 export const MINIAPP_BUNDLE_RULE_IDS = Object.freeze([
@@ -40,6 +42,7 @@ export const MINIAPP_BUNDLE_RULE_IDS = Object.freeze([
   "MINIAPP_BUNDLE_ES_MODULE",
   "MINIAPP_BUNDLE_FILE_MISSING",
   "MINIAPP_BUNDLE_FORBIDDEN_IMPORT",
+  "MINIAPP_BUNDLE_PROMPT_ASSET",
   "MINIAPP_BUNDLE_GENERATED_CONFIG",
   "MINIAPP_BUNDLE_PAGE_REGISTRY",
   "MINIAPP_BUNDLE_SECRET_IDENTIFIER",
@@ -130,6 +133,15 @@ export function scanMiniappBundleEntries(entries, options = {}) {
           "MINIAPP_BUNDLE_FORBIDDEN_IMPORT",
           entry.path,
           "client bundle contains a server, provider, Prompt, or Node dependency",
+        ),
+      );
+    }
+    if (forbiddenPromptAsset.test(entry.content)) {
+      diagnostics.push(
+        diagnostic(
+          "MINIAPP_BUNDLE_PROMPT_ASSET",
+          entry.path,
+          "client bundle contains a canonical Prompt asset marker",
         ),
       );
     }

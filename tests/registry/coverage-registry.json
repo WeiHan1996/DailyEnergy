@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 587, "NA_WITH_REASON": 0, "PLANNED": 417 },
+  "counts": { "COVERED": 590, "NA_WITH_REASON": 0, "PLANNED": 414 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -3550,11 +3550,35 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all compile cases use synthetic plans, aggregates, model and route versions with zero external provider calls",
+            "data-like injection cannot modify either canonical instruction layer and an unsafe preferred name is omitted",
+            "oversized instruction/data/schema budgets are rejected without truncation",
+            "package, workload and version mismatches reject before a compiled request can be returned"
+          ],
+          "file": "packages/prompt-library/src/prompt-package.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "P13-C04/P13-C06/P13-C10 deterministic compile cases",
+          "test_id": "T-AI003-PROMPT-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "compiled requests separate immutable system, developer and canonical user-data JSON layers and include model/route/gateway/safety/template/prompt/schema/plan/rule/result provenance",
+            "Daily builder accepts one strict ControlledExpressionPlan, binds action/task/ritual catalogs and omits injection-like preferred names",
+            "unknown input fields, aggregate drift, stale package fingerprints, latest versions and 16/24 KiB budget violations fail closed before any provider boundary",
+            "Weekly builder accepts one strict aggregate and expression plan, emits only approved fact projections and fixes each segment ref before model execution"
+          ],
+          "file": "packages/prompt-library/src/prompt-package.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "AI-003 strict prepared input and golden compile",
+          "test_id": "T-AI003-PROMPT-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-C04",
       "source_sets": ["s16-ai-corpus"]
@@ -3573,6 +3597,32 @@
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
       "evidence": [
+        {
+          "assertions": [
+            "all compile cases use synthetic plans, aggregates, model and route versions with zero external provider calls",
+            "data-like injection cannot modify either canonical instruction layer and an unsafe preferred name is omitted",
+            "oversized instruction/data/schema budgets are rejected without truncation",
+            "package, workload and version mismatches reject before a compiled request can be returned"
+          ],
+          "file": "packages/prompt-library/src/prompt-package.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "P13-C04/P13-C06/P13-C10 deterministic compile cases",
+          "test_id": "T-AI003-PROMPT-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "compiled requests separate immutable system, developer and canonical user-data JSON layers and include model/route/gateway/safety/template/prompt/schema/plan/rule/result provenance",
+            "Daily builder accepts one strict ControlledExpressionPlan, binds action/task/ritual catalogs and omits injection-like preferred names",
+            "unknown input fields, aggregate drift, stale package fingerprints, latest versions and 16/24 KiB budget violations fail closed before any provider boundary",
+            "Weekly builder accepts one strict aggregate and expression plan, emits only approved fact projections and fixes each segment ref before model execution"
+          ],
+          "file": "packages/prompt-library/src/prompt-package.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "AI-003 strict prepared input and golden compile",
+          "test_id": "T-AI003-PROMPT-MODULE-001"
+        },
         {
           "assertions": [
             "all style and assertion combinations pass field, paragraph, core 320 and full 480 grapheme budgets",
@@ -3642,11 +3692,35 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all compile cases use synthetic plans, aggregates, model and route versions with zero external provider calls",
+            "data-like injection cannot modify either canonical instruction layer and an unsafe preferred name is omitted",
+            "oversized instruction/data/schema budgets are rejected without truncation",
+            "package, workload and version mismatches reject before a compiled request can be returned"
+          ],
+          "file": "packages/prompt-library/src/prompt-package.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "P13-C04/P13-C06/P13-C10 deterministic compile cases",
+          "test_id": "T-AI003-PROMPT-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "common, Daily and Weekly canonical instruction blocks match the Accepted S-13 source byte for byte",
+            "Daily, Weekly, package registry, release catalog and deterministic evaluation fingerprints are pinned and immutable",
+            "latest, unknown and cross-workload lookups fail with one stable package-not-found code",
+            "packages remain STAGED and evaluation remains DETERMINISTIC_ONLY with external provider calls disabled"
+          ],
+          "file": "packages/prompt-library/src/prompt-package.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "AI-003 immutable Prompt package registry",
+          "test_id": "T-AI003-PROMPT-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "P13-C10",
       "source_sets": ["s16-ai-corpus"]
@@ -16933,6 +17007,26 @@
       "evidence": [
         {
           "assertions": [
+            "the Admin browser bundle rejects prompt-library/server dependencies, canonical Prompt text copied inline, provider key identifiers and escaped secret values"
+          ],
+          "file": "tooling/test-admin-bundle.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "AI-003 Admin Prompt asset and provider-key bundle fixtures",
+          "test_id": "T-AI003-ADMIN-BUNDLE-001"
+        },
+        {
+          "assertions": [
+            "the compiled Mini Program bundle rejects server/Prompt imports, canonical Prompt text copied inline and provider secret identifiers"
+          ],
+          "file": "tooling/test-miniapp-bundle.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "AI-003 Mini Program Prompt asset and secret bundle fixtures",
+          "test_id": "T-AI003-MINIAPP-BUNDLE-001"
+        },
+        {
+          "assertions": [
             "the bundle fixture has one known-pass bundle and minimum known-fail mutations for missing pages, forbidden imports and secret identifiers",
             "the compiled bundle contains the ordered six-page C-003 boundary and every registered page has JavaScript, JSON, WXML and WXSS output",
             "the Mini Program bundle rejects Node, Nest, Prisma, server, provider and Prompt imports",
@@ -16980,6 +17074,17 @@
           "origin": "tests/registry/ai001-evidence-manifest.json",
           "selector": "AI-001 API/Gateway/provider known-fail boundary fixtures",
           "test_id": "T-AI001-ARCH-STATIC-001"
+        },
+        {
+          "assertions": [
+            "copying a canonical Prompt instruction marker outside prompt-library/evaluation/tooling is rejected even without an import",
+            "Mini Program, Admin, API and Restricted source imports of prompt-library are rejected"
+          ],
+          "file": "tooling/test-boundaries.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "AI-003 Prompt import and inline-content known-fail fixtures",
+          "test_id": "T-AI003-PROMPT-BOUNDARY-001"
         }
       ],
       "status": "COVERED",
@@ -17068,6 +17173,17 @@
           "origin": "tests/queue/evidence-manifest.json",
           "selector": "api-bullmq-processor and worker profile capability fixtures",
           "test_id": "T-QUEUE-ARCH-001"
+        },
+        {
+          "assertions": [
+            "copying a canonical Prompt instruction marker outside prompt-library/evaluation/tooling is rejected even without an import",
+            "Mini Program, Admin, API and Restricted source imports of prompt-library are rejected"
+          ],
+          "file": "tooling/test-boundaries.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "AI-003 Prompt import and inline-content known-fail fixtures",
+          "test_id": "T-AI003-PROMPT-BOUNDARY-001"
         }
       ],
       "status": "COVERED",
@@ -17738,6 +17854,16 @@
       "evidence": [
         {
           "assertions": [
+            "the compiled Mini Program bundle rejects server/Prompt imports, canonical Prompt text copied inline and provider secret identifiers"
+          ],
+          "file": "tooling/test-miniapp-bundle.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "AI-003 Mini Program Prompt asset and secret bundle fixtures",
+          "test_id": "T-AI003-MINIAPP-BUNDLE-001"
+        },
+        {
+          "assertions": [
             "the bundle fixture has one known-pass bundle and minimum known-fail mutations for missing pages, forbidden imports and secret identifiers",
             "the compiled bundle contains the ordered six-page C-003 boundary and every registered page has JavaScript, JSON, WXML and WXSS output",
             "the Mini Program bundle rejects Node, Nest, Prisma, server, provider and Prompt imports",
@@ -17757,11 +17883,19 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "the Admin browser bundle rejects prompt-library/server dependencies, canonical Prompt text copied inline, provider key identifiers and escaped secret values"
+          ],
+          "file": "tooling/test-admin-bundle.mjs",
+          "level": "STATIC",
+          "origin": "tests/registry/ai003-evidence-manifest.json",
+          "selector": "AI-003 Admin Prompt asset and provider-key bundle fixtures",
+          "test_id": "T-AI003-ADMIN-BUNDLE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT", "STATIC"] }],
       "source_id": "S31-TEST-014",
       "source_sets": ["s31-testing"]

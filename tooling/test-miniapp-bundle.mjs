@@ -46,6 +46,7 @@ const expectedRuleIds = [
   "MINIAPP_BUNDLE_ES_MODULE",
   "MINIAPP_BUNDLE_FILE_MISSING",
   "MINIAPP_BUNDLE_FORBIDDEN_IMPORT",
+  "MINIAPP_BUNDLE_PROMPT_ASSET",
   "MINIAPP_BUNDLE_GENERATED_CONFIG",
   "MINIAPP_BUNDLE_PAGE_REGISTRY",
   "MINIAPP_BUNDLE_SECRET_IDENTIFIER",
@@ -85,6 +86,15 @@ const cases = [
         entries,
         "pages/launch/index.js",
         'const OPENAI_API_KEY = "synthetic-canary";',
+      ),
+  },
+  {
+    expectedRuleId: "MINIAPP_BUNDLE_PROMPT_ASSET",
+    mutate: (entries) =>
+      replace(
+        entries,
+        "pages/launch/index.js",
+        'const copiedPrompt = "common-expression-system-v1";',
       ),
   },
   {

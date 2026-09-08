@@ -706,6 +706,8 @@ function checkCapability(input) {
 function checkProvider(input) {
   const project = normalizeProject(input);
   const errors = [];
+  const promptAssetPattern =
+    /(?:common-expression-system-v1|daily-expression-instruction-v1|weekly-expression-instruction-v1|你是 DailyEnergy 的受控表达器)/u;
   for (const file of project.files) {
     for (const specifier of importsFor(file)) {
       const packageName = packageNameFromSpecifier(specifier);
@@ -735,6 +737,20 @@ function checkProvider(input) {
           ),
         );
       }
+    }
+    if (
+      promptAssetPattern.test(file.content) &&
+      !file.path.startsWith("packages/prompt-library/") &&
+      !file.path.startsWith("tests/ai-evaluation/") &&
+      !file.path.startsWith("tooling/")
+    ) {
+      errors.push(
+        diagnostic(
+          "BOUNDARY_PROVIDER_PROMPT_CONTENT",
+          file.path,
+          "canonical Prompt assets are only allowed in prompt-library/evaluation/tooling",
+        ),
+      );
     }
   }
   return errors;

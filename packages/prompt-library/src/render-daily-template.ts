@@ -257,7 +257,7 @@ export function renderControlledDailyTemplateV1(
     throw new ControlledTemplateError("TEMPLATE_PLAN_INVALID");
   }
   const plan = parsed.data;
-  validatePlanCatalogBindings(plan);
+  validateDailyPlanCatalogBindingsV1(plan);
 
   const expressionCandidate = renderExpectedExpression(plan);
   const expression = ExpressionPayloadSchema.safeParse(expressionCandidate);
@@ -368,7 +368,7 @@ export function validateControlledDailyTemplateCandidateV1(
   if (JSON.stringify(expression) !== JSON.stringify(expectedExpression)) {
     throw new ControlledTemplateError("TEMPLATE_OUTPUT_BINDING_INVALID");
   }
-  const safeName = projectPreferredName(plan.greeting_context.preferred_name);
+  const safeName = projectPreferredNameV1(plan.greeting_context.preferred_name);
   const expectedGreeting = greetingWithOptionalName(
     DAILY_TEMPLATE_REGISTRY_V1.styles[effectiveStyle(plan)].greeting,
     safeName,
@@ -391,7 +391,7 @@ function renderExpectedExpression(
   if (actionCopy === undefined) {
     throw new ControlledTemplateError("TEMPLATE_CATALOG_MISMATCH");
   }
-  const safeName = projectPreferredName(plan.greeting_context.preferred_name);
+  const safeName = projectPreferredNameV1(plan.greeting_context.preferred_name);
   return {
     greeting: greetingWithOptionalName(styleCopy.greeting, safeName),
     state_response: renderStateResponse(plan, style),
@@ -424,7 +424,9 @@ function renderExpectedExpression(
   };
 }
 
-function validatePlanCatalogBindings(plan: ControlledExpressionPlanV1): void {
+export function validateDailyPlanCatalogBindingsV1(
+  plan: ControlledExpressionPlanV1,
+): void {
   const slots = plan.semantic_slots;
   const action = slots.selected_action;
   const copy = DAILY_TEMPLATE_REGISTRY_V1.actionCopyById[action.action_id];
@@ -591,7 +593,9 @@ function renderRitualNotes(
   );
 }
 
-function projectPreferredName(value: string | undefined): string | undefined {
+export function projectPreferredNameV1(
+  value: string | undefined,
+): string | undefined {
   if (value === undefined || countDisplayCharacters(value) > 20) {
     return undefined;
   }
