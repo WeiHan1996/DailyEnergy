@@ -19,3 +19,4 @@ export {
   createGatewayRoutingTelemetrySinkV1,
 } from "./gateway-telemetry.js";
 export { RedisGatewayBreakerStoreV1 } from "./redis-gateway-breaker-store.js";
+export { createGatewayStructuredOutputValidatorV1 } from "./gateway-structured-output-validator.js";

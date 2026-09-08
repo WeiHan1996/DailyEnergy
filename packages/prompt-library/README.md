@@ -23,6 +23,10 @@
 - `compilePromptRequestV1`：分离 system、developer 与 canonical user-data JSON，绑定 strict
   output Schema，执行 Daily 16 KiB / Weekly 24 KiB 及子预算，并生成包含
   model/route/gateway/safety/template/prompt/schema/plan/rule/result 的 server-only trace；
+- `createStructuredOutputCandidateValidatorV1`：把 provider/template candidate 当作不可信输入，
+  依次执行单 JSON、12 KiB body、Daily/Weekly strict Schema、字符/核心预算、Daily
+  action/task/ritual/assertion、Weekly exact refs/数字/日期/方向/mode/helpful、人格、隐私与
+  Safety Gate；结果只有完整 `PASS` 或无正文的 `INVALID / REJECTED / INDETERMINATE`；
 - 不可变 `daily-template-v1` registry、renderer version 与 SHA-256 fingerprint；
 - `renderControlledDailyTemplateV1`，产出完整、严格的
   `CONTROLLED_TEMPLATE` candidate；
@@ -34,6 +38,6 @@
 缓存和历史冻结由 C-008 实现，本包不把候选写成 AVAILABLE 结果。
 
 两套 AI Prompt package 当前均为 `STAGED`；evaluation registry 固定为
-`DETERMINISTIC_ONLY / externalProviderCallsAllowed=false`。S-16 provider bake-off、AI-004
-candidate semantic validator 与 AI-006 template 路径完成前，不得升级为 ACTIVE，也不得接入
-真实 provider、key 或生产出网。
+`DETERMINISTIC_ONLY / externalProviderCallsAllowed=false`。S-16 provider bake-off、AI-005
+表达质量、AI-006 template 路径与后续发布 Gate 完成前，不得升级为 ACTIVE，也不得接入真实
+provider、key 或生产出网。

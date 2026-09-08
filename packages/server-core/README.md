@@ -53,6 +53,15 @@ AI-002 在同一边界内新增有限路由与熔断策略：
 - breaker store、live guard 或 Gateway 执行不可读时 fail closed，attempt telemetry 只携带
   封闭 role/model bucket、归一化 usage/cost 与完整性，不携带正文或用户引用。
 
+AI-004 收紧 candidate validator SPI 与 PASS receipt：
+
+- validation outcome 固定为 `PASS / INVALID / REJECTED / INDETERMINATE`；后三者只保留稳定
+  reason 并进入下一完整路径，不保存或拼接 raw candidate；
+- PASS receipt 的 SHA-256 同时绑定 payload、workload、route role、plan、Prompt、output
+  Schema、Safety policy 与 validator version；任一字段或 fingerprint 漂移都拒绝 candidate；
+- route 继续在 dispatch 前和 candidate 返回后读取 live guard，existing、Safety、删除和 stale
+  revision 均阻断迟到结果；双 provider 失败只返回 AI-006 可消费的 template 决策。
+
 本包不得导入 Nest、Prisma、Redis、BullMQ、provider SDK、环境变量或客户端代码。
 PostgreSQL 和运行 profile 实现位于 `@daily-energy/server-adapters` 的显式 capability
 subpath。Weekly 持久化、TX-07 与 HTTP 适配仍位于 adapters/API，不进入本包。

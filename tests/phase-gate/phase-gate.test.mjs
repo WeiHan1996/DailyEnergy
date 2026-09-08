@@ -67,8 +67,8 @@ test("T-E014-GATE-001 accepts conditional development admission and Production N
     conditions: 1,
     deferred: 7,
     total: 1004,
-    COVERED: 590,
-    PLANNED: 414,
+    COVERED: 644,
+    PLANNED: 360,
     NA_WITH_REASON: 0,
   });
 });
@@ -181,8 +181,8 @@ test("T-C017-GATE-001 accepts the owner-approved Phase 3 development decision", 
     cachedP95Ms: 42,
     generationP95Ms: 119,
     total: 1004,
-    COVERED: 590,
-    PLANNED: 414,
+    COVERED: 644,
+    PLANNED: 360,
     NA_WITH_REASON: 0,
   });
 });

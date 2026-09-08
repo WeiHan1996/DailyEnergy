@@ -48,3 +48,7 @@ fingerprint，Lua CAS 同时核对 revision 与 route fingerprint 并设置有�
 损坏 snapshot 或 CAS 状态不可读均返回稳定不可用错误。telemetry 只投影 PRIMARY/BACKUP、
 CURRENT/OTHER/UNKNOWN、workload、封闭 outcome/reason，以及真实归一化 usage/cost 或显式
 UNKNOWN；route version、attempt ref、Prompt、provider body 和用户内容不进入 metric label。
+
+AI-004 新增 `createGatewayStructuredOutputValidatorV1`，只把 prompt-library 的纯 validator
+适配为 Gateway SPI，并用 server-core canonical fingerprint 生成内容无关的验证 receipt。
+adapter 不复制事实/Safety 规则，不记录 candidate，也不把 `INDETERMINATE` 改成 PASS。

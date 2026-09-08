@@ -1,0 +1,466 @@
+{
+  "manifest_version": "ai-004-evidence-v1",
+  "scope": "AI-004 untrusted Daily/Weekly candidate parsing, strict Schema, fact/ref/version, text, personality, privacy, Safety and receipt validation with whole-candidate fallback and live-guard preservation",
+  "authority": [
+    "docs/ai/daily-content-schema.md",
+    "docs/ai/weekly-summary-schema.md",
+    "docs/ai/gateway.md",
+    "docs/ai/prompt-spec.md",
+    "docs/ai/personality.md",
+    "docs/ai/safety.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-AI004-VALIDATOR-AI-EVAL-001": {
+      "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+      "selector": "AI-004 structured output deterministic AI_EVAL",
+      "level": "AI_EVAL",
+      "assertions": [
+        "provider text must be one bounded JSON object and unknown/null/empty/markup/emoji/invalid-Unicode or grapheme-limit violations reject the entire candidate without extraction or repair",
+        "Daily action/task/ritual IDs, constraint labels, numbers, core budget, assertion evidence, preferred-name scope and no-memory relationship boundary remain bound to the prepared input",
+        "Weekly observation count/order, optional presence, exact refs, allowed numeric/date/state literals, coverage disclosure, direction/mode/helpful facts and missing boundaries remain bound to each preassigned segment",
+        "the S15-O01 through S15-O08 fixtures return only OUTPUT_SAFETY_REJECTED metadata and policy failure returns INDETERMINATE without candidate text",
+        "no validation path calls a provider, repairs JSON, stores raw output or splices fields"
+      ]
+    },
+    "T-AI004-VALIDATOR-MODULE-001": {
+      "file": "packages/prompt-library/src/structured-output-validator.test.ts",
+      "selector": "AI-004 structured output deterministic AI_EVAL",
+      "level": "MODULE",
+      "assertions": [
+        "the public validator consumes only the candidate plus the closed invocation projection and returns PASS, INVALID, REJECTED or INDETERMINATE",
+        "PASS returns one frozen strict payload and fingerprint while every failure returns one stable reason without raw text or partial fields",
+        "Daily and Weekly positive/negative fixtures exercise the same strict shared schemas used by publication contracts"
+      ]
+    },
+    "T-AI004-GATEWAY-MODULE-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/invoke-gateway.test.ts",
+      "selector": "AI-001 Gateway MODULE and deterministic AI_EVAL / AI-004 indeterminate candidate",
+      "level": "MODULE",
+      "assertions": [
+        "INVALID, REJECTED and INDETERMINATE validation outcomes complete the attempt with bounded metadata and return FALLBACK_REQUIRED",
+        "a malformed PASS receipt or payload fingerprint is rejected before CANDIDATE_READY",
+        "invalid and indeterminate raw bodies never enter attempt reservation or completion storage"
+      ]
+    },
+    "T-AI004-ROUTING-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+      "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+      "level": "AI_EVAL",
+      "assertions": [
+        "schema, Safety and validator-unavailable outcomes move to one backup using the original frozen invocation without candidate fragments",
+        "two failed provider roles produce only CONTROLLED_TEMPLATE_REQUIRED and do not execute AI-006 rendering",
+        "result-existing, owner/deletion, Safety and stale PublishGuard changes after candidate return discard the whole candidate"
+      ]
+    },
+    "T-AI004-ROUTING-MODULE-001": {
+      "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+      "selector": "AI-002 sequential Gateway routing / G12-L04/G12-L06",
+      "level": "MODULE",
+      "assertions": [
+        "primary and backup remain sequential and receive byte-identical prepared input and plan/route fingerprints",
+        "quality and indeterminate outcomes never race, retry one role or produce a partial candidate",
+        "the live guard is read before dispatch and again before returning a candidate"
+      ]
+    },
+    "T-AI004-ADAPTER-CONTRACT-001": {
+      "file": "packages/server-adapters/src/ai/gateway-structured-output-validator.test.ts",
+      "selector": "AI-004 Gateway structured-output validator adapter",
+      "level": "CONTRACT",
+      "assertions": [
+        "the AI adapter maps the prompt-library validator to the Gateway SPI without copying validation policy",
+        "a PASS receipt is content-free and fingerprint-bound to workload, role, plan, Prompt, output Schema, Safety policy and payload",
+        "every semantic receipt mutation is rejected and unsafe or indeterminate results expose only stable metadata"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "G12-N01",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-VALIDATOR-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "G12-N02",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-VALIDATOR-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "G12-C01",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-VALIDATOR-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "G12-C02",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-VALIDATOR-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "G12-C03",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-VALIDATOR-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "G12-C04",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-VALIDATOR-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "G12-C05",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-VALIDATOR-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "G12-C06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-ROUTING-AI-EVAL-001", "T-AI004-ROUTING-MODULE-001"]
+    },
+    {
+      "source_id": "G12-L04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-ROUTING-AI-EVAL-001", "T-AI004-ROUTING-MODULE-001"]
+    },
+    {
+      "source_id": "G12-L06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-ROUTING-AI-EVAL-001", "T-AI004-ROUTING-MODULE-001"]
+    },
+    {
+      "source_id": "G12-P03",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-GATEWAY-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "G12-P04",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-GATEWAY-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "P13-C01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-C02",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-C03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-C05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-ROUTING-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-C07",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-GATEWAY-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "P13-D04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-D06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-D07",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-D13",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-D15",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-D16",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-D18",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-D19",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-D21",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-D23",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-D24",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W02",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W07",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W08",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W09",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W10",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W11",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W12",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W13",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W14",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W15",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W16",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "P13-W18",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-O01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-O02",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-O03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-O04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-O05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-O06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-O07",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-O08",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-O09",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-ROUTING-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "S31-TEST-044",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-VALIDATOR-MODULE-001"
+      ]
+    },
+    {
+      "source_id": "E16-F03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-F04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-F11",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-P04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-P10",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-T07",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-T10",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-T11",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-R06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-R12",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-X08",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-X09",
+      "status": "COVERED",
+      "proof_ids": ["T-AI004-VALIDATOR-AI-EVAL-001"]
+    },
+    {
+      "source_id": "E16-X11",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-ADAPTER-CONTRACT-001"
+      ]
+    },
+    {
+      "source_id": "E16-O06",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI004-VALIDATOR-AI-EVAL-001",
+        "T-AI004-ROUTING-AI-EVAL-001"
+      ]
+    }
+  ]
+}

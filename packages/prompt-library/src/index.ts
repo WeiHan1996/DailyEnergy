@@ -75,3 +75,17 @@ export type {
   PromptVersionBindingsV1,
   PromptVersionTraceV1,
 } from "./compile-prompt.js";
+
+export {
+  STRUCTURED_OUTPUT_VALIDATOR_VERSION,
+  createStructuredOutputCandidateValidatorV1,
+} from "./structured-output-validator.js";
+export type {
+  CandidateContentPolicyResultV1,
+  CandidateContentPolicyV1,
+  CandidateRouteRoleV1,
+  StructuredOutputCandidateReasonCode,
+  StructuredOutputCandidateValidationResultV1,
+  StructuredOutputCandidateValidatorV1,
+  StructuredOutputInvocationContextV1,
+} from "./structured-output-validator.js";

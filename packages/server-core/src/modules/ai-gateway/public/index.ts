@@ -10,11 +10,13 @@ export {
   assertGatewayRouteCompatibilityV1,
   assertMinimalPreparedModelInput,
   canonicalGatewayJson,
+  createGatewayValidationReceiptV1,
   createGatewayRouteManifestV1,
   fingerprintGatewayJson,
   fingerprintGatewayRequestV1,
   validateGatewayInvocationV1,
   validateGatewayNormalizedUsageV1,
+  verifyGatewayValidationReceiptV1,
   verifyGatewayRouteManifestV1,
   workloadDeadlineMs,
 } from "../domain/contracts.js";
@@ -36,6 +38,7 @@ export type {
   GatewayRuntimeProfile,
   GatewayTemplateRouteV1,
   GatewayValidationReceiptV1,
+  GatewayValidationReceiptInputV1,
   GatewayWorkload,
 } from "../domain/contracts.js";
 
