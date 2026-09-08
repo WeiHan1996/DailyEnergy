@@ -3,21 +3,30 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：AI-005 post-merge — 修复 merged-main 供应链扫描误报
-- **任务状态**：In Review（紧急 CI Gate 缺陷中断 AI-006 启动）
-- **任务 Profile**：`security`（供应链 artifact 敏感值扫描与 fail-closed 边界）
-- **工作分支**：`agent/ai005-postmerge-artifact-scan`（从 merged `main@2617dac3163721f958c16219964702b36a69492a` 创建）
-- **任务 Issue**：[AI-005 Issue #74](https://github.com/WeiHan1996/DailyEnergy/issues/74) 已随 PR #195 关闭；本 post-merge 修复不重开产品范围
-- **当前 PR**：[Draft PR #196](https://github.com/WeiHan1996/DailyEnergy/pull/196)；实现基线 `dc7ac78ce0c29234143378809bcdf5813594d083` 已推送，本状态收据提交后必须使用新 head 的独立 CI
-- **上一完成任务**：AI-004 Done；[PR #193](https://github.com/WeiHan1996/DailyEnergy/pull/193) final head `d9ec7b086b4af07e3b97171b19ad6ea822c89eb4` / CI run `34186587481` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `52876a9a2f1784ecbdb5bc6e3678d7c89db0c0f8`；merged-main CI run `34186841083` 11/11 SUCCESS；Issue #73 Closed
+- **当前任务**：AI-006 — 实现 AI 失败时的完整模板降级
+- **任务状态**：Ready
+- **任务 Profile**：`security`（主备失败到模板、strict Schema/Safety、PublishGuard/epoch/revision、历史冻结、客户端与低基数 telemetry）
+- **工作分支**：`agent/ai006-ready`（仅状态收尾）；合并后从 verified `main` 创建 `agent/ai006-controlled-template-fallback`
+- **任务 Issue**：[AI-006 Issue #75](https://github.com/WeiHan1996/DailyEnergy/issues/75)
+- **当前 PR**：[Draft PR #197](https://github.com/WeiHan1996/DailyEnergy/pull/197)（仅状态收尾）；final head 的独立 11/11 CI 通过后按 owner 授权合并，再执行 AI-006 prepare 和实施
+- **上一完成任务**：AI-005 Done；PR #195 squash 合并为 `2617dac3163721f958c16219964702b36a69492a`，其 merged-main SHA 手机号误报由 [PR #196](https://github.com/WeiHan1996/DailyEnergy/pull/196) 修复并 squash 合并为 `605ec8b61d634e82769121d4458d12297e902bf6`；merged-main CI run `34197579568` 11/11 SUCCESS；Issue #74 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-003、AI-004、C-002 与 C-003 已 Done，AI-005 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-005 或后续开发任务自动关闭
+- **依赖边界**：AI-002、AI-004、AI-005、C-007 与 C-008 已 Done，AI-006 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-006 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待 PR #196 final head 的 11/11 CI 与 owner threat-boundary review；未经明确批准不标记 Ready、不运行 exact-head merge verifier、不合并，也不启动 AI-006
+- **下一候选动作**：等待 PR #197 final head 的 11/11 CI，执行 exact-head verifier 与 squash merge；然后以固定 Node `24.18.0` 运行 `pnpm agent:prepare AI-006 --remote --deep`，读取全部 required sources、相关 executable contracts/tests/fixtures 与附近实现，再创建独立实现分支
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-08 AI-005 post-merge 收尾
+
+- owner 明确“批准合并 PR #196 并继续 AI-006”，接受仅手机号检测忽略 opaque digest、其它 credential/raw-content 检测保持原值、供应链 Schema/source/lockfile binding 继续 fail closed 的修复 threat boundary；Production/RC、Alpha、真实用户和真实 provider 仍未授权；
+- PR #196 final head `7c49e4c5767de46e980fd0d9c5ae1ce465ff6c67` 的 CI run `34195721375` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=196:head=7c49e4c5767de46e980fd0d9c5ae1ce465ff6c67:run=34195721375:checks=11`；
+- PR #196 已用 `--squash --match-head-commit 7c49e4c5767de46e980fd0d9c5ae1ce465ff6c67` 合并为 `605ec8b61d634e82769121d4458d12297e902bf6`，GitHub verification=`valid`，final head 与 merge commit tree 均为 `bb2d6cfa67b42e60e3df8ab7f8aef74fc68285f8`，未删除分支；
+- merged-main CI run `34197579568` 为 11/11 SUCCESS，包含 supply-chain scanner 与聚合 full Gate；AI-005 及 post-merge CI Gate 修复进入 Done，AI-006 是唯一 Ready；
+- C-015 继续 Blocked，DEV_LITE 继续 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`，Production/RC、Alpha、真实用户、真实 provider 和公网服务操作继续 `NO_GO`。
+- 状态提交 `758210e491cf9059ba54282023357da35ee71062` 已推送并创建 [Draft PR #197](https://github.com/WeiHan1996/DailyEnergy/pull/197)；本次 PR 引用回写产生的新 final head 必须使用自己的同 run CI，不能复用本地 Gate 或初始状态提交 CI。
 
 ## 2026-09-08 AI-005 post-merge CI Gate 中断
 
@@ -28,7 +37,7 @@
 - 失败可由固定 merge SHA 稳定触发，重跑不能修复。该紧急 CI Gate 缺陷必须先以聚焦 branch/PR 修复并恢复 green main；AI-006 保持 Planned，尚未 prepare、建分支或实施。
 - 聚焦修复只让手机号正则在检查前遮蔽边界完整的 40/64 位十六进制 digest；私钥、数据库/Redis URL、Bearer 等其它敏感模式仍检查原始值，artifact Schema 和 supply-chain source/lockfile 精确绑定不变；回归使用真实 merge SHA，并证明真实手机号及 `Bearer <40-hex>` 仍被拒绝；
 - CI policy `29/29`、policy/agent fixtures 与 `git diff --check` 通过；固定 Node `24.18.0` 的 `pnpm agent:validate --mode=full --task=AI-005` 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（177490ms）。Gate 产生的 15 个 Prisma 纯空白副作用经忽略空白 diff 证明无语义变化后已恢复，未进入任务 diff；
-- 待 owner 审核的修复 threat boundary：仅手机号模式忽略 opaque digest token，不放宽其它 credential/raw-content 检测；digest 以外的手机号仍拒绝；供应链文档仍由严格 Schema 与 SHA/lockfile binding fail closed。Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`。
+- owner 已审核通过修复 threat boundary：仅手机号模式忽略 opaque digest token，不放宽其它 credential/raw-content 检测；digest 以外的手机号仍拒绝；供应链文档仍由严格 Schema 与 SHA/lockfile binding fail closed。Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`。
 - 实现提交 `dc7ac78ce0c29234143378809bcdf5813594d083` 已推送并创建 [Draft PR #196](https://github.com/WeiHan1996/DailyEnergy/pull/196)；本次状态回写产生的新 final head 必须使用自己的同 run CI，不能复用实现提交、本地 Gate 或失败的 merged-main run 作为合并证据。
 
 ## 2026-09-08 AI-005 启动
