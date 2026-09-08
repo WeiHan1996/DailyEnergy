@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（server-only Prompt 资产、输入最小化、版本/指纹、bundle/secret/content 边界）
 - **工作分支**：`agent/ai003-prompt-versioning`
 - **任务 Issue**：[AI-003 Issue #72](https://github.com/WeiHan1996/DailyEnergy/issues/72)
-- **当前 PR**：[Draft PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191)；review baseline CI 11/11，通过后等待 owner Prompt/输入/bundle threat-boundary review；合并前仍须 exact-head verifier
+- **当前 PR**：[Draft PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191)；owner 已批准 Prompt/输入/bundle threat boundary，当前等待接受状态新 head 的 11/11 CI；通过后才标记 Ready、执行 exact-head verifier 与 squash merge
 - **上一完成任务**：AI-002 Done；[PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189) final head `d809892f1de7b4e828058c660f53b128bb662ec4` / CI run `34143534031` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `849ab17d2e8c36663cb5c4d9a4364cb4d68d7c5a`；merged-main CI run `34167933143` 11/11 SUCCESS；Issue #71 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,7 +16,7 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-001、AI-002 与 E-008 已 Done，AI-003 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-003 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待 owner 审核 [PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191) 的 Prompt/输入/bundle threat boundary；获明确批准后才可标记 Ready、执行 exact-head verifier 与 squash merge
+- **下一候选动作**：提交并推送 owner 接受记录，等待该 exact head 的 11/11 CI；同 run 全绿后标记 [PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191) Ready、执行 exact-head verifier 与 squash merge，再验证 merged-main CI 并启动 AI-004
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-08 AI-003 启动
@@ -29,6 +29,7 @@
 
 ### AI-003 实施与本地验证
 
+- owner 于 2026-09-08 明确“审核通过，合并收尾后完成 AI-004”，接受 PR #191 的 Prompt/输入/bundle threat boundary，并授权标记 Ready、执行 exact-head verifier、squash merge 和后续 AI-004；该决定不授予 Production、RC、Alpha、真实用户或真实 provider；
 - 实现提交 `543908682d1acf1e8d11961361c96cd751b3b5be` 已推送并创建 [Draft PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191)；本次状态回写产生的新 head 必须使用自己的同 run CI，不能复用实现提交或本地 Gate 作为合并证据；
 - PR #191 review baseline head `356ce33428f9bd79df92ef9e0a90b6ea1c0bf612` 的 CI run `34173745512` 为 11/11 SUCCESS；本收据提交后的新 final head 仍须使用自己的同 run CI，不能复用该 baseline；
 - `packages/prompt-library` 新增 `daily-expression-zh-cn-v1` / `weekly-expression-zh-cn-v1` immutable Prompt packages：common、Daily、Weekly 三段 canonical instruction 与 Accepted `docs/ai/prompt-spec.md` 逐字一致，output Schema fingerprint 来自 `shared-schemas/json-schema`；两 package 保持 `STAGED`；
