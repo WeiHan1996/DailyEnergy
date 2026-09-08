@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（用户自由文本 Safety、用途授权、加密、修订与删除/不复活边界；尚未运行 AI-008 prepare）
 - **工作分支**：`agent/ai007-completion-status`（仅 AI-007 状态收尾）；本状态 PR 合并且收到新的明确启动指令前，不创建 AI-008 实现分支
 - **任务 Issue**：[AI-008 Issue #77](https://github.com/WeiHan1996/DailyEnergy/issues/77)
-- **当前 PR**：状态收尾 Draft PR 待创建；AI-008 实现 PR 不存在
+- **当前 PR**：[Draft PR #201](https://github.com/WeiHan1996/DailyEnergy/pull/201)（仅 AI-007 状态收尾）；AI-008 实现 PR 不存在
 - **上一完成任务**：AI-007 Done；[PR #200](https://github.com/WeiHan1996/DailyEnergy/pull/200) final head `d44ea182d0a489329f5be5dc4ecb0ec1c83d782f` / CI run `34223694159` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `719ffbe89cd21625deffcc6da425f6a7e5a6d823`；merged-main CI run `34240311148` 11/11 SUCCESS；Issue #76 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,7 +16,7 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-007 已 Done；AI-008 依赖与权威来源须在未来收到明确启动指令后通过 `pnpm agent:prepare AI-008` 恢复，不在本状态收尾中预判或实施；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由 AI-008 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：提交并验证 AI-007 状态收尾 Draft PR；合并后保持 AI-008 为唯一 Ready，等待新的明确启动指令，不运行 AI-008 prepare、不创建实现分支或编码
+- **下一候选动作**：等待 [Draft PR #201](https://github.com/WeiHan1996/DailyEnergy/pull/201) final head 的同 run 11-check CI；后续仅在新的明确指令下合并状态 PR 或启动 AI-008，本次不运行 AI-008 prepare、不创建实现分支或编码
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-08 AI-007 post-merge 收尾
@@ -29,6 +29,7 @@
 - AI-007 已闭合 LightFact-only count/stage/eligibility、真实生成快照、第 1/3/7 天一次性节点、数据库同 cycle/node 唯一、DAY 删除重算与不重放、关系整体删除后新 cycle、Prompt/模板关系语言 Safety、历史冻结和客户端缓存边界；
 - 微信 DevTools CLI 仍未配置并保持 `INFRA_BLOCKED`，MODEL/LOAD/HUMAN、真实 provider 与 Production authorization 继续 Planned/Pending；C-015 继续 Blocked，Production/RC 保持 `NO_GO`；
 - AI-008 仅按完成规则成为唯一 Ready；遵循 owner 最新指令，本次不运行 AI-008 prepare、不创建实现分支、不读取实现任务包或编码。
+- 状态提交 `e96bd9f8479e777fa944b2ff114af90f3d0aefd0` 已推送并创建 [Draft PR #201](https://github.com/WeiHan1996/DailyEnergy/pull/201)；本次 PR 引用回写产生的新 final head 必须使用自己的同 run CI，不能复用本地 Gate、PR #200 或 merged-main CI。
 
 ## 2026-09-08 AI-006 post-merge 收尾
 
