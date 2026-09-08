@@ -17,6 +17,7 @@ import {
   DAILY_TEMPLATE_VERSION,
   type DailyTemplateActionCopyV1,
 } from "./daily-template-registry.js";
+import { resolveEffectiveExpressionStyleV1 } from "./expression-style-policy.js";
 
 export const CONTROLLED_DAILY_TEMPLATE_CANDIDATE_CONTRACT =
   "controlled-daily-template-candidate-v1";
@@ -504,10 +505,10 @@ function matchesAction(
 }
 
 function effectiveStyle(plan: ControlledExpressionPlanV1): ExpressionStyle {
-  return plan.requested_expression_style === "LIGHT_HUMOR" &&
-    plan.effective_expression_constraints.humor_ceiling === "NONE"
-    ? "BALANCED"
-    : plan.requested_expression_style;
+  return resolveEffectiveExpressionStyleV1({
+    humorCeiling: plan.effective_expression_constraints.humor_ceiling,
+    requestedStyle: plan.requested_expression_style,
+  }).renderingStyle;
 }
 
 function renderStateResponse(

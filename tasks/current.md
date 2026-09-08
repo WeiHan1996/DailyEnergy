@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-005 — 实现三种表达偏好的单一人格
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **任务 Profile**：`security`（单一人格三种受控表达、事实与行动不漂移、历史冻结、禁用语言与 Safety 边界）
-- **工作分支**：无；仅在 owner 后续明确启动后，才从 verified `main@52876a9a2f1784ecbdb5bc6e3678d7c89db0c0f8` 创建
+- **工作分支**：`agent/ai005-expression-preferences`（从与 `origin/main` 一致的 `main@52903fc7a8864751b1d5ad6eddf1b019fdab820d` 创建）
 - **任务 Issue**：[AI-005 Issue #74](https://github.com/WeiHan1996/DailyEnergy/issues/74)
-- **当前 PR**：无；按 owner 最新指令，AI-005 仅进入 Ready，尚未 prepare、创建分支或实施
+- **当前 PR**：无；实现与本地 security Gate 完成后创建 Draft PR
 - **上一完成任务**：AI-004 Done；[PR #193](https://github.com/WeiHan1996/DailyEnergy/pull/193) final head `d9ec7b086b4af07e3b97171b19ad6ea822c89eb4` / CI run `34186587481` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `52876a9a2f1784ecbdb5bc6e3678d7c89db0c0f8`；merged-main CI run `34186841083` 11/11 SUCCESS；Issue #73 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,8 +16,16 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-003、AI-004、C-002 与 C-003 已 Done，AI-005 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-005 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待 owner 后续明确启动 AI-005；届时从 verified `main` 运行 `pnpm agent:prepare AI-005 --remote --deep`，读取 personality/Prompt/evaluation 原文与相关 executable contracts、tests 和 fixtures 后再创建独立实现分支；本次收尾不启动 AI-005
+- **下一候选动作**：实现不可变表达风格策略、合成同事实 corpus、禁用语言校验与未来生成/历史冻结证据；保持 MODEL/LOAD/HUMAN、真实 provider 和生产授权 Pending
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-08 AI-005 启动
+
+- owner 明确启动 AI-005；`pnpm agent:prepare AI-005 --remote --deep` 返回 `READY`，Profile=`security`，Node/pnpm/dependencies/GitHub 全部 PASS；required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；
+- 分支 `agent/ai005-expression-preferences` 从本地、`origin/main` 与远端一致的 `main@52903fc7a8864751b1d5ad6eddf1b019fdab820d` 创建；开工前工作树无变更；
+- 本任务在同一人格内实现 `GENTLE / LIGHT_HUMOR / CLEAR_DIRECT` 的温暖度、幽默度和直接度参数，保留 `BALANCED` 为不推断用户人格的安全默认，并让 care/uncertainty/Safety 上限始终覆盖风格；
+- 本任务补同事实/同行动的 Daily/Weekly 合成样例、禁用羞辱/恐惧/空泛夸奖/排他依赖/虚假亲密规则和偏好修改只影响未来生成的真实 PostgreSQL 证据；既有 Prompt/template 版本保持不可变，由独立 style policy/sample 版本显式绑定；
+- AI-014 的完整 Evaluation runner、AI-015 的 120-output 双人盲评、真实 provider MODEL/LOAD、AI-006 发布模板编排、Production/RC/Alpha 与真实用户均不在本任务授权内，不能由 deterministic corpus 冒充完成。
 
 ## 2026-09-08 AI-004 post-merge 收尾
 

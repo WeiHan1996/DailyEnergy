@@ -6,7 +6,7 @@
 - `api-client/`：公开/Admin transport client。
 - `server-core/`：服务端领域与 application contract。
 - `server-adapters/`：服务端基础设施 adapter。
-- `prompt-library/`：server-only 可版本化 Prompt/template、prepared input、受控编译与完整 candidate 校验。
+- `prompt-library/`：server-only 可版本化 Prompt/template、表达风格策略、prepared input、受控编译与完整 candidate 校验。
 - `eslint-config/`：统一工程规范。
 - `typescript-config/`：统一 TypeScript 配置。
 

@@ -374,6 +374,98 @@ test(
         "RETURN_EXISTING",
       );
 
+      const historicalBeforePreferenceChange = (
+        await admin.query(
+          `SELECT "expressionCorePayload","resultFingerprint"
+             FROM app_published_daily_result
+            WHERE "accountId"=$1 AND "productDate"=$2`,
+          [accountId, productDate],
+        )
+      ).rows[0];
+      const initialSnapshot = (
+        await admin.query(
+          `SELECT snapshot."snapshotPayload"->'profile'->>'expression_style' AS style,
+                  snapshot."snapshotPayload"->'profile'->>'revision' AS revision
+             FROM app_generation_input_snapshot snapshot
+             JOIN app_generation_intent intent
+               ON intent.id=snapshot."generationIntentId"
+            WHERE intent."accountId"=$1 AND intent."targetProductDate"=$2`,
+          [accountId, productDate],
+        )
+      ).rows[0];
+      assert.deepEqual(initialSnapshot, { revision: "1", style: "BALANCED" });
+      const preferenceUpdate = await consent.updateProfile({
+        accountId,
+        commandRef: "ai005-profile-style-gentle",
+        expectedRevision: 1,
+        expressionStyle: "GENTLE",
+        normalizedPayloadFingerprint: bytes("ai005:profile-style:gentle"),
+        now: new Date(baseNow.getTime() + 2_200),
+        operationCode: "PROFILE_UPDATE",
+      });
+      assert.equal(preferenceUpdate.status, "ACCEPTED");
+      const futureProductDate = "2026-08-25";
+      assert.equal(
+        (
+          await checkin.submit({
+            accountId,
+            commandRef: "ai005-future-checkin",
+            energy: "STEADY",
+            mood: "GOOD",
+            normalizedPayloadFingerprint: bytes("ai005:future-checkin"),
+            now: new Date(baseNow.getTime() + 2_300),
+            productDate: futureProductDate,
+            productDatePolicyVersion: "product-date-v1",
+            sleep: "OKAY",
+          })
+        ).status,
+        "ACCEPTED",
+      );
+      assert.equal(
+        (
+          await generation.start({
+            accountId,
+            commandRef: "ai005-future-generation",
+            expectedCheckinRevision: 1,
+            normalizedPayloadFingerprint: bytes("ai005:future-generation"),
+            now: new Date(baseNow.getTime() + 2_400),
+            productDate: futureProductDate,
+            productDatePolicyVersion: "product-date-v1",
+          })
+        ).status,
+        "ACCEPTED",
+      );
+      const snapshotsAfterPreferenceChange = (
+        await admin.query(
+          `SELECT intent."targetProductDate"::text AS product_date,
+                  snapshot."snapshotPayload"->'profile'->>'expression_style' AS style,
+                  snapshot."snapshotPayload"->'profile'->>'revision' AS revision
+             FROM app_generation_input_snapshot snapshot
+             JOIN app_generation_intent intent
+               ON intent.id=snapshot."generationIntentId"
+            WHERE intent."accountId"=$1
+            ORDER BY intent."targetProductDate"`,
+          [accountId],
+        )
+      ).rows;
+      assert.deepEqual(snapshotsAfterPreferenceChange, [
+        { product_date: productDate, revision: "1", style: "BALANCED" },
+        { product_date: futureProductDate, revision: "2", style: "GENTLE" },
+      ]);
+      const historicalAfterPreferenceChange = (
+        await admin.query(
+          `SELECT "expressionCorePayload","resultFingerprint"
+             FROM app_published_daily_result
+            WHERE "accountId"=$1 AND "productDate"=$2`,
+          [accountId, productDate],
+        )
+      ).rows[0];
+      assert.deepEqual(
+        historicalAfterPreferenceChange,
+        historicalBeforePreferenceChange,
+        "AI-005 style changes must not rewrite an existing snapshot or published result",
+      );
+
       const today = await generation.getToday({ accountId, productDate });
       assert.equal(today.status, "FOUND");
       if (today.status !== "FOUND") {

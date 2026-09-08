@@ -26,6 +26,7 @@ import {
   fingerprintPromptJsonV1,
   type PromptWorkloadV1,
 } from "./prompt-package-registry.js";
+import { evaluateExpressionLanguageV1 } from "./expression-style-policy.js";
 
 export const STRUCTURED_OUTPUT_VALIDATOR_VERSION =
   "structured-output-validator-v1";
@@ -281,6 +282,16 @@ async function validateCandidate(
     context.invocation.workload === "DAILY_EXPRESSION_V1"
       ? dailyText(payload as ExpressionPayload)
       : weeklyText(payload as WeeklyExpressionPayload);
+  const baselinePolicy = await DEFAULT_CONTENT_POLICY.evaluate({
+    text,
+    workload: context.invocation.workload,
+  });
+  if (baselinePolicy.status === "INDETERMINATE") {
+    return indeterminate();
+  }
+  if (baselinePolicy.status === "REJECTED") {
+    return rejected("OUTPUT_SAFETY_REJECTED");
+  }
   const personalityFailure =
     context.invocation.workload === "DAILY_EXPRESSION_V1"
       ? dailyPersonalityFailure(
@@ -300,16 +311,6 @@ async function validateCandidate(
   );
   if (privacyFailure !== undefined) {
     return rejected(privacyFailure);
-  }
-  const baselinePolicy = await DEFAULT_CONTENT_POLICY.evaluate({
-    text,
-    workload: context.invocation.workload,
-  });
-  if (baselinePolicy.status === "INDETERMINATE") {
-    return indeterminate();
-  }
-  if (baselinePolicy.status === "REJECTED") {
-    return rejected("OUTPUT_SAFETY_REJECTED");
   }
   if (supplementalContentPolicy !== undefined) {
     const supplementalPolicy = await supplementalContentPolicy.evaluate({
@@ -694,6 +695,7 @@ function dailyPersonalityFailure(
     0,
   );
   if (
+    evaluateExpressionLanguageV1(text).status === "REJECT" ||
     RELATIONSHIP_OR_FABRICATION.test(text) ||
     /[?？]$/u.test(payload.closing) ||
     humorCount > 1 ||
@@ -713,6 +715,7 @@ function weeklyPersonalityFailure(
   text: string,
 ): "OUTPUT_PERSONALITY_INVALID" | undefined {
   if (
+    evaluateExpressionLanguageV1(text).status === "REJECT" ||
     RELATIONSHIP_OR_FABRICATION.test(text) ||
     WEEKLY_DERIVED_OR_CAUSAL.test(text) ||
     WEEKLY_CONTINUITY_OR_PRESSURE.test(text) ||

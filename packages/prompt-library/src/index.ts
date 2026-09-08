@@ -89,3 +89,25 @@ export type {
   StructuredOutputCandidateValidatorV1,
   StructuredOutputInvocationContextV1,
 } from "./structured-output-validator.js";
+
+export {
+  EXPRESSION_STYLE_POLICY_FINGERPRINT_V1,
+  EXPRESSION_STYLE_POLICY_V1,
+  EXPRESSION_STYLE_POLICY_VERSION,
+  EXPRESSION_STYLE_SAMPLE_SET_VERSION,
+  VisibleExpressionStyleValues,
+  AuthoritativeExpressionStyleError,
+  assertAuthoritativeExpressionStyleV1,
+  classifySyntheticExpressionStyleV1,
+  evaluateExpressionLanguageV1,
+  fingerprintExpressionStyleJsonV1,
+  resolveEffectiveExpressionStyleV1,
+  resolveOptionalExpressionStylePreferenceV1,
+} from "./expression-style-policy.js";
+export type {
+  EffectiveExpressionStyleV1,
+  ExpressionLanguageViolationCode,
+  ExpressionStyleParametersV1,
+  OptionalExpressionStyleResolutionV1,
+  VisibleExpressionStyle,
+} from "./expression-style-policy.js";
