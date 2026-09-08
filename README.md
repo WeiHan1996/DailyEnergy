@@ -347,7 +347,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 3 — AI 陪伴层
-状态：AI-003 In Review（自动 Gate 通过，Draft PR 待创建）
+状态：AI-003 In Review（自动 Gate 通过，Draft PR #191 待审核）
 当前目标：建立 server-only Prompt registry、不可变版本、编译指纹与最小输入 builder
 当前任务：AI-003 实现 Prompt 与模板版本管理
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/72
