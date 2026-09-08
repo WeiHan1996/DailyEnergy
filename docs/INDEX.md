@@ -188,7 +188,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/technical/database-implementation.md](./technical/database-implementation.md)                                                                                                                    | Implemented | PostgreSQL 18 / Prisma 7、迁移、角色、seed、drift、SQL/TX 与恢复证据                                               | database、testing、deployment、ADR-0005、Issue #44            |
 | [docker/observability/contract.json](../docker/observability/contract.json)                                                                                                                            | Implemented | E-013 vendor-neutral 信号、字段/平面/基数、期限、成本与 Production blocked Gate                                    | observability、privacy、deployment                            |
 | [tests/README.md](../tests/README.md)                                                                                                                                                                  | Active      | E-010 registry/harness、E-011/E-016 CI/仓库控制、E-013/E-014 Gate、E-017 DEV_LITE 与 AI-005～AI-007 确定性证据入口 | testing、deployment、现有 DB/queue/API/Admin/miniapp evidence |
-| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 绑定三个真实 Milestone；AI-007 已进入 In Review；C-015 外部证据独立 Blocked                           | Accepted Phase 0B/1/2 specs、Phase 2 Gate、AI-007 #76         |
+| [Phase 1](https://github.com/WeiHan1996/DailyEnergy/milestone/1) / [Phase 2](https://github.com/WeiHan1996/DailyEnergy/milestone/2) / [Phase 3](https://github.com/WeiHan1996/DailyEnergy/milestone/3) | Active      | 54 个 Issues 绑定三个真实 Milestone；AI-007 已完成，AI-008 是唯一 Ready；C-015 外部证据独立 Blocked                | Accepted Phase 0B/1/2 specs、Phase 2 Gate、AI-008 #77         |
 
 ### 7.7 Phase Gate
 
@@ -261,7 +261,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-Phase 0B、Phase 1 和 Phase 2 已结束；D-001～D-005、E-001～E-017、C-001～C-014/C-016/C-017 与 AI-001～AI-006 已完成。AI-007 实现与完整自动 Gate 已完成并进入 In Review，等待 owner threat-boundary review。C-015 的 Production/Privacy/Legal 外部证据继续 Blocked，Production/RC 保持 `NO_GO`。读取顺序：
+Phase 0B、Phase 1 和 Phase 2 已结束；D-001～D-005、E-001～E-017、C-001～C-014/C-016/C-017 与 AI-001～AI-007 已完成。AI-008 是唯一 Ready，等待新的明确启动指令，本次不运行 prepare 或实现。C-015 的 Production/Privacy/Legal 外部证据继续 Blocked，Production/RC 保持 `NO_GO`。读取顺序：
 
 1. AGENTS.md；
 2. README.md；
