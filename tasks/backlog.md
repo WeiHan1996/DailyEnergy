@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：[AI-005 三种表达偏好](./current.md)：In Review，Draft PR #195 review baseline 已 11/11 SUCCESS，等待 owner threat-boundary review；AI-004 已随 PR #193 合并并关闭 Issue #73，C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
+- **当前任务**：[AI-005 post-merge CI Gate 修复](./current.md)：In Review，Draft PR #196 等待 final-head CI 与 owner threat-boundary review；AI-006 启动前先恢复 green main，C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -229,7 +229,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | [AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71) | 主模型与备用模型   | Done      | PR #189 squash 合并为 `849ab17d`；merged-main CI 11/11；Issue #71 Closed |
 | [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理    | Done      | PR #191 squash 合并为 `e6202556`；merged-main CI 11/11；Issue #72 Closed |
 | [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验     | Done      | PR #193 squash 合并为 `52876a9a`；merged-main CI 11/11；Issue #73 Closed |
-| [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | In Review | Draft PR #195；自动 Gate 通过，等待 threat-boundary review               |
+| [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | In Review | PR #195/Issue #74 已完成；Draft PR #196 修复 merged-main SHA 误报        |
 | [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | Planned   | 模型故障仍可完成                                                         |
 | [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Planned   | 第 1、3、7 天连续性                                                      |
 | [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | Planned   | 用户主动添加和删除                                                       |
