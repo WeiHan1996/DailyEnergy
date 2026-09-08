@@ -3,21 +3,29 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：AI-003 — 实现 Prompt 与模板版本管理
-- **任务状态**：In Review
-- **任务 Profile**：`security`（server-only Prompt 资产、输入最小化、版本/指纹、bundle/secret/content 边界）
-- **工作分支**：`agent/ai003-prompt-versioning`
-- **任务 Issue**：[AI-003 Issue #72](https://github.com/WeiHan1996/DailyEnergy/issues/72)
-- **当前 PR**：[Draft PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191)；owner 已批准 Prompt/输入/bundle threat boundary，当前等待接受状态新 head 的 11/11 CI；通过后才标记 Ready、执行 exact-head verifier 与 squash merge
-- **上一完成任务**：AI-002 Done；[PR #189](https://github.com/WeiHan1996/DailyEnergy/pull/189) final head `d809892f1de7b4e828058c660f53b128bb662ec4` / CI run `34143534031` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `849ab17d2e8c36663cb5c4d9a4364cb4d68d7c5a`；merged-main CI run `34167933143` 11/11 SUCCESS；Issue #71 Closed
+- **当前任务**：AI-004 — 实现 AI 结构化输出完整校验
+- **任务状态**：Ready
+- **任务 Profile**：`security`（provider candidate 不可信输入、strict Schema/事实/人格/Safety 全量 Gate、raw output 最小留存与 live guard）
+- **工作分支**：无；待从 verified `main@e62025561704ef48d4548eb4660e770efe6c01ce` 创建
+- **任务 Issue**：[AI-004 Issue #73](https://github.com/WeiHan1996/DailyEnergy/issues/73)
+- **当前 PR**：无；尚未开始 AI-004 实现
+- **上一完成任务**：AI-003 Done；[PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191) final head `5c4f9423701b17ff02ee3ffdcc797e03178d35d6` / CI run `34175720994` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `e62025561704ef48d4548eb4660e770efe6c01ce`；merged-main CI run `34175915945` 11/11 SUCCESS；Issue #72 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-001、AI-002 与 E-008 已 Done，AI-003 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-003 或后续开发任务自动关闭
+- **依赖边界**：AI-001、AI-003 与 E-008 已 Done，AI-004 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-004 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：提交并推送 owner 接受记录，等待该 exact head 的 11/11 CI；同 run 全绿后标记 [PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191) Ready、执行 exact-head verifier 与 squash merge，再验证 merged-main CI 并启动 AI-004
+- **下一候选动作**：合并本状态收尾后运行 `pnpm agent:prepare AI-004 --remote --deep`，读取 Daily/Weekly Schema、Gateway、Prompt、人格、Safety 与现有 candidate/template validator，再创建 AI-004 分支实施
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-08 AI-003 post-merge 收尾
+
+- owner 明确“审核通过，合并收尾后完成 AI-004”，接受 PR #191 的 Prompt/输入/bundle threat boundary，并授权标记 Ready、exact-head verifier、squash merge 和后续 AI-004；该决定不授予 Production、RC、Alpha、真实用户或真实 provider；
+- PR #191 final head `5c4f9423701b17ff02ee3ffdcc797e03178d35d6` 的 CI run `34175720994` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=191:head=5c4f9423701b17ff02ee3ffdcc797e03178d35d6:run=34175720994:checks=11`；
+- PR #191 已用 `--squash --match-head-commit 5c4f9423701b17ff02ee3ffdcc797e03178d35d6` 合并为 `e62025561704ef48d4548eb4660e770efe6c01ce`，GitHub verification=`valid`，final head 与 merge commit tree 均为 `5018277f7e22cf2844947ea80d64007d8b304cb4`，未删除分支；merged-main CI run `34175915945` 为 11/11 SUCCESS；
+- Issue #72 已关闭，AI-003 进入 Done；AI-004 是唯一 Ready，本状态收尾不提前实现 AI-004；
+- C-015 继续 Blocked，DEV_LITE 继续 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`，Production/RC、Alpha、真实用户、真实 provider 和公网服务操作继续 `NO_GO`。
 
 ## 2026-09-08 AI-003 启动
 
