@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-004 — 实现 AI 结构化输出完整校验
-- **任务状态**：Ready
+- **任务状态**：In Progress
 - **任务 Profile**：`security`（provider candidate 不可信输入、strict Schema/事实/人格/Safety 全量 Gate、raw output 最小留存与 live guard）
-- **工作分支**：无；待从 verified `main@e62025561704ef48d4548eb4660e770efe6c01ce` 创建
+- **工作分支**：`agent/ai004-structured-output-validation`
 - **任务 Issue**：[AI-004 Issue #73](https://github.com/WeiHan1996/DailyEnergy/issues/73)
-- **当前 PR**：无；尚未开始 AI-004 实现
+- **当前 PR**：无；实现与本地 Gate 完成后创建 Draft PR
 - **上一完成任务**：AI-003 Done；[PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191) final head `5c4f9423701b17ff02ee3ffdcc797e03178d35d6` / CI run `34175720994` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `e62025561704ef48d4548eb4660e770efe6c01ce`；merged-main CI run `34175915945` 11/11 SUCCESS；Issue #72 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,8 +16,16 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-001、AI-003 与 E-008 已 Done，AI-004 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-004 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：合并本状态收尾后运行 `pnpm agent:prepare AI-004 --remote --deep`，读取 Daily/Weekly Schema、Gateway、Prompt、人格、Safety 与现有 candidate/template validator，再创建 AI-004 分支实施
+- **下一候选动作**：实现 Daily/Weekly 不可信 candidate 的 JSON/strict Schema/事实/人格/Safety/隐私校验、稳定失败分类和无正文 receipt，补充 corpus/property/late-delete 边界证据后运行完整 security Gate
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-08 AI-004 启动
+
+- AI-003 状态收尾 PR #192 final head `aa50eba11e069c342877139181ab1a7133fe4be2` / CI run `34176287646` 11/11 SUCCESS，经 exact-head verifier 后 squash 合并为 `9993822489f1ea6fa923c2f12e2449da7c89f47f`；merged-main CI run `34176453280` 11/11 SUCCESS；
+- `pnpm agent:prepare AI-004 --remote --deep` 在固定 Node `24.18.0` 下返回 `READY`，Profile=`security`，Node/pnpm/dependencies/GitHub 全部 PASS；required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；
+- 分支 `agent/ai004-structured-output-validation` 从本地、origin/main 与远端一致的 verified `main@9993822489f1ea6fa923c2f12e2449da7c89f47f` 创建；开工前工作树无变更；
+- 本任务把 provider Daily/Weekly candidate 视为不可信输入，完成单 JSON 解析、strict Schema、事实/ID/ref/版本、字符/纯文本、人格、Safety、隐私和 live guard 协作，并只返回结构化 verdict/receipt；
+- 不自动修补 JSON，不拼接部分输出，不保存或记录 raw output，不实现 AI-005 表达偏好评测、AI-006 模板编排或真实 provider 接入；Production/RC、Alpha、真实用户与真实 provider 保持 `NO_GO`。
 
 ## 2026-09-08 AI-003 post-merge 收尾
 
