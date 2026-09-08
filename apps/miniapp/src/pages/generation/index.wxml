@@ -31,8 +31,8 @@
 
       <de-inline-notice
         wx:if="{{fallback}}"
-        title="今天先用简洁版本"
-        message="核心结果和行动不变，内容准备好后会直接进入今天。"
+        title="{{fallbackTitle}}"
+        message="{{fallbackMessage}}"
       ></de-inline-notice>
 
       <view wx:if="{{canLeave}}" class="generation__leave-copy">

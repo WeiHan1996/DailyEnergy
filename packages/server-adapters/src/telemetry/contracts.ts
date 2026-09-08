@@ -375,6 +375,11 @@ export const METRIC_DEFINITIONS = {
     ]),
     unit: "1",
   },
+  dailyenergy_gateway_fallbacks_total: {
+    kind: "counter",
+    labels: labelsFor(["operationCode", "reasonCode", "workload"]),
+    unit: "1",
+  },
   dailyenergy_gateway_invocations_total: {
     kind: "counter",
     labels: labelsFor([

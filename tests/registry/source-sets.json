@@ -385,6 +385,10 @@
     {
       "path": "tests/registry/ai005-evidence-manifest.json",
       "kind": "proof-map"
+    },
+    {
+      "path": "tests/registry/ai006-evidence-manifest.json",
+      "kind": "proof-map"
     }
   ],
   "automatic_evidence": [

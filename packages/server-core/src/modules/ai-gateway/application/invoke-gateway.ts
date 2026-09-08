@@ -502,6 +502,8 @@ export class AiGatewayV1 implements ExpressionGatewayV1 {
       input.role,
       input.invocation,
       validCandidate,
+      input.route.providerId,
+      providerResult.observedModelId,
     );
   }
 
@@ -549,12 +551,14 @@ function routeForRole(
 
 function candidateOutcome(
   attemptId: string,
-  generationMode: GatewayCandidateV1["generationMode"],
+  generationMode: GatewayProviderRole,
   invocation: GatewayInvocationV1,
   validation: Extract<
     GatewayCandidateValidationResultV1,
     { readonly status: "PASS" }
   >,
+  provider: string,
+  model: string,
 ): GatewayOutcomeV1 {
   const payload = freezeJsonObject(validation.payload);
   return Object.freeze({
@@ -563,6 +567,11 @@ function candidateOutcome(
       generationMode,
       payload,
       payloadFingerprint: validation.payloadFingerprint,
+      provenance: Object.freeze({
+        model,
+        promptVersion: invocation.promptVersion,
+        provider,
+      }),
       validationReceipt: validation.receipt,
       workload: invocation.workload,
     }),

@@ -10,6 +10,9 @@ export type {
 } from "./gateway-provider-adapter.js";
 
 export {
+  CONTROLLED_DAILY_TEMPLATE_LOCALE_CATALOG_VERSION,
+  CONTROLLED_DAILY_TEMPLATE_RENDERER_ID,
+  createGatewayControlledDailyTemplateRendererV1,
   DailyTemplateAdapterError,
   renderControlledDailyTemplate,
 } from "./controlled-daily-template.js";

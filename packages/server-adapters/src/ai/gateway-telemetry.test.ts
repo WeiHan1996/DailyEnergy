@@ -132,4 +132,36 @@ describe("AI-002 low-cardinality Gateway telemetry", () => {
       workload: "DAILY",
     });
   });
+
+  it("records a validated template as success with one bounded fallback reason", () => {
+    const capture = captureRuntime();
+    const sink = createGatewayRoutingTelemetrySinkV1(capture.runtime);
+    sink.record({
+      outcomeCode: "CANDIDATE",
+      reasonCode: "BREAKER_STATE_UNAVAILABLE",
+      role: "CONTROLLED_TEMPLATE",
+      routeManifestVersion: "route-sensitive-v99",
+      workload: "DAILY_EXPRESSION_V1",
+    });
+
+    expect(capture.metrics.map(({ name }) => name)).toEqual([
+      "dailyenergy_gateway_fallbacks_total",
+      "dailyenergy_gateway_invocations_total",
+      "dailyenergy_gateway_generation_mode_total",
+    ]);
+    expect(capture.metrics[0]?.attributes).toEqual({
+      operationCode: "GATEWAY_INVOKE",
+      outcomeCode: "SUCCESS",
+      reasonCode: "BREAKER_STATE_UNAVAILABLE",
+      workload: "DAILY",
+    });
+    expect(capture.metrics[1]?.attributes).toMatchObject({
+      generationMode: "CONTROLLED_TEMPLATE",
+      outcomeCode: "SUCCESS",
+      workload: "DAILY",
+    });
+    expect(JSON.stringify(capture.metrics)).not.toContain(
+      "route-sensitive-v99",
+    );
+  });
 });

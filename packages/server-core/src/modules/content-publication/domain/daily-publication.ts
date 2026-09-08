@@ -9,6 +9,13 @@ import {
   type RuleFacts,
   type StableDimensionId,
 } from "@daily-energy/shared-schemas";
+import {
+  fingerprintGatewayJson,
+  validateGatewayInvocationV1,
+  verifyGatewayValidationReceiptV1,
+  type GatewayCandidateV1,
+  type GatewayInvocationV1,
+} from "../../ai-gateway/public/index.js";
 
 const DIMENSION_LABELS: Readonly<Record<StableDimensionId, string>> =
   Object.freeze({
@@ -48,7 +55,132 @@ export function assembleControlledTemplateDailyResultV1(input: {
   readonly templateVersion: string;
   readonly userRef: string;
 }): PublishedDailyResult {
+  return assembleDailyResultV1({
+    ...input,
+    provenance: {
+      generationMode: "CONTROLLED_TEMPLATE",
+      personalizationLevel: "FULL",
+      templateVersion: input.templateVersion,
+    },
+  });
+}
+
+export function assembleGatewayDailyResultV1(input: {
+  readonly candidate: GatewayCandidateV1;
+  readonly generatedAt: Date;
+  readonly inputSnapshotRef: string;
+  readonly invocation: GatewayInvocationV1;
+  readonly productDate: string;
+  readonly resultId: string;
+  readonly resultVersion: string;
+  readonly ruleFacts: RuleFacts;
+  readonly userRef: string;
+}): PublishedDailyResult {
+  let invocation: GatewayInvocationV1;
+  try {
+    invocation = validateGatewayInvocationV1(input.invocation);
+  } catch {
+    throw new DailyPublicationError("GATEWAY_CANDIDATE_BINDING_INVALID");
+  }
+  if (
+    invocation.workload !== "DAILY_EXPRESSION_V1" ||
+    input.candidate.workload !== invocation.workload ||
+    fingerprintGatewayJson(input.candidate.payload) !==
+      input.candidate.payloadFingerprint ||
+    (input.candidate.generationMode === "CONTROLLED_TEMPLATE"
+      ? input.candidate.provenance.templateVersion !==
+        invocation.templateVersion
+      : input.candidate.provenance.promptVersion !== invocation.promptVersion)
+  ) {
+    throw new DailyPublicationError("GATEWAY_CANDIDATE_BINDING_INVALID");
+  }
+  try {
+    verifyGatewayValidationReceiptV1(input.candidate.validationReceipt, {
+      outputSchemaVersion: invocation.outputSchemaVersion,
+      payloadFingerprint: input.candidate.payloadFingerprint,
+      planFingerprint: invocation.planFingerprint,
+      promptVersion: invocation.promptVersion,
+      routeRole: input.candidate.generationMode,
+      safetyPolicyVersion: invocation.safetyPolicyVersion,
+      validatorVersion: input.candidate.validationReceipt.validatorVersion,
+      workload: invocation.workload,
+    });
+  } catch {
+    throw new DailyPublicationError("GATEWAY_CANDIDATE_RECEIPT_INVALID");
+  }
+  const common = {
+    expression: input.candidate.payload as unknown as ExpressionPayload,
+    generatedAt: input.generatedAt,
+    inputSnapshotRef: input.inputSnapshotRef,
+    productDate: input.productDate,
+    resultId: input.resultId,
+    resultVersion: input.resultVersion,
+    ruleFacts: input.ruleFacts,
+    safetyPolicyVersion: invocation.safetyPolicyVersion,
+    userRef: input.userRef,
+  };
+  return input.candidate.generationMode === "CONTROLLED_TEMPLATE"
+    ? assembleDailyResultV1({
+        ...common,
+        provenance: {
+          generationMode: "CONTROLLED_TEMPLATE",
+          personalizationLevel: invocation.personalizationLevel,
+          templateVersion: input.candidate.provenance.templateVersion,
+        },
+      })
+    : assembleDailyResultV1({
+        ...common,
+        provenance: {
+          generationMode: input.candidate.generationMode,
+          model: input.candidate.provenance.model,
+          personalizationLevel: invocation.personalizationLevel,
+          promptVersion: input.candidate.provenance.promptVersion,
+          provider: input.candidate.provenance.provider,
+        },
+      });
+}
+
+type DailyResultProvenanceV1 =
+  | {
+      readonly generationMode: "CONTROLLED_TEMPLATE";
+      readonly personalizationLevel: "FULL" | "REDUCED";
+      readonly templateVersion: string;
+    }
+  | {
+      readonly generationMode: "BACKUP_AI" | "PRIMARY_AI";
+      readonly model: string;
+      readonly personalizationLevel: "FULL" | "REDUCED";
+      readonly promptVersion: string;
+      readonly provider: string;
+    };
+
+function assembleDailyResultV1(input: {
+  readonly expression: ExpressionPayload;
+  readonly generatedAt: Date;
+  readonly inputSnapshotRef: string;
+  readonly productDate: string;
+  readonly provenance: DailyResultProvenanceV1;
+  readonly resultId: string;
+  readonly resultVersion: string;
+  readonly ruleFacts: RuleFacts;
+  readonly safetyPolicyVersion: string;
+  readonly userRef: string;
+}): PublishedDailyResult {
   const generatedAt = input.generatedAt.toISOString();
+  const provenance =
+    input.provenance.generationMode === "CONTROLLED_TEMPLATE"
+      ? {
+          generation_mode: "CONTROLLED_TEMPLATE" as const,
+          personalization_level: input.provenance.personalizationLevel,
+          template_version: input.provenance.templateVersion,
+        }
+      : {
+          generation_mode: input.provenance.generationMode,
+          model: input.provenance.model,
+          personalization_level: input.provenance.personalizationLevel,
+          prompt_version: input.provenance.promptVersion,
+          provider: input.provenance.provider,
+        };
   const parsed = PublishedDailyResultSchema.safeParse({
     contract: "daily-content",
     schema_version: "1.0.0",
@@ -68,10 +200,8 @@ export function assembleControlledTemplateDailyResultV1(input: {
       input_snapshot_version: "input-v1",
       rule_version: "daily-rules-v1",
       algorithm_version: "daily-score-v1",
-      generation_mode: "CONTROLLED_TEMPLATE",
-      personalization_level: "FULL",
-      template_version: input.templateVersion,
       safety_policy_version: input.safetyPolicyVersion,
+      ...provenance,
     },
     validation: { status: "PASSED", validated_at: generatedAt },
   });

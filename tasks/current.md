@@ -4,11 +4,11 @@
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-006 — 实现 AI 失败时的完整模板降级
-- **任务状态**：Ready
+- **任务状态**：In Review
 - **任务 Profile**：`security`（主备失败到模板、strict Schema/Safety、PublishGuard/epoch/revision、历史冻结、客户端与低基数 telemetry）
-- **工作分支**：`agent/ai006-ready`（仅状态收尾）；合并后从 verified `main` 创建 `agent/ai006-controlled-template-fallback`
+- **工作分支**：`agent/ai006-controlled-template-fallback`（从 verified `main@4470fdf9cef9d0987d75fa353fa36e73fa9c6c27` 创建）
 - **任务 Issue**：[AI-006 Issue #75](https://github.com/WeiHan1996/DailyEnergy/issues/75)
-- **当前 PR**：[Draft PR #197](https://github.com/WeiHan1996/DailyEnergy/pull/197)（仅状态收尾）；final head 的独立 11/11 CI 通过后按 owner 授权合并，再执行 AI-006 prepare 和实施
+- **当前 PR**：无；实现与 full Gate 已完成，提交并推送后创建独立 Draft PR
 - **上一完成任务**：AI-005 Done；PR #195 squash 合并为 `2617dac3163721f958c16219964702b36a69492a`，其 merged-main SHA 手机号误报由 [PR #196](https://github.com/WeiHan1996/DailyEnergy/pull/196) 修复并 squash 合并为 `605ec8b61d634e82769121d4458d12297e902bf6`；merged-main CI run `34197579568` 11/11 SUCCESS；Issue #74 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,8 +16,26 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-002、AI-004、AI-005、C-007 与 C-008 已 Done，AI-006 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-006 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待 PR #197 final head 的 11/11 CI，执行 exact-head verifier 与 squash merge；然后以固定 Node `24.18.0` 运行 `pnpm agent:prepare AI-006 --remote --deep`，读取全部 required sources、相关 executable contracts/tests/fixtures 与附近实现，再创建独立实现分支
+- **下一候选动作**：提交并推送 AI-006 实现，创建聚焦 Draft PR；等待 final-head 11/11 CI 后请求 owner 审核 template/validator/publish/telemetry threat boundary，未经明确批准不标记 Ready、不运行 merge verifier、不合并
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-08 AI-006 启动
+
+- 状态 PR #197 final head `8aec13c6aa94cde4246554e905857192f5a512d1` 的 CI run `34198425490` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=197:head=8aec13c6aa94cde4246554e905857192f5a512d1:run=34198425490:checks=11`；
+- PR #197 已按 owner “继续 AI-006”的授权 squash 合并为 `4470fdf9cef9d0987d75fa353fa36e73fa9c6c27`，GitHub verification=`valid`；merged-main CI run `34198703183` 为 11/11 SUCCESS；
+- 首次 `pnpm agent:prepare AI-006 --remote --deep` 的 Node/pnpm/dependencies/GitHub 均 PASS，唯一阻断是状态文件仍把已合并 PR #197 标为当前 PR；本分支先将 AI-006 改为 In Progress、当前 PR 改为无，再重新运行 prepare，不以该控制面修正替代 required sources；
+- 本任务严格使用 synthetic/fake provider 与本地 template，不接真实 provider/key、不开 Production/RC/Alpha/真实用户或公网服务，不改变 C-015 blocker。
+- 状态纠正后固定 Node `24.18.0` 的 `pnpm agent:prepare AI-006 --remote --deep` 返回 `READY`，Profile=`security`，Node/pnpm/dependencies/GitHub 全部 PASS；required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；
+- `ControlledTemplateGatewayV1` 在 provider dispatch 前验证 invocation/manifest/profile 与 frozen plan fingerprint，执行有界 renderer，并把完整结果交给 AI-004 同一 validator；renderer、validator、signal、receipt、payload fingerprint、template version 或 deadline 任一失败只返回稳定 F4/terminal metadata，不返回部分文本；
+- `GatewayRouteOrchestratorV1` 先完成 template preflight，再保持 `PRIMARY_AI → BACKUP_AI` 顺序；primary 成功不返回 preflight candidate，主备耗尽、breaker 不可读、budget hard limit、cost unknown 或 route disabled 时 provider 调用至多既定次数并返回已验证 template；Safety/删除、live guard 不可读/变化和 hard deadline 继续覆盖模板；
+- Gateway candidate 新增 server-only provider/model/Prompt 或 template provenance；`assembleGatewayDailyResultV1` 对 invocation、payload fingerprint、receipt、role 和版本重新绑定后，使用与既有 template 相同的严格 PublishedDailyResult/客户端投影路径；客户端仍不含 provider/model/route/token/cost/breaker；
+- `createGatewayControlledDailyTemplateRendererV1` 只接受精确 `daily-template-v1`、renderer 与 locale 版本和 frozen C-006 plan，无网络、随机、provider 输出或第二事实源；Mini Program 的 FALLBACK_RUNNING 使用“正在完成/今天先用简洁版本”的克制状态，不出现 AI/模型/供应商/错误/失败/重试/成本；
+- Gateway telemetry 新增低基数 `dailyenergy_gateway_fallbacks_total`，template success 使用 `CONTROLLED_TEMPLATE` 和封闭 reason；provider attempt 的 usage/cost UNKNOWN 语义不变，route ref、正文和用户内容不成为 label；
+- `tests/registry/ai006-evidence-manifest.json` 将 9 个实际覆盖条目从 PLANNED 提升为 COVERED：`G12-N04/F02/F04/F06/B06/P05`、`E16-O07`、`S29-ARCH-028`、`S31-TEST-043`；registry=`664/1004 COVERED`、`340 PLANNED`、`0 NA_WITH_REASON`。Weekly template/capacity 的 `G12-F05/B08`、真实 provider、MODEL/LOAD/HUMAN 与 Production authorization 继续 PLANNED/Pending；
+- 聚焦验证：server-core `127/127`、server-adapters `75/75`、Mini Program `91/91`，三包 lint/typecheck、architecture Gate、registry `5/5`、Phase Gate `12/12` 均通过；root `pnpm test` 18/18 Turbo tasks、`pnpm build` 9/9 通过；
+- 固定 Node `24.18.0` 的 `pnpm agent:validate --mode=full --task=AI-006` 在实现状态为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（177021ms），最终 In Review 状态与组合证据回写后再次同终态通过（189351ms）；两次 Gate 产生的 15 个 Prisma 纯空白副作用均经忽略空白 diff 证明无语义变化后恢复，未进入任务 diff；
+- 最终 `pnpm agent:validate --mode=task --task=AI-006` 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（92676ms，executed=5）；required evidence 保持 `threatBoundaryReview, productionAuthorizationWhenApplicable`，后者对本 development PR 不适用且仍为 `NOT_GRANTED`；
+- 待 owner 审核的 threat boundary：template preflight 在 provider 前但不会在 primary/backup 成功时发布；模板只接 frozen plan 且经过同一 strict validator/receipt；provider 与模板不拼接；Safety/删除/live guard/deadline 覆盖模板；内部 provenance 与 fallback reason 不进入客户端或高基数标签；Weekly capacity、真实 provider 和 Production authorization 不在本 PR，保持 `NOT_GRANTED / NO_GO`。
 
 ## 2026-09-08 AI-005 post-merge 收尾
 

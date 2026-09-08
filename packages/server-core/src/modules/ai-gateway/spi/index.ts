@@ -9,6 +9,7 @@ import type {
   GatewayRouteManifestV1,
   GatewayRouteRole,
   GatewayRuntimeProfile,
+  GatewayTemplateRouteV1,
   GatewayValidationReceiptV1,
   GatewayWorkload,
 } from "../domain/contracts.js";
@@ -46,7 +47,7 @@ export interface GatewayRoutingTelemetrySinkV1 {
   record(event: {
     readonly outcomeCode: "BLOCKED" | "CANDIDATE" | "FALLBACK";
     readonly reasonCode: string;
-    readonly role?: GatewayProviderRole;
+    readonly role?: GatewayRouteRole;
     readonly routeManifestVersion: string;
     readonly workload: GatewayWorkload;
   }): void;
@@ -220,6 +221,24 @@ export interface GatewayCandidateValidatorV1 {
     readonly invocation: GatewayInvocationV1;
     readonly source: GatewayRouteRole;
   }): Promise<GatewayCandidateValidationResultV1>;
+}
+
+export interface GatewayTemplateRendererV1 {
+  render(input: {
+    readonly frozenPlan: GatewayJsonObject;
+    readonly invocation: GatewayInvocationV1;
+    readonly route: GatewayTemplateRouteV1;
+  }): Promise<GatewayJsonObject | string>;
+}
+
+export interface GatewayTemplatePreflightV1 {
+  preflight(input: {
+    readonly frozenPlan: GatewayJsonObject;
+    readonly invocation: GatewayInvocationV1;
+    readonly manifest: GatewayRouteManifestV1;
+    readonly runtimeProfile: GatewayRuntimeProfile;
+    readonly signal?: AbortSignal;
+  }): Promise<import("../domain/contracts.js").GatewayOutcomeV1>;
 }
 
 export interface GatewayIdFactoryV1 {

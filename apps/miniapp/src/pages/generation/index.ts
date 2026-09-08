@@ -1,5 +1,10 @@
 import { getMiniappAppContext } from "../../app/app-context.js";
 import type { DailyFlowResult } from "../../features/daily/daily-flow.js";
+import {
+  GENERATION_FALLBACK_MESSAGE,
+  GENERATION_FALLBACK_TITLE,
+  generationWaitingPresentation,
+} from "./presentation.js";
 
 export const GENERATION_SCREEN_ID = "DLY-002";
 
@@ -11,6 +16,8 @@ Page({
     canLeave: false,
     error: false,
     fallback: false,
+    fallbackMessage: GENERATION_FALLBACK_MESSAGE,
+    fallbackTitle: GENERATION_FALLBACK_TITLE,
     loading: true,
     offline: false,
     productDate: "",
@@ -93,14 +100,14 @@ Page({
       return;
     }
     if (result.kind === "waiting") {
-      const fallback = result.intent.status === "FALLBACK_RUNNING";
+      const presentation = generationWaitingPresentation(result.intent.status);
       this.setData({
         error: false,
-        fallback,
+        fallback: presentation.fallback,
         loading: false,
         offline: false,
         productDate: result.productDate,
-        statusLabel: fallback ? "正在完成" : "正在准备",
+        statusLabel: presentation.statusLabel,
       });
       this.schedulePoll(result.retryAfterSeconds);
       return;

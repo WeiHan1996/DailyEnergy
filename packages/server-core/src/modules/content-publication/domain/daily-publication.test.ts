@@ -7,7 +7,16 @@ import {
 } from "@daily-energy/shared-schemas";
 
 import {
+  GATEWAY_CONTRACT_VERSION,
+  GATEWAY_POLICY_VERSION,
+  createGatewayValidationReceiptV1,
+  fingerprintGatewayJson,
+  type GatewayCandidateV1,
+  type GatewayInvocationV1,
+} from "../../ai-gateway/public/index.js";
+import {
   assembleControlledTemplateDailyResultV1,
+  assembleGatewayDailyResultV1,
   dailyResultFingerprintV1,
   projectClientDailyContentViewV1,
 } from "./daily-publication.js";
@@ -139,4 +148,92 @@ describe("C-008 daily publication and client projection", () => {
     expect(client.dimensions.map(({ id }) => id)).toEqual(facts.display_order);
     expect(JSON.stringify(client)).not.toMatch(/score|provenance|user_ref/u);
   });
+
+  it.each(["PRIMARY_AI", "BACKUP_AI"] as const)(
+    "AI-006 publishes a complete %s Gateway candidate without leaking its provenance to the client",
+    (generationMode) => {
+      const payloadFingerprint = fingerprintGatewayJson(
+        expression as unknown as GatewayCandidateV1["payload"],
+      );
+      const candidate = {
+        attemptId: "00000000-0000-4000-8000-000000000621",
+        generationMode,
+        payload: expression as unknown as GatewayCandidateV1["payload"],
+        payloadFingerprint,
+        provenance: {
+          model: `model-${generationMode.toLowerCase()}-v1`,
+          promptVersion: "daily-expression-zh-cn-v1",
+          provider: `provider-${generationMode.toLowerCase()}`,
+        },
+        validationReceipt: createGatewayValidationReceiptV1({
+          outputSchemaVersion: "1.0.0",
+          payloadFingerprint,
+          planFingerprint: "1".repeat(64),
+          promptVersion: "daily-expression-zh-cn-v1",
+          routeRole: generationMode,
+          safetyPolicyVersion: "safety-policy-v1",
+          validatorVersion: "structured-output-validator-v1",
+          workload: "DAILY_EXPRESSION_V1",
+        }),
+        workload: "DAILY_EXPRESSION_V1",
+      } as const satisfies GatewayCandidateV1;
+      const invocation: GatewayInvocationV1 = {
+        acceptedAt: "2026-09-08T01:00:00.000Z",
+        gatewayContractVersion: GATEWAY_CONTRACT_VERSION,
+        gatewayPolicyVersion: GATEWAY_POLICY_VERSION,
+        hardDeadlineAt: "2026-09-08T01:00:08.000Z",
+        invocationId: "00000000-0000-4000-8000-000000000625",
+        outputSchemaVersion: "1.0.0",
+        ownerIntentRef: "00000000-0000-4000-8000-000000000626",
+        personalizationLevel: "FULL",
+        planContractVersion: "daily-expression-v1",
+        planFingerprint: "1".repeat(64),
+        planRef: "synthetic-plan-publication-v1",
+        preparedModelInput: { contract: "prepared-daily-prompt-input-v1" },
+        promptVersion: "daily-expression-zh-cn-v1",
+        routeManifestFingerprint: "2".repeat(64),
+        routeManifestVersion: "route-publication-v1",
+        safetyPolicyVersion: "safety-policy-v1",
+        templateVersion: "daily-template-v1",
+        workload: "DAILY_EXPRESSION_V1",
+      };
+      const result = assembleGatewayDailyResultV1({
+        candidate,
+        generatedAt: new Date("2026-09-08T01:00:00.000Z"),
+        inputSnapshotRef: "00000000-0000-4000-8000-000000000622",
+        invocation,
+        productDate: "2026-09-08",
+        resultId: "00000000-0000-4000-8000-000000000623",
+        resultVersion: "daily-v1",
+        ruleFacts: facts,
+        userRef: "00000000-0000-4000-8000-000000000624",
+      });
+      expect(result.provenance).toMatchObject({
+        generation_mode: generationMode,
+        model: candidate.provenance.model,
+        prompt_version: candidate.provenance.promptVersion,
+        provider: candidate.provenance.provider,
+      });
+      const client = projectClientDailyContentViewV1(result);
+      expect(JSON.stringify(client)).not.toMatch(
+        /provider|model|prompt|route|token|cost|breaker/iu,
+      );
+      expect(() =>
+        assembleGatewayDailyResultV1({
+          candidate: {
+            ...candidate,
+            payload: { ...candidate.payload, closing: "被篡改的完整候选" },
+          },
+          generatedAt: new Date("2026-09-08T01:00:00.000Z"),
+          inputSnapshotRef: "00000000-0000-4000-8000-000000000622",
+          invocation,
+          productDate: "2026-09-08",
+          resultId: "00000000-0000-4000-8000-000000000623",
+          resultVersion: "daily-v1",
+          ruleFacts: facts,
+          userRef: "00000000-0000-4000-8000-000000000624",
+        }),
+      ).toThrow("GATEWAY_CANDIDATE_BINDING_INVALID");
+    },
+  );
 });

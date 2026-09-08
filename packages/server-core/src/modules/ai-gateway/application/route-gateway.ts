@@ -15,10 +15,12 @@ import type {
   GatewayAdmissionV1,
   GatewayCandidateV1,
   GatewayInvocationV1,
+  GatewayJsonObject,
   GatewayOutcomeV1,
   GatewayProviderRole,
   GatewayProviderRouteV1,
   GatewayRouteManifestV1,
+  GatewayRouteRole,
   GatewayRuntimeProfile,
 } from "../domain/contracts.js";
 import type {
@@ -27,16 +29,13 @@ import type {
   GatewayClockV1,
   GatewayLiveGuardV1,
   GatewayRoutingTelemetrySinkV1,
+  GatewayTemplatePreflightV1,
 } from "../spi/index.js";
 
 export type RoutedGatewayOutcomeV1 =
   | {
       readonly candidate: GatewayCandidateV1;
       readonly status: "CANDIDATE_READY";
-    }
-  | {
-      readonly reasonCode: string;
-      readonly status: "CONTROLLED_TEMPLATE_REQUIRED";
     }
   | { readonly reasonCode: string; readonly status: "BLOCKED" }
   | {
@@ -49,6 +48,7 @@ export class GatewayRouteOrchestratorV1 {
   readonly #clock: GatewayClockV1;
   readonly #gateway: ExpressionGatewayV1;
   readonly #guard: GatewayLiveGuardV1;
+  readonly #template: GatewayTemplatePreflightV1;
   readonly #telemetry: GatewayRoutingTelemetrySinkV1;
 
   public constructor(input: {
@@ -56,17 +56,20 @@ export class GatewayRouteOrchestratorV1 {
     readonly clock?: GatewayClockV1;
     readonly gateway: ExpressionGatewayV1;
     readonly guard: GatewayLiveGuardV1;
+    readonly template: GatewayTemplatePreflightV1;
     readonly telemetry: GatewayRoutingTelemetrySinkV1;
   }) {
     this.#breaker = input.breaker;
     this.#clock = input.clock ?? { now: () => new Date() };
     this.#gateway = input.gateway;
     this.#guard = input.guard;
+    this.#template = input.template;
     this.#telemetry = input.telemetry;
   }
 
   public async invoke(input: {
     readonly admission: GatewayAdmissionV1;
+    readonly frozenPlan: GatewayJsonObject;
     readonly invocation: GatewayInvocationV1;
     readonly manifest: GatewayRouteManifestV1;
     readonly runtimeProfile: GatewayRuntimeProfile;
@@ -74,9 +77,6 @@ export class GatewayRouteOrchestratorV1 {
   }): Promise<RoutedGatewayOutcomeV1> {
     if (input.admission.status === "ORDINARY_GATEWAY_BLOCKED") {
       return this.#blocked(input, input.admission.reasonCode);
-    }
-    if (input.admission.status === "PROVIDER_CALLS_DISABLED") {
-      return this.#template(input, input.admission.reasonCode);
     }
     if (input.signal?.aborted) {
       return this.#blocked(input, "OWNER_CANCELLED_OR_DELETED");
@@ -100,6 +100,50 @@ export class GatewayRouteOrchestratorV1 {
       return { reasonCode, status: "TERMINAL_GATEWAY_FAILURE" };
     }
     const routedInput = { ...input, invocation, manifest };
+    const preflightGuard = await this.#readGuard();
+    if (preflightGuard.status === "UNAVAILABLE") {
+      return this.#blocked(routedInput, "LIVE_GUARD_UNAVAILABLE");
+    }
+    if (preflightGuard.status === "BLOCKED") {
+      return this.#blocked(routedInput, preflightGuard.reasonCode);
+    }
+    let template: GatewayOutcomeV1;
+    try {
+      template = await this.#template.preflight({
+        frozenPlan: input.frozenPlan,
+        invocation,
+        manifest,
+        runtimeProfile: input.runtimeProfile,
+        ...(input.signal ? { signal: input.signal } : {}),
+      });
+    } catch {
+      return this.#terminal(routedInput, "TEMPLATE_PREFLIGHT_FAILED");
+    }
+    if (template.status === "BLOCKED") {
+      return this.#blocked(routedInput, template.reasonCode);
+    }
+    if (
+      template.status !== "CANDIDATE_READY" ||
+      template.candidate.generationMode !== "CONTROLLED_TEMPLATE" ||
+      template.candidate.workload !== invocation.workload ||
+      template.candidate.provenance.templateVersion !==
+        invocation.templateVersion ||
+      template.candidate.validationReceipt.routeRole !== "CONTROLLED_TEMPLATE"
+    ) {
+      return this.#terminal(
+        routedInput,
+        template.status === "TERMINAL_GATEWAY_FAILURE"
+          ? template.reasonCode
+          : "TEMPLATE_PREFLIGHT_FAILED",
+      );
+    }
+    if (input.admission.status === "PROVIDER_CALLS_DISABLED") {
+      return this.#templateCandidate(
+        routedInput,
+        template.candidate,
+        input.admission.reasonCode,
+      );
+    }
     for (const role of ["PRIMARY_AI", "BACKUP_AI"] as const) {
       const guard = await this.#readGuard();
       if (guard.status === "UNAVAILABLE") {
@@ -111,7 +155,11 @@ export class GatewayRouteOrchestratorV1 {
       const route = role === "PRIMARY_AI" ? manifest.primary : manifest.backup;
       const breaker = await this.#claimBreaker(route, invocation.workload);
       if (breaker.status === "UNAVAILABLE") {
-        return this.#template(routedInput, "BREAKER_STATE_UNAVAILABLE");
+        return this.#templateCandidate(
+          routedInput,
+          template.candidate,
+          "BREAKER_STATE_UNAVAILABLE",
+        );
       }
       if (breaker.status === "OPEN") {
         this.#recordTelemetry(routedInput, "FALLBACK", "CIRCUIT_OPEN", role);
@@ -129,7 +177,11 @@ export class GatewayRouteOrchestratorV1 {
         });
       } catch {
         await this.#recordBreaker(breaker.key, breaker.snapshot, "NEUTRAL");
-        return this.#template(routedInput, "GATEWAY_EXECUTION_UNAVAILABLE");
+        return this.#templateCandidate(
+          routedInput,
+          template.candidate,
+          "GATEWAY_EXECUTION_UNAVAILABLE",
+        );
       }
       await this.#recordBreaker(
         breaker.key,
@@ -159,7 +211,11 @@ export class GatewayRouteOrchestratorV1 {
       }
       this.#recordTelemetry(routedInput, "FALLBACK", result.reasonCode, role);
     }
-    return this.#template(routedInput, "PROVIDER_PATHS_EXHAUSTED");
+    return this.#templateCandidate(
+      routedInput,
+      template.candidate,
+      "PROVIDER_PATHS_EXHAUSTED",
+    );
   }
 
   async #claimBreaker(
@@ -289,15 +345,47 @@ export class GatewayRouteOrchestratorV1 {
     }
   }
 
-  #template(
+  async #templateCandidate(
+    input: {
+      invocation: GatewayInvocationV1;
+      manifest: GatewayRouteManifestV1;
+    },
+    candidate: Extract<
+      GatewayCandidateV1,
+      { readonly generationMode: "CONTROLLED_TEMPLATE" }
+    >,
+    reasonCode: string,
+  ): Promise<RoutedGatewayOutcomeV1> {
+    const guard = await this.#readGuard();
+    if (guard.status === "UNAVAILABLE") {
+      return this.#blocked(input, "LIVE_GUARD_UNAVAILABLE");
+    }
+    if (guard.status === "BLOCKED") {
+      return this.#blocked(input, guard.reasonCode);
+    }
+    if (
+      this.#clock.now().getTime() >= Date.parse(input.invocation.hardDeadlineAt)
+    ) {
+      return this.#terminal(input, "GATEWAY_DEADLINE_EXCEEDED");
+    }
+    this.#recordTelemetry(
+      input,
+      "CANDIDATE",
+      reasonCode,
+      "CONTROLLED_TEMPLATE",
+    );
+    return { candidate, status: "CANDIDATE_READY" };
+  }
+
+  #terminal(
     input: {
       invocation: GatewayInvocationV1;
       manifest: GatewayRouteManifestV1;
     },
     reasonCode: string,
-  ) {
-    this.#recordTelemetry(input, "FALLBACK", reasonCode);
-    return { reasonCode, status: "CONTROLLED_TEMPLATE_REQUIRED" } as const;
+  ): RoutedGatewayOutcomeV1 {
+    this.#recordTelemetry(input, "BLOCKED", reasonCode);
+    return { reasonCode, status: "TERMINAL_GATEWAY_FAILURE" };
   }
 
   #blocked(
@@ -318,7 +406,7 @@ export class GatewayRouteOrchestratorV1 {
     },
     outcomeCode: "BLOCKED" | "CANDIDATE" | "FALLBACK",
     reasonCode: string,
-    role?: GatewayProviderRole,
+    role?: GatewayRouteRole,
   ): void {
     try {
       this.#telemetry.record({

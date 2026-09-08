@@ -347,10 +347,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 3 — AI 陪伴层
-状态：AI-005 In Review（Draft PR #195；review baseline 11/11，等待 threat review）
-当前目标：固定表达参数、同事实 corpus、禁用语言和未来生成/历史冻结边界
-当前任务：AI-005 实现三种表达偏好的单一人格
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/74
+状态：AI-006 In Review
+当前目标：主备失败后返回完整、稳定、可发布的本地模板候选
+当前任务：AI-006 实现 AI 失败时的完整模板降级
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/75
 ```
 
 长期工作入口：
@@ -367,10 +367,9 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
   已获 owner 接受；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185)
   经 exact-head verifier 后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`，
   merged-main CI run `34078365765` 为 11/11 SUCCESS；
-- Phase 2 已结束，Phase 3 development 开始；AI-001～AI-004 已合并并关闭，AI-005 已创建
-  Draft PR #195 并进入 In Review；
-- AI-005 只实现同一人格内的表达参数、合成 Daily/Weekly 同事实样例、禁用语言与偏好历史冻结
-  证据；不接真实 provider，不冒充 AI-014 Evaluation runner、AI-015 人工盲评或 AI-006 发布编排；
+- Phase 2 已结束，Phase 3 development 开始；AI-001～AI-005 已合并并关闭，AI-006 已启动；
+- AI-006 只闭合受控模板 preflight、完整候选、统一发布、客户端克制状态与确定性故障矩阵；
+  不接真实 provider，不冒充 Weekly capacity、MODEL/LOAD/HUMAN 或 Production 证据；
 - C-015 的 Production bundle、处理主体/位置/受托方/跨境、最终用户说明和合格 Legal review
   继续 Blocked；
 - DEV_LITE 继续 `SYNTHETIC_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`；

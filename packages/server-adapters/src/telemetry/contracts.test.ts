@@ -41,6 +41,7 @@ const REQUIRED_METRICS = [
   "dailyenergy_gateway_attempt_duration_seconds",
   "dailyenergy_gateway_candidate_validation_total",
   "dailyenergy_gateway_generation_mode_total",
+  "dailyenergy_gateway_fallbacks_total",
   "dailyenergy_gateway_breaker_state",
   "dailyenergy_gateway_semaphore_wait_seconds",
   "dailyenergy_gateway_usage_units_total",

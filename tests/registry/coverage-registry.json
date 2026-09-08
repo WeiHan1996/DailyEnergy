@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 655, "NA_WITH_REASON": 0, "PLANNED": 349 },
+  "counts": { "COVERED": 664, "NA_WITH_REASON": 0, "PLANNED": 340 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -1401,11 +1401,34 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all route inputs, failures and candidates are deterministic synthetic values with no external provider or credential",
+            "the final routing event records CONTROLLED_TEMPLATE and one bounded reason rather than a no-result success",
+            "the frozen invocation and one preflighted complete template survive every provider failure class without inheriting provider text"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "G12-F02/E16-O07 and controlled-template route cases",
+          "test_id": "T-AI006-ROUTING-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a primary rate limit and backup protocol failure use the real template preflight, return one complete candidate and enter the common immutable Daily publisher with unchanged RuleFacts",
+            "a real C-006 plan is rendered by daily-template-v1 and accepted by the AI-004 strict validator through the Gateway template SPI",
+            "the complete expression preserves selected action and optional task IDs and low-state humor ceilings",
+            "the path uses no provider, network, key, provider output or second fact source"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-controlled-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-006 real Daily controlled-template Gateway adapter",
+          "test_id": "T-AI006-TEMPLATE-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "E16-O07",
       "source_sets": ["s16-ai-corpus"]
@@ -2626,11 +2649,47 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all route inputs, failures and candidates are deterministic synthetic values with no external provider or credential",
+            "the final routing event records CONTROLLED_TEMPLATE and one bounded reason rather than a no-result success",
+            "the frozen invocation and one preflighted complete template survive every provider failure class without inheriting provider text"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "G12-F02/E16-O07 and controlled-template route cases",
+          "test_id": "T-AI006-ROUTING-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "budget hard limit, unknown cost, disabled route and unreadable breaker state make zero provider calls and return the already validated template",
+            "primary rate limit plus backup protocol failure returns one complete CONTROLLED_TEMPLATE candidate with no field splicing or extra provider call",
+            "Safety admission invokes neither provider nor template, and a changed live guard discards a preflighted template before fallback publication",
+            "template preflight failure is terminal before provider dispatch and cannot expose partial content",
+            "the template is preflighted once before provider dispatch but a successful primary candidate is returned without publishing the template"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing",
+          "test_id": "T-AI006-ROUTING-MODULE-001"
+        },
+        {
+          "assertions": [
+            "a validated template records CONTROLLED_TEMPLATE success and one closed reason bucket",
+            "existing provider attempt telemetry retains explicit unknown usage and cost rather than coercing them to zero",
+            "route version and candidate content never become metric labels"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-telemetry.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-002 low-cardinality Gateway telemetry",
+          "test_id": "T-AI006-TELEMETRY-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -2982,11 +3041,48 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all route inputs, failures and candidates are deterministic synthetic values with no external provider or credential",
+            "the final routing event records CONTROLLED_TEMPLATE and one bounded reason rather than a no-result success",
+            "the frozen invocation and one preflighted complete template survive every provider failure class without inheriting provider text"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "G12-F02/E16-O07 and controlled-template route cases",
+          "test_id": "T-AI006-ROUTING-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "budget hard limit, unknown cost, disabled route and unreadable breaker state make zero provider calls and return the already validated template",
+            "primary rate limit plus backup protocol failure returns one complete CONTROLLED_TEMPLATE candidate with no field splicing or extra provider call",
+            "Safety admission invokes neither provider nor template, and a changed live guard discards a preflighted template before fallback publication",
+            "template preflight failure is terminal before provider dispatch and cannot expose partial content",
+            "the template is preflighted once before provider dispatch but a successful primary candidate is returned without publishing the template"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing",
+          "test_id": "T-AI006-ROUTING-MODULE-001"
+        },
+        {
+          "assertions": [
+            "a primary rate limit and backup protocol failure use the real template preflight, return one complete candidate and enter the common immutable Daily publisher with unchanged RuleFacts",
+            "a real C-006 plan is rendered by daily-template-v1 and accepted by the AI-004 strict validator through the Gateway template SPI",
+            "the complete expression preserves selected action and optional task IDs and low-state humor ceilings",
+            "the path uses no provider, network, key, provider output or second fact source"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-controlled-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-006 real Daily controlled-template Gateway adapter",
+          "test_id": "T-AI006-TEMPLATE-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -3040,11 +3136,48 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all route inputs, failures and candidates are deterministic synthetic values with no external provider or credential",
+            "the final routing event records CONTROLLED_TEMPLATE and one bounded reason rather than a no-result success",
+            "the frozen invocation and one preflighted complete template survive every provider failure class without inheriting provider text"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "G12-F02/E16-O07 and controlled-template route cases",
+          "test_id": "T-AI006-ROUTING-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "budget hard limit, unknown cost, disabled route and unreadable breaker state make zero provider calls and return the already validated template",
+            "primary rate limit plus backup protocol failure returns one complete CONTROLLED_TEMPLATE candidate with no field splicing or extra provider call",
+            "Safety admission invokes neither provider nor template, and a changed live guard discards a preflighted template before fallback publication",
+            "template preflight failure is terminal before provider dispatch and cannot expose partial content",
+            "the template is preflighted once before provider dispatch but a successful primary candidate is returned without publishing the template"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing",
+          "test_id": "T-AI006-ROUTING-MODULE-001"
+        },
+        {
+          "assertions": [
+            "a primary rate limit and backup protocol failure use the real template preflight, return one complete candidate and enter the common immutable Daily publisher with unchanged RuleFacts",
+            "a real C-006 plan is rendered by daily-template-v1 and accepted by the AI-004 strict validator through the Gateway template SPI",
+            "the complete expression preserves selected action and optional task IDs and low-state humor ceilings",
+            "the path uses no provider, network, key, provider output or second fact source"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-controlled-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-006 real Daily controlled-template Gateway adapter",
+          "test_id": "T-AI006-TEMPLATE-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -3074,11 +3207,45 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "FALLBACK_RUNNING uses one restrained completion state while other active states remain neutral",
+            "visible fallback copy contains no AI, model, provider, error, failure, retry or cost implementation detail"
+          ],
+          "file": "apps/miniapp/src/pages/generation/presentation.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-006 controlled template presentation",
+          "test_id": "T-AI006-MINIAPP-UNIT-001"
+        },
+        {
+          "assertions": [
+            "PRIMARY_AI and BACKUP_AI candidates use the same strict immutable PublishedDailyResult assembly as CONTROLLED_TEMPLATE",
+            "server-only provider, model and Prompt provenance matches the selected candidate mode",
+            "the client projection contains no provider, model, Prompt, route, token, cost or breaker detail"
+          ],
+          "file": "packages/server-core/src/modules/content-publication/domain/daily-publication.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "C-008 daily publication and client projection",
+          "test_id": "T-AI006-PUBLICATION-MODULE-001"
+        },
+        {
+          "assertions": [
+            "a primary rate limit and backup protocol failure use the real template preflight, return one complete candidate and enter the common immutable Daily publisher with unchanged RuleFacts",
+            "a real C-006 plan is rendered by daily-template-v1 and accepted by the AI-004 strict validator through the Gateway template SPI",
+            "the complete expression preserves selected action and optional task IDs and low-state humor ceilings",
+            "the path uses no provider, network, key, provider output or second fact source"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-controlled-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-006 real Daily controlled-template Gateway adapter",
+          "test_id": "T-AI006-TEMPLATE-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -3429,11 +3596,35 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "all route inputs, failures and candidates are deterministic synthetic values with no external provider or credential",
+            "the final routing event records CONTROLLED_TEMPLATE and one bounded reason rather than a no-result success",
+            "the frozen invocation and one preflighted complete template survive every provider failure class without inheriting provider text"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "G12-F02/E16-O07 and controlled-template route cases",
+          "test_id": "T-AI006-ROUTING-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "budget hard limit, unknown cost, disabled route and unreadable breaker state make zero provider calls and return the already validated template",
+            "primary rate limit plus backup protocol failure returns one complete CONTROLLED_TEMPLATE candidate with no field splicing or extra provider call",
+            "Safety admission invokes neither provider nor template, and a changed live guard discards a preflighted template before fallback publication",
+            "template preflight failure is terminal before provider dispatch and cannot expose partial content",
+            "the template is preflighted once before provider dispatch but a successful primary candidate is returned without publishing the template"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing",
+          "test_id": "T-AI006-ROUTING-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -3647,11 +3838,33 @@
         "docs/ai/evaluation-corpus.json",
         "docs/ai/gateway.md"
       ],
-      "planned": {
-        "owner": "AI Gateway implementation and evaluation issues; Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "PRIMARY_AI and BACKUP_AI candidates use the same strict immutable PublishedDailyResult assembly as CONTROLLED_TEMPLATE",
+            "server-only provider, model and Prompt provenance matches the selected candidate mode",
+            "the client projection contains no provider, model, Prompt, route, token, cost or breaker detail"
+          ],
+          "file": "packages/server-core/src/modules/content-publication/domain/daily-publication.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "C-008 daily publication and client projection",
+          "test_id": "T-AI006-PUBLICATION-MODULE-001"
+        },
+        {
+          "assertions": [
+            "all route inputs, failures and candidates are deterministic synthetic values with no external provider or credential",
+            "the final routing event records CONTROLLED_TEMPLATE and one bounded reason rather than a no-result success",
+            "the frozen invocation and one preflighted complete template survive every provider failure class without inheriting provider text"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "G12-F02/E16-O07 and controlled-template route cases",
+          "test_id": "T-AI006-ROUTING-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["AI_EVAL"] },
         { "any_of": ["CONTRACT", "INTEGRATION", "MODULE"] }
@@ -17349,11 +17562,23 @@
     },
     {
       "authority_paths": ["docs/technical/architecture.md"],
-      "planned": {
-        "owner": "Owning Phase 1-3 architecture implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "budget hard limit, unknown cost, disabled route and unreadable breaker state make zero provider calls and return the already validated template",
+            "primary rate limit plus backup protocol failure returns one complete CONTROLLED_TEMPLATE candidate with no field splicing or extra provider call",
+            "Safety admission invokes neither provider nor template, and a changed live guard discards a preflighted template before fallback publication",
+            "template preflight failure is terminal before provider dispatch and cannot expose partial content",
+            "the template is preflighted once before provider dispatch but a successful primary candidate is returned without publishing the template"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing",
+          "test_id": "T-AI006-ROUTING-MODULE-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         {
           "any_of": [
@@ -19832,11 +20057,36 @@
     },
     {
       "authority_paths": ["docs/technical/testing.md"],
-      "planned": {
-        "owner": "E-010 for harness gaps; owning business issue for unimplemented journeys",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "budget hard limit, unknown cost, disabled route and unreadable breaker state make zero provider calls and return the already validated template",
+            "primary rate limit plus backup protocol failure returns one complete CONTROLLED_TEMPLATE candidate with no field splicing or extra provider call",
+            "Safety admission invokes neither provider nor template, and a changed live guard discards a preflighted template before fallback publication",
+            "template preflight failure is terminal before provider dispatch and cannot expose partial content",
+            "the template is preflighted once before provider dispatch but a successful primary candidate is returned without publishing the template"
+          ],
+          "file": "packages/server-core/src/modules/ai-gateway/application/route-gateway.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-002 sequential Gateway routing",
+          "test_id": "T-AI006-ROUTING-MODULE-001"
+        },
+        {
+          "assertions": [
+            "a primary rate limit and backup protocol failure use the real template preflight, return one complete candidate and enter the common immutable Daily publisher with unchanged RuleFacts",
+            "a real C-006 plan is rendered by daily-template-v1 and accepted by the AI-004 strict validator through the Gateway template SPI",
+            "the complete expression preserves selected action and optional task IDs and low-state humor ceilings",
+            "the path uses no provider, network, key, provider output or second fact source"
+          ],
+          "file": "packages/server-adapters/src/ai/gateway-controlled-template.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai006-evidence-manifest.json",
+          "selector": "AI-006 real Daily controlled-template Gateway adapter",
+          "test_id": "T-AI006-TEMPLATE-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL", "MODULE"] }],
       "source_id": "S31-TEST-043",
       "source_sets": ["s31-testing"]
