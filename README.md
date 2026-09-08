@@ -347,7 +347,7 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 3 — AI 陪伴层
-状态：AI-005 In Review（Draft PR #195；自动 Gate 通过，等待 threat review）
+状态：AI-005 In Review（Draft PR #195；review baseline 11/11，等待 threat review）
 当前目标：固定表达参数、同事实 corpus、禁用语言和未来生成/历史冻结边界
 当前任务：AI-005 实现三种表达偏好的单一人格
 工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/74

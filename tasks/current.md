@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（单一人格三种受控表达、事实与行动不漂移、历史冻结、禁用语言与 Safety 边界）
 - **工作分支**：`agent/ai005-expression-preferences`（从与 `origin/main` 一致的 `main@52903fc7a8864751b1d5ad6eddf1b019fdab820d` 创建）
 - **任务 Issue**：[AI-005 Issue #74](https://github.com/WeiHan1996/DailyEnergy/issues/74)
-- **当前 PR**：[Draft PR #195](https://github.com/WeiHan1996/DailyEnergy/pull/195)；实现基线 `01aceaf03508241288a0f922995575b93215fc07` 已推送，当前状态收据提交后必须使用新 head 的独立 CI
+- **当前 PR**：[Draft PR #195](https://github.com/WeiHan1996/DailyEnergy/pull/195)；review baseline head `c9260dc3e7c2ce41f7a3d739d84c32dd446535f2` / CI run `34191097069` 为 11/11 SUCCESS；本状态收据提交后的新 head 仍须使用自己的独立 CI
 - **上一完成任务**：AI-004 Done；[PR #193](https://github.com/WeiHan1996/DailyEnergy/pull/193) final head `d9ec7b086b4af07e3b97171b19ad6ea822c89eb4` / CI run `34186587481` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `52876a9a2f1784ecbdb5bc6e3678d7c89db0c0f8`；merged-main CI run `34186841083` 11/11 SUCCESS；Issue #73 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,7 +16,7 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-003、AI-004、C-002 与 C-003 已 Done，AI-005 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-005 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待 PR #195 final head 的 11/11 CI 与 owner threat-boundary review；未经明确批准不标记 Ready、不运行 exact-head merge verifier、不合并，也不启动 AI-006
+- **下一候选动作**：等待 owner 审核 PR #195 的 threat boundary；获明确批准后才可标记 Ready、对当时 final head 运行 exact-head merge verifier 并 squash merge，合并收尾后才可启动 AI-006
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-08 AI-005 启动
@@ -29,7 +29,7 @@
 
 ### AI-005 实施与本地验证
 
-- 实现提交 `01aceaf03508241288a0f922995575b93215fc07` 已推送并创建 [Draft PR #195](https://github.com/WeiHan1996/DailyEnergy/pull/195)；本次状态回写产生的新 final head 必须使用自己的同 run CI，不能复用实现提交或本地 Gate 作为合并证据；
+- 实现提交 `01aceaf03508241288a0f922995575b93215fc07` 已推送并创建 [Draft PR #195](https://github.com/WeiHan1996/DailyEnergy/pull/195)；review baseline head `c9260dc3e7c2ce41f7a3d739d84c32dd446535f2` 的 CI run `34191097069` 为 11/11 SUCCESS，本状态收据提交后的新 final head 仍须使用自己的同 run CI；
 - `expression-style-policy-v1` 使用唯一 `dailyenergy-digital-friend-v1` 人格 ID，固定 BALANCED/GENTLE/LIGHT_HUMOR/CLEAR_DIRECT 的温暖度、幽默度和直接度；policy fingerprint=`4c2c678baaf68bdd92cb3b769354b451f8122f5c5f5521fdebbb40e4f36ecb10`，覆盖参数、禁用规则正文、合成分类标记与现有 Daily/Weekly Prompt/template 版本绑定；
 - 可选偏好投影对 missing/unrecognized 返回带原因的 BALANCED 系统默认且不推断用户人格；authoritative generation snapshot 继续对未知 token 返回稳定 `EXPRESSION_STYLE_AUTHORITATIVE_INVALID`，不静默修复损坏持久数据；
 - care/uncertainty 的 `humor_ceiling=NONE` 使 LIGHT_HUMOR 使用零幽默 BALANCED 表达，但保留 requested style；Daily template 的 overall/dimension/action/task/ritual 在四个 token 下逐字段一致；

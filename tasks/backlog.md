@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：[AI-005 三种表达偏好](./current.md)：In Review，Draft PR #195 已完成自动 Gate，等待 final-head CI 与 owner threat-boundary review；AI-004 已随 PR #193 合并并关闭 Issue #73，C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
+- **当前任务**：[AI-005 三种表达偏好](./current.md)：In Review，Draft PR #195 review baseline 已 11/11 SUCCESS，等待 owner threat-boundary review；AI-004 已随 PR #193 合并并关闭 Issue #73，C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
