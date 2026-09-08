@@ -1564,9 +1564,14 @@ function validateProvenanceDocument(value, options) {
 export function findArtifactDiagnostics(value, policy, options = {}) {
   const diagnostics = [];
   const forbiddenKeys = new Set(policy.forbidden_keys ?? []);
-  const patterns = (policy.forbidden_value_patterns ?? []).map(
-    (pattern) => new RegExp(pattern, "iu"),
-  );
+  const phonePatternSource = "(?:^|[^0-9])1[3-9][0-9]{9}(?:$|[^0-9])";
+  const patterns = (policy.forbidden_value_patterns ?? []).map((source) => ({
+    ignoresOpaqueDigests: source === phonePatternSource,
+    regex: new RegExp(source, "iu"),
+  }));
+  // Source hashes can contain phone-like digit runs; other detectors still inspect the original value.
+  const opaqueDigestPattern =
+    /(?<![a-f0-9])(?:sha256:[a-f0-9]{64}|[a-f0-9]{64}|[a-f0-9]{40})(?![a-f0-9])/giu;
   function visit(current, location) {
     if (Array.isArray(current)) {
       current.forEach((entry, index) => visit(entry, `${location}[${index}]`));
@@ -1582,12 +1587,12 @@ export function findArtifactDiagnostics(value, policy, options = {}) {
       return;
     }
     if (typeof current === "string") {
+      const scannableValue = current.replace(opaqueDigestPattern, "<digest>");
       if (
-        /^(?:[a-f0-9]{40}|[a-f0-9]{64}|sha256:[a-f0-9]{64})$/u.test(current)
+        patterns.some(({ ignoresOpaqueDigests, regex }) =>
+          regex.test(ignoresOpaqueDigests ? scannableValue : current),
+        )
       ) {
-        return;
-      }
-      if (patterns.some((pattern) => pattern.test(current))) {
         diagnostics.push(`CI_ARTIFACT_FORBIDDEN_VALUE:${location}`);
       }
     }

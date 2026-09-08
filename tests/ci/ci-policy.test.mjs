@@ -499,6 +499,36 @@ test("T-E011-CI-ARTIFACT-001 rejects raw content and credential canaries", () =>
   );
   assert.ok(
     findArtifactDiagnostics(
+      { result: `Bearer ${"a".repeat(40)}` },
+      artifactPolicy,
+    ).some((diagnostic) =>
+      diagnostic.startsWith("CI_ARTIFACT_FORBIDDEN_VALUE"),
+    ),
+  );
+  const phoneLikeCommitSha = "2617dac3163721f958c16219964702b36a69492a";
+  const digestNamespace =
+    `https://dailyenergy.invalid/spdx/${phoneLikeCommitSha}/` +
+    `${phoneLikeCommitSha}/${"a".repeat(64)}`;
+  assert.equal(phoneLikeCommitSha.length, 40);
+  assert.equal(
+    findArtifactDiagnostics(
+      { documentNamespace: digestNamespace },
+      artifactPolicy,
+    ).some((diagnostic) =>
+      diagnostic.startsWith("CI_ARTIFACT_FORBIDDEN_VALUE"),
+    ),
+    false,
+  );
+  assert.ok(
+    findArtifactDiagnostics(
+      { documentNamespace: `${digestNamespace}?contact=13800138000` },
+      artifactPolicy,
+    ).some((diagnostic) =>
+      diagnostic.startsWith("CI_ARTIFACT_FORBIDDEN_VALUE"),
+    ),
+  );
+  assert.ok(
+    findArtifactDiagnostics(
       { artifact_version: "v1", result: "PASS", arbitrary: "metadata" },
       artifactPolicy,
     ).some((diagnostic) =>
