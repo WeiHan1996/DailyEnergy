@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-08
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：[AI-006 本地模板降级](./current.md)：In Review；Draft PR #198 已创建，等待 final-head CI 与 owner threat-boundary review；C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
+- **当前任务**：[AI-007 关系阶段](./current.md)：Ready；AI-006 已随 PR #198 合并，merged-main CI 11/11 SUCCESS；AI-007 收到新的明确启动指令前不开始实现，C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -230,8 +230,8 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理    | Done      | PR #191 squash 合并为 `e6202556`；merged-main CI 11/11；Issue #72 Closed |
 | [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验     | Done      | PR #193 squash 合并为 `52876a9a`；merged-main CI 11/11；Issue #73 Closed |
 | [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | Done      | PR #195/#196 已合并；merged-main CI 11/11；Issue #74 Closed              |
-| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | In Review | Draft PR #198；自动 Gate 完成，待 owner threat review                    |
-| [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Planned   | 第 1、3、7 天连续性                                                      |
+| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | Done      | PR #198 squash 合并为 `aa7e6a28`；merged-main CI 11/11；Issue #75 Closed |
+| [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Ready     | 第 1、3、7 天连续性；等待新的明确启动指令                                |
 | [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | Planned   | 用户主动添加和删除                                                       |
 | [AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78) | 结构化记忆         | Planned   | 来源、用途和有效期                                                       |
 | [AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79) | 第 3 天风格校准    | Planned   | 反馈影响后续表达                                                         |
