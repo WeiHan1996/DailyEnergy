@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（LightFact 派生关系、节点资格与回执、删除/重放/历史冻结、Prompt/模板关系语言 Safety）
 - **工作分支**：`agent/ai007-relationship-continuity`（基于 verified `main@766c3c68b1054729cc83f59642483f786957945f`）
 - **任务 Issue**：[AI-007 Issue #76](https://github.com/WeiHan1996/DailyEnergy/issues/76)
-- **当前 PR**：Draft PR 待创建；首次实现提交推送后回填准确编号
+- **当前 PR**：[Draft PR #200](https://github.com/WeiHan1996/DailyEnergy/pull/200)
 - **上一完成任务**：AI-006 Done；[PR #198](https://github.com/WeiHan1996/DailyEnergy/pull/198) final head `4cf7d4874fa1668a529c49f0e458fc25bc9f1ec1` / CI run `34205576509` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `aa7e6a28f074a1fc7d2b30a5d84848c7bed79967`；merged-main CI run `34206603459` 11/11 SUCCESS；Issue #75 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,7 +16,7 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：C-011、C-013、AI-005 与 AI-006 已 Done，AI-007 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-007 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：创建聚焦 Draft PR；等待 owner 审核 LightFact/回执/删除/Prompt/缓存 threat boundary，随后只对 PR final head 使用同 run 11-check CI 和 exact-head verifier
+- **下一候选动作**：等待 [Draft PR #200](https://github.com/WeiHan1996/DailyEnergy/pull/200) final head 的同 run 11-check CI；随后由 owner 审核 LightFact/回执/删除/Prompt/缓存 threat boundary，批准后才标记 Ready、运行 exact-head verifier 并 squash merge
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-08 AI-006 post-merge 收尾
@@ -54,6 +54,7 @@
 - 微信构建与设计系统 Gate 通过，但 DevTools CLI 未配置，`pnpm test:miniapp:devtools` 返回 `MINIAPP_DEVTOOLS_INFRA_BLOCKED`，不能冒充平台 conformance PASS；
 - 待 owner 审核的 threat boundary：只有有效 LightFact 能增长关系；公开 stage/count/资格不等于亲密度；一次性 GET 节点在响应未知时选择 at-most-once 而不重复制造压力；DAY 删除不重放旧节点，RELATIONSHIP_DATA 删除后新 cycle 才可重建；Prompt v1 不扩权，关系 copy 独立确定性；节点不进离线 cache，Safety/删除 guard 在节点 claim 前生效；Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`；
 - AI-007 接受并合并后的下一任务为 AI-008（用户主动添加和删除重要事项）；本次不启动 AI-008。
+- 实现提交 `9373aff3a823be24bdbdb7df7f3a7324e3e13c90` 已推送并创建 [Draft PR #200](https://github.com/WeiHan1996/DailyEnergy/pull/200)；本次 PR 引用回写产生的新 final head 必须使用自己的同 run CI，不能复用实现提交或本地 Gate。
 
 ## 2026-09-08 AI-006 启动
 
