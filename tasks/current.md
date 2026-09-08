@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（provider candidate 不可信输入、strict Schema/事实/人格/Safety 全量 Gate、raw output 最小留存与 live guard）
 - **工作分支**：`agent/ai004-structured-output-validation`
 - **任务 Issue**：[AI-004 Issue #73](https://github.com/WeiHan1996/DailyEnergy/issues/73)
-- **当前 PR**：[Draft PR #193](https://github.com/WeiHan1996/DailyEnergy/pull/193)；实现与本地自动 Gate 已完成，等待 final head CI 与 owner validator/receipt/fallback threat-boundary review；合并前仍须 exact-head verifier
+- **当前 PR**：[Draft PR #193](https://github.com/WeiHan1996/DailyEnergy/pull/193)；owner 已批准 validator/receipt/fallback/live-guard threat boundary，当前等待接受状态新 head 的 11/11 CI；通过后才标记 Ready、执行 exact-head verifier 与 squash merge
 - **上一完成任务**：AI-003 Done；[PR #191](https://github.com/WeiHan1996/DailyEnergy/pull/191) final head `5c4f9423701b17ff02ee3ffdcc797e03178d35d6` / CI run `34175720994` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `e62025561704ef48d4548eb4660e770efe6c01ce`；merged-main CI run `34175915945` 11/11 SUCCESS；Issue #72 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,7 +16,7 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-001、AI-003 与 E-008 已 Done，AI-004 前置满足；C-015 的 Production/Privacy/Legal 证据不阻塞获批的 Phase 3 development，但持续阻塞 Production/RC，也不能由 AI-004 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待 [PR #193](https://github.com/WeiHan1996/DailyEnergy/pull/193) final head 的 11/11 CI，并请 owner 审核 validator/receipt/fallback/live-guard threat boundary；获明确批准后才可标记 Ready、执行 exact-head verifier 与 squash merge
+- **下一候选动作**：提交并推送 owner 接受记录，等待该 exact head 的 11/11 CI；同 run 全绿后标记 [PR #193](https://github.com/WeiHan1996/DailyEnergy/pull/193) Ready、执行 exact-head verifier 与 squash merge，再验证 merged-main CI 并启动 AI-005
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-08 AI-004 启动
@@ -29,6 +29,7 @@
 
 ### AI-004 实施与本地验证
 
+- owner 于 2026-09-08 明确“审核通过，合并收尾后完成 AI-005”，接受 PR #193 的 validator/receipt/fallback/live-guard threat boundary，并授权标记 Ready、执行 exact-head verifier、squash merge 和后续 AI-005；该决定不授予 Production、RC、Alpha、真实用户或真实 provider；
 - 实现提交 `ae5c8a7aab66fd582ac762c969e7d6b27bcfe4ee` 已推送并创建 [Draft PR #193](https://github.com/WeiHan1996/DailyEnergy/pull/193)；本次状态回写产生的新 final head 必须使用自己的同 run CI，不能复用实现提交或本地 Gate 作为合并证据；
 - `structured-output-validator-v1` 对 string/object candidate 执行 12 KiB body、单 JSON object、UTF-16 well-formed、Daily/Weekly shared Zod strict Schema、grapheme/纯文本和完整 payload Gate；不 strip fence、不提取、不截断、不 repair；
 - Daily 逐项绑定 action/task ID 与语义锚点、constraint、阿拉伯/中文 timebox、ritual key/value/label、core 320 字、state evidence/assertion、preferred-name 单段单次、无历史关系、人格、隐私和 S-15 全候选 Safety；
