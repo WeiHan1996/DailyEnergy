@@ -34,6 +34,7 @@ export interface EveningSafetyActivationStore {
     readonly now: Date;
     readonly policyVersion: string;
     readonly ruleVersion: string;
+    readonly surfaceCode: "EVE-001" | "MEM-002";
   }): Promise<EveningSafetyActivationResult>;
   close(): Promise<void>;
 }
@@ -107,6 +108,7 @@ export class PostgresEveningSafetyStore implements EveningSafetyActivationStore 
     readonly now: Date;
     readonly policyVersion: string;
     readonly ruleVersion: string;
+    readonly surfaceCode: "EVE-001" | "MEM-002";
   }): Promise<EveningSafetyActivationResult> {
     return this.#transaction(async (client) => {
       await client.query(
@@ -127,9 +129,9 @@ export class PostgresEveningSafetyStore implements EveningSafetyActivationStore 
         await client.query<DecisionRow>(
           `SELECT "irreversibleFingerprint"
              FROM daily_energy.restricted_safety_decision
-            WHERE "accountId"=$1::uuid AND "surfaceCode"='EVE-001'
-              AND "commandRef"=$2::uuid`,
-          [input.accountId, commandRef],
+            WHERE "accountId"=$1::uuid AND "surfaceCode"=$2
+              AND "commandRef"=$3::uuid`,
+          [input.accountId, input.surfaceCode, commandRef],
         )
       ).rows[0];
       if (existingDecision !== undefined) {
@@ -174,11 +176,12 @@ export class PostgresEveningSafetyStore implements EveningSafetyActivationStore 
            "policyVersion","ruleVersion","classifierVersion",
            "irreversibleFingerprint","createdAt","retentionPolicyVersion",
            "retentionScope","retentionAnchorAt")
-         VALUES (gen_random_uuid(),$1::uuid,'EVE-001',$2::uuid,'HIGH_RISK',
-                 $3::text[],$4,$5,$6,$7,$8::timestamptz,$9,'SAFETY',
-                 $8::timestamptz)`,
+         VALUES (gen_random_uuid(),$1::uuid,$2,$3::uuid,'HIGH_RISK',
+                 $4::text[],$5,$6,$7,$8,$9::timestamptz,$10,'SAFETY',
+                 $9::timestamptz)`,
         [
           input.accountId,
+          input.surfaceCode,
           commandRef,
           categories,
           input.policyVersion,
@@ -196,13 +199,14 @@ export class PostgresEveningSafetyStore implements EveningSafetyActivationStore 
            "classifierVersion","responseVersion","resourceRegistryVersion",
            "createdAt","retentionPolicyVersion","retentionScope",
            "retentionAnchorAt")
-         VALUES ($1::uuid,$2::uuid,$3,$4::bigint,'EVE-001','HIGH_RISK',$5::text[],
-                 $6,$7,$8,$9,$10,$11::timestamptz,$12,'SAFETY',$11::timestamptz)`,
+         VALUES ($1::uuid,$2::uuid,$3,$4::bigint,$5,'HIGH_RISK',$6::text[],
+                 $7,$8,$9,$10,$11,$12::timestamptz,$13,'SAFETY',$12::timestamptz)`,
         [
           eventId,
           input.accountId,
           revision,
           guardEpoch.toString(),
+          input.surfaceCode,
           categories,
           input.policyVersion,
           input.ruleVersion,

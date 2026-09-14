@@ -2548,83 +2548,13 @@ components:
         - command_ref
         - product_date
     MatterCreateRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        title:
-          type: string
-          minLength: 1
-          maxLength: 80
-        target_date:
-          $ref: "#/components/schemas/ProductDate"
-        daily_use_granted:
-          type: boolean
-        weekly_use_granted:
-          type: boolean
-      additionalProperties: false
-      required:
-        - command_ref
-        - title
-        - daily_use_granted
-        - weekly_use_granted
+      x-source-contract: MatterCreateRequestSchema
     MatterUpdateRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        expected_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-        title:
-          type: string
-          minLength: 1
-          maxLength: 80
-        target_date:
-          $ref: "#/components/schemas/ProductDate"
-        clear_target_date:
-          type: boolean
-      additionalProperties: false
-      required:
-        - command_ref
-        - expected_revision
+      x-source-contract: MatterUpdateRequestSchema
     MatterTransitionRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        expected_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-      additionalProperties: false
-      required:
-        - command_ref
-        - expected_revision
+      x-source-contract: MatterTransitionRequestSchema
     MatterDeleteRequest:
-      type: object
-      properties:
-        command_ref:
-          $ref: "#/components/schemas/CommandRef"
-        client_context:
-          $ref: "#/components/schemas/ClientContext"
-        expected_revision:
-          $ref: "#/components/schemas/PositiveRevision"
-        confirmation_version:
-          $ref: "#/components/schemas/VersionToken"
-        confirmed:
-          type: boolean
-          enum:
-            - true
-      additionalProperties: false
-      required:
-        - command_ref
-        - expected_revision
-        - confirmation_version
-        - confirmed
+      x-source-contract: MatterDeleteCommandRequestSchema
     MemoryPreferencesUpdateRequest:
       type: object
       properties:
@@ -2988,41 +2918,7 @@ components:
     HistoryDayView:
       x-source-contract: HistoryDayViewSchema
     MatterView:
-      type: object
-      properties:
-        matter_ref:
-          $ref: "#/components/schemas/OpaqueRef"
-        revision:
-          $ref: "#/components/schemas/PositiveRevision"
-        title:
-          type: string
-          minLength: 1
-          maxLength: 80
-        target_date:
-          $ref: "#/components/schemas/ProductDate"
-        status:
-          type: string
-          enum:
-            - ACTIVE
-            - PAUSED
-            - COMPLETED
-            - EXPIRED
-        daily_use_granted:
-          type: boolean
-        weekly_use_granted:
-          type: boolean
-        updated_at:
-          type: string
-          format: date-time
-      additionalProperties: false
-      required:
-        - matter_ref
-        - revision
-        - title
-        - status
-        - daily_use_granted
-        - weekly_use_granted
-        - updated_at
+      x-source-contract: MatterViewSchema
     MemoryPreferencesView:
       type: object
       properties:
@@ -3381,28 +3277,7 @@ components:
     HistoryListView:
       x-source-contract: HistoryListViewSchema
     MatterListView:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/MatterView"
-        next_cursor:
-          type: string
-          minLength: 1
-          maxLength: 512
-        page_info:
-          type: object
-          properties:
-            has_more:
-              type: boolean
-          additionalProperties: false
-          required:
-            - has_more
-      additionalProperties: false
-      required:
-        - items
-        - page_info
+      x-source-contract: MatterListViewSchema
     DataTaskListView:
       x-source-contract: DataTaskListViewSchema
     AdminSafetyEventListView:

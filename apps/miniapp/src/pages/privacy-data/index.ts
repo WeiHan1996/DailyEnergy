@@ -69,6 +69,9 @@ Page({
   openRecords() {
     wx.navigateTo({ url: "/pages/records/index" });
   },
+  openMatters() {
+    wx.navigateTo({ url: "/pages/matters/index" });
+  },
   async startExport() {
     const summary = this.data.summary;
     if (

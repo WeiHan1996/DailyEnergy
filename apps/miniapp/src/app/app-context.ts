@@ -5,6 +5,7 @@ import { DailyCoordinator } from "../features/daily/daily-flow.js";
 import { EveningCoordinator } from "../features/evening/evening-flow.js";
 import { WeeklyCoordinator } from "../features/weekly/weekly-flow.js";
 import { DataRightsCoordinator } from "../features/data-rights/data-rights-flow.js";
+import { MatterCoordinator } from "../features/matter/matter-flow.js";
 import { BestEffortClientSignalSender } from "../features/analytics/client-signal.js";
 import type { MiniappPlatform } from "../platform/ports.js";
 import {
@@ -25,6 +26,7 @@ export interface MiniappAppContext {
   readonly daily: DailyCoordinator;
   readonly dataRights: DataRightsCoordinator;
   readonly evening: EveningCoordinator;
+  readonly matters: MatterCoordinator;
   getSafetyView(): SafetyView | undefined;
   readonly onboarding: OnboardingCoordinator;
   readonly platform: MiniappPlatform;
@@ -55,6 +57,7 @@ export function createMiniappAppContext(
     api,
   );
   const evening = new EveningCoordinator(platform.storage, api, sessionScope);
+  const matters = new MatterCoordinator(api);
   const weekly = new WeeklyCoordinator(platform.storage, api, sessionScope);
   return Object.freeze({
     analytics,
@@ -66,10 +69,12 @@ export function createMiniappAppContext(
     getSafetyView: () =>
       daily.getSafetyView() ??
       evening.getSafetyView() ??
+      matters.getSafetyView() ??
       weekly.getSafetyView() ??
       checkin.getSafetyView() ??
       onboarding.getSafetyView(),
     onboarding,
+    matters,
     platform,
     weekly,
   });

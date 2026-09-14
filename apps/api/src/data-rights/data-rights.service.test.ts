@@ -58,7 +58,14 @@ function service(
         protect: vi.fn(),
         reveal: vi.fn(() => codecOverrides.note ?? "今天保持真实。"),
       },
-      { reveal: vi.fn(() => "准备发布的事项") },
+      {
+        fingerprint: vi.fn(() => Buffer.alloc(32, 7)),
+        protect: vi.fn(() => ({
+          ciphertext: Buffer.from("protected-matter"),
+          keyVersion: "synthetic-v1",
+        })),
+        reveal: vi.fn(() => "准备发布的事项"),
+      },
       { now: () => now },
       auth,
     ),

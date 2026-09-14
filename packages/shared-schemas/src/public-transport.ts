@@ -35,6 +35,46 @@ export const ClientContextSchema = z
   .strict();
 
 const PreferredNameSchema = singleLineTextSchema(1, 24);
+export const MatterTitleSchema = singleLineTextSchema(1, 80).superRefine(
+  (value, context) => {
+    if (value !== value.normalize("NFC")) {
+      context.addIssue({
+        code: "custom",
+        message: "must use NFC normalization",
+      });
+    }
+    if (utf8ByteLength(value) > 320) {
+      context.addIssue({
+        code: "custom",
+        message: "must contain at most 320 UTF-8 bytes",
+      });
+    }
+  },
+);
+
+function utf8ByteLength(value: string): number {
+  let bytes = 0;
+  for (const character of value) {
+    const codePoint = character.codePointAt(0)!;
+    bytes +=
+      codePoint <= 0x7f
+        ? 1
+        : codePoint <= 0x7ff
+          ? 2
+          : codePoint <= 0xffff
+            ? 3
+            : 4;
+  }
+  return bytes;
+}
+
+export const MatterStatusValues = [
+  "ACTIVE",
+  "PAUSED",
+  "COMPLETED",
+  "EXPIRED",
+] as const;
+export const MatterStatusSchema = z.enum(MatterStatusValues);
 const CommandShape = {
   command_ref: CommandRefSchema,
   client_context: ClientContextSchema.optional(),
@@ -183,6 +223,65 @@ export const EveningSaveRequestSchema = z
         view_schema_version: SemverSchema,
       })
       .strict(),
+  })
+  .strict();
+
+export const MatterCreateRequestSchema = z
+  .object({
+    ...CommandShape,
+    title: MatterTitleSchema,
+    target_date: ProductDateSchema.optional(),
+    daily_use_granted: z.boolean(),
+    weekly_use_granted: z.boolean(),
+  })
+  .strict();
+
+export const MatterUpdateRequestSchema = z
+  .object({
+    ...CommandShape,
+    expected_revision: PositiveRevisionSchema,
+    title: MatterTitleSchema.optional(),
+    target_date: ProductDateSchema.optional(),
+    clear_target_date: z.boolean().optional(),
+    daily_use_granted: z.boolean().optional(),
+    weekly_use_granted: z.boolean().optional(),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    if (value.target_date !== undefined && value.clear_target_date === true) {
+      context.addIssue({
+        code: "custom",
+        message: "target_date and clear_target_date are mutually exclusive",
+        path: ["clear_target_date"],
+      });
+    }
+    if (
+      value.title === undefined &&
+      value.target_date === undefined &&
+      value.clear_target_date !== true &&
+      value.daily_use_granted === undefined &&
+      value.weekly_use_granted === undefined
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "at least one matter field must change",
+      });
+    }
+  });
+
+export const MatterTransitionRequestSchema = z
+  .object({
+    ...CommandShape,
+    expected_revision: PositiveRevisionSchema,
+  })
+  .strict();
+
+export const MatterDeleteCommandRequestSchema = z
+  .object({
+    ...CommandShape,
+    expected_revision: PositiveRevisionSchema,
+    confirmation_version: VersionTokenSchema,
+    confirmed: z.literal(true),
   })
   .strict();
 
@@ -650,6 +749,31 @@ export const CheckinViewSchema = z
   })
   .strict();
 
+export const MatterViewSchema = z
+  .object({
+    matter_ref: OpaqueIdSchema,
+    revision: PositiveRevisionSchema,
+    title: MatterTitleSchema,
+    target_date: ProductDateSchema.optional(),
+    status: MatterStatusSchema,
+    daily_use_granted: z.boolean(),
+    weekly_use_granted: z.boolean(),
+    updated_at: Rfc3339TimestampSchema,
+  })
+  .strict();
+
+export const MatterListViewSchema = z
+  .object({
+    items: z.array(MatterViewSchema).max(1_000),
+    next_cursor: z.string().min(1).max(512).optional(),
+    page_info: z
+      .object({
+        has_more: z.boolean(),
+      })
+      .strict(),
+  })
+  .strict();
+
 export const MemoryPreferencesViewSchema = z
   .object({
     revision: PositiveRevisionSchema,
@@ -746,7 +870,7 @@ export const DataExportDaySchema = z
 export const DataExportMatterViewSchema = z
   .object({
     revision: PositiveRevisionSchema,
-    title: singleLineTextSchema(1, 80),
+    title: MatterTitleSchema,
     target_date: ProductDateSchema.optional(),
     status: z.enum(["ACTIVE", "PAUSED", "COMPLETED", "EXPIRED"]),
     daily_use_granted: z.boolean(),
@@ -841,6 +965,14 @@ export type TaskStateUpdateRequest = z.infer<
   typeof TaskStateUpdateRequestSchema
 >;
 export type EveningSaveRequest = z.infer<typeof EveningSaveRequestSchema>;
+export type MatterCreateRequest = z.infer<typeof MatterCreateRequestSchema>;
+export type MatterUpdateRequest = z.infer<typeof MatterUpdateRequestSchema>;
+export type MatterTransitionRequest = z.infer<
+  typeof MatterTransitionRequestSchema
+>;
+export type MatterDeleteCommandRequest = z.infer<
+  typeof MatterDeleteCommandRequestSchema
+>;
 export type MemoryPreferencesUpdateRequest = z.infer<
   typeof MemoryPreferencesUpdateRequestSchema
 >;
@@ -892,6 +1024,9 @@ export type CommandReceiptView = z.infer<typeof CommandReceiptViewSchema>;
 export type ConsentView = z.infer<typeof ConsentViewSchema>;
 export type ProfileView = z.infer<typeof ProfileViewSchema>;
 export type CheckinView = z.infer<typeof CheckinViewSchema>;
+export type MatterStatus = z.infer<typeof MatterStatusSchema>;
+export type MatterView = z.infer<typeof MatterViewSchema>;
+export type MatterListView = z.infer<typeof MatterListViewSchema>;
 export type MemoryPreferencesView = z.infer<typeof MemoryPreferencesViewSchema>;
 export type NotificationSettingsView = z.infer<
   typeof NotificationSettingsViewSchema

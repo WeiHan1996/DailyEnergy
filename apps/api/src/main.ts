@@ -11,6 +11,7 @@ import {
   PostgresDailyInteractionStore,
   PostgresDataRightsStore,
   PostgresEveningStore,
+  PostgresMatterStore,
   PostgresWeeklyStore,
   RedisDailyContentCache,
   UNAVAILABLE_DAILY_CONTENT_CACHE,
@@ -23,6 +24,7 @@ import {
   type DailyInteractionStore,
   type DataRightsStore,
   type EveningStore,
+  type MatterStore,
   type WeeklyStore,
   type TelemetryRuntime,
 } from "@daily-energy/server-adapters/api";
@@ -75,6 +77,7 @@ async function main(): Promise<void> {
   let dailyInteractionStore: DailyInteractionStore | undefined;
   let dataRightsStore: DataRightsStore | undefined;
   let eveningStore: EveningStore | undefined;
+  let matterStore: MatterStore | undefined;
   let weeklyStore: WeeklyStore | undefined;
   try {
     const config = loadRuntimeConfig(process.env);
@@ -161,6 +164,12 @@ async function main(): Promise<void> {
           connectionString,
           expectedDatabaseRole: "daily_energy_api",
         });
+        matterStore = await PostgresMatterStore.connect({
+          applicationName: "daily-energy:api:matter",
+          connectionLimit: 4,
+          connectionString,
+          expectedDatabaseRole: "daily_energy_api",
+        });
         weeklyStore = await PostgresWeeklyStore.connect({
           applicationName: "daily-energy:api:weekly",
           connectionLimit: 4,
@@ -183,6 +192,7 @@ async function main(): Promise<void> {
       ...(dailyInteractionStore === undefined ? {} : { dailyInteractionStore }),
       ...(dataRightsStore === undefined ? {} : { dataRightsStore }),
       ...(eveningStore === undefined ? {} : { eveningStore }),
+      ...(matterStore === undefined ? {} : { matterStore }),
       ...(weeklyStore === undefined ? {} : { weeklyStore }),
       readinessChecks,
       shutdownDrainHooks: [
@@ -210,6 +220,9 @@ async function main(): Promise<void> {
         ...(eveningStore === undefined
           ? []
           : [{ drain: () => eveningStore?.close() }]),
+        ...(matterStore === undefined
+          ? []
+          : [{ drain: () => matterStore?.close() }]),
         ...(weeklyStore === undefined
           ? []
           : [{ drain: () => weeklyStore?.close() }]),
@@ -237,6 +250,7 @@ async function main(): Promise<void> {
     await dailyInteractionStore?.close().catch(() => undefined);
     await dataRightsStore?.close().catch(() => undefined);
     await eveningStore?.close().catch(() => undefined);
+    await matterStore?.close().catch(() => undefined);
     await weeklyStore?.close().catch(() => undefined);
     await telemetry?.shutdown().catch(() => undefined);
     writeStartupFailure(

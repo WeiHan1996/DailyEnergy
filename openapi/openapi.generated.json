@@ -7343,20 +7343,33 @@
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "daily_use_granted": {
             "type": "boolean"
           },
           "target_date": {
-            "$ref": "#/components/schemas/ProductDate"
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           },
           "title": {
-            "maxLength": 80,
-            "minLength": 1,
             "type": "string"
           },
           "weekly_use_granted": {
@@ -7369,19 +7382,36 @@
           "daily_use_granted",
           "weekly_use_granted"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "MatterCreateRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "MatterDeleteRequest": {
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "confirmation_version": {
-            "$ref": "#/components/schemas/VersionToken"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+            "type": "string"
           },
           "confirmed": {
             "enum": [
@@ -7390,7 +7420,10 @@
             "type": "boolean"
           },
           "expected_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           }
         },
         "required": [
@@ -7399,15 +7432,66 @@
           "confirmation_version",
           "confirmed"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "MatterDeleteCommandRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "MatterListView": {
         "additionalProperties": false,
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/MatterView"
+              "additionalProperties": false,
+              "properties": {
+                "daily_use_granted": {
+                  "type": "boolean"
+                },
+                "matter_ref": {
+                  "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                  "type": "string"
+                },
+                "revision": {
+                  "exclusiveMinimum": true,
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "status": {
+                  "enum": [
+                    "ACTIVE",
+                    "PAUSED",
+                    "COMPLETED",
+                    "EXPIRED"
+                  ],
+                  "type": "string"
+                },
+                "target_date": {
+                  "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "updated_at": {
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+                  "type": "string"
+                },
+                "weekly_use_granted": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "matter_ref",
+                "revision",
+                "title",
+                "status",
+                "daily_use_granted",
+                "weekly_use_granted",
+                "updated_at"
+              ],
+              "type": "object"
             },
+            "maxItems": 1000,
             "type": "array"
           },
           "next_cursor": {
@@ -7432,26 +7516,47 @@
           "items",
           "page_info"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "MatterListViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "MatterTransitionRequest": {
         "additionalProperties": false,
         "properties": {
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
           },
           "expected_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           }
         },
         "required": [
           "command_ref",
           "expected_revision"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "MatterTransitionRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "MatterUpdateRequest": {
         "additionalProperties": false,
@@ -7460,28 +7565,52 @@
             "type": "boolean"
           },
           "client_context": {
-            "$ref": "#/components/schemas/ClientContext"
+            "additionalProperties": false,
+            "properties": {
+              "app_version": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scene": {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "command_ref": {
-            "$ref": "#/components/schemas/CommandRef"
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+            "type": "string"
+          },
+          "daily_use_granted": {
+            "type": "boolean"
           },
           "expected_revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "target_date": {
-            "$ref": "#/components/schemas/ProductDate"
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           },
           "title": {
-            "maxLength": 80,
-            "minLength": 1,
             "type": "string"
+          },
+          "weekly_use_granted": {
+            "type": "boolean"
           }
         },
         "required": [
           "command_ref",
           "expected_revision"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "MatterUpdateRequestSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "MatterView": {
         "additionalProperties": false,
@@ -7490,10 +7619,14 @@
             "type": "boolean"
           },
           "matter_ref": {
-            "$ref": "#/components/schemas/OpaqueRef"
+            "pattern": "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+            "type": "string"
           },
           "revision": {
-            "$ref": "#/components/schemas/PositiveRevision"
+            "exclusiveMinimum": true,
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
           },
           "status": {
             "enum": [
@@ -7505,15 +7638,14 @@
             "type": "string"
           },
           "target_date": {
-            "$ref": "#/components/schemas/ProductDate"
+            "pattern": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+            "type": "string"
           },
           "title": {
-            "maxLength": 80,
-            "minLength": 1,
             "type": "string"
           },
           "updated_at": {
-            "format": "date-time",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
             "type": "string"
           },
           "weekly_use_granted": {
@@ -7529,7 +7661,9 @@
           "weekly_use_granted",
           "updated_at"
         ],
-        "type": "object"
+        "type": "object",
+        "x-source-contract": "MatterViewSchema",
+        "x-source-projection": "zod-openapi-3.0"
       },
       "MemoryPreferencesUpdateRequest": {
         "additionalProperties": false,
@@ -13261,6 +13395,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:00a1a9cf76a6e9f1e0141332084859a6cd8c4ccc6cf4fdf25771f72b43e5da17"
+    "source-fingerprint": "sha256:2d436369bc54c09c74184bcd12804c0580c90a8db5d7523482827633567e7a1a"
   }
 }

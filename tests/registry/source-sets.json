@@ -260,7 +260,7 @@
         "kind": "text-regex",
         "pattern": "urn:dailyenergy:schema:[a-z0-9-]+:[0-9]+\\.[0-9]+\\.[0-9]+"
       },
-      "expected_count": 55,
+      "expected_count": 61,
       "requirements": [{ "any_of": ["UNIT"] }, { "any_of": ["CONTRACT"] }],
       "planned_owner": "E-008 contract maintenance"
     }
@@ -393,6 +393,10 @@
     {
       "path": "tests/registry/ai007-evidence-manifest.json",
       "kind": "proof-map"
+    },
+    {
+      "path": "tests/registry/ai008-evidence-manifest.json",
+      "kind": "proof-map"
     }
   ],
   "automatic_evidence": [
@@ -432,7 +436,7 @@
       "source_set": "shared-schemas",
       "test_id": "T-SCHEMA-JSON-001",
       "file": "packages/shared-schemas/test/json-schema.test.ts",
-      "selector": "exports 55 stable, unique JSON Schema IDs",
+      "selector": "exports 61 stable, unique JSON Schema IDs",
       "level": "UNIT",
       "assertion_template": "{source_id} is present in the unique stable JSON Schema ID set"
     },

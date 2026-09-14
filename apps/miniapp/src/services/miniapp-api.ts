@@ -29,6 +29,8 @@ export type DeletionConfirmationView =
   components["schemas"]["DeletionConfirmationView"];
 export type IdentityVerificationView =
   components["schemas"]["IdentityVerificationView"];
+export type MatterView = components["schemas"]["MatterView"];
+export type MatterListView = components["schemas"]["MatterListView"];
 export type ClientAnalyticsSignalRequest =
   components["schemas"]["ClientAnalyticsSignalRequest"];
 type ConsentView = components["schemas"]["ConsentView"];
@@ -132,6 +134,16 @@ export interface DeletionConfirmationEnvelope {
 export interface IdentityVerificationEnvelope {
   readonly productDate: string;
   readonly verification: IdentityVerificationView;
+}
+
+export interface MatterEnvelope {
+  readonly matter: MatterView;
+  readonly productDate: string;
+}
+
+export interface MatterListEnvelope {
+  readonly matters: MatterListView;
+  readonly productDate: string;
 }
 
 export interface C003Api {
@@ -303,6 +315,48 @@ export interface C015Api {
   submitAnalyticsSignal(input: ClientAnalyticsSignalRequest): Promise<void>;
 }
 
+export interface AI008Api {
+  completeMatter(input: {
+    readonly commandRef: string;
+    readonly expectedRevision: number;
+    readonly matterRef: string;
+  }): Promise<MatterEnvelope>;
+  createMatter(input: {
+    readonly commandRef: string;
+    readonly dailyUseGranted: boolean;
+    readonly targetDate?: string;
+    readonly title: string;
+    readonly weeklyUseGranted: boolean;
+  }): Promise<MatterEnvelope>;
+  deleteManagedMatter(input: {
+    readonly commandRef: string;
+    readonly confirmationVersion: string;
+    readonly expectedRevision: number;
+    readonly matterRef: string;
+  }): Promise<DataTaskEnvelope>;
+  listMatters(): Promise<MatterListEnvelope>;
+  pauseMatter(input: {
+    readonly commandRef: string;
+    readonly expectedRevision: number;
+    readonly matterRef: string;
+  }): Promise<MatterEnvelope>;
+  resumeMatter(input: {
+    readonly commandRef: string;
+    readonly expectedRevision: number;
+    readonly matterRef: string;
+  }): Promise<MatterEnvelope>;
+  updateMatter(input: {
+    readonly clearTargetDate?: boolean;
+    readonly commandRef: string;
+    readonly dailyUseGranted?: boolean;
+    readonly expectedRevision: number;
+    readonly matterRef: string;
+    readonly targetDate?: string;
+    readonly title?: string;
+    readonly weeklyUseGranted?: boolean;
+  }): Promise<MatterEnvelope>;
+}
+
 export class MiniappApiError extends Error {
   public constructor(
     public readonly code: string,
@@ -314,6 +368,7 @@ export class MiniappApiError extends Error {
     public readonly retryAfterSeconds?: number,
     public readonly currentInteraction?: DailyInteractionView,
     public readonly currentEvening?: EveningView,
+    public readonly currentMatter?: MatterView,
   ) {
     super(code);
     this.name = "MiniappApiError";
@@ -387,6 +442,9 @@ function apiError(body: unknown, status: number): MiniappApiError {
   const currentEvening = isRecord(error?.details)
     ? safeEveningView(error.details.current)
     : undefined;
+  const currentMatter = isRecord(error?.details)
+    ? safeMatterView(error.details.current)
+    : undefined;
   return new MiniappApiError(
     code,
     status,
@@ -401,6 +459,7 @@ function apiError(body: unknown, status: number): MiniappApiError {
       : undefined,
     currentInteraction,
     currentEvening,
+    currentMatter,
   );
 }
 
@@ -418,6 +477,92 @@ function safeInteractionView(value: unknown): DailyInteractionView | undefined {
   } catch {
     return undefined;
   }
+}
+
+function safeMatterView(value: unknown): MatterView | undefined {
+  try {
+    return projectMatterView(value);
+  } catch {
+    return undefined;
+  }
+}
+
+export function projectMatterView(value: unknown): MatterView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, [
+      "daily_use_granted",
+      "matter_ref",
+      "revision",
+      "status",
+      "target_date",
+      "title",
+      "updated_at",
+      "weekly_use_granted",
+    ]) ||
+    !isOpaqueRef(value.matter_ref) ||
+    typeof value.revision !== "number" ||
+    !Number.isInteger(value.revision) ||
+    value.revision < 1 ||
+    !["ACTIVE", "PAUSED", "COMPLETED", "EXPIRED"].includes(
+      String(value.status),
+    ) ||
+    typeof value.title !== "string" ||
+    Array.from(value.title).length < 1 ||
+    Array.from(value.title).length > 80 ||
+    utf8ByteLength(value.title) > 320 ||
+    /[\r\n\u0000-\u001f\u007f]/u.test(value.title) ||
+    value.title !== value.title.trim() ||
+    value.title !== value.title.normalize("NFC") ||
+    (value.target_date !== undefined && !isProductDate(value.target_date)) ||
+    typeof value.daily_use_granted !== "boolean" ||
+    typeof value.weekly_use_granted !== "boolean" ||
+    !isTimestamp(value.updated_at)
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return freezeJson(value) as MatterView;
+}
+
+function utf8ByteLength(value: string): number {
+  let bytes = 0;
+  for (const character of value) {
+    const codePoint = character.codePointAt(0)!;
+    bytes +=
+      codePoint <= 0x7f
+        ? 1
+        : codePoint <= 0x7ff
+          ? 2
+          : codePoint <= 0xffff
+            ? 3
+            : 4;
+  }
+  return bytes;
+}
+
+export function projectMatterListView(value: unknown): MatterListView {
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, ["items", "next_cursor", "page_info"]) ||
+    !Array.isArray(value.items) ||
+    value.items.length > 1_000 ||
+    !isRecord(value.page_info) ||
+    !hasOnlyKeys(value.page_info, ["has_more"]) ||
+    typeof value.page_info.has_more !== "boolean" ||
+    (value.next_cursor !== undefined &&
+      (typeof value.next_cursor !== "string" ||
+        value.next_cursor.length < 1 ||
+        value.next_cursor.length > 512))
+  ) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 200, false);
+  }
+  return Object.freeze({
+    items: value.items.map(projectMatterView),
+    ...(value.next_cursor === undefined
+      ? {}
+      : { next_cursor: value.next_cursor }),
+    page_info: Object.freeze({ has_more: value.page_info.has_more }),
+  });
 }
 
 function projectSafetyView(value: unknown): SafetyView | undefined {
@@ -1935,7 +2080,8 @@ export function createMiniappApi(
   C012Api &
   C013Api &
   C014Api &
-  C015Api {
+  C015Api &
+  AI008Api {
   let sessionToken: string | undefined;
 
   const api: C003Api &
@@ -1946,7 +2092,8 @@ export function createMiniappApi(
     C012Api &
     C013Api &
     C014Api &
-    C015Api = {
+    C015Api &
+    AI008Api = {
     async createSession(input): Promise<SessionEnvelope> {
       const response = await network.request({
         body: input as StorageValue,
@@ -2223,6 +2370,114 @@ export function createMiniappApi(
       return Object.freeze({
         productDate: parsed.productDate,
         weekly: projectWeeklyView(parsed.data),
+      });
+    },
+
+    async listMatters(): Promise<MatterListEnvelope> {
+      const response = await network.request({
+        headers: headers(sessionToken),
+        method: "GET",
+        path: "/v1/matters",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        matters: projectMatterListView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async createMatter(input): Promise<MatterEnvelope> {
+      if (input.targetDate !== undefined && !isProductDate(input.targetDate)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          daily_use_granted: input.dailyUseGranted,
+          ...(input.targetDate === undefined
+            ? {}
+            : { target_date: input.targetDate }),
+          title: input.title,
+          weekly_use_granted: input.weeklyUseGranted,
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/matters",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        matter: projectMatterView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async updateMatter(input): Promise<MatterEnvelope> {
+      if (
+        !isOpaqueRef(input.matterRef) ||
+        (input.targetDate !== undefined && !isProductDate(input.targetDate))
+      ) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          expected_revision: input.expectedRevision,
+          ...(input.title === undefined ? {} : { title: input.title }),
+          ...(input.targetDate === undefined
+            ? {}
+            : { target_date: input.targetDate }),
+          ...(input.clearTargetDate === undefined
+            ? {}
+            : { clear_target_date: input.clearTargetDate }),
+          ...(input.dailyUseGranted === undefined
+            ? {}
+            : { daily_use_granted: input.dailyUseGranted }),
+          ...(input.weeklyUseGranted === undefined
+            ? {}
+            : { weekly_use_granted: input.weeklyUseGranted }),
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "PATCH",
+        path: `/v1/matters/${encodeURIComponent(input.matterRef)}`,
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        matter: projectMatterView(parsed.data),
+        productDate: parsed.productDate,
+      });
+    },
+
+    async pauseMatter(input): Promise<MatterEnvelope> {
+      return matterTransitionRequest(network, sessionToken, input, "pause");
+    },
+
+    async resumeMatter(input): Promise<MatterEnvelope> {
+      return matterTransitionRequest(network, sessionToken, input, "resume");
+    },
+
+    async completeMatter(input): Promise<MatterEnvelope> {
+      return matterTransitionRequest(network, sessionToken, input, "complete");
+    },
+
+    async deleteManagedMatter(input): Promise<DataTaskEnvelope> {
+      if (!isOpaqueRef(input.matterRef)) {
+        throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+      }
+      const response = await network.request({
+        body: {
+          command_ref: input.commandRef,
+          confirmation_version: input.confirmationVersion,
+          confirmed: true,
+          expected_revision: input.expectedRevision,
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: `/v1/matters/${encodeURIComponent(input.matterRef)}/delete`,
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        task: projectDataTaskView(parsed.data),
       });
     },
 
@@ -2572,4 +2827,33 @@ export function createMiniappApi(
 
 export function isApiErrorBody(value: unknown): value is ApiErrorBody {
   return isRecord(value) && value.ok === false && isRecord(value.error);
+}
+
+async function matterTransitionRequest(
+  network: NetworkPort,
+  sessionToken: string | undefined,
+  input: {
+    readonly commandRef: string;
+    readonly expectedRevision: number;
+    readonly matterRef: string;
+  },
+  transition: "complete" | "pause" | "resume",
+): Promise<MatterEnvelope> {
+  if (!isOpaqueRef(input.matterRef)) {
+    throw new MiniappApiError("CONTRACT_VIOLATION", 0, false);
+  }
+  const response = await network.request({
+    body: {
+      command_ref: input.commandRef,
+      expected_revision: input.expectedRevision,
+    },
+    headers: headers(sessionToken, input.commandRef),
+    method: "POST",
+    path: `/v1/matters/${encodeURIComponent(input.matterRef)}/${transition}`,
+  });
+  const parsed = successData(response.data, response.statusCode);
+  return Object.freeze({
+    matter: projectMatterView(parsed.data),
+    productDate: parsed.productDate,
+  });
 }

@@ -1,0 +1,145 @@
+<de-page-shell labelled-by="matter-title">
+  <de-app-header
+    slot="header"
+    back-label="返回"
+    show-back="{{true}}"
+    title="{{matter ? '编辑重要事项' : '新增重要事项'}}"
+    subtitle="由你控制"
+    bind:back="back"
+  ></de-app-header>
+
+  <view class="matter" data-screen-id="{{screenId}}">
+    <de-loading-skeleton wx:if="{{loading}}" label="正在读取事项" lines="5" variant="card"></de-loading-skeleton>
+
+    <block wx:else>
+      <de-offline-state
+        wx:if="{{offline}}"
+        message="事项不会离线提交；恢复网络后可继续当前输入。"
+        bind:retry="retry"
+      ></de-offline-state>
+      <de-recoverable-error
+        wx:elif="{{error && !matter && matterRef}}"
+        message="暂时没能读取这件事。返回列表或重新读取后再继续。"
+        bind:retry="retry"
+      ></de-recoverable-error>
+
+      <de-inline-notice wx:if="{{notice}}" message="{{notice}}" tone="{{error ? 'error' : 'info'}}"></de-inline-notice>
+
+      <block wx:if="{{!(error && !matter && matterRef)}}">
+        <view id="matter-title" class="matter__title">记录一件近期在意的事</view>
+        <view class="matter__intro">只记录你主动填写的内容，不从反馈、历史或其它应用自动提取。</view>
+
+      <de-section-card heading="事项">
+        <textarea
+          class="matter__input {{inputError ? 'matter__input--error' : ''}}"
+          aria-describedby="matter-title-help"
+          auto-height="{{true}}"
+          disabled="{{offline || busy}}"
+          maxlength="80"
+          placeholder="例如：周五做项目汇报"
+          value="{{title}}"
+          bindinput="inputTitle"
+        ></textarea>
+        <view id="matter-title-help" class="matter__help {{inputError ? 'matter__help--error' : ''}}">
+          {{inputError ? inputError : titleCount + '/80'}}
+        </view>
+      </de-section-card>
+
+      <de-section-card heading="可选日期">
+        <picker
+          disabled="{{offline || busy}}"
+          mode="date"
+          start="{{minDate}}"
+          value="{{targetDate}}"
+          bindchange="chooseDate"
+        >
+          <view class="matter__picker">{{hasDate ? targetDate : '选择日期'}}</view>
+        </picker>
+        <de-action-button
+          wx:if="{{hasDate}}"
+          disabled="{{offline || busy}}"
+          label="清除日期"
+          variant="text"
+          bind:press="clearDate"
+        ></de-action-button>
+      </de-section-card>
+
+      <de-section-card heading="怎样使用">
+        <view class="matter__switch-row">
+          <view class="matter__switch-copy">
+            <view class="matter__switch-title">允许在未来每日内容中提及</view>
+            <view class="matter__help">关闭后仍会私有保存，但不会获得这一用途。</view>
+          </view>
+          <switch
+            aria-label="允许在未来每日内容中提及"
+            checked="{{dailyUseGranted}}"
+            disabled="{{offline || busy}}"
+            color="#2f6758"
+            bindchange="toggleDailyUse"
+          ></switch>
+        </view>
+        <de-inline-notice message="当前每日与七天内容版本都不会读取事项；启用需要后续独立版本和安全评测。"></de-inline-notice>
+      </de-section-card>
+
+      <de-action-button
+        block="{{true}}"
+        disabled="{{offline || !!inputError || !title}}"
+        label="保存"
+        loading="{{busy}}"
+        loading-label="正在保存"
+        bind:press="save"
+      ></de-action-button>
+
+      <view wx:if="{{matter}}" class="matter__status">
+        <view class="matter__section-title">状态</view>
+        <de-action-button
+          wx:if="{{matter.status === 'ACTIVE'}}"
+          disabled="{{offline || busy}}"
+          label="暂停使用"
+          variant="secondary"
+          bind:press="pause"
+        ></de-action-button>
+        <de-action-button
+          wx:if="{{matter.status === 'PAUSED' || matter.status === 'COMPLETED' || matter.status === 'EXPIRED'}}"
+          disabled="{{offline || busy}}"
+          label="重新启用"
+          variant="secondary"
+          bind:press="resume"
+        ></de-action-button>
+        <de-action-button
+          wx:if="{{matter.status !== 'COMPLETED'}}"
+          disabled="{{offline || busy}}"
+          label="标记为已完成"
+          variant="text"
+          bind:press="complete"
+        ></de-action-button>
+      </view>
+
+        <view wx:if="{{matter}}" class="matter__danger">
+        <view class="matter__section-title">删除</view>
+        <view class="matter__help">确认后立即停止未来使用，并清理用途授权和相关派生引用。</view>
+        <de-action-button
+          block="{{true}}"
+          disabled="{{offline || busy}}"
+          label="删除这件事"
+          variant="danger"
+          bind:press="openDelete"
+        ></de-action-button>
+        </view>
+      </block>
+    </block>
+  </view>
+
+  <de-confirm-sheet
+    cancel-label="保留"
+    confirm-label="删除这件事"
+    danger="{{true}}"
+    disabled="{{offline}}"
+    impact="删除后，这件事和它的用途授权会立即停止使用；在线副本将在 72 小时内清理，隔离备份最长 35 天到期。"
+    loading="{{busy}}"
+    open="{{confirmDeleteOpen}}"
+    title="删除这件重要事项？"
+    bind:cancel="closeDelete"
+    bind:confirm="confirmDelete"
+  ></de-confirm-sheet>
+</de-page-shell>

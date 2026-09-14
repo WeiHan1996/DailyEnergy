@@ -1,0 +1,266 @@
+{
+  "manifest_version": "ai-008-evidence-v1",
+  "scope": "AI-008 user-managed ImportantMatter contracts, encrypted owner-scoped CRUD/CAS, independent purpose grants, deterministic expiry, MEM-002 Safety, MATTER deletion guard/cleanup, and MEM-001/MEM-002 client flows",
+  "authority": [
+    "docs/decisions/ADR-0004-structured-memory.md",
+    "docs/decisions/ADR-0005-data-retention-and-deletion.md",
+    "docs/ai/memory.md",
+    "docs/ai/safety.md",
+    "docs/data/domain-model.md",
+    "docs/design/screen-specs.md",
+    "docs/operations/privacy-data-map.md",
+    "docs/product/state-machine.md",
+    "docs/technical/api.md",
+    "docs/technical/database.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-AI008-CONTRACT-001": {
+      "file": "packages/shared-schemas/test/matter.test.ts",
+      "selector": "AI-008 matter contracts",
+      "level": "CONTRACT",
+      "assertions": [
+        "Matter title is NFC, single-line, 1..80 graphemes and at most 320 UTF-8 bytes while owner/internal fields are rejected",
+        "create, update, transition and explicit deletion commands are strict, CAS-bound and reject ambiguous date patches",
+        "MatterView and MatterListView expose only title, date, status, independent Daily/Weekly grant booleans, revision and update time"
+      ]
+    },
+    "T-AI008-POLICY-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/matter/domain/matter.test.ts",
+      "selector": "matter-policy-v1",
+      "level": "AI_EVAL",
+      "assertions": [
+        "dated matters remain ACTIVE through the target date and expire on the next product date",
+        "undated matters remain ACTIVE for seven product dates and become EXPIRED on day eight",
+        "PAUSED, COMPLETED and EXPIRED remain distinct while reactivation is explicit and cannot reuse a past target date"
+      ]
+    },
+    "T-AI008-SERVICE-AI-EVAL-001": {
+      "file": "apps/api/src/matter/matter.service.test.ts",
+      "selector": "AI-008 matter service",
+      "level": "AI_EVAL",
+      "assertions": [
+        "MEM-002 Safety runs before encrypted owner-scoped Matter persistence",
+        "PROFESSIONAL_BOUNDARY saves a private source with both ordinary AI grants closed",
+        "HIGH_RISK activates the fixed Safety overlay and ordinary Matter persistence remains zero",
+        "indeterminate Safety fails closed and CAS conflicts return only the latest MatterView"
+      ]
+    },
+    "T-AI008-API-E2E-001": {
+      "file": "apps/api/src/matters.e2e.test.ts",
+      "selector": "AI-008 HTTP matter flow",
+      "level": "E2E",
+      "assertions": [
+        "real Nest HTTP creates, lists, updates, pauses, resumes and starts one explicit MATTER DataTask",
+        "strict request parsing rejects owner injection, newline/overlong titles and same command refs with changed payloads",
+        "Matter responses contain no account, ciphertext, key version, grant ref or fingerprint",
+        "HIGH_RISK returns SafetyView and calls the ordinary Matter store zero times"
+      ]
+    },
+    "T-AI008-API-AI-EVAL-001": {
+      "file": "apps/api/src/matters.e2e.test.ts",
+      "selector": "AI-008 HTTP matter flow",
+      "level": "AI_EVAL",
+      "assertions": [
+        "malformed and over-budget Matter titles are rejected before ordinary persistence",
+        "high-risk Matter title handling returns only fixed Safety projection without echoing the title",
+        "successful deletion removes the Matter from the next management list without exposing a reverse clue"
+      ]
+    },
+    "T-AI008-DB-001": {
+      "file": "tests/database/ai008-important-matters.test.mjs",
+      "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+      "level": "DB",
+      "assertions": [
+        "PostgreSQL 18 stores only ciphertext/key version, isolates owners and keeps Daily and Weekly grants independent",
+        "same command replay converges, changed payload conflicts and two concurrent revision-one updates produce one winner",
+        "undated day-eight expiry advances revision and sets EXPIRED while an invalid dated resume leaves no command receipt",
+        "MEM-002 Safety state blocks ordinary create and repeated activation produces one decision/state",
+        "MATTER DataTask guard immediately excludes the source from list/get before restricted physical cleanup"
+      ]
+    },
+    "T-AI008-DB-AI-EVAL-001": {
+      "file": "tests/database/ai008-important-matters.test.mjs",
+      "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+      "level": "AI_EVAL",
+      "assertions": [
+        "owner, purpose, revision, expiry and Safety inputs deterministically converge without reading or persisting plaintext",
+        "a deletion guard wins over subsequent Matter reads and no deleted title can be recovered through the management projection"
+      ]
+    },
+    "T-AI008-DELETE-DB-001": {
+      "file": "tests/database/c014-data-rights.test.mjs",
+      "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+      "level": "DB",
+      "assertions": [
+        "restricted MATTER cleanup removes the exact source, revisions, grants, dependency and encrypted personalized fragment",
+        "a published slot with a prevalidated fallback remains AVAILABLE without the deleted personalized fragment or model call"
+      ]
+    },
+    "T-AI008-DELETE-AI-EVAL-001": {
+      "file": "tests/database/c014-data-rights.test.mjs",
+      "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+      "level": "AI_EVAL",
+      "assertions": [
+        "MATTER deletion switches to the already validated no-source fallback and removes every active title-bearing dependency",
+        "the deletion path does not call a provider, regenerate history or recover content from a receipt"
+      ]
+    },
+    "T-AI008-MINIAPP-001": {
+      "file": "apps/miniapp/src/features/matter/matter-flow.test.ts",
+      "selector": "AI-008 Matter coordinator",
+      "level": "MODULE",
+      "assertions": [
+        "Matter drafts are normalized in memory and never written to local storage",
+        "transient retry reuses one command ref while revision conflict replaces the draft baseline with the latest server projection",
+        "Safety clears the pending ordinary write and exposes only the Safety route"
+      ]
+    },
+    "T-AI008-MINIAPP-CONTRACT-001": {
+      "file": "apps/miniapp/src/services/miniapp-api-ai008.test.ts",
+      "selector": "AI-008 miniapp Matter API bridge",
+      "level": "CONTRACT",
+      "assertions": [
+        "Mini Program list/create/update/transition/delete paths use authenticated idempotent request allowlists",
+        "client response projection rejects ciphertext, key version and unknown restricted fields"
+      ]
+    },
+    "T-AI008-CODEC-001": {
+      "file": "apps/api/src/data-rights/data-rights-codec.test.ts",
+      "selector": "AI-008 matter title codec",
+      "level": "UNIT",
+      "assertions": [
+        "AES-256-GCM uses random IVs and rejects ciphertext or key-version tampering",
+        "the keyed title fingerprint is stable for idempotency without storing plaintext or an ordinary reversible hash"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "D17-M01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DB-001", "T-AI008-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "D17-M04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DELETE-DB-001", "T-AI008-DELETE-AI-EVAL-001"]
+    },
+    {
+      "source_id": "D17-S02",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI008-SERVICE-AI-EVAL-001",
+        "T-AI008-API-E2E-001",
+        "T-AI008-DB-001"
+      ]
+    },
+    {
+      "source_id": "M14-C03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-C07",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-D04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DELETE-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-D11",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-S06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "PDM-C05",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI008-CONTRACT-001",
+        "T-AI008-DB-001",
+        "T-AI008-MINIAPP-001"
+      ]
+    },
+    {
+      "source_id": "S15-E03",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI008-SERVICE-AI-EVAL-001",
+        "T-AI008-API-AI-EVAL-001",
+        "T-AI008-DB-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "S15-E05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-SERVICE-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-E09",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-API-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S15-E10",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "S19-DB-025",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DB-001", "T-AI008-CODEC-001"]
+    },
+    {
+      "source_id": "S19-DB-026",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DB-001"]
+    },
+    {
+      "source_id": "S19-DB-028",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-DELETE-DB-001"]
+    },
+    {
+      "source_id": "S20-E06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-CONTRACT-001", "T-AI008-API-E2E-001"]
+    },
+    {
+      "source_id": "S20-E07",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI008-CONTRACT-001",
+        "T-AI008-API-E2E-001",
+        "T-AI008-SERVICE-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "S20-E08",
+      "status": "COVERED",
+      "proof_ids": ["T-AI008-CONTRACT-001", "T-AI008-API-E2E-001"]
+    },
+    {
+      "source_id": "S20-E09",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI008-CONTRACT-001",
+        "T-AI008-API-E2E-001",
+        "T-AI008-DELETE-DB-001"
+      ]
+    }
+  ],
+  "pending_evidence": {
+    "memory_resolver": "AI-009 must implement deterministic candidate selection, mention frequency, source/grant publish recheck and no-memory fallback for future memory-enabled workloads.",
+    "reminder_delivery": "A-004 remains responsible for user-selected reminder windows and platform delivery; AI-008 only preserves the accepted Matter source and existing deletion cleanup boundary.",
+    "miniapp_devtools": "INFRA_BLOCKED until MINIAPP_DEVTOOLS_CLI_PATH is configured; unit, contract and production bundle checks do not replace WeChat runtime evidence.",
+    "production_authorization": "NOT_GRANTED"
+  }
+}

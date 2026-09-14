@@ -104,6 +104,17 @@ export {
   type WeeklyStore,
 } from "../weekly/postgres-weekly-store.js";
 export {
+  PostgresMatterStore,
+  UNAVAILABLE_MATTER_STORE,
+  type MatterGuardFailure,
+  type MatterMutationResult,
+  type MatterQueryResult,
+  type MatterStore,
+  type PostgresMatterStoreConfig,
+  type ProtectedMatterTitle,
+  type StoredMatterView,
+} from "../matter/postgres-matter-store.js";
+export {
   DataRightsStoreError,
   PostgresDataRightsStore,
   UNAVAILABLE_DATA_RIGHTS_STORE,

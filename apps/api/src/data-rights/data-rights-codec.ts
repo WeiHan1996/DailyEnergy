@@ -1,8 +1,16 @@
-import { createDecipheriv, createHash, createHmac } from "node:crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  createHmac,
+  randomBytes,
+} from "node:crypto";
 
 import type { ProtectedExportText } from "@daily-energy/server-adapters/api";
 
 export interface MatterTitleCodec {
+  fingerprint(value: string): Buffer;
+  protect(value: string): ProtectedExportText;
   reveal(value: ProtectedExportText): string;
 }
 
@@ -14,6 +22,26 @@ export class AesGcmMatterTitleCodec implements MatterTitleCodec {
     if (key.length !== 32 || keyVersion.length < 1 || keyVersion.length > 64) {
       throw new Error("MATTER_TITLE_KEY_INVALID");
     }
+  }
+
+  public fingerprint(value: string): Buffer {
+    return createHmac("sha256", this.key)
+      .update("dailyenergy-matter-title-fingerprint-v1\0", "utf8")
+      .update(value, "utf8")
+      .digest();
+  }
+
+  public protect(value: string): ProtectedExportText {
+    const iv = randomBytes(12);
+    const cipher = createCipheriv("aes-256-gcm", this.key, iv);
+    const ciphertext = Buffer.concat([
+      cipher.update(value, "utf8"),
+      cipher.final(),
+    ]);
+    return {
+      ciphertext: Buffer.concat([iv, cipher.getAuthTag(), ciphertext]),
+      keyVersion: this.keyVersion,
+    };
   }
 
   public reveal(value: ProtectedExportText): string {
@@ -99,6 +127,8 @@ export function deletionStatusTokenFromAuthorization(
 }
 
 export const UNAVAILABLE_MATTER_TITLE_CODEC: MatterTitleCodec = {
+  fingerprint: unavailable,
+  protect: unavailable,
   reveal: unavailable,
 };
 

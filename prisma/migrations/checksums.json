@@ -64,6 +64,10 @@
     {
       "name": "20260908000000_ai007_relationship_continuity",
       "sha256": "9488fef69d7d106b649749f873e174891c92eb515c0291b08858211d674c772e"
+    },
+    {
+      "name": "20260909000000_ai008_important_matters",
+      "sha256": "4bbbfd50c299df1686e2bd1346286f7d928be89e2e9a7e981ae48db62eb0e83e"
     }
   ]
 }

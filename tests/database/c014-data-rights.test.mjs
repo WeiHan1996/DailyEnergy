@@ -314,6 +314,7 @@ test(
           now: new Date(baseNow.getTime() + 501),
           policyVersion: "safety-v1",
           ruleVersion: "safety-rules-v1",
+          surfaceCode: "EVE-001",
         })
         .then(
           (value) => ({ value }),

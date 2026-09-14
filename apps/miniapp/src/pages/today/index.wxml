@@ -137,6 +137,13 @@
         title="{{view.relationship.node_display.title}}"
         body="{{view.relationship.node_display.body}}"
       ></de-friend-message>
+      <de-action-button
+        wx:if="{{view.relationship.node_display && view.relationship.node_display.token === 'IMPORTANT_MATTER_INVITE_AVAILABLE'}}"
+        block="{{true}}"
+        label="记下一件事"
+        variant="secondary"
+        bind:press="openMatters"
+      ></de-action-button>
 
       <de-section-card heading="再看看">
         <view class="today__dimension today__dimension--focus">
