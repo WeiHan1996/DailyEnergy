@@ -3,21 +3,33 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-14
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：AI-008 — 实现重要事项的添加、编辑与删除
-- **任务状态**：In Review
-- **任务 Profile**：`security`（用户自由文本 Safety、用途授权、加密、修订与删除/不复活边界；prepare 已 READY）
-- **工作分支**：`agent/ai008-important-matters`（从 verified `main@2c061d4c571b612e1e8383b6f01b4ce40715124c` 创建）
-- **任务 Issue**：[AI-008 Issue #77](https://github.com/WeiHan1996/DailyEnergy/issues/77)
-- **当前 PR**：[Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204)；批准前 final head `b8c1aad08814b748ac70c32646e87da93b6881b4` / CI run `34825062102` 11/11 SUCCESS
-- **上一完成任务**：AI-007 Done；[PR #200](https://github.com/WeiHan1996/DailyEnergy/pull/200) final head `d44ea182d0a489329f5be5dc4ecb0ec1c83d782f` / CI run `34223694159` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `719ffbe89cd21625deffcc6da425f6a7e5a6d823`；merged-main CI run `34240311148` 11/11 SUCCESS；Issue #76 Closed
+- **当前任务**：AI-009 — 实现用途受限的结构化记忆选择
+- **任务状态**：Ready
+- **任务 Profile**：`security`（source/grant/expiry/owner/revision/delete、Prompt 最小披露与无记忆回退；尚未运行 AI-009 prepare）
+- **工作分支**：`agent/ai008-completion-status`（仅 AI-008 post-merge 状态收尾）；状态 PR 合并且收到新的明确启动指令前，不创建 AI-009 实现分支
+- **任务 Issue**：[AI-009 Issue #78](https://github.com/WeiHan1996/DailyEnergy/issues/78)
+- **当前 PR**：[Draft PR #205](https://github.com/WeiHan1996/DailyEnergy/pull/205)（仅 AI-008 post-merge 状态收尾；AI-009 实现 PR 不存在）
+- **上一完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-007 已 Done；`pnpm agent:prepare AI-008 --remote --deep` 返回 READY，Node/pnpm/dependencies/GitHub 全部 PASS；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由 AI-008 或后续开发任务自动关闭
+- **依赖边界**：AI-003 与 AI-008 已 Done；AI-009 的依赖与权威来源只在未来收到明确启动指令后通过 `pnpm agent:prepare AI-009 --remote --deep` 恢复，不在本状态收尾中预判或实施；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：提交 owner 接受收据，重新通过该 final head 的 full/task Gate 与 11-check CI；随后标记 PR #204 Ready、运行 exact-head verifier 并 squash merge，再完成 post-merge 状态收尾；不启动 AI-009
+- **下一候选动作**：等待 PR #205 final head 的 full Gate 与同一 head 11-check CI；按 owner 已给出的收尾授权通过 exact-head verifier 后 squash merge，随后等待新的明确启动指令；不运行 AI-009 prepare、不创建实现分支或编码
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-14 AI-008 post-merge 收尾
+
+- owner 明确“审核完成，合并并收尾”，接受 PR #204 的 Matter/Safety/用途授权/加密/幂等/删除/最小数据库权限 threat boundary，并授权 Ready、exact-head verifier、squash merge 与 post-merge 状态收尾；该决定不授予 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；
+- PR #204 final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` 的 CI run `34840065720` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=204:head=3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4:run=34840065720:checks=11`；
+- 批准 head 首次 full Gate 因两个 Testcontainers PostgreSQL 容器在 10 秒内未完成宿主端口绑定而失败；Docker 无残留且资源正常，两个失败用例随后聚焦 `2/2` PASS，完整 full Gate 重跑为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（178926ms），task Gate 同终态（86594ms，executed=5）；owner threat review 已由本次批准补齐，Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`；
+- PR #204 已用 exact-head squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；GitHub verification=`valid`，final head 与 merge commit tree 均为 `1cf17fcdedae16d9f4f816bdb066c04eb5aca4f9`；Issue #77 Closed；
+- merged-main CI run `34840948890` 在同一 merge commit 上 11/11 SUCCESS，包含 docs/static/unit-contract/真实 DB/queue/API/Admin/resilience/AI/supply-chain 与聚合 full Gate；AI-008 进入 Done；
+- AI-008 最终交付用户主动 Matter CRUD/CAS、独立用途授权、Safety 前置、AES-256-GCM 标题密文、MATTER DataTask 删除传播、MEM-001/MEM-002 和 `698/1010 COVERED` registry；Daily/Weekly v1 仍无 Matter context，AI-009 resolver 与 A-004 提醒排期未提前实现；
+- 微信 DevTools CLI 仍未配置并保持 `INFRA_BLOCKED: MINIAPP_DEVTOOLS_CLI_PATH_MISSING`；真实 provider、MODEL/LOAD/HUMAN、Production/RC/Alpha 与真实用户继续 Planned/Pending/NO_GO；C-015 继续 Blocked；
+- AI-009（用途受限的结构化记忆选择）成为唯一 Ready；遵循 owner 本轮“合并并收尾”的范围，本次不运行 AI-009 prepare、不创建实现分支或编码。
+- 状态提交 `e4305bdd050c9e0a3dab169b7c3dfe231cedd8d3` 已推送并创建 [Draft PR #205](https://github.com/WeiHan1996/DailyEnergy/pull/205)；本次 PR 引用回写产生的新 final head 必须使用自己的 Gate/CI，不能复用 PR #204 或 merged-main CI 作为状态 PR 合并证据。
 
 ## 2026-09-14 AI-008 实施与本地验证
 
