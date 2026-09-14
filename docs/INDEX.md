@@ -261,7 +261,7 @@ Phase 1 开始后逐步增加：
 
 ## 12. 当前读取顺序
 
-Phase 0B、Phase 1 和 Phase 2 已结束；D-001～D-005、E-001～E-017、C-001～C-014/C-016/C-017 与 AI-001～AI-007 已完成。AI-008 是唯一 In Review 任务，实现分支为 `agent/ai008-important-matters`，Draft PR 待创建。C-015 的 Production/Privacy/Legal 外部证据继续 Blocked，Production/RC 保持 `NO_GO`。读取顺序：
+Phase 0B、Phase 1 和 Phase 2 已结束；D-001～D-005、E-001～E-017、C-001～C-014/C-016/C-017 与 AI-001～AI-007 已完成。AI-008 是唯一 In Review 任务，实现分支为 `agent/ai008-important-matters`，[Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) 已创建。C-015 的 Production/Privacy/Legal 外部证据继续 Blocked，Production/RC 保持 `NO_GO`。读取顺序：
 
 1. AGENTS.md；
 2. README.md；

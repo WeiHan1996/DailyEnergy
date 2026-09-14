@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-14
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：[AI-008 重要事项](./current.md)：In Review；Schema/CRUD/CAS/grant/Safety/加密/MATTER DataTask 与 MEM-001/MEM-002 已实现，等待 Draft PR 和 owner threat-boundary 审核；C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
+- **当前任务**：[AI-008 重要事项](./current.md)：In Review；[Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) 已创建，等待 final-head Gate/CI 与 owner threat-boundary 审核；C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -232,7 +232,7 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 | [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | Done      | PR #195/#196 已合并；merged-main CI 11/11；Issue #74 Closed              |
 | [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | Done      | PR #198 squash 合并为 `aa7e6a28`；merged-main CI 11/11；Issue #75 Closed |
 | [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Done      | PR #200 squash 合并为 `719ffbe8`；merged-main CI 11/11；Issue #76 Closed |
-| [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | In Review | 用户主动 CRUD、独立 grant、Safety/加密/删除与 MEM-001/MEM-002 已实现     |
+| [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | In Review | Draft PR #204；等待 owner threat review                                  |
 | [AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78) | 结构化记忆         | Planned   | 来源、用途和有效期                                                       |
 | [AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79) | 第 3 天风格校准    | Planned   | 反馈影响后续表达                                                         |
 | [AI-011](https://github.com/WeiHan1996/DailyEnergy/issues/84) | 七天 AI 总结       | Planned   | 只引用真实数据                                                           |

@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（用户自由文本 Safety、用途授权、加密、修订与删除/不复活边界；prepare 已 READY）
 - **工作分支**：`agent/ai008-important-matters`（从 verified `main@2c061d4c571b612e1e8383b6f01b4ce40715124c` 创建）
 - **任务 Issue**：[AI-008 Issue #77](https://github.com/WeiHan1996/DailyEnergy/issues/77)
-- **当前 PR**：待创建聚焦 Draft PR；创建后回写 PR 与 final head
+- **当前 PR**：[Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204)；实现提交 `65c141bdec1219466af32f7fe1fdea014d83933b` 已推送，本次状态回写后的 final head 必须使用自己的 Gate/CI
 - **上一完成任务**：AI-007 Done；[PR #200](https://github.com/WeiHan1996/DailyEnergy/pull/200) final head `d44ea182d0a489329f5be5dc4ecb0ec1c83d782f` / CI run `34223694159` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `719ffbe89cd21625deffcc6da425f6a7e5a6d823`；merged-main CI run `34240311148` 11/11 SUCCESS；Issue #76 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,7 +16,7 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-007 已 Done；`pnpm agent:prepare AI-008 --remote --deep` 返回 READY，Node/pnpm/dependencies/GitHub 全部 PASS；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由 AI-008 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：运行 In Review 状态的 full/task Gate，提交并推送实现，创建聚焦 Draft PR；随后回写 PR/final head 并等待 owner 审核 threat boundary
+- **下一候选动作**：提交并推送 PR #204 状态收据，运行 final-head Gate 并核对同一 head CI；随后等待 owner 审核 threat boundary，不标记 Ready 或合并
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-14 AI-008 实施与本地验证
@@ -33,6 +33,7 @@
 - 微信构建与 bundle/design checks 已通过；本机未配置 `MINIAPP_DEVTOOLS_CLI_PATH`，DevTools conformance 保持 `INFRA_BLOCKED: MINIAPP_DEVTOOLS_CLI_PATH_MISSING`，不能冒充平台 PASS；
 - 待 owner 审核的 threat boundary：标题只以密文存在于当前源/revision，普通日志、analytics、outbox 与回执不含正文；Safety/删除/account/consent/onboarding guard 在普通写前 fail closed；用途 grant 不互借且 v1 不进 Prompt；重放先绑定 operation/target/HMAC payload 后才可返回，CAS loser 不覆盖；MATTER 删除与到期不复活标题或派生；API 最小列权限不获得 restricted 表或 DELETE；AI-009、A-004、真实 provider、Production/RC/Alpha 和真实用户均不在本 PR；Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`；
 - AI-008 获接受并合并后的下一任务为 AI-009（确定性结构化记忆 resolver）；本次不启动 AI-009。
+- 实现提交 `65c141bdec1219466af32f7fe1fdea014d83933b` 已推送并创建 [Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204)；本次 PR 引用回写产生的新 final head 必须使用自己的同 run CI，不能复用实现提交或此前本地 Gate 作为合并证据。
 
 ## 2026-09-09 AI-008 启动
 
