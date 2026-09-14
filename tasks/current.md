@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（用户自由文本 Safety、用途授权、加密、修订与删除/不复活边界；prepare 已 READY）
 - **工作分支**：`agent/ai008-important-matters`（从 verified `main@2c061d4c571b612e1e8383b6f01b4ce40715124c` 创建）
 - **任务 Issue**：[AI-008 Issue #77](https://github.com/WeiHan1996/DailyEnergy/issues/77)
-- **当前 PR**：[Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204)；review baseline `4cb58cc43bd6fbccabfe4847d9d77ff171e80e27` / CI run `34824600275` 11/11 SUCCESS
+- **当前 PR**：[Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204)；批准前 final head `b8c1aad08814b748ac70c32646e87da93b6881b4` / CI run `34825062102` 11/11 SUCCESS
 - **上一完成任务**：AI-007 Done；[PR #200](https://github.com/WeiHan1996/DailyEnergy/pull/200) final head `d44ea182d0a489329f5be5dc4ecb0ec1c83d782f` / CI run `34223694159` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `719ffbe89cd21625deffcc6da425f6a7e5a6d823`；merged-main CI run `34240311148` 11/11 SUCCESS；Issue #76 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -16,11 +16,12 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-007 已 Done；`pnpm agent:prepare AI-008 --remote --deep` 返回 READY，Node/pnpm/dependencies/GitHub 全部 PASS；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由 AI-008 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待 owner 审核 PR #204 的 threat boundary；未经明确批准不标记 Ready、不运行 merge verifier、不合并，也不启动 AI-009
+- **下一候选动作**：提交 owner 接受收据，重新通过该 final head 的 full/task Gate 与 11-check CI；随后标记 PR #204 Ready、运行 exact-head verifier 并 squash merge，再完成 post-merge 状态收尾；不启动 AI-009
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-14 AI-008 实施与本地验证
 
+- owner 明确“审核完成，合并并收尾”，接受 PR #204 的 Matter/Safety/用途授权/加密/幂等/删除/最小数据库权限 threat boundary，并授权标记 Ready、exact-head verifier、squash merge 与 post-merge 状态收尾；该决定不授予 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；
 - shared Schema、OpenAPI 与生成 client 已新增封闭 Matter 列表/创建/修改/暂停/恢复/完成/删除合同；标题强制 NFC、单行、1～80 grapheme 且最多 320 UTF-8 bytes，写命令保持 Idempotency-Key、command ref、expected revision/CAS 与 unknown-outcome 恢复边界；
 - `matter-policy-v1` 将有日期事项在目标日后派生为 EXPIRED、无日期事项在第 8 个产品日派生为 EXPIRED，并保持 PAUSED、COMPLETED、EXPIRED 与显式重新激活语义分离；
 - PostgreSQL Matter store 使用 owner/account advisory lock、CAS、HMAC payload fingerprint、AES-256-GCM 标题密文、append-only revision 与 Daily/Weekly 独立 grant；终态 retention anchor 为 90 天，API 只有当前 owner Matter/Grant 的列级最小权限，删除继续由 Restricted DataTask worker 拥有；
@@ -29,11 +30,11 @@
 - Mini Program 已实现 MEM-001/MEM-002、Today 第 4 相遇日邀请和隐私数据入口；标题不进入本地 storage，离线写关闭，网络失败重试只复用同一内存 command ref；提醒排期/投递仍由 A-004 负责；
 - Source registry 为 `698/1010 COVERED`、`312 PLANNED`、`0 NA_WITH_REASON`、`0 UNMAPPED`；AI-009 resolver/提及频率/发布时 source+grant recheck/fallback selection、真实 provider 与 MODEL/LOAD/HUMAN 均未被提前标记覆盖；
 - full Gate 首次失败证据保留：新 npm advisory 由 `next 16.3.3` 与 `multer 2.3.0` 修复；Next optional `sharp`/libvips 因 LGPL policy 被移除；固定日期 core E2E 在 2026-09-12 后触发 outbox TTL 到期，已改为相对当前测试时钟；官方 registry audit 最终为 critical=0/high=0，license scan 通过；
-- 完整实现状态在固定 Node `24.18.0` / pnpm `11.17.0` 下已完成 root typecheck/test、真实 PostgreSQL 18 `91/91`、API `168`、Mini Program `99`、shared-schemas `68`、server-core `156`；缓存 Today P95=`29ms`、template generation P95=`112ms`；本次幂等复核修正更新/状态命令先判 revision 导致成功重放误报冲突的问题，聚焦 API `8/8` 与真实 PostgreSQL AI-008 `1/1` 通过；In Review 状态 full Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（178216ms），task Gate 同终态（86111ms，executed=5）；PR review baseline `4cb58cc43bd6fbccabfe4847d9d77ff171e80e27` 的 final-head full Gate 同终态（177940ms），CI run `34824600275` 11/11 SUCCESS；
+- 完整实现状态在固定 Node `24.18.0` / pnpm `11.17.0` 下已完成 root typecheck/test、真实 PostgreSQL 18 `91/91`、API `168`、Mini Program `99`、shared-schemas `68`、server-core `156`；缓存 Today P95=`29ms`、template generation P95=`112ms`；本次幂等复核修正更新/状态命令先判 revision 导致成功重放误报冲突的问题，聚焦 API `8/8` 与真实 PostgreSQL AI-008 `1/1` 通过；In Review 状态 full Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（178216ms），task Gate 同终态（86111ms，executed=5）；PR review baseline `4cb58cc43bd6fbccabfe4847d9d77ff171e80e27` 的 final-head full Gate 同终态（177940ms），CI run `34824600275` 11/11 SUCCESS；批准前 final head `b8c1aad08814b748ac70c32646e87da93b6881b4` 的 full Gate 同终态（176725ms），CI run `34825062102` 11/11 SUCCESS；
 - 微信构建与 bundle/design checks 已通过；本机未配置 `MINIAPP_DEVTOOLS_CLI_PATH`，DevTools conformance 保持 `INFRA_BLOCKED: MINIAPP_DEVTOOLS_CLI_PATH_MISSING`，不能冒充平台 PASS；
-- 待 owner 审核的 threat boundary：标题只以密文存在于当前源/revision，普通日志、analytics、outbox 与回执不含正文；Safety/删除/account/consent/onboarding guard 在普通写前 fail closed；用途 grant 不互借且 v1 不进 Prompt；重放先绑定 operation/target/HMAC payload 后才可返回，CAS loser 不覆盖；MATTER 删除与到期不复活标题或派生；API 最小列权限不获得 restricted 表或 DELETE；AI-009、A-004、真实 provider、Production/RC/Alpha 和真实用户均不在本 PR；Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`；
+- owner 已审核接受的 threat boundary：标题只以密文存在于当前源/revision，普通日志、analytics、outbox 与回执不含正文；Safety/删除/account/consent/onboarding guard 在普通写前 fail closed；用途 grant 不互借且 v1 不进 Prompt；重放先绑定 operation/target/HMAC payload 后才可返回，CAS loser 不覆盖；MATTER 删除与到期不复活标题或派生；API 最小列权限不获得 restricted 表或 DELETE；AI-009、A-004、真实 provider、Production/RC/Alpha 和真实用户均不在本 PR；Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`；
 - AI-008 获接受并合并后的下一任务为 AI-009（确定性结构化记忆 resolver）；本次不启动 AI-009。
-- 实现提交 `65c141bdec1219466af32f7fe1fdea014d83933b` 已推送并创建 [Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204)；PR 引用回写后的 review baseline `4cb58cc43bd6fbccabfe4847d9d77ff171e80e27` 已通过自己的 final-head full Gate 与同一 head CI run `34824600275` 的 11 项 SUCCESS；本次状态收据提交只更新项目控制文件，仍须使用自己的 CI，不能作为 merge 授权。
+- 实现提交 `65c141bdec1219466af32f7fe1fdea014d83933b` 已推送并创建 [Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204)；批准前 final head `b8c1aad08814b748ac70c32646e87da93b6881b4` 已通过自己的 full Gate 与同一 head CI run `34825062102` 的 11 项 SUCCESS；本次 owner 接受收据会产生新的 final head，仍须使用自己的 Gate/CI 后才可合并。
 
 ## 2026-09-09 AI-008 启动
 
