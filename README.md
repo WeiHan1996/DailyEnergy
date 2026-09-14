@@ -347,10 +347,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
 
 ```text
 阶段：Phase 3 — AI 陪伴层
-状态：AI-008 In Review
-当前目标：实现用户主动添加、编辑与删除的重要事项
-当前任务：AI-008 实现重要事项的添加、编辑与删除
-工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/77
+状态：AI-009 Ready（等待新的明确启动指令）
+当前目标：从显式领域事实生成用途受限、可删除的确定性记忆投影
+当前任务：AI-009 实现用途受限的结构化记忆选择
+工程入口：https://github.com/WeiHan1996/DailyEnergy/issues/78
 ```
 
 长期工作入口：
@@ -367,10 +367,10 @@ MVP 的成功不以功能数量衡量，而以用户是否愿意持续回来衡�
   已获 owner 接受；[PR #185](https://github.com/WeiHan1996/DailyEnergy/pull/185)
   经 exact-head verifier 后 squash 合并为 `15e0e673a09b3d993637c284da3e299898595306`，
   merged-main CI run `34078365765` 为 11/11 SUCCESS；
-- Phase 2 已结束，Phase 3 development 开始；AI-001～AI-007 已合并并关闭，AI-008 是唯一 In Review 任务；
+- Phase 2 已结束，Phase 3 development 开始；AI-001～AI-008 已合并并关闭，AI-009 是唯一 Ready，本次不启动；
 - AI-008 已实现用户主动 Matter CRUD/CAS、独立用途授权、Safety 前置、密文保存、MATTER 删除传播和 MEM-001/MEM-002；
-  Daily/Weekly v1 仍不接收事项，AI-009 resolver、A-004 提醒排期与真实 provider 不在本任务；
-- [Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) review baseline 的 final-head Gate 与 CI 11/11 已通过，当前等待 owner threat-boundary 审核；
+  [PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) 经 exact-head verifier 后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`，merged-main CI run `34840948890` 为 11/11 SUCCESS；
+- AI-009 将实现用途受限的 deterministic resolver、发布前 source/grant recheck 与无记忆回退；当前尚未运行 prepare 或创建实现分支；
 - Source registry 当前为 `698/1010 COVERED`、`312 PLANNED`、`0 UNMAPPED`；完整自动 Gate 与 DevTools/人工边界状态见 `tasks/current.md`；
 - AI-007 已闭合 LightFact-only 关系派生、第 1/3/7 天一次性节点、删除/重放、历史冻结与受控关系文案；
   微信 DevTools、真实 provider、MODEL/LOAD/HUMAN 与 Production 证据仍保持 Blocked/Planned/Pending；
