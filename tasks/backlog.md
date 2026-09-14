@@ -3,7 +3,7 @@
 - **文档状态**：Active
 - **最后更新**：2026-09-14
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：[AI-008 重要事项](./current.md)：In Review；[Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) 已创建，等待 final-head Gate/CI 与 owner threat-boundary 审核；C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
+- **当前任务**：[AI-008 重要事项](./current.md)：In Review；[Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) review baseline CI 11/11 SUCCESS，等待 owner threat-boundary 审核；C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
