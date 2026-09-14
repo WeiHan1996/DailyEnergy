@@ -4,6 +4,7 @@ import {
   ClientEveningFeedbackViewSchema,
   DailyInteractionStateSchema,
   MemoryPreferencesViewSchema,
+  MatterViewSchema,
   NotificationSettingsViewSchema,
   ProfileViewSchema,
   SafetyOverlayViewSchema,
@@ -316,6 +317,7 @@ const RevisionErrorDetailsSchema = z.strictObject({
     ClientEveningFeedbackViewSchema,
     ProfileViewSchema,
     MemoryPreferencesViewSchema,
+    MatterViewSchema,
     NotificationSettingsViewSchema,
   ]),
 });

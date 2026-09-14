@@ -125,6 +125,7 @@ export class EveningService {
             now: resolution.now,
             policyVersion: decision.policyVersion,
             ruleVersion: decision.ruleVersion,
+            surfaceCode: "EVE-001",
           }),
         );
         if (activation.status === "IDEMPOTENCY_CONFLICT") {

@@ -27,17 +27,49 @@ const FORBIDDEN_OUTPUT =
   /stack|prisma|sql|provider|model|prompt|openid|ciphertext|deletion_epoch|guard_epoch/iu;
 const CACHED_TODAY_P95_BUDGET_MS = 1_000;
 const TEMPLATE_GENERATION_P95_BUDGET_MS = 8_000;
+const JOURNEY_END_PRODUCT_DATE = currentProductDate();
+const JOURNEY_DATES = Object.freeze(
+  Array.from({ length: 7 }, (_value, index) =>
+    addIsoDateDays(JOURNEY_END_PRODUCT_DATE, index - 6),
+  ),
+);
+const JOURNEY_PRECONDITION_AT = new Date(
+  `${addIsoDateDays(JOURNEY_DATES[0], -1)}T04:01:00+08:00`,
+);
+const JOURNEY_NEXT_PRODUCT_DATE = addIsoDateDays(JOURNEY_END_PRODUCT_DATE, 1);
 
 class MutableClock {
-  #value = new Date("2026-08-30T12:00:00.000Z");
+  #value = new Date(`${JOURNEY_DATES[0]}T04:01:00+08:00`);
 
   now() {
     return new Date(this.#value);
   }
 
   setProductDate(productDate) {
-    this.#value = new Date(`${productDate}T12:00:00.000Z`);
+    this.#value = new Date(`${productDate}T04:01:00+08:00`);
   }
+}
+
+function currentProductDate(now = new Date()) {
+  const shifted = new Date(now.getTime() - 4 * 60 * 60_000);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+  }).formatToParts(shifted);
+  const values = Object.fromEntries(
+    parts
+      .filter(({ type }) => ["day", "month", "year"].includes(type))
+      .map(({ type, value }) => [type, value]),
+  );
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function addIsoDateDays(productDate, days) {
+  const date = new Date(`${productDate}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
 }
 
 async function startRedis() {
@@ -454,9 +486,8 @@ test(
           ORDER BY "issuedAt" DESC LIMIT 1`,
       );
       await admin.query(
-        `UPDATE app_user_account SET "createdAt"='2026-08-29T12:00:00.000Z'
-          WHERE id=$1`,
-        [accountId],
+        `UPDATE app_user_account SET "createdAt"=$2::timestamptz WHERE id=$1`,
+        [accountId, JOURNEY_PRECONDITION_AT],
       );
 
       const consentCommand = "c016-consent-command-0001";
@@ -490,9 +521,9 @@ test(
       assert.equal(secondSession.body.data.consent_required, false);
       assert.equal(secondSession.body.data.onboarding_required, false);
       await admin.query(
-        `UPDATE app_session_credential SET "issuedAt"='2026-08-29T12:00:00.000Z'
+        `UPDATE app_session_credential SET "issuedAt"=$2::timestamptz
           WHERE "accountId"=$1`,
-        [accountId],
+        [accountId, JOURNEY_PRECONDITION_AT],
       );
       assert.equal(
         await scalar(
@@ -502,15 +533,7 @@ test(
         1,
       );
 
-      const dates = [
-        "2026-08-30",
-        "2026-08-31",
-        "2026-09-01",
-        "2026-09-02",
-        "2026-09-03",
-        "2026-09-04",
-        "2026-09-05",
-      ];
+      const dates = JOURNEY_DATES;
       const resultRefs = [];
       const cachedTodaySamples = [];
       const templateGenerationSamples = [];
@@ -923,16 +946,38 @@ test(
         ),
         1,
       );
-      const deletion = await pollUntil(
-        "day-deletion",
-        () =>
-          requestJson(baseUrl, `/v1/data-rights/tasks/${taskRef}`, {
-            authorization: authA,
-          }),
-        ({ response, body }) =>
-          response.status === 200 && body.data.status === "SUCCEEDED",
-        () => backgroundWorker.relayOnce(),
-      );
+      let deletion;
+      try {
+        deletion = await pollUntil(
+          "day-deletion",
+          () =>
+            requestJson(baseUrl, `/v1/data-rights/tasks/${taskRef}`, {
+              authorization: authA,
+            }),
+          ({ response, body }) =>
+            response.status === 200 && body.data.status === "SUCCEEDED",
+          () => backgroundWorker.relayOnce(),
+        );
+      } catch (error) {
+        const diagnostic = (
+          await admin.query(
+            `SELECT task.state::text AS task_state,task.revision,
+                    outbox.state::text AS outbox_state,outbox."attemptCount" AS outbox_attempts,
+                    inbox."outcomeCode" AS inbox_outcome
+               FROM restricted_data_task task
+               LEFT JOIN runtime_outbox_event outbox
+                 ON outbox."aggregateRef"=task.id AND outbox."eventType"='DeletionGuarded'
+               LEFT JOIN runtime_inbox_receipt inbox
+                 ON inbox."eventId"=outbox.id AND inbox."consumerCode"='restricted-data-task'
+              WHERE task.id=$1::uuid`,
+            [taskRef],
+          )
+        ).rows;
+        throw new Error(
+          `CORE_E2E_DAY_DELETION_TIMEOUT:${JSON.stringify(diagnostic)}`,
+          { cause: error },
+        );
+      }
       assert.equal(deletion.body.data.online_erased_at !== undefined, true);
       assert.equal(
         await scalar(
@@ -1072,7 +1117,7 @@ test(
       console.log(
         `CORE_E2E_PERFORMANCE_OK:cached_today_p95_ms=${Math.ceil(cachedTodayP95Ms)}:cached_samples=7:template_generation_p95_ms=${Math.ceil(templateGenerationP95Ms)}:generation_samples=6`,
       );
-      clock.setProductDate("2026-09-06");
+      clock.setProductDate(JOURNEY_NEXT_PRODUCT_DATE);
       const crossDaySafety = await requestJson(baseUrl, "/v1/daily/today", {
         authorization: authA,
         expectedStatus: 409,

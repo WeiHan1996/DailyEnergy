@@ -1426,6 +1426,7 @@ test(
         now: new Date(baseNow.getTime() + 8_100),
         policyVersion: "safety-v1",
         ruleVersion: "safety-rules-v1",
+        surfaceCode: "EVE-001",
       };
       const safetyActivated = await eveningSafety.activate(safetyInput);
       assert.equal(safetyActivated.status, "ACCEPTED");

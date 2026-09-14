@@ -7,6 +7,7 @@ import type {
   DailyInteractionStore,
   DataRightsStore,
   EveningStore,
+  MatterStore,
   TelemetryRuntime,
   WeeklyStore,
 } from "@daily-energy/server-adapters/api";
@@ -45,6 +46,7 @@ export const DELETION_STATUS_TOKEN_ISSUER = Symbol(
 );
 export const EVENING_STORE = Symbol("EVENING_STORE");
 export const MATTER_TITLE_CODEC = Symbol("MATTER_TITLE_CODEC");
+export const MATTER_STORE = Symbol("MATTER_STORE");
 export const WEEKLY_STORE = Symbol("WEEKLY_STORE");
 export const EVENING_NOTE_CODEC = Symbol("EVENING_NOTE_CODEC");
 export const EVENING_SAFETY_GATE = Symbol("EVENING_SAFETY_GATE");
@@ -74,6 +76,7 @@ export interface ApiCompositionOverrides {
   readonly deletionStatusTokenIssuer?: DeletionStatusTokenIssuer;
   readonly eveningStore?: EveningStore;
   readonly matterTitleCodec?: MatterTitleCodec;
+  readonly matterStore?: MatterStore;
   readonly weeklyStore?: WeeklyStore;
   readonly eveningNoteCodec?: EveningNoteCodec;
   readonly eveningSafetyGate?: EveningSafetyInputGate;

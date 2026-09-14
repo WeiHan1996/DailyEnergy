@@ -146,6 +146,9 @@ Page({
   openEvening() {
     wx.navigateTo({ url: "/pages/evening/index" });
   },
+  openMatters() {
+    wx.navigateTo({ url: "/pages/matters/index" });
+  },
   async updateTask(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
     const view = this.data.view;
     const status = event.detail.value;

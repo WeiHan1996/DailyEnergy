@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:00a1a9cf76a6e9f1e0141332084859a6cd8c4ccc6cf4fdf25771f72b43e5da17
+// source-fingerprint: sha256:2d436369bc54c09c74184bcd12804c0580c90a8db5d7523482827633567e7a1a
 // do not edit; run `pnpm codegen`.
 
 export const ADMIN_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:00a1a9cf76a6e9f1e0141332084859a6cd8c4ccc6cf4fdf25771f72b43e5da17";
+  "sha256:2d436369bc54c09c74184bcd12804c0580c90a8db5d7523482827633567e7a1a";
 
 export interface paths {
   "/admin/auth/login": {
@@ -382,10 +382,10 @@ export interface components {
     };
     MatterView: {
       daily_use_granted: boolean;
-      matter_ref: components["schemas"]["OpaqueRef"];
-      revision: components["schemas"]["PositiveRevision"];
+      matter_ref: string;
+      revision: number;
       status: "ACTIVE" | "PAUSED" | "COMPLETED" | "EXPIRED";
-      target_date?: components["schemas"]["ProductDate"];
+      target_date?: string;
       title: string;
       updated_at: string;
       weekly_use_granted: boolean;

@@ -66,9 +66,9 @@ test("T-E014-GATE-001 accepts conditional development admission and Production N
     production: "NO_GO",
     conditions: 1,
     deferred: 7,
-    total: 1004,
-    COVERED: 672,
-    PLANNED: 332,
+    total: 1010,
+    COVERED: 698,
+    PLANNED: 312,
     NA_WITH_REASON: 0,
   });
 });
@@ -180,9 +180,9 @@ test("T-C017-GATE-001 accepts the owner-approved Phase 3 development decision", 
     deferred: 5,
     cachedP95Ms: 42,
     generationP95Ms: 119,
-    total: 1004,
-    COVERED: 672,
-    PLANNED: 332,
+    total: 1010,
+    COVERED: 698,
+    PLANNED: 312,
     NA_WITH_REASON: 0,
   });
 });
@@ -232,7 +232,7 @@ test("T-C017-GATE-004 rejects missing Phase 2 exit evidence or performance budge
 test("T-C017-GATE-005 rejects registry false-PASS and manual-evidence drift", () => {
   const registryPass = structuredClone(c017Contract);
   registryPass.source_registry.counts.PLANNED = 0;
-  registryPass.source_registry.counts.COVERED = 1004;
+  registryPass.source_registry.counts.COVERED = 1010;
   assert.throws(
     () => validateC017PhaseGateContract(registryPass, c017Dependencies),
     /C017_GATE_REGISTRY/u,

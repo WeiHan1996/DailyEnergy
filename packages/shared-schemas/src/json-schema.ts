@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:a4f7db4d9563915d934f9402825a8e1802b823e86f9a52c90e840fdcfd43fe9f
+// source-fingerprint: sha256:aa656f20b8c9b5c3fa0172dceec454ff8a91010a75bdb3168b16aa40ff05dfc2
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:a4f7db4d9563915d934f9402825a8e1802b823e86f9a52c90e840fdcfd43fe9f";
+  "sha256:aa656f20b8c9b5c3fa0172dceec454ff8a91010a75bdb3168b16aa40ff05dfc2";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -47,6 +47,14 @@ export const JSON_SCHEMA_IDS = {
   relationshipView: "urn:dailyenergy:schema:relationship-view:1.0.0",
   todayView: "urn:dailyenergy:schema:today-view:1.0.0",
   historyDayView: "urn:dailyenergy:schema:history-day-view:1.0.0",
+  matterCreateRequest: "urn:dailyenergy:schema:matter-create-request:1.0.0",
+  matterUpdateRequest: "urn:dailyenergy:schema:matter-update-request:1.0.0",
+  matterTransitionRequest:
+    "urn:dailyenergy:schema:matter-transition-request:1.0.0",
+  matterDeleteCommandRequest:
+    "urn:dailyenergy:schema:matter-delete-command-request:1.0.0",
+  matterView: "urn:dailyenergy:schema:matter-view:1.0.0",
+  matterListView: "urn:dailyenergy:schema:matter-list-view:1.0.0",
   reauthVerifyRequest: "urn:dailyenergy:schema:reauth-verify-request:1.0.0",
   exportRequest: "urn:dailyenergy:schema:export-request:1.0.0",
   deleteDayRequest: "urn:dailyenergy:schema:delete-day-request:1.0.0",
@@ -5273,6 +5281,306 @@ export const jsonSchemas = {
       },
     },
     required: ["product_date"],
+    type: "object",
+  },
+  matterCreateRequest: {
+    $id: "urn:dailyenergy:schema:matter-create-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      daily_use_granted: {
+        type: "boolean",
+      },
+      target_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+      title: {
+        type: "string",
+      },
+      weekly_use_granted: {
+        type: "boolean",
+      },
+    },
+    required: [
+      "command_ref",
+      "title",
+      "daily_use_granted",
+      "weekly_use_granted",
+    ],
+    type: "object",
+  },
+  matterUpdateRequest: {
+    $id: "urn:dailyenergy:schema:matter-update-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      clear_target_date: {
+        type: "boolean",
+      },
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      daily_use_granted: {
+        type: "boolean",
+      },
+      expected_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      target_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+      title: {
+        type: "string",
+      },
+      weekly_use_granted: {
+        type: "boolean",
+      },
+    },
+    required: ["command_ref", "expected_revision"],
+    type: "object",
+  },
+  matterTransitionRequest: {
+    $id: "urn:dailyenergy:schema:matter-transition-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      expected_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+    },
+    required: ["command_ref", "expected_revision"],
+    type: "object",
+  },
+  matterDeleteCommandRequest: {
+    $id: "urn:dailyenergy:schema:matter-delete-command-request:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      client_context: {
+        additionalProperties: false,
+        properties: {
+          app_version: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+          scene: {
+            maxLength: 64,
+            minLength: 1,
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      command_ref: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+        type: "string",
+      },
+      confirmation_version: {
+        pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+        type: "string",
+      },
+      confirmed: {
+        const: true,
+        type: "boolean",
+      },
+      expected_revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+    },
+    required: [
+      "command_ref",
+      "expected_revision",
+      "confirmation_version",
+      "confirmed",
+    ],
+    type: "object",
+  },
+  matterView: {
+    $id: "urn:dailyenergy:schema:matter-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      daily_use_granted: {
+        type: "boolean",
+      },
+      matter_ref: {
+        pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+        type: "string",
+      },
+      revision: {
+        exclusiveMinimum: 0,
+        maximum: 9007199254740991,
+        type: "integer",
+      },
+      status: {
+        enum: ["ACTIVE", "PAUSED", "COMPLETED", "EXPIRED"],
+        type: "string",
+      },
+      target_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+      title: {
+        type: "string",
+      },
+      updated_at: {
+        pattern:
+          "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+        type: "string",
+      },
+      weekly_use_granted: {
+        type: "boolean",
+      },
+    },
+    required: [
+      "matter_ref",
+      "revision",
+      "title",
+      "status",
+      "daily_use_granted",
+      "weekly_use_granted",
+      "updated_at",
+    ],
+    type: "object",
+  },
+  matterListView: {
+    $id: "urn:dailyenergy:schema:matter-list-view:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      items: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            daily_use_granted: {
+              type: "boolean",
+            },
+            matter_ref: {
+              pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+              type: "string",
+            },
+            revision: {
+              exclusiveMinimum: 0,
+              maximum: 9007199254740991,
+              type: "integer",
+            },
+            status: {
+              enum: ["ACTIVE", "PAUSED", "COMPLETED", "EXPIRED"],
+              type: "string",
+            },
+            target_date: {
+              pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+              type: "string",
+            },
+            title: {
+              type: "string",
+            },
+            updated_at: {
+              pattern:
+                "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+              type: "string",
+            },
+            weekly_use_granted: {
+              type: "boolean",
+            },
+          },
+          required: [
+            "matter_ref",
+            "revision",
+            "title",
+            "status",
+            "daily_use_granted",
+            "weekly_use_granted",
+            "updated_at",
+          ],
+          type: "object",
+        },
+        maxItems: 1000,
+        type: "array",
+      },
+      next_cursor: {
+        maxLength: 512,
+        minLength: 1,
+        type: "string",
+      },
+      page_info: {
+        additionalProperties: false,
+        properties: {
+          has_more: {
+            type: "boolean",
+          },
+        },
+        required: ["has_more"],
+        type: "object",
+      },
+    },
+    required: ["items", "page_info"],
     type: "object",
   },
   reauthVerifyRequest: {

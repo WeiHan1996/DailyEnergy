@@ -1,0 +1,88 @@
+.matter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--de-layout-content-gap);
+  padding-bottom: var(--de-layout-safe-bottom);
+}
+
+.matter__title {
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-page-title-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-heading);
+}
+
+.matter__intro,
+.matter__help {
+  color: var(--de-color-text-secondary);
+  font-size: var(--de-font-label-size);
+  line-height: var(--de-font-line-body);
+}
+
+.matter__input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: calc(var(--de-state-touch-target) * 2);
+  padding: var(--de-component-notice-padding);
+  border: var(--de-component-button-border-width) solid
+    var(--de-color-border-default);
+  border-radius: var(--de-component-notice-radius);
+  background: var(--de-color-surface-raised);
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-body-size);
+  line-height: var(--de-font-line-body);
+}
+
+.matter__input--error {
+  border-color: var(--de-color-danger-border);
+}
+
+.matter__help--error {
+  color: var(--de-color-danger-text);
+}
+
+.matter__picker {
+  box-sizing: border-box;
+  min-height: var(--de-state-touch-target);
+  padding: var(--de-component-notice-padding);
+  border: var(--de-component-button-border-width) solid
+    var(--de-color-border-default);
+  border-radius: var(--de-component-notice-radius);
+  background: var(--de-color-surface-raised);
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-body-size);
+  line-height: var(--de-font-line-body);
+}
+
+.matter__switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--de-component-card-gap);
+}
+
+.matter__switch-copy {
+  min-width: 0;
+}
+
+.matter__switch-title,
+.matter__section-title {
+  color: var(--de-color-text-primary);
+  font-size: var(--de-font-body-size);
+  font-weight: var(--de-font-semibold);
+  line-height: var(--de-font-line-body);
+}
+
+.matter__status,
+.matter__danger {
+  display: flex;
+  padding-top: var(--de-layout-content-gap);
+  border-top: var(--de-component-card-border-width) solid
+    var(--de-color-border-subtle);
+  flex-direction: column;
+  gap: var(--de-component-card-gap);
+}
+
+.matter__danger {
+  border-top-color: var(--de-color-danger-border);
+}

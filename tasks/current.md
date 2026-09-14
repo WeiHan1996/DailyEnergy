@@ -1,23 +1,48 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-09-08
+- **最后更新**：2026-09-14
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-008 — 实现重要事项的添加、编辑与删除
-- **任务状态**：Ready
-- **任务 Profile**：`security`（用户自由文本 Safety、用途授权、加密、修订与删除/不复活边界；尚未运行 AI-008 prepare）
-- **工作分支**：`agent/ai007-completion-status`（仅 AI-007 状态收尾）；本状态 PR 合并且收到新的明确启动指令前，不创建 AI-008 实现分支
+- **任务状态**：In Review
+- **任务 Profile**：`security`（用户自由文本 Safety、用途授权、加密、修订与删除/不复活边界；prepare 已 READY）
+- **工作分支**：`agent/ai008-important-matters`（从 verified `main@2c061d4c571b612e1e8383b6f01b4ce40715124c` 创建）
 - **任务 Issue**：[AI-008 Issue #77](https://github.com/WeiHan1996/DailyEnergy/issues/77)
-- **当前 PR**：[Draft PR #201](https://github.com/WeiHan1996/DailyEnergy/pull/201)（仅 AI-007 状态收尾）；AI-008 实现 PR 不存在
+- **当前 PR**：待创建聚焦 Draft PR；创建后回写 PR 与 final head
 - **上一完成任务**：AI-007 Done；[PR #200](https://github.com/WeiHan1996/DailyEnergy/pull/200) final head `d44ea182d0a489329f5be5dc4ecb0ec1c83d782f` / CI run `34223694159` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `719ffbe89cd21625deffcc6da425f6a7e5a6d823`；merged-main CI run `34240311148` 11/11 SUCCESS；Issue #76 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-007 已 Done；AI-008 依赖与权威来源须在未来收到明确启动指令后通过 `pnpm agent:prepare AI-008` 恢复，不在本状态收尾中预判或实施；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由 AI-008 或后续开发任务自动关闭
+- **依赖边界**：AI-007 已 Done；`pnpm agent:prepare AI-008 --remote --deep` 返回 READY，Node/pnpm/dependencies/GitHub 全部 PASS；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由 AI-008 或后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待 [Draft PR #201](https://github.com/WeiHan1996/DailyEnergy/pull/201) final head 的同 run 11-check CI；后续仅在新的明确指令下合并状态 PR 或启动 AI-008，本次不运行 AI-008 prepare、不创建实现分支或编码
+- **下一候选动作**：运行 In Review 状态的 full/task Gate，提交并推送实现，创建聚焦 Draft PR；随后回写 PR/final head 并等待 owner 审核 threat boundary
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-14 AI-008 实施与本地验证
+
+- shared Schema、OpenAPI 与生成 client 已新增封闭 Matter 列表/创建/修改/暂停/恢复/完成/删除合同；标题强制 NFC、单行、1～80 grapheme 且最多 320 UTF-8 bytes，写命令保持 Idempotency-Key、command ref、expected revision/CAS 与 unknown-outcome 恢复边界；
+- `matter-policy-v1` 将有日期事项在目标日后派生为 EXPIRED、无日期事项在第 8 个产品日派生为 EXPIRED，并保持 PAUSED、COMPLETED、EXPIRED 与显式重新激活语义分离；
+- PostgreSQL Matter store 使用 owner/account advisory lock、CAS、HMAC payload fingerprint、AES-256-GCM 标题密文、append-only revision 与 Daily/Weekly 独立 grant；终态 retention anchor 为 90 天，API 只有当前 owner Matter/Grant 的列级最小权限，删除继续由 Restricted DataTask worker 拥有；
+- 所有标题写入复用现有 Safety Input Gate：HIGH_RISK 原子进入 Safety overlay 且 Matter/grant 写入为 0；PROFESSIONAL_BOUNDARY 只私有保存并关闭普通 AI grants；Daily/Weekly v1 仍不接收 Matter context；
+- 既有 MATTER DataTask 已接入新页面/API，guard 提交后事项立即从普通列表/读取消失，现有 restricted worker 与 fallback cleanup 清理 revisions、grants、mentions、dependencies、reminders/fragments；不改变 ACCOUNT/DAY/RELATIONSHIP_DATA 范围；
+- Mini Program 已实现 MEM-001/MEM-002、Today 第 4 相遇日邀请和隐私数据入口；标题不进入本地 storage，离线写关闭，网络失败重试只复用同一内存 command ref；提醒排期/投递仍由 A-004 负责；
+- Source registry 为 `698/1010 COVERED`、`312 PLANNED`、`0 NA_WITH_REASON`、`0 UNMAPPED`；AI-009 resolver/提及频率/发布时 source+grant recheck/fallback selection、真实 provider 与 MODEL/LOAD/HUMAN 均未被提前标记覆盖；
+- full Gate 首次失败证据保留：新 npm advisory 由 `next 16.3.3` 与 `multer 2.3.0` 修复；Next optional `sharp`/libvips 因 LGPL policy 被移除；固定日期 core E2E 在 2026-09-12 后触发 outbox TTL 到期，已改为相对当前测试时钟；官方 registry audit 最终为 critical=0/high=0，license scan 通过；
+- 完整实现状态在固定 Node `24.18.0` / pnpm `11.17.0` 下已完成 root typecheck/test、真实 PostgreSQL 18 `91/91`、API `168`、Mini Program `99`、shared-schemas `68`、server-core `156`；缓存 Today P95=`29ms`、template generation P95=`112ms`；本次幂等复核修正更新/状态命令先判 revision 导致成功重放误报冲突的问题，聚焦 API `8/8` 与真实 PostgreSQL AI-008 `1/1` 通过；In Review 状态的 final full Gate 为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（178216ms），task Gate 同终态（86111ms，executed=5）；
+- 微信构建与 bundle/design checks 已通过；本机未配置 `MINIAPP_DEVTOOLS_CLI_PATH`，DevTools conformance 保持 `INFRA_BLOCKED: MINIAPP_DEVTOOLS_CLI_PATH_MISSING`，不能冒充平台 PASS；
+- 待 owner 审核的 threat boundary：标题只以密文存在于当前源/revision，普通日志、analytics、outbox 与回执不含正文；Safety/删除/account/consent/onboarding guard 在普通写前 fail closed；用途 grant 不互借且 v1 不进 Prompt；重放先绑定 operation/target/HMAC payload 后才可返回，CAS loser 不覆盖；MATTER 删除与到期不复活标题或派生；API 最小列权限不获得 restricted 表或 DELETE；AI-009、A-004、真实 provider、Production/RC/Alpha 和真实用户均不在本 PR；Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`；
+- AI-008 获接受并合并后的下一任务为 AI-009（确定性结构化记忆 resolver）；本次不启动 AI-009。
+
+## 2026-09-09 AI-008 启动
+
+- owner 明确批准先合并 AI-007 状态收尾 PR #201 再启动 AI-008；该授权不包含 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；
+- PR #201 final head `2a64c624ab434bffc142bc8e532779a4ad084ad7` 经 exact-head verifier 绑定 CI run `34241589993` 的 11 项 SUCCESS，squash 合并为 `2c061d4c571b612e1e8383b6f01b4ce40715124c`；merged-main CI run `34250162988` 为 11/11 SUCCESS；
+- `pnpm agent:prepare AI-008 --remote --deep` 返回 READY，Profile=`security`，Node/pnpm/dependencies/GitHub 全部 PASS；required manual evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`；
+- 分支 `agent/ai008-important-matters` 从本地、`origin/main` 与远端一致的 verified `main@2c061d4c571b612e1e8383b6f01b4ce40715124c` 创建，开工前工作树无变更；
+- 范围只包含用户主动 Matter Schema、列表/创建/编辑/暂停/恢复/完成/删除、独立 grant、有效期/revision、MEM-001/MEM-002、Safety Input Gate、标题加密和 MATTER 删除传播；
+- 不从反馈/历史/对话自动抽取，不启用 Daily/Weekly v1 事项上下文，不实现 AI-009 resolver、向量检索、自动总结、真实 provider/key 或 Production/RC；
+- 自动证明必须覆盖 CRUD/CAS/owner/过期/grant/high-risk/delete race、真实 PostgreSQL 与页面 E2E；设计/威胁边界和 Production 授权不能由自动化代替。
 
 ## 2026-09-08 AI-007 post-merge 收尾
 

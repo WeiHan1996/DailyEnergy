@@ -20,11 +20,11 @@ function cloneRegistry() {
 test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () => {
   assert.deepEqual(await loadAndValidateCoverageRegistry(), {
     counts: {
-      COVERED: 672,
+      COVERED: 698,
       NA_WITH_REASON: 0,
-      PLANNED: 332,
+      PLANNED: 312,
     },
-    total: 1004,
+    total: 1010,
   });
 
   const ai001Entries = registry.entries.filter(({ evidence }) =>
@@ -160,6 +160,37 @@ test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () =>
     ],
   );
 
+  const ai008Entries = registry.entries.filter(({ evidence }) =>
+    evidence?.some(
+      ({ origin }) => origin === "tests/registry/ai008-evidence-manifest.json",
+    ),
+  );
+  assert.deepEqual(
+    ai008Entries.map(({ source_id: sourceId }) => sourceId),
+    [
+      "D17-M01",
+      "D17-M04",
+      "D17-S02",
+      "M14-C03",
+      "M14-C07",
+      "M14-D04",
+      "M14-D11",
+      "M14-S06",
+      "PDM-C05",
+      "S15-E03",
+      "S15-E05",
+      "S15-E09",
+      "S15-E10",
+      "S19-DB-025",
+      "S19-DB-026",
+      "S19-DB-028",
+      "S20-E06",
+      "S20-E07",
+      "S20-E08",
+      "S20-E09",
+    ],
+  );
+
   const analyticsEntries = registry.entries.filter(
     ({ source_sets: sourceSets }) =>
       sourceSets.some((sourceSet) =>
@@ -193,6 +224,8 @@ test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () =>
       "D17-I04",
       "D17-I05",
       "D17-I06",
+      "D17-M01",
+      "D17-M04",
       "D17-M05",
       "D17-M06",
       "D17-R01",
@@ -201,6 +234,7 @@ test("T-E010-REGISTRY-001 validates every explicit Source-ID state", async () =>
       "D17-R04",
       "D17-R05",
       "D17-R06",
+      "D17-S02",
       "D17-V01",
       "D17-V02",
       "D17-V03",

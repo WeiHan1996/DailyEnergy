@@ -32,6 +32,7 @@
       <de-section-card heading="查看和管理">
         <view class="privacy__copy">可以从最近记录逐日查看已保存内容；删除后日期会如实显示为缺失。</view>
         <de-action-button block="{{true}}" label="查看最近记录" variant="secondary" bind:press="openRecords"></de-action-button>
+        <de-action-button block="{{true}}" label="管理重要事项" variant="secondary" bind:press="openMatters"></de-action-button>
       </de-section-card>
 
       <de-section-card heading="导出自己的数据">

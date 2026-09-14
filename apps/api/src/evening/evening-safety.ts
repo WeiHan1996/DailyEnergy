@@ -2,7 +2,7 @@ import type { SafetyOverlayView } from "@daily-energy/shared-schemas";
 
 export type EveningSafetyDecision =
   | {
-      readonly outcome: "CLEAR";
+      readonly outcome: "CLEAR" | "PROFESSIONAL_BOUNDARY";
       readonly policyVersion: string;
       readonly ruleVersion: string;
       readonly classifierVersion: string;
@@ -21,7 +21,7 @@ export type EveningSafetyDecision =
 export interface EveningSafetyInputGate {
   decide(input: {
     readonly note: string;
-    readonly surface: "EVE-001";
+    readonly surface: "EVE-001" | "MEM-002";
   }): Promise<EveningSafetyDecision>;
 }
 
@@ -35,6 +35,7 @@ export interface EveningSafetyStore {
     readonly now: Date;
     readonly policyVersion: string;
     readonly ruleVersion: string;
+    readonly surfaceCode: "EVE-001" | "MEM-002";
   }): Promise<
     | {
         readonly status: "ACCEPTED" | "DUPLICATE";

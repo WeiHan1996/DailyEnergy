@@ -7,7 +7,7 @@
 
 | 命令                                                 | 证据                                                                                |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `pnpm registry:check`                                | 1004 个 Accepted/Schema Source ID 的唯一状态、强制层级和生成漂移                    |
+| `pnpm registry:check`                                | 1010 个 Accepted/Schema Source ID 的唯一状态、强制层级和生成漂移                    |
 | `pnpm registry:test`                                 | missing、duplicate、unknown status、missing assertion 与 insufficient layer 负例    |
 | `pnpm testing:policy`                                | runner、fixture、corpus、artifact、skip、quarantine 与 testing import 边界          |
 | `pnpm testing:playwright-policy`                     | Playwright 首次失败后 retry 通过仍以 `FLAKY_FAIL` 退出                              |
@@ -68,7 +68,7 @@ delivery、真实 TTL 删除、Production backend outage 或 RC 演练已经完�
 
 | 命令                       | 证据                                                                                   |
 | -------------------------- | -------------------------------------------------------------------------------------- |
-| `pnpm phase-gate:check`    | E-014/C-017 分层 Gate、C-016 receipt、P95、1004 个 Source ID 与 Production 延后条件    |
+| `pnpm phase-gate:check`    | E-014/C-017 分层 Gate、C-016 receipt、P95、1010 个 Source ID 与 Production 延后条件    |
 | `pnpm phase-gate:test`     | 拒绝无 owner GO、Production PASS、性能超限、registry/receipt 漂移和人工证据 false-PASS |
 | `pnpm phase-gate:validate` | 上述 checker 与负向 suite 的聚合 Gate                                                  |
 

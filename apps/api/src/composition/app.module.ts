@@ -7,6 +7,7 @@ import {
   UNAVAILABLE_DAILY_INTERACTION_STORE,
   UNAVAILABLE_DATA_RIGHTS_STORE,
   UNAVAILABLE_EVENING_STORE,
+  UNAVAILABLE_MATTER_STORE,
   UNAVAILABLE_WEEKLY_STORE,
 } from "@daily-energy/server-adapters/api";
 
@@ -34,6 +35,7 @@ import {
   UNAVAILABLE_MATTER_TITLE_CODEC,
 } from "../data-rights/data-rights-codec.js";
 import { EveningService } from "../evening/evening.service.js";
+import { MatterService } from "../matter/matter.service.js";
 import { WeeklyService } from "../weekly/weekly.service.js";
 import {
   developmentEveningNoteCodec,
@@ -72,6 +74,7 @@ import { DailyInteractionController } from "../transport/public/daily-interactio
 import { DataRightsController } from "../transport/public/data-rights.controller.js";
 import { DeletionStatusController } from "../transport/public/deletion-status.controller.js";
 import { EveningController } from "../transport/public/evening.controller.js";
+import { MatterController } from "../transport/public/matter.controller.js";
 import { WeeklyController } from "../transport/public/weekly.controller.js";
 import { HealthService } from "../transport/public/health.service.js";
 import { LaunchAudienceGuard } from "../transport/public/launch-audience.guard.js";
@@ -93,6 +96,7 @@ import {
   EVENING_SAFETY_STORE,
   EVENING_STORE,
   MATTER_TITLE_CODEC,
+  MATTER_STORE,
   WEEKLY_STORE,
   type ApiComposition,
   ORDINARY_LOG_SINK,
@@ -197,6 +201,11 @@ export class ApiModule {
           composition.overrides?.matterTitleCodec ?? developmentMatterCodec,
       },
       {
+        provide: MATTER_STORE,
+        useValue:
+          composition.overrides?.matterStore ?? UNAVAILABLE_MATTER_STORE,
+      },
+      {
         provide: WEEKLY_STORE,
         useValue:
           composition.overrides?.weeklyStore ?? UNAVAILABLE_WEEKLY_STORE,
@@ -283,6 +292,7 @@ export class ApiModule {
       DeletionStatusAttemptLimiter,
       EveningService,
       GenerationService,
+      MatterService,
       WeeklyService,
       HealthService,
       HttpLoggingInterceptor,
@@ -306,6 +316,7 @@ export class ApiModule {
         DeletionStatusController,
         EveningController,
         GenerationController,
+        MatterController,
         WeeklyController,
         HealthController,
         PublicController,

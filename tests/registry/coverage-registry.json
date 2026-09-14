@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 672, "NA_WITH_REASON": 0, "PLANNED": 332 },
+  "counts": { "COVERED": 698, "NA_WITH_REASON": 0, "PLANNED": 312 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -481,11 +481,34 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "MATTER DataTask guard immediately excludes the source from list/get before restricted physical cleanup",
+            "MEM-002 Safety state blocks ordinary create and repeated activation produces one decision/state",
+            "PostgreSQL 18 stores only ciphertext/key version, isolates owners and keeps Daily and Weekly grants independent",
+            "same command replay converges, changed payload conflicts and two concurrent revision-one updates produce one winner",
+            "undated day-eight expiry advances revision and sets EXPIRED while an invalid dated resume leaves no command receipt"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-001"
+        },
+        {
+          "assertions": [
+            "a deletion guard wins over subsequent Matter reads and no deleted title can be recovered through the management projection",
+            "owner, purpose, revision, expiry and Safety inputs deterministically converge without reading or persisting plaintext"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -520,11 +543,31 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "MATTER deletion switches to the already validated no-source fallback and removes every active title-bearing dependency",
+            "the deletion path does not call a provider, regenerate history or recover content from a receipt"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-AI008-DELETE-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a published slot with a prevalidated fallback remains AVAILABLE without the deleted personalized fragment or model call",
+            "restricted MATTER cleanup removes the exact source, revisions, grants, dependency and encrypted personalized fragment"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-AI008-DELETE-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -832,11 +875,49 @@
     },
     {
       "authority_paths": ["docs/data/domain-model.md"],
-      "planned": {
-        "owner": "Owning Phase 2-3 domain implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "HIGH_RISK returns SafetyView and calls the ordinary Matter store zero times",
+            "Matter responses contain no account, ciphertext, key version, grant ref or fingerprint",
+            "real Nest HTTP creates, lists, updates, pauses, resumes and starts one explicit MATTER DataTask",
+            "strict request parsing rejects owner injection, newline/overlong titles and same command refs with changed payloads"
+          ],
+          "file": "apps/api/src/matters.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 HTTP matter flow",
+          "test_id": "T-AI008-API-E2E-001"
+        },
+        {
+          "assertions": [
+            "MATTER DataTask guard immediately excludes the source from list/get before restricted physical cleanup",
+            "MEM-002 Safety state blocks ordinary create and repeated activation produces one decision/state",
+            "PostgreSQL 18 stores only ciphertext/key version, isolates owners and keeps Daily and Weekly grants independent",
+            "same command replay converges, changed payload conflicts and two concurrent revision-one updates produce one winner",
+            "undated day-eight expiry advances revision and sets EXPIRED while an invalid dated resume leaves no command receipt"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-001"
+        },
+        {
+          "assertions": [
+            "HIGH_RISK activates the fixed Safety overlay and ordinary Matter persistence remains zero",
+            "indeterminate Safety fails closed and CAS conflicts return only the latest MatterView",
+            "MEM-002 Safety runs before encrypted owner-scoped Matter persistence",
+            "PROFESSIONAL_BOUNDARY saves a private source with both ordinary AI grants closed"
+          ],
+          "file": "apps/api/src/matter/matter.service.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 matter service",
+          "test_id": "T-AI008-SERVICE-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "INTEGRATION"] }
       ],
@@ -4007,11 +4088,20 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a deletion guard wins over subsequent Matter reads and no deleted title can be recovered through the management projection",
+            "owner, purpose, revision, expiry and Safety inputs deterministically converge without reading or persisting plaintext"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-C03",
       "source_sets": ["s16-ai-corpus"]
@@ -4051,11 +4141,20 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a deletion guard wins over subsequent Matter reads and no deleted title can be recovered through the management projection",
+            "owner, purpose, revision, expiry and Safety inputs deterministically converge without reading or persisting plaintext"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-C07",
       "source_sets": ["s16-ai-corpus"]
@@ -4150,11 +4249,20 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "MATTER deletion switches to the already validated no-source fallback and removes every active title-bearing dependency",
+            "the deletion path does not call a provider, regenerate history or recover content from a receipt"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-AI008-DELETE-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-D04",
       "source_sets": ["s16-ai-corpus"]
@@ -4317,11 +4425,20 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a deletion guard wins over subsequent Matter reads and no deleted title can be recovered through the management projection",
+            "owner, purpose, revision, expiry and Safety inputs deterministically converge without reading or persisting plaintext"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-D11",
       "source_sets": ["s16-ai-corpus"]
@@ -4535,11 +4652,20 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a deletion guard wins over subsequent Matter reads and no deleted title can be recovered through the management projection",
+            "owner, purpose, revision, expiry and Safety inputs deterministically converge without reading or persisting plaintext"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-S06",
       "source_sets": ["s16-ai-corpus"]
@@ -6257,11 +6383,47 @@
     },
     {
       "authority_paths": ["docs/operations/privacy-data-map.md"],
-      "planned": {
-        "owner": "Owning privacy, data-rights, or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "create, update, transition and explicit deletion commands are strict, CAS-bound and reject ambiguous date patches",
+            "Matter title is NFC, single-line, 1..80 graphemes and at most 320 UTF-8 bytes while owner/internal fields are rejected",
+            "MatterView and MatterListView expose only title, date, status, independent Daily/Weekly grant booleans, revision and update time"
+          ],
+          "file": "packages/shared-schemas/test/matter.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 matter contracts",
+          "test_id": "T-AI008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "MATTER DataTask guard immediately excludes the source from list/get before restricted physical cleanup",
+            "MEM-002 Safety state blocks ordinary create and repeated activation produces one decision/state",
+            "PostgreSQL 18 stores only ciphertext/key version, isolates owners and keeps Daily and Weekly grants independent",
+            "same command replay converges, changed payload conflicts and two concurrent revision-one updates produce one winner",
+            "undated day-eight expiry advances revision and sets EXPIRED while an invalid dated resume leaves no command receipt"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-001"
+        },
+        {
+          "assertions": [
+            "Matter drafts are normalized in memory and never written to local storage",
+            "Safety clears the pending ordinary write and exposes only the Safety route",
+            "transient retry reuses one command ref while revision conflict replaces the draft baseline with the latest server projection"
+          ],
+          "file": "apps/miniapp/src/features/matter/matter-flow.test.ts",
+          "level": "MODULE",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 Matter coordinator",
+          "test_id": "T-AI008-MINIAPP-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [
         { "any_of": ["CONTRACT", "DB", "E2E", "RESILIENCE", "STATIC"] }
       ],
@@ -7151,11 +7313,45 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "high-risk Matter title handling returns only fixed Safety projection without echoing the title",
+            "malformed and over-budget Matter titles are rejected before ordinary persistence",
+            "successful deletion removes the Matter from the next management list without exposing a reverse clue"
+          ],
+          "file": "apps/api/src/matters.e2e.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 HTTP matter flow",
+          "test_id": "T-AI008-API-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a deletion guard wins over subsequent Matter reads and no deleted title can be recovered through the management projection",
+            "owner, purpose, revision, expiry and Safety inputs deterministically converge without reading or persisting plaintext"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "HIGH_RISK activates the fixed Safety overlay and ordinary Matter persistence remains zero",
+            "indeterminate Safety fails closed and CAS conflicts return only the latest MatterView",
+            "MEM-002 Safety runs before encrypted owner-scoped Matter persistence",
+            "PROFESSIONAL_BOUNDARY saves a private source with both ordinary AI grants closed"
+          ],
+          "file": "apps/api/src/matter/matter.service.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 matter service",
+          "test_id": "T-AI008-SERVICE-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-E03",
       "source_sets": ["s16-ai-corpus"]
@@ -7173,11 +7369,22 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "HIGH_RISK activates the fixed Safety overlay and ordinary Matter persistence remains zero",
+            "indeterminate Safety fails closed and CAS conflicts return only the latest MatterView",
+            "MEM-002 Safety runs before encrypted owner-scoped Matter persistence",
+            "PROFESSIONAL_BOUNDARY saves a private source with both ordinary AI grants closed"
+          ],
+          "file": "apps/api/src/matter/matter.service.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 matter service",
+          "test_id": "T-AI008-SERVICE-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-E05",
       "source_sets": ["s16-ai-corpus"]
@@ -7217,22 +7424,41 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "high-risk Matter title handling returns only fixed Safety projection without echoing the title",
+            "malformed and over-budget Matter titles are rejected before ordinary persistence",
+            "successful deletion removes the Matter from the next management list without exposing a reverse clue"
+          ],
+          "file": "apps/api/src/matters.e2e.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 HTTP matter flow",
+          "test_id": "T-AI008-API-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-E09",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a deletion guard wins over subsequent Matter reads and no deleted title can be recovered through the management projection",
+            "owner, purpose, revision, expiry and Safety inputs deterministically converge without reading or persisting plaintext"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "S15-E10",
       "source_sets": ["s16-ai-corpus"]
@@ -8362,22 +8588,57 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "AES-256-GCM uses random IVs and rejects ciphertext or key-version tampering",
+            "the keyed title fingerprint is stable for idempotency without storing plaintext or an ordinary reversible hash"
+          ],
+          "file": "apps/api/src/data-rights/data-rights-codec.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 matter title codec",
+          "test_id": "T-AI008-CODEC-001"
+        },
+        {
+          "assertions": [
+            "MATTER DataTask guard immediately excludes the source from list/get before restricted physical cleanup",
+            "MEM-002 Safety state blocks ordinary create and repeated activation produces one decision/state",
+            "PostgreSQL 18 stores only ciphertext/key version, isolates owners and keeps Daily and Weekly grants independent",
+            "same command replay converges, changed payload conflicts and two concurrent revision-one updates produce one winner",
+            "undated day-eight expiry advances revision and sets EXPIRED while an invalid dated resume leaves no command receipt"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-025",
       "source_sets": ["s19-database"]
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "MATTER DataTask guard immediately excludes the source from list/get before restricted physical cleanup",
+            "MEM-002 Safety state blocks ordinary create and repeated activation produces one decision/state",
+            "PostgreSQL 18 stores only ciphertext/key version, isolates owners and keeps Daily and Weekly grants independent",
+            "same command replay converges, changed payload conflicts and two concurrent revision-one updates produce one winner",
+            "undated day-eight expiry advances revision and sets EXPIRED while an invalid dated resume leaves no command receipt"
+          ],
+          "file": "tests/database/ai008-important-matters.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
+          "test_id": "T-AI008-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-026",
       "source_sets": ["s19-database"]
@@ -8395,11 +8656,20 @@
     },
     {
       "authority_paths": ["docs/technical/database.md"],
-      "planned": {
-        "owner": "Owning database or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a published slot with a prevalidated fallback remains AVAILABLE without the deleted personalized fragment or model call",
+            "restricted MATTER cleanup removes the exact source, revisions, grants, dependency and encrypted personalized fragment"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-AI008-DELETE-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["DB"] }],
       "source_id": "S19-DB-028",
       "source_sets": ["s19-database"]
@@ -10189,44 +10459,160 @@
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "HIGH_RISK returns SafetyView and calls the ordinary Matter store zero times",
+            "Matter responses contain no account, ciphertext, key version, grant ref or fingerprint",
+            "real Nest HTTP creates, lists, updates, pauses, resumes and starts one explicit MATTER DataTask",
+            "strict request parsing rejects owner injection, newline/overlong titles and same command refs with changed payloads"
+          ],
+          "file": "apps/api/src/matters.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 HTTP matter flow",
+          "test_id": "T-AI008-API-E2E-001"
+        },
+        {
+          "assertions": [
+            "create, update, transition and explicit deletion commands are strict, CAS-bound and reject ambiguous date patches",
+            "Matter title is NFC, single-line, 1..80 graphemes and at most 320 UTF-8 bytes while owner/internal fields are rejected",
+            "MatterView and MatterListView expose only title, date, status, independent Daily/Weekly grant booleans, revision and update time"
+          ],
+          "file": "packages/shared-schemas/test/matter.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 matter contracts",
+          "test_id": "T-AI008-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-E06",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "HIGH_RISK returns SafetyView and calls the ordinary Matter store zero times",
+            "Matter responses contain no account, ciphertext, key version, grant ref or fingerprint",
+            "real Nest HTTP creates, lists, updates, pauses, resumes and starts one explicit MATTER DataTask",
+            "strict request parsing rejects owner injection, newline/overlong titles and same command refs with changed payloads"
+          ],
+          "file": "apps/api/src/matters.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 HTTP matter flow",
+          "test_id": "T-AI008-API-E2E-001"
+        },
+        {
+          "assertions": [
+            "create, update, transition and explicit deletion commands are strict, CAS-bound and reject ambiguous date patches",
+            "Matter title is NFC, single-line, 1..80 graphemes and at most 320 UTF-8 bytes while owner/internal fields are rejected",
+            "MatterView and MatterListView expose only title, date, status, independent Daily/Weekly grant booleans, revision and update time"
+          ],
+          "file": "packages/shared-schemas/test/matter.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 matter contracts",
+          "test_id": "T-AI008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "HIGH_RISK activates the fixed Safety overlay and ordinary Matter persistence remains zero",
+            "indeterminate Safety fails closed and CAS conflicts return only the latest MatterView",
+            "MEM-002 Safety runs before encrypted owner-scoped Matter persistence",
+            "PROFESSIONAL_BOUNDARY saves a private source with both ordinary AI grants closed"
+          ],
+          "file": "apps/api/src/matter/matter.service.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 matter service",
+          "test_id": "T-AI008-SERVICE-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-E07",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "HIGH_RISK returns SafetyView and calls the ordinary Matter store zero times",
+            "Matter responses contain no account, ciphertext, key version, grant ref or fingerprint",
+            "real Nest HTTP creates, lists, updates, pauses, resumes and starts one explicit MATTER DataTask",
+            "strict request parsing rejects owner injection, newline/overlong titles and same command refs with changed payloads"
+          ],
+          "file": "apps/api/src/matters.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 HTTP matter flow",
+          "test_id": "T-AI008-API-E2E-001"
+        },
+        {
+          "assertions": [
+            "create, update, transition and explicit deletion commands are strict, CAS-bound and reject ambiguous date patches",
+            "Matter title is NFC, single-line, 1..80 graphemes and at most 320 UTF-8 bytes while owner/internal fields are rejected",
+            "MatterView and MatterListView expose only title, date, status, independent Daily/Weekly grant booleans, revision and update time"
+          ],
+          "file": "packages/shared-schemas/test/matter.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 matter contracts",
+          "test_id": "T-AI008-CONTRACT-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-E08",
       "source_sets": ["s20-api"]
     },
     {
       "authority_paths": ["docs/technical/api.md"],
-      "planned": {
-        "owner": "Owning API or business implementation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "HIGH_RISK returns SafetyView and calls the ordinary Matter store zero times",
+            "Matter responses contain no account, ciphertext, key version, grant ref or fingerprint",
+            "real Nest HTTP creates, lists, updates, pauses, resumes and starts one explicit MATTER DataTask",
+            "strict request parsing rejects owner injection, newline/overlong titles and same command refs with changed payloads"
+          ],
+          "file": "apps/api/src/matters.e2e.test.ts",
+          "level": "E2E",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 HTTP matter flow",
+          "test_id": "T-AI008-API-E2E-001"
+        },
+        {
+          "assertions": [
+            "create, update, transition and explicit deletion commands are strict, CAS-bound and reject ambiguous date patches",
+            "Matter title is NFC, single-line, 1..80 graphemes and at most 320 UTF-8 bytes while owner/internal fields are rejected",
+            "MatterView and MatterListView expose only title, date, status, independent Daily/Weekly grant booleans, revision and update time"
+          ],
+          "file": "packages/shared-schemas/test/matter.test.ts",
+          "level": "CONTRACT",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "AI-008 matter contracts",
+          "test_id": "T-AI008-CONTRACT-001"
+        },
+        {
+          "assertions": [
+            "a published slot with a prevalidated fallback remains AVAILABLE without the deleted personalized fragment or model call",
+            "restricted MATTER cleanup removes the exact source, revisions, grants, dependency and encrypted personalized fragment"
+          ],
+          "file": "tests/database/c014-data-rights.test.mjs",
+          "level": "DB",
+          "origin": "tests/registry/ai008-evidence-manifest.json",
+          "selector": "C-014 PG18 TX-09, restricted cleanup, receipt and account destruction",
+          "test_id": "T-AI008-DELETE-DB-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["E2E"] }],
       "source_id": "S20-E09",
       "source_sets": ["s20-api"]
@@ -24355,7 +24741,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24384,7 +24770,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24413,7 +24799,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24442,7 +24828,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24471,7 +24857,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24500,7 +24886,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24529,7 +24915,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24558,7 +24944,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24587,7 +24973,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24616,7 +25002,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24645,7 +25031,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24674,7 +25060,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24703,7 +25089,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24732,7 +25118,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24761,7 +25147,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24790,7 +25176,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24819,7 +25205,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24848,7 +25234,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24877,7 +25263,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24906,7 +25292,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24935,7 +25321,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24964,7 +25350,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -24993,7 +25379,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25022,7 +25408,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25051,7 +25437,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25080,7 +25466,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25109,7 +25495,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25138,7 +25524,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25167,7 +25553,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25196,7 +25582,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25225,7 +25611,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25254,7 +25640,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25283,7 +25669,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25312,7 +25698,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25341,7 +25727,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25370,7 +25756,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25399,7 +25785,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25428,7 +25814,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25457,7 +25843,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25486,13 +25872,187 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:identity-verification-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-create-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-create-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:matter-create-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-delete-command-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-delete-command-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:matter-delete-command-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-list-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-list-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:matter-list-view:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-transition-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-transition-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:matter-transition-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-update-request:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-update-request:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:matter-update-request:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-view:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:matter-view:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:matter-view:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {
@@ -25515,7 +26075,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25544,7 +26104,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25573,7 +26133,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25602,7 +26162,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25631,7 +26191,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25660,7 +26220,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25689,7 +26249,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25718,7 +26278,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25747,7 +26307,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25776,7 +26336,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25805,7 +26365,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25834,7 +26394,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25863,7 +26423,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25892,7 +26452,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],
@@ -25921,7 +26481,7 @@
           "file": "packages/shared-schemas/test/json-schema.test.ts",
           "level": "UNIT",
           "origin": "tests/registry/source-sets.json",
-          "selector": "exports 55 stable, unique JSON Schema IDs",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
           "test_id": "T-SCHEMA-JSON-001"
         }
       ],

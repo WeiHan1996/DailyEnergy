@@ -1,0 +1,79 @@
+<de-page-shell labelled-by="matters-title">
+  <de-app-header
+    slot="header"
+    back-label="返回"
+    show-back="{{true}}"
+    title="重要事项"
+    subtitle="你主动让我记住的事"
+    bind:back="back"
+  ></de-app-header>
+
+  <view class="matters" data-screen-id="{{screenId}}">
+    <de-loading-skeleton wx:if="{{loading}}" label="正在读取重要事项" lines="5" variant="card"></de-loading-skeleton>
+
+    <block wx:else>
+      <de-offline-state
+        wx:if="{{offline}}"
+        message="恢复网络后才能新增或修改重要事项。"
+        bind:retry="retry"
+      ></de-offline-state>
+      <de-recoverable-error
+        wx:elif="{{error}}"
+        message="暂时没能读取重要事项。已有内容不会因此改变。"
+        bind:retry="retry"
+      ></de-recoverable-error>
+
+      <view id="matters-title" class="matters__title">重要事项完全可选，也随时由你修改。</view>
+      <view class="matters__intro">只有你主动保存并允许的用途才会生效；当前每日与七天内容不会自动读取事项。</view>
+
+      <de-inline-notice
+        wx:if="{{!activeMatters.length && !inactiveMatters.length && !error && !offline}}"
+        title="还没有重要事项"
+        message="想记录时再来就好，不记录也不影响每天的一分钟。"
+      ></de-inline-notice>
+
+      <view wx:if="{{activeMatters.length}}" class="matters__section">
+        <view class="matters__section-title">有效事项</view>
+        <button
+          wx:for="{{activeMatters}}"
+          wx:key="matter_ref"
+          class="matters__item"
+          aria-label="编辑事项：{{item.title}}"
+          data-matter-ref="{{item.matter_ref}}"
+          bindtap="editMatter"
+        >
+          <view class="matters__item-title">{{item.title}}</view>
+          <view class="matters__meta">
+            <text>{{item.target_date ? item.target_date : '未设置日期'}}</text>
+            <text>{{item.daily_use_granted ? '每日提及已允许' : '仅私有保存'}}</text>
+          </view>
+        </button>
+      </view>
+
+      <view wx:if="{{inactiveMatters.length}}" class="matters__section">
+        <view class="matters__section-title">已暂停、完成或到期</view>
+        <button
+          wx:for="{{inactiveMatters}}"
+          wx:key="matter_ref"
+          class="matters__item matters__item--inactive"
+          aria-label="查看事项：{{item.title}}"
+          data-matter-ref="{{item.matter_ref}}"
+          bindtap="editMatter"
+        >
+          <view class="matters__item-title">{{item.title}}</view>
+          <view class="matters__meta">
+            <text>{{item.status === 'PAUSED' ? '已暂停' : item.status === 'COMPLETED' ? '已完成' : '已到期'}}</text>
+            <text>{{item.target_date ? item.target_date : '未设置日期'}}</text>
+          </view>
+        </button>
+      </view>
+
+      <de-action-button
+        block="{{true}}"
+        disabled="{{offline}}"
+        label="新增一件事"
+        bind:press="addMatter"
+      ></de-action-button>
+    </block>
+  </view>
+</de-page-shell>
