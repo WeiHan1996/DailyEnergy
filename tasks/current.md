@@ -1,23 +1,40 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-09-14
+- **最后更新**：2026-09-19
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-009 — 实现用途受限的结构化记忆选择
-- **任务状态**：Ready
-- **任务 Profile**：`security`（source/grant/expiry/owner/revision/delete、Prompt 最小披露与无记忆回退；尚未运行 AI-009 prepare）
-- **工作分支**：无 AI-009 实现分支；AI-008 实现与状态收尾已合并，当前保持 `main`，收到新的明确启动指令前不创建分支
+- **任务状态**：Blocked（Daily 记忆表达 v2 合同仍是 Draft；等待 owner 确认版本、段落位置、无标题方案和旧事项 Safety 证明迁移）
+- **任务 Profile**：`security`（source/grant/expiry/owner/revision/delete、Prompt 最小披露与无记忆回退）
+- **工作分支**：`agent/ai009-memory-selection`，基于已验证 `main@477d59c086395717b4aaa1b69e921fead1ceeb8d`
 - **任务 Issue**：[AI-009 Issue #78](https://github.com/WeiHan1996/DailyEnergy/issues/78)
-- **当前 PR**：无；AI-009 实现 PR 不存在
+- **当前 PR**：[Draft PR #207](https://github.com/WeiHan1996/DailyEnergy/pull/207)；仅供受限解析代码与 v2 合同提案审核，不是 AI-009 完工或发布申请
 - **上一完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-003 与 AI-008 已 Done；AI-009 的依赖与权威来源只在未来收到明确启动指令后通过 `pnpm agent:prepare AI-009 --remote --deep` 恢复，不在本状态收尾中预判或实施；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由后续开发任务自动关闭
+- **依赖边界**：AI-003 与 AI-008 已 Done；AI-009 本地/环境 prepare 通过，远端检查在本轮 GitHub GraphQL EOF 后返回 INFRA_BLOCKED，Git refs 与 Issue #78 已由独立只读接口确认；Daily/Weekly v1 继续无记忆。带记忆的发布缺少 Accepted 新 Prompt/Schema 与段落回退合同，提案为 `docs/ai/memory-enabled-daily-v2.md` Draft；C-015 继续独立阻塞 Production/RC
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待新的明确启动指令；本次不运行 AI-009 prepare、不创建实现分支或编码
+- **下一候选动作**：owner 审核 Draft v2 合同的 `state_response` 唯一提及段、首版无标题、Daily-only 范围与旧 Matter 必须主动重新保存取得当前 Safety 证明；确认后先将文档转 Accepted 并冻结严格 Prompt/input/output Schema，再完成同一发布事务的 source/grant/master/Safety 证明/epoch/mention 复查、依赖与同候选 fallback、删除/迟到/缓存回归和相应 Source-ID；运行完整 task Gate 与人工 threat boundary 审核。AI-010 仍为后续候选，不提前实施
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-18 AI-009 启动
+
+- owner 指示“合并 pr 后开始下一步”；当时唯一开放 PR 为依赖更新 #202，#206 已于 2026-09-14 合并；#202 升级 Vitest 4.1.11 并对齐 `@vitest/coverage-v8` 4.1.11，最终 head `9c298a6b990b14f051df657a0d37ec682a87decc` 经 CI run `35318937255` 的 11/11 SUCCESS 与 exact-head verifier 后 squash 合并为 `477d59c086395717b4aaa1b69e921fead1ceeb8d`；merged-main CI run `35319368376` 11/11 SUCCESS；
+- `pnpm agent:prepare AI-009 --remote --deep` 返回 READY，security Profile，远端与环境检查 PASS；权威输入为 Accepted ADR-0004、`docs/ai/memory.md`、Safety、测试、隐私与现有 Matter/Grant/Schema；required manual evidence 为 threatBoundaryReview 与适用时生产授权；
+- 分支从干净且与 `origin/main` 一致的 merge commit 创建。目标是确定性、用途受限的 resolver 与删除/修订安全边界；本次不启用 v1 Prompt 的记忆，也不接真实 provider、真实用户或 Production/RC。完成代码、合同与相应测试后执行 full/task Gate，并将人工边界决定留给 owner 审核。
+- 已新增 server-core 内部 Daily Matter 纯预选/复查：检查 owner、账户/同意/Safety/删除、master 与 Daily 开关、精确 grant/policy/revision、有效窗口、七日提及频次与稳定排序；输出只有服务端 ref/revision，不包含标题，不供 v1 Prompt 使用。7 项聚焦测试、server-core 162 项测试、类型检查、lint 和 architecture Gate 通过。此阶段尚无数据库读取、投影、原子发布、删除回退或真实 PG 验证，Source-ID registry 保持原状，不声称 AI-009 已覆盖。
+- 当前变更在 Node 24.18.0 下执行 `pnpm agent:validate --mode=changed --task=AI-009`，按策略升级 full：`automated=PASS / MANUAL_EVIDENCE_REQUIRED`（185327ms）；这只是当前开发片段的自动验证，AI-009 总任务 Gate 和 threat boundary 审核仍待完整实现后运行。Production authorization 不适用且未授予；C-015、真实用户/provider、RC/Alpha/Production 继续 NO_GO。
+
+## 2026-09-18 AI-009 受限解析与待审合同
+
+- 基于 `agent/ai009-memory-selection` 完成 server-core Matter 确定性预选与 owner/source/grant/master/Safety/deletion 修订绑定；新 interactive worker adapter 在相同 owner advisory lock 下读取当前 Matter 元数据、Daily grant、master 与七日 mention 回执，不读标题或自由文本。数据库迁移撤销 interactive/background 对四张记忆相关表的广泛权限，仅向 interactive 授予必要只读列与现有 guard function；API 和 Restricted 删除能力不扩权。
+- `resolveDaily` 在默认关闭、来源不存在、跨 owner、grant/日期/Safety/删除不符或数据库不可用时返回无记忆；`recheckDaily` 只是独立事务的当前有效性预检，不能授权发布。当前 v1 生成路径未接新 store，provider、客户端、缓存与分享均未接收记忆；不得把预检当成发布事务复查。
+- 新增真实 PostgreSQL AI-009 用例覆盖默认关闭、明确授权、跨 owner、密文/DELETE 权限拒绝、master 关后重开旧候选失效、grant 撤销、Safety 与 MATTER 删除守卫；完整数据库 Gate `92/92` PASS，迁移 checksum 与临时合成数据库生成的 catalog fingerprint 一致。server-core 聚焦测试 `7/7`，Source-ID registry 只将已有充分证据的 3 项提升为 `COVERED`，结果 `701/1010 COVERED`、`309 PLANNED`、`0 NA_WITH_REASON`；记忆发布/回退/频次实际写入不冒充覆盖。
+- `docs/ai/memory-enabled-daily-v2.md` 新建为 Draft，提议未来 `DAILY_EXPRESSION_V2` 只在现有 `state_response` 中受控提及一件用户主动事项且不发送标题，严格 fact ref 与同候选无源回退；Weekly/近期状态/关系继续空。AI-008 旧事项没有与来源修订绑定的当前 Safety 证明，只能在用户主动重新保存并通过当前 Safety Gate 后获得未来资格；当前解析器仅做服务端元数据预选，不能送 provider。此产品/设计/Schema 决定尚未获得 owner 确认，因此 AI-009 为 Blocked；不修改或激活 v1 Prompt，不标记 Draft 为 Accepted。Production/RC/真实用户/真实 provider 仍 NO_GO。
+- 2026-09-19 最终自动验证：固定 Node 24.18.0，`agent:validate --mode=changed --task=AI-009` 升级 full 后为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（184842ms）；`--mode=task --task=AI-009` 同终态（90111ms，5 组）；数据库完整 Gate `92/92` PASS，registry `701/1010 COVERED`，Phase Gate 12/12，server-core 聚焦 7/7。一次 npm 审计响应无 metadata 后重试取得完整结果，critical/high 均为 0；该失败不计作 PASS。需要 owner 先接受 Draft 合同，再实施原子发布链路并复跑 Gate；这两次自动通过只适用于当前受限预选代码。
+- 受限预选和 v2 Draft 首次提交 `c10a415` 已推送，创建 Draft PR #207。PR 链接回写将产生新 head，必须使用新 head 自己的 CI；本 PR 不标 Ready、不合并、不关闭 Issue #78。下一次会话从本文件、Draft 规范和 PR 的待决事项恢复，无需依赖聊天记录。
 
 ## 2026-09-14 AI-008 post-merge 收尾
 

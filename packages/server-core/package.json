@@ -40,6 +40,10 @@
       "types": "./dist/modules/matter/public/index.d.ts",
       "import": "./dist/modules/matter/public/index.js"
     },
+    "./memory": {
+      "types": "./dist/modules/memory/public/index.d.ts",
+      "import": "./dist/modules/memory/public/index.js"
+    },
     "./weekly-reflection": {
       "types": "./dist/modules/weekly-reflection/public/index.d.ts",
       "import": "./dist/modules/weekly-reflection/public/index.js"
