@@ -1,9 +1,9 @@
 # DailyEnergy 项目 Backlog
 
 - **文档状态**：Active
-- **最后更新**：2026-09-18
+- **最后更新**：2026-09-19
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：[AI-009 结构化记忆选择](./current.md)：In Progress；依赖更新 PR #202 已合并且 merged-main CI 11/11 SUCCESS；AI-009 基于该 main 启动；C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
+- **当前任务**：[AI-009 结构化记忆选择](./current.md)：Blocked，等待 owner 接受带记忆 Daily v2 的段落/Schema/无标题合同；受限解析已验证，v1 仍无记忆；C-015 的 Production/Privacy/Legal 证据继续独立 Blocked
 - **路线图**：[ROADMAP.md](../ROADMAP.md)
 
 ## 1. Backlog 规则
@@ -223,25 +223,25 @@ on-call/delivery/TTL、微信 DevTools/真机和完整 incident/manual RC 仍为
 
 ## 6. Phase 3：AI 陪伴层
 
-| ID                                                            | 任务               | 状态        | 主要结果                                                                 |
-| ------------------------------------------------------------- | ------------------ | ----------- | ------------------------------------------------------------------------ |
-| [AI-001](https://github.com/WeiHan1996/DailyEnergy/issues/67) | AI Gateway 基础    | Done        | PR #187 squash 合并为 `02e0120b`；merged-main CI 11/11；Issue #67 Closed |
-| [AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71) | 主模型与备用模型   | Done        | PR #189 squash 合并为 `849ab17d`；merged-main CI 11/11；Issue #71 Closed |
-| [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理    | Done        | PR #191 squash 合并为 `e6202556`；merged-main CI 11/11；Issue #72 Closed |
-| [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验     | Done        | PR #193 squash 合并为 `52876a9a`；merged-main CI 11/11；Issue #73 Closed |
-| [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | Done        | PR #195/#196 已合并；merged-main CI 11/11；Issue #74 Closed              |
-| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | Done        | PR #198 squash 合并为 `aa7e6a28`；merged-main CI 11/11；Issue #75 Closed |
-| [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Done        | PR #200 squash 合并为 `719ffbe8`；merged-main CI 11/11；Issue #76 Closed |
-| [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | Done        | PR #204 squash 合并为 `cd5d27f7`；merged-main CI 11/11；Issue #77 Closed |
-| [AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78) | 结构化记忆         | In Progress | 用途受限的确定性选择；Daily/Weekly v1 保持无记忆                         |
-| [AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79) | 第 3 天风格校准    | Planned     | 反馈影响后续表达                                                         |
-| [AI-011](https://github.com/WeiHan1996/DailyEnergy/issues/84) | 七天 AI 总结       | Planned     | 只引用真实数据                                                           |
-| [AI-012](https://github.com/WeiHan1996/DailyEnergy/issues/82) | 内容安全分类       | Planned     | 专业边界与敏感内容                                                       |
-| [AI-013](https://github.com/WeiHan1996/DailyEnergy/issues/86) | 高风险固定响应     | Planned     | 退出普通运势流程                                                         |
-| [AI-014](https://github.com/WeiHan1996/DailyEnergy/issues/81) | 自动人格评价       | Planned     | 质量评分和回归                                                           |
-| [AI-015](https://github.com/WeiHan1996/DailyEnergy/issues/85) | 人工内容抽检       | Planned     | 样本和问题分类                                                           |
-| [AI-016](https://github.com/WeiHan1996/DailyEnergy/issues/80) | 延迟、Token 和成本 | Planned     | 达到 MVP 工程目标                                                        |
-| [AI-017](https://github.com/WeiHan1996/DailyEnergy/issues/83) | Phase 3 Gate       | Planned     | AI 稳定、安全、可降级                                                    |
+| ID                                                            | 任务               | 状态    | 主要结果                                                                 |
+| ------------------------------------------------------------- | ------------------ | ------- | ------------------------------------------------------------------------ |
+| [AI-001](https://github.com/WeiHan1996/DailyEnergy/issues/67) | AI Gateway 基础    | Done    | PR #187 squash 合并为 `02e0120b`；merged-main CI 11/11；Issue #67 Closed |
+| [AI-002](https://github.com/WeiHan1996/DailyEnergy/issues/71) | 主模型与备用模型   | Done    | PR #189 squash 合并为 `849ab17d`；merged-main CI 11/11；Issue #71 Closed |
+| [AI-003](https://github.com/WeiHan1996/DailyEnergy/issues/72) | Prompt 版本管理    | Done    | PR #191 squash 合并为 `e6202556`；merged-main CI 11/11；Issue #72 Closed |
+| [AI-004](https://github.com/WeiHan1996/DailyEnergy/issues/73) | 结构化输出校验     | Done    | PR #193 squash 合并为 `52876a9a`；merged-main CI 11/11；Issue #73 Closed |
+| [AI-005](https://github.com/WeiHan1996/DailyEnergy/issues/74) | 三种表达偏好       | Done    | PR #195/#196 已合并；merged-main CI 11/11；Issue #74 Closed              |
+| [AI-006](https://github.com/WeiHan1996/DailyEnergy/issues/75) | 本地模板降级       | Done    | PR #198 squash 合并为 `aa7e6a28`；merged-main CI 11/11；Issue #75 Closed |
+| [AI-007](https://github.com/WeiHan1996/DailyEnergy/issues/76) | 关系阶段           | Done    | PR #200 squash 合并为 `719ffbe8`；merged-main CI 11/11；Issue #76 Closed |
+| [AI-008](https://github.com/WeiHan1996/DailyEnergy/issues/77) | 重要事项           | Done    | PR #204 squash 合并为 `cd5d27f7`；merged-main CI 11/11；Issue #77 Closed |
+| [AI-009](https://github.com/WeiHan1996/DailyEnergy/issues/78) | 结构化记忆         | Blocked | 受限解析完成；v2 Prompt/Schema 提案待 owner 决定；v1 无记忆              |
+| [AI-010](https://github.com/WeiHan1996/DailyEnergy/issues/79) | 第 3 天风格校准    | Planned | 反馈影响后续表达                                                         |
+| [AI-011](https://github.com/WeiHan1996/DailyEnergy/issues/84) | 七天 AI 总结       | Planned | 只引用真实数据                                                           |
+| [AI-012](https://github.com/WeiHan1996/DailyEnergy/issues/82) | 内容安全分类       | Planned | 专业边界与敏感内容                                                       |
+| [AI-013](https://github.com/WeiHan1996/DailyEnergy/issues/86) | 高风险固定响应     | Planned | 退出普通运势流程                                                         |
+| [AI-014](https://github.com/WeiHan1996/DailyEnergy/issues/81) | 自动人格评价       | Planned | 质量评分和回归                                                           |
+| [AI-015](https://github.com/WeiHan1996/DailyEnergy/issues/85) | 人工内容抽检       | Planned | 样本和问题分类                                                           |
+| [AI-016](https://github.com/WeiHan1996/DailyEnergy/issues/80) | 延迟、Token 和成本 | Planned | 达到 MVP 工程目标                                                        |
+| [AI-017](https://github.com/WeiHan1996/DailyEnergy/issues/83) | Phase 3 Gate       | Planned | AI 稳定、安全、可降级                                                    |
 
 ## 7. Phase 4：内部 Alpha
 

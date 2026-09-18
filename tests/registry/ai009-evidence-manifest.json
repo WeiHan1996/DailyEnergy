@@ -1,0 +1,75 @@
+{
+  "manifest_version": "ai-009-evidence-v1",
+  "scope": "AI-009 deterministic Daily Matter preselection and owner-scoped PostgreSQL reads only; no memory-enabled workload or publication",
+  "authority": [
+    "docs/decisions/ADR-0004-structured-memory.md",
+    "docs/ai/memory.md",
+    "docs/ai/safety.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-AI009-POLICY-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+      "selector": "memory-policy-v1 Daily matter preselection",
+      "level": "AI_EVAL",
+      "assertions": [
+        "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+        "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+        "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+        "same-day and rolling seven-day mention limits prevent repeated selection"
+      ]
+    },
+    "T-AI009-DB-AI-EVAL-001": {
+      "file": "tests/database/ai009-memory-selection.test.mjs",
+      "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+      "level": "AI_EVAL",
+      "assertions": [
+        "the real PostgreSQL resolver returns no memory until explicit owner consent, master and Daily grant are all active",
+        "a different owner cannot select the source, worker lacks Matter ciphertext/DELETE, and no title appears in the resolver result",
+        "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate use"
+      ]
+    },
+    "T-AI009-LIFECYCLE-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/matter/domain/matter.test.ts",
+      "selector": "matter-policy-v1",
+      "level": "AI_EVAL",
+      "assertions": [
+        "a dated ACTIVE matter becomes EXPIRED rather than COMPLETED after the target date",
+        "an undated matter becomes EXPIRED from its eighth product date"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "M14-C03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-POLICY-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-C05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-POLICY-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-S07",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI009-POLICY-AI-EVAL-001",
+        "T-AI009-LIFECYCLE-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "M14-S08",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI009-POLICY-AI-EVAL-001",
+        "T-AI009-LIFECYCLE-AI-EVAL-001"
+      ]
+    }
+  ],
+  "pending_evidence": {
+    "memory_enabled_publish": "New Accepted Prompt/input/output/segment contract is required before atomically publishing memory dependencies, fallback and mention receipts.",
+    "source_coverage": "Recent state and relationship facts lack Daily-purpose grants; Weekly v1 stays empty. Remaining M14 scenarios remain PLANNED until the matching workload and proof exist.",
+    "manual": "Threat-boundary review, design/source acceptance and applicable model or production authorization are not replaced by this manifest."
+  }
+}

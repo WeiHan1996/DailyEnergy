@@ -45,10 +45,14 @@ export interface DailyMatterSelectionRequestV1 {
   readonly productDate: string;
   readonly access: {
     readonly accountActive: boolean;
+    readonly accountRevision: number;
     readonly consentActive: boolean;
     readonly safetyClear: boolean;
+    readonly safetyEpoch: string;
     readonly deletionClear: boolean;
+    readonly deletionEpoch: string;
     readonly masterEnabled: boolean;
+    readonly masterRevision: number;
     readonly dailyExpressionEnabled: boolean;
   };
   readonly sources: readonly DailyMatterSourceV1[];
@@ -57,6 +61,10 @@ export interface DailyMatterSelectionRequestV1 {
 
 export interface SelectedDailyMatterV1 {
   readonly ownerRef: string;
+  readonly accountRevision: number;
+  readonly safetyEpoch: string;
+  readonly deletionEpoch: string;
+  readonly masterRevision: number;
   readonly sourceRef: string;
   readonly sourceRevision: number;
   readonly grantRef: string;
@@ -141,6 +149,10 @@ export function recheckDailyMatterV1(
   return (
     result.status === "SELECTED" &&
     result.candidate.ownerRef === selected.ownerRef &&
+    result.candidate.accountRevision === selected.accountRevision &&
+    result.candidate.safetyEpoch === selected.safetyEpoch &&
+    result.candidate.deletionEpoch === selected.deletionEpoch &&
+    result.candidate.masterRevision === selected.masterRevision &&
     result.candidate.sourceRevision === selected.sourceRevision &&
     result.candidate.grantRef === selected.grantRef &&
     result.candidate.grantRevision === selected.grantRevision &&
@@ -203,6 +215,10 @@ function eligibleSource(
   return {
     candidate: Object.freeze({
       ownerRef: request.ownerRef,
+      accountRevision: request.access.accountRevision,
+      safetyEpoch: request.access.safetyEpoch,
+      deletionEpoch: request.access.deletionEpoch,
+      masterRevision: request.access.masterRevision,
       sourceRef: source.sourceRef,
       sourceRevision: source.revision,
       grantRef: grant.grantRef,
@@ -243,10 +259,16 @@ function accessAllowed(
 ): boolean {
   return (
     access?.accountActive === true &&
+    Number.isSafeInteger(access.accountRevision) &&
+    access.accountRevision > 0 &&
     access.consentActive === true &&
     access.safetyClear === true &&
+    /^(0|[1-9][0-9]*)$/u.test(access.safetyEpoch) &&
     access.deletionClear === true &&
+    /^(0|[1-9][0-9]*)$/u.test(access.deletionEpoch) &&
     access.masterEnabled === true &&
+    Number.isSafeInteger(access.masterRevision) &&
+    access.masterRevision > 0 &&
     access.dailyExpressionEnabled === true
   );
 }

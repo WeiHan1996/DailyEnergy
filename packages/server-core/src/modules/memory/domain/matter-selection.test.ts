@@ -10,10 +10,14 @@ import {
 const ownerRef = "account-1";
 const access = {
   accountActive: true,
+  accountRevision: 1,
   consentActive: true,
   safetyClear: true,
+  safetyEpoch: "0",
   deletionClear: true,
+  deletionEpoch: "0",
   masterEnabled: true,
+  masterRevision: 1,
   dailyExpressionEnabled: true,
 };
 
@@ -83,7 +87,14 @@ describe("memory-policy-v1 Daily matter preselection", () => {
         ]),
       ).status,
     ).toBe("NO_ELIGIBLE_MEMORY");
-    for (const key of Object.keys(access) as (keyof typeof access)[]) {
+    for (const key of [
+      "accountActive",
+      "consentActive",
+      "safetyClear",
+      "deletionClear",
+      "masterEnabled",
+      "dailyExpressionEnabled",
+    ] as const) {
       expect(
         selectDailyMatterV1(
           request([source], { access: { ...access, [key]: false } }),
@@ -94,6 +105,7 @@ describe("memory-policy-v1 Daily matter preselection", () => {
 
   it("uses the exact dated and undated windows without inferring completion", () => {
     const dated = matter("dated", {
+      createdProductDate: "2026-09-01",
       targetProductDate: "2026-09-12",
     });
     const undated = matter("undated");
@@ -101,11 +113,19 @@ describe("memory-policy-v1 Daily matter preselection", () => {
       selectDailyMatterV1(request([dated], { productDate: "2026-09-08" }))
         .status,
     ).toBe("NO_ELIGIBLE_MEMORY");
+    expect(
+      selectDailyMatterV1(request([dated], { productDate: "2026-09-09" }))
+        .status,
+    ).toBe("SELECTED");
     expect(selectDailyMatterV1(request([dated])).status).toBe("SELECTED");
     expect(
       selectDailyMatterV1(request([dated], { productDate: "2026-09-13" }))
         .status,
     ).toBe("NO_ELIGIBLE_MEMORY");
+    expect(
+      selectDailyMatterV1(request([undated], { productDate: "2026-09-10" }))
+        .status,
+    ).toBe("SELECTED");
     expect(
       selectDailyMatterV1(request([undated], { productDate: "2026-09-16" }))
         .status,
@@ -186,6 +206,19 @@ describe("memory-policy-v1 Daily matter preselection", () => {
         request([source], { ownerRef: "other" }),
       ),
     ).toBe(false);
+    for (const changed of [
+      { accountRevision: 2 },
+      { safetyEpoch: "2" },
+      { deletionEpoch: "3" },
+      { masterRevision: 2 },
+    ]) {
+      expect(
+        recheckDailyMatterV1(
+          selected.candidate,
+          request([source], { access: { ...access, ...changed } }),
+        ),
+      ).toBe(false);
+    }
     expect(
       recheckDailyMatterV1(
         selected.candidate,

@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 698, "NA_WITH_REASON": 0, "PLANNED": 312 },
+  "counts": { "COVERED": 701, "NA_WITH_REASON": 0, "PLANNED": 309 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -4099,6 +4099,31 @@
           "origin": "tests/registry/ai008-evidence-manifest.json",
           "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
           "test_id": "T-AI008-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a different owner cannot select the source, worker lacks Matter ciphertext/DELETE, and no title appears in the resolver result",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master and Daily grant are all active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
         }
       ],
       "status": "COVERED",
@@ -4119,11 +4144,34 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source, worker lacks Matter ciphertext/DELETE, and no title appears in the resolver result",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master and Daily grant are all active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-C05",
       "source_sets": ["s16-ai-corpus"]
@@ -4672,22 +4720,66 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a dated ACTIVE matter becomes EXPIRED rather than COMPLETED after the target date",
+            "an undated matter becomes EXPIRED from its eighth product date"
+          ],
+          "file": "packages/server-core/src/modules/matter/domain/matter.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "matter-policy-v1",
+          "test_id": "T-AI009-LIFECYCLE-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-S07",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a dated ACTIVE matter becomes EXPIRED rather than COMPLETED after the target date",
+            "an undated matter becomes EXPIRED from its eighth product date"
+          ],
+          "file": "packages/server-core/src/modules/matter/domain/matter.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "matter-policy-v1",
+          "test_id": "T-AI009-LIFECYCLE-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-S08",
       "source_sets": ["s16-ai-corpus"]
