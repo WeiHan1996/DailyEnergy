@@ -8,7 +8,7 @@
 - **任务 Profile**：`security`（source/grant/expiry/owner/revision/delete、Prompt 最小披露与无记忆回退）
 - **工作分支**：`agent/ai009-memory-selection`，基于已验证 `main@477d59c086395717b4aaa1b69e921fead1ceeb8d`
 - **任务 Issue**：[AI-009 Issue #78](https://github.com/WeiHan1996/DailyEnergy/issues/78)
-- **当前 PR**：待创建 Draft PR；仅供代码与 v2 合同提案审核，不是 AI-009 完工或发布申请
+- **当前 PR**：[Draft PR #207](https://github.com/WeiHan1996/DailyEnergy/pull/207)；仅供受限解析代码与 v2 合同提案审核，不是 AI-009 完工或发布申请
 - **上一完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
@@ -34,6 +34,7 @@
 - 新增真实 PostgreSQL AI-009 用例覆盖默认关闭、明确授权、跨 owner、密文/DELETE 权限拒绝、master 关后重开旧候选失效、grant 撤销、Safety 与 MATTER 删除守卫；完整数据库 Gate `92/92` PASS，迁移 checksum 与临时合成数据库生成的 catalog fingerprint 一致。server-core 聚焦测试 `7/7`，Source-ID registry 只将已有充分证据的 3 项提升为 `COVERED`，结果 `701/1010 COVERED`、`309 PLANNED`、`0 NA_WITH_REASON`；记忆发布/回退/频次实际写入不冒充覆盖。
 - `docs/ai/memory-enabled-daily-v2.md` 新建为 Draft，提议未来 `DAILY_EXPRESSION_V2` 只在现有 `state_response` 中受控提及一件用户主动事项且不发送标题，严格 fact ref 与同候选无源回退；Weekly/近期状态/关系继续空。AI-008 旧事项没有与来源修订绑定的当前 Safety 证明，只能在用户主动重新保存并通过当前 Safety Gate 后获得未来资格；当前解析器仅做服务端元数据预选，不能送 provider。此产品/设计/Schema 决定尚未获得 owner 确认，因此 AI-009 为 Blocked；不修改或激活 v1 Prompt，不标记 Draft 为 Accepted。Production/RC/真实用户/真实 provider 仍 NO_GO。
 - 2026-09-19 最终自动验证：固定 Node 24.18.0，`agent:validate --mode=changed --task=AI-009` 升级 full 后为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（184842ms）；`--mode=task --task=AI-009` 同终态（90111ms，5 组）；数据库完整 Gate `92/92` PASS，registry `701/1010 COVERED`，Phase Gate 12/12，server-core 聚焦 7/7。一次 npm 审计响应无 metadata 后重试取得完整结果，critical/high 均为 0；该失败不计作 PASS。需要 owner 先接受 Draft 合同，再实施原子发布链路并复跑 Gate；这两次自动通过只适用于当前受限预选代码。
+- 受限预选和 v2 Draft 首次提交 `c10a415` 已推送，创建 Draft PR #207。PR 链接回写将产生新 head，必须使用新 head 自己的 CI；本 PR 不标 Ready、不合并、不关闭 Issue #78。下一次会话从本文件、Draft 规范和 PR 的待决事项恢复，无需依赖聊天记录。
 
 ## 2026-09-14 AI-008 post-merge 收尾
 
