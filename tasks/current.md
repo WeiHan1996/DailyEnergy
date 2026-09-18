@@ -1,23 +1,31 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-09-14
+- **最后更新**：2026-09-18
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-009 — 实现用途受限的结构化记忆选择
-- **任务状态**：Ready
-- **任务 Profile**：`security`（source/grant/expiry/owner/revision/delete、Prompt 最小披露与无记忆回退；尚未运行 AI-009 prepare）
-- **工作分支**：无 AI-009 实现分支；AI-008 实现与状态收尾已合并，当前保持 `main`，收到新的明确启动指令前不创建分支
+- **任务状态**：In Progress
+- **任务 Profile**：`security`（source/grant/expiry/owner/revision/delete、Prompt 最小披露与无记忆回退）
+- **工作分支**：`agent/ai009-memory-selection`，基于已验证 `main@477d59c086395717b4aaa1b69e921fead1ceeb8d`
 - **任务 Issue**：[AI-009 Issue #78](https://github.com/WeiHan1996/DailyEnergy/issues/78)
-- **当前 PR**：无；AI-009 实现 PR 不存在
+- **当前 PR**：无；AI-009 实现尚在开发中
 - **上一完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-003 与 AI-008 已 Done；AI-009 的依赖与权威来源只在未来收到明确启动指令后通过 `pnpm agent:prepare AI-009 --remote --deep` 恢复，不在本状态收尾中预判或实施；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由后续开发任务自动关闭
+- **依赖边界**：AI-003 与 AI-008 已 Done；AI-009 prepare 为 READY；Daily/Weekly v1 继续无记忆，启用新记忆 workload 前必须升级 Prompt/Schema 并通过 Safety/Evaluation Gate；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待新的明确启动指令；本次不运行 AI-009 prepare、不创建实现分支或编码
+- **下一候选动作**：从数据库读取 owner-scoped 最新 Matter/grant/master/mention 与 Safety/deletion guards，接入当前纯选择器；随后完成用途受限投影、发布事务复查/回执/无源回退、删除传播和真实数据库测试。新 Prompt/Schema 版本获批准前不启用模型记忆；完成任务 Gate 与人工 threat boundary 审核后创建 Draft PR；后续候选 AI-010
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-09-18 AI-009 启动
+
+- owner 指示“合并 pr 后开始下一步”；当时唯一开放 PR 为依赖更新 #202，#206 已于 2026-09-14 合并；#202 升级 Vitest 4.1.11 并对齐 `@vitest/coverage-v8` 4.1.11，最终 head `9c298a6b990b14f051df657a0d37ec682a87decc` 经 CI run `35318937255` 的 11/11 SUCCESS 与 exact-head verifier 后 squash 合并为 `477d59c086395717b4aaa1b69e921fead1ceeb8d`；merged-main CI run `35319368376` 11/11 SUCCESS；
+- `pnpm agent:prepare AI-009 --remote --deep` 返回 READY，security Profile，远端与环境检查 PASS；权威输入为 Accepted ADR-0004、`docs/ai/memory.md`、Safety、测试、隐私与现有 Matter/Grant/Schema；required manual evidence 为 threatBoundaryReview 与适用时生产授权；
+- 分支从干净且与 `origin/main` 一致的 merge commit 创建。目标是确定性、用途受限的 resolver 与删除/修订安全边界；本次不启用 v1 Prompt 的记忆，也不接真实 provider、真实用户或 Production/RC。完成代码、合同与相应测试后执行 full/task Gate，并将人工边界决定留给 owner 审核。
+- 已新增 server-core 内部 Daily Matter 纯预选/复查：检查 owner、账户/同意/Safety/删除、master 与 Daily 开关、精确 grant/policy/revision、有效窗口、七日提及频次与稳定排序；输出只有服务端 ref/revision，不包含标题，不供 v1 Prompt 使用。7 项聚焦测试、server-core 162 项测试、类型检查、lint 和 architecture Gate 通过。此阶段尚无数据库读取、投影、原子发布、删除回退或真实 PG 验证，Source-ID registry 保持原状，不声称 AI-009 已覆盖。
+- 当前变更在 Node 24.18.0 下执行 `pnpm agent:validate --mode=changed --task=AI-009`，按策略升级 full：`automated=PASS / MANUAL_EVIDENCE_REQUIRED`（185327ms）；这只是当前开发片段的自动验证，AI-009 总任务 Gate 和 threat boundary 审核仍待完整实现后运行。Production authorization 不适用且未授予；C-015、真实用户/provider、RC/Alpha/Production 继续 NO_GO。
 
 ## 2026-09-14 AI-008 post-merge 收尾
 
