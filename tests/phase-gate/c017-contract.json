@@ -148,8 +148,8 @@
   },
   "source_registry": {
     "counts": {
-      "total": 1010,
-      "COVERED": 568,
+      "total": 1012,
+      "COVERED": 570,
       "PLANNED": 442,
       "NA_WITH_REASON": 0
     },

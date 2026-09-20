@@ -1,16 +1,20 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:aa656f20b8c9b5c3fa0172dceec454ff8a91010a75bdb3168b16aa40ff05dfc2
+// source-fingerprint: sha256:4f6f40c8222e83848180ee27455081a67c07458b542deb79f7b67ed772250282
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:aa656f20b8c9b5c3fa0172dceec454ff8a91010a75bdb3168b16aa40ff05dfc2";
+  "sha256:4f6f40c8222e83848180ee27455081a67c07458b542deb79f7b67ed772250282";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
     "urn:dailyenergy:schema:generation-input-snapshot:1.0.0",
   ruleFacts: "urn:dailyenergy:schema:rule-facts:1.0.0",
   expressionPayload: "urn:dailyenergy:schema:expression-payload:1.0.0",
+  dailyExpressionPayloadV2:
+    "urn:dailyenergy:schema:daily-expression-payload-v2:1.0.0",
+  dailyMemoryContextProjectionV1:
+    "urn:dailyenergy:schema:daily-memory-context-projection-v1:1.0.0",
   publishedDailyResult: "urn:dailyenergy:schema:published-daily-result:1.0.0",
   clientDailyContentView:
     "urn:dailyenergy:schema:client-daily-content-view:1.0.0",
@@ -619,6 +623,307 @@ export const jsonSchemas = {
       "optional_task",
       "ritual_notes",
       "closing",
+    ],
+    type: "object",
+  },
+  dailyExpressionPayloadV2: {
+    $id: "urn:dailyenergy:schema:daily-expression-payload-v2:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      contract: {
+        const: "daily-expression-payload-v2",
+        type: "string",
+      },
+      expression: {
+        additionalProperties: false,
+        properties: {
+          closing: {
+            type: "string",
+          },
+          core_tip: {
+            type: "string",
+          },
+          dimension_explanations: {
+            additionalProperties: false,
+            properties: {
+              action: {
+                type: "string",
+              },
+              connection: {
+                type: "string",
+              },
+              pace: {
+                type: "string",
+              },
+              recovery: {
+                type: "string",
+              },
+              resources: {
+                type: "string",
+              },
+            },
+            required: ["pace", "action", "connection", "resources", "recovery"],
+            type: "object",
+          },
+          explanation_paragraphs: {
+            items: {
+              type: "string",
+            },
+            maxItems: 2,
+            minItems: 1,
+            type: "array",
+          },
+          greeting: {
+            type: "string",
+          },
+          optional_task: {
+            additionalProperties: false,
+            properties: {
+              instruction: {
+                type: "string",
+              },
+              task_id: {
+                pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                type: "string",
+              },
+            },
+            required: ["task_id", "instruction"],
+            type: "object",
+          },
+          overall_summary: {
+            type: "string",
+          },
+          primary_action: {
+            additionalProperties: false,
+            properties: {
+              action_id: {
+                pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+                type: "string",
+              },
+              constraint_label: {
+                type: "string",
+              },
+              instruction: {
+                type: "string",
+              },
+              rationale: {
+                type: "string",
+              },
+            },
+            required: ["action_id", "instruction"],
+            type: "object",
+          },
+          ritual_notes: {
+            additionalProperties: {
+              type: "string",
+            },
+            propertyNames: {
+              pattern: "^[^\\s\\u0000-\\u001f\\u007f]{1,128}$",
+              type: "string",
+            },
+            type: "object",
+          },
+          state_response: {
+            type: "string",
+          },
+        },
+        required: [
+          "greeting",
+          "state_response",
+          "overall_summary",
+          "core_tip",
+          "explanation_paragraphs",
+          "dimension_explanations",
+          "primary_action",
+          "optional_task",
+          "ritual_notes",
+          "closing",
+        ],
+        type: "object",
+      },
+      memory_bindings: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            exact_memory_fact_refs: {
+              items: {
+                pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                type: "string",
+              },
+              maxItems: 1,
+              minItems: 1,
+              type: "array",
+            },
+            segment_path: {
+              const: "expression.state_response",
+              type: "string",
+            },
+          },
+          required: ["segment_path", "exact_memory_fact_refs"],
+          type: "object",
+        },
+        maxItems: 1,
+        type: "array",
+      },
+      privacy_fallbacks: {
+        additionalProperties: false,
+        properties: {
+          "expression.state_response": {
+            type: "string",
+          },
+        },
+        type: "object",
+      },
+      schema_version: {
+        const: "2.0.0",
+        type: "string",
+      },
+    },
+    required: [
+      "contract",
+      "schema_version",
+      "expression",
+      "memory_bindings",
+      "privacy_fallbacks",
+    ],
+    type: "object",
+  },
+  dailyMemoryContextProjectionV1: {
+    $id: "urn:dailyenergy:schema:daily-memory-context-projection-v1:1.0.0",
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    additionalProperties: false,
+    properties: {
+      contract: {
+        const: "memory-context-projection-v1",
+        type: "string",
+      },
+      memory_facts: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            allowed_claim: {
+              const: "USER_SAVED_MATTER",
+              type: "string",
+            },
+            allowed_date_literals: {
+              prefixItems: [],
+              type: "array",
+            },
+            allowed_numeric_literals: {
+              prefixItems: [],
+              type: "array",
+            },
+            fact_id: {
+              pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+              type: "string",
+            },
+            fact_kind: {
+              const: "IMPORTANT_MATTER",
+              type: "string",
+            },
+            prohibited_inferences: {
+              prefixItems: [
+                {
+                  const: "CAUSE",
+                  type: "string",
+                },
+                {
+                  const: "OUTCOME",
+                  type: "string",
+                },
+                {
+                  const: "PROFESSIONAL_CONCLUSION",
+                  type: "string",
+                },
+                {
+                  const: "RELATIONSHIP_OR_IDENTITY",
+                  type: "string",
+                },
+              ],
+              readOnly: true,
+              type: "array",
+            },
+            temporal_relation: {
+              enum: ["TARGET_TODAY", "FUTURE_WINDOW", "UNSPECIFIED"],
+              type: "string",
+            },
+          },
+          required: [
+            "fact_id",
+            "fact_kind",
+            "temporal_relation",
+            "allowed_claim",
+            "allowed_date_literals",
+            "allowed_numeric_literals",
+            "prohibited_inferences",
+          ],
+          type: "object",
+        },
+        maxItems: 1,
+        type: "array",
+      },
+      personalization_expectation: {
+        enum: ["FULL", "REDUCED"],
+        type: "string",
+      },
+      product_date: {
+        pattern: "^(\\d{4})-(\\d{2})-(\\d{2})$",
+        type: "string",
+      },
+      provider_projection_bytes: {
+        maximum: 1024,
+        minimum: 0,
+        type: "integer",
+      },
+      segment_contracts: {
+        items: {
+          additionalProperties: false,
+          properties: {
+            exact_memory_fact_refs: {
+              items: {
+                pattern: "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+                type: "string",
+              },
+              maxItems: 1,
+              type: "array",
+            },
+            fallback_path: {
+              const: "expression.state_response",
+              type: "string",
+            },
+            memory_mention_allowed: {
+              type: "boolean",
+            },
+            segment_path: {
+              const: "expression.state_response",
+              type: "string",
+            },
+          },
+          required: [
+            "segment_path",
+            "exact_memory_fact_refs",
+            "memory_mention_allowed",
+            "fallback_path",
+          ],
+          type: "object",
+        },
+        maxItems: 1,
+        type: "array",
+      },
+      workload: {
+        const: "DAILY_EXPRESSION_V2",
+        type: "string",
+      },
+    },
+    required: [
+      "contract",
+      "workload",
+      "product_date",
+      "memory_facts",
+      "segment_contracts",
+      "personalization_expectation",
+      "provider_projection_bytes",
     ],
     type: "object",
   },

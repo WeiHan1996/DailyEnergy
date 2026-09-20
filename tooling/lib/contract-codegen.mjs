@@ -28,6 +28,16 @@ const SCHEMA_EXPORTS = [
   ["ruleFacts", "RuleFactsSchema", "rule-facts"],
   ["expressionPayload", "ExpressionPayloadSchema", "expression-payload"],
   [
+    "dailyExpressionPayloadV2",
+    "DailyExpressionPayloadV2Schema",
+    "daily-expression-payload-v2",
+  ],
+  [
+    "dailyMemoryContextProjectionV1",
+    "DailyMemoryContextProjectionV1Schema",
+    "daily-memory-context-projection-v1",
+  ],
+  [
     "publishedDailyResult",
     "PublishedDailyResultSchema",
     "published-daily-result",

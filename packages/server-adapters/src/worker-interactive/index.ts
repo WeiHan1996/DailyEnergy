@@ -21,6 +21,7 @@ import {
 } from "../telemetry/runtime.js";
 import { createInteractiveGenerationHandlers } from "../generation/interactive-generation-handler.js";
 import { PostgresDailyGenerationRuntime } from "../generation/postgres-daily-generation-runtime.js";
+export { PostgresMemoryStore } from "../memory/postgres-memory-store.js";
 
 export type WorkerInteractiveDatabaseCapability =
   DatabaseCapability<"worker-interactive">;

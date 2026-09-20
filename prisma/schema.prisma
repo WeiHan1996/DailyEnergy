@@ -801,24 +801,34 @@ model PersonalizedContentFragment {
 }
 
 model SourceDependency {
-  id                     String         @id @default(uuid()) @db.Uuid
-  fragmentId             String         @db.Uuid
-  sourceType             String         @db.VarChar(64)
-  sourceRef              String         @db.Uuid
-  sourceRevision         Int
-  purpose                MemoryPurpose
-  grantRef               String?        @db.Uuid
-  grantRevision          Int?
-  policyVersion          String         @db.VarChar(64)
-  segmentPaths           String[]
-  fallbackPaths          String[]
-  validAtPublish         Boolean
-  invalidatedAt          DateTime?      @db.Timestamptz(3)
-  invalidationReasonCode String?        @db.VarChar(64)
-  retentionPolicyVersion String         @db.VarChar(64)
-  retentionScope         RetentionScope @default(DAY)
-  retentionAnchorAt      DateTime       @db.Timestamptz(3)
-  expiresAt              DateTime?      @db.Timestamptz(3)
+  id                            String         @id @default(uuid()) @db.Uuid
+  fragmentId                    String         @db.Uuid
+  sourceType                    String         @db.VarChar(64)
+  sourceRef                     String         @db.Uuid
+  sourceRevision                Int
+  purpose                       MemoryPurpose
+  grantRef                      String?        @db.Uuid
+  grantRevision                 Int?
+  masterRevision                Int?
+  accountRevision               Int?
+  safetyEpoch                   BigInt?
+  deletionEpoch                 BigInt?
+  sourceSafetyPolicyVersion     String?        @db.VarChar(64)
+  sourceSafetyRuleVersion       String?        @db.VarChar(64)
+  sourceSafetyClassifierVersion String?        @db.VarChar(64)
+  sourceSafetyFingerprint       Bytes?
+  validUntilProductDate         DateTime?      @db.Date
+  temporalRelation              String?        @db.VarChar(32)
+  policyVersion                 String         @db.VarChar(64)
+  segmentPaths                  String[]
+  fallbackPaths                 String[]
+  validAtPublish                Boolean
+  invalidatedAt                 DateTime?      @db.Timestamptz(3)
+  invalidationReasonCode        String?        @db.VarChar(64)
+  retentionPolicyVersion        String         @db.VarChar(64)
+  retentionScope                RetentionScope @default(DAY)
+  retentionAnchorAt             DateTime       @db.Timestamptz(3)
+  expiresAt                     DateTime?      @db.Timestamptz(3)
 
   fragment PersonalizedContentFragment @relation(fields: [fragmentId], references: [id], onDelete: Restrict)
 
@@ -1017,21 +1027,27 @@ model RelationshipNodeReceipt {
 }
 
 model ImportantMatter {
-  id                     String         @id @default(uuid()) @db.Uuid
-  accountId              String         @db.Uuid
-  revision               Int            @default(1)
-  titleCiphertext        Bytes
-  titleKeyVersion        String         @db.VarChar(64)
-  targetProductDate      DateTime?      @db.Date
-  state                  MatterState    @default(ACTIVE)
-  createdProductDate     DateTime       @db.Date
-  terminalAt             DateTime?      @db.Timestamptz(3)
-  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
-  updatedAt              DateTime       @updatedAt @db.Timestamptz(3)
-  retentionPolicyVersion String         @db.VarChar(64)
-  retentionScope         RetentionScope @default(MATTER)
-  retentionAnchorAt      DateTime       @db.Timestamptz(3)
-  expiresAt              DateTime?      @db.Timestamptz(3)
+  id                            String         @id @default(uuid()) @db.Uuid
+  accountId                     String         @db.Uuid
+  revision                      Int            @default(1)
+  titleCiphertext               Bytes
+  titleKeyVersion               String         @db.VarChar(64)
+  memorySafetySourceRevision    Int?
+  memorySafetyPolicyVersion     String?        @db.VarChar(64)
+  memorySafetyRuleVersion       String?        @db.VarChar(64)
+  memorySafetyClassifierVersion String?        @db.VarChar(64)
+  memorySafetyFingerprint       Bytes?
+  memorySafetyClearedAt         DateTime?      @db.Timestamptz(3)
+  targetProductDate             DateTime?      @db.Date
+  state                         MatterState    @default(ACTIVE)
+  createdProductDate            DateTime       @db.Date
+  terminalAt                    DateTime?      @db.Timestamptz(3)
+  createdAt                     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt                     DateTime       @updatedAt @db.Timestamptz(3)
+  retentionPolicyVersion        String         @db.VarChar(64)
+  retentionScope                RetentionScope @default(MATTER)
+  retentionAnchorAt             DateTime       @db.Timestamptz(3)
+  expiresAt                     DateTime?      @db.Timestamptz(3)
 
   account   UserAccount               @relation(fields: [accountId], references: [id], onDelete: Restrict)
   revisions ImportantMatterRevision[]

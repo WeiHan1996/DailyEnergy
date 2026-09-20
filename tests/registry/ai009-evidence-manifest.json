@@ -1,0 +1,194 @@
+{
+  "manifest_version": "ai-009-evidence-v1",
+  "scope": "AI-009 Accepted Daily v2 Matter memory contracts, revision-bound Safety proof, deterministic context, strict Prompt/output, atomic dependency/fallback/mention publication, least privilege and no-memory fallback",
+  "authority": [
+    "docs/decisions/ADR-0004-structured-memory.md",
+    "docs/ai/memory.md",
+    "docs/ai/safety.md",
+    "docs/technical/testing.md"
+  ],
+  "proofs": {
+    "T-AI009-POLICY-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+      "selector": "memory-policy-v1 Daily matter preselection",
+      "level": "AI_EVAL",
+      "assertions": [
+        "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+        "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+        "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+        "same-day and rolling seven-day mention limits prevent repeated selection"
+      ]
+    },
+    "T-AI009-DB-AI-EVAL-001": {
+      "file": "tests/database/ai009-memory-selection.test.mjs",
+      "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+      "level": "AI_EVAL",
+      "assertions": [
+        "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active",
+        "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+        "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+        "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt"
+      ]
+    },
+    "T-AI009-LIFECYCLE-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/matter/domain/matter.test.ts",
+      "selector": "matter-policy-v1",
+      "level": "AI_EVAL",
+      "assertions": [
+        "a dated ACTIVE matter becomes EXPIRED rather than COMPLETED after the target date",
+        "an undated matter becomes EXPIRED from its eighth product date"
+      ]
+    },
+    "T-AI009-CONTEXT-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/memory/domain/daily-context.test.ts",
+      "selector": "memory-context-snapshot-v1",
+      "level": "AI_EVAL",
+      "assertions": [
+        "one selected Matter projects one title-free fact and exact state_response segment contract while source/grant/owner bindings remain server-only",
+        "no candidate creates a deterministic complete no-memory snapshot",
+        "dependency revision changes alter the immutable snapshot fingerprint and provider projection remains within 1 KiB"
+      ]
+    },
+    "T-AI009-PROMPT-AI-EVAL-001": {
+      "file": "packages/prompt-library/src/daily-memory-v2.test.ts",
+      "selector": "daily-expression-zh-cn-v2 staged memory contract",
+      "level": "AI_EVAL",
+      "assertions": [
+        "the immutable STAGED Prompt package forbids external provider calls and compiles strict 2.0.0 JSON Schema without source, owner or title",
+        "the controlled v2 renderer binds one exact fact only to state_response and includes a distinct complete fallback",
+        "no-memory output remains complete while substituted refs and missing fallback are rejected"
+      ]
+    },
+    "T-AI009-FALLBACK-AI-EVAL-001": {
+      "file": "packages/server-core/src/modules/memory/domain/privacy-fallback.test.ts",
+      "selector": "Daily v2 memory privacy fallback",
+      "level": "AI_EVAL",
+      "assertions": [
+        "personalized state_response is returned only while the dependency is valid",
+        "missing, revoked, Safety-blocked or deleted dependencies resolve to the prevalidated fallback without deletion disclosure",
+        "fallback text that reveals deletion history is rejected"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "source_id": "M14-C01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-CONTEXT-AI-EVAL-001", "T-AI009-PROMPT-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-C02",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-POLICY-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-C03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-POLICY-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-C05",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-POLICY-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-C06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-POLICY-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-C08",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-POLICY-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-C09",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-CONTEXT-AI-EVAL-001", "T-AI009-PROMPT-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-D01",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-D03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-POLICY-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-D08",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-FALLBACK-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-D09",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-PROMPT-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-D12",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-R02",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-CONTEXT-AI-EVAL-001", "T-AI009-PROMPT-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-R03",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-POLICY-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-R04",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-PROMPT-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-R06",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-CONTEXT-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-R09",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-FALLBACK-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-R11",
+      "status": "COVERED",
+      "proof_ids": ["T-AI009-PROMPT-AI-EVAL-001", "T-AI009-DB-AI-EVAL-001"]
+    },
+    {
+      "source_id": "M14-S07",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI009-POLICY-AI-EVAL-001",
+        "T-AI009-LIFECYCLE-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "M14-S08",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI009-POLICY-AI-EVAL-001",
+        "T-AI009-LIFECYCLE-AI-EVAL-001"
+      ]
+    },
+    {
+      "source_id": "M14-S09",
+      "status": "COVERED",
+      "proof_ids": [
+        "T-AI009-POLICY-AI-EVAL-001",
+        "T-AI009-LIFECYCLE-AI-EVAL-001"
+      ]
+    }
+  ],
+  "pending_evidence": {
+    "provider_qualification": "The Daily v2 package remains STAGED and external provider calls are prohibited. MODEL/LOAD/HUMAN qualification and real-provider authorization remain pending.",
+    "source_coverage": "Recent state and relationship facts lack Daily-purpose grants; Weekly v1 stays empty. Their M14 scenarios remain PLANNED.",
+    "manual": "Owner acceptance of the v2 contract is recorded; final threat-boundary review and any production authorization are not replaced by this manifest."
+  }
+}
