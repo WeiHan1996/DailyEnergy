@@ -32,6 +32,13 @@ function matter(
     state: "ACTIVE",
     createdProductDate: "2026-09-10",
     updatedAt: new Date("2026-09-10T12:00:00Z"),
+    memorySafetyProof: {
+      sourceRevision: 1,
+      policyVersion: "safety-v1",
+      ruleVersion: "rules-v1",
+      classifierVersion: "classifier-v1",
+      fingerprintHex: "ab".repeat(32),
+    },
     grant: {
       ownerRef,
       sourceRef,
@@ -87,6 +94,24 @@ describe("memory-policy-v1 Daily matter preselection", () => {
         ]),
       ).status,
     ).toBe("NO_ELIGIBLE_MEMORY");
+    expect(
+      selectDailyMatterV1(
+        request([{ ...source, memorySafetyProof: undefined }]),
+      ).status,
+    ).toBe("NO_ELIGIBLE_MEMORY");
+    expect(
+      selectDailyMatterV1(request([{ ...source, grant: undefined }])).status,
+    ).toBe("NO_ELIGIBLE_MEMORY");
+    for (const state of [
+      "PAUSED",
+      "COMPLETED",
+      "EXPIRED",
+      "DELETED",
+    ] as const) {
+      expect(selectDailyMatterV1(request([{ ...source, state }])).status).toBe(
+        "NO_ELIGIBLE_MEMORY",
+      );
+    }
     for (const key of [
       "accountActive",
       "consentActive",

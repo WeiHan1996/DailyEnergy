@@ -1,7 +1,11 @@
+import { createHash, randomUUID } from "node:crypto";
+
 import { Pool, type PoolClient } from "pg";
 
 import {
   recheckDailyMatterV1,
+  recheckPublishedDailyMatterV1,
+  resolveDailyMemoryStateResponseV2,
   selectDailyMatterV1,
   type DailyMatterMentionV1,
   type DailyMatterSelectionRequestV1,
@@ -40,6 +44,11 @@ interface MatterRow {
   readonly grantRevision: number | null;
   readonly grantState: "ACTIVE" | "REVOKED" | null;
   readonly grantPolicyVersion: string | null;
+  readonly memorySafetySourceRevision: number | null;
+  readonly memorySafetyPolicyVersion: string | null;
+  readonly memorySafetyRuleVersion: string | null;
+  readonly memorySafetyClassifierVersion: string | null;
+  readonly memorySafetyFingerprint: Buffer | null;
 }
 
 interface MentionRow {
@@ -47,8 +56,26 @@ interface MentionRow {
   readonly productDate: string;
 }
 
-// Staged metadata preselection only: existing Matter rows have no per-revision
-// Safety clearance proof and are never eligible for provider projection here.
+interface PublishedDependencyRow {
+  readonly sourceRef: string;
+  readonly sourceRevision: number;
+  readonly grantRef: string;
+  readonly grantRevision: number;
+  readonly masterRevision: number;
+  readonly accountRevision: number;
+  readonly safetyEpoch: string;
+  readonly deletionEpoch: string;
+  readonly sourceSafetyPolicyVersion: string;
+  readonly sourceSafetyRuleVersion: string;
+  readonly sourceSafetyClassifierVersion: string;
+  readonly sourceSafetyFingerprint: Buffer;
+  readonly validUntilProductDate: string;
+  readonly temporalRelation: SelectedDailyMatterV1["temporalRelation"];
+  readonly policyVersion: "memory-policy-v1";
+}
+
+// Existing Matter rows without a current per-revision Safety proof remain
+// ineligible; this store never reads title ciphertext.
 export class PostgresMemoryStore {
   readonly #pool: Pool;
   #closed = false;
@@ -136,6 +163,271 @@ export class PostgresMemoryStore {
     }
   }
 
+  public async commitDailyUse(input: {
+    readonly selected: SelectedDailyMatterV1;
+    readonly productDate: string;
+    readonly resultId: string;
+    readonly protectedStateResponse: {
+      readonly ciphertext: Buffer;
+      readonly keyVersion: string;
+      readonly fingerprint: Buffer;
+    };
+    readonly fallbackStateResponse: string;
+    readonly now: Date;
+    readonly hooks?: {
+      beforeCommit?(): Promise<void>;
+      onFailure?(diagnostic: {
+        readonly phase: MemoryPublicationPhase;
+        readonly databaseCode?: string;
+        readonly constraint?: string;
+      }): Promise<void>;
+    };
+  }): Promise<"COMMITTED" | "DUPLICATE" | "FALLBACK_REQUIRED"> {
+    if (this.#closed) {
+      return "FALLBACK_REQUIRED";
+    }
+    let phase: MemoryPublicationPhase = "LIVE_RECHECK";
+    try {
+      return await this.#transaction(
+        input.selected.ownerRef,
+        async (client) => {
+          phase = "RESULT_BINDING";
+          const result = (
+            await client.query<{
+              accountId: string;
+              productDate: string;
+              resultVersion: string;
+              schemaVersion: string;
+            }>(
+              `SELECT "accountId","productDate"::text AS "productDate",
+                      "resultVersion","schemaVersion"
+               FROM daily_energy.app_published_daily_result
+              WHERE id=$1::uuid`,
+              [input.resultId],
+            )
+          ).rows[0];
+          if (
+            result === undefined ||
+            result.accountId !== input.selected.ownerRef ||
+            result.productDate !== input.productDate ||
+            result.resultVersion !== "daily-v2" ||
+            result.schemaVersion !== "2.0.0"
+          ) {
+            return "FALLBACK_REQUIRED";
+          }
+          phase = "SLOT";
+          const duplicate = await client.query(
+            `SELECT 1 FROM daily_energy.app_result_content_slot
+            WHERE "resultId"=$1::uuid AND "segmentPath"='expression.state_response'`,
+            [input.resultId],
+          );
+          if (duplicate.rowCount === 1) {
+            return "DUPLICATE";
+          }
+          phase = "LIVE_RECHECK";
+          const current = await readCurrent(client, {
+            ownerRef: input.selected.ownerRef,
+            productDate: input.productDate,
+            sourceRef: input.selected.sourceRef,
+          });
+          if (!recheckDailyMatterV1(input.selected, current)) {
+            return "FALLBACK_REQUIRED";
+          }
+          assertProtectedFragment(input.protectedStateResponse);
+          if (
+            input.fallbackStateResponse.length < 1 ||
+            Buffer.byteLength(input.fallbackStateResponse, "utf8") > 560
+          ) {
+            return "FALLBACK_REQUIRED";
+          }
+          resolveDailyMemoryStateResponseV2({
+            dependencyValid: false,
+            fallbackStateResponse: input.fallbackStateResponse,
+          });
+          const slotId = randomUUID();
+          const fragmentId = randomUUID();
+          await client.query(
+            `INSERT INTO daily_energy.app_result_content_slot
+            (id,"resultId","segmentPath","fallbackPayload","fallbackFingerprint",
+             "fallbackSchemaVersion","createdAt","retentionPolicyVersion",
+             "retentionScope","retentionAnchorAt")
+           VALUES ($1::uuid,$2::uuid,'expression.state_response',$3::jsonb,$4,
+             'daily-memory-fragment-v2',$5::timestamptz,'retention-policy-v1',
+             'DAY',$5::timestamptz)`,
+            [
+              slotId,
+              input.resultId,
+              JSON.stringify({ text: input.fallbackStateResponse }),
+              createHash("sha256")
+                .update(input.fallbackStateResponse, "utf8")
+                .digest(),
+              input.now,
+            ],
+          );
+          phase = "FRAGMENT";
+          await client.query(
+            `INSERT INTO daily_energy.app_personalized_content_fragment
+            (id,"slotId","payloadCiphertext","payloadKeyVersion",
+             "payloadFingerprint","schemaVersion","createdAt",
+             "retentionPolicyVersion","retentionScope","retentionAnchorAt")
+           VALUES ($1::uuid,$2::uuid,$3,$4,$5,'daily-memory-fragment-v2',
+             $6::timestamptz,'retention-policy-v1','DAY',$6::timestamptz)`,
+            [
+              fragmentId,
+              slotId,
+              input.protectedStateResponse.ciphertext,
+              input.protectedStateResponse.keyVersion,
+              input.protectedStateResponse.fingerprint,
+              input.now,
+            ],
+          );
+          phase = "DEPENDENCY";
+          await client.query(
+            `INSERT INTO daily_energy.app_source_dependency
+            (id,"fragmentId","sourceType","sourceRef","sourceRevision",purpose,
+             "grantRef","grantRevision","masterRevision","accountRevision",
+             "safetyEpoch","deletionEpoch","sourceSafetyPolicyVersion",
+             "sourceSafetyRuleVersion","sourceSafetyClassifierVersion",
+             "sourceSafetyFingerprint","validUntilProductDate","temporalRelation",
+             "policyVersion","segmentPaths",
+             "fallbackPaths","validAtPublish","retentionPolicyVersion",
+             "retentionScope","retentionAnchorAt")
+           VALUES (gen_random_uuid(),$1::uuid,'MATTER',$2::uuid,$3,
+             'DAILY_EXPRESSION',$4::uuid,$5,$6,$7,$8::bigint,$9::bigint,
+             $10,$11,$12,$13,$14::date,$15,$16,
+             ARRAY['expression.state_response'],ARRAY['expression.state_response'],
+             true,'retention-policy-v1','DAY',$17::timestamptz)`,
+            [
+              fragmentId,
+              input.selected.sourceRef,
+              input.selected.sourceRevision,
+              input.selected.grantRef,
+              input.selected.grantRevision,
+              input.selected.masterRevision,
+              input.selected.accountRevision,
+              input.selected.safetyEpoch,
+              input.selected.deletionEpoch,
+              input.selected.sourceSafetyPolicyVersion,
+              input.selected.sourceSafetyRuleVersion,
+              input.selected.sourceSafetyClassifierVersion,
+              Buffer.from(input.selected.sourceSafetyFingerprintHex, "hex"),
+              input.selected.validUntilProductDate,
+              input.selected.temporalRelation,
+              input.selected.policyVersion,
+              input.now,
+            ],
+          );
+          phase = "MENTION";
+          await client.query(
+            `INSERT INTO daily_energy.app_memory_mention_receipt
+            (id,"accountId","sourceType","sourceRef","productDate",purpose,
+             "resultId","policyVersion","createdAt","retentionPolicyVersion",
+             "retentionScope","retentionAnchorAt")
+           VALUES (gen_random_uuid(),$1::uuid,'MATTER',$2::uuid,$3::date,
+             'DAILY_EXPRESSION',$4::uuid,$5,$6::timestamptz,
+             'retention-policy-v1','DAY',$6::timestamptz)`,
+            [
+              input.selected.ownerRef,
+              input.selected.sourceRef,
+              input.productDate,
+              input.resultId,
+              input.selected.policyVersion,
+              input.now,
+            ],
+          );
+          phase = "BEFORE_COMMIT";
+          await input.hooks?.beforeCommit?.();
+          return "COMMITTED";
+        },
+      );
+    } catch (error) {
+      const databaseCode = safeDiagnosticField(error, "code");
+      const constraint = safeDiagnosticField(error, "constraint");
+      await input.hooks?.onFailure?.({
+        phase,
+        ...(databaseCode === undefined ? {} : { databaseCode }),
+        ...(constraint === undefined ? {} : { constraint }),
+      });
+      return "FALLBACK_REQUIRED";
+    }
+  }
+
+  public async isDailyDependencyValid(input: {
+    readonly ownerRef: string;
+    readonly productDate: string;
+    readonly resultId: string;
+  }): Promise<boolean> {
+    if (this.#closed) {
+      return false;
+    }
+    try {
+      return await this.#transaction(input.ownerRef, async (client) => {
+        const rows = (
+          await client.query<PublishedDependencyRow>(
+            `SELECT dependency."sourceRef",dependency."sourceRevision",
+                    dependency."grantRef",dependency."grantRevision",
+                    dependency."masterRevision",dependency."accountRevision",
+                    dependency."safetyEpoch"::text AS "safetyEpoch",
+                    dependency."deletionEpoch"::text AS "deletionEpoch",
+                    dependency."sourceSafetyPolicyVersion",
+                    dependency."sourceSafetyRuleVersion",
+                    dependency."sourceSafetyClassifierVersion",
+                    dependency."sourceSafetyFingerprint",
+                    dependency."validUntilProductDate"::text AS "validUntilProductDate",
+                    dependency."temporalRelation",dependency."policyVersion"
+               FROM daily_energy.app_source_dependency dependency
+               JOIN daily_energy.app_personalized_content_fragment fragment
+                 ON fragment.id=dependency."fragmentId"
+               JOIN daily_energy.app_result_content_slot slot
+                 ON slot.id=fragment."slotId"
+               JOIN daily_energy.app_published_daily_result result
+                 ON result.id=slot."resultId"
+              WHERE slot."resultId"=$1::uuid
+                AND result."accountId"=$2::uuid
+                AND result."productDate"=$3::date
+                AND slot."segmentPath"='expression.state_response'
+                AND dependency."sourceType"='MATTER'
+                AND dependency.purpose='DAILY_EXPRESSION'`,
+            [input.resultId, input.ownerRef, input.productDate],
+          )
+        ).rows;
+        if (rows.length !== 1) {
+          return false;
+        }
+        const row = rows[0]!;
+        const selected: SelectedDailyMatterV1 = {
+          ownerRef: input.ownerRef,
+          accountRevision: row.accountRevision,
+          safetyEpoch: row.safetyEpoch,
+          deletionEpoch: row.deletionEpoch,
+          masterRevision: row.masterRevision,
+          sourceSafetyPolicyVersion: row.sourceSafetyPolicyVersion,
+          sourceSafetyRuleVersion: row.sourceSafetyRuleVersion,
+          sourceSafetyClassifierVersion: row.sourceSafetyClassifierVersion,
+          sourceSafetyFingerprintHex:
+            row.sourceSafetyFingerprint.toString("hex"),
+          temporalRelation: row.temporalRelation,
+          sourceRef: row.sourceRef,
+          sourceRevision: row.sourceRevision,
+          grantRef: row.grantRef,
+          grantRevision: row.grantRevision,
+          validUntilProductDate: row.validUntilProductDate,
+          policyVersion: row.policyVersion,
+        };
+        return recheckPublishedDailyMatterV1(
+          selected,
+          await readCurrent(client, {
+            ownerRef: input.ownerRef,
+            productDate: input.productDate,
+            sourceRef: row.sourceRef,
+          }),
+        );
+      });
+    } catch {
+      return false;
+    }
+  }
+
   public async close(): Promise<void> {
     if (!this.#closed) {
       this.#closed = true;
@@ -163,6 +455,43 @@ export class PostgresMemoryStore {
     } finally {
       client.release();
     }
+  }
+}
+
+type MemoryPublicationPhase =
+  | "LIVE_RECHECK"
+  | "RESULT_BINDING"
+  | "SLOT"
+  | "FRAGMENT"
+  | "DEPENDENCY"
+  | "MENTION"
+  | "BEFORE_COMMIT";
+
+function safeDiagnosticField(
+  error: unknown,
+  field: "code" | "constraint",
+): string | undefined {
+  if (typeof error !== "object" || error === null) {
+    return undefined;
+  }
+  const value = (error as Record<string, unknown>)[field];
+  return typeof value === "string" && /^[A-Za-z0-9_-]{1,128}$/u.test(value)
+    ? value
+    : undefined;
+}
+
+function assertProtectedFragment(value: {
+  readonly ciphertext: Buffer;
+  readonly keyVersion: string;
+  readonly fingerprint: Buffer;
+}): void {
+  if (
+    value.ciphertext.length < 29 ||
+    value.keyVersion.length < 1 ||
+    value.keyVersion.length > 64 ||
+    value.fingerprint.length !== 32
+  ) {
+    throw new Error("MEMORY_FRAGMENT_PROTECTION_INVALID");
   }
 }
 
@@ -220,7 +549,10 @@ async function readCurrent(
               matter."updatedAt",grant_row.id AS "grantRef",
               grant_row.revision AS "grantRevision",
               grant_row.state::text AS "grantState",
-              grant_row."policyVersion" AS "grantPolicyVersion"
+              grant_row."policyVersion" AS "grantPolicyVersion",
+              matter."memorySafetySourceRevision",
+              matter."memorySafetyPolicyVersion",matter."memorySafetyRuleVersion",
+              matter."memorySafetyClassifierVersion",matter."memorySafetyFingerprint"
          FROM daily_energy.app_important_matter matter
          LEFT JOIN daily_energy.app_memory_purpose_grant grant_row
            ON grant_row."accountId"=matter."accountId"
@@ -282,6 +614,21 @@ async function readCurrent(
         ? {}
         : { targetProductDate: row.targetProductDate }),
       updatedAt: row.updatedAt,
+      ...(row.memorySafetySourceRevision === null ||
+      row.memorySafetyPolicyVersion === null ||
+      row.memorySafetyRuleVersion === null ||
+      row.memorySafetyClassifierVersion === null ||
+      row.memorySafetyFingerprint === null
+        ? {}
+        : {
+            memorySafetyProof: {
+              sourceRevision: row.memorySafetySourceRevision,
+              policyVersion: row.memorySafetyPolicyVersion,
+              ruleVersion: row.memorySafetyRuleVersion,
+              classifierVersion: row.memorySafetyClassifierVersion,
+              fingerprintHex: row.memorySafetyFingerprint.toString("hex"),
+            },
+          }),
       ...(row.grantRef === null ||
       row.grantRevision === null ||
       row.grantState === null ||

@@ -258,7 +258,7 @@
     }
   ],
   "pending_evidence": {
-    "memory_resolver": "AI-009 must implement deterministic candidate selection, mention frequency, source/grant publish recheck and no-memory fallback for future memory-enabled workloads.",
+    "memory_resolver": "Implemented by AI-009 with evidence in tests/registry/ai009-evidence-manifest.json; Daily v2 remains STAGED with external provider calls prohibited.",
     "reminder_delivery": "A-004 remains responsible for user-selected reminder windows and platform delivery; AI-008 only preserves the accepted Matter source and existing deletion cleanup boundary.",
     "miniapp_devtools": "INFRA_BLOCKED until MINIAPP_DEVTOOLS_CLI_PATH is configured; unit, contract and production bundle checks do not replace WeChat runtime evidence.",
     "production_authorization": "NOT_GRANTED"

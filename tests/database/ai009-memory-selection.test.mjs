@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import path from "node:path";
 import test from "node:test";
 
@@ -71,6 +71,91 @@ async function createAccount(auth, consent, label) {
   return accountId;
 }
 
+async function createPublishedResult(admin, accountId) {
+  const checkinId = randomUUID();
+  const intentId = randomUUID();
+  const snapshotId = randomUUID();
+  const resultId = randomUUID();
+  await admin.query("BEGIN");
+  try {
+    await admin.query(
+      `INSERT INTO app_morning_checkin
+        (id,"accountId","productDate","productDatePolicyVersion",revision,
+         mood,energy,sleep,"firstSubmittedAt","updatedAt","sourceCommandRef",
+         "retentionPolicyVersion","retentionScope","retentionAnchorAt")
+       VALUES ($1,$2,$3::date,'product-date-v1',1,'STEADY','STEADY','OKAY',
+         $4,$4,$5,'retention-policy-v1','DAY',$4)`,
+      [checkinId, accountId, productDate, now, randomUUID()],
+    );
+    await admin.query(
+      `INSERT INTO app_morning_checkin_revision
+        (id,"checkinId",revision,mood,energy,sleep,"commandRef",
+         "retentionPolicyVersion","retentionScope","retentionAnchorAt")
+       VALUES (gen_random_uuid(),$1,1,'STEADY','STEADY','OKAY',$2,
+         'retention-policy-v1','DAY',$3)`,
+      [checkinId, randomUUID(), now],
+    );
+    await admin.query(
+      `INSERT INTO app_generation_intent
+        (id,"accountId","targetProductDate","productDatePolicyVersion",
+         "acceptedAt",revision,state,"resultVersion","manifestRef",
+         "manifestFingerprint","inputSnapshotFingerprint","rootSeedMaterialRef",
+         "completionGrantVersion","createdAt","updatedAt","retentionPolicyVersion",
+         "retentionScope","retentionAnchorAt")
+       VALUES ($1,$2,$3::date,'product-date-v1',$4,1,'RUNNING','daily-v2',
+         'manifest-v2',$5,$6,'seed-v1','grant-v1',$4,$4,'retention-policy-v1',
+         'DAY',$4)`,
+      [
+        intentId,
+        accountId,
+        productDate,
+        now,
+        bytes("manifest"),
+        bytes("input"),
+      ],
+    );
+    await admin.query(
+      `INSERT INTO app_generation_input_snapshot
+        (id,"generationIntentId","checkinId","checkinRevision","schemaVersion",
+         "snapshotPayload","snapshotFingerprint","createdAt","retentionPolicyVersion",
+         "retentionScope","retentionAnchorAt")
+       VALUES ($1,$2,$3,1,'snapshot-v1','{}',$4,$5,
+         'retention-policy-v1','DAY',$5)`,
+      [snapshotId, intentId, checkinId, bytes("snapshot"), now],
+    );
+    await admin.query(
+      `INSERT INTO app_published_daily_result
+        (id,"accountId","generationIntentId","inputSnapshotId","productDate",
+         "resultVersion","schemaVersion","generatedAt","ruleFactsPayload",
+         "expressionCorePayload","provenancePayload","validationReceipt",
+         "resultFingerprint","retentionPolicyVersion","retentionScope",
+         "retentionAnchorAt")
+       VALUES ($1,$2,$3,$4,$5::date,'daily-v2','2.0.0',$6,
+         '{}','{}','{}','{}',$7,'retention-policy-v1','DAY',$6)`,
+      [
+        resultId,
+        accountId,
+        intentId,
+        snapshotId,
+        productDate,
+        now,
+        bytes("result"),
+      ],
+    );
+    await admin.query(
+      `UPDATE app_generation_intent
+       SET state='SUCCEEDED',"publishedResultRef"=$2,revision=2,"updatedAt"=$3
+       WHERE id=$1`,
+      [intentId, resultId, now],
+    );
+    await admin.query("COMMIT");
+    return resultId;
+  } catch (error) {
+    await admin.query("ROLLBACK");
+    throw error;
+  }
+}
+
 test(
   "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
   { skip: enabled ? false : "requires DATABASE_INTEGRATION=1" },
@@ -91,7 +176,12 @@ test(
         connectionString: loginUrls.interactive,
       });
       await interactive.connect();
-      resources.push(interactive);
+      const admin = new Client({
+        connectionString: container.getConnectionUri(),
+      });
+      await admin.connect();
+      await admin.query("SET search_path TO daily_energy, pg_catalog");
+      resources.push(interactive, admin);
 
       const api =
         await import("../../packages/server-adapters/dist/api/index.js");
@@ -151,6 +241,19 @@ test(
         throw new Error("AI009_CREATE_FAILED");
       }
       const sourceRef = created.value.matterRef;
+      await assert.rejects(
+        admin.query(
+          `UPDATE app_important_matter
+              SET "memorySafetySourceRevision"=revision+1,
+                  "memorySafetyPolicyVersion"='safety-v1',
+                  "memorySafetyRuleVersion"='rules-v1',
+                  "memorySafetyClassifierVersion"='classifier-v1',
+                  "memorySafetyFingerprint"=$2,"memorySafetyClearedAt"=$3
+            WHERE id=$1`,
+          [sourceRef, bytes("invalid-proof"), now],
+        ),
+        /app_matter_memory_safety_complete_check/u,
+      );
       const query = { ownerRef: owner, productDate };
       assert.equal(
         (await memory.resolveDaily(query)).status,
@@ -176,6 +279,23 @@ test(
         ).status,
         "ACCEPTED",
       );
+      assert.equal(
+        (await memory.resolveDaily(query)).status,
+        "NO_ELIGIBLE_MEMORY",
+      );
+      const confirmed = await matters.update({
+        ...command(owner, "ai009-confirm-current-safety"),
+        clearTargetDate: false,
+        expectedRevision: created.value.revision,
+        matterRef: sourceRef,
+        memorySafetyProof: {
+          classifierVersion: "synthetic-classifier-v1",
+          irreversibleFingerprint: bytes("ai009:source-clear"),
+          policyVersion: "safety-v1",
+          ruleVersion: "safety-rules-v1",
+        },
+      });
+      assert.equal(confirmed.status, "ACCEPTED");
       const selected = await memory.resolveDaily(query);
       assert.equal(selected.status, "SELECTED");
       if (selected.status !== "SELECTED") {
@@ -272,9 +392,189 @@ test(
         expectedRevision: revoked.value.revision,
         matterRef: sourceRef,
         dailyUseGranted: true,
+        memorySafetyProof: {
+          classifierVersion: "synthetic-classifier-v1",
+          irreversibleFingerprint: bytes("ai009:source-clear-restored"),
+          policyVersion: "safety-v1",
+          ruleVersion: "safety-rules-v1",
+        },
       });
       assert.equal(restored.status, "ACCEPTED");
-      assert.equal((await memory.resolveDaily(query)).status, "SELECTED");
+      const publishable = await memory.resolveDaily(query);
+      assert.equal(publishable.status, "SELECTED");
+      if (publishable.status !== "SELECTED") {
+        throw new Error("AI009_PUBLISHABLE_SELECTION_FAILED");
+      }
+      const resultId = await createPublishedResult(admin, owner);
+      let commitFailureDiagnostic;
+      const commitOutcome = await memory.commitDailyUse({
+        selected: publishable.candidate,
+        productDate,
+        resultId,
+        protectedStateResponse: {
+          ciphertext: Buffer.concat([
+            Buffer.alloc(28, 9),
+            Buffer.from("synthetic-memory-state-response"),
+          ]),
+          keyVersion: "synthetic-memory-key-v1",
+          fingerprint: bytes("ai009:memory-fragment"),
+        },
+        fallbackStateResponse: "今天先按自己的节奏，稳稳放下一个清楚的小步骤。",
+        now,
+        hooks: {
+          onFailure: async (diagnostic) => {
+            commitFailureDiagnostic = diagnostic;
+          },
+        },
+      });
+      assert.equal(
+        commitOutcome,
+        "COMMITTED",
+        `memory publication failed: ${JSON.stringify(commitFailureDiagnostic ?? {})}`,
+      );
+      assert.equal(
+        await memory.commitDailyUse({
+          selected: publishable.candidate,
+          productDate,
+          resultId,
+          protectedStateResponse: {
+            ciphertext: Buffer.concat([
+              Buffer.alloc(28, 9),
+              Buffer.from("synthetic-memory-state-response"),
+            ]),
+            keyVersion: "synthetic-memory-key-v1",
+            fingerprint: bytes("ai009:memory-fragment"),
+          },
+          fallbackStateResponse:
+            "今天先按自己的节奏，稳稳放下一个清楚的小步骤。",
+          now,
+        }),
+        "DUPLICATE",
+      );
+      const attachmentCounts = (
+        await admin.query(
+          `SELECT
+            (SELECT count(*)::int FROM app_result_content_slot
+              WHERE "resultId"=$1) AS slots,
+            (SELECT count(*)::int FROM app_memory_mention_receipt
+              WHERE "resultId"=$1) AS mentions,
+            (SELECT count(*)::int FROM app_source_dependency dependency
+              JOIN app_personalized_content_fragment fragment
+                ON fragment.id=dependency."fragmentId"
+              JOIN app_result_content_slot slot ON slot.id=fragment."slotId"
+              WHERE slot."resultId"=$1) AS dependencies`,
+          [resultId],
+        )
+      ).rows[0];
+      assert.deepEqual(attachmentCounts, {
+        dependencies: 1,
+        mentions: 1,
+        slots: 1,
+      });
+      await assert.rejects(
+        interactive.query(
+          'SELECT "payloadCiphertext" FROM daily_energy.app_personalized_content_fragment LIMIT 1',
+        ),
+        /permission denied/u,
+      );
+      await assert.rejects(
+        interactive.query(
+          'DELETE FROM daily_energy.app_source_dependency WHERE "sourceRef"=$1',
+          [sourceRef],
+        ),
+        /permission denied/u,
+      );
+      assert.equal(
+        await memory.isDailyDependencyValid({
+          ownerRef: owner,
+          productDate,
+          resultId,
+        }),
+        true,
+      );
+      assert.equal(
+        (await memory.resolveDaily(query)).status,
+        "NO_ELIGIBLE_MEMORY",
+      );
+      const otherPreferences = await consent.getMemoryPreferences(other);
+      assert.ok(otherPreferences);
+      assert.equal(
+        (
+          await consent.updateMemoryPreferences({
+            ...command(other, "ai009-enable-other-memory"),
+            expectedRevision: otherPreferences.revision,
+            masterEnabled: true,
+            dailyUseEnabled: true,
+            weeklyUseEnabled: false,
+            requiresConsent: true,
+          })
+        ).status,
+        "ACCEPTED",
+      );
+      const secondMatter = await matters.create({
+        ...command(other, "ai009-create-second-matter"),
+        dailyUseGranted: true,
+        memorySafetyProof: {
+          classifierVersion: "synthetic-classifier-v1",
+          irreversibleFingerprint: bytes("ai009:second-source-clear"),
+          policyVersion: "safety-v1",
+          ruleVersion: "safety-rules-v1",
+        },
+        targetProductDate: "2026-09-21",
+        title: {
+          ciphertext: Buffer.concat([
+            Buffer.alloc(28, 8),
+            Buffer.from("synthetic-second-private-title"),
+          ]),
+          keyVersion: "synthetic-matter-key-v1",
+        },
+        weeklyUseGranted: false,
+      });
+      assert.equal(secondMatter.status, "ACCEPTED");
+      const secondSelection = await memory.resolveDaily({
+        ownerRef: other,
+        productDate,
+      });
+      assert.equal(secondSelection.status, "SELECTED");
+      if (secondSelection.status !== "SELECTED") {
+        throw new Error("AI009_SECOND_SELECTION_FAILED");
+      }
+      const failedResultId = await createPublishedResult(admin, other);
+      assert.equal(
+        await memory.commitDailyUse({
+          selected: secondSelection.candidate,
+          productDate,
+          resultId: failedResultId,
+          protectedStateResponse: {
+            ciphertext: Buffer.concat([
+              Buffer.alloc(28, 6),
+              Buffer.from("synthetic-failed-memory-fragment"),
+            ]),
+            keyVersion: "synthetic-memory-key-v1",
+            fingerprint: bytes("ai009:failed-memory-fragment"),
+          },
+          fallbackStateResponse:
+            "今天先按自己的节奏，稳稳放下一个清楚的小步骤。",
+          now,
+          hooks: {
+            beforeCommit: async () => {
+              throw new Error("SYNTHETIC_BEFORE_COMMIT_FAILURE");
+            },
+          },
+        }),
+        "FALLBACK_REQUIRED",
+      );
+      const rolledBack = (
+        await admin.query(
+          `SELECT
+            (SELECT count(*)::int FROM app_result_content_slot
+              WHERE "resultId"=$1) AS slots,
+            (SELECT count(*)::int FROM app_memory_mention_receipt
+              WHERE "resultId"=$1) AS mentions`,
+          [failedResultId],
+        )
+      ).rows[0];
+      assert.deepEqual(rolledBack, { mentions: 0, slots: 0 });
 
       assert.equal(
         (
@@ -296,6 +596,14 @@ test(
         (await memory.resolveDaily(query)).status,
         "NO_ELIGIBLE_MEMORY",
       );
+      assert.equal(
+        await memory.isDailyDependencyValid({
+          ownerRef: owner,
+          productDate,
+          resultId,
+        }),
+        false,
+      );
       if (restored.status !== "ACCEPTED") {
         throw new Error("AI009_RESTORE_FAILED");
       }
@@ -312,6 +620,14 @@ test(
       assert.equal(
         (await memory.resolveDaily(query)).status,
         "NO_ELIGIBLE_MEMORY",
+      );
+      assert.equal(
+        await memory.isDailyDependencyValid({
+          ownerRef: owner,
+          productDate,
+          resultId,
+        }),
+        false,
       );
       await memory.close();
       assert.equal(

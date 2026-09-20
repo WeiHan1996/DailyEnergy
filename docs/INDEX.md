@@ -143,7 +143,7 @@ ROADMAP 属于长期计划，审核后使用 Accepted；AGENTS、INDEX 和 tasks
 | [docs/ai/gateway.md](./ai/gateway.md)                                 | Accepted | 供应商隔离、路由、超时、降级、熔断、成本与隐私                      | generation-engine、schemas、ADR-0003                  |
 | [docs/ai/prompt-spec.md](./ai/prompt-spec.md)                         | Accepted | Prompt package、封闭输入、规范指令、事实绑定、版本与回归            | personality、schemas、gateway                         |
 | [docs/ai/memory.md](./ai/memory.md)                                   | Accepted | 领域源、用途授权、确定性投影、有效期、无源回退与删除                | persona、journey、personality、prompt                 |
-| [docs/ai/memory-enabled-daily-v2.md](./ai/memory-enabled-daily-v2.md) | Draft    | Daily v2 记忆表达位置、版本、严格引用与同候选回退提案               | ADR-0004、memory、daily-content、prompt、safety       |
+| [docs/ai/memory-enabled-daily-v2.md](./ai/memory-enabled-daily-v2.md) | Accepted | Daily v2 记忆表达位置、版本、严格引用、Safety 证明与同候选回退      | ADR-0004、memory、daily-content、prompt、safety       |
 | [docs/ai/safety.md](./ai/safety.md)                                   | Accepted | 输入分类、专业边界、固定响应、地区资源、恢复与全候选审核            | vision、personality、schemas、gateway、prompt、memory |
 | [docs/ai/evaluation.md](./ai/evaluation.md)                           | Accepted | 不可补偿 Gate、自动/人工评价、provider bake-off、延迟成本与变更回归 | personality、schemas、gateway、prompt、memory、safety |
 | [docs/ai/evaluation-corpus.json](./ai/evaluation-corpus.json)         | Accepted | 37+52+48+60+72 共 269 项版本化机器可读测试清单                      | gateway、prompt、memory、safety、evaluation           |

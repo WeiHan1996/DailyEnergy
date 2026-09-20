@@ -20,6 +20,15 @@ export interface DailyMatterSourceV1 {
   readonly createdProductDate: string;
   readonly targetProductDate?: string;
   readonly updatedAt: Date;
+  readonly memorySafetyProof?:
+    | {
+        readonly sourceRevision: number;
+        readonly policyVersion: string;
+        readonly ruleVersion: string;
+        readonly classifierVersion: string;
+        readonly fingerprintHex: string;
+      }
+    | undefined;
   readonly grant?:
     | {
         readonly ownerRef: string;
@@ -65,6 +74,11 @@ export interface SelectedDailyMatterV1 {
   readonly safetyEpoch: string;
   readonly deletionEpoch: string;
   readonly masterRevision: number;
+  readonly sourceSafetyPolicyVersion: string;
+  readonly sourceSafetyRuleVersion: string;
+  readonly sourceSafetyClassifierVersion: string;
+  readonly sourceSafetyFingerprintHex: string;
+  readonly temporalRelation: "TARGET_TODAY" | "FUTURE_WINDOW" | "UNSPECIFIED";
   readonly sourceRef: string;
   readonly sourceRevision: number;
   readonly grantRef: string;
@@ -153,11 +167,27 @@ export function recheckDailyMatterV1(
     result.candidate.safetyEpoch === selected.safetyEpoch &&
     result.candidate.deletionEpoch === selected.deletionEpoch &&
     result.candidate.masterRevision === selected.masterRevision &&
+    result.candidate.sourceSafetyPolicyVersion ===
+      selected.sourceSafetyPolicyVersion &&
+    result.candidate.sourceSafetyRuleVersion ===
+      selected.sourceSafetyRuleVersion &&
+    result.candidate.sourceSafetyClassifierVersion ===
+      selected.sourceSafetyClassifierVersion &&
+    result.candidate.sourceSafetyFingerprintHex ===
+      selected.sourceSafetyFingerprintHex &&
+    result.candidate.temporalRelation === selected.temporalRelation &&
     result.candidate.sourceRevision === selected.sourceRevision &&
     result.candidate.grantRef === selected.grantRef &&
     result.candidate.grantRevision === selected.grantRevision &&
     result.candidate.validUntilProductDate === selected.validUntilProductDate
   );
+}
+
+export function recheckPublishedDailyMatterV1(
+  selected: SelectedDailyMatterV1,
+  request: DailyMatterSelectionRequestV1,
+): boolean {
+  return recheckDailyMatterV1(selected, { ...request, mentions: [] });
 }
 
 interface RankedMatter {
@@ -180,6 +210,7 @@ function eligibleSource(
       ? undefined
       : validDate(source.targetProductDate);
   const grant = source.grant;
+  const safetyProof = source.memorySafetyProof;
   if (
     source.ownerRef !== request.ownerRef ||
     !OpaqueIdSchema.safeParse(source.sourceRef).success ||
@@ -196,6 +227,12 @@ function eligibleSource(
     grant.policyVersion !== MEMORY_MATTER_SELECTION_POLICY_VERSION ||
     !Number.isSafeInteger(grant.revision) ||
     grant.revision < 1 ||
+    safetyProof === undefined ||
+    safetyProof.sourceRevision !== source.revision ||
+    safetyProof.policyVersion.length < 1 ||
+    safetyProof.ruleVersion.length < 1 ||
+    safetyProof.classifierVersion.length < 1 ||
+    !/^[a-f0-9]{64}$/u.test(safetyProof.fingerprintHex) ||
     !(source.updatedAt instanceof Date) ||
     !Number.isFinite(source.updatedAt.getTime()) ||
     created > date ||
@@ -219,6 +256,16 @@ function eligibleSource(
       safetyEpoch: request.access.safetyEpoch,
       deletionEpoch: request.access.deletionEpoch,
       masterRevision: request.access.masterRevision,
+      sourceSafetyPolicyVersion: safetyProof.policyVersion,
+      sourceSafetyRuleVersion: safetyProof.ruleVersion,
+      sourceSafetyClassifierVersion: safetyProof.classifierVersion,
+      sourceSafetyFingerprintHex: safetyProof.fingerprintHex,
+      temporalRelation:
+        target === date
+          ? "TARGET_TODAY"
+          : target === undefined
+            ? "UNSPECIFIED"
+            : "FUTURE_WINDOW",
       sourceRef: source.sourceRef,
       sourceRevision: source.revision,
       grantRef: grant.grantRef,

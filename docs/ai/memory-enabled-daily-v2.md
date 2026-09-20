@@ -1,27 +1,30 @@
-# Daily 记忆表达 v2 合同提案
+# Daily 记忆表达 v2 合同
 
-- **文档状态**：Draft
+- **文档状态**：Accepted
+- **接受日期**：2026-09-20
 - **所属任务**：AI-009 — 用途受限的结构化记忆选择
-- **最后更新**：2026-09-19
+- **最后更新**：2026-09-20
 - **决策所有者**：DailyEnergy 项目所有者
 - **上游规范**：[ADR-0004](../decisions/ADR-0004-structured-memory.md)、[结构化记忆](./memory.md)、[今日内容 Schema](./daily-content-schema.md)、[Prompt 规范](./prompt-spec.md)、[内容安全](./safety.md)、[AI 评价](./evaluation.md)、[今日页面规格](../design/screen-specs.md)
-- **状态说明**：仅为待审核的版本化合同；不授权实现、激活或生产调用带记忆的模型
+- **状态说明**：项目所有者已接受版本、段落位置、无标题方案、Daily-only 范围与旧事项 Safety 证明迁移；允许继续开发与验证，不授权真实 provider、真实用户、RC 或 Production
 
-## 1. 需要确认的决定
+## 1. 已接受的决定
 
 建议第一个带记忆的表达版本只允许 **Daily 的用户主动重要事项**，一次最多一条；提及只能出现在现有 `state_response` 段。模型不接收事项标题，仅接收“用户主动保存并允许每日引用一件事”及经过规则计算的有限时间关系。没有事项或任一守卫失败时，仍生成完整的无记忆 Daily 内容。
 
-`state_response` 是现有今日页“朋友式解释”的一部分，不新增页面控件；是否接受这处文案位置、无标题的首版表达价值，是本提案需要项目所有者确认的产品和设计决定。若选择展示标题或新增段落，必须先重订 Safety 投影、输出 Schema、页面证据和删除回退合同。
+`state_response` 是现有今日页“朋友式解释”的一部分，不新增页面控件。首版接受无标题表达；若未来选择展示标题或新增段落，必须先重订 Safety 投影、输出 Schema、页面证据和删除回退合同。
 
 ## 2. 版本与适用面
 
-| 契约             | 提议版本                                 | 原 v1 行为                                  |
+| 契约             | Accepted 版本                            | 原 v1 行为                                  |
 | ---------------- | ---------------------------------------- | ------------------------------------------- |
 | Workload         | `DAILY_EXPRESSION_V2`                    | `DAILY_EXPRESSION_V1` 不变，记忆为空        |
 | Prepared input   | `prepared-daily-prompt-input-v2`         | v1 禁止事项、近期状态与关系事实             |
 | Prompt package   | `daily-expression-zh-cn-v2`，先 `STAGED` | `daily-expression-zh-cn-v1` 不变            |
 | Strict output    | `daily-expression-payload-v2`            | v1 `ExpressionPayloadSchema 1.0.0` 不加字段 |
 | Context snapshot | `memory-context-snapshot-v1`             | v1 不创建带记忆的 invocation                |
+
+实现冻结值：Prompt package fingerprint=`31adaeebbf49b9d9808b7e9edaae870893a57d98fcb00ac153212c5bd46e5a43`，output Schema fingerprint=`6effe83faf6fa75423055b590f054f65070101ace0146544503872b32885bd35`。Prompt package 保持 `STAGED`，evaluation 明确禁止外部 provider 调用。
 
 Weekly v1 保持无记忆，不能借用 Daily grant；近期状态无独立授权 UI、关系事实无 Daily 用途许可，均不进入本版本。`IMPORTANT_MATTER_REMINDER` 与分享不继承 Daily 授权。本提案不改变 RuleFacts、评分、行动、任务、仪式、娱乐元素或稳定结果身份。
 
@@ -45,10 +48,12 @@ Weekly v1 保持无记忆，不能借用 Daily grant；近期状态无独立授�
 
 - 执行严格 Zod/JSON Schema、Prompt 资产和 client bundle Gate、真实 PG 并发与角色权限、删除/恢复、provider late/unknown、Redis loss 和无记忆回归；相关 Source ID 才能记为 `COVERED`。
 - 通过 S-15 当前 Safety policy 的输入与输出审查、S-16 deterministic/MODEL/LOAD/HUMAN 适用评价、隐私与“被监视感”人工审核；项目所有者确认文案位置和无标题方案。
-- 模型/供应商、真实用户、RC 与 Production 各自仍需独立授权。此 Draft 或其 PR 通过自动 CI 均不等于接受或激活。
+- 模型/供应商、真实用户、RC 与 Production 各自仍需独立授权。本文 Accepted 或 PR 通过自动 CI 均不等于模型资格通过或生产激活。
 
-## 6. 待确认事项
+## 6. 接受记录
 
-1. 是否接受在既有 `state_response` 提及、首版不发送事项标题，并要求旧事项经用户主动重新保存与当前 Safety Gate 通过后才有资格？
-2. 本版本是否只启用 Daily Matter，Weekly/近期状态/关系事实继续保持空槽？
-3. 接受后再冻结 exact 输入、输出 Schema 与 Prompt 正文，执行上列自动及人工 Gate；未确认前运行路径继续严格使用 v1 的完整无记忆内容。
+项目所有者于 2026-09-20 审核通过：
+
+1. 在既有 `state_response` 受控提及，首版不发送事项标题；旧事项必须经用户主动重新保存并通过当前 Safety Gate 后才有资格；
+2. 本版本只启用 Daily Matter，Weekly、近期状态与关系事实继续保持空槽；
+3. 允许冻结 exact 输入、输出 Schema 与 Prompt 正文并完成开发 Gate；真实 provider、真实用户、RC 与 Production 仍需独立授权。

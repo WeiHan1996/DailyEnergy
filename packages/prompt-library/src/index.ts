@@ -119,3 +119,21 @@ export {
   assertRelationshipPromptLanguage,
   relationshipPromptDirectiveV1,
 } from "./relationship-continuity.js";
+
+export {
+  DAILY_MEMORY_INPUT_CONTRACT,
+  DAILY_MEMORY_OUTPUT_SCHEMA_VERSION,
+  DAILY_MEMORY_PROMPT_PACKAGE_V2,
+  DAILY_MEMORY_PROMPT_VERSION,
+  DAILY_MEMORY_RENDERER_VERSION,
+  DAILY_MEMORY_WORKLOAD,
+  PreparedDailyMemoryPromptInputV2Schema,
+  buildPreparedDailyMemoryPromptInputV2,
+  compileDailyMemoryPromptRequestV2,
+  renderControlledDailyMemoryV2,
+  validateDailyMemoryOutputV2,
+} from "./daily-memory-v2.js";
+export type {
+  CompiledDailyMemoryPromptRequestV2,
+  PreparedDailyMemoryPromptInputV2,
+} from "./daily-memory-v2.js";

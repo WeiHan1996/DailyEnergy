@@ -72,6 +72,10 @@
     {
       "name": "20260918000000_ai009_memory_selection",
       "sha256": "b8b28f7a328ba3fdfd1d166a13b837478b9815263d90f41d454e62d78f10a694"
+    },
+    {
+      "name": "20260920000000_ai009_memory_v2_contract",
+      "sha256": "b4d7ac609225155113751e7d51e6a8de949336413849df16e19d46bc41bb1c39"
     }
   ]
 }

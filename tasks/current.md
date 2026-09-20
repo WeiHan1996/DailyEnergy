@@ -1,22 +1,22 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-09-19
+- **最后更新**：2026-09-20
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-009 — 实现用途受限的结构化记忆选择
-- **任务状态**：Blocked（Daily 记忆表达 v2 合同仍是 Draft；等待 owner 确认版本、段落位置、无标题方案和旧事项 Safety 证明迁移）
+- **任务状态**：In Review
 - **任务 Profile**：`security`（source/grant/expiry/owner/revision/delete、Prompt 最小披露与无记忆回退）
 - **工作分支**：`agent/ai009-memory-selection`，基于已验证 `main@477d59c086395717b4aaa1b69e921fead1ceeb8d`
 - **任务 Issue**：[AI-009 Issue #78](https://github.com/WeiHan1996/DailyEnergy/issues/78)
-- **当前 PR**：[Draft PR #207](https://github.com/WeiHan1996/DailyEnergy/pull/207)；仅供受限解析代码与 v2 合同提案审核，不是 AI-009 完工或发布申请
+- **当前 PR**：[Draft PR #207](https://github.com/WeiHan1996/DailyEnergy/pull/207)；AI-009 实现与 threat-boundary 审核，等待 owner 接受后才可标 Ready/合并
 - **上一完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-003 与 AI-008 已 Done；AI-009 本地/环境 prepare 通过，远端检查在本轮 GitHub GraphQL EOF 后返回 INFRA_BLOCKED，Git refs 与 Issue #78 已由独立只读接口确认；Daily/Weekly v1 继续无记忆。带记忆的发布缺少 Accepted 新 Prompt/Schema 与段落回退合同，提案为 `docs/ai/memory-enabled-daily-v2.md` Draft；C-015 继续独立阻塞 Production/RC
+- **依赖边界**：AI-003 与 AI-008 已 Done；`docs/ai/memory-enabled-daily-v2.md` 于 2026-09-20 Accepted，允许冻结并实现 Daily v2 的 Prompt/Schema、Safety 证明和原子发布链路；Daily/Weekly v1 继续无记忆，Weekly/近期状态/关系仍不启用；C-015 继续独立阻塞 Production/RC
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：owner 审核 Draft v2 合同的 `state_response` 唯一提及段、首版无标题、Daily-only 范围与旧 Matter 必须主动重新保存取得当前 Safety 证明；确认后先将文档转 Accepted 并冻结严格 Prompt/input/output Schema，再完成同一发布事务的 source/grant/master/Safety 证明/epoch/mention 复查、依赖与同候选 fallback、删除/迟到/缓存回归和相应 Source-ID；运行完整 task Gate 与人工 threat boundary 审核。AI-010 仍为后续候选，不提前实施
+- **下一候选动作**：完成 final-head full/task Gate 与 PR CI；owner 审核并接受下述 threat boundary 后才将 PR 标 Ready、exact-head squash 合并并收尾。AI-010 是接受后的下一候选，不提前实施
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-09-18 AI-009 启动
@@ -35,6 +35,22 @@
 - `docs/ai/memory-enabled-daily-v2.md` 新建为 Draft，提议未来 `DAILY_EXPRESSION_V2` 只在现有 `state_response` 中受控提及一件用户主动事项且不发送标题，严格 fact ref 与同候选无源回退；Weekly/近期状态/关系继续空。AI-008 旧事项没有与来源修订绑定的当前 Safety 证明，只能在用户主动重新保存并通过当前 Safety Gate 后获得未来资格；当前解析器仅做服务端元数据预选，不能送 provider。此产品/设计/Schema 决定尚未获得 owner 确认，因此 AI-009 为 Blocked；不修改或激活 v1 Prompt，不标记 Draft 为 Accepted。Production/RC/真实用户/真实 provider 仍 NO_GO。
 - 2026-09-19 最终自动验证：固定 Node 24.18.0，`agent:validate --mode=changed --task=AI-009` 升级 full 后为 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（184842ms）；`--mode=task --task=AI-009` 同终态（90111ms，5 组）；数据库完整 Gate `92/92` PASS，registry `701/1010 COVERED`，Phase Gate 12/12，server-core 聚焦 7/7。一次 npm 审计响应无 metadata 后重试取得完整结果，critical/high 均为 0；该失败不计作 PASS。需要 owner 先接受 Draft 合同，再实施原子发布链路并复跑 Gate；这两次自动通过只适用于当前受限预选代码。
 - 受限预选和 v2 Draft 首次提交 `c10a415` 已推送，创建 Draft PR #207。PR 链接回写将产生新 head，必须使用新 head 自己的 CI；本 PR 不标 Ready、不合并、不关闭 Issue #78。下一次会话从本文件、Draft 规范和 PR 的待决事项恢复，无需依赖聊天记录。
+
+## 2026-09-20 AI-009 v2 合同接受与恢复实施
+
+- owner 明确“审核通过，继续下一步”，接受 `docs/ai/memory-enabled-daily-v2.md` 的 Daily-only 范围、`state_response` 唯一提及段、首版不发送 Matter 标题，以及旧事项必须由用户主动重新保存并通过当前 Safety Gate 后取得 source-revision 证明；文档状态更新为 Accepted，接受日期 2026-09-20。
+- 该授权允许继续冻结并实现严格 v2 input/output/Prompt、来源 Safety 证明、原子发布复查/mention/dependency/fallback 与开发验证；不授权真实 provider、真实用户、RC、Production 或改变 Weekly/近期状态/关系事实边界。
+- `pnpm agent:prepare AI-009 --remote --deep` 在当前 PR #207 head 上返回 READY，security Profile；remote/dependencies/node/pnpm/GitHub 均 PASS。继续实施后必须使用新 head 自己的 full/task Gate 与 CI，旧 run `35368074463` 只证明接受前的受限预选基线。
+
+## 2026-09-20 AI-009 完整实现与审核边界
+
+- Accepted `Daily v2` 已冻结 shared Zod/JSON Schema、`prepared-daily-prompt-input-v2`、`daily-expression-zh-cn-v2` STAGED package、严格 `memory_bindings/privacy_fallbacks`、16 KiB 总预算和 immutable fingerprints；provider projection 最多一条无标题 Matter fact，只允许 `expression.state_response`，owner/source/grant/revision/title 均不进入 provider JSON。外部 provider 调用保持禁止，Daily/Weekly v1 与 Weekly/近期状态/关系记忆保持原样。
+- Matter 当前修订只有在 MEM-002 Safety Gate 返回 CLEAR 时才原子保存不可逆 source-revision proof；旧 AI-008 Matter 默认 NULL 且无资格，用户主动重新保存/确认后才可获得证明。PROFESSIONAL_BOUNDARY 关闭 grant 且不留证明；HIGH_RISK 仍为普通 Matter 写入 0；暂停/完成/过期清除证明，恢复必须重跑当前 Safety。
+- deterministic resolver 绑定 owner、account/master/source/grant revision、Safety/deletion epoch、来源 Safety policy/rule/classifier/fingerprint、有效期与时间关系；同输入稳定排序，无候选/不可读/关闭/跨 owner/过期/频次满额均使用完整无记忆路径。冻结 snapshot 的 provider projection 与 server dependency 分离，fingerprint 随任一 live binding 改变。
+- interactive publication store 在 owner lock 的同一事务中校验 `daily-v2/2.0.0` result 与全部 live binding，写 fallback slot、加密 fragment、完整 SourceDependency 和 mention receipt；成功重放返回 DUPLICATE，注入故障全部回滚。读取依赖重新核对 result owner/date 与 ABA bindings；失效只解析预校验 fallback，不披露删除历史。C-014 真实删除用 v2 fragment fixture 证明 dependency/fragment 清零、fallback 保留；worker 不能读 Matter/fragment 密文或 DELETE Matter/dependency。
+- 数据库迁移总数 19，catalog fingerprint 由临时合成 PostgreSQL 生成；完整 PostgreSQL Gate `92/92` PASS，含 SQL-001..020、TX-01..09、C-008 发布、C-014 删除和 AI-009 原子提交/回滚/权限。Prompt library `75/75`、server-core `169/169`、API `168/168`、类型/lint/format/codegen/architecture/registry/Phase Gate 均通过。Source registry=`720/1012 COVERED`、`292 PLANNED`、`0 NA_WITH_REASON`、`0 UNMAPPED`；MODEL/LOAD/HUMAN、真实 provider、Production/RC 与未授权来源继续 PLANNED/NO_GO。
+- 待 owner threat-boundary 审核：无标题/无来源 ref 的 provider projection；source-revision Safety proof 不可逆且不恢复正文；interactive 只有最小列权限，SQL-013 通过固定 search path 的 definer 完整性函数执行；发布失败/撤销/删除/late 只回退或丢弃，不重新调用模型；普通日志/analytics/queue/client 无正文、依赖图或用户级轨迹；Prompt package 仅 STAGED、external provider calls=false。Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`。
+- 固定 Node 24.18.0 的 In Review 自动 Gate：首次 `agent:validate --mode=changed --task=AI-009` 按合同/数据库/security/未知 OpenAPI 路径升级 full，结果 `automated=PASS / MANUAL_EVIDENCE_REQUIRED`（190986ms）；`--mode=task --task=AI-009` 执行 5 组并同终态（85387ms）。收据回写后的最终工作树再次完成 full 自动 PASS（175975ms）与 task 5 组 PASS（84628ms）；required evidence=`threatBoundaryReview, productionAuthorizationWhenApplicable`，Production authorization 不适用且未授予。最终提交 head 仍须使用自己的 PR CI，不能复用旧 run。
 
 ## 2026-09-14 AI-008 post-merge 收尾
 

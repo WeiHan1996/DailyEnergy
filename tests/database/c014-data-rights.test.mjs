@@ -148,8 +148,8 @@ async function insertMatterFragment(admin, accountId, matterRef) {
         (id,"resultId","segmentPath","fallbackPayload","fallbackFingerprint",
          "fallbackSchemaVersion","createdAt","retentionPolicyVersion",
          "retentionScope","retentionAnchorAt")
-       VALUES ($1,$2,'matter-segment','{"text":"safe fallback"}',$3,
-         'fragment-v1',$4,'retention-policy-v1','DAY',$4)`,
+       VALUES ($1,$2,'expression.state_response','{"text":"safe fallback"}',$3,
+         'daily-memory-fragment-v2',$4,'retention-policy-v1','DAY',$4)`,
       [slotId, resultId, bytes("matter-fallback"), baseNow],
     );
     await admin.query(
@@ -157,7 +157,7 @@ async function insertMatterFragment(admin, accountId, matterRef) {
         (id,"slotId","payloadCiphertext","payloadKeyVersion","payloadFingerprint",
          "schemaVersion","createdAt","retentionPolicyVersion","retentionScope",
          "retentionAnchorAt")
-       VALUES ($1,$2,$3,'synthetic-key-v1',$4,'fragment-v1',$5,
+       VALUES ($1,$2,$3,'synthetic-key-v1',$4,'daily-memory-fragment-v2',$5,
          'retention-policy-v1','DAY',$5)`,
       [
         fragmentId,
@@ -170,12 +170,25 @@ async function insertMatterFragment(admin, accountId, matterRef) {
     await admin.query(
       `INSERT INTO app_source_dependency
         (id,"fragmentId","sourceType","sourceRef","sourceRevision",purpose,
+         "grantRef","grantRevision","masterRevision","accountRevision",
+         "safetyEpoch","deletionEpoch","sourceSafetyPolicyVersion",
+         "sourceSafetyRuleVersion","sourceSafetyClassifierVersion",
+         "sourceSafetyFingerprint","validUntilProductDate","temporalRelation",
          "policyVersion","segmentPaths","fallbackPaths","validAtPublish",
          "retentionPolicyVersion","retentionScope","retentionAnchorAt")
-       VALUES ($1,$2,'MATTER',$3,1,'DAILY_EXPRESSION','memory-policy-v1',
-         ARRAY['matter-segment'],ARRAY['matter-segment'],true,
-         'retention-policy-v1','DAY',$4)`,
-      [dependencyId, fragmentId, matterRef, baseNow],
+       VALUES ($1,$2,'MATTER',$3,1,'DAILY_EXPRESSION',$4,1,1,1,0,0,
+         'safety-v1','safety-rules-v1','synthetic-classifier-v1',$5,
+         '2026-08-25','TARGET_TODAY','memory-policy-v1',
+         ARRAY['expression.state_response'],ARRAY['expression.state_response'],true,
+         'retention-policy-v1','DAY',$6)`,
+      [
+        dependencyId,
+        fragmentId,
+        matterRef,
+        randomUUID(),
+        bytes("matter-safety"),
+        baseNow,
+      ],
     );
     await admin.query("SET CONSTRAINTS ALL IMMEDIATE");
     await admin.query("COMMIT");
