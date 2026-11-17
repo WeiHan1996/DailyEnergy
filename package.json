@@ -30,7 +30,7 @@
     "admin:bundle:check": "node tooling/check-admin-bundle.mjs",
     "admin:bundle:fixtures": "node tooling/test-admin-bundle.mjs",
     "agent:check": "node tooling/check-agent-workflow.mjs",
-    "agent:fixtures": "node tooling/test-agent-workflow.mjs && node tooling/test-sensitive-redaction.mjs",
+    "agent:fixtures": "node tooling/test-agent-workflow.mjs && node tooling/test-sensitive-redaction.mjs && node tooling/test-pnpm-invocation.mjs",
     "agent:prepare": "node tooling/agent-prepare.mjs",
     "agent:validate": "node tooling/agent-validate-entry.mjs",
     "registry:write": "node tooling/testing/source-registry.mjs --write",

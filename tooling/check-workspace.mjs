@@ -4,6 +4,7 @@ import { dirname, relative, resolve, sep } from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 
+import { resolveCommandInvocation } from "./lib/pnpm-invocation.mjs";
 import { importsForSource } from "./lib/source-imports.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -83,9 +84,16 @@ async function walk(directory, visitor) {
 async function enumerateWorkspaceDirectories() {
   let projects;
   try {
+    const invocation = resolveCommandInvocation("pnpm", [
+      "list",
+      "--recursive",
+      "--depth",
+      "-1",
+      "--json",
+    ]);
     const { stdout } = await executeFile(
-      "pnpm",
-      ["list", "--recursive", "--depth", "-1", "--json"],
+      invocation.command,
+      invocation.arguments,
       {
         cwd: repositoryRoot,
         maxBuffer: 10 * 1024 * 1024,

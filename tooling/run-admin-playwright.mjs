@@ -5,13 +5,16 @@ import { join, resolve } from "node:path";
 
 import { collectAdminSecretCanaries } from "./lib/admin-secret-canaries.mjs";
 
+import { resolveCommandInvocation } from "./lib/pnpm-invocation.mjs";
+
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const adminRoot = resolve(repositoryRoot, "apps/admin");
 const responseFixtureRoot = resolve(adminRoot, "tests/fixtures/response-leak");
 
 function run(command, arguments_, environment) {
   return new Promise((resolvePromise, reject) => {
-    const child = spawn(command, arguments_, {
+    const invocation = resolveCommandInvocation(command, arguments_);
+    const child = spawn(invocation.command, invocation.arguments, {
       cwd: adminRoot,
       env: environment,
       stdio: "inherit",

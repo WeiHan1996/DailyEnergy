@@ -2,11 +2,14 @@ import { spawn } from "node:child_process";
 import { rm } from "node:fs/promises";
 import { resolve } from "node:path";
 
+import { resolveCommandInvocation } from "../lib/pnpm-invocation.mjs";
+
 const repositoryRoot = resolve(import.meta.dirname, "../..");
 
 function run(command, arguments_) {
   return new Promise((resolvePromise, reject) => {
-    const child = spawn(command, arguments_, {
+    const invocation = resolveCommandInvocation(command, arguments_);
+    const child = spawn(invocation.command, invocation.arguments, {
       cwd: repositoryRoot,
       env: process.env,
       stdio: "inherit",

@@ -1,7 +1,7 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-09-14
+- **最后更新**：2026-11-17
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-009 — 实现用途受限的结构化记忆选择
 - **任务状态**：Ready
@@ -16,8 +16,15 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-003 与 AI-008 已 Done；AI-009 的依赖与权威来源只在未来收到明确启动指令后通过 `pnpm agent:prepare AI-009 --remote --deep` 恢复，不在本状态收尾中预判或实施；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待新的明确启动指令；本次不运行 AI-009 prepare、不创建实现分支或编码
+- **下一候选动作**：先完成并合并 Windows tooling 兼容修复（见下节，分支 `agent/windows-pnpm-spawn`），再基于最新 `main` 开始 AI-009；AI-009 的 `--remote` 检查还需要本机安装并登录 `gh`，真实 PostgreSQL/Redis 证据还需要 Docker
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-11-17 Windows tooling 兼容修复（中断 AI-009 启动）
+
+- **原因**：owner 要求启动 AI-009，但在 Windows 上 `agent:prepare --deep` 与 `agent:validate` 无法启动 `pnpm`（Windows 不能无 shell 直接 spawn `pnpm.cmd`，`ENOENT`/`EINVAL`），deep 检查因此 `INFRA_BLOCKED`；owner 明确选择修改 tooling 修复；AI-009 仍为唯一 Ready，未开始；
+- **范围**：新增 `tooling/lib/pnpm-invocation.mjs`，仅在 `win32` 把 `pnpm` 解析为 `npm_execpath` / corepack / PATH 中 `pnpm.cmd` 旁的 `pnpm.cjs`，找不到则 fail closed；非 Windows 行为不变；应用于 `agent-prepare`、`agent-validate`、`check-workspace`、`ensure-server-adapters-build`、`run-admin-playwright`、`testing/run-{vitest-projects,core-e2e,api-playwright}`、`testing/test-sticky-playwright`；新增 `tooling/test-pnpm-invocation.mjs` 并接入 `agent:fixtures`；
+- **不做**：不改变任何验证策略、Gate 判定、产品或 AI-009 代码；不处理 `gh` 与 Docker 缺失；`ci/runtime.mjs` 已有 Windows 分支，保持不变；
+- **验证**：Node `24.18.0` / pnpm `11.17.0` 下 `agent:prepare AI-009 --deep` 的 pnpm/dependencies 由 `INFRA_BLOCKED` 变为 `PASS`（github 仍因本机无 `gh` 为 `INFRA_BLOCKED`）；`agent:fixtures`、`agent:check`、eslint、`prettier --check --end-of-line auto` 通过；完整 `agent:validate` full Gate 未在本机运行（需要 Docker）。
 
 ## 2026-09-14 AI-008 post-merge 收尾
 
