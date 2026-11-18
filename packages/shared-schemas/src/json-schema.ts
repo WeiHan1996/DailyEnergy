@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:aa656f20b8c9b5c3fa0172dceec454ff8a91010a75bdb3168b16aa40ff05dfc2
+// source-fingerprint: sha256:117d2f819ac3f9c142d70f6df784681ef4ce65de067048e0ee8e68e87ead1858
 // do not edit; run `pnpm codegen`.
 
 export const JSON_SCHEMA_SOURCE_FINGERPRINT =
-  "sha256:aa656f20b8c9b5c3fa0172dceec454ff8a91010a75bdb3168b16aa40ff05dfc2";
+  "sha256:117d2f819ac3f9c142d70f6df784681ef4ce65de067048e0ee8e68e87ead1858";
 
 export const JSON_SCHEMA_IDS = {
   generationInputSnapshot:
@@ -1994,6 +1994,9 @@ export const jsonSchemas = {
         additionalProperties: false,
         properties: {
           helpfulness: {
+            items: false,
+            maxItems: 4,
+            minItems: 4,
             prefixItems: [
               {
                 const: "HELPFUL",
@@ -2015,6 +2018,9 @@ export const jsonSchemas = {
             type: "array",
           },
           overall_feeling: {
+            items: false,
+            maxItems: 6,
+            minItems: 6,
             prefixItems: [
               {
                 const: "VERY_HEAVY",
@@ -2044,6 +2050,9 @@ export const jsonSchemas = {
             type: "array",
           },
           task_status: {
+            items: false,
+            maxItems: 4,
+            minItems: 4,
             prefixItems: [
               {
                 const: "UNMARKED",
@@ -5060,6 +5069,9 @@ export const jsonSchemas = {
             additionalProperties: false,
             properties: {
               helpfulness: {
+                items: false,
+                maxItems: 4,
+                minItems: 4,
                 prefixItems: [
                   {
                     const: "HELPFUL",
@@ -5081,6 +5093,9 @@ export const jsonSchemas = {
                 type: "array",
               },
               overall_feeling: {
+                items: false,
+                maxItems: 6,
+                minItems: 6,
                 prefixItems: [
                   {
                     const: "VERY_HEAVY",
@@ -5110,6 +5125,9 @@ export const jsonSchemas = {
                 type: "array",
               },
               task_status: {
+                items: false,
+                maxItems: 4,
+                minItems: 4,
                 prefixItems: [
                   {
                     const: "UNMARKED",
