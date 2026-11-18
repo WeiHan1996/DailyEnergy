@@ -56,6 +56,13 @@
 - AI-008 获接受并合并后的下一任务为 AI-009（确定性结构化记忆 resolver）；本次不启动 AI-009。
 - 实现提交 `65c141bdec1219466af32f7fe1fdea014d83933b` 已推送并创建 [Draft PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204)；批准前 final head `b8c1aad08814b748ac70c32646e87da93b6881b4` 已通过自己的 full Gate 与同一 head CI run `34825062102` 的 11 项 SUCCESS；本次 owner 接受收据会产生新的 final head，仍须使用自己的 Gate/CI 后才可合并。
 
+## 2026-11-17 依赖漏洞告警修复（中断 AI-009 启动）
+
+- **原因**：PR #212 的 `supply-chain` 检查报 `CI_AUDIT_THRESHOLD_EXCEEDED:critical=4:high=13`（官方 `npm audit` 新增告警，与 #212 无关，`main` 同样受影响）；owner 明确要求另开任务修复；AI-009 仍为唯一 Ready，未开始；
+- **范围**：只改 `pnpm-workspace.yaml` 与由此产生的 `pnpm-lock.yaml`、重新生成的契约产物；`next` 16.3.3→16.4.1、`zod` 4.4.3→4.6.6；用 overrides 抬高 `multer` 2.5.0、`body-parser` 2.4.0、`proxy-addr` 2.0.8、`fast-uri` 3.1.7、`brace-expansion` 2.1.6/5.0.11、`source-map-js` 1.2.2、`@grpc/grpc-js` 1.14.5；不改业务代码、不设漏洞例外（`exceptions` 仍为空）；
+- **契约影响**：`zod` 4.6.x 对定长 tuple 额外输出 `items:false` 与 `minItems/maxItems`，`shared-schemas/src/json-schema.ts`、OpenAPI 与生成 client 的 source fingerprint 随之变化，已用 `pnpm run codegen` 重新生成；
+- **验证**：`pnpm audit --prod` 为 critical=0/high=0；Node 24.18.0 下 `pnpm typecheck` 16/16、`pnpm build` 9/9、shared-schemas `68/68`；本机无 Docker，数据库/队列/E2E 与完整 full Gate 依赖 CI；本机 Windows CRLF 检出使 `contract:check`、prompt-library 规范块测试等在 `main` 基线上同样失败，不计作本任务证据。
+
 ## 2026-09-09 AI-008 启动
 
 - owner 明确批准先合并 AI-007 状态收尾 PR #201 再启动 AI-008；该授权不包含 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；
