@@ -3,21 +3,32 @@
 - **文档状态**：Active
 - **最后更新**：2026-11-19
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：AI-009 — 实现用途受限的结构化记忆选择
-- **任务状态**：In Review
-- **任务 Profile**：`security`（source/grant/expiry/owner/revision/delete、Prompt 最小披露与无记忆回退）
-- **工作分支**：`agent/ai009-memory-selection`，基于已验证 `main@477d59c086395717b4aaa1b69e921fead1ceeb8d`，2026-11-19 已合并 `main@64c7b54ea7240bce42065737a1796bdb07f0d4c7`（含 #212/#213/#214）
-- **任务 Issue**：[AI-009 Issue #78](https://github.com/WeiHan1996/DailyEnergy/issues/78)
-- **当前 PR**：[Draft PR #207](https://github.com/WeiHan1996/DailyEnergy/pull/207)；AI-009 实现与 threat-boundary 审核，等待 owner 接受后才可标 Ready/合并
-- **上一完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
+- **当前任务**：AI-010 — 实现第 3 天风格校准
+- **任务状态**：Ready
+- **任务 Profile**：`security`（按 `AI-*` 路由；用户明确反馈、revision、撤回/删除与历史冻结；仅运行过本地 `pnpm agent:prepare AI-010` 路由检查并返回 READY，`--remote --deep` 与 required sources 尚未读取）
+- **工作分支**：无 AI-010 实现分支；收到新的明确启动指令前不创建分支
+- **任务 Issue**：[AI-010 Issue #79](https://github.com/WeiHan1996/DailyEnergy/issues/79)
+- **当前 PR**：无；AI-010 实现 PR 不存在
+- **上一完成任务**：AI-009 Done；[PR #207](https://github.com/WeiHan1996/DailyEnergy/pull/207) final head `7c2509ec0e270bf4d12b51b168a1c8e296a01955` / CI run `44446439437` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cb9b6f8dd6f28e38c4c73d5b46ae1c63948c5d92`；merged-main CI run `44477130778` 11/11 SUCCESS；Issue #78 Closed
+- **更早完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-003 与 AI-008 已 Done；`docs/ai/memory-enabled-daily-v2.md` 于 2026-09-20 Accepted，允许冻结并实现 Daily v2 的 Prompt/Schema、Safety 证明和原子发布链路；Daily/Weekly v1 继续无记忆，Weekly/近期状态/关系仍不启用；C-015 继续独立阻塞 Production/RC
+- **依赖边界**：AI-010 的前置 C-012、AI-005、AI-007、AI-009 均已 Done；AI-010 的依赖与权威来源只在收到明确启动指令后通过 `pnpm agent:prepare AI-010 --remote --deep` 恢复，不在本状态收尾中预判或实施；Daily v2 为 STAGED，Daily/Weekly v1 继续无记忆，Weekly/近期状态/关系仍不启用；C-015 继续独立阻塞 Production/RC
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：完成 final-head full/task Gate 与 PR CI；owner 审核并接受下述 threat boundary 后才将 PR 标 Ready、exact-head squash 合并并收尾。AI-010 是接受后的下一候选，不提前实施
+- **下一候选动作**：等待新的明确启动指令；本次不运行 AI-010 的 remote/deep prepare、不创建实现分支或编码
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-11-19 AI-009 post-merge 收尾
+
+- owner 明确“已审核，批准合并”，接受 PR #207 所列 threat boundary（provider projection 无标题/无来源 ref；source-revision Safety proof 不可逆且旧事项不被静默升级；interactive 最小列权限与 SQL-013 definer 完整性函数；发布失败/撤销/删除/迟到只回退或丢弃且不重新调用模型；普通日志/analytics/queue/client 无正文、依赖图或用户级轨迹；Prompt package 仅 STAGED 且外部 provider 调用保持禁止），并授权标记 Ready、exact-head verifier、squash merge 与 post-merge 状态收尾；该决定不授予 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；
+- PR #207 在 #212/#213 合并后更新到最新 `main`（合并 main 后在 LF 检出重新生成契约产物，普通推送、无强制），final head `7c2509ec0e270bf4d12b51b168a1c8e296a01955` 的 CI run `44446439437` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=207:head=7c2509ec0e270bf4d12b51b168a1c8e296a01955:run=44446439437:checks=11`；
+- PR #207 以 `--squash --match-head-commit 7c2509ec0e270bf4d12b51b168a1c8e296a01955` 合并为 `cb9b6f8dd6f28e38c4c73d5b46ae1c63948c5d92`；合并前已核对 PR head 与本地 head 完全一致；merged-main CI run `44477130778` 在同一 merge commit 上 11/11 SUCCESS（admin-e2e 07:14 完成，汇总 Gate 随后成功）；AI-009 进入 Done；
+- AI-009 最终交付 Accepted Daily v2 的 STAGED 实现：严格 2.0.0 Schema 与 `daily-expression-zh-cn-v2` package、source-revision Safety proof、deterministic resolver 与 owner/master/grant/revision/Safety/deletion 绑定、interactive 原子发布事务（fallback slot、加密 fragment、SourceDependency、mention receipt）和删除传播；Source registry 为 `720/1012 COVERED`、`292 PLANNED`、`0 NA_WITH_REASON`；MODEL/LOAD/HUMAN、真实 provider、Production/RC 与未授权来源继续 PLANNED/NO_GO；
+- 本次收尾发现并纠正：本任务期间曾因 `tasks/current.md` 记录“AI-009 无分支/无 PR”而在不知 #207 已存在的情况下重复实现了一份本地 resolver；该本地版本未推送，仅保留为本地备份分支 `agent/ai009-local-resolver-backup`，不属于交付；Dependabot 在合并后触发的多个 `npm_and_yarn` 更新任务部分失败，不属于项目 CI，未调查；
+- 本机无 Docker，所有真实 PostgreSQL/Redis 证据由 CI 提供；微信 DevTools CLI 仍未配置，真实 provider 与 Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`；C-015 继续 Blocked；
+- AI-010（第 3 天风格校准）按完成规则成为唯一 Ready；遵循本次收尾范围，不运行 AI-010 的 remote/deep prepare、不读取其 required sources、不创建实现分支或编码。
 
 ## 2026-09-18 AI-009 启动
 
