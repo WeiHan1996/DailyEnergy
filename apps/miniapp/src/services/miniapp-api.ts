@@ -315,7 +315,8 @@ export interface C015Api {
   submitAnalyticsSignal(input: ClientAnalyticsSignalRequest): Promise<void>;
 }
 
-export type StyleCalibrationChoice = components["schemas"]["StyleCalibrationChoice"];
+export type StyleCalibrationChoice =
+  components["schemas"]["StyleCalibrationChoice"];
 
 export interface AI010Api {
   submitStyleCalibration(input: {
