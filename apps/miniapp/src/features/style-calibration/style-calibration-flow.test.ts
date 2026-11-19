@@ -79,7 +79,7 @@ describe("AI-010 CMP-001 style calibration flow", () => {
   it("reuses the command ref when the same answer is retried after a network failure", async () => {
     const submit = vi
       .fn<AI010Api["submitStyleCalibration"]>()
-      .mockRejectedValueOnce(new MiniappPlatformError("NETWORK_REQUEST_FAILED"))
+      .mockRejectedValueOnce(new MiniappPlatformError("NETWORK_FAILED"))
       .mockResolvedValueOnce(envelope(4));
     const { coordinator, refs } = build(submit);
     expect(await coordinator.submit("KEEP")).toMatchObject({ kind: "retry" });

@@ -1,24 +1,38 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-11-19
+- **最后更新**：2026-11-20
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-010 — 实现第 3 天风格校准
-- **任务状态**：Ready
-- **任务 Profile**：`security`（按 `AI-*` 路由；用户明确反馈、revision、撤回/删除与历史冻结；仅运行过本地 `pnpm agent:prepare AI-010` 路由检查并返回 READY，`--remote --deep` 与 required sources 尚未读取）
-- **工作分支**：无 AI-010 实现分支；收到新的明确启动指令前不创建分支
+- **任务状态**：In Review
+- **任务 Profile**：`security`（按 `AI-*` 路由；用户明确反馈、revision、撤回/删除与历史冻结；`pnpm agent:prepare AI-010 --remote --deep` 于 2026-11-19 返回 READY，Remote/node/pnpm/dependencies/github 全部 PASS）
+- **工作分支**：`agent/ai010-style-calibration`，基于已验证 `main@c21bd394f9f5d95865178b9b0f0053a23ef19fa0`
 - **任务 Issue**：[AI-010 Issue #79](https://github.com/WeiHan1996/DailyEnergy/issues/79)
-- **当前 PR**：无；AI-010 实现 PR 不存在
+- **当前 PR**：待创建 Draft PR（见下节 AI-010 实施与本地验证）
 - **上一完成任务**：AI-009 Done；[PR #207](https://github.com/WeiHan1996/DailyEnergy/pull/207) final head `7c2509ec0e270bf4d12b51b168a1c8e296a01955` / CI run `44446439437` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cb9b6f8dd6f28e38c4c73d5b46ae1c63948c5d92`；merged-main CI run `44477130778` 11/11 SUCCESS；Issue #78 Closed
 - **更早完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-010 的前置 C-012、AI-005、AI-007、AI-009 均已 Done；AI-010 的依赖与权威来源只在收到明确启动指令后通过 `pnpm agent:prepare AI-010 --remote --deep` 恢复，不在本状态收尾中预判或实施；Daily v2 为 STAGED，Daily/Weekly v1 继续无记忆，Weekly/近期状态/关系仍不启用；C-015 继续独立阻塞 Production/RC
+- **依赖边界**：AI-010 的前置 C-012、AI-005、AI-007、AI-009 均已 Done；Daily v2 为 STAGED，Daily/Weekly v1 继续无记忆，Weekly/近期状态/关系仍不启用；C-015 继续独立阻塞 Production/RC
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待新的明确启动指令；本次不运行 AI-010 的 remote/deep prepare、不创建实现分支或编码
+- **下一候选动作**：owner 审核 AI-010 Draft PR 的 threat boundary 与 CI；通过后 exact-head 合并并收尾。提醒排期（A-004）、AI-011 七天总结、真实 provider 与 Production/RC 均不在本任务
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-11-20 AI-010 实施与本地验证
+
+- owner 于 2026-11-19 明确“启动 AI-010”并确认范围与目标文件清单（“按此开始实现”）；该授权不包含 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；开工前已核对远端无任何现成 AI-010 分支或 PR、Issue #79 无评论；
+- 复用既有 `POST /v1/profile/style-calibration`（此前无任何客户端使用），把请求体由 `expression_style` 改为封闭枚举 `choice`：`KEEP / GENTLER / LIGHTER / DIRECTER / LATER`（对应“正合适 / 再温柔一点 / 更轻松一点 / 更直接一点 / 稍后再说”），仍无自由文本；`docs/technical/api.md` 对该路由的描述“枚举，非自由文本”保持准确，故未改动 Accepted 文档；OpenAPI、shared Schema、生成 client 与 JSON Schema 已在 LF 检出重新生成；
+- `style-calibration-policy-v1`（server-core relationship 域，纯函数）：`KEEP/LATER` 永不改变已存风格；`GENTLER/LIGHTER/DIRECTER` 分别映射 `GENTLE/LIGHT_HUMOR/CLEAR_DIRECT`，若已等于当前风格则不产生新的 profile revision；资格为有效相遇日 ≥ 3；自动提示只在节点回执仍为 `PUBLISHED` 时出现，任何终态或无回执后只剩显式入口，不会自动重复询问；不使用帮助度、情绪、停留时长或渠道推断偏好；
+- 存储：在既有 `updateProfile` 事务内，同一 command receipt、同一账户锁与 CAS 之下检查同意/onboarding/revision，再读取当前 ACTIVE 关系周期的有效相遇日数；不足返回 `NOT_ELIGIBLE`（回滚，不留 receipt，API 为 422 `STATE_PRECONDITION_FAILED`）；足够则把节点回执由 `PUBLISHED` 一次性置为 `ADJUSTED/KEPT/DEFERRED`，需要改风格时同事务写 profile revision。复用既有 `outcomeCode` 列与 API 角色已有权限，没有新增 migration；重放返回 DUPLICATE，改变答案的同 command 返回 IDEMPOTENCY_CONFLICT；
+- 撤回/修改走既有 SET-002 资料更新（含恢复默认）；删除关系数据由 C-014 既有路径清除节点回执，校准产生的 profile revision 属 ACCOUNT 数据并保持既有保留策略；校准只改变后续生成快照使用的表达风格，历史 Published result 与 RuleFacts 不变（AI-005 既有证据）；
+- Mini Program：新增 `StyleCalibrationCoordinator`（同一答案重试复用 command ref，换答案才换 ref，冲突/不可用/忙碌各有平静结果）与 `miniapp-api.submitStyleCalibration`；Today 页在第 3 日节点出现且未处理时展示 CMP-001（`de-state-selector`，五选项，离线/提交中禁用，不阻塞点亮，失败只提示可再试）；SET-002 页面尚无独立入口，既有资料更新继续可用；
+- Source registry 不变（`720/1012 COVERED`、`292 PLANNED`）：现有 1012 个 Source ID 中没有专属于第 3 日风格校准的条目（相关 `S24-O02 style_calibration_saved` 属分析事件任务），因此本任务不提升任何 ID，也未冒充覆盖，留待 owner 决定是否补登记；
+- 聚焦验证（Node `24.18.0` / pnpm `11.17.0`，LF 检出）：server-core `175/175`（含新增校准策略 6 项）、shared-schemas `68/68`、server-adapters `75/75`、Mini Program `105/105`（含新增校准流程 6 项）、root typecheck `16/16`、codegen/contract Gate 通过、eslint 通过；API 服务层新增 5 项测试通过，但本机 Windows 上 `api.e2e.test.ts` 的 3 个 SIGTERM/进程生命周期用例失败（不支持 POSIX 信号，与本任务无关，需以 CI 为准）；
+- 真实 PostgreSQL 用例 `tests/database/ai010-style-calibration.test.mjs` 已写入 `database:test:integration`（覆盖无周期/不足 3 日不可校准且回滚、陈旧 revision 冲突不动回执、`ADJUSTED` 单事务改风格并写回执、重放 DUPLICATE、同 command 异答案冲突、终态后显式答案不覆盖回执、跨账户隔离、`KEPT` 不产生新 revision）；本机无 Docker，未在本机运行，只能由 CI `db-integration` 验证；该用例用管理员会话 `session_replication_role=replica` 播种合成关系周期/相遇日，不经过真实生成链路；
+- 微信 DevTools CLI 仍未配置，CMP-001 页面未在 DevTools/真机验证，只有单元与契约层证据，不能冒充设计/平台验收；
+- 待 owner 审核的 threat boundary：只有显式闭合答案能改变风格；`KEEP/LATER` 不改资料；校准与普通资料修改共用同一 CAS/幂等/同意/onboarding 守卫；资格由服务端从有效相遇日派生，客户端不可声明；节点回执只做防重复且不增加关系日；请求/响应/日志无自由文本；该端点请求体的字段变更是对 OpenAPI 的破坏性改动（此前无消费者），请 owner 确认；Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`。
 
 ## 2026-11-19 AI-009 post-merge 收尾
 
