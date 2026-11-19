@@ -2,6 +2,8 @@
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
 
+import { resolveCommandInvocation } from "../lib/pnpm-invocation.mjs";
+
 const repositoryRoot = resolve(import.meta.dirname, "../..");
 const repeatText = process.env.CORE_E2E_REPEAT ?? "1";
 const repeat = Number(repeatText);
@@ -12,7 +14,8 @@ if (!Number.isInteger(repeat) || repeat < 1 || repeat > 3) {
 
 function run(command, arguments_, environment = {}) {
   return new Promise((resolvePromise, reject) => {
-    const child = spawn(command, arguments_, {
+    const invocation = resolveCommandInvocation(command, arguments_);
+    const child = spawn(invocation.command, invocation.arguments, {
       cwd: repositoryRoot,
       env: { ...process.env, ...environment },
       stdio: "inherit",

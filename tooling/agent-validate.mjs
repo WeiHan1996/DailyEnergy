@@ -18,6 +18,7 @@ import {
   selectTaskRule,
   taskStateConflictDiagnostics,
 } from "./lib/agent-workflow.mjs";
+import { resolveCommandInvocation } from "./lib/pnpm-invocation.mjs";
 import { discoverGitChangeScope } from "./lib/git-change-scope.mjs";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
@@ -79,7 +80,13 @@ function parseArguments(arguments_) {
 }
 
 function commandOutput(command) {
-  const execution = spawnSync(command[0], command.slice(1), {
+  let invocation;
+  try {
+    invocation = resolveCommandInvocation(command[0], command.slice(1));
+  } catch (error) {
+    return { combinedOutput: error.message, status: 1 };
+  }
+  const execution = spawnSync(invocation.command, invocation.arguments, {
     cwd: repositoryRoot,
     encoding: "utf8",
     env: {
