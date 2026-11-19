@@ -3,6 +3,8 @@ import { spawnSync } from "node:child_process";
 import { access } from "node:fs/promises";
 import path from "node:path";
 
+import { resolveCommandInvocation } from "./lib/pnpm-invocation.mjs";
+
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const requiredOutputs = [
   "packages/shared-schemas/dist/index.d.ts",
@@ -25,11 +27,15 @@ try {
     requiredOutputs.map((file) => access(path.join(repositoryRoot, file))),
   );
 } catch {
-  const result = spawnSync(
-    "pnpm",
-    ["--filter", "@daily-energy/server-adapters...", "build"],
-    { cwd: repositoryRoot, stdio: "inherit" },
-  );
+  const invocation = resolveCommandInvocation("pnpm", [
+    "--filter",
+    "@daily-energy/server-adapters...",
+    "build",
+  ]);
+  const result = spawnSync(invocation.command, invocation.arguments, {
+    cwd: repositoryRoot,
+    stdio: "inherit",
+  });
   if (result.status !== 0) {
     throw new Error("SERVER_ADAPTERS_BUILD_FAILED");
   }

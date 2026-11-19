@@ -22,6 +22,7 @@ import {
   taskStateConflictDiagnostics,
 } from "./lib/agent-workflow.mjs";
 import { discoverGitChangeScope } from "./lib/git-change-scope.mjs";
+import { resolveCommandInvocation } from "./lib/pnpm-invocation.mjs";
 
 const executeFile = promisify(execFile);
 const repositoryRoot = resolve(import.meta.dirname, "..");
@@ -68,7 +69,8 @@ function parseArguments(arguments_) {
 
 async function run(command, arguments_) {
   try {
-    const result = await executeFile(command, arguments_, {
+    const invocation = resolveCommandInvocation(command, arguments_);
+    const result = await executeFile(invocation.command, invocation.arguments, {
       cwd: repositoryRoot,
       maxBuffer: 2 * 1024 * 1024,
     });

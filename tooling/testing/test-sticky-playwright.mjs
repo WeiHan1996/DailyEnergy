@@ -1,23 +1,22 @@
 import { spawn } from "node:child_process";
 import { resolve } from "node:path";
 
+import { resolveCommandInvocation } from "../lib/pnpm-invocation.mjs";
+
 const repositoryRoot = resolve(import.meta.dirname, "../..");
 
 const result = await new Promise((resolvePromise, reject) => {
-  const child = spawn(
-    "pnpm",
-    [
-      "exec",
-      "playwright",
-      "test",
-      "--config=tests/registry/playwright-known-fail.config.ts",
-    ],
-    {
-      cwd: repositoryRoot,
-      env: process.env,
-      stdio: ["ignore", "pipe", "pipe"],
-    },
-  );
+  const invocation = resolveCommandInvocation("pnpm", [
+    "exec",
+    "playwright",
+    "test",
+    "--config=tests/registry/playwright-known-fail.config.ts",
+  ]);
+  const child = spawn(invocation.command, invocation.arguments, {
+    cwd: repositoryRoot,
+    env: process.env,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
   let output = "";
   child.stdout.on("data", (chunk) => {
     output += chunk.toString();
