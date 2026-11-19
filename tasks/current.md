@@ -1,12 +1,12 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-11-17
+- **最后更新**：2026-11-19
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-009 — 实现用途受限的结构化记忆选择
 - **任务状态**：Ready
-- **任务 Profile**：`security`（source/grant/expiry/owner/revision/delete、Prompt 最小披露与无记忆回退；尚未运行 AI-009 prepare）
-- **工作分支**：无 AI-009 实现分支；AI-008 实现与状态收尾已合并，当前保持 `main`，收到新的明确启动指令前不创建分支
+- **任务 Profile**：`security`（source/grant/expiry/owner/revision/delete、Prompt 最小披露与无记忆回退；`pnpm agent:prepare AI-009 --remote --deep` 已于 2026-11-17 返回 READY，Remote/node/pnpm/dependencies/github 全部 PASS）
+- **工作分支**：无 AI-009 实现分支；owner 已于 2026-11-19 明确“开始收尾并启动”，本状态 PR 合并后再从最新 `main` 创建 AI-009 实现分支
 - **任务 Issue**：[AI-009 Issue #78](https://github.com/WeiHan1996/DailyEnergy/issues/78)
 - **当前 PR**：无；AI-009 实现 PR 不存在
 - **上一完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
@@ -14,9 +14,9 @@
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-003 与 AI-008 已 Done；AI-009 的依赖与权威来源只在未来收到明确启动指令后通过 `pnpm agent:prepare AI-009 --remote --deep` 恢复，不在本状态收尾中预判或实施；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由后续开发任务自动关闭
+- **依赖边界**：AI-003 与 AI-008 已 Done；AI-009 已获 owner 明确启动指令，依赖与权威来源通过 `pnpm agent:prepare AI-009 --remote --deep` 恢复，本状态收尾不预判或实施；C-015 的 Production/Privacy/Legal 证据持续阻塞 Production/RC，也不能由后续开发任务自动关闭
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：先完成并合并 Windows tooling 兼容修复（见下节，分支 `agent/windows-pnpm-spawn`），再基于最新 `main` 开始 AI-009；AI-009 的 `--remote` 检查还需要本机安装并登录 `gh`，真实 PostgreSQL/Redis 证据还需要 Docker
+- **下一候选动作**：合并本状态 PR 后，基于最新 `main` 创建 AI-009 实现分支并先读取 required sources；本机已有 `gh` 与固定 Node/pnpm，真实 PostgreSQL/Redis 证据仍缺 Docker，只能依赖 CI
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
 ## 2026-11-17 Windows tooling 兼容修复（中断 AI-009 启动）
@@ -24,7 +24,9 @@
 - **原因**：owner 要求启动 AI-009，但在 Windows 上 `agent:prepare --deep` 与 `agent:validate` 无法启动 `pnpm`（Windows 不能无 shell 直接 spawn `pnpm.cmd`，`ENOENT`/`EINVAL`），deep 检查因此 `INFRA_BLOCKED`；owner 明确选择修改 tooling 修复；AI-009 仍为唯一 Ready，未开始；
 - **范围**：新增 `tooling/lib/pnpm-invocation.mjs`，仅在 `win32` 把 `pnpm` 解析为 `npm_execpath` / corepack / PATH 中 `pnpm.cmd` 旁的 `pnpm.cjs`，找不到则 fail closed；非 Windows 行为不变；应用于 `agent-prepare`、`agent-validate`、`check-workspace`、`ensure-server-adapters-build`、`run-admin-playwright`、`testing/run-{vitest-projects,core-e2e,api-playwright}`、`testing/test-sticky-playwright`；新增 `tooling/test-pnpm-invocation.mjs` 并接入 `agent:fixtures`；
 - **不做**：不改变任何验证策略、Gate 判定、产品或 AI-009 代码；不处理 `gh` 与 Docker 缺失；`ci/runtime.mjs` 已有 Windows 分支，保持不变；
-- **验证**：Node `24.18.0` / pnpm `11.17.0` 下 `agent:prepare AI-009 --deep` 的 pnpm/dependencies 由 `INFRA_BLOCKED` 变为 `PASS`（github 仍因本机无 `gh` 为 `INFRA_BLOCKED`）；`agent:fixtures`、`agent:check`、eslint、`prettier --check --end-of-line auto` 通过；完整 `agent:validate` full Gate 未在本机运行（需要 Docker）。
+- **验证**：Node `24.18.0` / pnpm `11.17.0` 下 `agent:prepare AI-009 --deep` 的 pnpm/dependencies 由 `INFRA_BLOCKED` 变为 `PASS`（github 仍因本机无 `gh` 为 `INFRA_BLOCKED`）；`agent:fixtures`、`agent:check`、eslint、`prettier --check --end-of-line auto` 通过；完整 `agent:validate` full Gate 未在本机运行（需要 Docker）；
+- **合并收据**：owner 于 2026-11-19 明确“批准合并 #212”；[PR #212](https://github.com/WeiHan1996/DailyEnergy/pull/212) 在 #213 合并后更新到最新 `main`，final head `3df780169d76d2619e7b745cb7045632f7ec6b0e` 的 CI run `44210130558` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=212:head=3df780169d76d2619e7b745cb7045632f7ec6b0e:run=44210130558:checks=11`；以 `--squash --match-head-commit` 合并为 `4e79bd6a398fa86911d3bb354a94e2d9bee48d45`；merged-main CI run `44440326032` 11/11 SUCCESS；
+- **未覆盖**：本机仍无 Docker，完整 `agent:validate` full Gate 与真实 PostgreSQL/Redis 证据只由 CI 提供。
 
 ## 2026-09-14 AI-008 post-merge 收尾
 
@@ -61,7 +63,10 @@
 - **原因**：PR #212 的 `supply-chain` 检查报 `CI_AUDIT_THRESHOLD_EXCEEDED:critical=4:high=13`（官方 `npm audit` 新增告警，与 #212 无关，`main` 同样受影响）；owner 明确要求另开任务修复；AI-009 仍为唯一 Ready，未开始；
 - **范围**：只改 `pnpm-workspace.yaml` 与由此产生的 `pnpm-lock.yaml`、重新生成的契约产物；`next` 16.3.3→16.4.1、`zod` 4.4.3→4.6.6；用 overrides 抬高 `multer` 2.5.0、`body-parser` 2.4.0、`proxy-addr` 2.0.8、`fast-uri` 3.1.7、`brace-expansion` 2.1.6/5.0.11、`source-map-js` 1.2.2、`@grpc/grpc-js` 1.14.5；不改业务代码、不设漏洞例外（`exceptions` 仍为空）；
 - **契约影响**：`zod` 4.6.x 对定长 tuple 额外输出 `items:false` 与 `minItems/maxItems`，`shared-schemas/src/json-schema.ts`、OpenAPI 与生成 client 的 source fingerprint 随之变化，已用 `pnpm run codegen` 重新生成；
-- **验证**：`pnpm audit --prod` 为 critical=0/high=0；Node 24.18.0 下 `pnpm typecheck` 16/16、`pnpm build` 9/9、shared-schemas `68/68`；本机无 Docker，数据库/队列/E2E 与完整 full Gate 依赖 CI；本机 Windows CRLF 检出使 `contract:check`、prompt-library 规范块测试等在 `main` 基线上同样失败，不计作本任务证据。
+- **验证**：`pnpm audit --prod` 为 critical=0/high=0；Node 24.18.0 下 `pnpm typecheck` 16/16、`pnpm build` 9/9、shared-schemas `68/68`；本机无 Docker，数据库/队列/E2E 与完整 full Gate 依赖 CI；本机 Windows CRLF 检出使 `contract:check`、prompt-library 规范块测试等在 `main` 基线上同样失败，不计作本任务证据；
+- **首次 CI 失败保留**：首个 head `ebb910c` 在 CRLF 检出重新生成契约产物，`static` 与 `unit-contract` 因 `CONTRACT_GENERATED_FINGERPRINT_DRIFT` 失败；在 LF 检出重新生成后提交 `44786bf`，`codegen:check`、`contract:check`、`contract:fixtures` 与 prompt-library `72/72` 通过；今后在本机重新生成契约产物必须使用 LF 检出；
+- **合并收据**：owner 于 2026-11-19 明确“批准合并 #213”，接受 `zod` 4.6 带来的 tuple JSON Schema 变化；[PR #213](https://github.com/WeiHan1996/DailyEnergy/pull/213) final head `44786bfdeb36d67a349ef3a3f498a811db559718` 的 CI run `44102165563` 为 11/11 SUCCESS；正式 verifier 返回 `CI_PR_MERGE_GATE_OK:pr=213:head=44786bfdeb36d67a349ef3a3f498a811db559718:run=44102165563:checks=11`；以 `--squash --match-head-commit` 合并为 `c7d3487e6591847479bb1fc2b92120aae65477a4`；merged-main CI run `44210075793` 11/11 SUCCESS；
+- **其它观察**：合并同时触发多个 Dependabot `npm_and_yarn` 更新任务，其中数个失败、一个成功；它们不是项目 CI，未调查失败原因，也未修改 Dependabot 配置。
 
 ## 2026-09-09 AI-008 启动
 
