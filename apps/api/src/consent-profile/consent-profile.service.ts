@@ -9,6 +9,10 @@ import {
   type StoredNotificationSettingsView,
   type StoredProfileView,
 } from "@daily-energy/server-adapters/api";
+import {
+  STYLE_CALIBRATION_MIN_ENCOUNTER_DAYS,
+  resolveStyleCalibrationV1,
+} from "@daily-energy/server-core/relationship";
 import type {
   CommandReceiptView,
   ConsentAcceptRequest,
@@ -162,15 +166,32 @@ export class ConsentProfileService {
     principal: SessionPrincipal,
     request: StyleCalibrationRequest,
   ): Promise<ProfileView> {
+    const stored = await this.#storeCall(() =>
+      this.store.getProfile(principal.accountId),
+    );
+    if (stored === undefined || !stored.onboardingCompleted) {
+      throw new ApiException({ code: "ONBOARDING_REQUIRED" });
+    }
+    const resolution = resolveStyleCalibrationV1(
+      request.choice,
+      stored.expressionStyle,
+    );
     const result = await this.#storeCall(() =>
       this.store.updateProfile({
         accountId: principal.accountId,
+        calibration: {
+          changesStyle: resolution.changesStyle,
+          minimumEncounterDays: STYLE_CALIBRATION_MIN_ENCOUNTER_DAYS,
+          outcome: resolution.outcome,
+        },
         commandRef: request.command_ref,
         expectedRevision: request.expected_revision,
-        expressionStyle: request.expression_style,
+        ...(resolution.changesStyle
+          ? { expressionStyle: resolution.nextStyle }
+          : {}),
         normalizedPayloadFingerprint: payloadFingerprint("STYLE_CALIBRATION", {
+          choice: request.choice,
           expected_revision: request.expected_revision,
-          expression_style: request.expression_style,
         }),
         now: new Date(),
         operationCode: "STYLE_CALIBRATION",
@@ -436,6 +457,9 @@ function mutationException(
   }
   if (result.status === "ACCOUNT_BLOCKED") {
     return new ApiException({ code: "ACCOUNT_RESTRICTED" });
+  }
+  if (result.status === "NOT_ELIGIBLE") {
+    return new ApiException({ code: "STATE_PRECONDITION_FAILED" });
   }
   return new ApiException({
     code: "REVISION_CONFLICT",

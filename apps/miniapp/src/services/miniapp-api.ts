@@ -315,6 +315,16 @@ export interface C015Api {
   submitAnalyticsSignal(input: ClientAnalyticsSignalRequest): Promise<void>;
 }
 
+export type StyleCalibrationChoice = components["schemas"]["StyleCalibrationChoice"];
+
+export interface AI010Api {
+  submitStyleCalibration(input: {
+    readonly choice: StyleCalibrationChoice;
+    readonly commandRef: string;
+    readonly expectedRevision: number;
+  }): Promise<ProfileEnvelope>;
+}
+
 export interface AI008Api {
   completeMatter(input: {
     readonly commandRef: string;
@@ -2081,7 +2091,8 @@ export function createMiniappApi(
   C013Api &
   C014Api &
   C015Api &
-  AI008Api {
+  AI008Api &
+  AI010Api {
   let sessionToken: string | undefined;
 
   const api: C003Api &
@@ -2093,7 +2104,26 @@ export function createMiniappApi(
     C013Api &
     C014Api &
     C015Api &
-    AI008Api = {
+    AI008Api &
+    AI010Api = {
+    async submitStyleCalibration(input): Promise<ProfileEnvelope> {
+      const response = await network.request({
+        body: {
+          choice: input.choice,
+          command_ref: input.commandRef,
+          expected_revision: input.expectedRevision,
+        },
+        headers: headers(sessionToken, input.commandRef),
+        method: "POST",
+        path: "/v1/profile/style-calibration",
+      });
+      const parsed = successData(response.data, response.statusCode);
+      return Object.freeze({
+        productDate: parsed.productDate,
+        profile: profileView(parsed.data),
+      });
+    },
+
     async createSession(input): Promise<SessionEnvelope> {
       const response = await network.request({
         body: input as StorageValue,

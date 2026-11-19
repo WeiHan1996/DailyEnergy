@@ -3,6 +3,7 @@ import * as z from "zod";
 import {
   EnergySchema,
   ExpressionStyleSchema,
+  StyleCalibrationChoiceSchema,
   HelpfulnessRatingSchema,
   HelpfulnessStateSchema,
   MoodSchema,
@@ -143,7 +144,7 @@ export const StyleCalibrationRequestSchema = z
   .object({
     ...CommandShape,
     expected_revision: PositiveRevisionSchema,
-    expression_style: ExpressionStyleSchema,
+    choice: StyleCalibrationChoiceSchema,
   })
   .strict();
 
