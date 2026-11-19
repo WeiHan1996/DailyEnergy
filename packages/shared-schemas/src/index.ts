@@ -70,6 +70,17 @@ export type {
 } from "./common.js";
 
 export {
+  DailyExpressionPayloadV2Schema,
+  DailyMemoryContextProjectionV1Schema,
+  DailyMemoryFactV1Schema,
+} from "./daily-content.js";
+export type {
+  DailyExpressionPayloadV2,
+  DailyMemoryContextProjectionV1,
+  DailyMemoryFactV1,
+} from "./daily-content.js";
+
+export {
   AnalyticsCacheOutcomeValues,
   AnalyticsEnvironmentSchema,
   AnalyticsEnvironmentValues,

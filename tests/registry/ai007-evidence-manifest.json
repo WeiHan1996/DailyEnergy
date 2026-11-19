@@ -140,7 +140,7 @@
   ],
   "pending_evidence": {
     "E16-R09": "AI-011 must implement and validate the first seven-day Weekly summary from exact approved aggregate refs.",
-    "E16-R11": "AI-009 must implement future permissioned memory expiry, revocation and deletion propagation.",
+    "E16-R11": "Implemented by AI-009 for Accepted Daily v2 Matter memory; Weekly/recent-state/relationship Daily memory remains outside the authorized source set.",
     "model_and_human_quality": "AI-014 and AI-015 must run authorized MODEL/HUMAN evaluation; deterministic copy is not provider or human evidence.",
     "production_authorization": "NOT_GRANTED"
   }

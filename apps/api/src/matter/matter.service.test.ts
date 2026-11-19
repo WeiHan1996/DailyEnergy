@@ -150,6 +150,12 @@ describe("AI-008 matter service", () => {
     expect(create).toHaveBeenCalledWith(
       expect.objectContaining({
         accountId: principal.accountId,
+        memorySafetyProof: {
+          classifierVersion: "synthetic-classifier-v1",
+          irreversibleFingerprint: Buffer.alloc(32, 1),
+          policyVersion: "safety-v1",
+          ruleVersion: "rules-v1",
+        },
         title: expect.objectContaining({ ciphertext: expect.any(Buffer) }),
       }),
     );
@@ -186,6 +192,9 @@ describe("AI-008 matter service", () => {
       daily_use_granted: false,
       weekly_use_granted: false,
     });
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({ memorySafetyProof: null }),
+    );
   });
 
   it("diverts high-risk titles before ordinary Matter persistence", async () => {

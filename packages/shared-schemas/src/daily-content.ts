@@ -621,6 +621,123 @@ export const ExpressionPayloadSchema = z
   });
 export type ExpressionPayload = z.infer<typeof ExpressionPayloadSchema>;
 
+export const DailyMemoryFactV1Schema = z
+  .object({
+    fact_id: VersionTokenSchema,
+    fact_kind: z.literal("IMPORTANT_MATTER"),
+    temporal_relation: z.enum(["TARGET_TODAY", "FUTURE_WINDOW", "UNSPECIFIED"]),
+    allowed_claim: z.literal("USER_SAVED_MATTER"),
+    allowed_date_literals: z.tuple([]),
+    allowed_numeric_literals: z.tuple([]),
+    prohibited_inferences: z
+      .tuple([
+        z.literal("CAUSE"),
+        z.literal("OUTCOME"),
+        z.literal("PROFESSIONAL_CONCLUSION"),
+        z.literal("RELATIONSHIP_OR_IDENTITY"),
+      ])
+      .readonly(),
+  })
+  .strict();
+export type DailyMemoryFactV1 = z.infer<typeof DailyMemoryFactV1Schema>;
+
+export const DailyMemoryContextProjectionV1Schema = z
+  .object({
+    contract: z.literal("memory-context-projection-v1"),
+    workload: z.literal("DAILY_EXPRESSION_V2"),
+    product_date: ProductDateSchema,
+    memory_facts: z.array(DailyMemoryFactV1Schema).max(1),
+    segment_contracts: z
+      .array(
+        z
+          .object({
+            segment_path: z.literal("expression.state_response"),
+            exact_memory_fact_refs: z.array(VersionTokenSchema).max(1),
+            memory_mention_allowed: z.boolean(),
+            fallback_path: z.literal("expression.state_response"),
+          })
+          .strict(),
+      )
+      .max(1),
+    personalization_expectation: z.enum(["FULL", "REDUCED"]),
+    provider_projection_bytes: z.number().int().min(0).max(1024),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const facts = value.memory_facts.map(({ fact_id }) => fact_id);
+    const contracts = value.segment_contracts;
+    if (facts.length === 0 && contracts.length !== 0) {
+      addCustomIssue(
+        context,
+        ["segment_contracts"],
+        "must be empty when memory_facts is empty",
+      );
+    }
+    if (
+      facts.length === 1 &&
+      (contracts.length !== 1 ||
+        contracts[0]?.memory_mention_allowed !== true ||
+        JSON.stringify(contracts[0]?.exact_memory_fact_refs) !==
+          JSON.stringify(facts))
+    ) {
+      addCustomIssue(
+        context,
+        ["segment_contracts"],
+        "must bind the exact single memory fact to state_response",
+      );
+    }
+  });
+export type DailyMemoryContextProjectionV1 = z.infer<
+  typeof DailyMemoryContextProjectionV1Schema
+>;
+
+export const DailyExpressionPayloadV2Schema = z
+  .object({
+    contract: z.literal("daily-expression-payload-v2"),
+    schema_version: z.literal("2.0.0"),
+    expression: ExpressionPayloadSchema,
+    memory_bindings: z
+      .array(
+        z
+          .object({
+            segment_path: z.literal("expression.state_response"),
+            exact_memory_fact_refs: z.array(VersionTokenSchema).length(1),
+          })
+          .strict(),
+      )
+      .max(1),
+    privacy_fallbacks: z
+      .object({
+        "expression.state_response": generatedTextSchema(20, 60).optional(),
+      })
+      .strict(),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    const binding = value.memory_bindings[0];
+    const fallback = value.privacy_fallbacks["expression.state_response"];
+    if ((binding === undefined) !== (fallback === undefined)) {
+      addCustomIssue(
+        context,
+        ["privacy_fallbacks", "expression.state_response"],
+        "must exist exactly when state_response has a memory binding",
+      );
+    }
+    if (
+      fallback !== undefined &&
+      fallback === value.expression.state_response
+    ) {
+      addCustomIssue(
+        context,
+        ["privacy_fallbacks", "expression.state_response"],
+        "must differ from the memory-backed state_response",
+      );
+    }
+  });
+export type DailyExpressionPayloadV2 = z.infer<
+  typeof DailyExpressionPayloadV2Schema
+>;
+
 const SourceDependencySchema = z
   .object({
     source_ref: OpaqueIdSchema,

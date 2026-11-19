@@ -107,6 +107,7 @@ export {
   PostgresMatterStore,
   UNAVAILABLE_MATTER_STORE,
   type MatterGuardFailure,
+  type MatterMemorySafetyProof,
   type MatterMutationResult,
   type MatterQueryResult,
   type MatterStore,

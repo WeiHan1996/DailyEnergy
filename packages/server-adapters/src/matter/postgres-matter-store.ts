@@ -29,6 +29,13 @@ export interface ProtectedMatterTitle {
   readonly keyVersion: string;
 }
 
+export interface MatterMemorySafetyProof {
+  readonly classifierVersion: string;
+  readonly irreversibleFingerprint: Buffer;
+  readonly policyVersion: string;
+  readonly ruleVersion: string;
+}
+
 export interface StoredMatterView {
   readonly dailyUseGranted: boolean;
   readonly matterRef: string;
@@ -81,6 +88,7 @@ export interface MatterStore {
   create(
     input: MatterCommandInput & {
       readonly dailyUseGranted: boolean;
+      readonly memorySafetyProof?: MatterMemorySafetyProof | null;
       readonly targetProductDate?: string;
       readonly title: ProtectedMatterTitle;
       readonly weeklyUseGranted: boolean;
@@ -101,6 +109,7 @@ export interface MatterStore {
     input: MatterCommandInput & {
       readonly expectedRevision: number;
       readonly matterRef: string;
+      readonly memorySafetyProof?: MatterMemorySafetyProof | null;
       readonly revokeUseGrants: boolean;
       readonly transition: MatterTransition;
     },
@@ -111,6 +120,7 @@ export interface MatterStore {
       readonly dailyUseGranted?: boolean;
       readonly expectedRevision: number;
       readonly matterRef: string;
+      readonly memorySafetyProof?: MatterMemorySafetyProof | null;
       readonly targetProductDate?: string;
       readonly title?: ProtectedMatterTitle;
       readonly weeklyUseGranted?: boolean;
@@ -250,6 +260,7 @@ export class PostgresMatterStore implements MatterStore {
   public async create(
     input: MatterCommandInput & {
       readonly dailyUseGranted: boolean;
+      readonly memorySafetyProof?: MatterMemorySafetyProof | null;
       readonly targetProductDate?: string;
       readonly title: ProtectedMatterTitle;
       readonly weeklyUseGranted: boolean;
@@ -281,18 +292,24 @@ export class PostgresMatterStore implements MatterStore {
           : { status: "DUPLICATE", value: storedMatter(existing) };
       }
       const matterRef = randomUUID();
+      const proof = proofColumns(input.memorySafetyProof ?? null, 1, input.now);
       await client.query(
         `INSERT INTO daily_energy.app_important_matter
           (id,"accountId",revision,"titleCiphertext","titleKeyVersion",
+           "memorySafetySourceRevision","memorySafetyPolicyVersion",
+           "memorySafetyRuleVersion","memorySafetyClassifierVersion",
+           "memorySafetyFingerprint","memorySafetyClearedAt",
            "targetProductDate",state,"createdProductDate","createdAt","updatedAt",
            "retentionPolicyVersion","retentionScope","retentionAnchorAt")
-         VALUES ($1::uuid,$2::uuid,1,$3,$4,$5::date,'ACTIVE',$6::date,
-                 $7::timestamptz,$7::timestamptz,$8,'MATTER',$7::timestamptz)`,
+         VALUES ($1::uuid,$2::uuid,1,$3,$4,$5,$6,$7,$8,$9,$10::timestamptz,
+                 $11::date,'ACTIVE',$12::date,$13::timestamptz,$13::timestamptz,
+                 $14,'MATTER',$13::timestamptz)`,
         [
           matterRef,
           input.accountId,
           input.title.ciphertext,
           input.title.keyVersion,
+          ...proof,
           input.targetProductDate ?? null,
           input.productDate,
           input.now,
@@ -342,6 +359,7 @@ export class PostgresMatterStore implements MatterStore {
       readonly dailyUseGranted?: boolean;
       readonly expectedRevision: number;
       readonly matterRef: string;
+      readonly memorySafetyProof?: MatterMemorySafetyProof | null;
       readonly targetProductDate?: string;
       readonly title?: ProtectedMatterTitle;
       readonly weeklyUseGranted?: boolean;
@@ -429,8 +447,22 @@ export class PostgresMatterStore implements MatterStore {
         dailyUseGranted !== current.dailyUseGranted ||
         weeklyUseGranted !== current.weeklyUseGranted;
       if (!changed) {
+        await updateMatterSafetyProof(client, {
+          accountId: input.accountId,
+          matterRef: input.matterRef,
+          now: input.now,
+          proof: input.memorySafetyProof ?? null,
+          revision: current.revision,
+        });
         await attachResponseRef(client, input, input.matterRef);
-        return { status: "ACCEPTED", value: storedMatter(current) };
+        return {
+          status: "ACCEPTED",
+          value: storedMatter(
+            requiredMatter(
+              await readMatter(client, input.accountId, input.matterRef, false),
+            ),
+          ),
+        };
       }
       const revision = current.revision + 1;
       const reactivated =
@@ -442,8 +474,12 @@ export class PostgresMatterStore implements MatterStore {
                 "createdProductDate"=$6::date,
                 "terminalAt"=CASE WHEN $7 THEN NULL ELSE "terminalAt" END,
                 "expiresAt"=CASE WHEN $7 THEN NULL ELSE "expiresAt" END,
-                "updatedAt"=$8::timestamptz,"retentionAnchorAt"=$8::timestamptz
-          WHERE id=$9::uuid AND "accountId"=$10::uuid AND revision=$11`,
+                "updatedAt"=$8::timestamptz,"retentionAnchorAt"=$8::timestamptz,
+                "memorySafetySourceRevision"=$9,
+                "memorySafetyPolicyVersion"=$10,"memorySafetyRuleVersion"=$11,
+                "memorySafetyClassifierVersion"=$12,
+                "memorySafetyFingerprint"=$13,"memorySafetyClearedAt"=$14::timestamptz
+          WHERE id=$15::uuid AND "accountId"=$16::uuid AND revision=$17`,
         [
           revision,
           title.ciphertext,
@@ -453,6 +489,7 @@ export class PostgresMatterStore implements MatterStore {
           lifecycle.createdProductDate,
           reactivated,
           input.now,
+          ...proofColumns(input.memorySafetyProof ?? null, revision, input.now),
           input.matterRef,
           input.accountId,
           current.revision,
@@ -507,6 +544,7 @@ export class PostgresMatterStore implements MatterStore {
     input: MatterCommandInput & {
       readonly expectedRevision: number;
       readonly matterRef: string;
+      readonly memorySafetyProof?: MatterMemorySafetyProof | null;
       readonly revokeUseGrants: boolean;
       readonly transition: MatterTransition;
     },
@@ -580,6 +618,10 @@ export class PostgresMatterStore implements MatterStore {
         return { status: "DUPLICATE", value: storedMatter(current) };
       }
       const revision = current.revision + 1;
+      const proof =
+        input.transition === "RESUME"
+          ? (input.memorySafetyProof ?? null)
+          : null;
       const terminal = lifecycle.state === "COMPLETED";
       await client.query(
         `UPDATE daily_energy.app_important_matter
@@ -588,8 +630,12 @@ export class PostgresMatterStore implements MatterStore {
                 "terminalAt"=CASE WHEN $4 THEN $5::timestamptz ELSE NULL END,
                 "expiresAt"=CASE WHEN $4 THEN $5::timestamptz+
                   make_interval(days=>$6) ELSE NULL END,
-                "updatedAt"=$5::timestamptz,"retentionAnchorAt"=$5::timestamptz
-          WHERE id=$7::uuid AND "accountId"=$8::uuid AND revision=$9`,
+                "updatedAt"=$5::timestamptz,"retentionAnchorAt"=$5::timestamptz,
+                "memorySafetySourceRevision"=$7,
+                "memorySafetyPolicyVersion"=$8,"memorySafetyRuleVersion"=$9,
+                "memorySafetyClassifierVersion"=$10,
+                "memorySafetyFingerprint"=$11,"memorySafetyClearedAt"=$12::timestamptz
+          WHERE id=$13::uuid AND "accountId"=$14::uuid AND revision=$15`,
         [
           revision,
           lifecycle.state,
@@ -597,6 +643,7 @@ export class PostgresMatterStore implements MatterStore {
           terminal,
           input.now,
           TERMINAL_MATTER_TTL_DAYS,
+          ...proofColumns(proof, revision, input.now),
           input.matterRef,
           input.accountId,
           current.revision,
@@ -670,6 +717,68 @@ export class PostgresMatterStore implements MatterStore {
     if (this.#closed) {
       throw new Error("MATTER_STORE_CLOSED");
     }
+  }
+}
+
+function proofColumns(
+  proof: MatterMemorySafetyProof | null,
+  revision: number,
+  now: Date,
+): readonly [
+  number | null,
+  string | null,
+  string | null,
+  string | null,
+  Buffer | null,
+  Date | null,
+] {
+  if (proof === null) {
+    return [null, null, null, null, null, null];
+  }
+  if (
+    proof.policyVersion.length < 1 ||
+    proof.policyVersion.length > 64 ||
+    proof.ruleVersion.length < 1 ||
+    proof.ruleVersion.length > 64 ||
+    proof.classifierVersion.length < 1 ||
+    proof.classifierVersion.length > 64 ||
+    proof.irreversibleFingerprint.length !== 32
+  ) {
+    throw new Error("MATTER_MEMORY_SAFETY_PROOF_INVALID");
+  }
+  return [
+    revision,
+    proof.policyVersion,
+    proof.ruleVersion,
+    proof.classifierVersion,
+    proof.irreversibleFingerprint,
+    now,
+  ];
+}
+
+async function updateMatterSafetyProof(
+  client: PoolClient,
+  input: {
+    readonly accountId: string;
+    readonly matterRef: string;
+    readonly now: Date;
+    readonly proof: MatterMemorySafetyProof | null;
+    readonly revision: number;
+  },
+): Promise<void> {
+  const columns = proofColumns(input.proof, input.revision, input.now);
+  const updated = await client.query(
+    `UPDATE daily_energy.app_important_matter
+        SET "memorySafetySourceRevision"=$1,
+            "memorySafetyPolicyVersion"=$2,"memorySafetyRuleVersion"=$3,
+            "memorySafetyClassifierVersion"=$4,
+            "memorySafetyFingerprint"=$5,"memorySafetyClearedAt"=$6::timestamptz,
+            "updatedAt"=$6::timestamptz,"retentionAnchorAt"=$6::timestamptz
+      WHERE id=$7::uuid AND "accountId"=$8::uuid AND revision=$9`,
+    [...columns, input.matterRef, input.accountId, input.revision],
+  );
+  if (updated.rowCount !== 1) {
+    throw new Error("MATTER_MEMORY_SAFETY_PROOF_CAS_LOST");
   }
 }
 
@@ -844,7 +953,11 @@ async function expireDueMatters(
       `UPDATE daily_energy.app_important_matter
           SET state='EXPIRED',revision=$1,"terminalAt"=$2::timestamptz,
               "updatedAt"=$2::timestamptz,"retentionAnchorAt"=$2::timestamptz,
-              "expiresAt"=$2::timestamptz+make_interval(days=>$3)
+              "expiresAt"=$2::timestamptz+make_interval(days=>$3),
+              "memorySafetySourceRevision"=NULL,
+              "memorySafetyPolicyVersion"=NULL,"memorySafetyRuleVersion"=NULL,
+              "memorySafetyClassifierVersion"=NULL,
+              "memorySafetyFingerprint"=NULL,"memorySafetyClearedAt"=NULL
         WHERE id=$4::uuid AND revision=$5 AND state='ACTIVE'`,
       [
         revision,

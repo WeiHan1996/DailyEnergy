@@ -4,6 +4,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import type {
   MatterMutationResult,
   MatterQueryResult,
+  MatterMemorySafetyProof,
   MatterStore,
   StoredMatterView,
 } from "@daily-energy/server-adapters/api";
@@ -108,6 +109,7 @@ export class MatterService {
         accountId: principal.accountId,
         commandRef: request.command_ref,
         dailyUseGranted: restricted ? false : request.daily_use_granted,
+        memorySafetyProof: this.#memorySafetyProof(decision),
         normalizedPayloadFingerprint: this.#payloadFingerprint(
           "MATTER_CREATE",
           request,
@@ -161,6 +163,7 @@ export class MatterService {
             }),
         expectedRevision: request.expected_revision,
         matterRef,
+        memorySafetyProof: this.#memorySafetyProof(decision),
         normalizedPayloadFingerprint: this.#payloadFingerprint(
           "MATTER_UPDATE",
           request,
@@ -186,6 +189,7 @@ export class MatterService {
   ): Promise<MatterServiceResult<MatterView>> {
     const resolution = this.#resolve();
     let revokeUseGrants = false;
+    let memorySafetyProof: MatterMemorySafetyProof | null | undefined;
     if (transition === "RESUME") {
       const current = await this.#current(principal, matterRef, resolution);
       const decision = await this.#safetyDecision(
@@ -201,6 +205,7 @@ export class MatterService {
         );
       }
       revokeUseGrants = decision.outcome === "PROFESSIONAL_BOUNDARY";
+      memorySafetyProof = this.#memorySafetyProof(decision);
     }
     const result = await this.#storeCall(() =>
       this.store.transition({
@@ -208,6 +213,7 @@ export class MatterService {
         commandRef: request.command_ref,
         expectedRevision: request.expected_revision,
         matterRef,
+        ...(memorySafetyProof === undefined ? {} : { memorySafetyProof }),
         normalizedPayloadFingerprint: this.#payloadFingerprint(
           `MATTER_${transition}`,
           request,
@@ -267,6 +273,20 @@ export class MatterService {
         serverNow: resolution.now,
       });
     }
+  }
+
+  #memorySafetyProof(
+    decision: EveningSafetyDecision,
+  ): MatterMemorySafetyProof | null {
+    if (decision.outcome !== "CLEAR") {
+      return null;
+    }
+    return {
+      classifierVersion: decision.classifierVersion,
+      irreversibleFingerprint: decision.irreversibleFingerprint,
+      policyVersion: decision.policyVersion,
+      ruleVersion: decision.ruleVersion,
+    };
   }
 
   async #activateSafety(

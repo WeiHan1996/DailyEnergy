@@ -1,7 +1,7 @@
 {
   "registry_version": "e-010-source-registry-v1",
   "generated_from": "tests/registry/source-sets.json",
-  "counts": { "COVERED": 698, "NA_WITH_REASON": 0, "PLANNED": 312 },
+  "counts": { "COVERED": 720, "NA_WITH_REASON": 0, "PLANNED": 292 },
   "entries": [
     {
       "authority_paths": ["docs/data/domain-model.md"],
@@ -4066,22 +4066,68 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "dependency revision changes alter the immutable snapshot fingerprint and provider projection remains within 1 KiB",
+            "no candidate creates a deterministic complete no-memory snapshot",
+            "one selected Matter projects one title-free fact and exact state_response segment contract while source/grant/owner bindings remain server-only"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/daily-context.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-context-snapshot-v1",
+          "test_id": "T-AI009-CONTEXT-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "no-memory output remains complete while substituted refs and missing fallback are rejected",
+            "the controlled v2 renderer binds one exact fact only to state_response and includes a distinct complete fallback",
+            "the immutable STAGED Prompt package forbids external provider calls and compiles strict 2.0.0 JSON Schema without source, owner or title"
+          ],
+          "file": "packages/prompt-library/src/daily-memory-v2.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "daily-expression-zh-cn-v2 staged memory contract",
+          "test_id": "T-AI009-PROMPT-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-C01",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-C02",
       "source_sets": ["s16-ai-corpus"]
@@ -4099,6 +4145,32 @@
           "origin": "tests/registry/ai008-evidence-manifest.json",
           "selector": "AI-008 real PostgreSQL Matter encryption, grants, CAS, expiry, Safety and deletion guard",
           "test_id": "T-AI008-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
         }
       ],
       "status": "COVERED",
@@ -4119,22 +4191,70 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-C05",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-C06",
       "source_sets": ["s16-ai-corpus"]
@@ -4161,22 +4281,55 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-C08",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "dependency revision changes alter the immutable snapshot fingerprint and provider projection remains within 1 KiB",
+            "no candidate creates a deterministic complete no-memory snapshot",
+            "one selected Matter projects one title-free fact and exact state_response segment contract while source/grant/owner bindings remain server-only"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/daily-context.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-context-snapshot-v1",
+          "test_id": "T-AI009-CONTEXT-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "no-memory output remains complete while substituted refs and missing fallback are rejected",
+            "the controlled v2 renderer binds one exact fact only to state_response and includes a distinct complete fallback",
+            "the immutable STAGED Prompt package forbids external provider calls and compiles strict 2.0.0 JSON Schema without source, owner or title"
+          ],
+          "file": "packages/prompt-library/src/daily-memory-v2.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "daily-expression-zh-cn-v2 staged memory contract",
+          "test_id": "T-AI009-PROMPT-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-C09",
       "source_sets": ["s16-ai-corpus"]
@@ -4216,11 +4369,22 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-D01",
       "source_sets": ["s16-ai-corpus"]
@@ -4238,11 +4402,35 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-D03",
       "source_sets": ["s16-ai-corpus"]
@@ -4348,22 +4536,55 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "fallback text that reveals deletion history is rejected",
+            "missing, revoked, Safety-blocked or deleted dependencies resolve to the prevalidated fallback without deletion disclosure",
+            "personalized state_response is returned only while the dependency is valid"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/privacy-fallback.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "Daily v2 memory privacy fallback",
+          "test_id": "T-AI009-FALLBACK-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-D08",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "no-memory output remains complete while substituted refs and missing fallback are rejected",
+            "the controlled v2 renderer binds one exact fact only to state_response and includes a distinct complete fallback",
+            "the immutable STAGED Prompt package forbids external provider calls and compiles strict 2.0.0 JSON Schema without source, owner or title"
+          ],
+          "file": "packages/prompt-library/src/daily-memory-v2.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "daily-expression-zh-cn-v2 staged memory contract",
+          "test_id": "T-AI009-PROMPT-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-D09",
       "source_sets": ["s16-ai-corpus"]
@@ -4445,11 +4666,22 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-D12",
       "source_sets": ["s16-ai-corpus"]
@@ -4476,33 +4708,89 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "dependency revision changes alter the immutable snapshot fingerprint and provider projection remains within 1 KiB",
+            "no candidate creates a deterministic complete no-memory snapshot",
+            "one selected Matter projects one title-free fact and exact state_response segment contract while source/grant/owner bindings remain server-only"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/daily-context.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-context-snapshot-v1",
+          "test_id": "T-AI009-CONTEXT-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "no-memory output remains complete while substituted refs and missing fallback are rejected",
+            "the controlled v2 renderer binds one exact fact only to state_response and includes a distinct complete fallback",
+            "the immutable STAGED Prompt package forbids external provider calls and compiles strict 2.0.0 JSON Schema without source, owner or title"
+          ],
+          "file": "packages/prompt-library/src/daily-memory-v2.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "daily-expression-zh-cn-v2 staged memory contract",
+          "test_id": "T-AI009-PROMPT-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-R02",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-R03",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "no-memory output remains complete while substituted refs and missing fallback are rejected",
+            "the controlled v2 renderer binds one exact fact only to state_response and includes a distinct complete fallback",
+            "the immutable STAGED Prompt package forbids external provider calls and compiles strict 2.0.0 JSON Schema without source, owner or title"
+          ],
+          "file": "packages/prompt-library/src/daily-memory-v2.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "daily-expression-zh-cn-v2 staged memory contract",
+          "test_id": "T-AI009-PROMPT-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-R04",
       "source_sets": ["s16-ai-corpus"]
@@ -4520,11 +4808,34 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "dependency revision changes alter the immutable snapshot fingerprint and provider projection remains within 1 KiB",
+            "no candidate creates a deterministic complete no-memory snapshot",
+            "one selected Matter projects one title-free fact and exact state_response segment contract while source/grant/owner bindings remain server-only"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/daily-context.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-context-snapshot-v1",
+          "test_id": "T-AI009-CONTEXT-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-R06",
       "source_sets": ["s16-ai-corpus"]
@@ -4553,11 +4864,34 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "fallback text that reveals deletion history is rejected",
+            "missing, revoked, Safety-blocked or deleted dependencies resolve to the prevalidated fallback without deletion disclosure",
+            "personalized state_response is returned only while the dependency is valid"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/privacy-fallback.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "Daily v2 memory privacy fallback",
+          "test_id": "T-AI009-FALLBACK-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-R09",
       "source_sets": ["s16-ai-corpus"]
@@ -4575,11 +4909,34 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a different owner cannot select the source; worker cannot read Matter title or encrypted fragment ciphertext and cannot delete Matter/dependencies",
+            "fallback slot, encrypted fragment, full source dependency and mention receipt commit atomically; replay is duplicate and injected failure leaves no slot or receipt",
+            "master revision changes, purpose revocation, Safety overlay and MATTER deletion guard reject stale candidate or published dependency use",
+            "the real PostgreSQL resolver returns no memory until explicit owner consent, master, Daily grant and a current source-revision Safety proof are active"
+          ],
+          "file": "tests/database/ai009-memory-selection.test.mjs",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "AI-009 PostgreSQL owner-scoped memory selection, revision recheck and worker least privilege",
+          "test_id": "T-AI009-DB-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "no-memory output remains complete while substituted refs and missing fallback are rejected",
+            "the controlled v2 renderer binds one exact fact only to state_response and includes a distinct complete fallback",
+            "the immutable STAGED Prompt package forbids external provider calls and compiles strict 2.0.0 JSON Schema without source, owner or title"
+          ],
+          "file": "packages/prompt-library/src/daily-memory-v2.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "daily-expression-zh-cn-v2 staged memory contract",
+          "test_id": "T-AI009-PROMPT-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-R11",
       "source_sets": ["s16-ai-corpus"]
@@ -4672,33 +5029,99 @@
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a dated ACTIVE matter becomes EXPIRED rather than COMPLETED after the target date",
+            "an undated matter becomes EXPIRED from its eighth product date"
+          ],
+          "file": "packages/server-core/src/modules/matter/domain/matter.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "matter-policy-v1",
+          "test_id": "T-AI009-LIFECYCLE-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-S07",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a dated ACTIVE matter becomes EXPIRED rather than COMPLETED after the target date",
+            "an undated matter becomes EXPIRED from its eighth product date"
+          ],
+          "file": "packages/server-core/src/modules/matter/domain/matter.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "matter-policy-v1",
+          "test_id": "T-AI009-LIFECYCLE-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-S08",
       "source_sets": ["s16-ai-corpus"]
     },
     {
       "authority_paths": ["docs/ai/evaluation-corpus.json"],
-      "planned": {
-        "owner": "Applicable AI implementation and evaluation issue",
-        "reason": "No executable evidence is registered at the mandatory layer yet."
-      },
-      "status": "PLANNED",
+      "evidence": [
+        {
+          "assertions": [
+            "a dated ACTIVE matter becomes EXPIRED rather than COMPLETED after the target date",
+            "an undated matter becomes EXPIRED from its eighth product date"
+          ],
+          "file": "packages/server-core/src/modules/matter/domain/matter.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "matter-policy-v1",
+          "test_id": "T-AI009-LIFECYCLE-AI-EVAL-001"
+        },
+        {
+          "assertions": [
+            "a dated matter qualifies only from D-3 through D0 and an undated matter only on days 1 through 7",
+            "a different owner or a Weekly-only grant never authorizes a Daily candidate",
+            "no source or disabled master returns a complete no-memory selection, without extending the date window or inventing a candidate",
+            "same-day and rolling seven-day mention limits prevent repeated selection"
+          ],
+          "file": "packages/server-core/src/modules/memory/domain/matter-selection.test.ts",
+          "level": "AI_EVAL",
+          "origin": "tests/registry/ai009-evidence-manifest.json",
+          "selector": "memory-policy-v1 Daily matter preselection",
+          "test_id": "T-AI009-POLICY-AI-EVAL-001"
+        }
+      ],
+      "status": "COVERED",
       "required_evidence": [{ "any_of": ["AI_EVAL"] }],
       "source_id": "M14-S09",
       "source_sets": ["s16-ai-corpus"]
@@ -25045,6 +25468,35 @@
       "evidence": [
         {
           "assertions": [
+            "urn:dailyenergy:schema:daily-expression-payload-v2:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:daily-expression-payload-v2:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:daily-expression-payload-v2:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
             "urn:dailyenergy:schema:daily-helpfulness-record:1.0.0 participates in the executable contract drift Gate"
           ],
           "file": "tooling/check-contracts.mjs",
@@ -25096,6 +25548,35 @@
       "status": "COVERED",
       "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
       "source_id": "urn:dailyenergy:schema:daily-interaction-state:1.0.0",
+      "source_sets": ["shared-schemas"]
+    },
+    {
+      "authority_paths": ["packages/shared-schemas/src/json-schema.ts"],
+      "evidence": [
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:daily-memory-context-projection-v1:1.0.0 participates in the executable contract drift Gate"
+          ],
+          "file": "tooling/check-contracts.mjs",
+          "level": "CONTRACT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "shared-schemas to OpenAPI and client contract Gate",
+          "test_id": "T-CONTRACT-SCHEMA-001"
+        },
+        {
+          "assertions": [
+            "urn:dailyenergy:schema:daily-memory-context-projection-v1:1.0.0 is present in the unique stable JSON Schema ID set"
+          ],
+          "file": "packages/shared-schemas/test/json-schema.test.ts",
+          "level": "UNIT",
+          "origin": "tests/registry/source-sets.json",
+          "selector": "exports 61 stable, unique JSON Schema IDs",
+          "test_id": "T-SCHEMA-JSON-001"
+        }
+      ],
+      "status": "COVERED",
+      "required_evidence": [{ "any_of": ["CONTRACT"] }, { "any_of": ["UNIT"] }],
+      "source_id": "urn:dailyenergy:schema:daily-memory-context-projection-v1:1.0.0",
       "source_sets": ["shared-schemas"]
     },
     {
