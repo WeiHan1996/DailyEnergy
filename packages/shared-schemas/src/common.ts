@@ -304,6 +304,21 @@ export const ExpressionStyleValues = [
 export const ExpressionStyleSchema = z.enum(ExpressionStyleValues);
 export type ExpressionStyle = z.infer<typeof ExpressionStyleSchema>;
 
+/** Closed answers to the day-3 style question; never free text. */
+export const StyleCalibrationChoiceValues = [
+  "KEEP",
+  "GENTLER",
+  "LIGHTER",
+  "DIRECTER",
+  "LATER",
+] as const;
+export const StyleCalibrationChoiceSchema = z.enum(
+  StyleCalibrationChoiceValues,
+);
+export type StyleCalibrationChoice = z.infer<
+  typeof StyleCalibrationChoiceSchema
+>;
+
 export function addCustomIssue(
   context: z.RefinementCtx,
   path: Array<string | number>,

@@ -145,6 +145,22 @@
         bind:press="openMatters"
       ></de-action-button>
 
+      <de-section-card
+        wx:if="{{view.relationship.node_display && view.relationship.node_display.token === 'STYLE_CALIBRATION_AVAILABLE' && !styleCalibrationDone}}"
+        heading="{{styleCalibrationQuestion}}"
+      >
+        <de-state-selector
+          accessible-label="表达风格校准"
+          disabled="{{offline || styleCalibrationBusy}}"
+          error="{{styleCalibrationNotice}}"
+          label="选一个就好"
+          options="{{styleCalibrationOptions}}"
+          selected-value=""
+          supporting-text="只影响之后的表达，随时可以在设置里改。"
+          bind:change="answerStyleCalibration"
+        ></de-state-selector>
+      </de-section-card>
+
       <de-section-card heading="再看看">
         <view class="today__dimension today__dimension--focus">
           <view class="today__dimension-heading">

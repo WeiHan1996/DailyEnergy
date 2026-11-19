@@ -1,10 +1,10 @@
 // @generated
 // generator: daily-energy-contract-codegen/1.0.0
-// source-fingerprint: sha256:cfe0edc938d015720293a60d5a9b07fca459d548d6953690f6c0de56c908a4a3
+// source-fingerprint: sha256:cdbb550d2426c2116e3410049df31532e9c9f4c765b2f85b03f0247bed94d7ef
 // do not edit; run `pnpm codegen`.
 
 export const MINIAPP_CONTRACT_SOURCE_FINGERPRINT =
-  "sha256:cfe0edc938d015720293a60d5a9b07fca459d548d6953690f6c0de56c908a4a3";
+  "sha256:cdbb550d2426c2116e3410049df31532e9c9f4c765b2f85b03f0247bed94d7ef";
 
 export interface paths {
   "/analytics/signals": {
@@ -1645,11 +1645,13 @@ export interface components {
       visible_fields: Array<components["schemas"]["VersionToken"]>;
     };
     Sleep: "POOR" | "LOW" | "OKAY" | "GOOD" | "UNSURE";
+    StyleCalibrationChoice:
+      "KEEP" | "GENTLER" | "LIGHTER" | "DIRECTER" | "LATER";
     StyleCalibrationRequest: {
+      choice: components["schemas"]["StyleCalibrationChoice"];
       client_context?: components["schemas"]["ClientContext"];
       command_ref: components["schemas"]["CommandRef"];
       expected_revision: components["schemas"]["PositiveRevision"];
-      expression_style: components["schemas"]["ExpressionStyle"];
     };
     SupportFeedbackRequest: {
       category: "BUG" | "CONTENT" | "PRIVACY" | "ACCOUNT" | "OTHER";

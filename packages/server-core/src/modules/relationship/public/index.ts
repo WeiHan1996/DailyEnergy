@@ -19,3 +19,20 @@ export {
   assertRelationshipCopyLanguage,
   renderRelationshipNodeDisplayV1,
 } from "../domain/continuity-copy.js";
+export {
+  STYLE_CALIBRATION_CHOICES,
+  STYLE_CALIBRATION_MIN_ENCOUNTER_DAYS,
+  STYLE_CALIBRATION_NODE_CODE,
+  STYLE_CALIBRATION_POLICY_VERSION,
+  StyleCalibrationPolicyError,
+  isStyleCalibrationChoice,
+  isStyleCalibrationEligibleV1,
+  resolveStyleCalibrationV1,
+  shouldPromptStyleCalibrationV1,
+} from "../domain/style-calibration.js";
+export type {
+  StyleCalibrationChoice,
+  StyleCalibrationNodeOutcome,
+  StyleCalibrationOutcome,
+  StyleCalibrationResolution,
+} from "../domain/style-calibration.js";

@@ -226,3 +226,130 @@ describe("C-002 consent/profile application service", () => {
     );
   });
 });
+
+describe("AI-010 style calibration service", () => {
+  const request = (
+    choice: "DIRECTER" | "GENTLER" | "KEEP" | "LATER" | "LIGHTER",
+  ) => ({
+    choice,
+    command_ref,
+    expected_revision: 1,
+  });
+
+  it("turns one explicit answer into a style change inside the same command", async () => {
+    const updateProfile = vi.fn<ConsentProfileStore["updateProfile"]>(
+      async (input) => ({
+        status: "ACCEPTED",
+        value: {
+          ...profile(2),
+          expressionStyle: input.expressionStyle ?? "BALANCED",
+        },
+      }),
+    );
+    const service = new ConsentProfileService(
+      fakeStore({ getProfile: async () => profile(1), updateProfile }),
+      developmentPreferredNameCodec(),
+    );
+    const view = await service.calibrateStyle(principal, request("GENTLER"));
+    expect(view).toMatchObject({ expression_style: "GENTLE", revision: 2 });
+    expect(updateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        calibration: {
+          changesStyle: true,
+          minimumEncounterDays: 3,
+          outcome: "ADJUSTED",
+        },
+        expectedRevision: 1,
+        expressionStyle: "GENTLE",
+        operationCode: "STYLE_CALIBRATION",
+      }),
+    );
+  });
+
+  it.each(["KEEP", "LATER"] as const)(
+    "%s never sends a style change",
+    async (choice) => {
+      const updateProfile = vi.fn<ConsentProfileStore["updateProfile"]>(
+        async () => ({
+          status: "ACCEPTED",
+          value: profile(1),
+        }),
+      );
+      const service = new ConsentProfileService(
+        fakeStore({ getProfile: async () => profile(1), updateProfile }),
+        developmentPreferredNameCodec(),
+      );
+      const view = await service.calibrateStyle(principal, request(choice));
+      expect(view).toMatchObject({ expression_style: "BALANCED", revision: 1 });
+      const call = updateProfile.mock.calls[0]?.[0];
+      expect(call?.expressionStyle).toBeUndefined();
+      expect(call?.calibration?.changesStyle).toBe(false);
+    },
+  );
+
+  it("keys idempotency on the choice, so a changed answer conflicts", async () => {
+    const fingerprints: Buffer[] = [];
+    const updateProfile = vi.fn<ConsentProfileStore["updateProfile"]>(
+      async (input) => {
+        fingerprints.push(input.normalizedPayloadFingerprint);
+        return { status: "ACCEPTED", value: profile(1) };
+      },
+    );
+    const service = new ConsentProfileService(
+      fakeStore({ getProfile: async () => profile(1), updateProfile }),
+      developmentPreferredNameCodec(),
+    );
+    await service.calibrateStyle(principal, request("KEEP"));
+    await service.calibrateStyle(principal, request("LATER"));
+    expect(fingerprints[0]?.equals(fingerprints[1] as Buffer)).toBe(false);
+  });
+
+  it("answers 422 when the relationship is not yet eligible and a 409 on a stale revision", async () => {
+    const eligible = new ConsentProfileService(
+      fakeStore({
+        getProfile: async () => profile(1),
+        updateProfile: async () => ({
+          current: profile(1),
+          status: "NOT_ELIGIBLE",
+        }),
+      }),
+      developmentPreferredNameCodec(),
+    );
+    await expect(
+      eligible.calibrateStyle(principal, request("GENTLER")),
+    ).rejects.toMatchObject({
+      code: "STATE_PRECONDITION_FAILED",
+    });
+    const stale = new ConsentProfileService(
+      fakeStore({
+        getProfile: async () => profile(2),
+        updateProfile: async () => ({
+          current: profile(2),
+          status: "REVISION_CONFLICT",
+        }),
+      }),
+      developmentPreferredNameCodec(),
+    );
+    await expect(
+      stale.calibrateStyle(principal, request("GENTLER")),
+    ).rejects.toMatchObject({
+      code: "REVISION_CONFLICT",
+    });
+  });
+
+  it("requires a completed onboarding before any calibration", async () => {
+    const updateProfile =
+      vi.fn<ConsentProfileStore["updateProfile"]>(unavailable);
+    const service = new ConsentProfileService(
+      fakeStore({ getProfile: async () => undefined, updateProfile }),
+      developmentPreferredNameCodec(),
+    );
+    await expect(
+      service.calibrateStyle(principal, request("KEEP")),
+    ).rejects.toMatchObject({
+      code: "ONBOARDING_REQUIRED",
+    });
+    expect(updateProfile).not.toHaveBeenCalled();
+    expect(ApiException).toBeDefined();
+  });
+});

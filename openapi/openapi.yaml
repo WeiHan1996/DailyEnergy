@@ -381,7 +381,7 @@ paths:
       tags:
         - Profile
       operationId: submitStyleCalibration
-      summary: Record controlled style calibration
+      summary: Answer the day-3 style calibration with one closed choice
       security:
         - userBearerAuth: []
       parameters:
@@ -2320,6 +2320,14 @@ components:
       additionalProperties: false
     ExpressionStyle:
       x-source-contract: ExpressionStyleSchema
+    StyleCalibrationChoice:
+      type: string
+      enum:
+        - KEEP
+        - GENTLER
+        - LIGHTER
+        - DIRECTER
+        - LATER
     Mood:
       x-source-contract: MoodSchema
     Energy:
@@ -2425,13 +2433,13 @@ components:
           $ref: "#/components/schemas/ClientContext"
         expected_revision:
           $ref: "#/components/schemas/PositiveRevision"
-        expression_style:
-          $ref: "#/components/schemas/ExpressionStyle"
+        choice:
+          $ref: "#/components/schemas/StyleCalibrationChoice"
       additionalProperties: false
       required:
         - command_ref
         - expected_revision
-        - expression_style
+        - choice
     CheckinSubmitRequest:
       x-source-contract: CheckinSubmitRequestSchema
     CheckinCorrectRequest:
