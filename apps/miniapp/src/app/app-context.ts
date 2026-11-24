@@ -6,6 +6,7 @@ import { EveningCoordinator } from "../features/evening/evening-flow.js";
 import { WeeklyCoordinator } from "../features/weekly/weekly-flow.js";
 import { DataRightsCoordinator } from "../features/data-rights/data-rights-flow.js";
 import { MatterCoordinator } from "../features/matter/matter-flow.js";
+import { StyleCalibrationCoordinator } from "../features/style-calibration/style-calibration-flow.js";
 import { BestEffortClientSignalSender } from "../features/analytics/client-signal.js";
 import type { MiniappPlatform } from "../platform/ports.js";
 import {
@@ -30,6 +31,7 @@ export interface MiniappAppContext {
   getSafetyView(): SafetyView | undefined;
   readonly onboarding: OnboardingCoordinator;
   readonly platform: MiniappPlatform;
+  readonly styleCalibration: StyleCalibrationCoordinator;
   readonly weekly: WeeklyCoordinator;
 }
 
@@ -58,6 +60,7 @@ export function createMiniappAppContext(
   );
   const evening = new EveningCoordinator(platform.storage, api, sessionScope);
   const matters = new MatterCoordinator(api);
+  const styleCalibration = new StyleCalibrationCoordinator(api);
   const weekly = new WeeklyCoordinator(platform.storage, api, sessionScope);
   return Object.freeze({
     analytics,
@@ -76,6 +79,7 @@ export function createMiniappAppContext(
     onboarding,
     matters,
     platform,
+    styleCalibration,
     weekly,
   });
 }

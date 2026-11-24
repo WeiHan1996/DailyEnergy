@@ -63,10 +63,21 @@ export type StoreMutation<T> =
         | "ACCOUNT_BLOCKED"
         | "CONSENT_REQUIRED"
         | "IDEMPOTENCY_CONFLICT"
+        | "NOT_ELIGIBLE"
         | "ONBOARDING_REQUIRED"
         | "REVISION_CONFLICT";
       readonly current?: T;
     };
+
+/**
+ * The domain decides the outcome and style from one explicit answer; the store
+ * only enforces eligibility and records the outcome atomically.
+ */
+export interface StoredStyleCalibration {
+  readonly changesStyle: boolean;
+  readonly minimumEncounterDays: number;
+  readonly outcome: "ADJUSTED" | "DEFERRED" | "KEPT";
+}
 
 interface CommandInput {
   readonly accountId: string;
@@ -96,6 +107,7 @@ export interface ConsentProfileStore {
       readonly expressionStyle?: StoredExpressionStyle;
       readonly preferredName?: ProtectedPreferredName | null;
       readonly operationCode: "PROFILE_UPDATE" | "STYLE_CALIBRATION";
+      readonly calibration?: StoredStyleCalibration;
     },
   ): Promise<StoreMutation<StoredProfileView>>;
   getMemoryPreferences(
@@ -510,6 +522,7 @@ export class PostgresConsentProfileStore implements ConsentProfileStore {
       readonly expressionStyle?: StoredExpressionStyle;
       readonly preferredName?: ProtectedPreferredName | null;
       readonly operationCode: "PROFILE_UPDATE" | "STYLE_CALIBRATION";
+      readonly calibration?: StoredStyleCalibration;
     },
   ): Promise<StoreMutation<StoredProfileView>> {
     return this.#transaction(async (client) => {
@@ -546,6 +559,23 @@ export class PostgresConsentProfileStore implements ConsentProfileStore {
       const currentView = profileView(current)!;
       if (current.revision !== input.expectedRevision) {
         return { status: "REVISION_CONFLICT", current: currentView };
+      }
+      if (input.calibration !== undefined) {
+        const cycle = await readCalibrationCycle(client, input.accountId);
+        if (
+          cycle === undefined ||
+          cycle.encounterDayCount < input.calibration.minimumEncounterDays
+        ) {
+          return { status: "NOT_ELIGIBLE", current: currentView };
+        }
+        await recordCalibrationOutcome(
+          client,
+          cycle.cycleId,
+          input.calibration.outcome,
+        );
+        if (!input.calibration.changesStyle) {
+          return { status: "ACCEPTED", value: currentView };
+        }
       }
 
       const nextPreferredName =
@@ -941,6 +971,7 @@ export class PostgresConsentProfileStore implements ConsentProfileStore {
       const result = await run(client);
       if (
         result.status === "CONSENT_REQUIRED" ||
+        result.status === "NOT_ELIGIBLE" ||
         result.status === "ONBOARDING_REQUIRED" ||
         result.status === "REVISION_CONFLICT"
       ) {
@@ -1283,6 +1314,58 @@ async function readNotificationSettings(
       ),
     ),
   };
+}
+
+interface CalibrationCycle {
+  readonly cycleId: string;
+  readonly encounterDayCount: number;
+}
+
+/**
+ * Reads the account's current relationship cycle and its valid encounter-day
+ * count. A cycle that was deleted, closed or never created is not eligible.
+ */
+async function readCalibrationCycle(
+  client: PoolClient,
+  accountId: string,
+): Promise<CalibrationCycle | undefined> {
+  const row = (
+    await client.query<{ cycleId: string; encounterDayCount: number }>(
+      `SELECT cycle.id AS "cycleId",
+              (SELECT count(*)::int
+                 FROM daily_energy.app_relationship_encounter_link link
+                WHERE link."cycleId" = cycle.id) AS "encounterDayCount"
+         FROM daily_energy.app_relationship_cycle cycle
+        WHERE cycle."accountId" = $1::uuid
+          AND cycle."activeSlot" IS TRUE
+          AND cycle.state = 'ACTIVE'
+        LIMIT 1`,
+      [accountId],
+    )
+  ).rows[0];
+  return row === undefined
+    ? undefined
+    : { cycleId: row.cycleId, encounterDayCount: row.encounterDayCount };
+}
+
+/**
+ * Moves the published day-3 node receipt to its terminal outcome exactly once.
+ * No receipt means the node was never shown automatically, so there is nothing
+ * to record and the explicit SET-002 entry still works.
+ */
+async function recordCalibrationOutcome(
+  client: PoolClient,
+  cycleId: string,
+  outcome: StoredStyleCalibration["outcome"],
+): Promise<void> {
+  await client.query(
+    `UPDATE daily_energy.app_relationship_node_receipt
+        SET "outcomeCode" = $2::varchar(32)
+      WHERE "cycleId" = $1::uuid
+        AND "nodeCode" = 'STYLE_CALIBRATION_AVAILABLE'
+        AND "outcomeCode" = 'PUBLISHED'`,
+    [cycleId, outcome],
+  );
 }
 
 async function claimCommand(

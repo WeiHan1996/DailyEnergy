@@ -8512,9 +8512,22 @@
         "x-source-contract": "SleepSchema",
         "x-source-projection": "zod-openapi-3.0"
       },
+      "StyleCalibrationChoice": {
+        "enum": [
+          "KEEP",
+          "GENTLER",
+          "LIGHTER",
+          "DIRECTER",
+          "LATER"
+        ],
+        "type": "string"
+      },
       "StyleCalibrationRequest": {
         "additionalProperties": false,
         "properties": {
+          "choice": {
+            "$ref": "#/components/schemas/StyleCalibrationChoice"
+          },
           "client_context": {
             "$ref": "#/components/schemas/ClientContext"
           },
@@ -8523,15 +8536,12 @@
           },
           "expected_revision": {
             "$ref": "#/components/schemas/PositiveRevision"
-          },
-          "expression_style": {
-            "$ref": "#/components/schemas/ExpressionStyle"
           }
         },
         "required": [
           "command_ref",
           "expected_revision",
-          "expression_style"
+          "choice"
         ],
         "type": "object"
       },
@@ -12763,7 +12773,7 @@
             "userBearerAuth": []
           }
         ],
-        "summary": "Record controlled style calibration",
+        "summary": "Answer the day-3 style calibration with one closed choice",
         "tags": [
           "Profile"
         ]
@@ -13395,6 +13405,6 @@
   "x-generated": {
     "do-not-edit": true,
     "generator": "daily-energy-contract-codegen/1.0.0",
-    "source-fingerprint": "sha256:cfe0edc938d015720293a60d5a9b07fca459d548d6953690f6c0de56c908a4a3"
+    "source-fingerprint": "sha256:cdbb550d2426c2116e3410049df31532e9c9f4c765b2f85b03f0247bed94d7ef"
   }
 }

@@ -3,7 +3,14 @@ import type {
   DailyFlowResult,
   DailyNoticeCode,
 } from "../../features/daily/daily-flow.js";
-import type { TodayView } from "../../services/miniapp-api.js";
+import {
+  STYLE_CALIBRATION_OPTIONS,
+  STYLE_CALIBRATION_QUESTION,
+} from "../../features/style-calibration/style-calibration-flow.js";
+import type {
+  StyleCalibrationChoice,
+  TodayView,
+} from "../../services/miniapp-api.js";
 
 export const TODAY_SCREEN_ID = "DLY-003";
 
@@ -34,6 +41,13 @@ Page({
     offline: false,
     otherDimensions: [] as TodayView["content"]["dimensions"],
     screenId: TODAY_SCREEN_ID,
+    styleCalibrationBusy: false,
+    styleCalibrationDone: false,
+    styleCalibrationNotice: "",
+    styleCalibrationOptions: STYLE_CALIBRATION_OPTIONS.map(
+      ({ choice, label }) => ({ label, value: choice }),
+    ),
+    styleCalibrationQuestion: STYLE_CALIBRATION_QUESTION,
     taskBusy: false,
     taskError: "",
     taskNotice: "",
@@ -148,6 +162,30 @@ Page({
   },
   openMatters() {
     wx.navigateTo({ url: "/pages/matters/index" });
+  },
+  async answerStyleCalibration(
+    event: WechatMiniprogram.CustomEvent<{ value: string }>,
+  ) {
+    const choice = event.detail.value as StyleCalibrationChoice;
+    if (
+      this.data.offline ||
+      this.data.styleCalibrationBusy ||
+      !STYLE_CALIBRATION_OPTIONS.some((option) => option.choice === choice)
+    ) {
+      return;
+    }
+    this.setData({ styleCalibrationBusy: true, styleCalibrationNotice: "" });
+    const result = await getMiniappAppContext().styleCalibration.submit(choice);
+    if (result.kind === "done" || result.kind === "unavailable") {
+      this.setData({ styleCalibrationDone: true });
+    } else if (result.kind === "conflict") {
+      this.setData({ styleCalibrationNotice: "设置刚刚有变化，请再选一次。" });
+    } else if (result.kind === "retry") {
+      this.setData({
+        styleCalibrationNotice: "刚才没有保存成功，可以再试一次。",
+      });
+    }
+    this.setData({ styleCalibrationBusy: false });
   },
   async updateTask(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
     const view = this.data.view;
