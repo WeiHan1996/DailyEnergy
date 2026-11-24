@@ -20,6 +20,15 @@
 - **下一候选动作**：owner 审核 AI-010 Draft PR 的 threat boundary 与 CI；通过后 exact-head 合并并收尾。提醒排期（A-004）、AI-011 七天总结、真实 provider 与 Production/RC 均不在本任务
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
 
+## 2026-11-24 effect 依赖漏洞告警修复（中断 AI-010 收尾）
+
+- **原因**：AI-010 的 PR #216 以 `6a9f6ed` squash 合并后，main CI run `45425162937` 的 `supply-chain` 因官方 `npm audit` 新增的 high 告警 `GHSA-7589-6fvf-x4pw` 失败（`CI_AUDIT_THRESHOLD_EXCEEDED:critical=0:high=1`），汇总 Gate 连带失败，其余 9 项成功；#216 自己 head 的 CI 在 2026-11-19 为 11/11，故该告警是之后才出现，与 AI-010 无关；owner 明确要求另开任务修复；AI-010 的 post-merge 状态收尾因此暂停，待 main 恢复绿后再做，本节不改变 AI-010 的任务状态；
+- **告警**：`effect` <=3.22.0 的 `Schema.TemplateLiteral` 编译正则存在 ReDoS，修复版本 >=3.22.1；项目解析到 `effect@3.20.0`，唯一依赖路径为 `server-adapters > @prisma/client > prisma > @prisma/config > effect`（Prisma 7.9.1 固定依赖 3.20.0，仅用于 Prisma 配置工具链）；
+- **范围**：只在 `pnpm-workspace.yaml` 增加 override `effect@<3.22.1: 3.22.1` 并更新 `pnpm-lock.yaml`；不改业务代码、不设漏洞例外（`exceptions` 仍为空）、不升级 Prisma；该 override 跨过 Prisma 声明的精确版本，需由 CI 的真实 PostgreSQL 与 Prisma 相关检查验证；
+- **本地验证**（Node `24.18.0` / pnpm `11.17.0`）：`pnpm audit --prod` 为 critical=0/high=0（修复前 high=1）；`prisma validate` 通过、`prisma generate` 成功；root typecheck `16/16`、build `9/9`、ci:test `29/29`；lockfile 中 `effect` 只剩 3.22.1；本机无 Docker，真实 PostgreSQL 与完整 Gate 依赖 CI；
+- **本机既有噪声（非本任务引入）**：`prisma generate` 会重写大量生成文件为 CRLF，已确认为空白差异并还原；在未改动的 main 上 `prisma generate` 还会因已提交的客户端落后于 schema（ImportantMatter/SourceDependency 等）产生语义差异，`database:test` 的 `T-DB-STATIC-004` 也在未改动的 main 上同样失败，二者均未处理、未提交，需以 CI 为准，是否存在真实漂移留待单独核查；
+- **其它观察**：Dependabot PR #211（next 16.4.1 → 16.4.5）仍开着，未处理，也未核对是否含本告警修复。
+
 ## 2026-11-20 AI-010 实施与本地验证
 
 - owner 于 2026-11-19 明确“启动 AI-010”并确认范围与目标文件清单（“按此开始实现”）；该授权不包含 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；开工前已核对远端无任何现成 AI-010 分支或 PR、Issue #79 无评论；
