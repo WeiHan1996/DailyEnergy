@@ -1,24 +1,35 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-11-20
+- **最后更新**：2026-11-27
 - **当前阶段**：Phase 3 — AI 陪伴层
-- **当前任务**：AI-010 — 实现第 3 天风格校准
-- **任务状态**：In Review
-- **任务 Profile**：`security`（按 `AI-*` 路由；用户明确反馈、revision、撤回/删除与历史冻结；`pnpm agent:prepare AI-010 --remote --deep` 于 2026-11-19 返回 READY，Remote/node/pnpm/dependencies/github 全部 PASS）
-- **工作分支**：`agent/ai010-style-calibration`，基于已验证 `main@c21bd394f9f5d95865178b9b0f0053a23ef19fa0`
-- **任务 Issue**：[AI-010 Issue #79](https://github.com/WeiHan1996/DailyEnergy/issues/79)
-- **当前 PR**：待创建 Draft PR（见下节 AI-010 实施与本地验证）
-- **上一完成任务**：AI-009 Done；[PR #207](https://github.com/WeiHan1996/DailyEnergy/pull/207) final head `7c2509ec0e270bf4d12b51b168a1c8e296a01955` / CI run `44446439437` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cb9b6f8dd6f28e38c4c73d5b46ae1c63948c5d92`；merged-main CI run `44477130778` 11/11 SUCCESS；Issue #78 Closed
+- **当前任务**：AI-011 — 实现七天 AI 总结
+- **任务状态**：Ready
+- **任务 Profile**：`security`（按 `AI-*` 路由；只引用真实数据、不改 Weekly 聚合事实；仅运行过本地 `pnpm agent:prepare AI-011` 路由检查，该检查因当前任务状态而返回 BLOCKED，`--remote --deep` 与 required sources 尚未读取）
+- **工作分支**：无 AI-011 实现分支；收到新的明确启动指令前不创建分支
+- **任务 Issue**：[AI-011 Issue #84](https://github.com/WeiHan1996/DailyEnergy/issues/84)
+- **当前 PR**：无；AI-011 实现 PR 不存在
+- **上一完成任务**：AI-010 Done；[PR #216](https://github.com/WeiHan1996/DailyEnergy/pull/216) final head `14e1d578a3d75d50ab1c3cc2e03b35f730448cba` / CI run `44498557766` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `6a9f6edf1a187fb122fe0a490b41d2c4681a9508`；Issue #79 Closed；其 post-merge main CI 因无关的 effect 告警失败，由 [PR #217](https://github.com/WeiHan1996/DailyEnergy/pull/217) final head `78463419155def8b38267aae6da6183e47f085a3` / CI run `45426801973` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `1cee30ba5435d86eb5ffa41fbc477597b4eb3a1b`；merged-main CI run `45427730633` 11/11 SUCCESS
+- **更早完成任务**：AI-009 Done；AI-009 Done；[PR #207](https://github.com/WeiHan1996/DailyEnergy/pull/207) final head `7c2509ec0e270bf4d12b51b168a1c8e296a01955` / CI run `44446439437` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cb9b6f8dd6f28e38c4c73d5b46ae1c63948c5d92`；merged-main CI run `44477130778` 11/11 SUCCESS；Issue #78 Closed
 - **更早完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
 - **开工控制合并**：[PR #182](https://github.com/WeiHan1996/DailyEnergy/pull/182) exact head `6d37f79dff906244615302ef70af81586541f687` / CI run `33974824119` / 11 checks 通过后 squash 合并为 `d9b696d2fc264168b462edacfcfd1505097bfee2`；merged-main CI run `33975208632` 11/11 SUCCESS
 - **Stacked 基线**：[C-015 PR #170](https://github.com/WeiHan1996/DailyEnergy/pull/170) 已在 exact head `c3c716605cb458ddcd88cf9bd2cbdc06d130c968` / CI run `33713182325` / 11 checks 验证后 squash 合并为 `0de26bf56f226246825a9a34fdd2a8967574dcda`；merged-main CI run `33736831445` 11/11 SUCCESS
 - **已完成的中断任务**：E-017 Done；PR #179 squash 合并为 `ab3dd7768d939588d4992c149cb1990fbfff648d`，merged-main CI run `33971805374` 11/11 SUCCESS，Issue #171 Closed；阿里云环境仅为 `DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / PRODUCTION_INELIGIBLE`
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
-- **依赖边界**：AI-010 的前置 C-012、AI-005、AI-007、AI-009 均已 Done；Daily v2 为 STAGED，Daily/Weekly v1 继续无记忆，Weekly/近期状态/关系仍不启用；C-015 继续独立阻塞 Production/RC
+- **依赖边界**：AI-011 的前置 C-013、AI-003、AI-004、AI-006、AI-009 均已 Done；AI-011 的依赖与权威来源只在收到明确启动指令后通过 `pnpm agent:prepare AI-011 --remote --deep` 恢复，不在本状态收尾中预判或实施；Daily v2 为 STAGED，Daily/Weekly v1 继续无记忆；C-015 继续独立阻塞 Production/RC
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：owner 审核 AI-010 Draft PR 的 threat boundary 与 CI；通过后 exact-head 合并并收尾。提醒排期（A-004）、AI-011 七天总结、真实 provider 与 Production/RC 均不在本任务
+- **下一候选动作**：等待新的明确启动指令；本次不运行 AI-011 的 remote/deep prepare、不创建实现分支或编码
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-11-27 AI-010 post-merge 收尾
+
+- owner 明确“已审核，批准合并”，接受 PR #216 所列 threat boundary（封闭枚举 `choice`、`KEEP/LATER` 不改资料、服务端按有效相遇日判定资格、与普通资料修改共用同一 CAS/幂等/同意守卫、节点回执只防重复且不增加关系日、无新 migration 与新数据库权限），并明确知晓：端点请求体字段由 `expression_style` 改为 `choice` 是此前无消费者的破坏性契约变更、Source registry 因无专属 Source ID 而保持 `720/1012`、CMP-001 未在微信 DevTools/真机验证；该决定不授予 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；
+- [PR #216](https://github.com/WeiHan1996/DailyEnergy/pull/216) final head `14e1d578a3d75d50ab1c3cc2e03b35f730448cba` / CI run `44498557766` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `6a9f6edf1a187fb122fe0a490b41d2c4681a9508`；合并前已核对 PR head 与本地 head 完全一致且无非成功检查；PR #216 首个 head `b89eebe` 的 `static` 因 `miniapp-api.ts` 一行类型别名超 80 字符 prettier 失败（汇总 Gate 连带失败），已用新提交 `14e1d57` 修复并由其自己的 11/11 CI 证明，首次失败保留不改写；
+- **post-merge main CI 失败与恢复（如实记录）**：`6a9f6ed` 的 main CI run `45425162937` 为 9/11：`supply-chain` 因官方 `npm audit` 新增 high 告警 `GHSA-7589-6fvf-x4pw`（`effect` <=3.22.0）失败，汇总 Gate 连带失败；#216 自己 head 的 CI 在 2026-11-19 为 11/11，告警是其后才出现，与 AI-010 无关；按 owner 指示另开 PR #217 修复（`pnpm-workspace.yaml` 增加 `effect@<3.22.1: 3.22.1` override，lockfile 只剩 3.22.1，不升级 Prisma、不设漏洞例外），[PR #217](https://github.com/WeiHan1996/DailyEnergy/pull/217) final head `78463419155def8b38267aae6da6183e47f085a3` / CI run `45426801973` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `1cee30ba5435d86eb5ffa41fbc477597b4eb3a1b`；merged-main CI run `45427730633` 11/11 SUCCESS，main 恢复绿色；
+- AI-010 进入 Done，Issue #79 Closed；最终交付五个封闭答案的校准（正合适/再温柔一点/更轻松一点/更直接一点/稍后再说）、`style-calibration-policy-v1`、同事务的资格检查与节点回执一次性终态、CMP-001 与 `StyleCalibrationCoordinator`；撤回/修改沿用 SET-002 既有资料更新，SET-002 页面尚无独立校准入口；真实 PostgreSQL 用例仅由 CI 验证；
+- 本机仍无 Docker，微信 DevTools CLI 未配置，真实 provider、MODEL/LOAD/HUMAN 与 Production authorization 继续 Planned/Pending 并保持 `NOT_GRANTED / NO_GO`；C-015 继续 Blocked；Dependabot PR #211（next 16.4.1 → 16.4.5）仍开着，未处理；
+- 未核查事项：本机 `prisma generate` 在未改动的 main 上产生已提交客户端的语义差异、`database:test` 的 `T-DB-STATIC-004` 在本机失败，CI 在 main 上相关检查为绿，疑为 Windows 本机问题，未证实，留待单独核查；
+- AI-011（七天 AI 总结，前置 C-013/AI-003/AI-004/AI-006/AI-009 均已 Done）按完成规则成为唯一 Ready；遵循本次收尾范围，不运行 AI-011 的 remote/deep prepare、不读取其 required sources、不创建实现分支或编码。
 
 ## 2026-11-24 effect 依赖漏洞告警修复（中断 AI-010 收尾）
 
