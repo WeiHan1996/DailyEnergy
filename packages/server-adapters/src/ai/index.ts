@@ -18,6 +18,16 @@ export {
 } from "./controlled-daily-template.js";
 export type { RenderedControlledDailyTemplate } from "./controlled-daily-template.js";
 export {
+  CONTROLLED_WEEKLY_TEMPLATE_LOCALE_CATALOG_VERSION,
+  CONTROLLED_WEEKLY_TEMPLATE_RENDERER_ID,
+  WeeklyTemplateAdapterError,
+  createGatewayControlledWeeklyTemplateRendererV1,
+  parseWeeklyFrozenPlanV1,
+  renderControlledWeeklyTemplate,
+  weeklyFrozenPlanToGatewayJson,
+} from "./controlled-weekly-template.js";
+export type { WeeklyFrozenPlanV1 } from "./controlled-weekly-template.js";
+export {
   createGatewayAttemptTelemetrySinkV1,
   createGatewayRoutingTelemetrySinkV1,
 } from "./gateway-telemetry.js";

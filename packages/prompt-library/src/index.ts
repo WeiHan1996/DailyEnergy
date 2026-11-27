@@ -17,6 +17,11 @@ export type {
 } from "./render-daily-template.js";
 
 export {
+  WEEKLY_PROMPT_RELEASE_TEMPLATE_VERSION,
+  WEEKLY_TEMPLATE_RENDERER_VERSION,
+  WEEKLY_TEMPLATE_VERSION,
+} from "./weekly-template-versions.js";
+export {
   DAILY_TEMPLATE_REGISTRY_FINGERPRINT_V1,
   DAILY_TEMPLATE_REGISTRY_V1,
   DAILY_TEMPLATE_RENDERER_VERSION,

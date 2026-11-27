@@ -113,3 +113,8 @@ export {
   type AnalyticsBatchStore,
   type ClientAggregateDelta,
 } from "../analytics/postgres-analytics-store.js";
+export {
+  createMemoryBreakerStore,
+  createWeeklyOrchestrator,
+  createWeeklyTemplateService,
+} from "./weekly-gateway-test-support.js";
