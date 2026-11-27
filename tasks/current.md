@@ -1,14 +1,14 @@
 # DailyEnergy 当前任务
 
 - **文档状态**：Active
-- **最后更新**：2026-11-27
+- **最后更新**：2026-11-28
 - **当前阶段**：Phase 3 — AI 陪伴层
 - **当前任务**：AI-011 — 实现七天 AI 总结
-- **任务状态**：Ready
-- **任务 Profile**：`security`（按 `AI-*` 路由；只引用真实数据、不改 Weekly 聚合事实；仅运行过本地 `pnpm agent:prepare AI-011` 路由检查，该检查因当前任务状态而返回 BLOCKED，`--remote --deep` 与 required sources 尚未读取）
-- **工作分支**：无 AI-011 实现分支；收到新的明确启动指令前不创建分支
+- **任务状态**：In Progress（阶段 1 已实现；阶段 2 数据库接线未开始）
+- **任务 Profile**：`security`（按 `AI-*` 路由；只引用真实数据、不改 Weekly 聚合事实；`pnpm agent:prepare AI-011 --remote --deep` 于 2026-11-27 返回 READY，Remote/node/pnpm/dependencies/github 全部 PASS）
+- **工作分支**：`agent/ai011-weekly-ai-summary`，基于已验证 `main@dd3d274b3e83a725a26b478e4d525b4b51d7dad7`
 - **任务 Issue**：[AI-011 Issue #84](https://github.com/WeiHan1996/DailyEnergy/issues/84)
-- **当前 PR**：无；AI-011 实现 PR 不存在
+- **当前 PR**：待创建 Draft PR（见下节 AI-011 阶段 1）
 - **上一完成任务**：AI-010 Done；[PR #216](https://github.com/WeiHan1996/DailyEnergy/pull/216) final head `14e1d578a3d75d50ab1c3cc2e03b35f730448cba` / CI run `44498557766` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `6a9f6edf1a187fb122fe0a490b41d2c4681a9508`；Issue #79 Closed；其 post-merge main CI 因无关的 effect 告警失败，由 [PR #217](https://github.com/WeiHan1996/DailyEnergy/pull/217) final head `78463419155def8b38267aae6da6183e47f085a3` / CI run `45426801973` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `1cee30ba5435d86eb5ffa41fbc477597b4eb3a1b`；merged-main CI run `45427730633` 11/11 SUCCESS
 - **更早完成任务**：AI-009 Done；AI-009 Done；[PR #207](https://github.com/WeiHan1996/DailyEnergy/pull/207) final head `7c2509ec0e270bf4d12b51b168a1c8e296a01955` / CI run `44446439437` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cb9b6f8dd6f28e38c4c73d5b46ae1c63948c5d92`；merged-main CI run `44477130778` 11/11 SUCCESS；Issue #78 Closed
 - **更早完成任务**：AI-008 Done；[PR #204](https://github.com/WeiHan1996/DailyEnergy/pull/204) final head `3a5a5a08bbdcdbf7339f2fb45bf1ecd6d3d5bdd4` / CI run `34840065720` / 11 checks 通过且 exact-head verifier 成功后 squash 合并为 `cd5d27f7481d0036f3f5049a9dd920de3459c970`；merged-main CI run `34840948890` 11/11 SUCCESS；Issue #77 Closed
@@ -18,8 +18,23 @@
 - **延期任务**：C-015 保持 Blocked；production origin/image/Release Manifest bundle、处理主体/位置/受托方/跨境、最终用户说明与合格 Legal review 继续延期并阻塞 Production/RC
 - **依赖边界**：AI-011 的前置 C-013、AI-003、AI-004、AI-006、AI-009 均已 Done；AI-011 的依赖与权威来源只在收到明确启动指令后通过 `pnpm agent:prepare AI-011 --remote --deep` 恢复，不在本状态收尾中预判或实施；Daily v2 为 STAGED，Daily/Weekly v1 继续无记忆；C-015 继续独立阻塞 Production/RC
 - **环境边界**：`DEV_LITE_ACCEPTED / LOCAL_SYNTHETIC_OBJECT_ONLY / REAL_USER_DATA_PROHIBITED / PRODUCTION_INELIGIBLE`
-- **下一候选动作**：等待新的明确启动指令；本次不运行 AI-011 的 remote/deep prepare、不创建实现分支或编码
+- **下一候选动作**：owner 审核 AI-011 阶段 1 Draft PR（含 `weekly-template-v2` 用户可见文案）；阶段 2（Weekly Gateway 运行时、事务外调用、发布复查、迟到丢弃、真实 PostgreSQL 与 registry）须在阶段 1 合并后另行确认范围，是否拆成独立 PR 由 owner 决定
 - **Phase Gate 结论**：`GO_FOR_PHASE_3_DEVELOPMENT / PRODUCTION_AND_RC_NO_GO`（owner accepted；C-017 merged and closed）
+
+## 2026-11-28 AI-011 阶段 1：Weekly 发布装配与回退模板 v2
+
+- owner 于 2026-11-27 明确“启动 AI-011”“按建议范围开始”“按此清单开始写”（受控接线、合成 provider、provider calls 为 0），并在发现冲突后明确“v2 只用于回退，不改已接受绑定”；该授权不包含 Production、RC、Alpha、真实用户、真实 provider 或公网服务操作；开工前已核对远端无 AI-011 分支/PR、Issue #84 无评论；
+- 范围判断：C-013 已有确定性 Weekly 聚合/模板/发布/删除失效，AI-001～AI-009 已有 Gateway 主备路由、Prompt 包、严格校验器与合成 provider；Weekly 目前只用 `weekly-template-v1` 受控模板发布，没有任何地方把 Weekly 接到 Gateway（Daily 的运行时同样只用模板）；本任务只补 Weekly 的 Gateway 发布装配与回退模板，不接真实 provider、不改 Daily、不改 Weekly 聚合/窗口/客户端视图；
+- `assembleGatewayWeeklySummaryV1`（server-core 纯函数）：把一个通过校验的 Gateway 候选装配成 `PublishedWeeklySummary`，核对 invocation、payload 指纹、验证回执（plan/prompt/role/safety/validator 绑定）、聚合与计划及窗口绑定，provenance 支持 `PRIMARY_AI/BACKUP_AI/CONTROLLED_TEMPLATE`，`source_dependencies` 只接受去重、排序、修订 ≥1 的 owner 记忆依赖（当前为空，Weekly 默认无记忆）；任一不一致整份候选丢弃，不修补、不拼接；
+- **发现并如实记录的冲突**：现有 `weekly-template-v1` 的输出从未经过 AI-004 严格校验器，三种窗口（3/5/7 天）均返回 `OUTPUT_FACT_BINDING_INVALID`（开头段绑定 `fact.light.count` 而非计划要求的 `fact.coverage.disclosure` 等），因此不能作为 Gateway 回退；
+- 决定（owner 选择）：新增独立的 `weekly-template-v2`（`renderControlledWeeklyExpressionV2`），`weekly-template-v1` 与 C-013 已发布结果完全不变；v2 只用于 Gateway 回退，**不修改** AI-003 Prompt release catalog 与 AI-005 表达风格策略里 pin 的 `weekly-template-v1` 及其指纹（改动它们会使 `EXPRESSION_STYLE_POLICY_FINGERPRINT_MISMATCH` 并连带 AI-005 评测语料指纹，需另行授权）；`compilePromptRequestV1` 把 `weekly-template-v1` 写入 provider 请求的版本 trace，而 Gateway 只要求 invocation 的 `templateVersion` 等于路由清单的 `templateCompatibilityVersion`，两条身份互不冲突并在 `weekly-template-versions.ts` 注释中说明（`WEEKLY_PROMPT_RELEASE_TEMPLATE_VERSION=v1`、`WEEKLY_TEMPLATE_VERSION=v2`）；
+- v2 实现要点：开头段绑定计划的 headline 与 source disclosure 并披露真实/缺失天数，观察段在计划批准 companion `observed_count` 时同时引用它，闭合段绑定覆盖等级，所有数字来自冻结聚合；文案满足 Weekly 段长（开头 20～55、观察 30～80、下周 20～55、闭合 10～30 字）与校验器的数字/状态标签/压力/因果/完整性规则；**v2 的用户可见文案（开头、观察、下周、闭合、标题）尚待 owner 审核**，本 PR 保持 Draft；
+- Weekly 模板适配器 `createGatewayControlledWeeklyTemplateRendererV1`（rendererId `controlled-weekly-template`、renderer `controlled-weekly-template-renderer-v2`、locale `zh-cn-v1`）与 Daily 同构；Weekly 路由清单要求模板 reserve ≥ 4000ms 且 prepared input ≤ 24 KiB，测试夹具已按该规则构造；冻结计划为 `{aggregate, plan}`，渲染器逐项核对路由/版本/计划形状，漂移一律 `TEMPLATE_ROUTE_MISMATCH/TEMPLATE_PLAN_INVALID`；`/testing` 入口新增仅测试用的编排器与内存 breaker 辅助，未进入主入口；
+- 聚焦验证（Node `24.18.0` / pnpm `11.17.0`）：server-core `198/198`（新增发布装配 12 + v2 渲染 11）、server-adapters `80/80`（新增 Weekly 适配器与 Gateway 回退 5 项，覆盖主备失败后以经校验的模板发布且表达等于 v2 输出、模板失败时 provider 调用为 0）、shared-schemas `68/68`、root typecheck `16/16`、root build 通过、eslint 与边界 Gate 通过；对 4 个发布装配校验分支与 3 处 v2 文案/引用做了变异检查，测试均能失败并已还原；
+- prompt-library 在本机有 1 个失败（`matches the three Accepted canonical instruction blocks byte for byte`，`missing canonical instruction common-expression-system-v1`）：已在未改动的 main 上同样失败，为 Windows CRLF 检出所致，非本任务引入，以 CI 为准；
+- Source registry 保持 `720/1012 COVERED`、`292 PLANNED`：与 Weekly 相关的剩余条目（如 E16-P11/R09/O09）要求 AI_EVAL/真实评测或负载证据，阶段 1 只有确定性模板与装配，不提升任何 ID，也不冒充覆盖；
+- **阶段 2 未开始**：Weekly 生成意图的“读取并冻结输入 → 事务外调用 Gateway → 事务内发布复查”拆分（现有 `handleSummaryDue` 在队列事务内），迟到结果丢弃，更正/删除/consent/revision 变化使旧结果失效并重建，真实 PostgreSQL 用例与证据登记；本机无 Docker，只能由 CI 验证；`weekly-handler.ts` 仍以 `weekly-template-v1` 发布，行为未变；
+- 待 owner 审核的 threat boundary：候选只在校验回执与 invocation/plan/payload 全部绑定后才可发布；失败整份丢弃不拼接；v2 与 v1 版本不混用且不改已接受绑定；渲染只读冻结聚合；provider 调用为 0、无真实 provider/密钥；Production authorization 不适用并保持 `NOT_GRANTED / NO_GO`。
 
 ## 2026-11-27 AI-010 post-merge 收尾
 
